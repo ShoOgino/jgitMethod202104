@@ -1,0 +1,56 @@
+			boolean calculate(int d) {
+				prevBeginK = beginK;
+				prevEndK = endK;
+				beginK = forceKIntoRange(middleK - d);
+				endK = forceKIntoRange(middleK + d);
+				// TODO: handle i more efficiently
+				// TODO: walk snake(k, getX(d, k)) only once per (d, k)
+				// TODO: move end points out of the loop to avoid conditionals inside the loop
+				// go backwards so that we can avoid temp vars
+				for (int k = endK; k >= beginK; k -= 2) {
+					int left = -1, right = -1;
+					int leftSnake = -1, rightSnake = -1;
+					// TODO: refactor into its own function
+					if (k > prevBeginK) {
+						int i = getIndex(d - 1, k - 1);
+						left = x.get(i);
+						int end = snake(k - 1, left);
+						leftSnake = left != end ?
+							newSnake(k - 1, end) :
+							snake.get(i);
+						if (meets(d, k - 1, end, leftSnake))
+							return true;
+						left = getLeft(end);
+					}
+					if (k < prevEndK) {
+						int i = getIndex(d - 1, k + 1);
+						right = x.get(i);
+						int end = snake(k + 1, right);
+						rightSnake = right != end ?
+							newSnake(k + 1, end) :
+							snake.get(i);
+						if (meets(d, k + 1, end, rightSnake))
+							return true;
+						right = getRight(end);
+					}
+					int newX, newSnake;
+					if (k >= prevEndK ||
+							(k > prevBeginK &&
+							 isBetter(left, right))) {
+						newX = left;
+						newSnake = leftSnake;
+					}
+					else {
+						newX = right;
+						newSnake = rightSnake;
+					}
+					if (meets(d, k, newX, newSnake))
+						return true;
+					adjustMinMaxK(k, newX);
+					int i = getIndex(d, k);
+					x.set(i, newX);
+					snake.set(i, newSnake);
+				}
+				return false;
+			}
+

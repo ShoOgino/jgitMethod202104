@@ -1,0 +1,12 @@
+			final boolean meets(int d, int k, int x, int snake) {
+				if (k < backward.beginK || k > backward.endK)
+					return false;
+				// TODO: move out of loop
+				if (((d - 1 + k - backward.middleK) % 2) == 1)
+					return false;
+				if (x < backward.getX(d - 1, k))
+					return false;
+				makeEdit(snake, backward.getSnake(d - 1, k));
+				return true;
+			}
+

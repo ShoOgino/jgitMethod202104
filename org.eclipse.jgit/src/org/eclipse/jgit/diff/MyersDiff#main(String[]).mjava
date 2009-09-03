@@ -1,0 +1,15 @@
+	public static void main(String[] args) {
+		if (args.length != 2) {
+			System.err.println("Need 2 arguments");
+			System.exit(1);
+		}
+		try {
+			RawText a = new RawText(new java.io.File(args[0]));
+			RawText b = new RawText(new java.io.File(args[1]));
+			MyersDiff diff = new MyersDiff(a, b);
+			System.out.println(diff.getEdits().toString());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
