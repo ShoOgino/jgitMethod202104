@@ -1,0 +1,16 @@
+	@Override
+	protected void run() throws Exception {
+		final TreeWalk walk = new TreeWalk(db);
+		walk.reset();
+		walk.setRecursive(true);
+		for (final AbstractTreeIterator i : trees)
+			walk.addTree(i);
+		walk.setFilter(AndTreeFilter.create(TreeFilter.ANY_DIFF, pathFilter));
+
+		final int nTree = walk.getTreeCount();
+		while (walk.next())
+			outputDiff(System.out, walk.getPathString(),
+				walk.getObjectId(0), walk.getFileMode(0),
+				walk.getObjectId(1), walk.getFileMode(1));
+	}
+
