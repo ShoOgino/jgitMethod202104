@@ -1,0 +1,12 @@
+	public void testCreate_ByStringPath() {
+		assertEquals("a", new DirCacheEntry("a").getPathString());
+		assertEquals("a/b", new DirCacheEntry("a/b").getPathString());
+
+		try {
+			new DirCacheEntry("/a");
+			fail("Incorrectly created DirCacheEntry");
+		} catch (IllegalArgumentException err) {
+			assertEquals("Invalid path: /a", err.getMessage());
+		}
+	}
+

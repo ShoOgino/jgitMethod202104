@@ -1,0 +1,24 @@
+	static boolean isValidPath(final byte[] path) {
+		if (path.length == 0)
+			return false; // empty path is not permitted.
+
+		boolean componentHasChars = false;
+		for (final byte c : path) {
+			switch (c) {
+			case 0:
+				return false; // NUL is never allowed within the path.
+
+			case '/':
+				if (componentHasChars)
+					componentHasChars = false;
+				else
+					return false;
+				break;
+
+			default:
+				componentHasChars = true;
+			}
+		}
+		return componentHasChars;
+	}
+

@@ -1,0 +1,41 @@
+	public void testCreate_ByStringPathAndStage() {
+		DirCacheEntry e;
+
+		e = new DirCacheEntry("a", 0);
+		assertEquals("a", e.getPathString());
+		assertEquals(0, e.getStage());
+
+		e = new DirCacheEntry("a/b", 1);
+		assertEquals("a/b", e.getPathString());
+		assertEquals(1, e.getStage());
+
+		e = new DirCacheEntry("a/c", 2);
+		assertEquals("a/c", e.getPathString());
+		assertEquals(2, e.getStage());
+
+		e = new DirCacheEntry("a/d", 3);
+		assertEquals("a/d", e.getPathString());
+		assertEquals(3, e.getStage());
+
+		try {
+			new DirCacheEntry("/a", 1);
+			fail("Incorrectly created DirCacheEntry");
+		} catch (IllegalArgumentException err) {
+			assertEquals("Invalid path: /a", err.getMessage());
+		}
+
+		try {
+			new DirCacheEntry("a", -11);
+			fail("Incorrectly created DirCacheEntry");
+		} catch (IllegalArgumentException err) {
+			assertEquals("Invalid stage -11 for path a", err.getMessage());
+		}
+
+		try {
+			new DirCacheEntry("a", 4);
+			fail("Incorrectly created DirCacheEntry");
+		} catch (IllegalArgumentException err) {
+			assertEquals("Invalid stage 4 for path a", err.getMessage());
+		}
+	}
+

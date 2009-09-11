@@ -5,6 +5,11 @@
 	 *            name of the cache entry.
 	 * @param stage
 	 *            the stage index of the new entry.
+	 * @throws IllegalArgumentException
+	 *             If the path starts or ends with "/", or contains "//" either
+	 *             "\0". These sequences are not permitted in a git tree object
+	 *             or DirCache file.  Or if {@code stage} is outside of the
+	 *             range 0..3, inclusive.
 	 */
 	public DirCacheEntry(final String newPath, final int stage) {
 		this(Constants.encode(newPath), stage);
