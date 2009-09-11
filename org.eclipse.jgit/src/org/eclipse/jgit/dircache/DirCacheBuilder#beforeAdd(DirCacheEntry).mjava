@@ -1,6 +1,4 @@
 	private void beforeAdd(final DirCacheEntry newEntry) {
-		if (FileMode.TREE.equals(newEntry.getRawMode()))
-			throw bad(newEntry, "Adding subtree not allowed");
 		if (sorted && entryCnt > 0) {
 			final DirCacheEntry lastEntry = entries[entryCnt - 1];
 			final int cr = DirCache.cmp(lastEntry, newEntry);
