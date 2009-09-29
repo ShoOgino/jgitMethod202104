@@ -1,0 +1,22 @@
+	/**
+	 * Obtain an integer value from the configuration.
+	 *
+	 * @param section
+	 *            section the key is grouped within.
+	 * @param subsection
+	 *            subsection name, such a remote or branch name.
+	 * @param name
+	 *            name of the key to get.
+	 * @param defaultValue
+	 *            default value to return if no value was present.
+	 * @return an integer value from the configuration, or defaultValue.
+	 */
+	public int getInt(final String section, String subsection,
+			final String name, final int defaultValue) {
+		final long val = getLong(section, subsection, name, defaultValue);
+		if (Integer.MIN_VALUE <= val && val <= Integer.MAX_VALUE)
+			return (int) val;
+		throw new IllegalArgumentException("Integer value " + section + "."
+				+ name + " out of range");
+	}
+

@@ -1,0 +1,23 @@
+	/**
+	 * Create a new RefSpec with a different source/destination name setting.
+	 * 
+	 * @param source
+	 *            new value for source in the returned instance.
+	 * @param destination
+	 *            new value for destination in the returned instance.
+	 * @return a new RefSpec with destination as specified.
+	 * @throws IllegalArgumentException
+	 *             The wildcard status of the new source disagrees with the
+	 *             wildcard status of the new destination.
+	 */
+	public RefSpec setSourceDestination(final String source,
+			final String destination) {
+		if (isWildcard(source) != isWildcard(destination))
+			throw new IllegalArgumentException("Source/Destination must match.");
+		final RefSpec r = new RefSpec(this);
+		r.wildcard = isWildcard(source);
+		r.srcName = source;
+		r.dstName = destination;
+		return r;
+	}
+

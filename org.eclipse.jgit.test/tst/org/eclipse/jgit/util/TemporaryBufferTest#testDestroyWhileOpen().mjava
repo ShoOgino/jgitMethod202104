@@ -1,0 +1,10 @@
+	public void testDestroyWhileOpen() throws IOException {
+		final TemporaryBuffer b = new TemporaryBuffer();
+		try {
+			b.write(new TestRng(getName())
+					.nextBytes(TemporaryBuffer.DEFAULT_IN_CORE_LIMIT * 2));
+		} finally {
+			b.destroy();
+		}
+	}
+

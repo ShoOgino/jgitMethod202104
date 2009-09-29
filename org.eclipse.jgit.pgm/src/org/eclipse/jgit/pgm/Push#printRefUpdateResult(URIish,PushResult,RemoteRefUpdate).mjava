@@ -1,0 +1,74 @@
+	private void printRefUpdateResult(final URIish uri,
+			final PushResult result, final RemoteRefUpdate rru) {
+		if (!shownURI) {
+			shownURI = true;
+			out.format("To %s\n", uri);
+		}
+
+		final String remoteName = rru.getRemoteName();
+		final String srcRef = rru.isDelete() ? null : rru.getSrcRef();
+
+		switch (rru.getStatus()) {
+		case OK:
+			if (rru.isDelete())
+				printUpdateLine('-', "[deleted]", null, remoteName, null);
+			else {
+				final Ref oldRef = result.getAdvertisedRef(remoteName);
+				if (oldRef == null) {
+					final String summary;
+					if (remoteName.startsWith(Constants.R_TAGS))
+						summary = "[new tag]";
+					else
+						summary = "[new branch]";
+					printUpdateLine('*', summary, srcRef, remoteName, null);
+				} else {
+					boolean fastForward = rru.isFastForward();
+					final char flag = fastForward ? ' ' : '+';
+					final String summary = oldRef.getObjectId().abbreviate(db)
+							.name()
+							+ (fastForward ? ".." : "...")
+							+ rru.getNewObjectId().abbreviate(db).name();
+					final String message = fastForward ? null : "forced update";
+					printUpdateLine(flag, summary, srcRef, remoteName, message);
+				}
+			}
+			break;
+
+		case NON_EXISTING:
+			printUpdateLine('X', "[no match]", null, remoteName, null);
+			break;
+
+		case REJECTED_NODELETE:
+			printUpdateLine('!', "[rejected]", null, remoteName,
+					"remote side does not support deleting refs");
+			break;
+
+		case REJECTED_NONFASTFORWARD:
+			printUpdateLine('!', "[rejected]", srcRef, remoteName,
+					"non-fast forward");
+			break;
+
+		case REJECTED_REMOTE_CHANGED:
+			final String message = "remote ref object changed - is not expected one "
+					+ rru.getExpectedOldObjectId().abbreviate(db).name();
+			printUpdateLine('!', "[rejected]", srcRef, remoteName, message);
+			break;
+
+		case REJECTED_OTHER_REASON:
+			printUpdateLine('!', "[remote rejected]", srcRef, remoteName, rru
+					.getMessage());
+			break;
+
+		case UP_TO_DATE:
+			if (verbose)
+				printUpdateLine('=', "[up to date]", srcRef, remoteName, null);
+			break;
+
+		case NOT_ATTEMPTED:
+		case AWAITING_REPORT:
+			printUpdateLine('?', "[unexpected push-process behavior]", srcRef,
+					remoteName, rru.getMessage());
+			break;
+		}
+	}
+

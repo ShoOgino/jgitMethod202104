@@ -1,0 +1,22 @@
+	private static String pickHEAD(final List<RemoteRefUpdate> updates) {
+		// Try to use master if the user is pushing that, it is the
+		// default branch and is likely what they want to remain as
+		// the default on the new remote.
+		//
+		for (final RemoteRefUpdate u : updates) {
+			final String n = u.getRemoteName();
+			if (n.equals(Constants.R_HEADS + Constants.MASTER))
+				return n;
+		}
+
+		// Pick any branch, under the assumption the user pushed only
+		// one to the remote side.
+		//
+		for (final RemoteRefUpdate u : updates) {
+			final String n = u.getRemoteName();
+			if (n.startsWith(Constants.R_HEADS))
+				return n;
+		}
+		return updates.get(0).getRemoteName();
+	}
+

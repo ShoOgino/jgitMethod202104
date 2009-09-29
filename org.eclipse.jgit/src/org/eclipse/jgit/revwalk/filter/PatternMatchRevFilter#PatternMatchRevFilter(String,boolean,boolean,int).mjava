@@ -1,0 +1,32 @@
+	/**
+	 * Construct a new pattern matching filter.
+	 *
+	 * @param pattern
+	 *            text of the pattern. Callers may want to surround their
+	 *            pattern with ".*" on either end to allow matching in the
+	 *            middle of the string.
+	 * @param innerString
+	 *            should .* be wrapped around the pattern of ^ and $ are
+	 *            missing? Most users will want this set.
+	 * @param rawEncoding
+	 *            should {@link #forceToRaw(String)} be applied to the pattern
+	 *            before compiling it?
+	 * @param flags
+	 *            flags from {@link Pattern} to control how matching performs.
+	 */
+	protected PatternMatchRevFilter(String pattern, final boolean innerString,
+			final boolean rawEncoding, final int flags) {
+		if (pattern.length() == 0)
+			throw new IllegalArgumentException("Cannot match on empty string.");
+		patternText = pattern;
+
+		if (innerString) {
+			if (!pattern.startsWith("^") && !pattern.startsWith(".*"))
+				pattern = ".*" + pattern;
+			if (!pattern.endsWith("$") && !pattern.endsWith(".*"))
+				pattern = pattern + ".*";
+		}
+		final String p = rawEncoding ? forceToRaw(pattern) : pattern;
+		compiledPattern = Pattern.compile(p, flags).matcher("");
+	}
+

@@ -1,0 +1,19 @@
+	public void testHasFlags() throws Exception {
+		final RevCommit a = parse(commit());
+		final RevCommit b = parse(commit(a));
+
+		q.add(a);
+		q.add(b);
+
+		assertFalse(q.everbodyHasFlag(RevWalk.UNINTERESTING));
+		assertFalse(q.anybodyHasFlag(RevWalk.UNINTERESTING));
+
+		a.flags |= RevWalk.UNINTERESTING;
+		assertFalse(q.everbodyHasFlag(RevWalk.UNINTERESTING));
+		assertTrue(q.anybodyHasFlag(RevWalk.UNINTERESTING));
+
+		b.flags |= RevWalk.UNINTERESTING;
+		assertTrue(q.everbodyHasFlag(RevWalk.UNINTERESTING));
+		assertTrue(q.anybodyHasFlag(RevWalk.UNINTERESTING));
+	}
+

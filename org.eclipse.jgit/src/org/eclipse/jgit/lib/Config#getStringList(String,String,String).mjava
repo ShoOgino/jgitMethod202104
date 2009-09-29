@@ -1,0 +1,34 @@
+	/**
+	 * Get a list of string values
+	 * <p>
+	 * If this instance was created with a base, the base's values are returned
+	 * first (if any).
+	 *
+	 * @param section
+	 *            the section
+	 * @param subsection
+	 *            the subsection for the value
+	 * @param name
+	 *            the key name
+	 * @return array of zero or more values from the configuration.
+	 */
+	public String[] getStringList(final String section, String subsection,
+			final String name) {
+		final String[] baseList;
+		if (baseConfig != null)
+			baseList = baseConfig.getStringList(section, subsection, name);
+		else
+			baseList = EMPTY_STRING_ARRAY;
+
+		final List<String> lst = getRawStringList(section, subsection, name);
+		if (lst != null) {
+			final String[] res = new String[baseList.length + lst.size()];
+			int idx = baseList.length;
+			System.arraycopy(baseList, 0, res, 0, idx);
+			for (final String val : lst)
+				res[idx++] = val;
+			return res;
+		}
+		return baseList;
+	}
+

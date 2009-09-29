@@ -1,0 +1,71 @@
+	/**
+	 * Create a new S3 client for the supplied user information.
+	 * <p>
+	 * The connection properties are a subset of those supported by the popular
+	 * <a href="http://jets3t.s3.amazonaws.com/index.html">jets3t</a> library.
+	 * For example:
+	 *
+	 * <pre>
+	 * # AWS Access and Secret Keys (required)
+	 * accesskey: &lt;YourAWSAccessKey&gt;
+	 * secretkey: &lt;YourAWSSecretKey&gt;
+	 *
+	 * # Access Control List setting to apply to uploads, must be one of:
+	 * # PRIVATE, PUBLIC_READ (defaults to PRIVATE).
+	 * acl: PRIVATE
+	 *
+	 * # Number of times to retry after internal error from S3.
+	 * httpclient.retry-max: 3
+	 *
+	 * # End-to-end encryption (hides content from S3 owners)
+	 * password: &lt;encryption pass-phrase&gt;
+	 * crypto.algorithm: PBEWithMD5AndDES
+	 * </pre>
+	 *
+	 * @param props
+	 *            connection properties.
+	 *
+	 */
+	public AmazonS3(final Properties props) {
+		publicKey = props.getProperty("accesskey");
+		if (publicKey == null)
+			throw new IllegalArgumentException("Missing accesskey.");
+
+		final String secret = props.getProperty("secretkey");
+		if (secret == null)
+			throw new IllegalArgumentException("Missing secretkey.");
+		privateKey = new SecretKeySpec(Constants.encodeASCII(secret), HMAC);
+
+		final String pacl = props.getProperty("acl", "PRIVATE");
+		if (StringUtils.equalsIgnoreCase("PRIVATE", pacl))
+			acl = "private";
+		else if (StringUtils.equalsIgnoreCase("PUBLIC", pacl))
+			acl = "public-read";
+		else if (StringUtils.equalsIgnoreCase("PUBLIC-READ", pacl))
+			acl = "public-read";
+		else if (StringUtils.equalsIgnoreCase("PUBLIC_READ", pacl))
+			acl = "public-read";
+		else
+			throw new IllegalArgumentException("Invalid acl: " + pacl);
+
+		try {
+			final String cPas = props.getProperty("password");
+			if (cPas != null) {
+				String cAlg = props.getProperty("crypto.algorithm");
+				if (cAlg == null)
+					cAlg = "PBEWithMD5AndDES";
+				encryption = new WalkEncryption.ObjectEncryptionV2(cAlg, cPas);
+			} else {
+				encryption = WalkEncryption.NONE;
+			}
+		} catch (InvalidKeySpecException e) {
+			throw new IllegalArgumentException("Invalid encryption", e);
+		} catch (NoSuchAlgorithmException e) {
+			throw new IllegalArgumentException("Invalid encryption", e);
+		}
+
+		maxAttempts = Integer.parseInt(props.getProperty(
+				"httpclient.retry-max", "3"));
+		proxySelector = ProxySelector.getDefault();
+	}
+

@@ -1,0 +1,79 @@
+	/**
+	 * Consume data from the input stream until the packfile is indexed.
+	 * 
+	 * @param progress
+	 *            progress feedback
+	 * 
+	 * @throws IOException
+	 */
+	public void index(final ProgressMonitor progress) throws IOException {
+		progress.start(2 /* tasks */);
+		try {
+			try {
+				readPackHeader();
+
+				entries = new PackedObjectInfo[(int) objectCount];
+				baseById = new ObjectIdSubclassMap<DeltaChain>();
+				baseByPos = new LongMap<UnresolvedDelta>();
+
+				progress.beginTask(PROGRESS_DOWNLOAD, (int) objectCount);
+				for (int done = 0; done < objectCount; done++) {
+					indexOneObject();
+					progress.update(1);
+					if (progress.isCancelled())
+						throw new IOException("Download cancelled");
+				}
+				readPackFooter();
+				endInput();
+				progress.endTask();
+				if (deltaCount > 0) {
+					if (packOut == null)
+						throw new IOException("need packOut");
+					resolveDeltas(progress);
+					if (entryCount < objectCount) {
+						if (!fixThin) {
+							throw new IOException("pack has "
+									+ (objectCount - entryCount)
+									+ " unresolved deltas");
+						}
+						fixThinPack(progress);
+					}
+				}
+				if (packOut != null && (keepEmpty || entryCount > 0))
+					packOut.getChannel().force(true);
+
+				packDigest = null;
+				baseById = null;
+				baseByPos = null;
+
+				if (dstIdx != null && (keepEmpty || entryCount > 0))
+					writeIdx();
+
+			} finally {
+				try {
+					InflaterCache.release(inflater);
+				} finally {
+					inflater = null;
+				}
+				readCurs = WindowCursor.release(readCurs);
+
+				progress.endTask();
+				if (packOut != null)
+					packOut.close();
+			}
+
+			if (keepEmpty || entryCount > 0) {
+				if (dstPack != null)
+					dstPack.setReadOnly();
+				if (dstIdx != null)
+					dstIdx.setReadOnly();
+			}
+		} catch (IOException err) {
+			if (dstPack != null)
+				dstPack.delete();
+			if (dstIdx != null)
+				dstIdx.delete();
+			throw err;
+		}
+	}
+

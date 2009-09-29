@@ -1,0 +1,16 @@
+		SftpObjectDB(final SftpObjectDB parent, final String p)
+				throws TransportException {
+			try {
+				ftp = newSftp();
+				ftp.cd(parent.objectsPath);
+				ftp.cd(p);
+				objectsPath = ftp.pwd();
+			} catch (TransportException err) {
+				close();
+				throw err;
+			} catch (SftpException je) {
+				throw new TransportException("Can't enter " + p + " from "
+						+ parent.objectsPath + ": " + je.getMessage(), je);
+			}
+		}
+

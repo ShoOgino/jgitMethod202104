@@ -1,0 +1,11 @@
+	/**
+	 * Reread index data from disk if the index file has been changed
+	 * @throws IOException
+	 */
+	public void rereadIfNecessary() throws IOException {
+		if (cacheFile.exists() && cacheFile.lastModified() != lastCacheTime) {
+			read();
+			db.fireIndexChanged();
+		}
+	}
+

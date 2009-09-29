@@ -1,0 +1,24 @@
+	/**
+	 * Force this entry to no longer match its working tree file.
+	 * <p>
+	 * This avoids the "racy git" problem by making this index entry no longer
+	 * match the file in the working directory. Later git will be forced to
+	 * compare the file content to ensure the file matches the working tree.
+	 */
+	final void smudgeRacilyClean() {
+		// We don't use the same approach as C Git to smudge the entry,
+		// as we cannot compare the working tree file to our SHA-1 and
+		// thus cannot use the "size to 0" trick without accidentally
+		// thinking a zero length file is clean.
+		//
+		// Instead we force the mtime to the largest possible value, so
+		// it is certainly after the index's own modification time and
+		// on a future read will cause mightBeRacilyClean to say "yes!".
+		// It is also unlikely to match with the working tree file.
+		//
+		// I'll see you again before Jan 19, 2038, 03:14:07 AM GMT.
+		//
+		final int base = infoOffset + P_MTIME;
+		Arrays.fill(info, base, base + 8, (byte) 127);
+	}
+

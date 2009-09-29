@@ -1,0 +1,16 @@
+	/**
+	 * The constructor from a byte array
+	 *
+	 * @param base
+	 *            the base configuration file
+	 * @param blob
+	 *            the byte array, should be UTF-8 encoded text.
+	 * @throws ConfigInvalidException
+	 *             the byte array is not a valid configuration format.
+	 */
+	public BlobBasedConfig(Config base, final byte[] blob)
+			throws ConfigInvalidException {
+		super(base);
+		fromText(RawParseUtils.decode(blob));
+	}
+

@@ -1,0 +1,26 @@
+	/**
+	 * Parse the committer identity from the raw buffer.
+	 * <p>
+	 * This method parses and returns the content of the committer line, after
+	 * taking the commit's character set into account and decoding the committer
+	 * name and email address. This method is fairly expensive and produces a
+	 * new PersonIdent instance on each invocation. Callers should invoke this
+	 * method only if they are certain they will be outputting the result, and
+	 * should cache the return value for as long as necessary to use all
+	 * information from it.
+	 * <p>
+	 * RevFilter implementations should try to use {@link RawParseUtils} to scan
+	 * the {@link #getRawBuffer()} instead, as this will allow faster evaluation
+	 * of commits.
+	 * 
+	 * @return identity of the committer (name, email) and the time the commit
+	 *         was made by the committer; null if no committer line was found.
+	 */
+	public final PersonIdent getCommitterIdent() {
+		final byte[] raw = buffer;
+		final int nameB = RawParseUtils.committer(raw, 0);
+		if (nameB < 0)
+			return null;
+		return RawParseUtils.parsePersonIdent(raw, nameB);
+	}
+

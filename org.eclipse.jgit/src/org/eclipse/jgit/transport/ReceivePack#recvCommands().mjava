@@ -1,0 +1,37 @@
+	private void recvCommands() throws IOException {
+		for (;;) {
+			String line;
+			try {
+				line = pckIn.readStringRaw();
+			} catch (EOFException eof) {
+				if (commands.isEmpty())
+					return;
+				throw eof;
+			}
+			if (line == PacketLineIn.END)
+				break;
+
+			if (commands.isEmpty()) {
+				final int nul = line.indexOf('\0');
+				if (nul >= 0) {
+					for (String c : line.substring(nul + 1).split(" "))
+						enabledCapablities.add(c);
+					line = line.substring(0, nul);
+				}
+			}
+
+			if (line.length() < 83) {
+				final String m = "error: invalid protocol: wanted 'old new ref'";
+				sendError(m);
+				throw new PackProtocolException(m);
+			}
+
+			final ObjectId oldId = ObjectId.fromString(line.substring(0, 40));
+			final ObjectId newId = ObjectId.fromString(line.substring(41, 81));
+			final String name = line.substring(82);
+			final ReceiveCommand cmd = new ReceiveCommand(oldId, newId, name);
+			cmd.setRef(refs.get(cmd.getRefName()));
+			commands.add(cmd);
+		}
+	}
+

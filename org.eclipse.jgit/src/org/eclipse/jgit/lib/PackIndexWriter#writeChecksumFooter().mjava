@@ -1,0 +1,19 @@
+	/**
+	 * Output the standard two-checksum index footer.
+	 * <p>
+	 * The standard footer contains two checksums (20 byte SHA-1 values):
+	 * <ol>
+	 * <li>Pack data checksum - taken from the last 20 bytes of the pack file.</li>
+	 * <li>Index data checksum - checksum of all index bytes written, including
+	 * the pack data checksum above.</li>
+	 * </ol>
+	 *
+	 * @throws IOException
+	 *             an error occurred while writing to the output stream.
+	 */
+	protected void writeChecksumFooter() throws IOException {
+		out.write(packChecksum);
+		out.on(false);
+		out.write(out.getMessageDigest().digest());
+	}
+

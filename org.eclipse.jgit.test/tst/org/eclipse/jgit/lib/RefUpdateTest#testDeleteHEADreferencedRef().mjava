@@ -1,0 +1,21 @@
+	/**
+	 * Delete a ref that is pointed to by HEAD
+	 *
+	 * @throws IOException
+	 */
+	public void testDeleteHEADreferencedRef() throws IOException {
+		ObjectId pid = db.resolve("refs/heads/master^");
+		RefUpdate updateRef = db.updateRef("refs/heads/master");
+		updateRef.setNewObjectId(pid);
+		updateRef.setForceUpdate(true);
+		Result update = updateRef.update();
+		assertEquals(Result.FORCED, update); // internal
+
+		RefUpdate updateRef2 = db.updateRef("refs/heads/master");
+		Result delete = updateRef2.delete();
+		assertEquals(Result.REJECTED_CURRENT_BRANCH, delete);
+		assertEquals(pid, db.resolve("refs/heads/master"));
+		assertEquals(1,db.getReflogReader("refs/heads/master").getReverseEntries().size());
+		assertEquals(0,db.getReflogReader("HEAD").getReverseEntries().size());
+	}
+

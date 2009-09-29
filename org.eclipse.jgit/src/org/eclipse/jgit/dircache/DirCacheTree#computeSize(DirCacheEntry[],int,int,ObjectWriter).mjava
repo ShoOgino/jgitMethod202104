@@ -1,0 +1,44 @@
+	private int computeSize(final DirCacheEntry[] cache, int cIdx,
+			final int pathOffset, final ObjectWriter ow)
+			throws UnmergedPathException, IOException {
+		final int endIdx = cIdx + entrySpan;
+		int childIdx = 0;
+		int entryIdx = cIdx;
+		int size = 0;
+
+		while (entryIdx < endIdx) {
+			final DirCacheEntry e = cache[entryIdx];
+			if (e.getStage() != 0)
+				throw new UnmergedPathException(e);
+
+			final byte[] ep = e.path;
+			if (childIdx < childCnt) {
+				final DirCacheTree st = children[childIdx];
+				if (st.contains(ep, pathOffset, ep.length)) {
+					final int stOffset = pathOffset + st.nameLength() + 1;
+					st.writeTree(cache, entryIdx, stOffset, ow);
+
+					size += FileMode.TREE.copyToLength();
+					size += st.nameLength();
+					size += OBJECT_ID_LENGTH + 2;
+
+					entryIdx += st.entrySpan;
+					childIdx++;
+					continue;
+				}
+			}
+
+			final FileMode mode = e.getFileMode();
+			if (mode.getObjectType() == Constants.OBJ_BAD)
+				throw new IllegalStateException("Entry \"" + e.getPathString()
+						+ "\" has incorrect mode set up.");
+
+			size += mode.copyToLength();
+			size += ep.length - pathOffset;
+			size += OBJECT_ID_LENGTH + 2;
+			entryIdx++;
+		}
+
+		return size;
+	}
+

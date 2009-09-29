@@ -1,0 +1,24 @@
+		private void mkdir_p(String path) throws IOException {
+			final int s = path.lastIndexOf('/');
+			if (s <= 0)
+				return;
+
+			path = path.substring(0, s);
+			try {
+				ftp.mkdir(path);
+			} catch (SftpException je) {
+				if (je.id == ChannelSftp.SSH_FX_NO_SUCH_FILE) {
+					mkdir_p(path);
+					try {
+						ftp.mkdir(path);
+						return;
+					} catch (SftpException je2) {
+						je = je2;
+					}
+				}
+
+				throw new TransportException("Can't mkdir " + objectsPath + "/"
+						+ path + ": " + je.getMessage(), je);
+			}
+		}
+

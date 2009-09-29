@@ -1,0 +1,17 @@
+	public void testDecodeUInt16() {
+		assertEquals(0, NB.decodeUInt16(b(0, 0), 0));
+		assertEquals(0, NB.decodeUInt16(padb(3, 0, 0), 3));
+
+		assertEquals(3, NB.decodeUInt16(b(0, 3), 0));
+		assertEquals(3, NB.decodeUInt16(padb(3, 0, 3), 3));
+
+		assertEquals(0xde03, NB.decodeUInt16(b(0xde, 3), 0));
+		assertEquals(0xde03, NB.decodeUInt16(padb(3, 0xde, 3), 3));
+
+		assertEquals(0x03de, NB.decodeUInt16(b(3, 0xde), 0));
+		assertEquals(0x03de, NB.decodeUInt16(padb(3, 3, 0xde), 3));
+
+		assertEquals(0xffff, NB.decodeUInt16(b(0xff, 0xff), 0));
+		assertEquals(0xffff, NB.decodeUInt16(padb(3, 0xff, 0xff), 3));
+	}
+

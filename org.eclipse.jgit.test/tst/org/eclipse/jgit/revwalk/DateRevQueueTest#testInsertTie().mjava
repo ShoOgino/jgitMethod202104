@@ -1,0 +1,23 @@
+	public void testInsertTie() throws Exception {
+		final RevCommit a = parse(commit());
+		final RevCommit b = parse(commit(0, a));
+		{
+			q = create();
+			q.add(a);
+			q.add(b);
+
+			assertCommit(a, q.next());
+			assertCommit(b, q.next());
+			assertNull(q.next());
+		}
+		{
+			q = create();
+			q.add(b);
+			q.add(a);
+
+			assertCommit(b, q.next());
+			assertCommit(a, q.next());
+			assertNull(q.next());
+		}
+	}
+

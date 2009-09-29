@@ -1,0 +1,18 @@
+	/**
+	 * Construct a PersonIdent from simple data
+	 * 
+	 * @param aName
+	 * @param aEmailAddress
+	 * @param aWhen
+	 *            local time stamp
+	 * @param aTZ
+	 *            time zone
+	 */
+	public PersonIdent(final String aName, final String aEmailAddress,
+			final Date aWhen, final TimeZone aTZ) {
+		name = aName;
+		emailAddress = aEmailAddress;
+		when = aWhen.getTime();
+		tzOffset = aTZ.getOffset(when) / (60 * 1000);
+	}
+

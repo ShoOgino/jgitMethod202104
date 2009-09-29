@@ -1,0 +1,33 @@
+	/**
+	 * Add a range of existing entries from the destination cache.
+	 * <p>
+	 * The entries are placed at the end of the entry list, preserving their
+	 * current order. The caller is responsible for making sure the final table
+	 * is correctly sorted.
+	 * <p>
+	 * This method copies from the destination cache, which has not yet been
+	 * updated with this editor's new table. So all offsets into the destination
+	 * cache are not affected by any updates that may be currently taking place
+	 * in this editor.
+	 * <p>
+	 * The {@link #entries} table is automatically expanded if there is
+	 * insufficient space for the new additions.
+	 *
+	 * @param pos
+	 *            first entry to copy from the destination cache.
+	 * @param cnt
+	 *            number of entries to copy.
+	 */
+	protected void fastKeep(final int pos, int cnt) {
+		if (entryCnt + cnt > entries.length) {
+			final int m1 = (entryCnt + 16) * 3 / 2;
+			final int m2 = entryCnt + cnt;
+			final DirCacheEntry[] n = new DirCacheEntry[Math.max(m1, m2)];
+			System.arraycopy(entries, 0, n, 0, entryCnt);
+			entries = n;
+		}
+
+		cache.toArray(pos, entries, entryCnt, cnt);
+		entryCnt += cnt;
+	}
+

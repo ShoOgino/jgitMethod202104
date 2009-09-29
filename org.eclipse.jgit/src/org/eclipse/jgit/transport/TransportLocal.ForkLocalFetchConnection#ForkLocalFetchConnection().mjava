@@ -1,0 +1,9 @@
+		ForkLocalFetchConnection() throws TransportException {
+			super(TransportLocal.this);
+			uploadPack = startProcessWithErrStream(getOptionUploadPack());
+			final InputStream upIn = uploadPack.getInputStream();
+			final OutputStream upOut = uploadPack.getOutputStream();
+			init(upIn, upOut);
+			readAdvertisedRefs();
+		}
+

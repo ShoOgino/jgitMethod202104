@@ -1,0 +1,14 @@
+	private static final AbbreviatedObjectId fromHexString(final byte[] bs,
+			int ptr, final int end) {
+		try {
+			final int a = hexUInt32(bs, ptr, end);
+			final int b = hexUInt32(bs, ptr + 8, end);
+			final int c = hexUInt32(bs, ptr + 16, end);
+			final int d = hexUInt32(bs, ptr + 24, end);
+			final int e = hexUInt32(bs, ptr + 32, end);
+			return new AbbreviatedObjectId(end - ptr, a, b, c, d, e);
+		} catch (ArrayIndexOutOfBoundsException e1) {
+			throw new InvalidObjectIdException(bs, ptr, end - ptr);
+		}
+	}
+

@@ -1,0 +1,18 @@
+	private static String getNameInternal(Config rc, String envKey) {
+		// try to get the user name from the local and global configurations.
+		String username = rc.getString("user", null, "name");
+
+		if (username == null) {
+			// try to get the user name for the system property GIT_XXX_NAME
+			username = system().getenv(envKey);
+		}
+		if (username == null) {
+			// get the system user name
+			username = system().getProperty(Constants.OS_USER_NAME_KEY);
+		}
+		if (username == null) {
+			username = Constants.UNKNOWN_USER_DEFAULT;
+		}
+		return username;
+	}
+

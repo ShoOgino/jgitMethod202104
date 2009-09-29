@@ -1,0 +1,32 @@
+	/**
+	 * Open a new transport instance to connect two repositories.
+	 *
+	 * @param local
+	 *            existing local repository.
+	 * @param cfg
+	 *            configuration describing how to connect to the remote
+	 *            repository.
+	 * @param op
+	 *            planned use of the returned Transport; the URI may differ
+	 *            based on the type of connection desired.
+	 * @return the new transport instance. Never null. In case of multiple URIs
+	 *         in remote configuration, only the first is chosen.
+	 * @throws NotSupportedException
+	 *             the protocol specified is not supported.
+	 * @throws IllegalArgumentException
+	 *             if provided remote configuration doesn't have any URI
+	 *             associated.
+	 */
+	public static Transport open(final Repository local,
+			final RemoteConfig cfg, final Operation op)
+			throws NotSupportedException {
+		final List<URIish> uris = getURIs(cfg, op);
+		if (uris.isEmpty())
+			throw new IllegalArgumentException(
+					"Remote config \""
+					+ cfg.getName() + "\" has no URIs associated");
+		final Transport tn = open(local, uris.get(0));
+		tn.applyConfig(cfg);
+		return tn;
+	}
+

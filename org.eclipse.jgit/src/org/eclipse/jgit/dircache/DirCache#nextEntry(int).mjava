@@ -1,0 +1,24 @@
+	/**
+	 * Determine the next index position past all entries with the same name.
+	 * <p>
+	 * As index entries are sorted by path name, then stage number, this method
+	 * advances the supplied position to the first position in the index whose
+	 * path name does not match the path name of the supplied position's entry.
+	 *
+	 * @param position
+	 *            entry position of the path that should be skipped.
+	 * @return position of the next entry whose path is after the input.
+	 */
+	public int nextEntry(final int position) {
+		DirCacheEntry last = sortedEntries[position];
+		int nextIdx = position + 1;
+		while (nextIdx < entryCnt) {
+			final DirCacheEntry next = sortedEntries[nextIdx];
+			if (cmp(last, next) != 0)
+				break;
+			last = next;
+			nextIdx++;
+		}
+		return nextIdx;
+	}
+

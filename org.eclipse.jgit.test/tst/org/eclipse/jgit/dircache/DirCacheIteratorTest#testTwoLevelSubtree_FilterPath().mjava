@@ -1,0 +1,35 @@
+	public void testTwoLevelSubtree_FilterPath() throws Exception {
+		final DirCache dc = DirCache.read(db);
+
+		final FileMode mode = FileMode.REGULAR_FILE;
+		final String[] paths = { "a.", "a/b", "a/c/e", "a/c/f", "a/d", "a0b" };
+		final DirCacheEntry[] ents = new DirCacheEntry[paths.length];
+		for (int i = 0; i < paths.length; i++) {
+			ents[i] = new DirCacheEntry(paths[i]);
+			ents[i].setFileMode(mode);
+		}
+
+		final DirCacheBuilder b = dc.builder();
+		for (int i = 0; i < ents.length; i++)
+			b.add(ents[i]);
+		b.finish();
+
+		final TreeWalk tw = new TreeWalk(db);
+		for (int victimIdx = 0; victimIdx < paths.length; victimIdx++) {
+			tw.reset();
+			tw.addTree(new DirCacheIterator(dc));
+			tw.setFilter(PathFilterGroup.createFromStrings(Collections
+					.singleton(paths[victimIdx])));
+			tw.setRecursive(tw.getFilter().shouldBeRecursive());
+			assertTrue(tw.next());
+			final DirCacheIterator c = tw.getTree(0, DirCacheIterator.class);
+			assertNotNull(c);
+			assertEquals(victimIdx, c.ptr);
+			assertSame(ents[victimIdx], c.getDirCacheEntry());
+			assertEquals(paths[victimIdx], tw.getPathString());
+			assertEquals(mode.getBits(), tw.getRawMode(0));
+			assertSame(mode, tw.getFileMode(0));
+			assertFalse(tw.next());
+		}
+	}
+

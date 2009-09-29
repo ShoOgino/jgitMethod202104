@@ -1,0 +1,20 @@
+	public void testDecodeUInt32() {
+		assertEquals(0L, NB.decodeUInt32(b(0, 0, 0, 0), 0));
+		assertEquals(0L, NB.decodeUInt32(padb(3, 0, 0, 0, 0), 3));
+
+		assertEquals(3L, NB.decodeUInt32(b(0, 0, 0, 3), 0));
+		assertEquals(3L, NB.decodeUInt32(padb(3, 0, 0, 0, 3), 3));
+
+		assertEquals(0xdeadbeefL, NB.decodeUInt32(b(0xde, 0xad, 0xbe, 0xef), 0));
+		assertEquals(0xdeadbeefL, NB.decodeUInt32(padb(3, 0xde, 0xad, 0xbe,
+				0xef), 3));
+
+		assertEquals(0x0310adefL, NB.decodeUInt32(b(0x03, 0x10, 0xad, 0xef), 0));
+		assertEquals(0x0310adefL, NB.decodeUInt32(padb(3, 0x03, 0x10, 0xad,
+				0xef), 3));
+
+		assertEquals(0xffffffffL, NB.decodeUInt32(b(0xff, 0xff, 0xff, 0xff), 0));
+		assertEquals(0xffffffffL, NB.decodeUInt32(padb(3, 0xff, 0xff, 0xff,
+				0xff), 3));
+	}
+

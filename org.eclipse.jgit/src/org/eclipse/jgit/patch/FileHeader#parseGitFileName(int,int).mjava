@@ -1,0 +1,69 @@
+	/**
+	 * Parse a "diff --git" or "diff --cc" line.
+	 *
+	 * @param ptr
+	 *            first character after the "diff --git " or "diff --cc " part.
+	 * @param end
+	 *            one past the last position to parse.
+	 * @return first character after the LF at the end of the line; -1 on error.
+	 */
+	int parseGitFileName(int ptr, final int end) {
+		final int eol = nextLF(buf, ptr);
+		final int bol = ptr;
+		if (eol >= end) {
+			return -1;
+		}
+
+		// buffer[ptr..eol] looks like "a/foo b/foo\n". After the first
+		// A regex to match this is "^[^/]+/(.*?) [^/+]+/\1\n$". There
+		// is only one way to split the line such that text to the left
+		// of the space matches the text to the right, excluding the part
+		// before the first slash.
+		//
+
+		final int aStart = nextLF(buf, ptr, '/');
+		if (aStart >= eol)
+			return eol;
+
+		while (ptr < eol) {
+			final int sp = nextLF(buf, ptr, ' ');
+			if (sp >= eol) {
+				// We can't split the header, it isn't valid.
+				// This may be OK if this is a rename patch.
+				//
+				return eol;
+			}
+			final int bStart = nextLF(buf, sp, '/');
+			if (bStart >= eol)
+				return eol;
+
+			// If buffer[aStart..sp - 1] = buffer[bStart..eol - 1]
+			// we have a valid split.
+			//
+			if (eq(aStart, sp - 1, bStart, eol - 1)) {
+				if (buf[bol] == '"') {
+					// We're a double quoted name. The region better end
+					// in a double quote too, and we need to decode the
+					// characters before reading the name.
+					//
+					if (buf[sp - 2] != '"') {
+						return eol;
+					}
+					oldName = QuotedString.GIT_PATH.dequote(buf, bol, sp - 1);
+					oldName = p1(oldName);
+				} else {
+					oldName = decode(Constants.CHARSET, buf, aStart, sp - 1);
+				}
+				newName = oldName;
+				return eol;
+			}
+
+			// This split wasn't correct. Move past the space and try
+			// another split as the space must be part of the file name.
+			//
+			ptr = sp;
+		}
+
+		return eol;
+	}
+

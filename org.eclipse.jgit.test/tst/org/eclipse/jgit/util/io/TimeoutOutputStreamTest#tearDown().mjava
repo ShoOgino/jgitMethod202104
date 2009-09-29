@@ -1,0 +1,7 @@
+	protected void tearDown() throws Exception {
+		timer.terminate();
+		for (Thread t : active())
+			assertFalse(t instanceof InterruptTimer.AlarmThread);
+		super.tearDown();
+	}
+

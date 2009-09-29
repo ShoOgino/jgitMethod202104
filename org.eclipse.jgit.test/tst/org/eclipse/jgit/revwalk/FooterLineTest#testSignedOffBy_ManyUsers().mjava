@@ -1,0 +1,35 @@
+	public void testSignedOffBy_ManyUsers() {
+		final RevCommit commit = parse("subject\n\nbody of commit\n"
+				+ "Not-A-Footer-Line: this line must not be read as a footer\n"
+				+ "\n" // paragraph break, now footers appear in final block
+				+ "Signed-off-by: A. U. Thor <a@example.com>\n"
+				+ "CC:            <some.mailing.list@example.com>\n"
+				+ "Acked-by: Some Reviewer <sr@example.com>\n"
+				+ "Signed-off-by: Main Tain Er <mte@example.com>\n");
+		final List<FooterLine> footers = commit.getFooterLines();
+		FooterLine f;
+
+		assertNotNull(footers);
+		assertEquals(4, footers.size());
+
+		f = footers.get(0);
+		assertEquals("Signed-off-by", f.getKey());
+		assertEquals("A. U. Thor <a@example.com>", f.getValue());
+		assertEquals("a@example.com", f.getEmailAddress());
+
+		f = footers.get(1);
+		assertEquals("CC", f.getKey());
+		assertEquals("<some.mailing.list@example.com>", f.getValue());
+		assertEquals("some.mailing.list@example.com", f.getEmailAddress());
+
+		f = footers.get(2);
+		assertEquals("Acked-by", f.getKey());
+		assertEquals("Some Reviewer <sr@example.com>", f.getValue());
+		assertEquals("sr@example.com", f.getEmailAddress());
+
+		f = footers.get(3);
+		assertEquals("Signed-off-by", f.getKey());
+		assertEquals("Main Tain Er <mte@example.com>", f.getValue());
+		assertEquals("mte@example.com", f.getEmailAddress());
+	}
+

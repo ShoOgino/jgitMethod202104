@@ -1,0 +1,35 @@
+	public void testError_CcTruncatedOld() throws IOException {
+		final Patch p = parseTestPatchFile();
+		assertEquals(1, p.getFiles().size());
+		assertEquals(3, p.getErrors().size());
+		{
+			final FormatError e = p.getErrors().get(0);
+			assertSame(FormatError.Severity.ERROR, e.getSeverity());
+			assertEquals(
+					"Truncated hunk, at least 1 lines is missing for ancestor 1",
+					e.getMessage());
+			assertEquals(346, e.getOffset());
+			assertTrue(e.getLineText().startsWith(
+					"@@@ -55,12 -163,13 +163,15 @@@ public "));
+		}
+		{
+			final FormatError e = p.getErrors().get(1);
+			assertSame(FormatError.Severity.ERROR, e.getSeverity());
+			assertEquals(
+					"Truncated hunk, at least 2 lines is missing for ancestor 2",
+					e.getMessage());
+			assertEquals(346, e.getOffset());
+			assertTrue(e.getLineText().startsWith(
+					"@@@ -55,12 -163,13 +163,15 @@@ public "));
+		}
+		{
+			final FormatError e = p.getErrors().get(2);
+			assertSame(FormatError.Severity.ERROR, e.getSeverity());
+			assertEquals("Truncated hunk, at least 3 new lines is missing", e
+					.getMessage());
+			assertEquals(346, e.getOffset());
+			assertTrue(e.getLineText().startsWith(
+					"@@@ -55,12 -163,13 +163,15 @@@ public "));
+		}
+	}
+

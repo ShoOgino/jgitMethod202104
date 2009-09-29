@@ -1,0 +1,22 @@
+		@Override
+		void writeFile(final String path, final byte[] data) throws IOException {
+			final String lock = path + ".lock";
+			try {
+				super.writeFile(lock, data);
+				try {
+					ftp.rename(lock, path);
+				} catch (SftpException je) {
+					throw new TransportException("Can't write " + objectsPath
+							+ "/" + path + ": " + je.getMessage(), je);
+				}
+			} catch (IOException err) {
+				try {
+					ftp.rm(lock);
+				} catch (SftpException e) {
+					// Ignore deletion failure, we are already
+					// failing anyway.
+				}
+				throw err;
+			}
+		}
+

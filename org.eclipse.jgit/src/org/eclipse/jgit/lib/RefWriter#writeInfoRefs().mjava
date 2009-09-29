@@ -1,0 +1,38 @@
+	/**
+	 * Rebuild the {@link Constants#INFO_REFS}.
+	 * <p>
+	 * This method rebuilds the contents of the {@link Constants#INFO_REFS} file
+	 * to match the passed list of references.
+	 * 
+	 * 
+	 * @throws IOException
+	 *             writing is not supported, or attempting to write the file
+	 *             failed, possibly due to permissions or remote disk full, etc.
+	 */
+	public void writeInfoRefs() throws IOException {
+		final StringWriter w = new StringWriter();
+		final char[] tmp = new char[Constants.OBJECT_ID_LENGTH * 2];
+		for (final Ref r : refs) {
+			if (Constants.HEAD.equals(r.getName())) {
+				// Historically HEAD has never been published through
+				// the INFO_REFS file. This is a mistake, but its the
+				// way things are.
+				//
+				continue;
+			}
+
+			r.getObjectId().copyTo(tmp, w);
+			w.write('\t');
+			w.write(r.getName());
+			w.write('\n');
+
+			if (r.getPeeledObjectId() != null) {
+				r.getPeeledObjectId().copyTo(tmp, w);
+				w.write('\t');
+				w.write(r.getName());
+				w.write("^{}\n");
+			}
+		}
+		writeFile(Constants.INFO_REFS, Constants.encode(w.toString()));
+	}
+

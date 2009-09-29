@@ -1,0 +1,29 @@
+	/**
+	 * Create a new writer instance for a specific index format version.
+	 *
+	 * @param dst
+	 *            the stream the index data will be written to. If not already
+	 *            buffered it will be automatically wrapped in a buffered
+	 *            stream. Callers are always responsible for closing the stream.
+	 * @param version
+	 *            index format version number required by the caller. Exactly
+	 *            this formatted version will be written.
+	 * @return a new writer to output an index file of the requested format to
+	 *         the supplied stream.
+	 * @throws IllegalArgumentException
+	 *             the version requested is not supported by this
+	 *             implementation.
+	 */
+	public static PackIndexWriter createVersion(final OutputStream dst,
+			final int version) {
+		switch (version) {
+		case 1:
+			return new PackIndexWriterV1(dst);
+		case 2:
+			return new PackIndexWriterV2(dst);
+		default:
+			throw new IllegalArgumentException(
+					"Unsupported pack index version " + version);
+		}
+	}
+

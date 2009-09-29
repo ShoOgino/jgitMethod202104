@@ -1,0 +1,34 @@
+	private static void appendOneRecord(final ObjectId oldId,
+			final ObjectId newId, PersonIdent ident, final String msg,
+			final Repository db, final String refName) throws IOException {
+		if (ident == null)
+			ident = new PersonIdent(db);
+		else
+			ident = new PersonIdent(ident);
+
+		final StringBuilder r = new StringBuilder();
+		r.append(ObjectId.toString(oldId));
+		r.append(' ');
+		r.append(ObjectId.toString(newId));
+		r.append(' ');
+		r.append(ident.toExternalString());
+		r.append('\t');
+		r.append(msg);
+		r.append('\n');
+
+		final byte[] rec = Constants.encode(r.toString());
+		final File logdir = new File(db.getDirectory(), Constants.LOGS);
+		final File reflog = new File(logdir, refName);
+		final File refdir = reflog.getParentFile();
+
+		if (!refdir.exists() && !refdir.mkdirs())
+			throw new IOException("Cannot create directory " + refdir);
+
+		final FileOutputStream out = new FileOutputStream(reflog, true);
+		try {
+			out.write(rec);
+		} finally {
+			out.close();
+		}
+	}
+

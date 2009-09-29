@@ -1,0 +1,47 @@
+	/**
+	 * Atomically create or replace a single large object.
+	 * <p>
+	 * Initially the returned output stream buffers data into memory, but if the
+	 * total number of written bytes starts to exceed an internal limit the data
+	 * is spooled to a temporary file on the local drive.
+	 * <p>
+	 * Network transmission is attempted only when <code>close()</code> gets
+	 * called at the end of output. Closing the returned stream can therefore
+	 * take significant time, especially if the written content is very large.
+	 * <p>
+	 * End-to-end data integrity is assured by internally computing the MD5
+	 * checksum of the supplied data and transmitting the checksum along with
+	 * the data itself.
+	 *
+	 * @param bucket
+	 *            name of the bucket storing the object.
+	 * @param key
+	 *            key of the object within its bucket.
+	 * @param monitor
+	 *            (optional) progress monitor to post upload completion to
+	 *            during the stream's close method.
+	 * @param monitorTask
+	 *            (optional) task name to display during the close method.
+	 * @return a stream which accepts the new data, and transmits once closed.
+	 * @throws IOException
+	 *             if encryption was enabled it could not be configured.
+	 */
+	public OutputStream beginPut(final String bucket, final String key,
+			final ProgressMonitor monitor, final String monitorTask)
+			throws IOException {
+		final MessageDigest md5 = newMD5();
+		final TemporaryBuffer buffer = new TemporaryBuffer() {
+			@Override
+			public void close() throws IOException {
+				super.close();
+				try {
+					putImpl(bucket, key, md5.digest(), this, monitor,
+							monitorTask);
+				} finally {
+					destroy();
+				}
+			}
+		};
+		return encryption.encrypt(new DigestOutputStream(buffer, md5));
+	}
+

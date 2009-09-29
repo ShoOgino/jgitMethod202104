@@ -1,0 +1,14 @@
+	public void testFull_FromString() {
+		final String s = "7b6e8067ec96acef9a4184b43210d583b6d2f99a";
+		final AbbreviatedObjectId i = AbbreviatedObjectId.fromString(s);
+		assertNotNull(i);
+		assertEquals(s.length(), i.length());
+		assertTrue(i.isComplete());
+		assertEquals(s, i.name());
+
+		final ObjectId f = i.toObjectId();
+		assertNotNull(f);
+		assertEquals(ObjectId.fromString(s), f);
+		assertEquals(f.hashCode(), i.hashCode());
+	}
+

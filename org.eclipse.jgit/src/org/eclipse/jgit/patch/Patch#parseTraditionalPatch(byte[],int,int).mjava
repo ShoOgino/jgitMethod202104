@@ -1,0 +1,10 @@
+	private int parseTraditionalPatch(final byte[] buf, final int start,
+			final int end) {
+		final FileHeader fh = new FileHeader(buf, start);
+		int ptr = fh.parseTraditionalHeaders(start, end);
+		ptr = parseHunks(fh, ptr, end);
+		fh.endOffset = ptr;
+		addFile(fh);
+		return ptr;
+	}
+

@@ -1,0 +1,29 @@
+	/**
+	 * Parse the tag message and return the first "line" of it.
+	 * <p>
+	 * The first line is everything up to the first pair of LFs. This is the
+	 * "oneline" format, suitable for output in a single line display.
+	 * <p>
+	 * This method parses and returns the message portion of the tag buffer,
+	 * after taking the tag's character set into account and decoding the buffer
+	 * using that character set. This method is a fairly expensive operation and
+	 * produces a new string on each invocation.
+	 *
+	 * @return decoded tag message as a string. Never null. The returned string
+	 *         does not contain any LFs, even if the first paragraph spanned
+	 *         multiple lines. Embedded LFs are converted to spaces.
+	 */
+	public final String getShortMessage() {
+		final byte[] raw = buffer;
+		final int msgB = RawParseUtils.tagMessage(raw, 0);
+		if (msgB < 0)
+			return "";
+
+		final Charset enc = RawParseUtils.parseEncoding(raw);
+		final int msgE = RawParseUtils.endOfParagraph(raw, msgB);
+		String str = RawParseUtils.decode(enc, raw, msgB, msgE);
+		if (RevCommit.hasLF(raw, msgB, msgE))
+			str = str.replace('\n', ' ');
+		return str;
+	}
+

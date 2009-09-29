@@ -1,0 +1,8 @@
+	public void testParseGitFileName_FailFooBar() {
+		final FileHeader fh = data("a/foo b/bar\n-");
+		assertTrue(fh.parseGitFileName(0, fh.buf.length) > 0);
+		assertNull(fh.getOldName());
+		assertNull(fh.getNewName());
+		assertFalse(fh.hasMetaDataChanges());
+	}
+

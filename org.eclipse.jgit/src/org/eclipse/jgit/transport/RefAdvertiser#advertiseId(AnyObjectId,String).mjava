@@ -1,0 +1,21 @@
+	void advertiseId(final AnyObjectId id, final String refName)
+			throws IOException {
+		tmpLine.setLength(0);
+		id.copyTo(tmpId, tmpLine);
+		tmpLine.append(' ');
+		tmpLine.append(refName);
+		if (first) {
+			first = false;
+			if (!capablities.isEmpty()) {
+				tmpLine.append('\0');
+				for (final String capName : capablities) {
+					tmpLine.append(' ');
+					tmpLine.append(capName);
+				}
+				tmpLine.append(' ');
+			}
+		}
+		tmpLine.append('\n');
+		pckOut.writeString(tmpLine.toString());
+	}
+

@@ -1,0 +1,31 @@
+	private void addOne(final String name, final boolean interesting)
+			throws CmdLineException {
+		final ObjectId id;
+		try {
+			id = clp.getRepository().resolve(name);
+		} catch (IOException e) {
+			throw new CmdLineException(e.getMessage());
+		}
+		if (id == null)
+			throw new CmdLineException(name + " is not a commit");
+
+		final RevCommit c;
+		try {
+			c = clp.getRevWalk().parseCommit(id);
+		} catch (MissingObjectException e) {
+			throw new CmdLineException(name + " is not a commit");
+		} catch (IncorrectObjectTypeException e) {
+			throw new CmdLineException(name + " is not a commit");
+		} catch (IOException e) {
+			throw new CmdLineException("cannot read " + name + ": "
+					+ e.getMessage());
+		}
+
+		if (interesting)
+			c.remove(RevFlag.UNINTERESTING);
+		else
+			c.add(RevFlag.UNINTERESTING);
+
+		setter.addValue(c);
+	}
+

@@ -1,0 +1,18 @@
+	void service(final String name, final PacketLineOut pckOut)
+			throws IOException {
+		final StringBuilder cmd = new StringBuilder();
+		cmd.append(name);
+		cmd.append(' ');
+		cmd.append(uri.getPath());
+		cmd.append('\0');
+		cmd.append("host=");
+		cmd.append(uri.getHost());
+		if (uri.getPort() > 0 && uri.getPort() != GIT_PORT) {
+			cmd.append(":");
+			cmd.append(uri.getPort());
+		}
+		cmd.append('\0');
+		pckOut.writeString(cmd.toString());
+		pckOut.flush();
+	}
+

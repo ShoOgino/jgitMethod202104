@@ -1,0 +1,12 @@
+	@Override
+	public void write(int b) throws IOException {
+		try {
+			beginWrite();
+			dst.write(b);
+		} catch (InterruptedIOException e) {
+			throw writeTimedOut();
+		} finally {
+			endWrite();
+		}
+	}
+

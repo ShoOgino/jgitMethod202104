@@ -1,0 +1,18 @@
+	/**
+	 * Create a filter around many filters, one of which must match.
+	 * 
+	 * @param list
+	 *            list of filters to match against. Must contain at least 2
+	 *            filters.
+	 * @return a filter that must match at least one input filter.
+	 */
+	public static RevFilter create(final Collection<RevFilter> list) {
+		if (list.size() < 2)
+			throw new IllegalArgumentException("At least two filters needed.");
+		final RevFilter[] subfilters = new RevFilter[list.size()];
+		list.toArray(subfilters);
+		if (subfilters.length == 2)
+			return create(subfilters[0], subfilters[1]);
+		return new List(subfilters);
+	}
+

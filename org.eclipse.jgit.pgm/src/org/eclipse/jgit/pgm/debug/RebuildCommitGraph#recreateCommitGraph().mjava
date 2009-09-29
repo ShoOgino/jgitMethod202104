@@ -1,0 +1,76 @@
+	private void recreateCommitGraph() throws IOException {
+		final RevWalk rw = new RevWalk(db);
+		final Map<ObjectId, ToRewrite> toRewrite = new HashMap<ObjectId, ToRewrite>();
+		List<ToRewrite> queue = new ArrayList<ToRewrite>();
+		final BufferedReader br = new BufferedReader(new InputStreamReader(
+				new FileInputStream(graph), Constants.CHARSET));
+		try {
+			String line;
+			while ((line = br.readLine()) != null) {
+				final String[] parts = line.split("[ \t]{1,}");
+				final ObjectId oldId = ObjectId.fromString(parts[0]);
+				try {
+					rw.parseCommit(oldId);
+					// We have it already. Don't rewrite it.
+					continue;
+				} catch (MissingObjectException mue) {
+					// Fall through and rewrite it.
+				}
+
+				final long time = Long.parseLong(parts[1]) * 1000L;
+				final ObjectId[] parents = new ObjectId[parts.length - 2];
+				for (int i = 0; i < parents.length; i++) {
+					parents[i] = ObjectId.fromString(parts[2 + i]);
+				}
+
+				final ToRewrite t = new ToRewrite(oldId, time, parents);
+				toRewrite.put(oldId, t);
+				queue.add(t);
+			}
+		} finally {
+			br.close();
+		}
+
+		pm.beginTask("Rewriting commits", queue.size());
+		final ObjectWriter ow = new ObjectWriter(db);
+		final ObjectId emptyTree = ow.writeTree(new Tree(db));
+		final PersonIdent me = new PersonIdent("jgit rebuild-commitgraph",
+				"rebuild-commitgraph@localhost");
+		while (!queue.isEmpty()) {
+			final ListIterator<ToRewrite> itr = queue
+					.listIterator(queue.size());
+			queue = new ArrayList<ToRewrite>();
+			REWRITE: while (itr.hasPrevious()) {
+				final ToRewrite t = itr.previous();
+				final ObjectId[] newParents = new ObjectId[t.oldParents.length];
+				for (int k = 0; k < t.oldParents.length; k++) {
+					final ToRewrite p = toRewrite.get(t.oldParents[k]);
+					if (p != null) {
+						if (p.newId == null) {
+							// Must defer until after the parent is rewritten.
+							queue.add(t);
+							continue REWRITE;
+						} else {
+							newParents[k] = p.newId;
+						}
+					} else {
+						// We have the old parent object. Use it.
+						//
+						newParents[k] = t.oldParents[k];
+					}
+				}
+
+				final Commit newc = new Commit(db);
+				newc.setTreeId(emptyTree);
+				newc.setAuthor(new PersonIdent(me, new Date(t.commitTime)));
+				newc.setCommitter(newc.getAuthor());
+				newc.setParentIds(newParents);
+				newc.setMessage("ORIGINAL " + t.oldId.name() + "\n");
+				t.newId = ow.writeCommit(newc);
+				rewrites.put(t.oldId, t.newId);
+				pm.update(1);
+			}
+		}
+		pm.endTask();
+	}
+

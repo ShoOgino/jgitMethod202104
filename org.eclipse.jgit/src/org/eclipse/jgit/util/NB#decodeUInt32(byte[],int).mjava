@@ -1,0 +1,20 @@
+	/**
+	 * Convert sequence of 4 bytes (network byte order) into unsigned value.
+	 * 
+	 * @param intbuf
+	 *            buffer to acquire the 4 bytes of data from.
+	 * @param offset
+	 *            position within the buffer to begin reading from. This
+	 *            position and the next 3 bytes after it (for a total of 4
+	 *            bytes) will be read.
+	 * @return unsigned integer value that matches the 32 bits read.
+	 */
+	public static long decodeUInt32(final byte[] intbuf, final int offset) {
+		int low = (intbuf[offset + 1] & 0xff) << 8;
+		low |= (intbuf[offset + 2] & 0xff);
+		low <<= 8;
+
+		low |= (intbuf[offset + 3] & 0xff);
+		return ((long) (intbuf[offset] & 0xff)) << 24 | low;
+	}
+

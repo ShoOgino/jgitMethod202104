@@ -1,0 +1,33 @@
+	public void testTimeout_close_Timeout() throws IOException {
+		final boolean[] called = new boolean[1];
+		os = new TimeoutOutputStream(new OutputStream() {
+			@Override
+			public void write(int b) throws IOException {
+				fail("should not have written");
+			}
+
+			@Override
+			public void close() throws IOException {
+				called[0] = true;
+				for (;;) {
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {
+						throw new InterruptedIOException();
+					}
+				}
+			}
+		}, timer);
+		os.setTimeout(timeout);
+
+		beginWrite();
+		try {
+			os.close();
+			fail("incorrectly closed");
+		} catch (InterruptedIOException e) {
+			// expected
+		}
+		assertTimeout();
+		assertTrue(called[0]);
+	}
+

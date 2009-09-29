@@ -1,0 +1,10 @@
+	public void testTimeout_writeBuffer_Success1() throws IOException {
+		final byte[] exp = new byte[] { 'a', 'b', 'c' };
+		final byte[] act = new byte[exp.length];
+		in.free(exp.length);
+		os.write(exp);
+		in.want(exp.length);
+		in.read(act);
+		assertTrue(Arrays.equals(exp, act));
+	}
+

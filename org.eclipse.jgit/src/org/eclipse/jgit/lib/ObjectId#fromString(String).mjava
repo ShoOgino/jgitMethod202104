@@ -1,0 +1,13 @@
+	/**
+	 * Convert an ObjectId from hex characters.
+	 * 
+	 * @param str
+	 *            the string to read from. Must be 40 characters long.
+	 * @return the converted object id.
+	 */
+	public static final ObjectId fromString(final String str) {
+		if (str.length() != STR_LEN)
+			throw new IllegalArgumentException("Invalid id: " + str);
+		return fromHexString(Constants.encodeASCII(str), 0);
+	}
+

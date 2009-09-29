@@ -1,0 +1,8 @@
+	@Override
+	public PushConnection openPush() throws TransportException {
+		final SftpObjectDB c = new SftpObjectDB(uri.getPath());
+		final WalkPushConnection r = new WalkPushConnection(this, c);
+		r.available(c.readAdvertisedRefs());
+		return r;
+	}
+

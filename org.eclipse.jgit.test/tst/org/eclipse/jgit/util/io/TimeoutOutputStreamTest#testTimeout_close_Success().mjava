@@ -1,0 +1,18 @@
+	public void testTimeout_close_Success() throws IOException {
+		final boolean[] called = new boolean[1];
+		os = new TimeoutOutputStream(new OutputStream() {
+			@Override
+			public void write(int b) throws IOException {
+				fail("should not have written");
+			}
+
+			@Override
+			public void close() throws IOException {
+				called[0] = true;
+			}
+		}, timer);
+		os.setTimeout(timeout);
+		os.close();
+		assertTrue(called[0]);
+	}
+

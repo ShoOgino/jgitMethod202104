@@ -1,0 +1,17 @@
+	private void configureHeader() {
+		final JTableHeader th = getTableHeader();
+		final TableColumnModel cols = th.getColumnModel();
+
+		final TableColumn graph = cols.getColumn(0);
+		final TableColumn author = cols.getColumn(1);
+		final TableColumn date = cols.getColumn(2);
+
+		graph.setHeaderValue("");
+		author.setHeaderValue("Author");
+		date.setHeaderValue("Date");
+
+		graph.setCellRenderer(new GraphCellRender());
+		author.setCellRenderer(new NameCellRender());
+		date.setCellRenderer(new DateCellRender());
+	}
+

@@ -1,0 +1,14 @@
+		private static String readFirstLine(final File head) {
+			try {
+				final byte[] buf = NB.readFully(head, 4096);
+				int n = buf.length;
+				if (n == 0)
+					return null;
+				if (buf[n - 1] == '\n')
+					n--;
+				return RawParseUtils.decode(buf, 0, n);
+			} catch (IOException e) {
+				return null;
+			}
+		}
+

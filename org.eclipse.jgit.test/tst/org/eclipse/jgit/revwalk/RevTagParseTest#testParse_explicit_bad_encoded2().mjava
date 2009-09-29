@@ -1,0 +1,34 @@
+	/**
+	 * This is a twisted case too, but show what we expect here. We can revise
+	 * the expectations provided this case is updated.
+	 *
+	 * What happens here is that an encoding us given, but data is not encoded
+	 * that way (and we can detect it), so we try other encodings. Here data
+	 * could actually be decoded in the stated encoding, but we override using
+	 * UTF-8.
+	 *
+	 * @throws Exception
+	 */
+	public void testParse_explicit_bad_encoded2() throws Exception {
+		final ByteArrayOutputStream b = new ByteArrayOutputStream();
+		b.write("object 9788669ad918b6fcce64af8882fc9a81cb6aba67\n"
+				.getBytes("UTF-8"));
+		b.write("type tree\n".getBytes("UTF-8"));
+		b.write("tag v1.2.3.4.5\n".getBytes("UTF-8"));
+		b
+				.write("tagger F\u00f6r fattare <a_u_thor@example.com> 1218123387 +0700\n"
+						.getBytes("UTF-8"));
+		b.write("encoding ISO-8859-1\n".getBytes("UTF-8"));
+		b.write("\n".getBytes("UTF-8"));
+		b.write("\u304d\u308c\u3044\n".getBytes("UTF-8"));
+		b.write("\n".getBytes("UTF-8"));
+		b.write("Hi\n".getBytes("UTF-8"));
+		final RevTag c;
+		c = new RevTag(id("9473095c4cb2f12aefe1db8a355fe3fafba42f67"));
+		c.parseCanonical(new RevWalk(db), b.toByteArray());
+
+		assertEquals("F\u00f6r fattare", c.getTaggerIdent().getName());
+		assertEquals("\u304d\u308c\u3044", c.getShortMessage());
+		assertEquals("\u304d\u308c\u3044\n\nHi\n", c.getFullMessage());
+	}
+

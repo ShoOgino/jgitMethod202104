@@ -1,0 +1,10 @@
+	public void testReadACK_Invalid2() {
+		init("0009HELO\n");
+		try {
+			in.readACK(new MutableObjectId());
+			fail("incorrectly accepted invalid ACK/NAK");
+		} catch (IOException e) {
+			assertEquals("Expected ACK/NAK, got: HELO", e.getMessage());
+		}
+	}
+

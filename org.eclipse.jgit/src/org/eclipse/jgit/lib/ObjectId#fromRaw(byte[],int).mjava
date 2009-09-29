@@ -1,0 +1,19 @@
+	/**
+	 * Convert an ObjectId from raw binary representation.
+	 * 
+	 * @param bs
+	 *            the raw byte buffer to read from. At least 20 bytes after p
+	 *            must be available within this byte array.
+	 * @param p
+	 *            position to read the first byte of data from.
+	 * @return the converted object id.
+	 */
+	public static final ObjectId fromRaw(final byte[] bs, final int p) {
+		final int a = NB.decodeInt32(bs, p);
+		final int b = NB.decodeInt32(bs, p + 4);
+		final int c = NB.decodeInt32(bs, p + 8);
+		final int d = NB.decodeInt32(bs, p + 12);
+		final int e = NB.decodeInt32(bs, p + 16);
+		return new ObjectId(a, b, c, d, e);
+	}
+

@@ -1,0 +1,11 @@
+	void send(final Collection<Ref> refs) throws IOException {
+		for (final Ref r : RefComparator.sort(refs)) {
+			final RevObject obj = parseAnyOrNull(r.getObjectId());
+			if (obj != null) {
+				advertiseAny(obj, r.getOrigName());
+				if (derefTags && obj instanceof RevTag)
+					advertiseTag((RevTag) obj, r.getOrigName() + "^{}");
+			}
+		}
+	}
+

@@ -1,0 +1,21 @@
+	/**
+	 * Create an empty entry at the specified stage.
+	 *
+	 * @param newPath
+	 *            name of the cache entry, in the standard encoding.
+	 * @param stage
+	 *            the stage index of the new entry.
+	 */
+	public DirCacheEntry(final byte[] newPath, final int stage) {
+		info = new byte[INFO_LEN];
+		infoOffset = 0;
+		path = newPath;
+
+		int flags = ((stage & 0x3) << 12);
+		if (path.length < NAME_MASK)
+			flags |= path.length;
+		else
+			flags |= NAME_MASK;
+		NB.encodeInt16(info, infoOffset + P_FLAGS, flags);
+	}
+

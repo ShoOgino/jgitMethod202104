@@ -1,0 +1,12 @@
+	public void testConfigureCache_Limits1() {
+		// This test is just to force coverage over some lower bounds for
+		// the table. We don't want the table to wind up with too small
+		// of a size. This is highly dependent upon the table allocation
+		// algorithm actually implemented in WindowCache.
+		//
+		final WindowCacheConfig cfg = new WindowCacheConfig();
+		cfg.setPackedGitLimit(6 * 4096 / 5);
+		cfg.setPackedGitWindowSize(4096);
+		WindowCache.reconfigure(cfg);
+	}
+

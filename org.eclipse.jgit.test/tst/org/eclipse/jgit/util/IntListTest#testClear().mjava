@@ -1,0 +1,17 @@
+	public void testClear() {
+		final IntList i = new IntList();
+		final int n = 5;
+		for (int v = 0; v < n; v++)
+			i.add(10 + v);
+		assertEquals(n, i.size());
+
+		i.clear();
+		assertEquals(0, i.size());
+		try {
+			i.get(0);
+			fail("Accepted 0 index on empty list");
+		} catch (ArrayIndexOutOfBoundsException e) {
+			assertTrue(true);
+		}
+	}
+

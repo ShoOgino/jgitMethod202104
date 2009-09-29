@@ -1,0 +1,18 @@
+	/**
+	 * Resets internal state and allows this instance to be used again.
+	 * <p>
+	 * Unlike {@link #dispose()} previously acquired RevObject (and RevCommit)
+	 * instances are not invalidated. RevFlag instances are not invalidated, but
+	 * are removed from all RevObjects.
+	 * 
+	 * @param retainFlags
+	 *            application flags that should <b>not</b> be cleared from
+	 *            existing commit objects.
+	 */
+	public final void resetRetain(final RevFlag... retainFlags) {
+		int mask = 0;
+		for (final RevFlag flag : retainFlags)
+			mask |= flag.mask;
+		reset(mask);
+	}
+

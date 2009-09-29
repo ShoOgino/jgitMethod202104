@@ -1,0 +1,31 @@
+	public void testInt16() {
+		assertEquals(0x0000, parse16("0000"));
+		assertEquals(0x0001, parse16("0001"));
+		assertEquals(0x1234, parse16("1234"));
+		assertEquals(0xdead, parse16("dead"));
+		assertEquals(0xBEEF, parse16("BEEF"));
+		assertEquals(0x4321, parse16("4321"));
+		assertEquals(0xffff, parse16("ffff"));
+
+		try {
+			parse16("noth");
+			fail("Incorrectly acccepted \"noth\"");
+		} catch (ArrayIndexOutOfBoundsException e) {
+			// pass
+		}
+
+		try {
+			parse16("01");
+			fail("Incorrectly acccepted \"01\"");
+		} catch (ArrayIndexOutOfBoundsException e) {
+			// pass
+		}
+
+		try {
+			parse16("000.");
+			fail("Incorrectly acccepted \"000.\"");
+		} catch (ArrayIndexOutOfBoundsException e) {
+			// pass
+		}
+	}
+

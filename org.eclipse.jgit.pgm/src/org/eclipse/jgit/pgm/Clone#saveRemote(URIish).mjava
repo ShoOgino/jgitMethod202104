@@ -1,0 +1,11 @@
+	private void saveRemote(final URIish uri) throws URISyntaxException,
+			IOException {
+		final RemoteConfig rc = new RemoteConfig(db.getConfig(), remoteName);
+		rc.addURI(uri);
+		rc.addFetchRefSpec(new RefSpec().setForceUpdate(true)
+				.setSourceDestination(Constants.R_HEADS + "*",
+						Constants.R_REMOTES + remoteName + "/*"));
+		rc.update(db.getConfig());
+		db.getConfig().save();
+	}
+

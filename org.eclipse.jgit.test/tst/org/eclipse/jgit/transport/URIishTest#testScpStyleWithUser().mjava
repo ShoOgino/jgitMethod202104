@@ -1,0 +1,13 @@
+	public void testScpStyleWithUser() throws Exception {
+		final String str = "user@example.com:some/p ath";
+		URIish u = new URIish(str);
+		assertNull(u.getScheme());
+		assertTrue(u.isRemote());
+		assertEquals("some/p ath", u.getPath());
+		assertEquals("user", u.getUser());
+		assertEquals("example.com", u.getHost());
+		assertEquals(-1, u.getPort());
+		assertEquals(str, u.toString());
+		assertEquals(u, new URIish(str));
+	}
+

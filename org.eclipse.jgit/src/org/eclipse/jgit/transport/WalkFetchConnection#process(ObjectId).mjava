@@ -1,0 +1,40 @@
+	private void process(final ObjectId id) throws TransportException {
+		final RevObject obj;
+		try {
+			if (id instanceof RevObject) {
+				obj = (RevObject) id;
+				if (obj.has(COMPLETE))
+					return;
+				revWalk.parseHeaders(obj);
+			} else {
+				obj = revWalk.parseAny(id);
+				if (obj.has(COMPLETE))
+					return;
+			}
+		} catch (IOException e) {
+			throw new TransportException("Cannot read " + id.name(), e);
+		}
+
+		switch (obj.getType()) {
+		case Constants.OBJ_BLOB:
+			processBlob(obj);	
+			break;
+		case Constants.OBJ_TREE:
+			processTree(obj);
+			break;
+		case Constants.OBJ_COMMIT:
+			processCommit(obj);
+			break;
+		case Constants.OBJ_TAG:
+			processTag(obj);
+			break;
+		default:
+			throw new TransportException("Unknown object type " + id.name());
+		}
+
+		// If we had any prior errors fetching this object they are
+		// now resolved, as the object was parsed successfully.
+		//
+		fetchErrors.remove(id.copy());
+	}
+

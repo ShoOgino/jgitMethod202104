@@ -1,0 +1,55 @@
+	private AbstractTreeIterator combineDF(final AbstractTreeIterator minRef)
+			throws CorruptObjectException {
+		// Look for a possible D/F conflict forward in the tree(s)
+		// as there may be a "$path/" which matches "$path". Make
+		// such entries match this entry.
+		//
+		AbstractTreeIterator treeMatch = null;
+		for (final AbstractTreeIterator t : trees) {
+			if (t.matches == minRef || t.eof())
+				continue;
+
+			for (;;) {
+				final int cmp = t.pathCompare(minRef, TREE_MODE);
+				if (cmp < 0) {
+					// The "$path/" may still appear later.
+					//
+					t.matchShift++;
+					t.next(1);
+					if (t.eof()) {
+						t.back(t.matchShift);
+						t.matchShift = 0;
+						break;
+					}
+				} else if (cmp == 0) {
+					// We have a conflict match here.
+					//
+					t.matches = minRef;
+					treeMatch = t;
+					break;
+				} else {
+					// A conflict match is not possible.
+					//
+					if (t.matchShift != 0) {
+						t.back(t.matchShift);
+						t.matchShift = 0;
+					}
+					break;
+				}
+			}
+		}
+
+		if (treeMatch != null) {
+			// If we do have a conflict use one of the directory
+			// matching iterators instead of the file iterator.
+			// This way isSubtree is true and isRecursive works.
+			//
+			for (final AbstractTreeIterator t : trees)
+				if (t.matches == minRef)
+					t.matches = treeMatch;
+			return treeMatch;
+		}
+
+		return minRef;
+	}
+

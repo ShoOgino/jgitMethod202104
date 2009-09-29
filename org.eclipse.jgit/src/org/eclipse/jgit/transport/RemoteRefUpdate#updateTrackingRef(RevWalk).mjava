@@ -1,0 +1,15 @@
+	/**
+	 * Update locally stored tracking branch with the new object.
+	 *
+	 * @param walk
+	 *            walker used for checking update properties.
+	 * @throws IOException
+	 *             when I/O error occurred during update
+	 */
+	protected void updateTrackingRef(final RevWalk walk) throws IOException {
+		if (isDelete())
+			trackingRefUpdate.delete(walk);
+		else
+			trackingRefUpdate.update(walk);
+	}
+

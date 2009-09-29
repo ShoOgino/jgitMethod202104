@@ -1,0 +1,11 @@
+	private void expandSingle(final RefSpec spec, final Set<Ref> matched)
+			throws TransportException {
+		final Ref src = conn.getRef(spec.getSource());
+		if (src == null) {
+			throw new TransportException("Remote does not have "
+					+ spec.getSource() + " available for fetch.");
+		}
+		if (matched.add(src))
+			want(src, spec);
+	}
+

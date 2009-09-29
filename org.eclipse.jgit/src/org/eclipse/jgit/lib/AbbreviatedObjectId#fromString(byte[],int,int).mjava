@@ -1,0 +1,19 @@
+	/**
+	 * Convert an AbbreviatedObjectId from hex characters (US-ASCII).
+	 *
+	 * @param buf
+	 *            the US-ASCII buffer to read from.
+	 * @param offset
+	 *            position to read the first character from.
+	 * @param end
+	 *            one past the last position to read (<code>end-offset</code> is
+	 *            the length of the string).
+	 * @return the converted object id.
+	 */
+	public static final AbbreviatedObjectId fromString(final byte[] buf,
+			final int offset, final int end) {
+		if (end - offset > AnyObjectId.STR_LEN)
+			throw new IllegalArgumentException("Invalid id");
+		return fromHexString(buf, offset, end);
+	}
+

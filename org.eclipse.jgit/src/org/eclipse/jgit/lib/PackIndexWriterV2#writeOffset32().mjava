@@ -1,0 +1,12 @@
+	private void writeOffset32() throws IOException {
+		int o64 = 0;
+		for (final PackedObjectInfo oe : entries) {
+			final long o = oe.getOffset();
+			if (o < Integer.MAX_VALUE)
+				NB.encodeInt32(tmp, 0, (int) o);
+			else
+				NB.encodeInt32(tmp, 0, (1 << 31) | o64++);
+			out.write(tmp, 0, 4);
+		}
+	}
+

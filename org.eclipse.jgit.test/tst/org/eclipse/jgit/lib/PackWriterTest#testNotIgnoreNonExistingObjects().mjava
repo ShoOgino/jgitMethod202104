@@ -1,0 +1,18 @@
+	/**
+	 * Try to pass non-existing object as uninteresting, with non-ignoring
+	 * setting.
+	 *
+	 * @throws IOException
+	 */
+	public void testNotIgnoreNonExistingObjects() throws IOException {
+		final ObjectId nonExisting = ObjectId
+				.fromString("0000000000000000000000000000000000000001");
+		try {
+			createVerifyOpenPack(EMPTY_LIST_OBJECT, Collections.nCopies(1,
+					nonExisting), false, false);
+			fail("Should have thrown MissingObjectException");
+		} catch (MissingObjectException x) {
+			// expected
+		}
+	}
+

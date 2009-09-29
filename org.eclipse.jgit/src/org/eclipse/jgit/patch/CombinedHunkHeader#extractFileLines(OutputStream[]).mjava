@@ -1,0 +1,64 @@
+	@Override
+	void extractFileLines(final OutputStream[] out) throws IOException {
+		final byte[] buf = file.buf;
+		int ptr = startOffset;
+		int eol = nextLF(buf, ptr);
+		if (endOffset <= eol)
+			return;
+
+		// Treat the hunk header as though it were from the ancestor,
+		// as it may have a function header appearing after it which
+		// was copied out of the ancestor file.
+		//
+		out[0].write(buf, ptr, eol - ptr);
+
+		SCAN: for (ptr = eol; ptr < endOffset; ptr = eol) {
+			eol = nextLF(buf, ptr);
+
+			if (eol - ptr < old.length + 1) {
+				// Line isn't long enough to mention the state of each
+				// ancestor. It must be the end of the hunk.
+				break SCAN;
+			}
+
+			switch (buf[ptr]) {
+			case ' ':
+			case '-':
+			case '+':
+				break;
+
+			default:
+				// Line can't possibly be part of this hunk; the first
+				// ancestor information isn't recognizable.
+				//
+				break SCAN;
+			}
+
+			int delcnt = 0;
+			for (int ancestor = 0; ancestor < old.length; ancestor++) {
+				switch (buf[ptr + ancestor]) {
+				case '-':
+					delcnt++;
+					out[ancestor].write(buf, ptr, eol - ptr);
+					continue;
+
+				case ' ':
+					out[ancestor].write(buf, ptr, eol - ptr);
+					continue;
+
+				case '+':
+					continue;
+
+				default:
+					break SCAN;
+				}
+			}
+			if (delcnt < old.length) {
+				// This line appears in the new file if it wasn't deleted
+				// relative to all ancestors.
+				//
+				out[old.length].write(buf, ptr, eol - ptr);
+			}
+		}
+	}
+

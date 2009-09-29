@@ -1,0 +1,8 @@
+	@Override
+	public FetchConnection openFetch() throws TransportException {
+		final SftpObjectDB c = new SftpObjectDB(uri.getPath());
+		final WalkFetchConnection r = new WalkFetchConnection(this, c);
+		r.available(c.readAdvertisedRefs());
+		return r;
+	}
+

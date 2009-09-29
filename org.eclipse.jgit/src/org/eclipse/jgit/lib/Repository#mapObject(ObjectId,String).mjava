@@ -1,0 +1,33 @@
+	/**
+	 * Access any type of Git object by id and
+	 *
+	 * @param id
+	 *            SHA-1 of object to read
+	 * @param refName optional, only relevant for simple tags
+	 * @return The Git object if found or null
+	 * @throws IOException
+	 */
+	public Object mapObject(final ObjectId id, final String refName) throws IOException {
+		final ObjectLoader or = openObject(id);
+		if (or == null)
+			return null;
+		final byte[] raw = or.getBytes();
+		switch (or.getType()) {
+		case Constants.OBJ_TREE:
+			return makeTree(id, raw);
+
+		case Constants.OBJ_COMMIT:
+			return makeCommit(id, raw);
+
+		case Constants.OBJ_TAG:
+			return makeTag(id, refName, raw);
+
+		case Constants.OBJ_BLOB:
+			return raw;
+
+		default:
+			throw new IncorrectObjectTypeException(id,
+				"COMMIT nor TREE nor BLOB nor TAG");
+		}
+	}
+

@@ -1,0 +1,11 @@
+	public void testTimeout_writeBuffer_Timeout() throws IOException {
+		beginWrite();
+		try {
+			os.write(new byte[512]);
+			fail("incorrectly wrote bytes");
+		} catch (InterruptedIOException e) {
+			// expected
+		}
+		assertTimeout();
+	}
+

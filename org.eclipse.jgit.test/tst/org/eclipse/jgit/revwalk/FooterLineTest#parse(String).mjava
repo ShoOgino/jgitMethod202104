@@ -1,0 +1,15 @@
+	private RevCommit parse(final String msg) {
+		final StringBuilder buf = new StringBuilder();
+		buf.append("tree " + ObjectId.zeroId().name() + "\n");
+		buf.append("author A. U. Thor <a@example.com> 1 +0000\n");
+		buf.append("committer A. U. Thor <a@example.com> 1 +0000\n");
+		buf.append("\n");
+		buf.append(msg);
+
+		final RevWalk walk = new RevWalk(db);
+		walk.setRetainBody(true);
+		final RevCommit c = new RevCommit(ObjectId.zeroId());
+		c.parseCanonical(walk, Constants.encode(buf.toString()));
+		return c;
+	}
+

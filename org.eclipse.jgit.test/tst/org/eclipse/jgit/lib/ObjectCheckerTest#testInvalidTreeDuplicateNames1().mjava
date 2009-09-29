@@ -1,0 +1,13 @@
+	public void testInvalidTreeDuplicateNames1() {
+		final StringBuilder b = new StringBuilder();
+		entry(b, "100644 a");
+		entry(b, "100644 a");
+		final byte[] data = Constants.encodeASCII(b.toString());
+		try {
+			checker.checkTree(data);
+			fail("incorrectly accepted an invalid tree");
+		} catch (CorruptObjectException e) {
+			assertEquals("duplicate entry names", e.getMessage());
+		}
+	}
+

@@ -1,0 +1,88 @@
+	private boolean downloadPackedObject(final ProgressMonitor monitor,
+			final AnyObjectId id) throws TransportException {
+		// Search for the object in a remote pack whose index we have,
+		// but whose pack we do not yet have.
+		//
+		final Iterator<RemotePack> packItr = unfetchedPacks.iterator();
+		while (packItr.hasNext() && !monitor.isCancelled()) {
+			final RemotePack pack = packItr.next();
+			try {
+				pack.openIndex(monitor);
+			} catch (IOException err) {
+				// If the index won't open its either not found or
+				// its a format we don't recognize. In either case
+				// we may still be able to obtain the object from
+				// another source, so don't consider it a failure.
+				//
+				recordError(id, err);
+				packItr.remove();
+				continue;
+			}
+
+			if (monitor.isCancelled()) {
+				// If we were cancelled while the index was opening
+				// the open may have aborted. We can't search an
+				// unopen index.
+				//
+				return false;
+			}
+
+			if (!pack.index.hasObject(id)) {
+				// Not in this pack? Try another.
+				//
+				continue;
+			}
+
+			// It should be in the associated pack. Download that
+			// and attach it to the local repository so we can use
+			// all of the contained objects.
+			//
+			try {
+				pack.downloadPack(monitor);
+			} catch (IOException err) {
+				// If the pack failed to download, index correctly,
+				// or open in the local repository we may still be
+				// able to obtain this object from another pack or
+				// an alternate.
+				//
+				recordError(id, err);
+				continue;
+			} finally {
+				// If the pack was good its in the local repository
+				// and Repository.hasObject(id) will succeed in the
+				// future, so we do not need this data anymore. If
+				// it failed the index and pack are unusable and we
+				// shouldn't consult them again.
+				//
+				pack.tmpIdx.delete();
+				packItr.remove();
+			}
+
+			if (!local.hasObject(id)) {
+				// What the hell? This pack claimed to have
+				// the object, but after indexing we didn't
+				// actually find it in the pack.
+				//
+				recordError(id, new FileNotFoundException("Object " + id.name()
+						+ " not found in " + pack.packName + "."));
+				continue;
+			}
+
+			// Complete any other objects that we can.
+			//
+			final Iterator<ObjectId> pending = swapFetchQueue();
+			while (pending.hasNext()) {
+				final ObjectId p = pending.next();
+				if (pack.index.hasObject(p)) {
+					pending.remove();
+					process(p);
+				} else {
+					workQueue.add(p);
+				}
+			}
+			return true;
+
+		}
+		return false;
+	}
+

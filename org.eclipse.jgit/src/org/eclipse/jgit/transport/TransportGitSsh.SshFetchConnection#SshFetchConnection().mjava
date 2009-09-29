@@ -1,0 +1,26 @@
+		SshFetchConnection() throws TransportException {
+			super(TransportGitSsh.this);
+			try {
+				channel = exec(getOptionUploadPack());
+
+				if (channel.isConnected())
+					init(channel.getInputStream(), outputStream(channel));
+				else
+					throw new TransportException(uri, errStream.toString());
+
+			} catch (TransportException err) {
+				close();
+				throw err;
+			} catch (IOException err) {
+				close();
+				throw new TransportException(uri,
+						"remote hung up unexpectedly", err);
+			}
+
+			try {
+				readAdvertisedRefs();
+			} catch (NoRemoteRepositoryException notFound) {
+				throw cleanNotFound(notFound);
+			}
+		}
+

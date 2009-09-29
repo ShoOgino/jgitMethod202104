@@ -1,0 +1,47 @@
+	/**
+	 * Copy the current file content into the temporary file.
+	 * <p>
+	 * This method saves the current file content by inserting it into the
+	 * temporary file, so that the caller can safely append rather than replace
+	 * the primary file.
+	 * <p>
+	 * This method does nothing if the current file does not exist, or exists
+	 * but is empty.
+	 * 
+	 * @throws IOException
+	 *             the temporary file could not be written, or a read error
+	 *             occurred while reading from the current file. The lock is
+	 *             released before throwing the underlying IO exception to the
+	 *             caller.
+	 * @throws RuntimeException
+	 *             the temporary file could not be written. The lock is released
+	 *             before throwing the underlying exception to the caller.
+	 */
+	public void copyCurrentContent() throws IOException {
+		requireLock();
+		try {
+			final FileInputStream fis = new FileInputStream(ref);
+			try {
+				final byte[] buf = new byte[2048];
+				int r;
+				while ((r = fis.read(buf)) >= 0)
+					os.write(buf, 0, r);
+			} finally {
+				fis.close();
+			}
+		} catch (FileNotFoundException fnfe) {
+			// Don't worry about a file that doesn't exist yet, it
+			// conceptually has no current content to copy.
+			//
+		} catch (IOException ioe) {
+			unlock();
+			throw ioe;
+		} catch (RuntimeException ioe) {
+			unlock();
+			throw ioe;
+		} catch (Error ioe) {
+			unlock();
+			throw ioe;
+		}
+	}
+

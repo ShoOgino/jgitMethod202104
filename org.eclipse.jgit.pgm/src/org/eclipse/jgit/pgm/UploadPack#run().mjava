@@ -1,0 +1,15 @@
+	@Override
+	protected void run() throws Exception {
+		final org.eclipse.jgit.transport.UploadPack rp;
+
+		if (new File(srcGitdir, ".git").isDirectory())
+			srcGitdir = new File(srcGitdir, ".git");
+		db = new Repository(srcGitdir);
+		if (!db.getObjectsDirectory().isDirectory())
+			throw die("'" + srcGitdir.getPath() + "' not a git repository");
+		rp = new org.eclipse.jgit.transport.UploadPack(db);
+		if (0 <= timeout)
+			rp.setTimeout(timeout);
+		rp.upload(System.in, System.out, System.err);
+	}
+

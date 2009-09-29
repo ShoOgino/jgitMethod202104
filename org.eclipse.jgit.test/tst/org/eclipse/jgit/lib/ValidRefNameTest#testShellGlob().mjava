@@ -1,0 +1,14 @@
+	public void testShellGlob() {
+		assertValid(false, "refs/heads/master?");
+		assertValid(false, "refs/heads/?master");
+		assertValid(false, "?refs/heads/master");
+
+		assertValid(false, "refs/heads/master[");
+		assertValid(false, "refs/heads/[master");
+		assertValid(false, "[refs/heads/master");
+
+		assertValid(false, "refs/heads/master*");
+		assertValid(false, "refs/heads/*master");
+		assertValid(false, "*refs/heads/master");
+	}
+

@@ -1,0 +1,11 @@
+	public void testConfigureCache_PackedGitOpenFiles_0() {
+		try {
+			final WindowCacheConfig cfg = new WindowCacheConfig();
+			cfg.setPackedGitOpenFiles(0);
+			WindowCache.reconfigure(cfg);
+			fail("incorrectly permitted PackedGitOpenFiles = 0");
+		} catch (IllegalArgumentException e) {
+			assertEquals("Open files must be >= 1", e.getMessage());
+		}
+	}
+

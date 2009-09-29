@@ -1,0 +1,14 @@
+	public void testFileKeyOpenExisting() throws IOException {
+		Repository r;
+
+		r = new FileKey(db.getDirectory()).open(true);
+		assertNotNull(r);
+		assertEquals(db.getDirectory(), r.getDirectory());
+		r.close();
+
+		r = new FileKey(db.getDirectory()).open(false);
+		assertNotNull(r);
+		assertEquals(db.getDirectory(), r.getDirectory());
+		r.close();
+	}
+

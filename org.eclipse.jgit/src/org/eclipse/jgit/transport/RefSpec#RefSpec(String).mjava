@@ -1,0 +1,46 @@
+	/**
+	 * Parse a ref specification for use during transport operations.
+	 * <p>
+	 * Specifications are typically one of the following forms:
+	 * <ul>
+	 * <li><code>refs/head/master</code></li>
+	 * <li><code>refs/head/master:refs/remotes/origin/master</code></li>
+	 * <li><code>refs/head/*:refs/remotes/origin/*</code></li>
+	 * <li><code>+refs/head/master</code></li>
+	 * <li><code>+refs/head/master:refs/remotes/origin/master</code></li>
+	 * <li><code>+refs/head/*:refs/remotes/origin/*</code></li>
+	 * <li><code>:refs/head/master</code></li>
+	 * </ul>
+	 * 
+	 * @param spec
+	 *            string describing the specification.
+	 * @throws IllegalArgumentException
+	 *             the specification is invalid.
+	 */
+	public RefSpec(final String spec) {
+		String s = spec;
+		if (s.startsWith("+")) {
+			force = true;
+			s = s.substring(1);
+		}
+
+		final int c = s.lastIndexOf(':');
+		if (c == 0) {
+			s = s.substring(1);
+			if (isWildcard(s))
+				throw new IllegalArgumentException("Invalid wildcards " + spec);
+			dstName = s;
+		} else if (c > 0) {
+			srcName = s.substring(0, c);
+			dstName = s.substring(c + 1);
+			if (isWildcard(srcName) && isWildcard(dstName))
+				wildcard = true;
+			else if (isWildcard(srcName) || isWildcard(dstName))
+				throw new IllegalArgumentException("Invalid wildcards " + spec);
+		} else {
+			if (isWildcard(s))
+				throw new IllegalArgumentException("Invalid wildcards " + spec);
+			srcName = s;
+		}
+	}
+

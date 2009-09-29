@@ -1,0 +1,23 @@
+	public void testRenameCurrentBranch() throws IOException {
+		ObjectId rb = db.resolve("refs/heads/b");
+		db.writeSymref(Constants.HEAD, "refs/heads/b");
+		ObjectId oldHead = db.resolve(Constants.HEAD);
+		assertTrue("internal test condition, b == HEAD", rb.equals(oldHead));
+		RefLogWriter.writeReflog(db, rb, rb, "Just a message", "refs/heads/b");
+		assertTrue("no log on old branch", new File(db.getDirectory(),
+				"logs/refs/heads/b").exists());
+		RefRename renameRef = db.renameRef("refs/heads/b",
+				"refs/heads/new/name");
+		Result result = renameRef.rename();
+		assertEquals(Result.RENAMED, result);
+		assertEquals(rb, db.resolve("refs/heads/new/name"));
+		assertNull(db.resolve("refs/heads/b"));
+		assertEquals("Branch: renamed b to new/name", db.getReflogReader(
+				"new/name").getLastEntry().getComment());
+		assertFalse(new File(db.getDirectory(), "logs/refs/heads/b").exists());
+		assertEquals(rb, db.resolve(Constants.HEAD));
+		assertEquals(2, db.getReflogReader("new/name").getReverseEntries().size());
+		assertEquals("Branch: renamed b to new/name", db.getReflogReader("new/name").getReverseEntries().get(0).getComment());
+		assertEquals("Just a message", db.getReflogReader("new/name").getReverseEntries().get(1).getComment());
+	}
+

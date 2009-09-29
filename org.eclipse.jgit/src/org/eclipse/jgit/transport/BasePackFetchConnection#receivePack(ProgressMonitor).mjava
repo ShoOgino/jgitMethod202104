@@ -1,0 +1,10 @@
+	private void receivePack(final ProgressMonitor monitor) throws IOException {
+		final IndexPack ip;
+
+		ip = IndexPack.create(local, sideband ? pckIn.sideband(monitor) : in);
+		ip.setFixThin(thinPack);
+		ip.setObjectChecking(transport.isCheckFetchedObjects());
+		ip.index(monitor);
+		packLock = ip.renameAndOpenPack(lockMessage);
+	}
+

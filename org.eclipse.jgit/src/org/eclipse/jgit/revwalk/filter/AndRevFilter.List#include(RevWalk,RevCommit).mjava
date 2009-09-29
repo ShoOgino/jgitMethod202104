@@ -1,0 +1,11 @@
+		@Override
+		public boolean include(final RevWalk walker, final RevCommit c)
+				throws MissingObjectException, IncorrectObjectTypeException,
+				IOException {
+			for (final RevFilter f : subfilters) {
+				if (!f.include(walker, c))
+					return false;
+			}
+			return true;
+		}
+

@@ -1,0 +1,33 @@
+	public void testForceRemotesOrigin() {
+		final String srcn = "refs/heads/*";
+		final String dstn = "refs/remotes/origin/*";
+		final RefSpec rs = new RefSpec("+" + srcn + ":" + dstn);
+		assertTrue(rs.isForceUpdate());
+		assertTrue(rs.isWildcard());
+		assertEquals(srcn, rs.getSource());
+		assertEquals(dstn, rs.getDestination());
+		assertEquals("+" + srcn + ":" + dstn, rs.toString());
+		assertEquals(rs, new RefSpec(rs.toString()));
+
+		Ref r;
+		RefSpec expanded;
+
+		r = new Ref(Ref.Storage.LOOSE, "refs/heads/master", null);
+		assertTrue(rs.matchSource(r));
+		assertFalse(rs.matchDestination(r));
+		expanded = rs.expandFromSource(r);
+		assertNotSame(rs, expanded);
+		assertTrue(expanded.isForceUpdate());
+		assertFalse(expanded.isWildcard());
+		assertEquals(r.getName(), expanded.getSource());
+		assertEquals("refs/remotes/origin/master", expanded.getDestination());
+
+		r = new Ref(Ref.Storage.LOOSE, "refs/remotes/origin/next", null);
+		assertFalse(rs.matchSource(r));
+		assertTrue(rs.matchDestination(r));
+
+		r = new Ref(Ref.Storage.LOOSE, "refs/tags/v1.0", null);
+		assertFalse(rs.matchSource(r));
+		assertFalse(rs.matchDestination(r));
+	}
+

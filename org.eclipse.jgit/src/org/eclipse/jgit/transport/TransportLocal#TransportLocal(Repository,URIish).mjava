@@ -1,0 +1,9 @@
+	TransportLocal(final Repository local, final URIish uri) {
+		super(local, uri);
+
+		File d = FS.resolve(new File(PWD), uri.getPath()).getAbsoluteFile();
+		if (new File(d, ".git").isDirectory())
+			d = new File(d, ".git");
+		remoteGitDir = d;
+	}
+

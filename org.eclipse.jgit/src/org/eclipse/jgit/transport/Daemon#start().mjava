@@ -1,0 +1,44 @@
+	/**
+	 * Start this daemon on a background thread.
+	 *
+	 * @throws IOException
+	 *             the server socket could not be opened.
+	 * @throws IllegalStateException
+	 *             the daemon is already running.
+	 */
+	public synchronized void start() throws IOException {
+		if (acceptThread != null)
+			throw new IllegalStateException("Daemon already running");
+
+		final ServerSocket listenSock = new ServerSocket(
+				myAddress != null ? myAddress.getPort() : 0, BACKLOG,
+				myAddress != null ? myAddress.getAddress() : null);
+		myAddress = (InetSocketAddress) listenSock.getLocalSocketAddress();
+
+		run = true;
+		acceptThread = new Thread(processors, "Git-Daemon-Accept") {
+			public void run() {
+				while (isRunning()) {
+					try {
+						startClient(listenSock.accept());
+					} catch (InterruptedIOException e) {
+						// Test again to see if we should keep accepting.
+					} catch (IOException e) {
+						break;
+					}
+				}
+
+				try {
+					listenSock.close();
+				} catch (IOException err) {
+					//
+				} finally {
+					synchronized (Daemon.this) {
+						acceptThread = null;
+					}
+				}
+			}
+		};
+		acceptThread.start();
+	}
+

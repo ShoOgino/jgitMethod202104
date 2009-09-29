@@ -1,0 +1,30 @@
+	/**
+	 * Decode a region of the buffer under the specified character set if possible.
+	 *
+	 * If the byte stream cannot be decoded that way, the platform default is tried
+	 * and if that too fails, the fail-safe ISO-8859-1 encoding is tried.
+	 * 
+	 * @param cs
+	 *            character set to use when decoding the buffer.
+	 * @param buffer
+	 *            buffer to pull raw bytes from.
+	 * @param start
+	 *            first position within the buffer to take data from.
+	 * @param end
+	 *            one position past the last location within the buffer to take
+	 *            data from.
+	 * @return a string representation of the range <code>[start,end)</code>,
+	 *         after decoding the region through the specified character set.
+	 */
+	public static String decode(final Charset cs, final byte[] buffer,
+			final int start, final int end) {
+		try {
+			return decodeNoFallback(cs, buffer, start, end);
+		} catch (CharacterCodingException e) {
+			// Fall back to an ISO-8859-1 style encoding. At least all of
+			// the bytes will be present in the output.
+			//
+			return extractBinaryString(buffer, start, end);
+		}
+	}
+

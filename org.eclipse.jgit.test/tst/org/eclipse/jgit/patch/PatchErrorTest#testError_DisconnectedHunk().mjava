@@ -1,0 +1,19 @@
+	public void testError_DisconnectedHunk() throws IOException {
+		final Patch p = parseTestPatchFile();
+		assertEquals(1, p.getFiles().size());
+		{
+			final FileHeader fh = p.getFiles().get(0);
+			assertEquals(
+					"org.eclipse.jgit/src/org/spearce/jgit/lib/RepositoryConfig.java",
+					fh.getNewName());
+			assertEquals(1, fh.getHunks().size());
+		}
+
+		assertEquals(1, p.getErrors().size());
+		final FormatError e = p.getErrors().get(0);
+		assertSame(FormatError.Severity.ERROR, e.getSeverity());
+		assertEquals("Hunk disconnected from file", e.getMessage());
+		assertEquals(18, e.getOffset());
+		assertTrue(e.getLineText().startsWith("@@ -109,4 +109,11 @@ assert"));
+	}
+

@@ -1,0 +1,59 @@
+	@Override
+	RevCommit next() throws MissingObjectException,
+			IncorrectObjectTypeException, IOException {
+		try {
+			for (;;) {
+				final RevCommit c = pending.next();
+				if (c == null) {
+					walker.curs.release();
+					return null;
+				}
+
+				final boolean produce;
+				if ((c.flags & UNINTERESTING) != 0)
+					produce = false;
+				else
+					produce = filter.include(walker, c);
+
+				for (final RevCommit p : c.parents) {
+					if ((p.flags & SEEN) != 0)
+						continue;
+					if ((p.flags & PARSED) == 0)
+						p.parseHeaders(walker);
+					p.flags |= SEEN;
+					pending.add(p);
+				}
+				walker.carryFlagsImpl(c);
+
+				if ((c.flags & UNINTERESTING) != 0) {
+					if (pending.everbodyHasFlag(UNINTERESTING)) {
+						final RevCommit n = pending.peek();
+						if (n != null && n.commitTime >= last.commitTime) {
+							// This is too close to call. The next commit we
+							// would pop is dated after the last one produced.
+							// We have to keep going to ensure that we carry
+							// flags as much as necessary.
+							//
+							overScan = OVER_SCAN;
+						} else if (--overScan == 0)
+							throw StopWalkException.INSTANCE;
+					} else {
+						overScan = OVER_SCAN;
+					}
+					if (canDispose)
+						c.disposeBody();
+					continue;
+				}
+
+				if (produce)
+					return last = c;
+				else if (canDispose)
+					c.disposeBody();
+			}
+		} catch (StopWalkException swe) {
+			walker.curs.release();
+			pending.clear();
+			return null;
+		}
+	}
+

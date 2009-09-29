@@ -1,0 +1,18 @@
+	private void markLocalCommitsComplete(final int until)
+			throws TransportException {
+		try {
+			for (;;) {
+				final RevCommit c = localCommitQueue.peek();
+				if (c == null || c.getCommitTime() < until)
+					return;
+				localCommitQueue.next();
+
+				markTreeComplete(c.getTree());
+				for (final RevCommit p : c.getParents())
+					pushLocalCommit(p);
+			}
+		} catch (IOException err) {
+			throw new TransportException("Local objects incomplete.", err);
+		}
+	}
+

@@ -1,0 +1,25 @@
+		@Override
+		public String dequote(final byte[] in, int ip, final int ie) {
+			boolean inquote = false;
+			final byte[] r = new byte[ie - ip];
+			int rPtr = 0;
+			while (ip < ie) {
+				final byte b = in[ip++];
+				switch (b) {
+				case '\'':
+					inquote = !inquote;
+					continue;
+				case '\\':
+					if (inquote || ip == ie)
+						r[rPtr++] = b; // literal within a quote
+					else
+						r[rPtr++] = in[ip++];
+					continue;
+				default:
+					r[rPtr++] = b;
+					continue;
+				}
+			}
+			return RawParseUtils.decode(Constants.CHARSET, r, 0, rPtr);
+		}
+

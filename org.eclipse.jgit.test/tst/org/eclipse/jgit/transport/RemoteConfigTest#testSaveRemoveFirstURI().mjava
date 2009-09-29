@@ -1,0 +1,15 @@
+	public void testSaveRemoveFirstURI() throws Exception {
+		readConfig("[remote \"spearce\"]\n"
+				+ "url = http://www.spearce.org/egit.git\n"
+				+ "url = /some/dir\n"
+				+ "fetch = +refs/heads/*:refs/remotes/spearce/*\n");
+
+		final RemoteConfig rc = new RemoteConfig(config, "spearce");
+		assertEquals(2, rc.getURIs().size());
+		rc.removeURI(new URIish("http://www.spearce.org/egit.git"));
+		assertEquals(1, rc.getURIs().size());
+		rc.update(config);
+		checkConfig("[remote \"spearce\"]\n" + "\turl = /some/dir\n"
+				+ "\tfetch = +refs/heads/*:refs/remotes/spearce/*\n");
+	}
+

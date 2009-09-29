@@ -1,0 +1,8 @@
+	private static String decode(final ByteBuffer b, final Charset charset)
+			throws CharacterCodingException {
+		final CharsetDecoder d = charset.newDecoder();
+		d.onMalformedInput(CodingErrorAction.REPORT);
+		d.onUnmappableCharacter(CodingErrorAction.REPORT);
+		return d.decode(b).toString();
+	}
+

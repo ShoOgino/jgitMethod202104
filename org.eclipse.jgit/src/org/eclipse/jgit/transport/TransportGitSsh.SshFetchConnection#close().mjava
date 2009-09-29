@@ -1,0 +1,14 @@
+		@Override
+		public void close() {
+			super.close();
+
+			if (channel != null) {
+				try {
+					if (channel.isConnected())
+						channel.disconnect();
+				} finally {
+					channel = null;
+				}
+			}
+		}
+

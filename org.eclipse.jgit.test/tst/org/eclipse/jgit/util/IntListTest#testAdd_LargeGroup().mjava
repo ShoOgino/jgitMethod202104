@@ -1,0 +1,17 @@
+	public void testAdd_LargeGroup() {
+		final IntList i = new IntList();
+		final int n = 500;
+		for (int v = 0; v < n; v++)
+			i.add(10 + v);
+		assertEquals(n, i.size());
+
+		for (int v = 0; v < n; v++)
+			assertEquals(10 + v, i.get(v));
+		try {
+			i.get(n);
+			fail("Accepted out of bound index on list");
+		} catch (ArrayIndexOutOfBoundsException e) {
+			assertTrue(true);
+		}
+	}
+

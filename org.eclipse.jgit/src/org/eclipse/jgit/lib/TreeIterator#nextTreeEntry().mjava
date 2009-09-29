@@ -1,0 +1,16 @@
+	private TreeEntry nextTreeEntry() throws IOException {
+		TreeEntry ret;
+		if (sub != null)
+			ret = sub.nextTreeEntry();
+		else {
+			if (index < 0 && order == Order.PREORDER) {
+				return tree;
+			}
+			if (order == Order.POSTORDER && index == tree.memberCount()) {
+				return tree;
+			}
+			ret = tree.members()[index];
+		}
+		return ret;
+	}
+

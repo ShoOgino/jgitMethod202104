@@ -1,0 +1,19 @@
+	/**
+	 * Parse the complete tag message and decode it to a string.
+	 * <p>
+	 * This method parses and returns the message portion of the tag buffer,
+	 * after taking the tag's character set into account and decoding the buffer
+	 * using that character set. This method is a fairly expensive operation and
+	 * produces a new string on each invocation.
+	 *
+	 * @return decoded tag message as a string. Never null.
+	 */
+	public final String getFullMessage() {
+		final byte[] raw = buffer;
+		final int msgB = RawParseUtils.tagMessage(raw, 0);
+		if (msgB < 0)
+			return "";
+		final Charset enc = RawParseUtils.parseEncoding(raw);
+		return RawParseUtils.decode(enc, raw, msgB, raw.length);
+	}
+

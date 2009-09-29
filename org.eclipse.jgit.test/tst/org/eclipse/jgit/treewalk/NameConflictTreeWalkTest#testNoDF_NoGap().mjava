@@ -1,0 +1,31 @@
+	public void testNoDF_NoGap() throws Exception {
+		final DirCache tree0 = DirCache.read(db);
+		final DirCache tree1 = DirCache.read(db);
+		{
+			final DirCacheBuilder b0 = tree0.builder();
+			final DirCacheBuilder b1 = tree1.builder();
+
+			b0.add(makeEntry("a", REGULAR_FILE));
+			b0.add(makeEntry("a.b", EXECUTABLE_FILE));
+			b1.add(makeEntry("a/b", REGULAR_FILE));
+			b0.add(makeEntry("a0b", SYMLINK));
+
+			b0.finish();
+			b1.finish();
+			assertEquals(3, tree0.getEntryCount());
+			assertEquals(1, tree1.getEntryCount());
+		}
+
+		final TreeWalk tw = new TreeWalk(db);
+		tw.reset();
+		tw.addTree(new DirCacheIterator(tree0));
+		tw.addTree(new DirCacheIterator(tree1));
+
+		assertModes("a", REGULAR_FILE, MISSING, tw);
+		assertModes("a.b", EXECUTABLE_FILE, MISSING, tw);
+		assertModes("a", MISSING, TREE, tw);
+		tw.enterSubtree();
+		assertModes("a/b", MISSING, REGULAR_FILE, tw);
+		assertModes("a0b", SYMLINK, MISSING, tw);
+	}
+

@@ -1,0 +1,18 @@
+	V remove(final long key) {
+		Node<V> n = table[index(key)];
+		Node<V> prior = null;
+		while (n != null) {
+			if (n.key == key) {
+				if (prior == null)
+					table[index(key)] = n.next;
+				else
+					prior.next = n.next;
+				size--;
+				return n.value;
+			}
+			prior = n;
+			n = n.next;
+		}
+		return null;
+	}
+

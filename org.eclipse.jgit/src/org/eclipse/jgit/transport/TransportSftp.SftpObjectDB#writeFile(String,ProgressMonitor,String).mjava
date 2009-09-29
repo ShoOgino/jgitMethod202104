@@ -1,0 +1,21 @@
+		@Override
+		OutputStream writeFile(final String path,
+				final ProgressMonitor monitor, final String monitorTask)
+				throws IOException {
+			try {
+				return ftp.put(path);
+			} catch (SftpException je) {
+				if (je.id == ChannelSftp.SSH_FX_NO_SUCH_FILE) {
+					mkdir_p(path);
+					try {
+						return ftp.put(path);
+					} catch (SftpException je2) {
+						je = je2;
+					}
+				}
+
+				throw new TransportException("Can't write " + objectsPath + "/"
+						+ path + ": " + je.getMessage(), je);
+			}
+		}
+

@@ -1,0 +1,19 @@
+	void parseCanonical(final RevWalk walk, final byte[] rawTag)
+			throws CorruptObjectException {
+		final MutableInteger pos = new MutableInteger();
+		final int oType;
+
+		pos.value = 53; // "object $sha1\ntype "
+		oType = Constants.decodeTypeString(this, rawTag, (byte) '\n', pos);
+		walk.idBuffer.fromString(rawTag, 7);
+		object = walk.lookupAny(walk.idBuffer, oType);
+
+		int p = pos.value += 4; // "tag "
+		final int nameEnd = RawParseUtils.nextLF(rawTag, p) - 1;
+		tagName = RawParseUtils.decode(Constants.CHARSET, rawTag, p, nameEnd);
+
+		if (walk.isRetainBody())
+			buffer = rawTag;
+		flags |= PARSED;
+	}
+

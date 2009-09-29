@@ -1,0 +1,11 @@
+	private static void touch(final long begin, final File dir) {
+		while (begin >= dir.lastModified()) {
+			try {
+				Thread.sleep(25);
+			} catch (InterruptedException ie) {
+				//
+			}
+			dir.setLastModified(System.currentTimeMillis());
+		}
+	}
+

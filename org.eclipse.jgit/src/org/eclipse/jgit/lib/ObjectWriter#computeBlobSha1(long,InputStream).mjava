@@ -1,0 +1,14 @@
+	/**
+	 * Compute the SHA-1 of a blob without creating an object. This is for
+	 * figuring out if we already have a blob or not.
+	 *
+	 * @param len number of bytes to consume
+	 * @param is stream for read blob data from
+	 * @return SHA-1 of a looked for blob
+	 * @throws IOException
+	 */
+	public ObjectId computeBlobSha1(final long len, final InputStream is)
+			throws IOException {
+		return writeObject(Constants.OBJ_BLOB, len, is, false);
+	}
+

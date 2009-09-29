@@ -1,0 +1,24 @@
+	/**
+	 * Set the tree entry filter for this walker.
+	 * <p>
+	 * Multiple filters may be combined by constructing an arbitrary tree of
+	 * <code>AndTreeFilter</code> or <code>OrTreeFilter</code> instances to
+	 * describe the boolean expression required by the application. Custom
+	 * filter implementations may also be constructed by applications.
+	 * <p>
+	 * Note that filters are not thread-safe and may not be shared by concurrent
+	 * TreeWalk instances. Every TreeWalk must be supplied its own unique
+	 * filter, unless the filter implementation specifically states it is (and
+	 * always will be) thread-safe. Callers may use {@link TreeFilter#clone()}
+	 * to create a unique filter tree for this TreeWalk instance.
+	 * 
+	 * @param newFilter
+	 *            the new filter. If null the special {@link TreeFilter#ALL}
+	 *            filter will be used instead, as it matches every entry.
+	 * @see org.eclipse.jgit.treewalk.filter.AndTreeFilter
+	 * @see org.eclipse.jgit.treewalk.filter.OrTreeFilter
+	 */
+	public void setFilter(final TreeFilter newFilter) {
+		filter = newFilter != null ? newFilter : TreeFilter.ALL;
+	}
+

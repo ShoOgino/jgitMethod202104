@@ -1,0 +1,26 @@
+	private void run() throws IOException {
+		for (final File src : includes) {
+			if (src.isFile())
+				scanJar(src);
+			else
+				scanDirectory(src, src, "");
+		}
+		for (final Map.Entry<String, String> e : files.entrySet())
+			chosenSources.put(e.getKey(), new File(e.getValue()));
+
+		creationTime = System.currentTimeMillis();
+		zos = new ZipOutputStream(System.out);
+		zos.setLevel(9);
+
+		for (final File src : includes) {
+			if (src.isFile())
+				appendJar(src);
+			else
+				appendDirectory(src, src, "");
+		}
+		for (final String name : files.keySet())
+			appendFile(chosenSources.get(name), name);
+
+		zos.close();
+	}
+

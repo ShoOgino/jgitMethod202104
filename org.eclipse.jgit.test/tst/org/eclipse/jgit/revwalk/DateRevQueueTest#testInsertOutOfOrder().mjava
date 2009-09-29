@@ -1,0 +1,18 @@
+	public void testInsertOutOfOrder() throws Exception {
+		final RevCommit a = parse(commit());
+		final RevCommit b = parse(commit(10, a));
+		final RevCommit c1 = parse(commit(5, b));
+		final RevCommit c2 = parse(commit(-50, b));
+
+		q.add(c2);
+		q.add(a);
+		q.add(b);
+		q.add(c1);
+
+		assertCommit(c1, q.next());
+		assertCommit(b, q.next());
+		assertCommit(a, q.next());
+		assertCommit(c2, q.next());
+		assertNull(q.next());
+	}
+

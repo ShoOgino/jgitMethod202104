@@ -1,0 +1,29 @@
+	@Override
+	public void next(int delta) {
+		if (delta == 1) {
+			// Moving forward one is the most common case.
+			//
+			prevPtr = currPtr;
+			currPtr = nextPtr;
+			if (!eof())
+				parseEntry();
+			return;
+		}
+
+		// Fast skip over records, then parse the last one.
+		//
+		final int end = raw.length;
+		int ptr = nextPtr;
+		while (--delta > 0 && ptr != end) {
+			prevPtr = ptr;
+			while (raw[ptr] != 0)
+				ptr++;
+			ptr += Constants.OBJECT_ID_LENGTH + 1;
+		}
+		if (delta != 0)
+			throw new ArrayIndexOutOfBoundsException(delta);
+		currPtr = ptr;
+		if (!eof())
+			parseEntry();
+	}
+

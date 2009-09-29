@@ -1,0 +1,12 @@
+	private void grow() {
+		final V[] old_hash = obj_hash;
+		final int old_hash_size = obj_hash.length;
+
+		obj_hash = createArray(2 * old_hash_size);
+		for (int i = 0; i < old_hash_size; i++) {
+			final V obj = old_hash[i];
+			if (obj != null)
+				insert(obj);
+		}
+	}
+

@@ -1,0 +1,25 @@
+	AbstractTreeIterator min() throws CorruptObjectException {
+		int i = 0;
+		AbstractTreeIterator minRef = trees[i];
+		while (minRef.eof() && ++i < trees.length)
+			minRef = trees[i];
+		if (minRef.eof())
+			return minRef;
+
+		minRef.matches = minRef;
+		while (++i < trees.length) {
+			final AbstractTreeIterator t = trees[i];
+			if (t.eof())
+				continue;
+			final int cmp = t.pathCompare(minRef);
+			if (cmp < 0) {
+				t.matches = t;
+				minRef = t;
+			} else if (cmp == 0) {
+				t.matches = minRef;
+			}
+		}
+
+		return minRef;
+	}
+

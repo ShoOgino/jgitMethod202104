@@ -1,0 +1,10 @@
+	public void testEncodeASCII_FailOnNonASCII() {
+		final String src = "Ūnĭcōde̽";
+		try {
+			Constants.encodeASCII(src);
+			fail("Incorrectly accepted a Unicode character");
+		} catch (IllegalArgumentException err) {
+			assertEquals("Not ASCII string: " + src, err.getMessage());
+		}
+	}
+

@@ -1,0 +1,34 @@
+	/**
+	 * Reset this parser to walk through the given tree.
+	 *
+	 * @param repo
+	 *            repository to load the tree data from.
+	 * @param id
+	 *            identity of the tree being parsed; used only in exception
+	 *            messages if data corruption is found.
+	 * @param curs
+	 *            window cursor to use during repository access.
+	 * @throws MissingObjectException
+	 *             the object supplied is not available from the repository.
+	 * @throws IncorrectObjectTypeException
+	 *             the object supplied as an argument is not actually a tree and
+	 *             cannot be parsed as though it were a tree.
+	 * @throws IOException
+	 *             a loose object or pack file could not be read.
+	 */
+	public void reset(final Repository repo, final AnyObjectId id,
+			final WindowCursor curs)
+			throws IncorrectObjectTypeException, IOException {
+		final ObjectLoader ldr = repo.openObject(curs, id);
+		if (ldr == null) {
+			final ObjectId me = id.toObjectId();
+			throw new MissingObjectException(me, Constants.TYPE_TREE);
+		}
+		final byte[] subtreeData = ldr.getCachedBytes();
+		if (ldr.getType() != Constants.OBJ_TREE) {
+			final ObjectId me = id.toObjectId();
+			throw new IncorrectObjectTypeException(me, Constants.TYPE_TREE);
+		}
+		reset(subtreeData);
+	}
+

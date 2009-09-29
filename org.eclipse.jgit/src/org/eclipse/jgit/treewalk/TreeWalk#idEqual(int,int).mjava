@@ -1,0 +1,27 @@
+	/**
+	 * Compare two tree's current ObjectId values for equality.
+	 * 
+	 * @param nthA
+	 *            first tree to compare the object id from.
+	 * @param nthB
+	 *            second tree to compare the object id from.
+	 * @return result of
+	 *         <code>getObjectId(nthA).equals(getObjectId(nthB))</code>.
+	 * @see #getObjectId(int)
+	 */
+	public boolean idEqual(final int nthA, final int nthB) {
+		final AbstractTreeIterator ch = currentHead;
+		final AbstractTreeIterator a = trees[nthA];
+		final AbstractTreeIterator b = trees[nthB];
+		if (a.matches == ch && b.matches == ch)
+			return a.idEqual(b);
+		if (a.matches != ch && b.matches != ch) {
+			// If neither tree matches the current path node then neither
+			// tree has this entry. In such case the ObjectId is zero(),
+			// and zero() is always equal to zero().
+			//
+			return true;
+		}
+		return false;
+	}
+

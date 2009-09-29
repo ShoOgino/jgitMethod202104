@@ -1,0 +1,18 @@
+	protected void doPush(final ProgressMonitor monitor,
+			final Map<String, RemoteRefUpdate> refUpdates)
+			throws TransportException {
+		try {
+			writeCommands(refUpdates.values(), monitor);
+			if (writePack)
+				writePack(refUpdates, monitor);
+			if (sentCommand && capableReport)
+				readStatusReport(refUpdates);
+		} catch (TransportException e) {
+			throw e;
+		} catch (Exception e) {
+			throw new TransportException(uri, e.getMessage(), e);
+		} finally {
+			close();
+		}
+	}
+

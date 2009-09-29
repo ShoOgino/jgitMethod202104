@@ -1,0 +1,54 @@
+	public void testParse_CcNewFile() throws IOException {
+		final Patch p = parseTestPatchFile();
+		assertEquals(1, p.getFiles().size());
+		assertTrue(p.getErrors().isEmpty());
+
+		final CombinedFileHeader cfh = (CombinedFileHeader) p.getFiles().get(0);
+
+		assertSame(FileHeader.DEV_NULL, cfh.getOldName());
+		assertEquals("d", cfh.getNewName());
+
+		assertEquals(187, cfh.startOffset);
+
+		assertEquals(2, cfh.getParentCount());
+		assertSame(cfh.getOldId(0), cfh.getOldId());
+		assertEquals("0000000", cfh.getOldId(0).name());
+		assertEquals("0000000", cfh.getOldId(1).name());
+		assertEquals("4bcfe98", cfh.getNewId().name());
+
+		assertSame(cfh.getOldMode(0), cfh.getOldMode());
+		assertSame(FileMode.MISSING, cfh.getOldMode(0));
+		assertSame(FileMode.MISSING, cfh.getOldMode(1));
+		assertSame(FileMode.REGULAR_FILE, cfh.getNewMode());
+		assertSame(FileHeader.ChangeType.ADD, cfh.getChangeType());
+		assertSame(FileHeader.PatchType.UNIFIED, cfh.getPatchType());
+
+		assertEquals(1, cfh.getHunks().size());
+		{
+			final CombinedHunkHeader h = cfh.getHunks().get(0);
+
+			assertSame(cfh, h.getFileHeader());
+			assertEquals(273, h.startOffset);
+			assertEquals(300, h.endOffset);
+
+			assertSame(h.getOldImage(0), h.getOldImage());
+			assertSame(cfh.getOldId(0), h.getOldImage(0).getId());
+			assertSame(cfh.getOldId(1), h.getOldImage(1).getId());
+
+			assertEquals(1, h.getOldImage(0).getStartLine());
+			assertEquals(0, h.getOldImage(0).getLineCount());
+			assertEquals(1, h.getOldImage(0).getLinesAdded());
+			assertEquals(0, h.getOldImage(0).getLinesDeleted());
+
+			assertEquals(1, h.getOldImage(1).getStartLine());
+			assertEquals(0, h.getOldImage(1).getLineCount());
+			assertEquals(1, h.getOldImage(1).getLinesAdded());
+			assertEquals(0, h.getOldImage(1).getLinesDeleted());
+
+			assertEquals(1, h.getNewStartLine());
+			assertEquals(1, h.getNewLineCount());
+
+			assertEquals(0, h.getLinesContext());
+		}
+	}
+

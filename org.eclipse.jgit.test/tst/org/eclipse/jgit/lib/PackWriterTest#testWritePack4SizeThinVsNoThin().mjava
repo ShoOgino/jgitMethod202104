@@ -1,0 +1,18 @@
+	/**
+	 * Compare sizes of packs created using {@link #testWritePack4()} and
+	 * {@link #testWritePack4ThinPack()}. Obviously, the thin pack should be
+	 * smaller.
+	 *
+	 * @throws Exception
+	 */
+	public void testWritePack4SizeThinVsNoThin() throws Exception {
+		testWritePack4();
+		final long sizePack4 = cos.length();
+		tearDown();
+		setUp();
+		testWritePack4ThinPack();
+		final long sizePack4Thin = cos.length();
+
+		assertTrue(sizePack4 > sizePack4Thin);
+	}
+

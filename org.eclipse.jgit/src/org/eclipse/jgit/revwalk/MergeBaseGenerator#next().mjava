@@ -1,0 +1,49 @@
+	@Override
+	RevCommit next() throws MissingObjectException,
+			IncorrectObjectTypeException, IOException {
+		for (;;) {
+			final RevCommit c = pending.next();
+			if (c == null) {
+				walker.curs.release();
+				return null;
+			}
+
+			for (final RevCommit p : c.parents) {
+				if ((p.flags & IN_PENDING) != 0)
+					continue;
+				if ((p.flags & PARSED) == 0)
+					p.parseHeaders(walker);
+				p.flags |= IN_PENDING;
+				pending.add(p);
+			}
+
+			int carry = c.flags & branchMask;
+			boolean mb = carry == branchMask;
+			if (mb) {
+				// If we are a merge base make sure our ancestors are
+				// also flagged as being popped, so that they do not
+				// generate to the caller.
+				//
+				carry |= MERGE_BASE;
+			}
+			carryOntoHistory(c, carry);
+
+			if ((c.flags & MERGE_BASE) != 0) {
+				// This commit is an ancestor of a merge base we already
+				// popped back to the caller. If everyone in pending is
+				// that way we are done traversing; if not we just need
+				// to move to the next available commit and try again.
+				//
+				if (pending.everbodyHasFlag(MERGE_BASE))
+					return null;
+				continue;
+			}
+			c.flags |= POPPED;
+
+			if (mb) {
+				c.flags |= MERGE_BASE;
+				return c;
+			}
+		}
+	}
+

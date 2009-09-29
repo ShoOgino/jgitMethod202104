@@ -1,0 +1,20 @@
+	@Override
+	public RevCommit next() throws MissingObjectException,
+			IncorrectObjectTypeException, IOException {
+		for (;;) {
+			final RevCommit r = super.next();
+			if (r == null)
+				return null;
+			if ((r.flags & UNINTERESTING) != 0) {
+				markTreeUninteresting(r.getTree());
+				if (hasRevSort(RevSort.BOUNDARY)) {
+					pendingObjects.add(r.getTree());
+					return r;
+				}
+				continue;
+			}
+			pendingObjects.add(r.getTree());
+			return r;
+		}
+	}
+

@@ -1,0 +1,10 @@
+	private static int tableSize(final WindowCacheConfig cfg) {
+		final int wsz = cfg.getPackedGitWindowSize();
+		final long limit = cfg.getPackedGitLimit();
+		if (wsz <= 0)
+			throw new IllegalArgumentException("Invalid window size");
+		if (limit < wsz)
+			throw new IllegalArgumentException("Window size must be < limit");
+		return (int) Math.min(5 * (limit / wsz) / 2, 2000000000);
+	}
+

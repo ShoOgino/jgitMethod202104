@@ -1,0 +1,48 @@
+	public void testEncodeInt64() {
+		final byte[] out = new byte[16];
+
+		prepareOutput(out);
+		NB.encodeInt64(out, 0, 0L);
+		assertOutput(b(0, 0, 0, 0, 0, 0, 0, 0), out, 0);
+
+		prepareOutput(out);
+		NB.encodeInt64(out, 3, 0L);
+		assertOutput(b(0, 0, 0, 0, 0, 0, 0, 0), out, 3);
+
+		prepareOutput(out);
+		NB.encodeInt64(out, 0, 3L);
+		assertOutput(b(0, 0, 0, 0, 0, 0, 0, 3), out, 0);
+
+		prepareOutput(out);
+		NB.encodeInt64(out, 3, 3L);
+		assertOutput(b(0, 0, 0, 0, 0, 0, 0, 3), out, 3);
+
+		prepareOutput(out);
+		NB.encodeInt64(out, 0, 0xdeacL);
+		assertOutput(b(0, 0, 0, 0, 0, 0, 0xde, 0xac), out, 0);
+
+		prepareOutput(out);
+		NB.encodeInt64(out, 3, 0xdeacL);
+		assertOutput(b(0, 0, 0, 0, 0, 0, 0xde, 0xac), out, 3);
+
+		prepareOutput(out);
+		NB.encodeInt64(out, 0, 0xdeac9853L);
+		assertOutput(b(0, 0, 0, 0, 0xde, 0xac, 0x98, 0x53), out, 0);
+
+		prepareOutput(out);
+		NB.encodeInt64(out, 3, 0xdeac9853L);
+		assertOutput(b(0, 0, 0, 0, 0xde, 0xac, 0x98, 0x53), out, 3);
+
+		prepareOutput(out);
+		NB.encodeInt64(out, 0, 0xac431242deac9853L);
+		assertOutput(b(0xac, 0x43, 0x12, 0x42, 0xde, 0xac, 0x98, 0x53), out, 0);
+
+		prepareOutput(out);
+		NB.encodeInt64(out, 3, 0xac431242deac9853L);
+		assertOutput(b(0xac, 0x43, 0x12, 0x42, 0xde, 0xac, 0x98, 0x53), out, 3);
+
+		prepareOutput(out);
+		NB.encodeInt64(out, 3, -1L);
+		assertOutput(b(0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff), out, 3);
+	}
+

@@ -1,0 +1,12 @@
+	public void testReadRightLog() throws Exception {
+		setupReflog("logs/refs/heads/a", aLine);
+		setupReflog("logs/refs/heads/master", masterLine);
+		setupReflog("logs/HEAD", headLine);
+		assertEquals("branch: change to master", db.getReflogReader("master")
+				.getLastEntry().getComment());
+		assertEquals("branch: change to a", db.getReflogReader("a")
+				.getLastEntry().getComment());
+		assertEquals("branch: change to HEAD", db.getReflogReader("HEAD")
+				.getLastEntry().getComment());
+	}
+

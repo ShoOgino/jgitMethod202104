@@ -1,0 +1,37 @@
+	/**
+	 * Match a character sequence against this pattern.
+	 * 
+	 * @param rcs
+	 *            the sequence to match. Must not be null but the length of the
+	 *            sequence is permitted to be 0.
+	 * @return offset within <code>rcs</code> of the first occurrence of this
+	 *         pattern; -1 if this pattern does not appear at any position of
+	 *         <code>rcs</code>.
+	 */
+	public int match(final RawCharSequence rcs) {
+		final int needleLen = needle.length;
+		final byte first = needle[0];
+
+		final byte[] text = rcs.buffer;
+		int matchPos = rcs.startPtr;
+		final int maxPos = rcs.endPtr - needleLen;
+
+		OUTER: for (; matchPos < maxPos; matchPos++) {
+			if (neq(first, text[matchPos])) {
+				while (++matchPos < maxPos && neq(first, text[matchPos])) {
+					/* skip */
+				}
+				if (matchPos == maxPos)
+					return -1;
+			}
+
+			int si = ++matchPos;
+			for (int j = 1; j < needleLen; j++, si++) {
+				if (neq(needle[j], text[si]))
+					continue OUTER;
+			}
+			return matchPos - 1;
+		}
+		return -1;
+	}
+

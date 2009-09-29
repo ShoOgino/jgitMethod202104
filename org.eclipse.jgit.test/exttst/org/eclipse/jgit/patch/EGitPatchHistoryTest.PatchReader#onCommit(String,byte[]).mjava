@@ -1,0 +1,53 @@
+		@Override
+		void onCommit(String cid, byte[] buf) {
+			final HashMap<String, StatInfo> files = stats.remove(cid);
+			assertNotNull("No files for " + cid, files);
+
+			final Patch p = new Patch();
+			p.parse(buf, 0, buf.length - 1);
+			assertEquals("File count " + cid, files.size(), p.getFiles().size());
+			if (!p.getErrors().isEmpty()) {
+				for (final FormatError e : p.getErrors()) {
+					System.out.println("error " + e.getMessage());
+					System.out.println("  at " + e.getLineText());
+				}
+				dump(buf);
+				fail("Unexpected error in " + cid);
+			}
+
+			for (final FileHeader fh : p.getFiles()) {
+				final String fileName;
+				if (fh.getChangeType() != FileHeader.ChangeType.DELETE)
+					fileName = fh.getNewName();
+				else
+					fileName = fh.getOldName();
+				final StatInfo s = files.remove(fileName);
+				final String nid = fileName + " in " + cid;
+				assertNotNull("No " + nid, s);
+				int added = 0, deleted = 0;
+				for (final HunkHeader h : fh.getHunks()) {
+					added += h.getOldImage().getLinesAdded();
+					deleted += h.getOldImage().getLinesDeleted();
+				}
+
+				if (s.added == added) {
+					//
+				} else if (s.added == added + 1 && offBy1.contains(cid)) {
+					//
+				} else {
+					dump(buf);
+					assertEquals("Added diff in " + nid, s.added, added);
+				}
+
+				if (s.deleted == deleted) {
+					//
+				} else if (s.deleted == deleted + 1 && offBy1.contains(cid)) {
+					//
+				} else {
+					dump(buf);
+					assertEquals("Deleted diff in " + nid, s.deleted, deleted);
+				}
+			}
+			assertTrue("Missed files in " + cid, files.isEmpty());
+		}
+

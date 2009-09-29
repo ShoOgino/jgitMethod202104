@@ -1,0 +1,21 @@
+	private FileMode(int mode, final int expType) {
+		modeBits = mode;
+		objectType = expType;
+		if (mode != 0) {
+			final byte[] tmp = new byte[10];
+			int p = tmp.length;
+
+			while (mode != 0) {
+				tmp[--p] = (byte) ('0' + (mode & 07));
+				mode >>= 3;
+			}
+
+			octalBytes = new byte[tmp.length - p];
+			for (int k = 0; k < octalBytes.length; k++) {
+				octalBytes[k] = tmp[p + k];
+			}
+		} else {
+			octalBytes = new byte[] { '0' };
+		}
+	}
+

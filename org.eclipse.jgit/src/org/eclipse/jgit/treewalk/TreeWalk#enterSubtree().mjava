@@ -1,0 +1,37 @@
+	/**
+	 * Enter into the current subtree.
+	 * <p>
+	 * If the current entry is a subtree this method arranges for its children
+	 * to be returned before the next sibling following the subtree is returned.
+	 * 
+	 * @throws MissingObjectException
+	 *             a subtree was found, but the subtree object does not exist in
+	 *             this repository. The repository may be missing objects.
+	 * @throws IncorrectObjectTypeException
+	 *             a subtree was found, and the subtree id does not denote a
+	 *             tree, but instead names some other non-tree type of object.
+	 *             The repository may have data corruption.
+	 * @throws CorruptObjectException
+	 *             the contents of a tree did not appear to be a tree. The
+	 *             repository may have data corruption.
+	 * @throws IOException
+	 *             a loose object or pack file could not be read.
+	 */
+	public void enterSubtree() throws MissingObjectException,
+			IncorrectObjectTypeException, CorruptObjectException, IOException {
+		final AbstractTreeIterator ch = currentHead;
+		final AbstractTreeIterator[] tmp = new AbstractTreeIterator[trees.length];
+		for (int i = 0; i < trees.length; i++) {
+			final AbstractTreeIterator t = trees[i];
+			final AbstractTreeIterator n;
+			if (t.matches == ch && !t.eof() && FileMode.TREE.equals(t.mode))
+				n = t.createSubtreeIterator(db, idBuffer, curs);
+			else
+				n = t.createEmptyTreeIterator();
+			tmp[i] = n;
+		}
+		depth++;
+		advance = false;
+		System.arraycopy(tmp, 0, trees, 0, trees.length);
+	}
+

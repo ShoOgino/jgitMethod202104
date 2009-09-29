@@ -1,0 +1,16 @@
+	public void testInvalidCommitInvalidTree1() {
+		final StringBuilder b = new StringBuilder();
+
+		b.append("tree ");
+		b.append("zzzzfa841874ccc9f2ef7c48d0c76226f89b7189");
+		b.append('\n');
+
+		final byte[] data = Constants.encodeASCII(b.toString());
+		try {
+			checker.checkCommit(data);
+			fail("Did not catch corrupt object");
+		} catch (CorruptObjectException e) {
+			assertEquals("invalid tree", e.getMessage());
+		}
+	}
+

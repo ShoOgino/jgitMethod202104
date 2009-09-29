@@ -1,0 +1,14 @@
+	private void fetchObjects(final ProgressMonitor monitor)
+			throws TransportException {
+		try {
+			conn.setPackLockMessage("jgit fetch " + transport.uri);
+			conn.fetch(monitor, askFor.values(), have);
+		} finally {
+			packLocks.addAll(conn.getPackLocks());
+		}
+		if (transport.isCheckFetchedObjects()
+				&& !conn.didFetchTestConnectivity() && !askForIsComplete())
+			throw new TransportException(transport.getURI(),
+					"peer did not supply a complete object graph");
+	}
+

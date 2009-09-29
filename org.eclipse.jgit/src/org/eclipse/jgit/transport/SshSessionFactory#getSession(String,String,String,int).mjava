@@ -1,0 +1,29 @@
+	/**
+	 * Open (or reuse) a session to a host.
+	 * <p>
+	 * A reasonable UserInfo that can interact with the end-user (if necessary)
+	 * is installed on the returned session by this method.
+	 * <p>
+	 * The caller must connect the session by invoking <code>connect()</code>
+	 * if it has not already been connected.
+	 * 
+	 * @param user
+	 *            username to authenticate as. If null a reasonable default must
+	 *            be selected by the implementation. This may be
+	 *            <code>System.getProperty("user.name")</code>.
+	 * @param pass
+	 *            optional user account password or passphrase. If not null a
+	 *            UserInfo that supplies this value to the SSH library will be
+	 *            configured.
+	 * @param host
+	 *            hostname (or IP address) to connect to. Must not be null.
+	 * @param port
+	 *            port number the server is listening for connections on. May be <=
+	 *            0 to indicate the IANA registered port of 22 should be used.
+	 * @return a session that can contact the remote host.
+	 * @throws JSchException
+	 *             the session could not be created.
+	 */
+	public abstract Session getSession(String user, String pass, String host,
+			int port) throws JSchException;
+

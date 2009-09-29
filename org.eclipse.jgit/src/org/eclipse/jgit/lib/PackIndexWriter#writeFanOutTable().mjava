@@ -1,0 +1,23 @@
+	/**
+	 * Output the standard 256 entry first-level fan-out table.
+	 * <p>
+	 * The fan-out table is 4 KB in size, holding 256 32-bit unsigned integer
+	 * counts. Each count represents the number of objects within this index
+	 * whose {@link ObjectId#getFirstByte()} matches the count's position in the
+	 * fan-out table.
+	 *
+	 * @throws IOException
+	 *             an error occurred while writing to the output stream.
+	 */
+	protected void writeFanOutTable() throws IOException {
+		final int[] fanout = new int[256];
+		for (final PackedObjectInfo po : entries)
+			fanout[po.getFirstByte() & 0xff]++;
+		for (int i = 1; i < 256; i++)
+			fanout[i] += fanout[i - 1];
+		for (final int n : fanout) {
+			NB.encodeInt32(tmp, 0, n);
+			out.write(tmp, 0, 4);
+		}
+	}
+

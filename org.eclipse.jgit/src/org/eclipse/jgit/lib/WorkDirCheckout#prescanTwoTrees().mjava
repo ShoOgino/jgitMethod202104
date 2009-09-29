@@ -1,0 +1,42 @@
+	void prescanTwoTrees() throws IOException {
+		new IndexTreeWalker(index, head, merge, root, new AbstractIndexTreeVisitor() {
+			public void visitEntry(TreeEntry treeEntry, TreeEntry auxEntry,
+					Entry indexEntry, File file) throws IOException {
+				if (treeEntry instanceof Tree || auxEntry instanceof Tree) {
+					throw new IllegalArgumentException("Can't pass me a tree!");
+				}
+				processEntry(treeEntry, auxEntry, indexEntry);
+			}
+	
+			@Override
+			public void finishVisitTree(Tree tree, Tree auxTree, String curDir) throws IOException {
+				if (curDir.length() == 0) return;
+				
+				if (auxTree != null) {
+					if (index.getEntry(curDir) != null)
+						removed.add(curDir);
+				} 
+			}
+			
+		}).walk();
+		
+		// if there's a conflict, don't list it under
+		// to-be-removed, since that messed up our next
+		// section
+		removed.removeAll(conflicts);
+		
+		for (String path : updated.keySet()) {
+			if (index.getEntry(path) == null) {
+				File file = new File(root, path);
+				if (file.isFile())
+					conflicts.add(path);
+				else if (file.isDirectory()) {
+					checkConflictsWithFile(file);
+				}
+			}
+		}
+		
+		
+		conflicts.removeAll(removed);
+	}
+

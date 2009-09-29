@@ -1,0 +1,19 @@
+	/**
+	 * Writes a symref (e.g. HEAD) to disk
+	 * 
+	 * @param name
+	 *            symref name
+	 * @param target
+	 *            pointed to ref
+	 * @throws IOException
+	 */
+	void link(final String name, final String target) throws IOException {
+		final byte[] content = Constants.encode("ref: " + target + "\n");
+		lockAndWriteFile(fileForRef(name), content);
+		synchronized (this) {
+			looseSymRefs.remove(name);
+			setModified();
+		}
+		db.fireRefsMaybeChanged();
+	}
+

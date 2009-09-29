@@ -1,0 +1,21 @@
+	/**
+	 * Obtain the user's configuration data.
+	 * <p>
+	 * The configuration file is always returned to the caller, even if no file
+	 * exists in the user's home directory at the time the call was made. Lookup
+	 * requests are cached and are automatically updated if the user modifies
+	 * the configuration file since the last time it was cached.
+	 *
+	 * @return a caching reader of the user's configuration file.
+	 */
+	public static OpenSshConfig get() {
+		File home = FS.userHome();
+		if (home == null)
+			home = new File(".").getAbsoluteFile();
+
+		final File config = new File(new File(home, ".ssh"), "config");
+		final OpenSshConfig osc = new OpenSshConfig(home, config);
+		osc.refresh();
+		return osc;
+	}
+

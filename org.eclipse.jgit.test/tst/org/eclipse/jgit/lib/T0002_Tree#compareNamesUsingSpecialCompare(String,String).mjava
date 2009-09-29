@@ -1,0 +1,18 @@
+	private int compareNamesUsingSpecialCompare(String a,String b) throws UnsupportedEncodingException {
+		char lasta = '\0';
+		byte[] abytes;
+		if (a.length() > 0 && a.charAt(a.length()-1) == '/') {
+			lasta = '/';
+			a = a.substring(0, a.length() - 1);
+		}
+		abytes = a.getBytes("ISO-8859-1");
+		char lastb = '\0';
+		byte[] bbytes;
+		if (b.length() > 0 && b.charAt(b.length()-1) == '/') {
+			lastb = '/';
+			b = b.substring(0, b.length() - 1);
+		}
+		bbytes = b.getBytes("ISO-8859-1");
+		return Tree.compareNames(abytes, bbytes, lasta, lastb);
+	}
+

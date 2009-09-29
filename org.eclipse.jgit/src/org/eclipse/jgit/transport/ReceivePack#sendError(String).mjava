@@ -1,0 +1,20 @@
+	/**
+	 * Send an error message to the client, if it supports receiving them.
+	 * <p>
+	 * If the client doesn't support receiving messages, the message will be
+	 * discarded, with no other indication to the caller or to the client.
+	 * <p>
+	 * {@link PreReceiveHook}s should always try to use
+	 * {@link ReceiveCommand#setResult(Result, String)} with a result status of
+	 * {@link Result#REJECTED_OTHER_REASON} to indicate any reasons for
+	 * rejecting an update. Messages attached to a command are much more likely
+	 * to be returned to the client.
+	 *
+	 * @param what
+	 *            string describing the problem identified by the hook. The
+	 *            string must not end with an LF, and must not contain an LF.
+	 */
+	public void sendError(final String what) {
+		sendMessage("error", what);
+	}
+

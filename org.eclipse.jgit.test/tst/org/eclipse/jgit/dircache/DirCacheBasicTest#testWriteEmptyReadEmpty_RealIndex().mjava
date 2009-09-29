@@ -1,0 +1,17 @@
+	public void testWriteEmptyReadEmpty_RealIndex() throws Exception {
+		final File idx = new File(db.getDirectory(), "index");
+		final File lck = new File(db.getDirectory(), "index.lock");
+		assertFalse(idx.exists());
+		assertFalse(lck.exists());
+		{
+			final DirCache dc = DirCache.lock(db);
+			dc.write();
+			assertTrue(dc.commit());
+			assertTrue(idx.exists());
+		}
+		{
+			final DirCache dc = DirCache.read(db);
+			assertEquals(0, dc.getEntryCount());
+		}
+	}
+

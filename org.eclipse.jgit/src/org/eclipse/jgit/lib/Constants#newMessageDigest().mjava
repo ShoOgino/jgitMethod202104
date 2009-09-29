@@ -1,0 +1,18 @@
+	/**
+	 * Create a new digest function for objects.
+	 * 
+	 * @return a new digest object.
+	 * @throws RuntimeException
+	 *             this Java virtual machine does not support the required hash
+	 *             function. Very unlikely given that JGit uses a hash function
+	 *             that is in the Java reference specification.
+	 */
+	public static MessageDigest newMessageDigest() {
+		try {
+			return MessageDigest.getInstance(HASH_FUNCTION);
+		} catch (NoSuchAlgorithmException nsae) {
+			throw new RuntimeException("Required hash function "
+					+ HASH_FUNCTION + " not available.", nsae);
+		}
+	}
+

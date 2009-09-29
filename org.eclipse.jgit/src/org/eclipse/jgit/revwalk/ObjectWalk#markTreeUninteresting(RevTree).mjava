@@ -1,0 +1,41 @@
+	private void markTreeUninteresting(final RevTree tree)
+			throws MissingObjectException, IncorrectObjectTypeException,
+			IOException {
+		if ((tree.flags & UNINTERESTING) != 0)
+			return;
+		tree.flags |= UNINTERESTING;
+
+		treeWalk = treeWalk.resetRoot(db, tree, curs);
+		while (!treeWalk.eof()) {
+			final FileMode mode = treeWalk.getEntryFileMode();
+			final int sType = mode.getObjectType();
+
+			switch (sType) {
+			case Constants.OBJ_BLOB: {
+				treeWalk.getEntryObjectId(idBuffer);
+				lookupBlob(idBuffer).flags |= UNINTERESTING;
+				break;
+			}
+			case Constants.OBJ_TREE: {
+				treeWalk.getEntryObjectId(idBuffer);
+				final RevTree t = lookupTree(idBuffer);
+				if ((t.flags & UNINTERESTING) == 0) {
+					t.flags |= UNINTERESTING;
+					treeWalk = treeWalk.createSubtreeIterator0(db, t, curs);
+					continue;
+				}
+				break;
+			}
+			default:
+				if (FileMode.GITLINK.equals(mode))
+					break;
+				treeWalk.getEntryObjectId(idBuffer);
+				throw new CorruptObjectException("Invalid mode " + mode
+						+ " for " + idBuffer.name() + " "
+						+ treeWalk.getEntryPathString() + " in " + tree + ".");
+			}
+
+			treeWalk = treeWalk.next();
+		}
+	}
+

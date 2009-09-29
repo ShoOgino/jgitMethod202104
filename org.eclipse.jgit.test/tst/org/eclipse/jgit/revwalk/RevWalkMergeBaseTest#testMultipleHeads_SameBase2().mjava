@@ -1,0 +1,16 @@
+	public void testMultipleHeads_SameBase2() throws Exception {
+		final RevCommit a = commit();
+		final RevCommit b = commit(a);
+		final RevCommit c = commit(b);
+		final RevCommit d1 = commit(commit(commit(commit(commit(b)))));
+		final RevCommit d2 = commit(commit(commit(commit(commit(c)))));
+		final RevCommit d3 = commit(commit(commit(c)));
+
+		rw.setRevFilter(RevFilter.MERGE_BASE);
+		markStart(d1);
+		markStart(d2);
+		markStart(d3);
+		assertCommit(b, rw.next());
+		assertNull(rw.next());
+	}
+

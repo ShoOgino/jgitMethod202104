@@ -1,0 +1,19 @@
+	public void testComputeFileObjectId() throws Exception {
+		final FileTreeIterator top = new FileTreeIterator(trash);
+
+		final MessageDigest md = Constants.newMessageDigest();
+		md.update(Constants.encodeASCII(Constants.TYPE_BLOB));
+		md.update((byte) ' ');
+		md.update(Constants.encodeASCII(paths[0].length()));
+		md.update((byte) 0);
+		md.update(Constants.encode(paths[0]));
+		final ObjectId expect = ObjectId.fromRaw(md.digest());
+
+		assertEquals(expect, top.getEntryObjectId());
+
+		// Verify it was cached by removing the file and getting it again.
+		//
+		new File(trash, paths[0]).delete();
+		assertEquals(expect, top.getEntryObjectId());
+	}
+

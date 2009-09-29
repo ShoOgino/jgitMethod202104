@@ -1,0 +1,14 @@
+	public void testUnpopAtFront() throws Exception {
+		final RevCommit a = commit();
+		final RevCommit b = commit();
+		final RevCommit c = commit();
+
+		q.add(a);
+		q.unpop(b);
+		q.unpop(c);
+
+		assertSame(c, q.next());
+		assertSame(b, q.next());
+		assertSame(a, q.next());
+	}
+

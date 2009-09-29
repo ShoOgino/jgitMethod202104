@@ -1,0 +1,21 @@
+	/** Clear this buffer so it has no data, and cannot be used again. */
+	public void destroy() {
+		blocks = null;
+
+		if (diskOut != null) {
+			try {
+				diskOut.close();
+			} catch (IOException err) {
+				// We shouldn't encounter an error closing the file.
+			} finally {
+				diskOut = null;
+			}
+		}
+
+		if (onDiskFile != null) {
+			if (!onDiskFile.delete())
+				onDiskFile.deleteOnExit();
+			onDiskFile = null;
+		}
+	}
+

@@ -1,0 +1,13 @@
+	/**
+	 * @return all tags; key is short tag name ("v1.0") and value of the entry
+	 *         contains the ref with the full tag name ("refs/tags/v1.0").
+	 */
+	Map<String, Ref> getTags() {
+		final Map<String, Ref> tags = new HashMap<String, Ref>();
+		for (final Ref r : readRefs().values()) {
+			if (r.getName().startsWith(R_TAGS))
+				tags.put(r.getName().substring(R_TAGS.length()), r);
+		}
+		return tags;
+	}
+

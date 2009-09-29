@@ -1,0 +1,33 @@
+	private Map<String, Ref> computeNewRefs() throws IOException {
+		final RevWalk rw = new RevWalk(db);
+		final Map<String, Ref> refs = new HashMap<String, Ref>();
+		final BufferedReader br = new BufferedReader(new InputStreamReader(
+				new FileInputStream(refList), Constants.CHARSET));
+		try {
+			String line;
+			while ((line = br.readLine()) != null) {
+				final String[] parts = line.split("[ \t]{1,}");
+				final ObjectId origId = ObjectId.fromString(parts[0]);
+				final String type = parts[1];
+				final String name = parts[2];
+
+				ObjectId id = rewrites.get(origId);
+				if (id == null)
+					id = origId;
+				try {
+					rw.parseAny(id);
+				} catch (MissingObjectException mue) {
+					if (!Constants.TYPE_COMMIT.equals(type)) {
+						System.err.println("skipping " + type + " " + name);
+						continue;
+					}
+					throw new MissingObjectException(id, type);
+				}
+				refs.put(name, new Ref(Ref.Storage.PACKED, name, id));
+			}
+		} finally {
+			br.close();
+		}
+		return refs;
+	}
+

@@ -1,0 +1,13 @@
+	public void testReadSymRefToLoosePacked() throws IOException {
+		ObjectId pid = db.resolve("refs/heads/master^");
+		RefUpdate updateRef = db.updateRef("refs/heads/master");
+		updateRef.setNewObjectId(pid);
+		updateRef.setForceUpdate(true);
+		Result update = updateRef.update();
+		assertEquals(Result.FORCED, update); // internal
+
+		db.writeSymref("HEAD", "refs/heads/master");
+		Ref ref = db.getRef("HEAD");
+		assertEquals(Ref.Storage.LOOSE_PACKED, ref.getStorage());
+	}
+

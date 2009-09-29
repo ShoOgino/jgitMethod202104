@@ -1,0 +1,29 @@
+	/**
+	 * Open new transport instances to connect two repositories.
+	 *
+	 * @param local
+	 *            existing local repository.
+	 * @param cfg
+	 *            configuration describing how to connect to the remote
+	 *            repository.
+	 * @param op
+	 *            planned use of the returned Transport; the URI may differ
+	 *            based on the type of connection desired.
+	 * @return the list of new transport instances for every URI in remote
+	 *         configuration.
+	 * @throws NotSupportedException
+	 *             the protocol specified is not supported.
+	 */
+	public static List<Transport> openAll(final Repository local,
+			final RemoteConfig cfg, final Operation op)
+			throws NotSupportedException {
+		final List<URIish> uris = getURIs(cfg, op);
+		final List<Transport> transports = new ArrayList<Transport>(uris.size());
+		for (final URIish uri : uris) {
+			final Transport tn = open(local, uri);
+			tn.applyConfig(cfg);
+			transports.add(tn);
+		}
+		return transports;
+	}
+

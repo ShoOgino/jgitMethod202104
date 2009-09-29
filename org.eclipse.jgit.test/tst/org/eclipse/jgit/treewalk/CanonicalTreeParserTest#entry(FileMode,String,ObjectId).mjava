@@ -1,0 +1,11 @@
+	private static byte[] entry(final FileMode mode, final String name,
+			final ObjectId id) throws Exception {
+		final ByteArrayOutputStream out = new ByteArrayOutputStream();
+		mode.copyTo(out);
+		out.write(' ');
+		out.write(Constants.encode(name));
+		out.write(0);
+		id.copyRawTo(out);
+		return out.toByteArray();
+	}
+

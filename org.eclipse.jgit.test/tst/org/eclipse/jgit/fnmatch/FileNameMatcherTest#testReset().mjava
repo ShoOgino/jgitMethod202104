@@ -1,0 +1,22 @@
+	public void testReset() throws Exception {
+		final String pattern = "helloworld";
+		final FileNameMatcher matcher = new FileNameMatcher(pattern, null);
+		matcher.append("helloworld");
+		assertEquals(true, matcher.isMatch());
+		assertEquals(false, matcher.canAppendMatch());
+		matcher.reset();
+		matcher.append("hello");
+		assertEquals(false, matcher.isMatch());
+		assertEquals(true, matcher.canAppendMatch());
+		matcher.append("world");
+		assertEquals(true, matcher.isMatch());
+		assertEquals(false, matcher.canAppendMatch());
+		matcher.append("to much");
+		assertEquals(false, matcher.isMatch());
+		assertEquals(false, matcher.canAppendMatch());
+		matcher.reset();
+		matcher.append("helloworld");
+		assertEquals(true, matcher.isMatch());
+		assertEquals(false, matcher.canAppendMatch());
+	}
+

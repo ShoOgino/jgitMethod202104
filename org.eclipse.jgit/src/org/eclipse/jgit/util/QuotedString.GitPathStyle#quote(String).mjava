@@ -1,0 +1,36 @@
+		@Override
+		public String quote(final String instr) {
+			if (instr.length() == 0)
+				return "\"\"";
+			boolean reuse = true;
+			final byte[] in = Constants.encode(instr);
+			final StringBuilder r = new StringBuilder(2 + in.length);
+			r.append('"');
+			for (int i = 0; i < in.length; i++) {
+				final int c = in[i] & 0xff;
+				if (c < quote.length) {
+					final byte style = quote[c];
+					if (style == 0) {
+						r.append((char) c);
+						continue;
+					}
+					if (style > 0) {
+						reuse = false;
+						r.append('\\');
+						r.append((char) style);
+						continue;
+					}
+				}
+
+				reuse = false;
+				r.append('\\');
+				r.append((char) (((c >> 6) & 03) + '0'));
+				r.append((char) (((c >> 3) & 07) + '0'));
+				r.append((char) (((c >> 0) & 07) + '0'));
+			}
+			if (reuse)
+				return instr;
+			r.append('"');
+			return r.toString();
+		}
+

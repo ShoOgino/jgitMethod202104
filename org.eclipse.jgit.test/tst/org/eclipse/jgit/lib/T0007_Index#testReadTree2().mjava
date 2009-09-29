@@ -1,0 +1,45 @@
+	public void testReadTree2() throws Exception {
+		// Prepare a larger tree to test some odd cases in tree writing
+		GitIndex index = new GitIndex(db);
+		File f1 = writeTrashFile("a/a/a/a", "data:a/a/a/a");
+		File f2 = writeTrashFile("a/c/c", "data:a/c/c");
+		File f3 = writeTrashFile("a/b", "data:a/b");
+		File f4 = writeTrashFile("a:b", "data:a:b");
+		File f5 = writeTrashFile("a/d", "data:a/d");
+		File f6 = writeTrashFile("a.b", "data:a.b");
+		index.add(trash, f1);
+		index.add(trash, f2);
+		index.add(trash, f3);
+		index.add(trash, f4);
+		index.add(trash, f5);
+		index.add(trash, f6);
+		index.write();
+		ObjectId id = index.writeTree();
+		System.out.println("wrote id " + id);
+		assertEquals("ba78e065e2c261d4f7b8f42107588051e87e18e9", id.name());
+		GitIndex index2 = new GitIndex(db);
+
+		index2.readTree(db.mapTree(ObjectId.fromString(
+				"ba78e065e2c261d4f7b8f42107588051e87e18e9")));
+		Entry[] members = index2.getMembers();
+		assertEquals(6, members.length);
+		assertEquals("a.b", members[0].getName());
+		assertEquals("a/a/a/a", members[1].getName());
+		assertEquals("a/b", members[2].getName());
+		assertEquals("a/c/c", members[3].getName());
+		assertEquals("a/d", members[4].getName());
+		assertEquals("a:b", members[5].getName());
+
+		// reread and test
+		GitIndex indexr = new GitIndex(db);
+		indexr.read();
+		Entry[] membersr = indexr.getMembers();
+		assertEquals(6, membersr.length);
+		assertEquals("a.b", membersr[0].getName());
+		assertEquals("a/a/a/a", membersr[1].getName());
+		assertEquals("a/b", membersr[2].getName());
+		assertEquals("a/c/c", membersr[3].getName());
+		assertEquals("a/d", membersr[4].getName());
+		assertEquals("a:b", membersr[5].getName());
+	}
+

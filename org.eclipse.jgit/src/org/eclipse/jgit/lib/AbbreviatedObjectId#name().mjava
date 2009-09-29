@@ -1,0 +1,26 @@
+	/**
+	 * @return string form of the abbreviation, in lower case hexadecimal.
+	 */
+	public final String name() {
+		final char[] b = new char[AnyObjectId.STR_LEN];
+
+		AnyObjectId.formatHexChar(b, 0, w1);
+		if (nibbles <= 8)
+			return new String(b, 0, nibbles);
+
+		AnyObjectId.formatHexChar(b, 8, w2);
+		if (nibbles <= 16)
+			return new String(b, 0, nibbles);
+
+		AnyObjectId.formatHexChar(b, 16, w3);
+		if (nibbles <= 24)
+			return new String(b, 0, nibbles);
+
+		AnyObjectId.formatHexChar(b, 24, w4);
+		if (nibbles <= 32)
+			return new String(b, 0, nibbles);
+
+		AnyObjectId.formatHexChar(b, 32, w5);
+		return new String(b, 0, nibbles);
+	}
+

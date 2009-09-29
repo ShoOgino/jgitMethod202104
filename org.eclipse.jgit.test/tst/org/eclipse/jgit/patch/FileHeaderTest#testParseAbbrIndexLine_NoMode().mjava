@@ -1,0 +1,29 @@
+	public void testParseAbbrIndexLine_NoMode() {
+		final int a = 7;
+		final String oid = "78981922613b2afb6025042ff6bd878ac1994e85";
+		final String nid = "61780798228d17af2d34fce4cfbdf35556832472";
+		final FileHeader fh = data("diff --git a/a b/a\n" + "index "
+				+ oid.substring(0, a - 1) + ".." + nid.substring(0, a - 1)
+				+ "\n" + "--- a/a\n" + "+++ b/a\n");
+		assertParse(fh);
+
+		assertEquals("a", fh.getOldName());
+		assertEquals("a", fh.getNewName());
+
+		assertNull(fh.getOldMode());
+		assertNull(fh.getNewMode());
+		assertFalse(fh.hasMetaDataChanges());
+
+		assertNotNull(fh.getOldId());
+		assertNotNull(fh.getNewId());
+
+		assertFalse(fh.getOldId().isComplete());
+		assertFalse(fh.getNewId().isComplete());
+
+		assertEquals(oid.substring(0, a - 1), fh.getOldId().name());
+		assertEquals(nid.substring(0, a - 1), fh.getNewId().name());
+
+		assertTrue(ObjectId.fromString(oid).startsWith(fh.getOldId()));
+		assertTrue(ObjectId.fromString(nid).startsWith(fh.getNewId()));
+	}
+

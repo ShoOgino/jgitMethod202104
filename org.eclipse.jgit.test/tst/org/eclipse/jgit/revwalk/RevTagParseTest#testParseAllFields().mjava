@@ -1,0 +1,51 @@
+	public void testParseAllFields() throws Exception {
+		final ObjectId treeId = id("9788669ad918b6fcce64af8882fc9a81cb6aba67");
+		final String name = "v1.2.3.4.5";
+		final String taggerName = "A U. Thor";
+		final String taggerEmail = "a_u_thor@example.com";
+		final int taggerTime = 1218123387;
+
+		final StringBuilder body = new StringBuilder();
+
+		body.append("object ");
+		body.append(treeId.name());
+		body.append("\n");
+
+		body.append("type tree\n");
+
+		body.append("tag ");
+		body.append(name);
+		body.append("\n");
+
+		body.append("tagger ");
+		body.append(taggerName);
+		body.append(" <");
+		body.append(taggerEmail);
+		body.append("> ");
+		body.append(taggerTime);
+		body.append(" +0700\n");
+
+		body.append("\n");
+
+		final RevWalk rw = new RevWalk(db);
+		final RevTag c;
+
+		c = new RevTag(id("9473095c4cb2f12aefe1db8a355fe3fafba42f67"));
+		assertNull(c.getObject());
+		assertNull(c.getTagName());
+
+		c.parseCanonical(rw, body.toString().getBytes("UTF-8"));
+		assertNotNull(c.getObject());
+		assertEquals(treeId, c.getObject().getId());
+		assertSame(rw.lookupTree(treeId), c.getObject());
+
+		assertNotNull(c.getTagName());
+		assertEquals(name, c.getTagName());
+		assertEquals("", c.getFullMessage());
+
+		final PersonIdent cTagger = c.getTaggerIdent();
+		assertNotNull(cTagger);
+		assertEquals(taggerName, cTagger.getName());
+		assertEquals(taggerEmail, cTagger.getEmailAddress());
+	}
+

@@ -1,0 +1,14 @@
+	public void testStopWalkCallsParent() throws Exception {
+		final boolean called[] = new boolean[1];
+		assertFalse(called[0]);
+
+		final EmptyTreeIterator parent = new EmptyTreeIterator() {
+			@Override
+			public void stopWalk() {
+				called[0] = true;
+			}
+		};
+		parent.createSubtreeIterator(db).stopWalk();
+		assertTrue(called[0]);
+	}
+

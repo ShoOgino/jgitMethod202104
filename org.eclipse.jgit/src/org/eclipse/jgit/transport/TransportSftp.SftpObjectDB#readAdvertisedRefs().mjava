@@ -1,0 +1,8 @@
+		Map<String, Ref> readAdvertisedRefs() throws TransportException {
+			final TreeMap<String, Ref> avail = new TreeMap<String, Ref>();
+			readPackedRefs(avail);
+			readRef(avail, ROOT_DIR + Constants.HEAD, Constants.HEAD);
+			readLooseRefs(avail, ROOT_DIR + "refs", "refs/");
+			return avail;
+		}
+

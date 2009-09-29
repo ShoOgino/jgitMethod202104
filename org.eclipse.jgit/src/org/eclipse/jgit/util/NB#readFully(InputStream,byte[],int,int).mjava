@@ -1,0 +1,27 @@
+	/**
+	 * Read the entire byte array into memory, or throw an exception.
+	 * 
+	 * @param fd
+	 *            input stream to read the data from.
+	 * @param dst
+	 *            buffer that must be fully populated, [off, off+len).
+	 * @param off
+	 *            position within the buffer to start writing to.
+	 * @param len
+	 *            number of bytes that must be read.
+	 * @throws EOFException
+	 *             the stream ended before dst was fully populated.
+	 * @throws IOException
+	 *             there was an error reading from the stream.
+	 */
+	public static void readFully(final InputStream fd, final byte[] dst,
+			int off, int len) throws IOException {
+		while (len > 0) {
+			final int r = fd.read(dst, off, len);
+			if (r <= 0)
+				throw new EOFException("Short read of block.");
+			off += r;
+			len -= r;
+		}
+	}
+

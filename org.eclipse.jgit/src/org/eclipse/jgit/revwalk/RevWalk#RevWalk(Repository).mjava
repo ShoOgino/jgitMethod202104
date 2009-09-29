@@ -1,0 +1,20 @@
+	/**
+	 * Create a new revision walker for a given repository.
+	 * 
+	 * @param repo
+	 *            the repository the walker will obtain data from.
+	 */
+	public RevWalk(final Repository repo) {
+		db = repo;
+		curs = new WindowCursor();
+		idBuffer = new MutableObjectId();
+		objects = new ObjectIdSubclassMap<RevObject>();
+		roots = new ArrayList<RevCommit>();
+		queue = new DateRevQueue();
+		pending = new StartGenerator(this);
+		sorting = EnumSet.of(RevSort.NONE);
+		filter = RevFilter.ALL;
+		treeFilter = TreeFilter.ALL;
+		retainBody = true;
+	}
+

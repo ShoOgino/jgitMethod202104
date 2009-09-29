@@ -1,0 +1,11 @@
+		private String resolveKey(String subpath) {
+			if (subpath.endsWith("/"))
+				subpath = subpath.substring(0, subpath.length() - 1);
+			String k = objectsKey;
+			while (subpath.startsWith(ROOT_DIR)) {
+				k = k.substring(0, k.lastIndexOf('/'));
+				subpath = subpath.substring(3);
+			}
+			return k + "/" + subpath;
+		}
+

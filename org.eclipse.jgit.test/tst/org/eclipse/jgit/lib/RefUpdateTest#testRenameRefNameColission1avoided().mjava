@@ -1,0 +1,32 @@
+	public void testRenameRefNameColission1avoided() throws IOException {
+		// setup
+		ObjectId rb = db.resolve("refs/heads/b");
+		db.writeSymref(Constants.HEAD, "refs/heads/a");
+		RefUpdate updateRef = db.updateRef("refs/heads/a");
+		updateRef.setNewObjectId(rb);
+		updateRef.setRefLogMessage("Setup", false);
+		assertEquals(Result.FAST_FORWARD, updateRef.update());
+		ObjectId oldHead = db.resolve(Constants.HEAD);
+		assertTrue(rb.equals(oldHead)); // assumption for this test
+		RefLogWriter.writeReflog(db, rb, rb, "Just a message", "refs/heads/a");
+		assertTrue("internal check, we have a log", new File(db.getDirectory(),
+				"logs/refs/heads/a").exists());
+
+		// Now this is our test
+		RefRename renameRef = db.renameRef("refs/heads/a", "refs/heads/a/b");
+		Result result = renameRef.rename();
+		assertEquals(Result.RENAMED, result);
+		assertNull(db.resolve("refs/heads/a"));
+		assertEquals(rb, db.resolve("refs/heads/a/b"));
+		assertEquals(3, db.getReflogReader("a/b").getReverseEntries().size());
+		assertEquals("Branch: renamed a to a/b", db.getReflogReader("a/b")
+				.getReverseEntries().get(0).getComment());
+		assertEquals("Just a message", db.getReflogReader("a/b")
+				.getReverseEntries().get(1).getComment());
+		assertEquals("Setup", db.getReflogReader("a/b").getReverseEntries()
+				.get(2).getComment());
+		// same thing was logged to HEAD
+		assertEquals("Branch: renamed a to a/b", db.getReflogReader("HEAD")
+				.getReverseEntries().get(0).getComment());
+	}
+

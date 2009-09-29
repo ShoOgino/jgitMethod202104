@@ -1,0 +1,12 @@
+	@Override
+	public void close() throws IOException {
+		try {
+			beginWrite();
+			dst.close();
+		} catch (InterruptedIOException e) {
+			throw writeTimedOut();
+		} finally {
+			endWrite();
+		}
+	}
+

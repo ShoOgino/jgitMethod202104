@@ -1,0 +1,18 @@
+	/**
+	 * URL encode a value string into an output buffer.
+	 *
+	 * @param urlstr
+	 *            the output buffer.
+	 * @param key
+	 *            value which must be encoded to protected special characters.
+	 */
+	public static void encode(final StringBuilder urlstr, final String key) {
+		if (key == null || key.length() == 0)
+			return;
+		try {
+			urlstr.append(URLEncoder.encode(key, "UTF-8"));
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException("Could not URL encode to UTF-8", e);
+		}
+	}
+

@@ -1,0 +1,39 @@
+	private static String readSectionName(final StringReader in)
+			throws ConfigInvalidException {
+		final StringBuilder name = new StringBuilder();
+		for (;;) {
+			int c = in.read();
+			if (c < 0)
+				throw new ConfigInvalidException("Unexpected end of config file");
+
+			if (']' == c) {
+				in.reset();
+				break;
+			}
+
+			if (' ' == c || '\t' == c) {
+				for (;;) {
+					c = in.read();
+					if (c < 0)
+						throw new ConfigInvalidException("Unexpected end of config file");
+
+					if ('"' == c) {
+						in.reset();
+						break;
+					}
+
+					if (' ' == c || '\t' == c)
+						continue; // Skipped...
+					throw new ConfigInvalidException("Bad section entry: " + name);
+				}
+				break;
+			}
+
+			if (Character.isLetterOrDigit((char) c) || '.' == c || '-' == c)
+				name.append((char) c);
+			else
+				throw new ConfigInvalidException("Bad section entry: " + name);
+		}
+		return name.toString();
+	}
+

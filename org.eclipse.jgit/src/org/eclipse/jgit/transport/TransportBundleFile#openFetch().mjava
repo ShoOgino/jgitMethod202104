@@ -1,0 +1,12 @@
+	@Override
+	public FetchConnection openFetch() throws NotSupportedException,
+			TransportException {
+		final InputStream src;
+		try {
+			src = new FileInputStream(bundle);
+		} catch (FileNotFoundException err) {
+			throw new TransportException(uri, "not found");
+		}
+		return new BundleFetchConnection(this, src);
+	}
+

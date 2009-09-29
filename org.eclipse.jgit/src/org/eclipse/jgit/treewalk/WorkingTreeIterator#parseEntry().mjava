@@ -1,0 +1,10 @@
+	private void parseEntry() {
+		final Entry e = entries[ptr];
+		mode = e.getMode().getBits();
+
+		final int nameLen = e.encodedNameLen;
+		ensurePathCapacity(pathOffset + nameLen, pathOffset);
+		System.arraycopy(e.encodedName, 0, path, pathOffset, nameLen);
+		pathLen = pathOffset + nameLen;
+	}
+

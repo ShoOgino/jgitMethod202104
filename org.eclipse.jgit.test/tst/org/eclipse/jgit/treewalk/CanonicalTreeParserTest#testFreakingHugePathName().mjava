@@ -1,0 +1,12 @@
+	public void testFreakingHugePathName() throws Exception {
+		final int n = AbstractTreeIterator.DEFAULT_PATH_SIZE * 4;
+		final StringBuilder b = new StringBuilder(n);
+		for (int i = 0; i < n; i++)
+			b.append('q');
+		final String name = b.toString();
+		ctp.reset(entry(m644, name, hash_a));
+		assertFalse(ctp.eof());
+		assertEquals(name, RawParseUtils.decode(Constants.CHARSET, ctp.path,
+				ctp.pathOffset, ctp.pathLen));
+	}
+

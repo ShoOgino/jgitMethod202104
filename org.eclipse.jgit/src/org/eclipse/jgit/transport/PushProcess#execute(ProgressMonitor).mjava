@@ -1,0 +1,36 @@
+	/**
+	 * Perform push operation between local and remote repository - set remote
+	 * refs appropriately, send needed objects and update local tracking refs.
+	 * <p>
+	 * When {@link Transport#isDryRun()} is true, result of this operation is
+	 * just estimation of real operation result, no real action is performed.
+	 *
+	 * @param monitor
+	 *            progress monitor used for feedback about operation.
+	 * @return result of push operation with complete status description.
+	 * @throws NotSupportedException
+	 *             when push operation is not supported by provided transport.
+	 * @throws TransportException
+	 *             when some error occurred during operation, like I/O, protocol
+	 *             error, or local database consistency error.
+	 */
+	PushResult execute(final ProgressMonitor monitor)
+			throws NotSupportedException, TransportException {
+		monitor.beginTask(PROGRESS_OPENING_CONNECTION, ProgressMonitor.UNKNOWN);
+		connection = transport.openPush();
+		try {
+			monitor.endTask();
+
+			final Map<String, RemoteRefUpdate> preprocessed = prepareRemoteUpdates();
+			if (transport.isDryRun())
+				modifyUpdatesForDryRun();
+			else if (!preprocessed.isEmpty())
+				connection.push(monitor, preprocessed);
+		} finally {
+			connection.close();
+		}
+		if (!transport.isDryRun())
+			updateTrackingRefs();
+		return prepareOperationResult();
+	}
+

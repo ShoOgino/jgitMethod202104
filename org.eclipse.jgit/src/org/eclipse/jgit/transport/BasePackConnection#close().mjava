@@ -1,0 +1,37 @@
+	@Override
+	public void close() {
+		if (out != null) {
+			try {
+				if (outNeedsEnd)
+					pckOut.end();
+				out.close();
+			} catch (IOException err) {
+				// Ignore any close errors.
+			} finally {
+				out = null;
+				pckOut = null;
+			}
+		}
+
+		if (in != null) {
+			try {
+				in.close();
+			} catch (IOException err) {
+				// Ignore any close errors.
+			} finally {
+				in = null;
+				pckIn = null;
+			}
+		}
+
+		if (myTimer != null) {
+			try {
+				myTimer.terminate();
+			} finally {
+				myTimer = null;
+				timeoutIn = null;
+				timeoutOut = null;
+			}
+		}
+	}
+

@@ -1,0 +1,9 @@
+	public void testCache_TooSmallLimit() throws IOException {
+		final WindowCacheConfig cfg = new WindowCacheConfig();
+		cfg.setPackedGitWindowSize(4096);
+		cfg.setPackedGitLimit(4096);
+		WindowCache.reconfigure(cfg);
+		doCacheTests();
+		checkLimits(cfg);
+	}
+

@@ -1,0 +1,10 @@
+	public void testEntryFileMode() {
+		for (FileMode m : new FileMode[] { FileMode.TREE,
+				FileMode.REGULAR_FILE, FileMode.EXECUTABLE_FILE,
+				FileMode.GITLINK, FileMode.SYMLINK }) {
+			final FakeTreeIterator i = new FakeTreeIterator("a", m);
+			assertEquals(m.getBits(), i.getEntryRawMode());
+			assertSame(m, i.getEntryFileMode());
+		}
+	}
+

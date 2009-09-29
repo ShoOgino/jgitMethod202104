@@ -1,0 +1,10 @@
+	private static List<Thread> active() {
+		Thread[] all = new Thread[16];
+		int n = Thread.currentThread().getThreadGroup().enumerate(all);
+		while (n == all.length) {
+			all = new Thread[all.length * 2];
+			n = Thread.currentThread().getThreadGroup().enumerate(all);
+		}
+		return Arrays.asList(all).subList(0, n);
+	}
+

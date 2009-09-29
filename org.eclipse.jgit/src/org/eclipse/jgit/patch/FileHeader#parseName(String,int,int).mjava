@@ -1,0 +1,25 @@
+	private String parseName(final String expect, int ptr, final int end) {
+		if (ptr == end)
+			return expect;
+
+		String r;
+		if (buf[ptr] == '"') {
+			// New style GNU diff format
+			//
+			r = QuotedString.GIT_PATH.dequote(buf, ptr, end - 1);
+		} else {
+			// Older style GNU diff format, an optional tab ends the name.
+			//
+			int tab = end;
+			while (ptr < tab && buf[tab - 1] != '\t')
+				tab--;
+			if (ptr == tab)
+				tab = end;
+			r = decode(Constants.CHARSET, buf, ptr, tab - 1);
+		}
+
+		if (r.equals(DEV_NULL))
+			r = DEV_NULL;
+		return r;
+	}
+

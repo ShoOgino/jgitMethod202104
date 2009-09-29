@@ -1,0 +1,41 @@
+	@Override
+	protected void run() throws Exception {
+		walk = createWalk();
+		for (final RevSort s : sorting)
+			walk.sort(s, true);
+
+		if (pathFilter != TreeFilter.ALL)
+			walk.setTreeFilter(AndTreeFilter.create(pathFilter,
+					TreeFilter.ANY_DIFF));
+
+		if (revLimiter.size() == 1)
+			walk.setRevFilter(revLimiter.get(0));
+		else if (revLimiter.size() > 1)
+			walk.setRevFilter(AndRevFilter.create(revLimiter));
+
+		if (commits.isEmpty()) {
+			final ObjectId head = db.resolve(Constants.HEAD);
+			if (head == null)
+				throw die("Cannot resolve " + Constants.HEAD);
+			commits.add(walk.parseCommit(head));
+		}
+		for (final RevCommit c : commits) {
+			final RevCommit real = argWalk == walk ? c : walk.parseCommit(c);
+			if (c.has(RevFlag.UNINTERESTING))
+				walk.markUninteresting(real);
+			else
+				walk.markStart(real);
+		}
+
+		final long start = System.currentTimeMillis();
+		final int n = walkLoop();
+		if (count) {
+			final long end = System.currentTimeMillis();
+			System.err.print(n);
+			System.err.print(' ');
+			System.err.print(end - start);
+			System.err.print(" ms");
+			System.err.println();
+		}
+	}
+

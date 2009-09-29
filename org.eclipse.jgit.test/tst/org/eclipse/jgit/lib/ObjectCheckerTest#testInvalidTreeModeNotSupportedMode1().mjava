@@ -1,0 +1,12 @@
+	public void testInvalidTreeModeNotSupportedMode1() {
+		final StringBuilder b = new StringBuilder();
+		entry(b, "1 a");
+		final byte[] data = Constants.encodeASCII(b.toString());
+		try {
+			checker.checkTree(data);
+			fail("incorrectly accepted an invalid tree");
+		} catch (CorruptObjectException e) {
+			assertEquals("invalid mode 1", e.getMessage());
+		}
+	}
+

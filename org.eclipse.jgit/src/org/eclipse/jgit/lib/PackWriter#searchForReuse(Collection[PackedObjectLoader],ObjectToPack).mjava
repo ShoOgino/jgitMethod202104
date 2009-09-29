@@ -1,0 +1,13 @@
+	private void searchForReuse(
+			final Collection<PackedObjectLoader> reuseLoaders,
+			final ObjectToPack otp) throws IOException {
+		db.openObjectInAllPacks(otp, reuseLoaders, windowCursor);
+		if (reuseDeltas) {
+			selectDeltaReuseForObject(otp, reuseLoaders);
+		}
+		// delta reuse is preferred over object reuse
+		if (reuseObjects && !otp.hasReuseLoader()) {
+			selectObjectReuseForObject(otp, reuseLoaders);
+		}
+	}
+

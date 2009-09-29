@@ -1,0 +1,18 @@
+	static int mask(final int nibbles, final int word, final int v) {
+		final int b = (word - 1) * 8;
+		if (b + 8 <= nibbles) {
+			// We have all of the bits required for this word.
+			//
+			return v;
+		}
+
+		if (nibbles <= b) {
+			// We have none of the bits required for this word.
+			//
+			return 0;
+		}
+
+		final int s = 32 - (nibbles - b) * 4;
+		return (v >>> s) << s;
+	}
+

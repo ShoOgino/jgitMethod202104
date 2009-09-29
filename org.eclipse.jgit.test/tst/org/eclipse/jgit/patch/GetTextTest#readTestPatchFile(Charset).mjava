@@ -1,0 +1,20 @@
+	private String readTestPatchFile(final Charset cs) throws IOException {
+		final String patchFile = getName() + ".patch";
+		final InputStream in = getClass().getResourceAsStream(patchFile);
+		if (in == null) {
+			fail("No " + patchFile + " test vector");
+			return null; // Never happens
+		}
+		try {
+			final InputStreamReader r = new InputStreamReader(in, cs);
+			char[] tmp = new char[2048];
+			final StringBuilder s = new StringBuilder();
+			int n;
+			while ((n = r.read(tmp)) > 0)
+				s.append(tmp, 0, n);
+			return s.toString();
+		} finally {
+			in.close();
+		}
+	}
+

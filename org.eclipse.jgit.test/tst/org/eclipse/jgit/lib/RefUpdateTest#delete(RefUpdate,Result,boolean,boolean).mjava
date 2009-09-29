@@ -1,0 +1,7 @@
+	private void delete(final RefUpdate ref, final Result expected,
+			final boolean exists, final boolean removed) throws IOException {
+		assertEquals(exists, db.getAllRefs().containsKey(ref.getName()));
+		assertEquals(expected, ref.delete());
+		assertEquals(!removed, db.getAllRefs().containsKey(ref.getName()));
+	}
+

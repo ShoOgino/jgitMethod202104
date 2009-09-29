@@ -1,0 +1,7 @@
+	private int readSignature() throws IOException {
+		final String rev = readLine(new byte[1024]);
+		if (TransportBundle.V2_BUNDLE_SIGNATURE.equals(rev))
+			return 2;
+		throw new TransportException(transport.uri, "not a bundle");
+	}
+

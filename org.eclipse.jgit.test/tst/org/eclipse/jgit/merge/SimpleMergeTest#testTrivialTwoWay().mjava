@@ -1,0 +1,7 @@
+	public void testTrivialTwoWay() throws IOException {
+		Merger ourMerger = MergeStrategy.SIMPLE_TWO_WAY_IN_CORE.newMerger(db);
+		boolean merge = ourMerger.merge(new ObjectId[] { db.resolve("a"), db.resolve("c") });
+		assertTrue(merge);
+		assertEquals("02ba32d3649e510002c21651936b7077aa75ffa9",ourMerger.getResultTreeId().name());
+	}
+

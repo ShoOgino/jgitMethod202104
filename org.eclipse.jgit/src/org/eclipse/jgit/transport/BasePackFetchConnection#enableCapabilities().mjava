@@ -1,0 +1,16 @@
+	private String enableCapabilities() {
+		final StringBuilder line = new StringBuilder();
+		if (includeTags)
+			includeTags = wantCapability(line, OPTION_INCLUDE_TAG);
+		if (allowOfsDelta)
+			wantCapability(line, OPTION_OFS_DELTA);
+		multiAck = wantCapability(line, OPTION_MULTI_ACK);
+		if (thinPack)
+			thinPack = wantCapability(line, OPTION_THIN_PACK);
+		if (wantCapability(line, OPTION_SIDE_BAND_64K))
+			sideband = true;
+		else if (wantCapability(line, OPTION_SIDE_BAND))
+			sideband = true;
+		return line.toString();
+	}
+

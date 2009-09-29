@@ -1,0 +1,17 @@
+	protected void validateImpl(final HttpURLConnection u, final String p,
+			final String version, final String name) throws IOException {
+		String v;
+
+		v = u.getHeaderField(p + JETS3T_CRYPTO_VER);
+		if (v == null)
+			v = "";
+		if (!version.equals(v))
+			throw new IOException("Unsupported encryption version: " + v);
+
+		v = u.getHeaderField(p + JETS3T_CRYPTO_ALG);
+		if (v == null)
+			v = "";
+		if (!name.equals(v))
+			throw new IOException("Unsupported encryption algorithm: " + v);
+	}
+

@@ -1,0 +1,70 @@
+	int parseGitHeaders(int ptr, final int end) {
+		while (ptr < end) {
+			final int eol = nextLF(buf, ptr);
+			if (isHunkHdr(buf, ptr, eol) >= 1) {
+				// First hunk header; break out and parse them later.
+				break;
+
+			} else if (match(buf, ptr, OLD_NAME) >= 0) {
+				parseOldName(ptr, eol);
+
+			} else if (match(buf, ptr, NEW_NAME) >= 0) {
+				parseNewName(ptr, eol);
+
+			} else if (match(buf, ptr, OLD_MODE) >= 0) {
+				oldMode = parseFileMode(ptr + OLD_MODE.length, eol);
+
+			} else if (match(buf, ptr, NEW_MODE) >= 0) {
+				newMode = parseFileMode(ptr + NEW_MODE.length, eol);
+
+			} else if (match(buf, ptr, DELETED_FILE_MODE) >= 0) {
+				oldMode = parseFileMode(ptr + DELETED_FILE_MODE.length, eol);
+				newMode = FileMode.MISSING;
+				changeType = ChangeType.DELETE;
+
+			} else if (match(buf, ptr, NEW_FILE_MODE) >= 0) {
+				parseNewFileMode(ptr, eol);
+
+			} else if (match(buf, ptr, COPY_FROM) >= 0) {
+				oldName = parseName(oldName, ptr + COPY_FROM.length, eol);
+				changeType = ChangeType.COPY;
+
+			} else if (match(buf, ptr, COPY_TO) >= 0) {
+				newName = parseName(newName, ptr + COPY_TO.length, eol);
+				changeType = ChangeType.COPY;
+
+			} else if (match(buf, ptr, RENAME_OLD) >= 0) {
+				oldName = parseName(oldName, ptr + RENAME_OLD.length, eol);
+				changeType = ChangeType.RENAME;
+
+			} else if (match(buf, ptr, RENAME_NEW) >= 0) {
+				newName = parseName(newName, ptr + RENAME_NEW.length, eol);
+				changeType = ChangeType.RENAME;
+
+			} else if (match(buf, ptr, RENAME_FROM) >= 0) {
+				oldName = parseName(oldName, ptr + RENAME_FROM.length, eol);
+				changeType = ChangeType.RENAME;
+
+			} else if (match(buf, ptr, RENAME_TO) >= 0) {
+				newName = parseName(newName, ptr + RENAME_TO.length, eol);
+				changeType = ChangeType.RENAME;
+
+			} else if (match(buf, ptr, SIMILARITY_INDEX) >= 0) {
+				score = parseBase10(buf, ptr + SIMILARITY_INDEX.length, null);
+
+			} else if (match(buf, ptr, DISSIMILARITY_INDEX) >= 0) {
+				score = parseBase10(buf, ptr + DISSIMILARITY_INDEX.length, null);
+
+			} else if (match(buf, ptr, INDEX) >= 0) {
+				parseIndexLine(ptr + INDEX.length, eol);
+
+			} else {
+				// Probably an empty patch (stat dirty).
+				break;
+			}
+
+			ptr = eol;
+		}
+		return ptr;
+	}
+

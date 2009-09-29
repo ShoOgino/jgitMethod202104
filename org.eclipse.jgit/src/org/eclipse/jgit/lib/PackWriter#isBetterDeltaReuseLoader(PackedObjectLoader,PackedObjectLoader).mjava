@@ -1,0 +1,12 @@
+	private static boolean isBetterDeltaReuseLoader(
+			PackedObjectLoader currentLoader, PackedObjectLoader loader)
+			throws IOException {
+		if (currentLoader == null)
+			return true;
+		if (loader.getRawSize() < currentLoader.getRawSize())
+			return true;
+		return (loader.getRawSize() == currentLoader.getRawSize()
+				&& loader.supportsFastCopyRawData() && !currentLoader
+				.supportsFastCopyRawData());
+	}
+

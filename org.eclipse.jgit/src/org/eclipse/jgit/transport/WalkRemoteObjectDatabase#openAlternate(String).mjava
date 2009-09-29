@@ -1,0 +1,21 @@
+	/**
+	 * Create a new connection for a discovered alternate object database
+	 * <p>
+	 * This method is typically called by {@link #readAlternates(String)} when
+	 * subclasses us the generic alternate parsing logic for their
+	 * implementation of {@link #getAlternates()}.
+	 * 
+	 * @param location
+	 *            the location of the new alternate, relative to the current
+	 *            object database.
+	 * @return a new database connection that can read from the specified
+	 *         alternate.
+	 * @throws IOException
+	 *             The database connection cannot be established with the
+	 *             alternate, such as if the alternate location does not
+	 *             actually exist and the connection's constructor attempts to
+	 *             verify that.
+	 */
+	abstract WalkRemoteObjectDatabase openAlternate(String location)
+			throws IOException;
+

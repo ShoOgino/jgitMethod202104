@@ -1,0 +1,16 @@
+	/**
+	 * Get the entry's complete path.
+	 * <p>
+	 * This method is not very efficient and is primarily meant for debugging
+	 * and final output generation. Applications should try to avoid calling it,
+	 * and if invoked do so only once per interesting entry, where the name is
+	 * absolutely required for correct function.
+	 *
+	 * @return complete path of the entry, from the root of the repository. If
+	 *         the entry is in a subtree there will be at least one '/' in the
+	 *         returned string.
+	 */
+	public String getPathString() {
+		return Constants.CHARSET.decode(ByteBuffer.wrap(path)).toString();
+	}
+

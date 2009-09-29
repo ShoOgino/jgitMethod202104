@@ -1,0 +1,10 @@
+	public void testTimeout_readByte_Success2() throws IOException {
+		final byte[] exp = new byte[] { 'a', 'b', 'c' };
+		out.write(exp);
+		assertEquals(exp[0], is.read());
+		assertEquals(exp[1], is.read());
+		assertEquals(exp[2], is.read());
+		out.close();
+		assertEquals(-1, is.read());
+	}
+

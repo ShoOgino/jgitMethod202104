@@ -1,0 +1,11 @@
+	public void testConfigureCache_PackedGitWindowSize_4097() {
+		try {
+			final WindowCacheConfig cfg = new WindowCacheConfig();
+			cfg.setPackedGitWindowSize(4097);
+			WindowCache.reconfigure(cfg);
+			fail("incorrectly permitted PackedGitWindowSize = 4097");
+		} catch (IllegalArgumentException e) {
+			assertEquals("Window size must be power of 2", e.getMessage());
+		}
+	}
+

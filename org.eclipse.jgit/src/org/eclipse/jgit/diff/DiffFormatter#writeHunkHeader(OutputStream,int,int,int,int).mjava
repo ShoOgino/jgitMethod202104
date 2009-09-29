@@ -1,0 +1,12 @@
+	private void writeHunkHeader(final OutputStream out, int aCur, int aEnd,
+			int bCur, int bEnd) throws IOException {
+		out.write('@');
+		out.write('@');
+		writeRange(out, '-', aCur + 1, aEnd - aCur);
+		writeRange(out, '+', bCur + 1, bEnd - bCur);
+		out.write(' ');
+		out.write('@');
+		out.write('@');
+		out.write('\n');
+	}
+

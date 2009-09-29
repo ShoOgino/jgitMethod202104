@@ -1,0 +1,10 @@
+	public void testGetText_NoBinary() throws IOException {
+		final Charset cs = Charset.forName("ISO-8859-1");
+		final Patch p = parseTestPatchFile();
+		assertTrue(p.getErrors().isEmpty());
+		assertEquals(1, p.getFiles().size());
+		final FileHeader fh = p.getFiles().get(0);
+		assertEquals(0, fh.getHunks().size());
+		assertEquals(readTestPatchFile(cs), fh.getScriptText(cs, cs));
+	}
+

@@ -1,0 +1,9 @@
+	public void testSimpleAlwaysTags() throws Exception {
+		readConfig("[remote \"spearce\"]\n"
+				+ "url = http://www.spearce.org/egit.git\n"
+				+ "fetch = +refs/heads/*:refs/remotes/spearce/*\n"
+				+ "tagopt = --tags\n");
+		final RemoteConfig rc = new RemoteConfig(config, "spearce");
+		assertSame(TagOpt.FETCH_TAGS, rc.getTagOpt());
+	}
+

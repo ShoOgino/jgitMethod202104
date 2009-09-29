@@ -1,0 +1,11 @@
+	public void testUnknown() throws Exception {
+		readConfig("");
+
+		final RemoteConfig rc = new RemoteConfig(config, "backup");
+		assertEquals(0, rc.getURIs().size());
+		assertEquals(0, rc.getFetchRefSpecs().size());
+		assertEquals(0, rc.getPushRefSpecs().size());
+		assertEquals("git-upload-pack", rc.getUploadPack());
+		assertEquals("git-receive-pack", rc.getReceivePack());
+	}
+

@@ -1,0 +1,40 @@
+	/**
+	 * Reset this walker to run over a single existing tree.
+	 *
+	 * @param id
+	 *            the tree we need to parse. The walker will execute over this
+	 *            single tree if the reset is successful.
+	 * @throws MissingObjectException
+	 *             the given tree object does not exist in this repository.
+	 * @throws IncorrectObjectTypeException
+	 *             the given object id does not denote a tree, but instead names
+	 *             some other non-tree type of object. Note that commits are not
+	 *             trees, even if they are sometimes called a "tree-ish".
+	 * @throws CorruptObjectException
+	 *             the object claimed to be a tree, but its contents did not
+	 *             appear to be a tree. The repository may have data corruption.
+	 * @throws IOException
+	 *             a loose object or pack file could not be read.
+	 */
+	public void reset(final AnyObjectId id) throws MissingObjectException,
+			IncorrectObjectTypeException, CorruptObjectException, IOException {
+		if (trees.length == 1) {
+			AbstractTreeIterator o = trees[0];
+			while (o.parent != null)
+				o = o.parent;
+			if (o instanceof CanonicalTreeParser) {
+				o.matches = null;
+				o.matchShift = 0;
+				((CanonicalTreeParser) o).reset(db, id, curs);
+				trees[0] = o;
+			} else {
+				trees[0] = parserFor(id);
+			}
+		} else {
+			trees = new AbstractTreeIterator[] { parserFor(id) };
+		}
+
+		advance = false;
+		depth = 0;
+	}
+

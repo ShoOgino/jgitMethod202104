@@ -1,0 +1,10 @@
+	public void testReadStringRaw4() {
+		init("HELO");
+		try {
+			in.readStringRaw();
+			fail("incorrectly accepted invalid packet header");
+		} catch (IOException e) {
+			assertEquals("Invalid packet line header: HELO", e.getMessage());
+		}
+	}
+

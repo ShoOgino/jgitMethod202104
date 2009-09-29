@@ -1,0 +1,24 @@
+	/**
+	 * Rebuild the {@link #INFO_PACKS} for dumb transport clients.
+	 * <p>
+	 * This method rebuilds the contents of the {@link #INFO_PACKS} file to
+	 * match the passed list of pack names.
+	 *
+	 * @param packNames
+	 *            names of available pack files, in the order they should appear
+	 *            in the file. Valid pack name strings are of the form
+	 *            <code>pack-035760ab452d6eebd123add421f253ce7682355a.pack</code>.
+	 * @throws IOException
+	 *             writing is not supported, or attempting to write the file
+	 *             failed, possibly due to permissions or remote disk full, etc.
+	 */
+	void writeInfoPacks(final Collection<String> packNames) throws IOException {
+		final StringBuilder w = new StringBuilder();
+		for (final String n : packNames) {
+			w.append("P ");
+			w.append(n);
+			w.append('\n');
+		}
+		writeFile(INFO_PACKS, Constants.encodeASCII(w.toString()));
+	}
+

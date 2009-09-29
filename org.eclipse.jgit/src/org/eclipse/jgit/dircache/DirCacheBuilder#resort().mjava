@@ -1,0 +1,23 @@
+	private void resort() {
+		Arrays.sort(entries, 0, entryCnt, DirCache.ENT_CMP);
+
+		for (int entryIdx = 1; entryIdx < entryCnt; entryIdx++) {
+			final DirCacheEntry pe = entries[entryIdx - 1];
+			final DirCacheEntry ce = entries[entryIdx];
+			final int cr = DirCache.cmp(pe, ce);
+			if (cr == 0) {
+				// Same file path; we can only allow this if the stages
+				// are 1-3 and no 0 exists.
+				//
+				final int peStage = pe.getStage();
+				final int ceStage = ce.getStage();
+				if (peStage == ceStage)
+					throw bad(ce, "Duplicate stages not allowed");
+				if (peStage == 0 || ceStage == 0)
+					throw bad(ce, "Mixed stages not allowed");
+			}
+		}
+
+		sorted = true;
+	}
+

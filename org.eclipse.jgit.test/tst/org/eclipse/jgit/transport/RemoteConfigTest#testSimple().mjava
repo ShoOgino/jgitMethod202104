@@ -1,0 +1,30 @@
+	public void testSimple() throws Exception {
+		readConfig("[remote \"spearce\"]\n"
+				+ "url = http://www.spearce.org/egit.git\n"
+				+ "fetch = +refs/heads/*:refs/remotes/spearce/*\n");
+
+		final RemoteConfig rc = new RemoteConfig(config, "spearce");
+		final List<URIish> allURIs = rc.getURIs();
+		RefSpec spec;
+
+		assertEquals("spearce", rc.getName());
+		assertNotNull(allURIs);
+		assertNotNull(rc.getFetchRefSpecs());
+		assertNotNull(rc.getPushRefSpecs());
+		assertNotNull(rc.getTagOpt());
+		assertEquals(0, rc.getTimeout());
+		assertSame(TagOpt.AUTO_FOLLOW, rc.getTagOpt());
+
+		assertEquals(1, allURIs.size());
+		assertEquals("http://www.spearce.org/egit.git", allURIs.get(0));
+
+		assertEquals(1, rc.getFetchRefSpecs().size());
+		spec = rc.getFetchRefSpecs().get(0);
+		assertTrue(spec.isForceUpdate());
+		assertTrue(spec.isWildcard());
+		assertEquals("refs/heads/*", spec.getSource());
+		assertEquals("refs/remotes/spearce/*", spec.getDestination());
+
+		assertEquals(0, rc.getPushRefSpecs().size());
+	}
+

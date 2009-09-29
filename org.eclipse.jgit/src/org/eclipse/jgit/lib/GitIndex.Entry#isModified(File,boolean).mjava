@@ -1,0 +1,97 @@
+		/**
+		 * Check if an entry's content is different from the cache, 
+		 * 
+		 * File status information is used and status is same we
+		 * consider the file identical to the state in the working
+		 * directory. Native git uses more stat fields than we
+		 * have accessible in Java.
+		 * 
+		 * @param wd working directory to compare content with
+		 * @param forceContentCheck True if the actual file content
+		 * should be checked if modification time differs.
+		 * 
+		 * @return true if content is most likely different.
+		 */
+		public boolean isModified(File wd, boolean forceContentCheck) {
+
+			if (isAssumedValid())
+				return false;
+
+			if (isUpdateNeeded())
+				return true;
+
+			File file = getFile(wd);
+			if (!file.exists())
+				return true;
+
+			// JDK1.6 has file.canExecute
+			// if (file.canExecute() != FileMode.EXECUTABLE_FILE.equals(mode))
+			// return true;
+			final int exebits = FileMode.EXECUTABLE_FILE.getBits()
+					^ FileMode.REGULAR_FILE.getBits();
+
+			if (config_filemode() && FileMode.EXECUTABLE_FILE.equals(mode)) {
+				if (!File_canExecute(file)&& File_hasExecute())
+					return true;
+			} else {
+				if (FileMode.REGULAR_FILE.equals(mode&~exebits)) {
+					if (!file.isFile())
+						return true;
+					if (config_filemode() && File_canExecute(file) && File_hasExecute())
+						return true;
+				} else {
+					if (FileMode.SYMLINK.equals(mode)) {
+						return true;
+					} else {
+						if (FileMode.TREE.equals(mode)) {
+							if (!file.isDirectory())
+								return true;
+						} else {
+							System.out.println("Does not handle mode "+mode+" ("+file+")");
+							return true;
+						}
+					}
+				}
+			}
+
+			if (file.length() != size)
+				return true;
+
+			// Git under windows only stores seconds so we round the timestamp
+			// Java gives us if it looks like the timestamp in index is seconds
+			// only. Otherwise we compare the timestamp at millisecond prevision.
+			long javamtime = mtime / 1000000L;
+			long lastm = file.lastModified();
+			if (javamtime % 1000 == 0)
+				lastm = lastm - lastm % 1000;
+			if (lastm != javamtime) {
+				if (!forceContentCheck)
+					return true;
+
+				try {
+					InputStream is = new FileInputStream(file);
+					try {
+						ObjectWriter objectWriter = new ObjectWriter(db);
+						ObjectId newId = objectWriter.computeBlobSha1(file
+								.length(), is);
+						boolean ret = !newId.equals(sha1);
+						return ret;
+					} catch (IOException e) {
+						e.printStackTrace();
+					} finally {
+						try {
+							is.close();
+						} catch (IOException e) {
+							// can't happen, but if it does we ignore it
+							e.printStackTrace();
+						}
+					}
+				} catch (FileNotFoundException e) {
+					// should not happen because we already checked this
+					e.printStackTrace();
+					throw new Error(e);
+				}
+			}
+			return false;
+		}
+

@@ -1,0 +1,41 @@
+	/**
+	 * Read the index from disk, if it has changed on disk.
+	 * <p>
+	 * This method tries to avoid loading the index if it has not changed since
+	 * the last time we consulted it. A missing index file will be treated as
+	 * though it were present but had no file entries in it.
+	 *
+	 * @throws IOException
+	 *             the index file is present but could not be read. This
+	 *             DirCache instance may not be populated correctly.
+	 * @throws CorruptObjectException
+	 *             the index file is using a format or extension that this
+	 *             library does not support.
+	 */
+	public void read() throws IOException, CorruptObjectException {
+		if (liveFile == null)
+			throw new IOException("DirCache does not have a backing file");
+		if (!liveFile.exists())
+			clear();
+		else if (liveFile.lastModified() != lastModified) {
+			try {
+				final FileInputStream inStream = new FileInputStream(liveFile);
+				try {
+					clear();
+					readFrom(inStream);
+				} finally {
+					try {
+						inStream.close();
+					} catch (IOException err2) {
+						// Ignore any close failures.
+					}
+				}
+			} catch (FileNotFoundException fnfe) {
+				// Someone must have deleted it between our exists test
+				// and actually opening the path. That's fine, its empty.
+				//
+				clear();
+			}
+		}
+	}
+

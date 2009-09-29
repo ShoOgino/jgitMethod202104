@@ -1,0 +1,20 @@
+	public void testForceMaster() {
+		final String sn = "refs/heads/master";
+		final RefSpec rs = new RefSpec("+" + sn);
+		assertTrue(rs.isForceUpdate());
+		assertFalse(rs.isWildcard());
+		assertEquals(sn, rs.getSource());
+		assertNull(rs.getDestination());
+		assertEquals("+" + sn, rs.toString());
+		assertEquals(rs, new RefSpec(rs.toString()));
+
+		Ref r = new Ref(Ref.Storage.LOOSE, sn, null);
+		assertTrue(rs.matchSource(r));
+		assertFalse(rs.matchDestination(r));
+		assertSame(rs, rs.expandFromSource(r));
+
+		r = new Ref(Ref.Storage.LOOSE, sn + "-and-more", null);
+		assertFalse(rs.matchSource(r));
+		assertFalse(rs.matchDestination(r));
+	}
+

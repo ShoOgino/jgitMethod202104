@@ -1,0 +1,25 @@
+	public void testFindSingleFile() throws Exception {
+		final String path = "a-file-path";
+		final DirCache dc = DirCache.read(db);
+		final DirCacheBuilder b = dc.builder();
+		assertNotNull(b);
+
+		final DirCacheEntry entOrig = new DirCacheEntry(path);
+		assertNotSame(path, entOrig.getPathString());
+		assertEquals(path, entOrig.getPathString());
+		b.add(entOrig);
+		b.finish();
+
+		assertEquals(1, dc.getEntryCount());
+		assertSame(entOrig, dc.getEntry(0));
+		assertEquals(0, dc.findEntry(path));
+
+		assertEquals(-1, dc.findEntry("@@-before"));
+		assertEquals(0, real(dc.findEntry("@@-before")));
+
+		assertEquals(-2, dc.findEntry("a-zoo"));
+		assertEquals(1, real(dc.findEntry("a-zoo")));
+
+		assertSame(entOrig, dc.getEntry(path));
+	}
+

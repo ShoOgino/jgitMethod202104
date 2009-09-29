@@ -1,0 +1,28 @@
+	public void testInCoreLimit_SwitchOnAppendByte() throws IOException {
+		final TemporaryBuffer b = new TemporaryBuffer();
+		final byte[] test = new TestRng(getName())
+				.nextBytes(TemporaryBuffer.DEFAULT_IN_CORE_LIMIT + 1);
+		try {
+			b.write(test, 0, test.length - 1);
+			b.write(test[test.length - 1]);
+			b.close();
+			assertEquals(test.length, b.length());
+			{
+				final byte[] r = b.toByteArray();
+				assertNotNull(r);
+				assertEquals(test.length, r.length);
+				assertTrue(Arrays.equals(test, r));
+			}
+			{
+				final ByteArrayOutputStream o = new ByteArrayOutputStream();
+				b.writeTo(o, null);
+				o.close();
+				final byte[] r = o.toByteArray();
+				assertEquals(test.length, r.length);
+				assertTrue(Arrays.equals(test, r));
+			}
+		} finally {
+			b.destroy();
+		}
+	}
+

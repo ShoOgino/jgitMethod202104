@@ -1,0 +1,17 @@
+		@Override
+		Collection<String> getPackNames() throws IOException {
+			final HashSet<String> have = new HashSet<String>();
+			have.addAll(s3.list(bucket, resolveKey("pack")));
+
+			final Collection<String> packs = new ArrayList<String>();
+			for (final String n : have) {
+				if (!n.startsWith("pack-") || !n.endsWith(".pack"))
+					continue;
+
+				final String in = n.substring(0, n.length() - 5) + ".idx";
+				if (have.contains(in))
+					packs.add(n);
+			}
+			return packs;
+		}
+

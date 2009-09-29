@@ -1,0 +1,16 @@
+	/**
+	 * Access a Commit by SHA'1 id.
+	 * @param id
+	 * @return Commit or null
+	 * @throws IOException for I/O error or unexpected object type.
+	 */
+	public Commit mapCommit(final ObjectId id) throws IOException {
+		final ObjectLoader or = openObject(id);
+		if (or == null)
+			return null;
+		final byte[] raw = or.getBytes();
+		if (Constants.OBJ_COMMIT == or.getType())
+			return new Commit(this, id, raw);
+		throw new IncorrectObjectTypeException(id, Constants.TYPE_COMMIT);
+	}
+

@@ -1,0 +1,29 @@
+		@Override
+		RevCommit next() throws MissingObjectException,
+				IncorrectObjectTypeException, IOException {
+			RevCommit c = source.next();
+			if (c != null) {
+				for (final RevCommit p : c.parents)
+					if ((p.flags & UNINTERESTING) != 0)
+						held.add(p);
+				return c;
+			}
+
+			final FIFORevQueue boundary = new FIFORevQueue();
+			boundary.shareFreeList(held);
+			for (;;) {
+				c = held.next();
+				if (c == null)
+					break;
+				if ((c.flags & DUPLICATE) != 0)
+					continue;
+				if ((c.flags & PARSED) == 0)
+					c.parseHeaders(walk);
+				c.flags |= DUPLICATE;
+				boundary.add(c);
+			}
+			boundary.removeFlag(DUPLICATE);
+			g = boundary;
+			return boundary.next();
+		}
+

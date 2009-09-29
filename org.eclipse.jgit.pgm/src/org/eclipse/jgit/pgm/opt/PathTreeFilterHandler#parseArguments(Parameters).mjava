@@ -1,0 +1,23 @@
+	@Override
+	public int parseArguments(final Parameters params) throws CmdLineException {
+		final List<PathFilter> filters = new ArrayList<PathFilter>();
+		for (int idx = 0;; idx++) {
+			final String path;
+			try {
+				path = params.getParameter(idx);
+			} catch (CmdLineException cle) {
+				break;
+			}
+			filters.add(PathFilter.create(path));
+		}
+
+		if (filters.size() == 0)
+			return 0;
+		if (filters.size() == 1) {
+			setter.addValue(filters.get(0));
+			return 1;
+		}
+		setter.addValue(PathFilterGroup.create(filters));
+		return filters.size();
+	}
+

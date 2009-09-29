@@ -1,0 +1,24 @@
+	/**
+	 * Convert an OBJ_* type constant to an ASCII encoded string constant.
+	 * <p>
+	 * The ASCII encoded string is often the canonical representation of
+	 * the type within a loose object header, or within a tag header.
+	 *
+	 * @param typeCode the type code, from a pack representation.
+	 * @return the canonical ASCII encoded name of this type.
+	 */
+	public static byte[] encodedTypeString(final int typeCode) {
+		switch (typeCode) {
+		case OBJ_COMMIT:
+			return ENCODED_TYPE_COMMIT;
+		case OBJ_TREE:
+			return ENCODED_TYPE_TREE;
+		case OBJ_BLOB:
+			return ENCODED_TYPE_BLOB;
+		case OBJ_TAG:
+			return ENCODED_TYPE_TAG;
+		default:
+			throw new IllegalArgumentException("Bad object type: " + typeCode);
+		}
+	}
+

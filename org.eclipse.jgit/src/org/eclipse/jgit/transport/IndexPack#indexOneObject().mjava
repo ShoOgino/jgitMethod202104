@@ -1,0 +1,59 @@
+	// Read one entire object or delta from the input.
+	private void indexOneObject() throws IOException {
+		final long pos = position();
+
+		crc.reset();
+		int c = readFromInput();
+		final int typeCode = (c >> 4) & 7;
+		long sz = c & 15;
+		int shift = 4;
+		while ((c & 0x80) != 0) {
+			c = readFromInput();
+			sz += (c & 0x7f) << shift;
+			shift += 7;
+		}
+
+		switch (typeCode) {
+		case Constants.OBJ_COMMIT:
+		case Constants.OBJ_TREE:
+		case Constants.OBJ_BLOB:
+		case Constants.OBJ_TAG:
+			whole(typeCode, pos, sz);
+			break;
+		case Constants.OBJ_OFS_DELTA: {
+			c = readFromInput();
+			long ofs = c & 127;
+			while ((c & 128) != 0) {
+				ofs += 1;
+				c = readFromInput();
+				ofs <<= 7;
+				ofs += (c & 127);
+			}
+			final long base = pos - ofs;
+			final UnresolvedDelta n;
+			skipInflateFromInput(sz);
+			n = new UnresolvedDelta(pos, (int) crc.getValue());
+			n.next = baseByPos.put(base, n);
+			deltaCount++;
+			break;
+		}
+		case Constants.OBJ_REF_DELTA: {
+			c = fillFromInput(20);
+			crc.update(buf, c, 20);
+			final ObjectId base = ObjectId.fromRaw(buf, c);
+			use(20);
+			DeltaChain r = baseById.get(base);
+			if (r == null) {
+				r = new DeltaChain(base);
+				baseById.add(r);
+			}
+			skipInflateFromInput(sz);
+			r.add(new UnresolvedDelta(pos, (int) crc.getValue()));
+			deltaCount++;
+			break;
+		}
+		default:
+			throw new IOException("Unknown object type " + typeCode + ".");
+		}
+	}
+

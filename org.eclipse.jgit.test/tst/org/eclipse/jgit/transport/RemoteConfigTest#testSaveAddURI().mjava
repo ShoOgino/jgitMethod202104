@@ -1,0 +1,15 @@
+	public void testSaveAddURI() throws Exception {
+		readConfig("[remote \"spearce\"]\n"
+				+ "url = http://www.spearce.org/egit.git\n"
+				+ "fetch = +refs/heads/*:refs/remotes/spearce/*\n");
+
+		final RemoteConfig rc = new RemoteConfig(config, "spearce");
+		rc.addURI(new URIish("/some/dir"));
+		assertEquals(2, rc.getURIs().size());
+		rc.update(config);
+		checkConfig("[remote \"spearce\"]\n"
+				+ "\turl = http://www.spearce.org/egit.git\n"
+				+ "\turl = /some/dir\n"
+				+ "\tfetch = +refs/heads/*:refs/remotes/spearce/*\n");
+	}
+

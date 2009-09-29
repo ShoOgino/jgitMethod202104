@@ -1,0 +1,20 @@
+	/**
+	 * Create a new iterator for an already loaded DirCache instance.
+	 * <p>
+	 * The iterator implementation may copy part of the cache's data during
+	 * construction, so the cache must be read in prior to creating the
+	 * iterator.
+	 *
+	 * @param dc
+	 *            the cache to walk. It must be already loaded into memory.
+	 */
+	public DirCacheIterator(final DirCache dc) {
+		cache = dc;
+		tree = dc.getCacheTree(true);
+		treeStart = 0;
+		treeEnd = tree.getEntrySpan();
+		subtreeId = new byte[Constants.OBJECT_ID_LENGTH];
+		if (!eof())
+			parseEntry();
+	}
+

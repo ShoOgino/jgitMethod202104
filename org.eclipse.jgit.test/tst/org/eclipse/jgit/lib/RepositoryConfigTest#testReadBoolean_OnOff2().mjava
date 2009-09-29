@@ -1,0 +1,9 @@
+	public void testReadBoolean_OnOff2() throws ConfigInvalidException {
+		final Config c = parse("[s]\na = ON\nb = OFF\n");
+		assertEquals("ON", c.getString("s", null, "a"));
+		assertEquals("OFF", c.getString("s", null, "b"));
+
+		assertTrue(c.getBoolean("s", "a", false));
+		assertFalse(c.getBoolean("s", "b", true));
+	}
+

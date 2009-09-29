@@ -1,0 +1,33 @@
+	/**
+	 * Get the content of a bucket object.
+	 *
+	 * @param bucket
+	 *            name of the bucket storing the object.
+	 * @param key
+	 *            key of the object within its bucket.
+	 * @return connection to stream the content of the object. The request
+	 *         properties of the connection may not be modified by the caller as
+	 *         the request parameters have already been signed.
+	 * @throws IOException
+	 *             sending the request was not possible.
+	 */
+	public URLConnection get(final String bucket, final String key)
+			throws IOException {
+		for (int curAttempt = 0; curAttempt < maxAttempts; curAttempt++) {
+			final HttpURLConnection c = open("GET", bucket, key);
+			authorize(c);
+			switch (HttpSupport.response(c)) {
+			case HttpURLConnection.HTTP_OK:
+				encryption.validate(c, X_AMZ_META);
+				return c;
+			case HttpURLConnection.HTTP_NOT_FOUND:
+				throw new FileNotFoundException(key);
+			case HttpURLConnection.HTTP_INTERNAL_ERROR:
+				continue;
+			default:
+				throw error("Reading", key, c);
+			}
+		}
+		throw maxAttempts("Reading", key);
+	}
+

@@ -1,0 +1,48 @@
+	/**
+	 * Rebuild the {@link Constants#PACKED_REFS} file.
+	 * <p>
+	 * This method rebuilds the contents of the {@link Constants#PACKED_REFS}
+	 * file to match the passed list of references, including only those refs
+	 * that have a storage type of {@link Ref.Storage#PACKED}.
+	 * 
+	 * @throws IOException
+	 *             writing is not supported, or attempting to write the file
+	 *             failed, possibly due to permissions or remote disk full, etc.
+	 */
+	public void writePackedRefs() throws IOException {
+		boolean peeled = false;
+
+		for (final Ref r : refs) {
+			if (r.getStorage() != Ref.Storage.PACKED)
+				continue;
+			if (r.getPeeledObjectId() != null)
+				peeled = true;
+		}
+
+		final StringWriter w = new StringWriter();
+		if (peeled) {
+			w.write("# pack-refs with:");
+			if (peeled)
+				w.write(" peeled");
+			w.write('\n');
+		}
+
+		final char[] tmp = new char[Constants.OBJECT_ID_LENGTH * 2];
+		for (final Ref r : refs) {
+			if (r.getStorage() != Ref.Storage.PACKED)
+				continue;
+
+			r.getObjectId().copyTo(tmp, w);
+			w.write(' ');
+			w.write(r.getName());
+			w.write('\n');
+
+			if (r.getPeeledObjectId() != null) {
+				w.write('^');
+				r.getPeeledObjectId().copyTo(tmp, w);
+				w.write('\n');
+			}
+		}
+		writeFile(Constants.PACKED_REFS, Constants.encode(w.toString()));
+	}
+

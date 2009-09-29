@@ -1,0 +1,19 @@
+	private static int findSectionEnd(final List<Entry> entries,
+			final String section, final String subsection) {
+		for (int i = 0; i < entries.size(); i++) {
+			Entry e = entries.get(i);
+			if (e.match(section, subsection, null)) {
+				i++;
+				while (i < entries.size()) {
+					e = entries.get(i);
+					if (e.match(section, subsection, e.name))
+						i++;
+					else
+						break;
+				}
+				return i;
+			}
+		}
+		return -1;
+	}
+

@@ -1,0 +1,14 @@
+	private void cleanUpConflicts() throws CheckoutConflictException {
+		for (String c : conflicts) {
+			File conflict = new File(root, c);
+			if (!conflict.delete())
+				throw new CheckoutConflictException("Cannot delete file: " + c);
+			removeEmptyParents(conflict);
+		}
+		for (String r : removed) {
+			File file = new File(root, r);
+			file.delete();
+			removeEmptyParents(file);
+		}
+	}
+

@@ -1,0 +1,8 @@
+	@Override
+	protected boolean tryAgain1() {
+		final PackList old = packList.get();
+		if (old.tryAgain(packDirectory.lastModified()))
+			return old != scanPacks(old);
+		return false;
+	}
+

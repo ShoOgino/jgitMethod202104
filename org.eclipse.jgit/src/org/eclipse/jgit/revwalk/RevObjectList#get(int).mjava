@@ -1,0 +1,12 @@
+	public E get(int index) {
+		Block s = contents;
+		if (index >> s.shift >= 1024)
+			return null;
+		while (s != null && s.shift > 0) {
+			final int i = index >> s.shift;
+			index -= i << s.shift;
+			s = (Block) s.contents[i];
+		}
+		return s != null ? (E) s.contents[index] : null;
+	}
+

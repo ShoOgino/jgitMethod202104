@@ -1,0 +1,26 @@
+	/**
+	 * Save the configuration as a Git text style configuration file.
+	 * <p>
+	 * <b>Warning:</b> Although this method uses the traditional Git file
+	 * locking approach to protect against concurrent writes of the
+	 * configuration file, it does not ensure that the file has not been
+	 * modified since the last read, which means updates performed by other
+	 * objects accessing the same backing file may be lost.
+	 *
+	 * @throws IOException
+	 *             the file could not be written.
+	 */
+	public void save() throws IOException {
+		final byte[] out = Constants.encode(toText());
+		final LockFile lf = new LockFile(getFile());
+		if (!lf.lock())
+			throw new IOException("Cannot lock " + getFile());
+		try {
+			lf.write(out);
+			if (!lf.commit())
+				throw new IOException("Cannot commit write to " + getFile());
+		} finally {
+			lf.unlock();
+		}
+	}
+

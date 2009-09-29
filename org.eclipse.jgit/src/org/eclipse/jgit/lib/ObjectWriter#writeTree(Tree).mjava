@@ -1,0 +1,30 @@
+	/**
+	 * Write a Tree to the object database.
+	 *
+	 * @param t
+	 *            Tree
+	 * @return SHA-1 of the tree
+	 * @throws IOException
+	 */
+	public ObjectId writeTree(final Tree t) throws IOException {
+		final ByteArrayOutputStream o = new ByteArrayOutputStream();
+		final TreeEntry[] items = t.members();
+		for (int k = 0; k < items.length; k++) {
+			final TreeEntry e = items[k];
+			final ObjectId id = e.getId();
+
+			if (id == null)
+				throw new ObjectWritingException("Object at path \""
+						+ e.getFullName() + "\" does not have an id assigned."
+						+ "  All object ids must be assigned prior"
+						+ " to writing a tree.");
+
+			e.getMode().copyTo(o);
+			o.write(' ');
+			o.write(e.getNameUTF8());
+			o.write(0);
+			id.copyRawTo(o);
+		}
+		return writeCanonicalTree(o.toByteArray());
+	}
+

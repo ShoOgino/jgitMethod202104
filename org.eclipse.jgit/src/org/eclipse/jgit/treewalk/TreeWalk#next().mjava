@@ -1,0 +1,66 @@
+	/**
+	 * Advance this walker to the next relevant entry.
+	 * 
+	 * @return true if there is an entry available; false if all entries have
+	 *         been walked and the walk of this set of tree iterators is over.
+	 * @throws MissingObjectException
+	 *             {@link #isRecursive()} was enabled, a subtree was found, but
+	 *             the subtree object does not exist in this repository. The
+	 *             repository may be missing objects.
+	 * @throws IncorrectObjectTypeException
+	 *             {@link #isRecursive()} was enabled, a subtree was found, and
+	 *             the subtree id does not denote a tree, but instead names some
+	 *             other non-tree type of object. The repository may have data
+	 *             corruption.
+	 * @throws CorruptObjectException
+	 *             the contents of a tree did not appear to be a tree. The
+	 *             repository may have data corruption.
+	 * @throws IOException
+	 *             a loose object or pack file could not be read.
+	 */
+	public boolean next() throws MissingObjectException,
+			IncorrectObjectTypeException, CorruptObjectException, IOException {
+		try {
+			if (advance) {
+				advance = false;
+				postChildren = false;
+				popEntriesEqual();
+			}
+
+			for (;;) {
+				final AbstractTreeIterator t = min();
+				if (t.eof()) {
+					if (depth > 0) {
+						exitSubtree();
+						if (postOrderTraversal) {
+							advance = true;
+							postChildren = true;
+							return true;
+						}
+						popEntriesEqual();
+						continue;
+					}
+					return false;
+				}
+
+				currentHead = t;
+				if (!filter.include(this)) {
+					skipEntriesEqual();
+					continue;
+				}
+
+				if (recursive && FileMode.TREE.equals(t.mode)) {
+					enterSubtree();
+					continue;
+				}
+
+				advance = true;
+				return true;
+			}
+		} catch (StopWalkException stop) {
+			for (final AbstractTreeIterator t : trees)
+				t.stopWalk();
+			return false;
+		}
+	}
+

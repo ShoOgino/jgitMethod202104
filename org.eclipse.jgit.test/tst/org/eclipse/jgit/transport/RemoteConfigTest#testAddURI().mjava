@@ -1,0 +1,15 @@
+	public void testAddURI() throws Exception {
+		readConfig("");
+
+		final URIish uri = new URIish("/some/dir");
+		final RemoteConfig rc = new RemoteConfig(config, "backup");
+		assertEquals(0, rc.getURIs().size());
+
+		assertTrue(rc.addURI(uri));
+		assertEquals(1, rc.getURIs().size());
+		assertSame(uri, rc.getURIs().get(0));
+
+		assertFalse(rc.addURI(new URIish(uri.toString())));
+		assertEquals(1, rc.getURIs().size());
+	}
+

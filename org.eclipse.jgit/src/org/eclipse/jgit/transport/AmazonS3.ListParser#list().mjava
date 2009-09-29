@@ -1,0 +1,45 @@
+		void list() throws IOException {
+			final Map<String, String> args = new TreeMap<String, String>();
+			if (prefix.length() > 0)
+				args.put("prefix", prefix);
+			if (!entries.isEmpty())
+				args.put("marker", prefix + entries.get(entries.size() - 1));
+
+			for (int curAttempt = 0; curAttempt < maxAttempts; curAttempt++) {
+				final HttpURLConnection c = open("GET", bucket, "", args);
+				authorize(c);
+				switch (HttpSupport.response(c)) {
+				case HttpURLConnection.HTTP_OK:
+					truncated = false;
+					data = null;
+
+					final XMLReader xr;
+					try {
+						xr = XMLReaderFactory.createXMLReader();
+					} catch (SAXException e) {
+						throw new IOException("No XML parser available.");
+					}
+					xr.setContentHandler(this);
+					final InputStream in = c.getInputStream();
+					try {
+						xr.parse(new InputSource(in));
+					} catch (SAXException parsingError) {
+						final IOException p;
+						p = new IOException("Error listing " + prefix);
+						p.initCause(parsingError);
+						throw p;
+					} finally {
+						in.close();
+					}
+					return;
+
+				case HttpURLConnection.HTTP_INTERNAL_ERROR:
+					continue;
+
+				default:
+					throw AmazonS3.this.error("Listing", prefix, c);
+				}
+			}
+			throw maxAttempts("Listing", prefix);
+		}
+

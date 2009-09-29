@@ -1,0 +1,24 @@
+	public void testParseFullIndexLine_WithMode() {
+		final String oid = "78981922613b2afb6025042ff6bd878ac1994e85";
+		final String nid = "61780798228d17af2d34fce4cfbdf35556832472";
+		final FileHeader fh = data("diff --git a/a b/a\n" + "index " + oid
+				+ ".." + nid + " 100644\n" + "--- a/a\n" + "+++ b/a\n");
+		assertParse(fh);
+
+		assertEquals("a", fh.getOldName());
+		assertEquals("a", fh.getNewName());
+
+		assertSame(FileMode.REGULAR_FILE, fh.getOldMode());
+		assertSame(FileMode.REGULAR_FILE, fh.getNewMode());
+		assertFalse(fh.hasMetaDataChanges());
+
+		assertNotNull(fh.getOldId());
+		assertNotNull(fh.getNewId());
+
+		assertTrue(fh.getOldId().isComplete());
+		assertTrue(fh.getNewId().isComplete());
+
+		assertEquals(ObjectId.fromString(oid), fh.getOldId().toObjectId());
+		assertEquals(ObjectId.fromString(nid), fh.getNewId().toObjectId());
+	}
+

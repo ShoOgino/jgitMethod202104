@@ -1,0 +1,24 @@
+	private void readLooseRefs(final Map<String, Ref> avail,
+			final String prefix, final File dir) {
+		final File[] entries = dir.listFiles();
+		if (entries == null)
+			return;
+
+		for (final File ent : entries) {
+			final String entName = ent.getName();
+			if (".".equals(entName) || "..".equals(entName))
+				continue;
+			if (ent.isDirectory()) {
+				readLooseRefs(avail, prefix + entName + "/", ent);
+			} else {
+				try {
+					final Ref ref = readRefBasic(prefix + entName, 0);
+					if (ref != null)
+						avail.put(ref.getOrigName(), ref);
+				} catch (IOException e) {
+					continue;
+				}
+			}
+		}
+	}
+

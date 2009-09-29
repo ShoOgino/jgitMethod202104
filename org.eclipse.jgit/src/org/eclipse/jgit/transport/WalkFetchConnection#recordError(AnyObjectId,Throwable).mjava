@@ -1,0 +1,10 @@
+	private void recordError(final AnyObjectId id, final Throwable what) {
+		final ObjectId objId = id.copy();
+		List<Throwable> errors = fetchErrors.get(objId);
+		if (errors == null) {
+			errors = new ArrayList<Throwable>(2);
+			fetchErrors.put(objId, errors);
+		}
+		errors.add(what);
+	}
+

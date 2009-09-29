@@ -1,0 +1,9 @@
+	private boolean hasParentBlob(Tree t, String name) throws IOException {
+		if (name.indexOf("/") == -1) return false;
+		
+		String parent = name.substring(0, name.lastIndexOf("/"));
+		if (t.findBlobMember(parent) != null) 
+			return true;
+		return hasParentBlob(t, parent);
+	}
+

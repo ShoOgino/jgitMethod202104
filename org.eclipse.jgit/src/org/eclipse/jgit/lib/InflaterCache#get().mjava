@@ -1,0 +1,13 @@
+	/**
+	 * Obtain an Inflater for decompression.
+	 * <p>
+	 * Inflaters obtained through this cache should be returned (if possible) by
+	 * {@link #release(Inflater)} to avoid garbage collection and reallocation.
+	 * 
+	 * @return an available inflater. Never null.
+	 */
+	public static Inflater get() {
+		final Inflater r = getImpl();
+		return r != null ? r : new Inflater(false);
+	}
+

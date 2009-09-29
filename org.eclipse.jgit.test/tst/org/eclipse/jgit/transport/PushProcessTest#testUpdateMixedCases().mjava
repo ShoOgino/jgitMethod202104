@@ -1,0 +1,22 @@
+	/**
+	 * Test for remote refs updates with mixed cases that shouldn't depend on
+	 * each other.
+	 *
+	 * @throws IOException
+	 */
+	public void testUpdateMixedCases() throws IOException {
+		final RemoteRefUpdate rruOk = new RemoteRefUpdate(db, null,
+				"refs/heads/master", false, null, null);
+		final Ref refToChange = new Ref(Ref.Storage.LOOSE, "refs/heads/master",
+				ObjectId.fromString("2c349335b7f797072cf729c4f3bb0914ecb6dec9"));
+		final RemoteRefUpdate rruReject = new RemoteRefUpdate(db, null,
+				"refs/heads/nonexisting", false, null, null);
+		refUpdates.add(rruOk);
+		refUpdates.add(rruReject);
+		advertisedRefs.add(refToChange);
+		executePush();
+		assertEquals(Status.OK, rruOk.getStatus());
+		assertEquals(true, rruOk.isFastForward());
+		assertEquals(Status.NON_EXISTING, rruReject.getStatus());
+	}
+

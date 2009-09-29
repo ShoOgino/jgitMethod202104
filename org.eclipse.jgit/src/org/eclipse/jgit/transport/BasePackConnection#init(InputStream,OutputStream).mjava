@@ -1,0 +1,23 @@
+	protected final void init(InputStream myIn, OutputStream myOut) {
+		final int timeout = transport.getTimeout();
+		if (timeout > 0) {
+			final Thread caller = Thread.currentThread();
+			myTimer = new InterruptTimer(caller.getName() + "-Timer");
+			timeoutIn = new TimeoutInputStream(myIn, myTimer);
+			timeoutOut = new TimeoutOutputStream(myOut, myTimer);
+			timeoutIn.setTimeout(timeout * 1000);
+			timeoutOut.setTimeout(timeout * 1000);
+			myIn = timeoutIn;
+			myOut = timeoutOut;
+		}
+
+		in = myIn instanceof BufferedInputStream ? myIn
+				: new BufferedInputStream(myIn, IndexPack.BUFFER_SIZE);
+		out = myOut instanceof BufferedOutputStream ? myOut
+				: new BufferedOutputStream(myOut);
+
+		pckIn = new PacketLineIn(in);
+		pckOut = new PacketLineOut(out);
+		outNeedsEnd = true;
+	}
+

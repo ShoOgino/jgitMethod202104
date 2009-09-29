@@ -1,0 +1,15 @@
+	void execute(final ProgressMonitor monitor, final FetchResult result)
+			throws NotSupportedException, TransportException {
+		askFor.clear();
+		localUpdates.clear();
+		fetchHeadUpdates.clear();
+		packLocks.clear();
+
+		try {
+			executeImp(monitor, result);
+		} finally {
+			for (final PackLock lock : packLocks)
+				lock.unlock();
+		}
+	}
+

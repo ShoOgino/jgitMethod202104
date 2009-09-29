@@ -1,0 +1,12 @@
+	@Override
+	public int read(byte[] buf, int off, int cnt) throws IOException {
+		try {
+			beginRead();
+			return super.read(buf, off, cnt);
+		} catch (InterruptedIOException e) {
+			throw readTimedOut();
+		} finally {
+			endRead();
+		}
+	}
+

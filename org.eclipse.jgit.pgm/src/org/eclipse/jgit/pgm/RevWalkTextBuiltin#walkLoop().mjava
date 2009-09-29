@@ -1,0 +1,18 @@
+	protected int walkLoop() throws Exception {
+		int n = 0;
+		for (final RevCommit c : walk) {
+			n++;
+			show(c);
+		}
+		if (walk instanceof ObjectWalk) {
+			final ObjectWalk ow = (ObjectWalk) walk;
+			for (;;) {
+				final RevObject obj = ow.nextObject();
+				if (obj == null)
+					break;
+				show(ow, obj);
+			}
+		}
+		return n;
+	}
+

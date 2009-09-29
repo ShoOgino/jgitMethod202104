@@ -1,0 +1,17 @@
+	public void testAddOne() {
+		final String flagName = "flag";
+		final RevFlag flag = rw.newFlag(flagName);
+		assertTrue(0 != flag.mask);
+		assertSame(flagName, flag.name);
+
+		final RevFlagSet set = new RevFlagSet();
+		assertTrue(set.add(flag));
+		assertFalse(set.add(flag));
+		assertEquals(flag.mask, set.mask);
+		assertEquals(1, set.size());
+		final Iterator<RevFlag> i = set.iterator();
+		assertTrue(i.hasNext());
+		assertSame(flag, i.next());
+		assertFalse(i.hasNext());
+	}
+

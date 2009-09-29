@@ -1,0 +1,26 @@
+	private void negotiateBegin() throws IOException {
+		walk.resetRetain(REACHABLE, ADVERTISED);
+		walk.markStart(reachableCommits);
+		walk.sort(RevSort.COMMIT_TIME_DESC);
+		walk.setRevFilter(new RevFilter() {
+			@Override
+			public RevFilter clone() {
+				return this;
+			}
+
+			@Override
+			public boolean include(final RevWalk walker, final RevCommit c) {
+				final boolean remoteKnowsIsCommon = c.has(COMMON);
+				if (c.has(ADVERTISED)) {
+					// Remote advertised this, and we have it, hence common.
+					// Whether or not the remote knows that fact is tested
+					// before we added the flag. If the remote doesn't know
+					// we have to still send them this object.
+					//
+					c.add(COMMON);
+				}
+				return !remoteKnowsIsCommon;
+			}
+		});
+	}
+

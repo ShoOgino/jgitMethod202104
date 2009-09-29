@@ -1,0 +1,62 @@
+	private State replaceStringList(final State srcState,
+			final String section, final String subsection, final String name,
+			final List<String> values) {
+		final List<Entry> entries = copy(srcState, values);
+		int entryIndex = 0;
+		int valueIndex = 0;
+		int insertPosition = -1;
+
+		// Reset the first n Entry objects that match this input name.
+		//
+		while (entryIndex < entries.size() && valueIndex < values.size()) {
+			final Entry e = entries.get(entryIndex);
+			if (e.match(section, subsection, name)) {
+				entries.set(entryIndex, e.forValue(values.get(valueIndex++)));
+				insertPosition = entryIndex + 1;
+			}
+			entryIndex++;
+		}
+
+		// Remove any extra Entry objects that we no longer need.
+		//
+		if (valueIndex == values.size() && entryIndex < entries.size()) {
+			while (entryIndex < entries.size()) {
+				final Entry e = entries.get(entryIndex++);
+				if (e.match(section, subsection, name))
+					entries.remove(--entryIndex);
+			}
+		}
+
+		// Insert new Entry objects for additional/new values.
+		//
+		if (valueIndex < values.size() && entryIndex == entries.size()) {
+			if (insertPosition < 0) {
+				// We didn't find a matching key above, but maybe there
+				// is already a section available that matches. Insert
+				// after the last key of that section.
+				//
+				insertPosition = findSectionEnd(entries, section, subsection);
+			}
+			if (insertPosition < 0) {
+				// We didn't find any matching section header for this key,
+				// so we must create a new section header at the end.
+				//
+				final Entry e = new Entry();
+				e.section = section;
+				e.subsection = subsection;
+				entries.add(e);
+				insertPosition = entries.size();
+			}
+			while (valueIndex < values.size()) {
+				final Entry e = new Entry();
+				e.section = section;
+				e.subsection = subsection;
+				e.name = name;
+				e.value = values.get(valueIndex++);
+				entries.add(insertPosition++, e);
+			}
+		}
+
+		return newState(entries);
+	}
+

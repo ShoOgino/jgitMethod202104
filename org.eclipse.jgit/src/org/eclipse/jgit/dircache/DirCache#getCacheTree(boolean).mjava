@@ -1,0 +1,21 @@
+	/**
+	 * Obtain (or build) the current cache tree structure.
+	 * <p>
+	 * This method can optionally recreate the cache tree, without flushing the
+	 * tree objects themselves to disk.
+	 *
+	 * @param build
+	 *            if true and the cache tree is not present in the index it will
+	 *            be generated and returned to the caller.
+	 * @return the cache tree; null if there is no current cache tree available
+	 *         and <code>build</code> was false.
+	 */
+	public DirCacheTree getCacheTree(final boolean build) {
+		if (build) {
+			if (tree == null)
+				tree = new DirCacheTree();
+			tree.validate(sortedEntries, entryCnt, 0, 0);
+		}
+		return tree;
+	}
+

@@ -1,0 +1,27 @@
+	public Iterator<V> iterator() {
+		return new Iterator<V>() {
+			private int found;
+
+			private int i;
+
+			public boolean hasNext() {
+				return found < size;
+			}
+
+			public V next() {
+				while (i < obj_hash.length) {
+					final V v = obj_hash[i++];
+					if (v != null) {
+						found++;
+						return v;
+					}
+				}
+				throw new IllegalStateException();
+			}
+
+			public void remove() {
+				throw new UnsupportedOperationException();
+			}
+		};
+	}
+

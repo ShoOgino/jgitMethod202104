@@ -1,0 +1,34 @@
+	/**
+	 * Add or modify a configuration value. The parameters will result in a
+	 * configuration entry like this.
+	 *
+	 * <pre>
+	 * [section &quot;subsection&quot;]
+	 *         name = value
+	 * </pre>
+	 *
+	 * @param section
+	 *            section name, e.g "branch"
+	 * @param subsection
+	 *            optional subsection value, e.g. a branch name
+	 * @param name
+	 *            parameter name, e.g. "filemode"
+	 * @param value
+	 *            parameter value
+	 */
+	public void setLong(final String section, final String subsection,
+			final String name, final long value) {
+		final String s;
+
+		if (value >= GiB && (value % GiB) == 0)
+			s = String.valueOf(value / GiB) + " g";
+		else if (value >= MiB && (value % MiB) == 0)
+			s = String.valueOf(value / MiB) + " m";
+		else if (value >= KiB && (value % KiB) == 0)
+			s = String.valueOf(value / KiB) + " k";
+		else
+			s = String.valueOf(value);
+
+		setString(section, subsection, name, s);
+	}
+

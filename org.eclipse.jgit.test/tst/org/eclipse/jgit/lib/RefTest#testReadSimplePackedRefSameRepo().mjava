@@ -1,0 +1,20 @@
+	/**
+	 * Modify a packed ref using the API. This creates a loose ref too, ie.
+	 * LOOSE_PACKED
+	 *
+	 * @throws IOException
+	 */
+	public void testReadSimplePackedRefSameRepo() throws IOException {
+		Ref ref = db.getRef("refs/heads/master");
+		ObjectId pid = db.resolve("refs/heads/master^");
+		assertEquals(Storage.PACKED, ref.getStorage());
+		RefUpdate updateRef = db.updateRef("refs/heads/master");
+		updateRef.setNewObjectId(pid);
+		updateRef.setForceUpdate(true);
+		Result update = updateRef.update();
+		assertEquals(Result.FORCED, update);
+
+		ref = db.getRef("refs/heads/master");
+		assertEquals(Storage.LOOSE_PACKED, ref.getStorage());
+	}
+

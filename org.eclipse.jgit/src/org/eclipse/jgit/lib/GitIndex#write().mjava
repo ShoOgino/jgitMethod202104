@@ -1,0 +1,60 @@
+	/**
+	 * Write content of index to disk.
+	 *
+	 * @throws IOException
+	 */
+	public void write() throws IOException {
+		checkWriteOk();
+		File tmpIndex = new File(cacheFile.getAbsoluteFile() + ".tmp");
+		File lock = new File(cacheFile.getAbsoluteFile() + ".lock");
+		if (!lock.createNewFile())
+			throw new IOException("Index file is in use");
+		try {
+			FileOutputStream fileOutputStream = new FileOutputStream(tmpIndex);
+			FileChannel fc = fileOutputStream.getChannel();
+			ByteBuffer buf = ByteBuffer.allocate(4096);
+			MessageDigest newMessageDigest = Constants.newMessageDigest();
+			header = new Header(entries);
+			header.write(buf);
+			buf.flip();
+			newMessageDigest
+					.update(buf.array(), buf.arrayOffset(), buf.limit());
+			fc.write(buf);
+			buf.flip();
+			buf.clear();
+			for (Iterator i = entries.values().iterator(); i.hasNext();) {
+				Entry e = (Entry) i.next();
+				e.write(buf);
+				buf.flip();
+				newMessageDigest.update(buf.array(), buf.arrayOffset(), buf
+						.limit());
+				fc.write(buf);
+				buf.flip();
+				buf.clear();
+			}
+			buf.put(newMessageDigest.digest());
+			buf.flip();
+			fc.write(buf);
+			fc.close();
+			fileOutputStream.close();
+			if (cacheFile.exists())
+				if (!cacheFile.delete())
+					throw new IOException(
+						"Could not rename delete old index");
+			if (!tmpIndex.renameTo(cacheFile))
+				throw new IOException(
+						"Could not rename temporary index file to index");
+			changed = false;
+			statDirty = false;
+			lastCacheTime = cacheFile.lastModified();
+			db.fireIndexChanged();
+		} finally {
+			if (!lock.delete())
+				throw new IOException(
+						"Could not delete lock file. Should not happen");
+			if (tmpIndex.exists() && !tmpIndex.delete())
+				throw new IOException(
+						"Could not delete temporary index file. Should not happen");
+		}
+	}
+

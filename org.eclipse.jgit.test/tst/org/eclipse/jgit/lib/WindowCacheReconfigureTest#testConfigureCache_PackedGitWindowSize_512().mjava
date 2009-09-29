@@ -1,0 +1,11 @@
+	public void testConfigureCache_PackedGitWindowSize_512() {
+		try {
+			final WindowCacheConfig cfg = new WindowCacheConfig();
+			cfg.setPackedGitWindowSize(512);
+			WindowCache.reconfigure(cfg);
+			fail("incorrectly permitted PackedGitWindowSize = 512");
+		} catch (IllegalArgumentException e) {
+			assertEquals("Invalid window size", e.getMessage());
+		}
+	}
+

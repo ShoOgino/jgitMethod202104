@@ -1,0 +1,10 @@
+	TrackingRefUpdate(final Repository db, final String localName,
+			final String remoteName, final boolean forceUpdate,
+			final AnyObjectId nv, final String msg) throws IOException {
+		this.remoteName = remoteName;
+		update = db.updateRef(localName);
+		update.setForceUpdate(forceUpdate);
+		update.setNewObjectId(nv);
+		update.setRefLogMessage(msg, true);
+	}
+

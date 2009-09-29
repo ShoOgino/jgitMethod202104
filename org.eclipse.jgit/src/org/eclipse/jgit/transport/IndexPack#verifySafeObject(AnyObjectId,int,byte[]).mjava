@@ -1,0 +1,21 @@
+	private void verifySafeObject(final AnyObjectId id, final int type,
+			final byte[] data) throws IOException {
+		if (objCheck != null) {
+			try {
+				objCheck.check(type, data);
+			} catch (CorruptObjectException e) {
+				throw new IOException("Invalid "
+						+ Constants.typeString(type) + " " + id.name()
+						+ ":" + e.getMessage());
+			}
+		}
+
+		final ObjectLoader ldr = repo.openObject(readCurs, id);
+		if (ldr != null) {
+			final byte[] existingData = ldr.getCachedBytes();
+			if (ldr.getType() != type || !Arrays.equals(data, existingData)) {
+				throw new IOException("Collision on " + id.name());
+			}
+		}
+	}
+

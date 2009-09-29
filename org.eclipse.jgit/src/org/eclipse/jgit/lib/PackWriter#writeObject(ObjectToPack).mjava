@@ -1,0 +1,42 @@
+	private void writeObject(final ObjectToPack otp) throws IOException {
+		otp.markWantWrite();
+		if (otp.isDeltaRepresentation()) {
+			ObjectToPack deltaBase = otp.getDeltaBase();
+			assert deltaBase != null || thin;
+			if (deltaBase != null && !deltaBase.isWritten()) {
+				if (deltaBase.wantWrite()) {
+					otp.clearDeltaBase(); // cycle detected
+					otp.disposeLoader();
+				} else {
+					writeObject(deltaBase);
+				}
+			}
+		}
+
+		assert !otp.isWritten();
+
+		out.resetCRC32();
+		otp.setOffset(out.length());
+
+		final PackedObjectLoader reuse = open(otp);
+		if (reuse != null) {
+			try {
+				if (otp.isDeltaRepresentation()) {
+					writeDeltaObjectReuse(otp, reuse);
+				} else {
+					writeObjectHeader(otp.getType(), reuse.getSize());
+					reuse.copyRawData(out, buf, windowCursor);
+				}
+			} finally {
+				reuse.endCopyRawData();
+			}
+		} else if (otp.isDeltaRepresentation()) {
+			throw new IOException("creating deltas is not implemented");
+		} else {
+			writeWholeObjectDeflate(otp);
+		}
+		otp.setCRC(out.getCRC32());
+
+		writeMonitor.update(1);
+	}
+

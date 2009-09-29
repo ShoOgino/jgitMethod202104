@@ -1,0 +1,12 @@
+	@Override
+	long findOffset(final AnyObjectId objId) {
+		final int levelOne = objId.getFirstByte();
+		final int levelTwo = binarySearchLevelTwo(objId, levelOne);
+		if (levelTwo == -1)
+			return -1;
+		final long p = NB.decodeUInt32(offset32[levelOne], levelTwo << 2);
+		if ((p & IS_O64) != 0)
+			return NB.decodeUInt64(offset64, (8 * (int) (p & ~IS_O64)));
+		return p;
+	}
+

@@ -1,0 +1,13 @@
+	public void testEmpty() throws IOException {
+		final TemporaryBuffer b = new TemporaryBuffer();
+		try {
+			b.close();
+			assertEquals(0, b.length());
+			final byte[] r = b.toByteArray();
+			assertNotNull(r);
+			assertEquals(0, r.length);
+		} finally {
+			b.destroy();
+		}
+	}
+

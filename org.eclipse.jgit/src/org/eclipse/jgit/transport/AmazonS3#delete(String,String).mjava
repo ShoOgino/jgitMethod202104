@@ -1,0 +1,29 @@
+	/**
+	 * Delete a single object.
+	 * <p>
+	 * Deletion always succeeds, even if the object does not exist.
+	 *
+	 * @param bucket
+	 *            name of the bucket storing the object.
+	 * @param key
+	 *            key of the object within its bucket.
+	 * @throws IOException
+	 *             deletion failed due to communications error.
+	 */
+	public void delete(final String bucket, final String key)
+			throws IOException {
+		for (int curAttempt = 0; curAttempt < maxAttempts; curAttempt++) {
+			final HttpURLConnection c = open("DELETE", bucket, key);
+			authorize(c);
+			switch (HttpSupport.response(c)) {
+			case HttpURLConnection.HTTP_NO_CONTENT:
+				return;
+			case HttpURLConnection.HTTP_INTERNAL_ERROR:
+				continue;
+			default:
+				throw error("Deletion", key, c);
+			}
+		}
+		throw maxAttempts("Deletion", key);
+	}
+

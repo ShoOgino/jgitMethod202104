@@ -1,0 +1,12 @@
+	@Override
+	public void back(int delta) {
+		while (--delta >= 0) {
+			if (currentSubtree != null)
+				nextSubtreePos--;
+			ptr--;
+			parseEntry();
+			if (currentSubtree != null)
+				ptr -= currentSubtree.getEntrySpan() - 1;
+		}
+	}
+

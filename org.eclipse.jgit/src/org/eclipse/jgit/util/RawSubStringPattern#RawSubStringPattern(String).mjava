@@ -1,0 +1,19 @@
+	/**
+	 * Construct a new substring pattern.
+	 * 
+	 * @param patternText
+	 *            text to locate. This should be a literal string, as no
+	 *            meta-characters are supported by this implementation. The
+	 *            string may not be the empty string.
+	 */
+	public RawSubStringPattern(final String patternText) {
+		if (patternText.length() == 0)
+			throw new IllegalArgumentException("Cannot match on empty string.");
+		needleString = patternText;
+
+		final byte[] b = Constants.encode(patternText);
+		needle = new byte[b.length];
+		for (int i = 0; i < b.length; i++)
+			needle[i] = lc(b[i]);
+	}
+

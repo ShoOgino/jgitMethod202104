@@ -1,0 +1,23 @@
+	/**
+	 * Obtain the ObjectId for the current entry.
+	 * <p>
+	 * Using this method to compare ObjectId values between trees of this walker
+	 * is very inefficient. Applications should try to use
+	 * {@link #idEqual(int, int)} or {@link #getObjectId(MutableObjectId, int)}
+	 * whenever possible.
+	 * <p>
+	 * Every tree supplies an object id, even if the tree does not contain the
+	 * current entry. In the latter case {@link ObjectId#zeroId()} is returned.
+	 * 
+	 * @param nth
+	 *            tree to obtain the object identifier from.
+	 * @return object identifier for the current tree entry.
+	 * @see #getObjectId(MutableObjectId, int)
+	 * @see #idEqual(int, int)
+	 */
+	public ObjectId getObjectId(final int nth) {
+		final AbstractTreeIterator t = trees[nth];
+		return t.matches == currentHead ? t.getEntryObjectId() : ObjectId
+				.zeroId();
+	}
+

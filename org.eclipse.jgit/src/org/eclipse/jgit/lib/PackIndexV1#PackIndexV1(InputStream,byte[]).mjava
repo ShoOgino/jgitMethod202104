@@ -1,0 +1,28 @@
+	PackIndexV1(final InputStream fd, final byte[] hdr)
+			throws CorruptObjectException, IOException {
+		final byte[] fanoutTable = new byte[IDX_HDR_LEN];
+		System.arraycopy(hdr, 0, fanoutTable, 0, hdr.length);
+		NB.readFully(fd, fanoutTable, hdr.length, IDX_HDR_LEN - hdr.length);
+
+		idxHeader = new long[256]; // really unsigned 32-bit...
+		for (int k = 0; k < idxHeader.length; k++)
+			idxHeader[k] = NB.decodeUInt32(fanoutTable, k * 4);
+		idxdata = new byte[idxHeader.length][];
+		for (int k = 0; k < idxHeader.length; k++) {
+			int n;
+			if (k == 0) {
+				n = (int) (idxHeader[k]);
+			} else {
+				n = (int) (idxHeader[k] - idxHeader[k - 1]);
+			}
+			if (n > 0) {
+				idxdata[k] = new byte[n * (Constants.OBJECT_ID_LENGTH + 4)];
+				NB.readFully(fd, idxdata[k], 0, idxdata[k].length);
+			}
+		}
+		objectCnt = idxHeader[255];
+
+		packChecksum = new byte[20];
+		NB.readFully(fd, packChecksum, 0, packChecksum.length);
+	}
+

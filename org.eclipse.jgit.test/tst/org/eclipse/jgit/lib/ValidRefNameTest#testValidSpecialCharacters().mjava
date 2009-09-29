@@ -1,0 +1,31 @@
+	public void testValidSpecialCharacters() {
+		assertValid(true, "refs/heads/!");
+		assertValid(true, "refs/heads/\"");
+		assertValid(true, "refs/heads/#");
+		assertValid(true, "refs/heads/$");
+		assertValid(true, "refs/heads/%");
+		assertValid(true, "refs/heads/&");
+		assertValid(true, "refs/heads/'");
+		assertValid(true, "refs/heads/(");
+		assertValid(true, "refs/heads/)");
+		assertValid(true, "refs/heads/+");
+		assertValid(true, "refs/heads/,");
+		assertValid(true, "refs/heads/-");
+		assertValid(true, "refs/heads/;");
+		assertValid(true, "refs/heads/<");
+		assertValid(true, "refs/heads/=");
+		assertValid(true, "refs/heads/>");
+		assertValid(true, "refs/heads/@");
+		assertValid(true, "refs/heads/]");
+		assertValid(true, "refs/heads/_");
+		assertValid(true, "refs/heads/`");
+		assertValid(true, "refs/heads/{");
+		assertValid(true, "refs/heads/|");
+		assertValid(true, "refs/heads/}");
+
+		// This is valid on UNIX, but not on Windows
+		// hence we make in invalid due to non-portability
+		//
+		assertValid(false, "refs/heads/\\");
+	}
+

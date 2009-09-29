@@ -1,0 +1,46 @@
+	public void testRandomWrites() throws IOException {
+		final TemporaryBuffer b = new TemporaryBuffer();
+		final TestRng rng = new TestRng(getName());
+		final int max = TemporaryBuffer.DEFAULT_IN_CORE_LIMIT * 2;
+		final byte[] expect = new byte[max];
+		try {
+			int written = 0;
+			boolean onebyte = true;
+			while (written < max) {
+				if (onebyte) {
+					final byte v = (byte) rng.nextInt();
+					b.write(v);
+					expect[written++] = v;
+				} else {
+					final int len = Math
+							.min(rng.nextInt() & 127, max - written);
+					final byte[] tmp = rng.nextBytes(len);
+					b.write(tmp, 0, len);
+					System.arraycopy(tmp, 0, expect, written, len);
+					written += len;
+				}
+				onebyte = !onebyte;
+			}
+			assertEquals(expect.length, written);
+			b.close();
+
+			assertEquals(expect.length, b.length());
+			{
+				final byte[] r = b.toByteArray();
+				assertNotNull(r);
+				assertEquals(expect.length, r.length);
+				assertTrue(Arrays.equals(expect, r));
+			}
+			{
+				final ByteArrayOutputStream o = new ByteArrayOutputStream();
+				b.writeTo(o, null);
+				o.close();
+				final byte[] r = o.toByteArray();
+				assertEquals(expect.length, r.length);
+				assertTrue(Arrays.equals(expect, r));
+			}
+		} finally {
+			b.destroy();
+		}
+	}
+

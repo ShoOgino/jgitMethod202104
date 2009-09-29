@@ -1,0 +1,9 @@
+	int allocFlag() {
+		if (freeFlags == 0)
+			throw new IllegalArgumentException(32 - RESERVED_FLAGS
+					+ " flags already created.");
+		final int m = Integer.lowestOneBit(freeFlags);
+		freeFlags &= ~m;
+		return m;
+	}
+

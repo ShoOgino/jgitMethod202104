@@ -1,0 +1,33 @@
+	/**
+	 * Convert a set of mode bits into a FileMode enumerated value.
+	 * 
+	 * @param bits
+	 *            the mode bits the caller has somehow obtained.
+	 * @return the FileMode instance that represents the given bits.
+	 */
+	public static final FileMode fromBits(final int bits) {
+		switch (bits & TYPE_MASK) {
+		case TYPE_MISSING:
+			if (bits == 0)
+				return MISSING;
+			break;
+		case TYPE_TREE:
+			return TREE;
+		case TYPE_FILE:
+			if ((bits & 0111) != 0)
+				return EXECUTABLE_FILE;
+			return REGULAR_FILE;
+		case TYPE_SYMLINK:
+			return SYMLINK;
+		case TYPE_GITLINK:
+			return GITLINK;
+		}
+
+		return new FileMode(bits, Constants.OBJ_BAD) {
+			@Override
+			public boolean equals(final int a) {
+				return bits == a;
+			}
+		};
+	}
+

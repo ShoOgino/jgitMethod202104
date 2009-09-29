@@ -1,0 +1,14 @@
+	public void testRemoveOnlyURI() throws Exception {
+		readConfig("");
+
+		final URIish a = new URIish("/some/dir");
+		final RemoteConfig rc = new RemoteConfig(config, "backup");
+		assertTrue(rc.addURI(a));
+
+		assertEquals(1, rc.getURIs().size());
+		assertSame(a, rc.getURIs().get(0));
+
+		assertTrue(rc.removeURI(a));
+		assertEquals(0, rc.getURIs().size());
+	}
+

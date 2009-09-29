@@ -1,0 +1,15 @@
+	public void testSort_REVERSE() throws Exception {
+		final RevCommit a = commit();
+		final RevCommit b = commit(a);
+		final RevCommit c = commit(b);
+		final RevCommit d = commit(c);
+
+		rw.sort(RevSort.REVERSE);
+		markStart(d);
+		assertCommit(a, rw.next());
+		assertCommit(b, rw.next());
+		assertCommit(c, rw.next());
+		assertCommit(d, rw.next());
+		assertNull(rw.next());
+	}
+

@@ -1,0 +1,20 @@
+	/**
+	 * Obtain alternate connections to alternate object databases (if any).
+	 * <p>
+	 * Alternates are typically read from the file {@link #INFO_ALTERNATES} or
+	 * {@link #INFO_HTTP_ALTERNATES}. The content of each line must be resolved
+	 * by the implementation and a new database reference should be returned to
+	 * represent the additional location.
+	 * <p>
+	 * Alternates may reuse the same network connection handle, however the
+	 * fetch connection will {@link #close()} each created alternate.
+	 * 
+	 * @return list of additional object databases the caller could fetch from;
+	 *         null or empty list if none are configured.
+	 * @throws IOException
+	 *             The connection is unable to read the remote repository's list
+	 *             of configured alternates.
+	 */
+	abstract Collection<WalkRemoteObjectDatabase> getAlternates()
+			throws IOException;
+

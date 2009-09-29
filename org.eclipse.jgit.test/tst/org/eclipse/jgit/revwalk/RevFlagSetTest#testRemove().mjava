@@ -1,0 +1,13 @@
+	public void testRemove() {
+		final RevFlag flag1 = rw.newFlag("flag_1");
+		final RevFlag flag2 = rw.newFlag("flag_2");
+		final RevFlagSet set = new RevFlagSet();
+		assertTrue(set.add(flag1));
+		assertTrue(set.add(flag2));
+
+		assertTrue(set.remove(flag1));
+		assertFalse(set.remove(flag1));
+		assertEquals(flag2.mask, set.mask);
+		assertFalse(set.contains(flag1));
+	}
+

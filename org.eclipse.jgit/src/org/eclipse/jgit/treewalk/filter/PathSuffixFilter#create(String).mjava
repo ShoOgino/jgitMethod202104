@@ -1,0 +1,17 @@
+	/**
+	 * Create a new tree filter for a user supplied path.
+	 * <p>
+	 * Path strings use '/' to delimit directories on all platforms.
+	 *
+	 * @param path
+	 *            the path (suffix) to filter on. Must not be the empty string.
+	 * @return a new filter for the requested path.
+	 * @throws IllegalArgumentException
+	 *             the path supplied was the empty string.
+	 */
+	public static PathSuffixFilter create(String path) {
+		if (path.length() == 0)
+			throw new IllegalArgumentException("Empty path not permitted.");
+		return new PathSuffixFilter(path);
+	}
+

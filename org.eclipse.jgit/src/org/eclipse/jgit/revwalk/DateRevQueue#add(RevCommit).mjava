@@ -1,0 +1,18 @@
+	public void add(final RevCommit c) {
+		Entry q = head;
+		final long when = c.commitTime;
+		final Entry n = newEntry(c);
+		if (q == null || when > q.commit.commitTime) {
+			n.next = q;
+			head = n;
+		} else {
+			Entry p = q.next;
+			while (p != null && p.commit.commitTime > when) {
+				q = p;
+				p = q.next;
+			}
+			n.next = q.next;
+			q.next = n;
+		}
+	}
+

@@ -1,0 +1,16 @@
+	private void parseModeLine(int ptr, final int eol) {
+		// "mode $amode,$bmode..$cmode"
+		//
+		int n = 0;
+		while (ptr < eol) {
+			final int comma = nextLF(buf, ptr, ',');
+			if (eol <= comma)
+				break;
+			oldModes[n++] = parseFileMode(ptr, comma);
+			ptr = comma;
+		}
+		final int dot2 = nextLF(buf, ptr, '.');
+		oldModes[n] = parseFileMode(ptr, dot2);
+		newMode = parseFileMode(dot2 + 1, eol);
+	}
+

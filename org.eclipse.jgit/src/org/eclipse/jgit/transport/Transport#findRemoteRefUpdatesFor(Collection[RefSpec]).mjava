@@ -1,0 +1,23 @@
+	/**
+	 * Convert push remote refs update specification from {@link RefSpec} form
+	 * to {@link RemoteRefUpdate}. Conversion expands wildcards by matching
+	 * source part to local refs. expectedOldObjectId in RemoteRefUpdate is
+	 * always set as null. Tracking branch is configured if RefSpec destination
+	 * matches source of any fetch ref spec for this transport remote
+	 * configuration.
+	 * <p>
+	 * Conversion is performed for context of this transport (database, fetch
+	 * specifications).
+	 *
+	 * @param specs
+	 *            collection of RefSpec to convert.
+	 * @return collection of set up {@link RemoteRefUpdate}.
+	 * @throws IOException
+	 *             when problem occurred during conversion or specification set
+	 *             up: most probably, missing objects or refs.
+	 */
+	public Collection<RemoteRefUpdate> findRemoteRefUpdatesFor(
+			final Collection<RefSpec> specs) throws IOException {
+		return findRemoteRefUpdatesFor(local, specs, fetch);
+	}
+

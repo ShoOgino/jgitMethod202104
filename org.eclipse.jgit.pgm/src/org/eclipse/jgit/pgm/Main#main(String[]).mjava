@@ -1,0 +1,33 @@
+	/**
+	 * Execute the command line.
+	 * 
+	 * @param argv
+	 *            arguments.
+	 */
+	public static void main(final String[] argv) {
+		final Main me = new Main();
+		try {
+			AwtAuthenticator.install();
+			HttpSupport.configureHttpProxy();
+			me.execute(argv);
+		} catch (Die err) {
+			System.err.println("fatal: " + err.getMessage());
+			if (me.showStackTrace)
+				err.printStackTrace();
+			System.exit(128);
+		} catch (Exception err) {
+			if (!me.showStackTrace && err.getCause() != null
+					&& err instanceof TransportException)
+				System.err.println("fatal: " + err.getCause().getMessage());
+
+			if (err.getClass().getName().startsWith("org.eclipse.jgit.errors.")) {
+				System.err.println("fatal: " + err.getMessage());
+				if (me.showStackTrace)
+					err.printStackTrace();
+				System.exit(128);
+			}
+			err.printStackTrace();
+			System.exit(1);
+		}
+	}
+

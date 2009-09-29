@@ -1,0 +1,27 @@
+	/**
+	 * Commit this change and release the lock.
+	 * <p>
+	 * If this method fails (returns false) the lock is still released.
+	 * 
+	 * @return true if the commit was successful and the file contains the new
+	 *         data; false if the commit failed and the file remains with the
+	 *         old data.
+	 * @throws IllegalStateException
+	 *             the lock is not held.
+	 */
+	public boolean commit() {
+		if (os != null) {
+			unlock();
+			throw new IllegalStateException("Lock on " + ref + " not closed.");
+		}
+
+		saveStatInformation();
+		if (lck.renameTo(ref))
+			return true;
+		if (!ref.exists() || ref.delete())
+			if (lck.renameTo(ref))
+				return true;
+		unlock();
+		return false;
+	}
+

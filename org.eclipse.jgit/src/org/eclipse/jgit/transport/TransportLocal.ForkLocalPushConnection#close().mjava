@@ -1,0 +1,15 @@
+		@Override
+		public void close() {
+			super.close();
+
+			if (receivePack != null) {
+				try {
+					receivePack.waitFor();
+				} catch (InterruptedException ie) {
+					// Stop waiting and return anyway.
+				} finally {
+					receivePack = null;
+				}
+			}
+		}
+

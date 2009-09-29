@@ -1,0 +1,16 @@
+	private void parseDeletedFileMode(int ptr, final int eol) {
+		// "deleted file mode $amode,$bmode"
+		//
+		changeType = ChangeType.DELETE;
+		int n = 0;
+		while (ptr < eol) {
+			final int comma = nextLF(buf, ptr, ',');
+			if (eol <= comma)
+				break;
+			oldModes[n++] = parseFileMode(ptr, comma);
+			ptr = comma;
+		}
+		oldModes[n] = parseFileMode(ptr, eol);
+		newMode = FileMode.MISSING;
+	}
+

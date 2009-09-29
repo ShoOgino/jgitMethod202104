@@ -1,0 +1,9 @@
+	public void testReadLooseRef() throws IOException {
+		RefUpdate updateRef = db.updateRef("ref/heads/new");
+		updateRef.setNewObjectId(db.resolve("refs/heads/master"));
+		Result update = updateRef.update();
+		assertEquals(Result.NEW, update);
+		Ref ref = db.getRef("ref/heads/new");
+		assertEquals(Storage.LOOSE, ref.getStorage());
+	}
+

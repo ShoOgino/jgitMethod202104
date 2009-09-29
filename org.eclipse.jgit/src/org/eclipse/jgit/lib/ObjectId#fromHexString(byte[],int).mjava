@@ -1,0 +1,13 @@
+	private static final ObjectId fromHexString(final byte[] bs, int p) {
+		try {
+			final int a = RawParseUtils.parseHexInt32(bs, p);
+			final int b = RawParseUtils.parseHexInt32(bs, p + 8);
+			final int c = RawParseUtils.parseHexInt32(bs, p + 16);
+			final int d = RawParseUtils.parseHexInt32(bs, p + 24);
+			final int e = RawParseUtils.parseHexInt32(bs, p + 32);
+			return new ObjectId(a, b, c, d, e);
+		} catch (ArrayIndexOutOfBoundsException e1) {
+			throw new InvalidObjectIdException(bs, p, STR_LEN);
+		}
+	}
+

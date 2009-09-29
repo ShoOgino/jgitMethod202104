@@ -1,0 +1,10 @@
+	public void testObjectInNewPack() throws IncorrectObjectTypeException,
+			IOException {
+		// Create a new object in a new pack, and test that it is present.
+		//
+		final Repository eden = createNewEmptyRepo();
+		final RevObject o1 = writeBlob(eden, "o1");
+		pack(eden, o1);
+		assertEquals(o1.name(), parse(o1).name());
+	}
+

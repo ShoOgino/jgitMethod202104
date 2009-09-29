@@ -1,0 +1,12 @@
+	@Override
+	public int read() throws IOException {
+		try {
+			beginRead();
+			return super.read();
+		} catch (InterruptedIOException e) {
+			throw readTimedOut();
+		} finally {
+			endRead();
+		}
+	}
+

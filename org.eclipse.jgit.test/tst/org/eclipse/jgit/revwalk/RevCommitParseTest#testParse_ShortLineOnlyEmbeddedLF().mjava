@@ -1,0 +1,8 @@
+	public void testParse_ShortLineOnlyEmbeddedLF() throws Exception {
+		final String fullMsg = "This is a\nshort message.";
+		final String shortMsg = fullMsg.replace('\n', ' ');
+		final RevCommit c = create(fullMsg);
+		assertEquals(fullMsg, c.getFullMessage());
+		assertEquals(shortMsg, c.getShortMessage());
+	}
+

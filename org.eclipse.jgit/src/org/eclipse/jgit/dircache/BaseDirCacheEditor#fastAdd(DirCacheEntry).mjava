@@ -1,0 +1,21 @@
+	/**
+	 * Append one entry into the resulting entry list.
+	 * <p>
+	 * The entry is placed at the end of the entry list. The caller is
+	 * responsible for making sure the final table is correctly sorted.
+	 * <p>
+	 * The {@link #entries} table is automatically expanded if there is
+	 * insufficient space for the new addition.
+	 *
+	 * @param newEntry
+	 *            the new entry to add.
+	 */
+	protected void fastAdd(final DirCacheEntry newEntry) {
+		if (entries.length == entryCnt) {
+			final DirCacheEntry[] n = new DirCacheEntry[(entryCnt + 16) * 3 / 2];
+			System.arraycopy(entries, 0, n, 0, entryCnt);
+			entries = n;
+		}
+		entries[entryCnt++] = newEntry;
+	}
+

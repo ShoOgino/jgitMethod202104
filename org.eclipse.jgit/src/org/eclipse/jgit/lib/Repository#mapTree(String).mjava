@@ -1,0 +1,16 @@
+	/**
+	 * Access a Tree object using a symbolic reference. This reference may
+	 * be a SHA-1 or ref in combination with a number of symbols translating
+	 * from one ref or SHA1-1 to another, such as HEAD^{tree} etc.
+	 *
+	 * @param revstr a reference to a git commit object
+	 * @return a Tree named by the specified string
+	 * @throws IOException
+	 *
+	 * @see #resolve(String)
+	 */
+	public Tree mapTree(final String revstr) throws IOException {
+		final ObjectId id = resolve(revstr);
+		return id != null ? mapTree(id) : null;
+	}
+

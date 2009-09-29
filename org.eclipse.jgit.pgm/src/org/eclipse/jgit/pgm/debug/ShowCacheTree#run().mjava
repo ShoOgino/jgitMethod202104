@@ -1,0 +1,9 @@
+	@Override
+	protected void run() throws Exception {
+		final DirCache cache = DirCache.read(db);
+		final DirCacheTree tree = cache.getCacheTree(false);
+		if (tree == null)
+			throw die("no 'TREE' section in index");
+		show(tree);
+	}
+

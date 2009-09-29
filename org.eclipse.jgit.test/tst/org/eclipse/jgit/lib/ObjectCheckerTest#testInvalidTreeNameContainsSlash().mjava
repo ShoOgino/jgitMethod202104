@@ -1,0 +1,12 @@
+	public void testInvalidTreeNameContainsSlash() {
+		final StringBuilder b = new StringBuilder();
+		entry(b, "100644 a/b");
+		final byte[] data = Constants.encodeASCII(b.toString());
+		try {
+			checker.checkTree(data);
+			fail("incorrectly accepted an invalid tree");
+		} catch (CorruptObjectException e) {
+			assertEquals("name contains '/'", e.getMessage());
+		}
+	}
+

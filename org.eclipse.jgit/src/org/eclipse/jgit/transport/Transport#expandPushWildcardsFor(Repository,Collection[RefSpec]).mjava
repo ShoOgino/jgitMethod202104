@@ -1,0 +1,18 @@
+	private static Collection<RefSpec> expandPushWildcardsFor(
+			final Repository db, final Collection<RefSpec> specs) {
+		final Map<String, Ref> localRefs = db.getAllRefs();
+		final Collection<RefSpec> procRefs = new HashSet<RefSpec>();
+
+		for (final RefSpec spec : specs) {
+			if (spec.isWildcard()) {
+				for (final Ref localRef : localRefs.values()) {
+					if (spec.matchSource(localRef))
+						procRefs.add(spec.expandFromSource(localRef));
+				}
+			} else {
+				procRefs.add(spec);
+			}
+		}
+		return procRefs;
+	}
+

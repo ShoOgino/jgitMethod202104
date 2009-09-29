@@ -1,0 +1,33 @@
+	@Override
+	RevCommit next() throws MissingObjectException,
+			IncorrectObjectTypeException, IOException {
+		for (;;) {
+			final RevCommit c = pending.next();
+			if (c == null)
+				return null;
+
+			if (c.inDegree > 0) {
+				// At least one of our children is missing. We delay
+				// production until all of our children are output.
+				//
+				c.flags |= TOPO_DELAY;
+				continue;
+			}
+
+			// All of our children have already produced,
+			// so it is OK for us to produce now as well.
+			//
+			for (final RevCommit p : c.parents) {
+				if (--p.inDegree == 0 && (p.flags & TOPO_DELAY) != 0) {
+					// This parent tried to come before us, but we are
+					// his last child. unpop the parent so it goes right
+					// behind this child.
+					//
+					p.flags &= ~TOPO_DELAY;
+					pending.unpop(p);
+				}
+			}
+			return c;
+		}
+	}
+

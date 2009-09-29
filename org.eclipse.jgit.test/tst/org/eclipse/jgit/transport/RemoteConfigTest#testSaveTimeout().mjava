@@ -1,0 +1,12 @@
+	public void testSaveTimeout() throws Exception {
+		final RemoteConfig rc = new RemoteConfig(config, "origin");
+		rc.addURI(new URIish("/some/dir"));
+		rc.addFetchRefSpec(new RefSpec("+refs/heads/*:refs/remotes/"
+				+ rc.getName() + "/*"));
+		rc.setTimeout(60);
+		rc.update(config);
+		checkConfig("[remote \"origin\"]\n" + "\turl = /some/dir\n"
+				+ "\tfetch = +refs/heads/*:refs/remotes/origin/*\n"
+				+ "\ttimeout = 60\n");
+	}
+

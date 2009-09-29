@@ -1,0 +1,22 @@
+	ByteWindow mmap(final long pos, int size) throws IOException {
+		if (length < pos + size)
+			size = (int) (length - pos);
+
+		MappedByteBuffer map;
+		try {
+			map = fd.getChannel().map(MapMode.READ_ONLY, pos, size);
+		} catch (IOException ioe1) {
+			// The most likely reason this failed is the JVM has run out
+			// of virtual memory. We need to discard quickly, and try to
+			// force the GC to finalize and release any existing mappings.
+			//
+			System.gc();
+			System.runFinalization();
+			map = fd.getChannel().map(MapMode.READ_ONLY, pos, size);
+		}
+
+		if (map.hasArray())
+			return new ByteArrayWindow(this, pos, map.array());
+		return new ByteBufferWindow(this, pos, map);
+	}
+

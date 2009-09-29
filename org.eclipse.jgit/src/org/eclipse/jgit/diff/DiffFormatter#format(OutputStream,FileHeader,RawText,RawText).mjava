@@ -1,0 +1,35 @@
+	/**
+	 * Format a patch script, reusing a previously parsed FileHeader.
+	 * <p>
+	 * This formatter is primarily useful for editing an existing patch script
+	 * to increase or reduce the number of lines of context within the script.
+	 * All header lines are reused as-is from the supplied FileHeader.
+	 *
+	 * @param out
+	 *            stream to write the patch script out to.
+	 * @param head
+	 *            existing file header containing the header lines to copy.
+	 * @param a
+	 *            text source for the pre-image version of the content. This
+	 *            must match the content of {@link FileHeader#getOldId()}.
+	 * @param b
+	 *            text source for the post-image version of the content. This
+	 *            must match the content of {@link FileHeader#getNewId()}.
+	 * @throws IOException
+	 *             writing to the supplied stream failed.
+	 */
+	public void format(final OutputStream out, final FileHeader head,
+			final RawText a, final RawText b) throws IOException {
+		// Reuse the existing FileHeader as-is by blindly copying its
+		// header lines, but avoiding its hunks. Instead we recreate
+		// the hunks from the text instances we have been supplied.
+		//
+		final int start = head.getStartOffset();
+		int end = head.getEndOffset();
+		if (!head.getHunks().isEmpty())
+			end = head.getHunks().get(0).getStartOffset();
+		out.write(head.getBuffer(), start, end - start);
+
+		formatEdits(out, a, b, head.toEditList());
+	}
+

@@ -1,0 +1,12 @@
+	private State getState() {
+		State cur, upd;
+		do {
+			cur = state.get();
+			final State base = getBaseState();
+			if (cur.baseState == base)
+				return cur;
+			upd = new State(cur.entryList, base);
+		} while (!state.compareAndSet(cur, upd));
+		return upd;
+	}
+

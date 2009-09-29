@@ -1,0 +1,54 @@
+	/**
+	 * Returns an Iterator over the commits of this walker.
+	 * <p>
+	 * The returned iterator is only useful for one walk. If this RevWalk gets
+	 * reset a new iterator must be obtained to walk over the new results.
+	 * <p>
+	 * Applications must not use both the Iterator and the {@link #next()} API
+	 * at the same time. Pick one API and use that for the entire walk.
+	 * <p>
+	 * If a checked exception is thrown during the walk (see {@link #next()})
+	 * it is rethrown from the Iterator as a {@link RevWalkException}.
+	 * 
+	 * @return an iterator over this walker's commits.
+	 * @see RevWalkException
+	 */
+	public Iterator<RevCommit> iterator() {
+		final RevCommit first;
+		try {
+			first = RevWalk.this.next();
+		} catch (MissingObjectException e) {
+			throw new RevWalkException(e);
+		} catch (IncorrectObjectTypeException e) {
+			throw new RevWalkException(e);
+		} catch (IOException e) {
+			throw new RevWalkException(e);
+		}
+
+		return new Iterator<RevCommit>() {
+			RevCommit next = first;
+
+			public boolean hasNext() {
+				return next != null;
+			}
+
+			public RevCommit next() {
+				try {
+					final RevCommit r = next;
+					next = RevWalk.this.next();
+					return r;
+				} catch (MissingObjectException e) {
+					throw new RevWalkException(e);
+				} catch (IncorrectObjectTypeException e) {
+					throw new RevWalkException(e);
+				} catch (IOException e) {
+					throw new RevWalkException(e);
+				}
+			}
+
+			public void remove() {
+				throw new UnsupportedOperationException();
+			}
+		};
+	}
+

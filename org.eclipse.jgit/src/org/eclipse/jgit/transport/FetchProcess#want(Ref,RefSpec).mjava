@@ -1,0 +1,28 @@
+	private void want(final Ref src, final RefSpec spec)
+			throws TransportException {
+		final ObjectId newId = src.getObjectId();
+		if (spec.getDestination() != null) {
+			try {
+				final TrackingRefUpdate tru = createUpdate(spec, newId);
+				if (newId.equals(tru.getOldObjectId()))
+					return;
+				localUpdates.add(tru);
+			} catch (IOException err) {
+				// Bad symbolic ref? That is the most likely cause.
+				//
+				throw new TransportException("Cannot resolve"
+						+ " local tracking ref " + spec.getDestination()
+						+ " for updating.", err);
+			}
+		}
+
+		askFor.put(newId, src);
+
+		final FetchHeadRecord fhr = new FetchHeadRecord();
+		fhr.newValue = newId;
+		fhr.notForMerge = spec.getDestination() != null;
+		fhr.sourceName = src.getName();
+		fhr.sourceURI = transport.getURI();
+		fetchHeadUpdates.add(fhr);
+	}
+

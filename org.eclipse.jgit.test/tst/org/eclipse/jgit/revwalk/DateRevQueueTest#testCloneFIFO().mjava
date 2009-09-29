@@ -1,0 +1,22 @@
+	public void testCloneFIFO() throws Exception {
+		final RevCommit a = parse(commit());
+		final RevCommit b = parse(commit(200, a));
+		final RevCommit c = parse(commit(200, b));
+
+		final FIFORevQueue src = new FIFORevQueue();
+		src.add(a);
+		src.add(b);
+		src.add(c);
+
+		q = new DateRevQueue(src);
+		assertFalse(q.everbodyHasFlag(RevWalk.UNINTERESTING));
+		assertFalse(q.anybodyHasFlag(RevWalk.UNINTERESTING));
+		assertCommit(c, q.peek());
+		assertCommit(c, q.peek());
+
+		assertCommit(c, q.next());
+		assertCommit(b, q.next());
+		assertCommit(a, q.next());
+		assertNull(q.next());
+	}
+

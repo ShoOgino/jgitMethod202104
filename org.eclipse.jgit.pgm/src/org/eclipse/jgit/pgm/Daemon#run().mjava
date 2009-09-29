@@ -1,0 +1,29 @@
+	@Override
+	protected void run() throws Exception {
+		final org.eclipse.jgit.transport.Daemon d;
+
+		d = new org.eclipse.jgit.transport.Daemon(
+				host != null ? new InetSocketAddress(host, port)
+						: new InetSocketAddress(port));
+		d.setExportAll(exportAll);
+		if (0 <= timeout)
+			d.setTimeout(timeout);
+
+		for (final String n : enable)
+			service(d, n).setEnabled(true);
+		for (final String n : disable)
+			service(d, n).setEnabled(false);
+
+		for (final String n : canOverride)
+			service(d, n).setOverridable(true);
+		for (final String n : forbidOverride)
+			service(d, n).setOverridable(false);
+
+		for (final File f : directory) {
+			out.println("Exporting " + f.getAbsolutePath());
+			d.exportDirectory(f);
+		}
+		d.start();
+		out.println("Listening on " + d.getAddress());
+	}
+

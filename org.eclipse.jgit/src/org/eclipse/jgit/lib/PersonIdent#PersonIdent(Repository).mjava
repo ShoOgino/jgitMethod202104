@@ -1,0 +1,15 @@
+	/**
+	 * Creates new PersonIdent from config info in repository, with current time.
+	 * This new PersonIdent gets the info from the default committer as available
+	 * from the configuration.
+	 * 
+	 * @param repo
+	 */
+	public PersonIdent(final Repository repo) {
+		final RepositoryConfig config = repo.getConfig();
+		name = config.getCommitterName();
+		emailAddress = config.getCommitterEmail();
+		when = SystemReader.getInstance().getCurrentTime();
+		tzOffset = SystemReader.getInstance().getTimezone(when);
+	}
+

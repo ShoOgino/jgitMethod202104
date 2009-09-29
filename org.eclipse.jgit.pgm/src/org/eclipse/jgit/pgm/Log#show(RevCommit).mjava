@@ -1,0 +1,44 @@
+	@Override
+	protected void show(final RevCommit c) throws Exception {
+		out.print("commit ");
+		c.getId().copyTo(outbuffer, out);
+		if (decorate) {
+			Collection<Ref> list = allRefsByPeeledObjectId.get(c.copy());
+			if (list != null) {
+				out.print(" (");
+				for (Iterator<Ref> i = list.iterator(); i.hasNext(); ) {
+					out.print(i.next().getOrigName());
+					if (i.hasNext())
+						out.print(" ");
+				}
+				out.print(")");
+			}
+		}
+		out.println();
+
+		final PersonIdent author = c.getAuthorIdent();
+		out.print("Author: ");
+		out.print(author.getName());
+		out.print(" <");
+		out.print(author.getEmailAddress());
+		out.print(">");
+		out.println();
+
+		final TimeZone authorTZ = author.getTimeZone();
+		fmt.setTimeZone(authorTZ != null ? authorTZ : myTZ);
+		out.print("Date:   ");
+		out.print(fmt.format(author.getWhen()));
+		out.println();
+
+		out.println();
+		final String[] lines = c.getFullMessage().split("\n");
+		for (final String s : lines) {
+			out.print("    ");
+			out.print(s);
+			out.println();
+		}
+
+		out.println();
+		out.flush();
+	}
+

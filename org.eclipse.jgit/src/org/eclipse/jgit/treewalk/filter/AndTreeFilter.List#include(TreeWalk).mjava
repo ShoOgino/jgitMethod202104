@@ -1,0 +1,11 @@
+		@Override
+		public boolean include(final TreeWalk walker)
+				throws MissingObjectException, IncorrectObjectTypeException,
+				IOException {
+			for (final TreeFilter f : subfilters) {
+				if (!f.include(walker))
+					return false;
+			}
+			return true;
+		}
+

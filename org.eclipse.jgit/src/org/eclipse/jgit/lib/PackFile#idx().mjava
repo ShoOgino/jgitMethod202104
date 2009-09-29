@@ -1,0 +1,22 @@
+	private synchronized PackIndex idx() throws IOException {
+		if (loadedIdx == null) {
+			if (invalid)
+				throw new PackInvalidException(packFile);
+
+			try {
+				final PackIndex idx = PackIndex.open(idxFile);
+
+				if (packChecksum == null)
+					packChecksum = idx.packChecksum;
+				else if (!Arrays.equals(packChecksum, idx.packChecksum))
+					throw new PackMismatchException("Pack checksum mismatch");
+
+				loadedIdx = idx;
+			} catch (IOException e) {
+				invalid = true;
+				throw e;
+			}
+		}
+		return loadedIdx;
+	}
+

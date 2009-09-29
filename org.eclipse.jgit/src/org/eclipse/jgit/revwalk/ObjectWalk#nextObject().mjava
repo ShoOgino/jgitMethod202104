@@ -1,0 +1,81 @@
+	/**
+	 * Pop the next most recent object.
+	 * 
+	 * @return next most recent object; null if traversal is over.
+	 * @throws MissingObjectException
+	 *             one or or more of the next objects are not available from the
+	 *             object database, but were thought to be candidates for
+	 *             traversal. This usually indicates a broken link.
+	 * @throws IncorrectObjectTypeException
+	 *             one or or more of the objects in a tree do not match the type
+	 *             indicated.
+	 * @throws IOException
+	 *             a pack file or loose object could not be read.
+	 */
+	public RevObject nextObject() throws MissingObjectException,
+			IncorrectObjectTypeException, IOException {
+		fromTreeWalk = false;
+
+		if (nextSubtree != null) {
+			treeWalk = treeWalk.createSubtreeIterator0(db, nextSubtree, curs);
+			nextSubtree = null;
+		}
+
+		while (!treeWalk.eof()) {
+			final FileMode mode = treeWalk.getEntryFileMode();
+			final int sType = mode.getObjectType();
+
+			switch (sType) {
+			case Constants.OBJ_BLOB: {
+				treeWalk.getEntryObjectId(idBuffer);
+				final RevBlob o = lookupBlob(idBuffer);
+				if ((o.flags & SEEN) != 0)
+					break;
+				o.flags |= SEEN;
+				if (shouldSkipObject(o))
+					break;
+				fromTreeWalk = true;
+				return o;
+			}
+			case Constants.OBJ_TREE: {
+				treeWalk.getEntryObjectId(idBuffer);
+				final RevTree o = lookupTree(idBuffer);
+				if ((o.flags & SEEN) != 0)
+					break;
+				o.flags |= SEEN;
+				if (shouldSkipObject(o))
+					break;
+				nextSubtree = o;
+				fromTreeWalk = true;
+				return o;
+			}
+			default:
+				if (FileMode.GITLINK.equals(mode))
+					break;
+				treeWalk.getEntryObjectId(idBuffer);
+				throw new CorruptObjectException("Invalid mode " + mode
+						+ " for " + idBuffer.name() + " "
+						+ treeWalk.getEntryPathString() + " in " + currentTree
+						+ ".");
+			}
+
+			treeWalk = treeWalk.next();
+		}
+
+		for (;;) {
+			final RevObject o = pendingObjects.next();
+			if (o == null)
+				return null;
+			if ((o.flags & SEEN) != 0)
+				continue;
+			o.flags |= SEEN;
+			if (shouldSkipObject(o))
+				continue;
+			if (o instanceof RevTree) {
+				currentTree = (RevTree) o;
+				treeWalk = treeWalk.resetRoot(db, currentTree, curs);
+			}
+			return o;
+		}
+	}
+

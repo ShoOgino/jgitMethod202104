@@ -1,0 +1,12 @@
+	@Override
+	public boolean add(final RevFlag flag) {
+		if ((mask & flag.mask) != 0)
+			return false;
+		mask |= flag.mask;
+		int p = 0;
+		while (p < active.size() && active.get(p).mask < flag.mask)
+			p++;
+		active.add(p, flag);
+		return true;
+	}
+

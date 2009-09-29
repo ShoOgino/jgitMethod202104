@@ -1,0 +1,32 @@
+	private ObjectWalk setUpWalker(
+			final Collection<? extends ObjectId> interestingObjects,
+			final Collection<? extends ObjectId> uninterestingObjects)
+			throws MissingObjectException, IOException,
+			IncorrectObjectTypeException {
+		final ObjectWalk walker = new ObjectWalk(db);
+		walker.setRetainBody(false);
+		walker.sort(RevSort.TOPO);
+		walker.sort(RevSort.COMMIT_TIME_DESC, true);
+		if (thin)
+			walker.sort(RevSort.BOUNDARY, true);
+
+		for (ObjectId id : interestingObjects) {
+			RevObject o = walker.parseAny(id);
+			walker.markStart(o);
+		}
+		if (uninterestingObjects != null) {
+			for (ObjectId id : uninterestingObjects) {
+				final RevObject o;
+				try {
+					o = walker.parseAny(id);
+				} catch (MissingObjectException x) {
+					if (ignoreMissingUninteresting)
+						continue;
+					throw x;
+				}
+				walker.markUninteresting(o);
+			}
+		}
+		return walker;
+	}
+

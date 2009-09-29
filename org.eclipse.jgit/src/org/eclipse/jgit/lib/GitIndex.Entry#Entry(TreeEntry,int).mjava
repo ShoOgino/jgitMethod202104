@@ -1,0 +1,19 @@
+		Entry(TreeEntry f, int stage) {
+			ctime = -1; // hmm
+			mtime = -1;
+			dev = -1;
+			ino = -1;
+			mode = f.getMode().getBits();
+			uid = -1;
+			gid = -1;
+			try {
+				size = (int) db.openBlob(f.getId()).getSize();
+			} catch (IOException e) {
+				e.printStackTrace();
+				size = -1;
+			}
+			sha1 = f.getId();
+			name = Constants.encode(f.getFullName());
+			flags = (short) ((stage << 12) | name.length); // TODO: fix flags
+		}
+

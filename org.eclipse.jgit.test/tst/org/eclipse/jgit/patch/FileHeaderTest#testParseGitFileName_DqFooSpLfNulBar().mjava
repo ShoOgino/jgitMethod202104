@@ -1,0 +1,11 @@
+	public void testParseGitFileName_DqFooSpLfNulBar() {
+		final String name = "foo \n\0bar";
+		final String dqName = "foo \\n\\0bar";
+		final FileHeader fh = dqHeader(dqName);
+		assertEquals(dqGitLine(dqName).length(), fh.parseGitFileName(0,
+				fh.buf.length));
+		assertEquals(name, fh.getOldName());
+		assertSame(fh.getOldName(), fh.getNewName());
+		assertFalse(fh.hasMetaDataChanges());
+	}
+

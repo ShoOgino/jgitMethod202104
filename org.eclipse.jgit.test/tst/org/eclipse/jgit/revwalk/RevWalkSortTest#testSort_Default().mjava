@@ -1,0 +1,14 @@
+	public void testSort_Default() throws Exception {
+		final RevCommit a = commit();
+		final RevCommit b = commit(1, a);
+		final RevCommit c = commit(1, b);
+		final RevCommit d = commit(1, c);
+
+		markStart(d);
+		assertCommit(d, rw.next());
+		assertCommit(c, rw.next());
+		assertCommit(b, rw.next());
+		assertCommit(a, rw.next());
+		assertNull(rw.next());
+	}
+

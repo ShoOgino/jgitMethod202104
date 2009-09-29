@@ -1,0 +1,54 @@
+	/**
+	 * Obtain the direct output stream for this lock.
+	 * <p>
+	 * The stream may only be accessed once, and only after {@link #lock()} has
+	 * been successfully invoked and returned true. Callers must close the
+	 * stream prior to calling {@link #commit()} to commit the change.
+	 * 
+	 * @return a stream to write to the new file. The stream is unbuffered.
+	 */
+	public OutputStream getOutputStream() {
+		requireLock();
+		return new OutputStream() {
+			@Override
+			public void write(final byte[] b, final int o, final int n)
+					throws IOException {
+				os.write(b, o, n);
+			}
+
+			@Override
+			public void write(final byte[] b) throws IOException {
+				os.write(b);
+			}
+
+			@Override
+			public void write(final int b) throws IOException {
+				os.write(b);
+			}
+
+			@Override
+			public void flush() throws IOException {
+				os.flush();
+			}
+
+			@Override
+			public void close() throws IOException {
+				try {
+					os.flush();
+					fLck.release();
+					os.close();
+					os = null;
+				} catch (IOException ioe) {
+					unlock();
+					throw ioe;
+				} catch (RuntimeException ioe) {
+					unlock();
+					throw ioe;
+				} catch (Error ioe) {
+					unlock();
+					throw ioe;
+				}
+			}
+		};
+	}
+

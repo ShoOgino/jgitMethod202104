@@ -1,0 +1,9 @@
+	public RevCommit next() {
+		final Entry q = head;
+		if (q == null)
+			return null;
+		head = q.next;
+		freeEntry(q);
+		return q.commit;
+	}
+

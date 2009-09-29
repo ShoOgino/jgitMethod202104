@@ -1,0 +1,6 @@
+	private void resolveDeltas(final PackedObjectInfo oe) throws IOException {
+		final int oldCRC = oe.getCRC();
+		if (baseById.get(oe) != null || baseByPos.containsKey(oe.getOffset()))
+			resolveDeltas(oe.getOffset(), oldCRC, Constants.OBJ_BAD, null, oe);
+	}
+

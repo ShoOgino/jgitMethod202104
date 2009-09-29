@@ -1,0 +1,11 @@
+	/**
+	 * Construct an Object writer for the specified repository
+	 * @param d
+	 */
+	public ObjectWriter(final Repository d) {
+		r = d;
+		buf = new byte[8192];
+		md = Constants.newMessageDigest();
+		def = new Deflater(r.getConfig().getCore().getCompression());
+	}
+

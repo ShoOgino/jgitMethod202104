@@ -1,0 +1,20 @@
+	@Override
+	public void write(final int b) throws IOException {
+		if (blocks == null) {
+			diskOut.write(b);
+			return;
+		}
+
+		Block s = last();
+		if (s.isFull()) {
+			if (reachedInCoreLimit()) {
+				diskOut.write(b);
+				return;
+			}
+
+			s = new Block();
+			blocks.add(s);
+		}
+		s.buffer[s.count++] = (byte) b;
+	}
+

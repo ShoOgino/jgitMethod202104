@@ -1,0 +1,38 @@
+		private Map<String, Ref> readAdvertisedImpl(final BufferedReader br)
+				throws IOException, PackProtocolException {
+			final TreeMap<String, Ref> avail = new TreeMap<String, Ref>();
+			for (;;) {
+				String line = br.readLine();
+				if (line == null)
+					break;
+
+				final int tab = line.indexOf('\t');
+				if (tab < 0)
+					throw invalidAdvertisement(line);
+
+				String name;
+				final ObjectId id;
+
+				name = line.substring(tab + 1);
+				id = ObjectId.fromString(line.substring(0, tab));
+				if (name.endsWith("^{}")) {
+					name = name.substring(0, name.length() - 3);
+					final Ref prior = avail.get(name);
+					if (prior == null)
+						throw outOfOrderAdvertisement(name);
+
+					if (prior.getPeeledObjectId() != null)
+						throw duplicateAdvertisement(name + "^{}");
+
+					avail.put(name, new Ref(Ref.Storage.NETWORK, name, prior
+							.getObjectId(), id, true));
+				} else {
+					final Ref prior = avail.put(name, new Ref(
+							Ref.Storage.NETWORK, name, id));
+					if (prior != null)
+						throw duplicateAdvertisement(name);
+				}
+			}
+			return avail;
+		}
+

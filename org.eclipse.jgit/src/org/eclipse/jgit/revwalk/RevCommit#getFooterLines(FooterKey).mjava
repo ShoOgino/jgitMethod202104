@@ -1,0 +1,23 @@
+	/**
+	 * Get the values of all footer lines with the given key.
+	 *
+	 * @param keyName
+	 *            footer key to find values of, case insensitive.
+	 * @return values of footers with key of {@code keyName}, ordered by their
+	 *         order of appearance. Duplicates may be returned if the same
+	 *         footer appeared more than once. Empty list if no footers appear
+	 *         with the specified key, or there are no footers at all.
+	 * @see #getFooterLines()
+	 */
+	public final List<String> getFooterLines(final FooterKey keyName) {
+		final List<FooterLine> src = getFooterLines();
+		if (src.isEmpty())
+			return Collections.emptyList();
+		final ArrayList<String> r = new ArrayList<String>(src.size());
+		for (final FooterLine f : src) {
+			if (f.matches(keyName))
+				r.add(f.getValue());
+		}
+		return r;
+	}
+

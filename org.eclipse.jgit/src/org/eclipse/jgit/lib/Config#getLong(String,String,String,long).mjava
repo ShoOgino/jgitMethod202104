@@ -1,0 +1,48 @@
+	/**
+	 * Obtain an integer value from the configuration.
+	 *
+	 * @param section
+	 *            section the key is grouped within.
+	 * @param subsection
+	 *            subsection name, such a remote or branch name.
+	 * @param name
+	 *            name of the key to get.
+	 * @param defaultValue
+	 *            default value to return if no value was present.
+	 * @return an integer value from the configuration, or defaultValue.
+	 */
+	public long getLong(final String section, String subsection,
+			final String name, final long defaultValue) {
+		final String str = getString(section, subsection, name);
+		if (str == null)
+			return defaultValue;
+
+		String n = str.trim();
+		if (n.length() == 0)
+			return defaultValue;
+
+		long mul = 1;
+		switch (StringUtils.toLowerCase(n.charAt(n.length() - 1))) {
+		case 'g':
+			mul = GiB;
+			break;
+		case 'm':
+			mul = MiB;
+			break;
+		case 'k':
+			mul = KiB;
+			break;
+		}
+		if (mul > 1)
+			n = n.substring(0, n.length() - 1).trim();
+		if (n.length() == 0)
+			return defaultValue;
+
+		try {
+			return mul * Long.parseLong(n);
+		} catch (NumberFormatException nfe) {
+			throw new IllegalArgumentException("Invalid integer value: "
+					+ section + "." + name + "=" + str);
+		}
+	}
+

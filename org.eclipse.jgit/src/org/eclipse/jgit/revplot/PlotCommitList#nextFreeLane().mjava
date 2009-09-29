@@ -1,0 +1,12 @@
+	private PlotLane nextFreeLane() {
+		final PlotLane p = createLane();
+		if (freeLanes.isEmpty()) {
+			p.position = lanesAllocated++;
+		} else {
+			final Integer min = freeLanes.first();
+			p.position = min.intValue();
+			freeLanes.remove(min);
+		}
+		return p;
+	}
+

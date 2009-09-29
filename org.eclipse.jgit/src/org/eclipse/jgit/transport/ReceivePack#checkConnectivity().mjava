@@ -1,0 +1,14 @@
+	private void checkConnectivity() throws IOException {
+		final ObjectWalk ow = new ObjectWalk(db);
+		for (final ReceiveCommand cmd : commands) {
+			if (cmd.getResult() != Result.NOT_ATTEMPTED)
+				continue;
+			if (cmd.getType() == ReceiveCommand.Type.DELETE)
+				continue;
+			ow.markStart(ow.parseAny(cmd.getNewId()));
+		}
+		for (final Ref ref : refs.values())
+			ow.markUninteresting(ow.parseAny(ref.getObjectId()));
+		ow.checkConnectivity();
+	}
+

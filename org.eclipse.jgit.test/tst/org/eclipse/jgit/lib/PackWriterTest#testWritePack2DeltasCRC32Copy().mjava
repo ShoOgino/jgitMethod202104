@@ -1,0 +1,21 @@
+	/**
+	 * Test pack writing with delta reuse. Raw-data copy (reuse) is made on a
+	 * pack with CRC32 index. Pack configuration as in
+	 * {@link #testWritePack2DeltasReuseRefs()}.
+	 *
+	 * @throws IOException
+	 */
+	public void testWritePack2DeltasCRC32Copy() throws IOException {
+		final File packDir = new File(db.getObjectsDirectory(), "pack");
+		final File crc32Pack = new File(packDir,
+				"pack-34be9032ac282b11fa9babdc2b2a93ca996c9c2f.pack");
+		final File crc32Idx = new File(packDir,
+				"pack-34be9032ac282b11fa9babdc2b2a93ca996c9c2f.idx");
+		copyFile(JGitTestUtil.getTestResourceFile(
+				"pack-34be9032ac282b11fa9babdc2b2a93ca996c9c2f.idxV2"),
+				crc32Idx);
+		db.openPack(crc32Pack, crc32Idx);
+
+		writeVerifyPack2(true);
+	}
+

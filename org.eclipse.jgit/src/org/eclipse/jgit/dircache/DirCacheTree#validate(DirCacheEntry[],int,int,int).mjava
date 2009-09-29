@@ -1,0 +1,90 @@
+	/**
+	 * Update (if necessary) this tree's entrySpan.
+	 *
+	 * @param cache
+	 *            the complete cache from DirCache.
+	 * @param cCnt
+	 *            number of entries in <code>cache</code> that are valid for
+	 *            iteration.
+	 * @param cIdx
+	 *            first position of <code>cache</code> that is a member of this
+	 *            tree. The path of <code>cache[cacheIdx].path</code> for the
+	 *            range <code>[0,pathOff-1)</code> matches the complete path of
+	 *            this tree, from the root of the repository.
+	 * @param pathOff
+	 *            number of bytes of <code>cache[cacheIdx].path</code> that
+	 *            matches this tree's path. The value at array position
+	 *            <code>cache[cacheIdx].path[pathOff-1]</code> is always '/' if
+	 *            <code>pathOff</code> is > 0.
+	 */
+	void validate(final DirCacheEntry[] cache, final int cCnt, int cIdx,
+			final int pathOff) {
+		if (entrySpan >= 0) {
+			// If we are valid, our children are also valid.
+			// We have no need to validate them.
+			//
+			return;
+		}
+
+		entrySpan = 0;
+		if (cCnt == 0) {
+			// Special case of an empty index, and we are the root tree.
+			//
+			return;
+		}
+
+		final byte[] firstPath = cache[cIdx].path;
+		int stIdx = 0;
+		while (cIdx < cCnt) {
+			final byte[] currPath = cache[cIdx].path;
+			if (pathOff > 0 && !peq(firstPath, currPath, pathOff)) {
+				// The current entry is no longer in this tree. Our
+				// span is updated and the remainder goes elsewhere.
+				//
+				break;
+			}
+
+			DirCacheTree st = stIdx < childCnt ? children[stIdx] : null;
+			final int cc = namecmp(currPath, pathOff, st);
+			if (cc > 0) {
+				// This subtree is now empty.
+				//
+				removeChild(stIdx);
+				continue;
+			}
+
+			if (cc < 0) {
+				final int p = slash(currPath, pathOff);
+				if (p < 0) {
+					// The entry has no '/' and thus is directly in this
+					// tree. Count it as one of our own.
+					//
+					cIdx++;
+					entrySpan++;
+					continue;
+				}
+
+				// Build a new subtree for this entry.
+				//
+				st = new DirCacheTree(this, currPath, pathOff, p - pathOff);
+				insertChild(stIdx, st);
+			}
+
+			// The entry is contained in this subtree.
+			//
+			st.validate(cache, cCnt, cIdx, pathOff + st.nameLength() + 1);
+			cIdx += st.entrySpan;
+			entrySpan += st.entrySpan;
+			stIdx++;
+		}
+
+		if (stIdx < childCnt) {
+			// None of our remaining children can be in this tree
+			// as the current cache entry is after our own name.
+			//
+			final DirCacheTree[] dct = new DirCacheTree[stIdx];
+			System.arraycopy(children, 0, dct, 0, stIdx);
+			children = dct;
+		}
+	}
+

@@ -1,0 +1,15 @@
+	public void testShortKey() {
+		final RevCommit commit = parse("subject\n\nbody of commit\n" + "\n"
+				+ "K:V\n");
+		final List<FooterLine> footers = commit.getFooterLines();
+		FooterLine f;
+
+		assertNotNull(footers);
+		assertEquals(1, footers.size());
+
+		f = footers.get(0);
+		assertEquals("K", f.getKey());
+		assertEquals("V", f.getValue());
+		assertNull(f.getEmailAddress());
+	}
+

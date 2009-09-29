@@ -1,0 +1,14 @@
+	/**
+	 * Test for non fast-forward remote update, when force update flag is set.
+	 *
+	 * @throws IOException
+	 */
+	public void testUpdateNonFastForwardForced() throws IOException {
+		final RemoteRefUpdate rru = new RemoteRefUpdate(db,
+				"ac7e7e44c1885efb472ad54a78327d66bfc4ecef",
+				"refs/heads/master", true, null, null);
+		final Ref ref = new Ref(Ref.Storage.LOOSE, "refs/heads/master",
+				ObjectId.fromString("2c349335b7f797072cf729c4f3bb0914ecb6dec9"));
+		testOneUpdateStatus(rru, ref, Status.OK, false);
+	}
+

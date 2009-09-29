@@ -1,0 +1,9 @@
+	private CommandCatalog() {
+		ldr = Thread.currentThread().getContextClassLoader();
+		commands = new HashMap<String, CommandRef>();
+
+		final Enumeration<URL> catalogs = catalogs();
+		while (catalogs.hasMoreElements())
+			scan(catalogs.nextElement());
+	}
+

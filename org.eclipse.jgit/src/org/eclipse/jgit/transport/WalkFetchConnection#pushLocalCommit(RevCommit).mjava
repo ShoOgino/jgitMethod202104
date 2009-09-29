@@ -1,0 +1,11 @@
+	private void pushLocalCommit(final RevCommit p)
+			throws MissingObjectException, IOException {
+		if (p.has(LOCALLY_SEEN))
+			return;
+		revWalk.parseHeaders(p);
+		p.add(LOCALLY_SEEN);
+		p.add(COMPLETE);
+		p.carry(COMPLETE);
+		localCommitQueue.add(p);
+	}
+

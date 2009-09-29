@@ -1,0 +1,9 @@
+	public void testSimpleTimeout() throws Exception {
+		readConfig("[remote \"spearce\"]\n"
+				+ "url = http://www.spearce.org/egit.git\n"
+				+ "fetch = +refs/heads/*:refs/remotes/spearce/*\n"
+				+ "timeout = 12\n");
+		final RemoteConfig rc = new RemoteConfig(config, "spearce");
+		assertEquals(12, rc.getTimeout());
+	}
+

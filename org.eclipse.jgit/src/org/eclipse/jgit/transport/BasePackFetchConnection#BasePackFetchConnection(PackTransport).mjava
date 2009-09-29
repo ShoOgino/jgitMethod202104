@@ -1,0 +1,19 @@
+	BasePackFetchConnection(final PackTransport packTransport) {
+		super(packTransport);
+
+		final FetchConfig cfg = local.getConfig().get(FetchConfig.KEY);
+		includeTags = transport.getTagOpt() != TagOpt.NO_TAGS;
+		thinPack = transport.isFetchThin();
+		allowOfsDelta = cfg.allowOfsDelta;
+
+		walk = new RevWalk(local);
+		reachableCommits = new RevCommitList<RevCommit>();
+		REACHABLE = walk.newFlag("REACHABLE");
+		COMMON = walk.newFlag("COMMON");
+		ADVERTISED = walk.newFlag("ADVERTISED");
+
+		walk.carry(COMMON);
+		walk.carry(REACHABLE);
+		walk.carry(ADVERTISED);
+	}
+

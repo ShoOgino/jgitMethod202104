@@ -1,0 +1,13 @@
+	public void testTwoCommitsEmptyTree() throws Exception {
+		final RevCommit a = commit();
+		final RevCommit b = commit(a);
+		markStart(b);
+
+		assertCommit(b, objw.next());
+		assertCommit(a, objw.next());
+		assertNull(objw.next());
+
+		assertSame(emptyTree, objw.nextObject());
+		assertNull(objw.nextObject());
+	}
+

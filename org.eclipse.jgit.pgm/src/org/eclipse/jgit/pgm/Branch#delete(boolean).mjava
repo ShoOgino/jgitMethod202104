@@ -1,0 +1,27 @@
+	private void delete(boolean force) throws IOException {
+		String current = db.getBranch();
+		ObjectId head = db.resolve(Constants.HEAD);
+		for (String branch : branches) {
+			if (current.equals(branch)) {
+				String err = "Cannot delete the branch '%s' which you are currently on.";
+				throw die(String.format(err, branch));
+			}
+			RefUpdate update = db.updateRef((remote ? Constants.R_REMOTES
+					: Constants.R_HEADS)
+					+ branch);
+			update.setNewObjectId(head);
+			update.setForceUpdate(force || remote);
+			Result result = update.delete();
+			if (result == Result.REJECTED) {
+				String err = "The branch '%s' is not an ancestor of your current HEAD.\n"
+						+ "If you are sure you want to delete it, run 'jgit branch -D %1$s'.";
+				throw die(String.format(err, branch));
+			} else if (result == Result.NEW)
+				throw die(String.format("branch '%s' not found.", branch));
+			if (remote)
+				out.println(String.format("Deleted remote branch %s", branch));
+			else if (verbose)
+				out.println(String.format("Deleted branch %s", branch));
+		}
+	}
+

@@ -1,0 +1,20 @@
+	/**
+	 * Creates a new command line owner that parses arguments/options and set
+	 * them into the given object.
+	 *
+	 * @param bean
+	 *            instance of a class annotated by {@link Option} and
+	 *            {@link Argument}. this object will receive values.
+	 * @param repo
+	 *            repository this parser can translate options through.
+	 * @throws IllegalAnnotationError
+	 *             if the option bean class is using args4j annotations
+	 *             incorrectly.
+	 */
+	public CmdLineParser(final Object bean, Repository repo) {
+		super(bean);
+		if (repo == null && bean instanceof TextBuiltin)
+			repo = ((TextBuiltin) bean).getRepository();
+		this.db = repo;
+	}
+

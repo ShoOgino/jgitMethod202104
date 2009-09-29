@@ -1,0 +1,31 @@
+	/**
+	 * List the names of keys available within a bucket.
+	 * <p>
+	 * This method is primarily meant for obtaining a "recursive directory
+	 * listing" rooted under the specified bucket and prefix location.
+	 *
+	 * @param bucket
+	 *            name of the bucket whose objects should be listed.
+	 * @param prefix
+	 *            common prefix to filter the results by. Must not be null.
+	 *            Supplying the empty string will list all keys in the bucket.
+	 *            Supplying a non-empty string will act as though a trailing '/'
+	 *            appears in prefix, even if it does not.
+	 * @return list of keys starting with <code>prefix</code>, after removing
+	 *         <code>prefix</code> (or <code>prefix + "/"</code>)from all
+	 *         of them.
+	 * @throws IOException
+	 *             sending the request was not possible, or the response XML
+	 *             document could not be parsed properly.
+	 */
+	public List<String> list(final String bucket, String prefix)
+			throws IOException {
+		if (prefix.length() > 0 && !prefix.endsWith("/"))
+			prefix += "/";
+		final ListParser lp = new ListParser(bucket, prefix);
+		do {
+			lp.list();
+		} while (lp.truncated);
+		return lp.entries;
+	}
+

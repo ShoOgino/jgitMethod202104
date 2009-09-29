@@ -1,0 +1,22 @@
+		@Override
+		public String quote(final String in) {
+			if (in.matches("^~[A-Za-z0-9_-]+$")) {
+				// If the string is just "~user" we can assume they
+				// mean "~user/".
+				//
+				return in + "/";
+			}
+
+			if (in.matches("^~[A-Za-z0-9_-]*/.*$")) {
+				// If the string is of "~/path" or "~user/path"
+				// we must not escape ~/ or ~user/ from the shell.
+				//
+				final int i = in.indexOf('/') + 1;
+				if (i == in.length())
+					return in;
+				return in.substring(0, i) + super.quote(in.substring(i));
+			}
+
+			return super.quote(in);
+		}
+

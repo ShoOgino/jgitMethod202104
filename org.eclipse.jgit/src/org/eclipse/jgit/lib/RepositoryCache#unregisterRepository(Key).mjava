@@ -1,0 +1,7 @@
+	private void unregisterRepository(final Key location) {
+		Reference<Repository> oldRef = cacheMap.remove(location);
+		Repository oldDb = oldRef != null ? oldRef.get() : null;
+		if (oldDb != null)
+			oldDb.close();
+	}
+

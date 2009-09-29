@@ -1,0 +1,9 @@
+	synchronized boolean beginWindowCache() throws IOException {
+		if (++activeWindows == 1) {
+			if (activeCopyRawData == 0)
+				doOpen();
+			return true;
+		}
+		return false;
+	}
+

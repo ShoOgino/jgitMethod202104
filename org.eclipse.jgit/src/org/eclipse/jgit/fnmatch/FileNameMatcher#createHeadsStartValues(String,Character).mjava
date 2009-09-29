@@ -1,0 +1,28 @@
+	private static List<Head> createHeadsStartValues(
+			final String patternString, final Character invalidWildgetCharacter)
+			throws InvalidPatternException {
+
+		final List<AbstractHead> allHeads = parseHeads(patternString,
+				invalidWildgetCharacter);
+
+		List<Head> nextHeadsSuggestion = new ArrayList<Head>(2);
+		nextHeadsSuggestion.add(LastHead.INSTANCE);
+		for (int i = allHeads.size() - 1; i >= 0; i--) {
+			final AbstractHead head = allHeads.get(i);
+
+			// explanation:
+			// a and * of the pattern "a*b"
+			// need *b as newHeads
+			// that's why * extends the list for it self and it's left neighbor.
+			if (head.isStar()) {
+				nextHeadsSuggestion.add(head);
+				head.setNewHeads(nextHeadsSuggestion);
+			} else {
+				head.setNewHeads(nextHeadsSuggestion);
+				nextHeadsSuggestion = new ArrayList<Head>(2);
+				nextHeadsSuggestion.add(head);
+			}
+		}
+		return nextHeadsSuggestion;
+	}
+

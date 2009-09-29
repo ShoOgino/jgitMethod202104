@@ -1,0 +1,12 @@
+	public void testSetForceUpdate() {
+		final String s = "refs/heads/*:refs/remotes/origin/*";
+		final RefSpec a = new RefSpec(s);
+		assertFalse(a.isForceUpdate());
+		RefSpec b = a.setForceUpdate(true);
+		assertNotSame(a, b);
+		assertFalse(a.isForceUpdate());
+		assertTrue(b.isForceUpdate());
+		assertEquals(s, a.toString());
+		assertEquals("+" + s, b.toString());
+	}
+

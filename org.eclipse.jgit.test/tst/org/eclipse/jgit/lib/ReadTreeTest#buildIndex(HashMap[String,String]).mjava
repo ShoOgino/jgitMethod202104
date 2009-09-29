@@ -1,0 +1,12 @@
+	private GitIndex buildIndex(HashMap<String, String> indexEntries) throws IOException {
+		GitIndex index = new GitIndex(db);
+		
+		if (indexEntries == null)
+			return index;
+		for (java.util.Map.Entry<String,String> e : indexEntries.entrySet()) {
+			index.add(trash, writeTrashFile(e.getKey(), e.getValue())).forceRecheck();
+		}
+		
+		return index;
+	}
+

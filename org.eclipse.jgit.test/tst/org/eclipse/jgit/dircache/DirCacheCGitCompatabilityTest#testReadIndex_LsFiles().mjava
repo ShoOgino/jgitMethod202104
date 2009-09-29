@@ -1,0 +1,13 @@
+	public void testReadIndex_LsFiles() throws Exception {
+		final Map<String, CGitIndexRecord> ls = readLsFiles();
+		final DirCache dc = new DirCache(index);
+		assertEquals(0, dc.getEntryCount());
+		dc.read();
+		assertEquals(ls.size(), dc.getEntryCount());
+		{
+			final Iterator<CGitIndexRecord> rItr = ls.values().iterator();
+			for (int i = 0; rItr.hasNext(); i++)
+				assertEqual(rItr.next(), dc.getEntry(i));
+		}
+	}
+

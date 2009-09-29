@@ -1,0 +1,31 @@
+	WalkFetchConnection(final WalkTransport t, final WalkRemoteObjectDatabase w) {
+		Transport wt = (Transport)t;
+		local = wt.local;
+		objCheck = wt.isCheckFetchedObjects() ? new ObjectChecker() : null;
+
+		remotes = new ArrayList<WalkRemoteObjectDatabase>();
+		remotes.add(w);
+
+		unfetchedPacks = new LinkedList<RemotePack>();
+		packsConsidered = new HashSet<String>();
+
+		noPacksYet = new LinkedList<WalkRemoteObjectDatabase>();
+		noPacksYet.add(w);
+
+		noAlternatesYet = new LinkedList<WalkRemoteObjectDatabase>();
+		noAlternatesYet.add(w);
+
+		fetchErrors = new HashMap<ObjectId, List<Throwable>>();
+		packLocks = new ArrayList<PackLock>(4);
+
+		revWalk = new RevWalk(local);
+		revWalk.setRetainBody(false);
+		treeWalk = new TreeWalk(local);
+		COMPLETE = revWalk.newFlag("COMPLETE");
+		IN_WORK_QUEUE = revWalk.newFlag("IN_WORK_QUEUE");
+		LOCALLY_SEEN = revWalk.newFlag("LOCALLY_SEEN");
+
+		localCommitQueue = new DateRevQueue();
+		workQueue = new LinkedList<ObjectId>();
+	}
+

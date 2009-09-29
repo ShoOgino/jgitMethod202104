@@ -1,0 +1,72 @@
+	/**
+	 * Clear this configuration and reset to the contents of the parsed string.
+	 *
+	 * @param text
+	 *            Git style text file listing configuration properties.
+	 * @throws ConfigInvalidException
+	 *             the text supplied is not formatted correctly. No changes were
+	 *             made to {@code this}.
+	 */
+	public void fromText(final String text) throws ConfigInvalidException {
+		final List<Entry> newEntries = new ArrayList<Entry>();
+		final StringReader in = new StringReader(text);
+		Entry last = null;
+		Entry e = new Entry();
+		for (;;) {
+			int input = in.read();
+			if (-1 == input)
+				break;
+
+			final char c = (char) input;
+			if ('\n' == c) {
+				// End of this entry.
+				newEntries.add(e);
+				if (e.section != null)
+					last = e;
+				e = new Entry();
+
+			} else if (e.suffix != null) {
+				// Everything up until the end-of-line is in the suffix.
+				e.suffix += c;
+
+			} else if (';' == c || '#' == c) {
+				// The rest of this line is a comment; put into suffix.
+				e.suffix = String.valueOf(c);
+
+			} else if (e.section == null && Character.isWhitespace(c)) {
+				// Save the leading whitespace (if any).
+				if (e.prefix == null)
+					e.prefix = "";
+				e.prefix += c;
+
+			} else if ('[' == c) {
+				// This is a section header.
+				e.section = readSectionName(in);
+				input = in.read();
+				if ('"' == input) {
+					e.subsection = readValue(in, true, '"');
+					input = in.read();
+				}
+				if (']' != input)
+					throw new ConfigInvalidException("Bad group header");
+				e.suffix = "";
+
+			} else if (last != null) {
+				// Read a value.
+				e.section = last.section;
+				e.subsection = last.subsection;
+				in.reset();
+				e.name = readKeyName(in);
+				if (e.name.endsWith("\n")) {
+					e.name = e.name.substring(0, e.name.length() - 1);
+					e.value = MAGIC_EMPTY_VALUE;
+				} else
+					e.value = readValue(in, false, -1);
+
+			} else
+				throw new ConfigInvalidException("Invalid line in config file");
+		}
+
+		state.set(newState(newEntries));
+	}
+

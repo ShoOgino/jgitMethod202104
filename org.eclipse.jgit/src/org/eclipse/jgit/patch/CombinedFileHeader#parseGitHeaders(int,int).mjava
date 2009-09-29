@@ -1,0 +1,36 @@
+	@Override
+	int parseGitHeaders(int ptr, final int end) {
+		while (ptr < end) {
+			final int eol = nextLF(buf, ptr);
+			if (isHunkHdr(buf, ptr, end) >= 1) {
+				// First hunk header; break out and parse them later.
+				break;
+
+			} else if (match(buf, ptr, OLD_NAME) >= 0) {
+				parseOldName(ptr, eol);
+
+			} else if (match(buf, ptr, NEW_NAME) >= 0) {
+				parseNewName(ptr, eol);
+
+			} else if (match(buf, ptr, INDEX) >= 0) {
+				parseIndexLine(ptr + INDEX.length, eol);
+
+			} else if (match(buf, ptr, MODE) >= 0) {
+				parseModeLine(ptr + MODE.length, eol);
+
+			} else if (match(buf, ptr, NEW_FILE_MODE) >= 0) {
+				parseNewFileMode(ptr, eol);
+
+			} else if (match(buf, ptr, DELETED_FILE_MODE) >= 0) {
+				parseDeletedFileMode(ptr + DELETED_FILE_MODE.length, eol);
+
+			} else {
+				// Probably an empty patch (stat dirty).
+				break;
+			}
+
+			ptr = eol;
+		}
+		return ptr;
+	}
+

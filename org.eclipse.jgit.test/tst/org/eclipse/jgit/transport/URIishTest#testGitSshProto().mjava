@@ -1,0 +1,12 @@
+	public void testGitSshProto() throws Exception {
+		final String str = "git+ssh://example.com/some/p ath";
+		URIish u = new URIish(str);
+		assertEquals("git+ssh", u.getScheme());
+		assertTrue(u.isRemote());
+		assertEquals("/some/p ath", u.getPath());
+		assertEquals("example.com", u.getHost());
+		assertEquals(-1, u.getPort());
+		assertEquals(str, u.toString());
+		assertEquals(u, new URIish(str));
+	}
+

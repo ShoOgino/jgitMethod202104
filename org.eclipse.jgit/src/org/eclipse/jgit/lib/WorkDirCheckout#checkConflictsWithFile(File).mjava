@@ -1,0 +1,18 @@
+	private void checkConflictsWithFile(File file) {
+		if (file.isDirectory()) {
+			ArrayList<String> childFiles = listFiles(file);
+			conflicts.addAll(childFiles);
+		} else {
+			File parent = file.getParentFile();
+			while (!parent.equals(root)) {
+				if (parent.isDirectory())
+					break;
+				if (parent.isFile()) {
+					conflicts.add(Repository.stripWorkDir(root, parent));
+					break;
+				}
+				parent = parent.getParentFile();
+			}
+		}
+	}
+

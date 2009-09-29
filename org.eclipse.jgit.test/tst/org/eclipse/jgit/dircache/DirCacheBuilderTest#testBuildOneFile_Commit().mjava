@@ -1,0 +1,47 @@
+	public void testBuildOneFile_Commit() throws Exception {
+		final String path = "a-file-path";
+		final FileMode mode = FileMode.REGULAR_FILE;
+		final long lastModified = 1218123387057L;
+		final int length = 1342;
+		final DirCacheEntry entOrig;
+		{
+			final DirCache dc = DirCache.lock(db);
+			final DirCacheBuilder b = dc.builder();
+			assertNotNull(b);
+
+			entOrig = new DirCacheEntry(path);
+			entOrig.setFileMode(mode);
+			entOrig.setLastModified(lastModified);
+			entOrig.setLength(length);
+
+			assertNotSame(path, entOrig.getPathString());
+			assertEquals(path, entOrig.getPathString());
+			assertEquals(ObjectId.zeroId(), entOrig.getObjectId());
+			assertEquals(mode.getBits(), entOrig.getRawMode());
+			assertEquals(0, entOrig.getStage());
+			assertEquals(lastModified, entOrig.getLastModified());
+			assertEquals(length, entOrig.getLength());
+			assertFalse(entOrig.isAssumeValid());
+			b.add(entOrig);
+
+			assertTrue(b.commit());
+			assertEquals(1, dc.getEntryCount());
+			assertSame(entOrig, dc.getEntry(0));
+			assertFalse(new File(db.getDirectory(), "index.lock").exists());
+		}
+		{
+			final DirCache dc = DirCache.read(db);
+			assertEquals(1, dc.getEntryCount());
+
+			final DirCacheEntry entRead = dc.getEntry(0);
+			assertNotSame(entOrig, entRead);
+			assertEquals(path, entRead.getPathString());
+			assertEquals(ObjectId.zeroId(), entOrig.getObjectId());
+			assertEquals(mode.getBits(), entOrig.getRawMode());
+			assertEquals(0, entOrig.getStage());
+			assertEquals(lastModified, entOrig.getLastModified());
+			assertEquals(length, entOrig.getLength());
+			assertFalse(entOrig.isAssumeValid());
+		}
+	}
+

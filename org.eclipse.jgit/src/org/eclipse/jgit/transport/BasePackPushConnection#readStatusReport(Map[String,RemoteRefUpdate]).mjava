@@ -1,0 +1,49 @@
+	private void readStatusReport(final Map<String, RemoteRefUpdate> refUpdates)
+			throws IOException {
+		final String unpackLine = readStringLongTimeout();
+		if (!unpackLine.startsWith("unpack "))
+			throw new PackProtocolException(uri, "unexpected report line: "
+					+ unpackLine);
+		final String unpackStatus = unpackLine.substring("unpack ".length());
+		if (!unpackStatus.equals("ok"))
+			throw new TransportException(uri,
+					"error occurred during unpacking on the remote end: "
+							+ unpackStatus);
+
+		String refLine;
+		while ((refLine = pckIn.readString()) != PacketLineIn.END) {
+			boolean ok = false;
+			int refNameEnd = -1;
+			if (refLine.startsWith("ok ")) {
+				ok = true;
+				refNameEnd = refLine.length();
+			} else if (refLine.startsWith("ng ")) {
+				ok = false;
+				refNameEnd = refLine.indexOf(" ", 3);
+			}
+			if (refNameEnd == -1)
+				throw new PackProtocolException(uri
+						+ ": unexpected report line: " + refLine);
+			final String refName = refLine.substring(3, refNameEnd);
+			final String message = (ok ? null : refLine
+					.substring(refNameEnd + 1));
+
+			final RemoteRefUpdate rru = refUpdates.get(refName);
+			if (rru == null)
+				throw new PackProtocolException(uri
+						+ ": unexpected ref report: " + refName);
+			if (ok) {
+				rru.setStatus(Status.OK);
+			} else {
+				rru.setStatus(Status.REJECTED_OTHER_REASON);
+				rru.setMessage(message);
+			}
+		}
+		for (final RemoteRefUpdate rru : refUpdates.values()) {
+			if (rru.getStatus() == Status.AWAITING_REPORT)
+				throw new PackProtocolException(uri
+						+ ": expected report for ref " + rru.getRemoteName()
+						+ " not received");
+		}
+	}
+

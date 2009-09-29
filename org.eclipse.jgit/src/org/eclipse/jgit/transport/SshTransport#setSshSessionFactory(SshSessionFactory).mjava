@@ -1,0 +1,18 @@
+	/**
+	 * Set SSH session factory instead of the default one for this instance of
+	 * the transport.
+	 *
+	 * @param factory
+	 *            a factory to set, must not be null
+	 * @throws IllegalStateException
+	 *             if session has been already created.
+	 */
+	public void setSshSessionFactory(SshSessionFactory factory) {
+		if (factory == null)
+			throw new NullPointerException("The factory must not be null");
+		if (sock != null)
+			throw new IllegalStateException(
+					"An SSH session has been already created");
+		sch = factory;
+	}
+

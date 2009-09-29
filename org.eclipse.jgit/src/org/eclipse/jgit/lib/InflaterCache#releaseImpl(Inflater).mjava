@@ -1,0 +1,8 @@
+	private static synchronized boolean releaseImpl(final Inflater i) {
+		if (openInflaterCount < SZ) {
+			inflaterCache[openInflaterCount++] = i;
+			return false;
+		}
+		return true;
+	}
+

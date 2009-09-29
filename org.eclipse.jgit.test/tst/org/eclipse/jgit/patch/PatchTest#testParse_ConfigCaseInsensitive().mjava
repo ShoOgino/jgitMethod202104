@@ -1,0 +1,97 @@
+	public void testParse_ConfigCaseInsensitive() throws IOException {
+		final Patch p = parseTestPatchFile();
+		assertEquals(2, p.getFiles().size());
+		assertTrue(p.getErrors().isEmpty());
+
+		final FileHeader fRepositoryConfigTest = p.getFiles().get(0);
+		final FileHeader fRepositoryConfig = p.getFiles().get(1);
+
+		assertEquals(
+				"org.eclipse.jgit.test/tst/org/spearce/jgit/lib/RepositoryConfigTest.java",
+				fRepositoryConfigTest.getNewName());
+
+		assertEquals(
+				"org.eclipse.jgit/src/org/spearce/jgit/lib/RepositoryConfig.java",
+				fRepositoryConfig.getNewName());
+
+		assertEquals(572, fRepositoryConfigTest.startOffset);
+		assertEquals(1490, fRepositoryConfig.startOffset);
+
+		assertEquals("da7e704", fRepositoryConfigTest.getOldId().name());
+		assertEquals("34ce04a", fRepositoryConfigTest.getNewId().name());
+		assertSame(FileHeader.PatchType.UNIFIED, fRepositoryConfigTest
+				.getPatchType());
+		assertSame(FileMode.REGULAR_FILE, fRepositoryConfigTest.getOldMode());
+		assertSame(FileMode.REGULAR_FILE, fRepositoryConfigTest.getNewMode());
+		assertEquals(1, fRepositoryConfigTest.getHunks().size());
+		{
+			final HunkHeader h = fRepositoryConfigTest.getHunks().get(0);
+			assertSame(fRepositoryConfigTest, h.getFileHeader());
+			assertEquals(921, h.startOffset);
+			assertEquals(109, h.getOldImage().getStartLine());
+			assertEquals(4, h.getOldImage().getLineCount());
+			assertEquals(109, h.getNewStartLine());
+			assertEquals(11, h.getNewLineCount());
+
+			assertEquals(4, h.getLinesContext());
+			assertEquals(7, h.getOldImage().getLinesAdded());
+			assertEquals(0, h.getOldImage().getLinesDeleted());
+			assertSame(fRepositoryConfigTest.getOldId(), h.getOldImage()
+					.getId());
+
+			assertEquals(1490, h.endOffset);
+		}
+
+		assertEquals("45c2f8a", fRepositoryConfig.getOldId().name());
+		assertEquals("3291bba", fRepositoryConfig.getNewId().name());
+		assertSame(FileHeader.PatchType.UNIFIED, fRepositoryConfig
+				.getPatchType());
+		assertSame(FileMode.REGULAR_FILE, fRepositoryConfig.getOldMode());
+		assertSame(FileMode.REGULAR_FILE, fRepositoryConfig.getNewMode());
+		assertEquals(3, fRepositoryConfig.getHunks().size());
+		{
+			final HunkHeader h = fRepositoryConfig.getHunks().get(0);
+			assertSame(fRepositoryConfig, h.getFileHeader());
+			assertEquals(1803, h.startOffset);
+			assertEquals(236, h.getOldImage().getStartLine());
+			assertEquals(9, h.getOldImage().getLineCount());
+			assertEquals(236, h.getNewStartLine());
+			assertEquals(9, h.getNewLineCount());
+
+			assertEquals(7, h.getLinesContext());
+			assertEquals(2, h.getOldImage().getLinesAdded());
+			assertEquals(2, h.getOldImage().getLinesDeleted());
+			assertSame(fRepositoryConfig.getOldId(), h.getOldImage().getId());
+
+			assertEquals(2434, h.endOffset);
+		}
+		{
+			final HunkHeader h = fRepositoryConfig.getHunks().get(1);
+			assertEquals(2434, h.startOffset);
+			assertEquals(300, h.getOldImage().getStartLine());
+			assertEquals(7, h.getOldImage().getLineCount());
+			assertEquals(300, h.getNewStartLine());
+			assertEquals(7, h.getNewLineCount());
+
+			assertEquals(6, h.getLinesContext());
+			assertEquals(1, h.getOldImage().getLinesAdded());
+			assertEquals(1, h.getOldImage().getLinesDeleted());
+
+			assertEquals(2816, h.endOffset);
+		}
+		{
+			final HunkHeader h = fRepositoryConfig.getHunks().get(2);
+			assertEquals(2816, h.startOffset);
+			assertEquals(954, h.getOldImage().getStartLine());
+			assertEquals(7, h.getOldImage().getLineCount());
+			assertEquals(954, h.getNewStartLine());
+			assertEquals(7, h.getNewLineCount());
+
+			assertEquals(6, h.getLinesContext());
+			assertEquals(1, h.getOldImage().getLinesAdded());
+			assertEquals(1, h.getOldImage().getLinesDeleted());
+
+			assertEquals(3035, h.endOffset);
+		}
+	}
+

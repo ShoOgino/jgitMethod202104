@@ -1,0 +1,19 @@
+	private static void knownHosts(final JSch sch) throws JSchException {
+		final File home = FS.userHome();
+		if (home == null)
+			return;
+		final File known_hosts = new File(new File(home, ".ssh"), "known_hosts");
+		try {
+			final FileInputStream in = new FileInputStream(known_hosts);
+			try {
+				sch.setKnownHosts(in);
+			} finally {
+				in.close();
+			}
+		} catch (FileNotFoundException none) {
+			// Oh well. They don't have a known hosts in home.
+		} catch (IOException err) {
+			// Oh well. They don't have a known hosts in home.
+		}
+	}
+

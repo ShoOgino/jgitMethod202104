@@ -1,0 +1,21 @@
+	public void testDirectoryFileConflicts_7() throws Exception {
+		// 7
+		doit(mk("DF"), mk("DF"), mk("DF/DF"));
+		assertUpdated("DF");
+		assertRemoved("DF/DF");
+
+		cleanUpDF();
+		setupCase(mk("DF/DF"), mk("DF/DF"), mk("DF/DF/DF/DF/DF"));
+		go();
+		assertRemoved("DF/DF/DF/DF/DF");
+		assertUpdated("DF/DF");
+		
+		cleanUpDF();
+		setupCase(mk("DF/DF"), mk("DF/DF"), mk("DF/DF/DF/DF/DF"));
+		writeTrashFile("DF/DF/DF/DF/DF", "diff");
+		go();
+		assertConflict("DF/DF/DF/DF/DF");
+		assertUpdated("DF/DF");
+
+	}
+

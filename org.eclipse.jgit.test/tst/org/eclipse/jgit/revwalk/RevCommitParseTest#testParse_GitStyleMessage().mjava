@@ -1,0 +1,10 @@
+	public void testParse_GitStyleMessage() throws Exception {
+		final String shortMsg = "This fixes a bug.";
+		final String body = "We do it with magic and pixie dust and stuff.\n"
+				+ "\n" + "Signed-off-by: A U. Thor <author@example.com>\n";
+		final String fullMsg = shortMsg + "\n" + "\n" + body;
+		final RevCommit c = create(fullMsg);
+		assertEquals(fullMsg, c.getFullMessage());
+		assertEquals(shortMsg, c.getShortMessage());
+	}
+

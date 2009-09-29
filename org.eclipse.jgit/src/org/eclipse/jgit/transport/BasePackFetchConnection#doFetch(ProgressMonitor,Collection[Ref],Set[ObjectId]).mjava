@@ -1,0 +1,27 @@
+	protected void doFetch(final ProgressMonitor monitor,
+			final Collection<Ref> want, final Set<ObjectId> have)
+			throws TransportException {
+		try {
+			markRefsAdvertised();
+			markReachable(have, maxTimeWanted(want));
+
+			if (sendWants(want)) {
+				negotiate(monitor);
+
+				walk.dispose();
+				reachableCommits = null;
+
+				receivePack(monitor);
+			}
+		} catch (CancelledException ce) {
+			close();
+			return; // Caller should test (or just know) this themselves.
+		} catch (IOException err) {
+			close();
+			throw new TransportException(err.getMessage(), err);
+		} catch (RuntimeException err) {
+			close();
+			throw new TransportException(err.getMessage(), err);
+		}
+	}
+

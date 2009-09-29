@@ -1,0 +1,14 @@
+	public void testGrowPath() throws Exception {
+		final FakeTreeIterator i = new FakeTreeIterator("ab", FileMode.TREE);
+		final byte[] origpath = i.path;
+		assertEquals(i.path[0], 'a');
+		assertEquals(i.path[1], 'b');
+
+		i.growPath(2);
+
+		assertNotSame(origpath, i.path);
+		assertEquals(origpath.length * 2, i.path.length);
+		assertEquals(i.path[0], 'a');
+		assertEquals(i.path[1], 'b');
+	}
+

@@ -1,0 +1,18 @@
+	void write(final byte[] tmp, final OutputStream os) throws IOException {
+		int ptr = tmp.length;
+		tmp[--ptr] = '\n';
+		ptr = RawParseUtils.formatBase10(tmp, ptr, childCnt);
+		tmp[--ptr] = ' ';
+		ptr = RawParseUtils.formatBase10(tmp, ptr, isValid() ? entrySpan : -1);
+		tmp[--ptr] = 0;
+
+		os.write(encodedName);
+		os.write(tmp, ptr, tmp.length - ptr);
+		if (isValid()) {
+			id.copyRawTo(tmp, 0);
+			os.write(tmp, 0, Constants.OBJECT_ID_LENGTH);
+		}
+		for (int i = 0; i < childCnt; i++)
+			children[i].write(tmp, os);
+	}
+

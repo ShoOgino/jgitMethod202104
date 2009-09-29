@@ -1,0 +1,11 @@
+	synchronized void readFully(final byte[] b, int o, int len)
+			throws IOException {
+		int r;
+		while (len > 0 && (r = read(b, o, len)) > 0) {
+			o += r;
+			len -= r;
+		}
+		if (len > 0)
+			throw new EOFException();
+	}
+

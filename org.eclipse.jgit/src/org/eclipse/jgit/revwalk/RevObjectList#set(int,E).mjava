@@ -1,0 +1,19 @@
+	public E set(int index, E element) {
+		Block s = contents;
+		while (index >> s.shift >= BLOCK_SIZE) {
+			s = new Block(s.shift + BLOCK_SHIFT);
+			s.contents[0] = contents;
+			contents = s;
+		}
+		while (s.shift > 0) {
+			final int i = index >> s.shift;
+			index -= i << s.shift;
+			if (s.contents[i] == null)
+				s.contents[i] = new Block(s.shift - BLOCK_SHIFT);
+			s = (Block) s.contents[i];
+		}
+		final Object old = s.contents[index];
+		s.contents[index] = element;
+		return (E) old;
+	}
+

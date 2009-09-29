@@ -1,0 +1,22 @@
+	Ref peel(final Ref ref) {
+		if (ref.isPeeled())
+			return ref;
+		ObjectId peeled = null;
+		try {
+			Object target = db.mapObject(ref.getObjectId(), ref.getName());
+			while (target instanceof Tag) {
+				final Tag tag = (Tag)target;
+				peeled = tag.getObjId();
+				if (Constants.TYPE_TAG.equals(tag.getType()))
+					target = db.mapObject(tag.getObjId(), ref.getName());
+				else
+					break;
+			}
+		} catch (IOException e) {
+			// Ignore a read error.  Callers will also get the same error
+			// if they try to use the result of getPeeledObjectId.
+		}
+		return new Ref(ref.getStorage(), ref.getName(), ref.getObjectId(), peeled, true);
+
+	}
+

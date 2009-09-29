@@ -1,0 +1,15 @@
+	public void testRemoveCollision2() {
+		// This test relies upon the fact that we always >>> 1 the value
+		// to derive an unsigned hash code. Thus, 0 and 1 fall into the
+		// same hash bucket. Further it relies on the fact that we add
+		// the 2nd put at the top of the chain, so removing the 2nd will
+		// cause a different code path.
+		//
+		assertNull(map.put(0, Long.valueOf(0)));
+		assertNull(map.put(1, Long.valueOf(1)));
+		assertEquals(Long.valueOf(1), map.remove(1));
+
+		assertTrue(map.containsKey(0));
+		assertFalse(map.containsKey(1));
+	}
+

@@ -1,0 +1,19 @@
+		Entry(byte[] key, File f, int stage)
+				throws IOException {
+			ctime = f.lastModified() * 1000000L;
+			mtime = ctime; // we use same here
+			dev = -1;
+			ino = -1;
+			if (config_filemode() && File_canExecute(f))
+				mode = FileMode.EXECUTABLE_FILE.getBits();
+			else
+				mode = FileMode.REGULAR_FILE.getBits();
+			uid = -1;
+			gid = -1;
+			size = (int) f.length();
+			ObjectWriter writer = new ObjectWriter(db);
+			sha1 = writer.writeBlob(f);
+			name = key;
+			flags = (short) ((stage << 12) | name.length); // TODO: fix flags
+		}
+

@@ -1,0 +1,8 @@
+	@Override
+	public FetchConnection openFetch() throws TransportException {
+		final DatabaseS3 c = new DatabaseS3(bucket, keyPrefix + "/objects");
+		final WalkFetchConnection r = new WalkFetchConnection(this, c);
+		r.available(c.readAdvertisedRefs());
+		return r;
+	}
+

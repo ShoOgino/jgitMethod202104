@@ -1,0 +1,46 @@
+	/**
+	 * Resets internal state and allows this instance to be used again.
+	 * <p>
+	 * Unlike {@link #dispose()} previously acquired RevObject (and RevCommit)
+	 * instances are not invalidated. RevFlag instances are not invalidated, but
+	 * are removed from all RevObjects.
+	 * 
+	 * @param retainFlags
+	 *            application flags that should <b>not</b> be cleared from
+	 *            existing commit objects.
+	 */
+	protected void reset(int retainFlags) {
+		finishDelayedFreeFlags();
+		retainFlags |= PARSED;
+		final int clearFlags = ~retainFlags;
+
+		final FIFORevQueue q = new FIFORevQueue();
+		for (final RevCommit c : roots) {
+			if ((c.flags & clearFlags) == 0)
+				continue;
+			c.flags &= retainFlags;
+			c.reset();
+			q.add(c);
+		}
+
+		for (;;) {
+			final RevCommit c = q.next();
+			if (c == null)
+				break;
+			if (c.parents == null)
+				continue;
+			for (final RevCommit p : c.parents) {
+				if ((p.flags & clearFlags) == 0)
+					continue;
+				p.flags &= retainFlags;
+				p.reset();
+				q.add(p);
+			}
+		}
+
+		curs.release();
+		roots.clear();
+		queue = new DateRevQueue();
+		pending = new StartGenerator(this);
+	}
+

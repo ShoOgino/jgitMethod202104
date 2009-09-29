@@ -1,0 +1,12 @@
+	public void testIndexOnlySubDirs() throws IOException {
+		GitIndex index = new GitIndex(db);
+		Tree tree = new Tree(db);
+
+		index.add(trash, writeTrashFile("foo/bar/baz", "foobar"));
+		index.add(trash, writeTrashFile("asdf", "asdf"));
+		new IndexTreeWalker(index, tree, trash, new TestIndexTreeVisitor()).walk();
+		
+		assertEquals("asdf", indexOnlyEntriesVisited.get(0));
+		assertEquals("foo/bar/baz", indexOnlyEntriesVisited.get(1));
+	}
+

@@ -1,0 +1,14 @@
+	public void testNewNamespaceConflictWithPackedPrefixNameExists()
+			throws IOException {
+		final String newRef = "refs/heads/master/x";
+		final RefUpdate ru = updateRef(newRef);
+		final RevCommit newid = new RevCommit(ru.getNewObjectId()) {
+			// empty
+		};
+		ru.setNewObjectId(newid);
+		Result update = ru.update();
+		assertEquals(Result.LOCK_FAILURE, update);
+		assertNull(db.getReflogReader("refs/heads/master/x"));
+		assertEquals(0, db.getReflogReader("HEAD").getReverseEntries().size());
+	}
+

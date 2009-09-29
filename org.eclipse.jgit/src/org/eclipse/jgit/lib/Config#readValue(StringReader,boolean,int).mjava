@@ -1,0 +1,76 @@
+	private static String readValue(final StringReader in, boolean quote,
+			final int eol) throws ConfigInvalidException {
+		final StringBuffer value = new StringBuffer();
+		boolean space = false;
+		for (;;) {
+			int c = in.read();
+			if (c < 0) {
+				if (value.length() == 0)
+					throw new ConfigInvalidException("Unexpected end of config file");
+				break;
+			}
+
+			if ('\n' == c) {
+				if (quote)
+					throw new ConfigInvalidException("Newline in quotes not allowed");
+				in.reset();
+				break;
+			}
+
+			if (eol == c)
+				break;
+
+			if (!quote) {
+				if (Character.isWhitespace((char) c)) {
+					space = true;
+					continue;
+				}
+				if (';' == c || '#' == c) {
+					in.reset();
+					break;
+				}
+			}
+
+			if (space) {
+				if (value.length() > 0)
+					value.append(' ');
+				space = false;
+			}
+
+			if ('\\' == c) {
+				c = in.read();
+				switch (c) {
+				case -1:
+					throw new ConfigInvalidException("End of file in escape");
+				case '\n':
+					continue;
+				case 't':
+					value.append('\t');
+					continue;
+				case 'b':
+					value.append('\b');
+					continue;
+				case 'n':
+					value.append('\n');
+					continue;
+				case '\\':
+					value.append('\\');
+					continue;
+				case '"':
+					value.append('"');
+					continue;
+				default:
+					throw new ConfigInvalidException("Bad escape: " + ((char) c));
+				}
+			}
+
+			if ('"' == c) {
+				quote = !quote;
+				continue;
+			}
+
+			value.append((char) c);
+		}
+		return value.length() > 0 ? value.toString() : null;
+	}
+

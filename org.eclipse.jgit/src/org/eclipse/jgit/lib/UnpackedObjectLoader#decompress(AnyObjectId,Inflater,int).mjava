@@ -1,0 +1,15 @@
+	private void decompress(final AnyObjectId id, final Inflater inf, int p)
+			throws CorruptObjectException {
+		try {
+			while (!inf.finished())
+				p += inf.inflate(bytes, p, objectSize - p);
+		} catch (DataFormatException dfe) {
+			final CorruptObjectException coe;
+			coe = new CorruptObjectException(id, "bad stream");
+			coe.initCause(dfe);
+			throw coe;
+		}
+		if (p != objectSize)
+			throw new CorruptObjectException(id, "incorrect length");
+	}
+

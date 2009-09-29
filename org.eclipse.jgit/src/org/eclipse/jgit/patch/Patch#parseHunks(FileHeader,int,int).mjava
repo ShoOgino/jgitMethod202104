@@ -1,0 +1,71 @@
+	private int parseHunks(final FileHeader fh, int c, final int end) {
+		final byte[] buf = fh.buf;
+		while (c < end) {
+			// If we see a file header at this point, we have all of the
+			// hunks for our current file. We should stop and report back
+			// with this position so it can be parsed again later.
+			//
+			if (match(buf, c, DIFF_GIT) >= 0)
+				break;
+			if (match(buf, c, DIFF_CC) >= 0)
+				break;
+			if (match(buf, c, DIFF_COMBINED) >= 0)
+				break;
+			if (match(buf, c, OLD_NAME) >= 0)
+				break;
+			if (match(buf, c, NEW_NAME) >= 0)
+				break;
+
+			if (isHunkHdr(buf, c, end) == fh.getParentCount()) {
+				final HunkHeader h = fh.newHunkHeader(c);
+				h.parseHeader();
+				c = h.parseBody(this, end);
+				h.endOffset = c;
+				fh.addHunk(h);
+				if (c < end) {
+					switch (buf[c]) {
+					case '@':
+					case 'd':
+					case '\n':
+						break;
+					default:
+						if (match(buf, c, SIG_FOOTER) < 0)
+							warn(buf, c, "Unexpected hunk trailer");
+					}
+				}
+				continue;
+			}
+
+			final int eol = nextLF(buf, c);
+			if (fh.getHunks().isEmpty() && match(buf, c, GIT_BINARY) >= 0) {
+				fh.patchType = FileHeader.PatchType.GIT_BINARY;
+				return parseGitBinary(fh, eol, end);
+			}
+
+			if (fh.getHunks().isEmpty() && BIN_TRAILER.length < eol - c
+					&& match(buf, eol - BIN_TRAILER.length, BIN_TRAILER) >= 0
+					&& matchAny(buf, c, BIN_HEADERS)) {
+				// The patch is a binary file diff, with no deltas.
+				//
+				fh.patchType = FileHeader.PatchType.BINARY;
+				return eol;
+			}
+
+			// Skip this line and move to the next. Its probably garbage
+			// after the last hunk of a file.
+			//
+			c = eol;
+		}
+
+		if (fh.getHunks().isEmpty()
+				&& fh.getPatchType() == FileHeader.PatchType.UNIFIED
+				&& !fh.hasMetaDataChanges()) {
+			// Hmm, an empty patch? If there is no metadata here we
+			// really have a binary patch that we didn't notice above.
+			//
+			fh.patchType = FileHeader.PatchType.BINARY;
+		}
+
+		return c;
+	}
+

@@ -1,0 +1,10 @@
+		ObjectEncryptionV2(final String algo, final String key)
+				throws InvalidKeySpecException, NoSuchAlgorithmException {
+			algorithmName = algo;
+
+			final PBEKeySpec s;
+			s = new PBEKeySpec(key.toCharArray(), salt, ITERATION_COUNT, 32);
+			skey = SecretKeyFactory.getInstance(algo).generateSecret(s);
+			aspec = new PBEParameterSpec(salt, ITERATION_COUNT);
+		}
+

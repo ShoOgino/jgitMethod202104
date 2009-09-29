@@ -1,0 +1,10 @@
+	private void service() throws IOException {
+		sendAdvertisedRefs();
+		recvWants();
+		if (wantAll.isEmpty())
+			return;
+		multiAck = options.contains(OPTION_MULTI_ACK);
+		negotiate();
+		sendPack();
+	}
+

@@ -1,0 +1,30 @@
+	private void writeVerifyPack4(final boolean thin) throws IOException {
+		final LinkedList<ObjectId> interestings = new LinkedList<ObjectId>();
+		interestings.add(ObjectId
+				.fromString("82c6b885ff600be425b4ea96dee75dca255b69e7"));
+		final LinkedList<ObjectId> uninterestings = new LinkedList<ObjectId>();
+		uninterestings.add(ObjectId
+				.fromString("c59759f143fb1fe21c197981df75a7ee00290799"));
+		createVerifyOpenPack(interestings, uninterestings, thin, false);
+
+		final ObjectId writtenObjects[] = new ObjectId[] {
+				ObjectId.fromString("82c6b885ff600be425b4ea96dee75dca255b69e7"),
+				ObjectId.fromString("aabf2ffaec9b497f0950352b3e582d73035c2035"),
+				ObjectId.fromString("5b6e7c66c276e7610d4a73c70ec1a1f7c1003259") };
+		assertEquals(writtenObjects.length, writer.getObjectsNumber());
+		ObjectId expectedObjects[];
+		if (thin) {
+			expectedObjects = new ObjectId[4];
+			System.arraycopy(writtenObjects, 0, expectedObjects, 0,
+					writtenObjects.length);
+			expectedObjects[3] = ObjectId
+					.fromString("6ff87c4664981e4397625791c8ea3bbb5f2279a3");
+
+		} else {
+			expectedObjects = writtenObjects;
+		}
+		verifyObjectsOrder(expectedObjects);
+		assertEquals("cded4b74176b4456afa456768b2b5aafb41c44fc", writer
+				.computeName().name());
+	}
+

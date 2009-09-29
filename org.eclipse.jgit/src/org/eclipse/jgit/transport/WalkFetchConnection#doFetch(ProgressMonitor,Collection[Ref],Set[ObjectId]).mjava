@@ -1,0 +1,15 @@
+	@Override
+	protected void doFetch(final ProgressMonitor monitor,
+			final Collection<Ref> want, final Set<ObjectId> have)
+			throws TransportException {
+		markLocalRefsComplete(have);
+		queueWants(want);
+
+		while (!monitor.isCancelled() && !workQueue.isEmpty()) {
+			final ObjectId id = workQueue.removeFirst();
+			if (!(id instanceof RevObject) || !((RevObject) id).has(COMPLETE))
+				downloadObject(monitor, id);
+			process(id);
+		}
+	}
+

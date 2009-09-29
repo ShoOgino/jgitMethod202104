@@ -1,0 +1,75 @@
+	private void readFrom(final FileInputStream inStream) throws IOException,
+			CorruptObjectException {
+		final BufferedInputStream in = new BufferedInputStream(inStream);
+		final MessageDigest md = Constants.newMessageDigest();
+
+		// Read the index header and verify we understand it.
+		//
+		final byte[] hdr = new byte[20];
+		NB.readFully(in, hdr, 0, 12);
+		md.update(hdr, 0, 12);
+		if (!is_DIRC(hdr))
+			throw new CorruptObjectException("Not a DIRC file.");
+		final int ver = NB.decodeInt32(hdr, 4);
+		if (ver != 2)
+			throw new CorruptObjectException("Unknown DIRC version " + ver);
+		entryCnt = NB.decodeInt32(hdr, 8);
+		if (entryCnt < 0)
+			throw new CorruptObjectException("DIRC has too many entries.");
+
+		// Load the individual file entries.
+		//
+		final byte[] infos = new byte[INFO_LEN * entryCnt];
+		sortedEntries = new DirCacheEntry[entryCnt];
+		for (int i = 0; i < entryCnt; i++)
+			sortedEntries[i] = new DirCacheEntry(infos, i * INFO_LEN, in, md);
+		lastModified = liveFile.lastModified();
+
+		// After the file entries are index extensions, and then a footer.
+		//
+		for (;;) {
+			in.mark(21);
+			NB.readFully(in, hdr, 0, 20);
+			if (in.read() < 0) {
+				// No extensions present; the file ended where we expected.
+				//
+				break;
+			}
+			in.reset();
+
+			switch (NB.decodeInt32(hdr, 0)) {
+			case EXT_TREE: {
+				final byte[] raw = new byte[NB.decodeInt32(hdr, 4)];
+				md.update(hdr, 0, 8);
+				NB.skipFully(in, 8);
+				NB.readFully(in, raw, 0, raw.length);
+				md.update(raw, 0, raw.length);
+				tree = new DirCacheTree(raw, new MutableInteger(), null);
+				break;
+			}
+			default:
+				if (hdr[0] >= 'A' && hdr[0] <= 'Z') {
+					// The extension is optional and is here only as
+					// a performance optimization. Since we do not
+					// understand it, we can safely skip past it.
+					//
+					NB.skipFully(in, NB.decodeUInt32(hdr, 4));
+				} else {
+					// The extension is not an optimization and is
+					// _required_ to understand this index format.
+					// Since we did not trap it above we must abort.
+					//
+					throw new CorruptObjectException("DIRC extension '"
+							+ Constants.CHARSET.decode(
+									ByteBuffer.wrap(hdr, 0, 4)).toString()
+							+ "' not supported by this version.");
+				}
+			}
+		}
+
+		final byte[] exp = md.digest();
+		if (!Arrays.equals(exp, hdr)) {
+			throw new CorruptObjectException("DIRC checksum mismatch");
+		}
+	}
+

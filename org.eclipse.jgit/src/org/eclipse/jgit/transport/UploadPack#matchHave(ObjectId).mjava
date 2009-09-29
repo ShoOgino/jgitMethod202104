@@ -1,0 +1,17 @@
+	private boolean matchHave(final ObjectId id) {
+		final RevObject o;
+		try {
+			o = walk.parseAny(id);
+		} catch (IOException err) {
+			return false;
+		}
+
+		if (!o.has(PEER_HAS)) {
+			o.add(PEER_HAS);
+			if (o instanceof RevCommit)
+				((RevCommit) o).carry(PEER_HAS);
+			addCommonBase(o);
+		}
+		return true;
+	}
+

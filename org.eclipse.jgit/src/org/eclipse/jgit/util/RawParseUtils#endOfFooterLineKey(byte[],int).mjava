@@ -1,0 +1,33 @@
+	/**
+	 * Locate the end of a footer line key string.
+	 * <p>
+	 * If the region at {@code raw[ptr]} matches {@code ^[A-Za-z0-9-]+:} (e.g.
+	 * "Signed-off-by: A. U. Thor\n") then this method returns the position of
+	 * the first ':'.
+	 * <p>
+	 * If the region at {@code raw[ptr]} does not match {@code ^[A-Za-z0-9-]+:}
+	 * then this method returns -1.
+	 *
+	 * @param raw
+	 *            buffer to scan.
+	 * @param ptr
+	 *            first position within raw to consider as a footer line key.
+	 * @return position of the ':' which terminates the footer line key if this
+	 *         is otherwise a valid footer line key; otherwise -1.
+	 */
+	public static int endOfFooterLineKey(final byte[] raw, int ptr) {
+		try {
+			for (;;) {
+				final byte c = raw[ptr];
+				if (footerLineKeyChars[c] == 0) {
+					if (c == ':')
+						return ptr;
+					return -1;
+				}
+				ptr++;
+			}
+		} catch (ArrayIndexOutOfBoundsException e) {
+			return -1;
+		}
+	}
+

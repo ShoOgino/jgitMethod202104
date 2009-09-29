@@ -1,0 +1,12 @@
+	public void testTimeout_writeByte_Success2() throws IOException {
+		final byte[] exp = new byte[] { 'a', 'b', 'c' };
+		final byte[] act = new byte[exp.length];
+		in.free(exp.length);
+		os.write(exp[0]);
+		os.write(exp[1]);
+		os.write(exp[2]);
+		in.want(exp.length);
+		in.read(act);
+		assertTrue(Arrays.equals(exp, act));
+	}
+

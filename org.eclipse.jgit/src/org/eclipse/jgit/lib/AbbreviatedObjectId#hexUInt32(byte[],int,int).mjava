@@ -1,0 +1,13 @@
+	private static final int hexUInt32(final byte[] bs, int p, final int end) {
+		if (8 <= end - p)
+			return RawParseUtils.parseHexInt32(bs, p);
+
+		int r = 0, n = 0;
+		while (n < 8 && p < end) {
+			r <<= 4;
+			r |= RawParseUtils.parseHexInt4(bs[p++]);
+			n++;
+		}
+		return r << (8 - n) * 4;
+	}
+

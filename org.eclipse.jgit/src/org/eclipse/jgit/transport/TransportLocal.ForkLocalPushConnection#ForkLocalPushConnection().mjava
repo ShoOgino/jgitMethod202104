@@ -1,0 +1,9 @@
+		ForkLocalPushConnection() throws TransportException {
+			super(TransportLocal.this);
+			receivePack = startProcessWithErrStream(getOptionReceivePack());
+			final InputStream rpIn = receivePack.getInputStream();
+			final OutputStream rpOut = receivePack.getOutputStream();
+			init(rpIn, rpOut);
+			readAdvertisedRefs();
+		}
+

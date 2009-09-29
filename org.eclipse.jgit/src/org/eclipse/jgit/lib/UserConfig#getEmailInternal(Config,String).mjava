@@ -1,0 +1,21 @@
+	private static String getEmailInternal(Config rc, String envKey) {
+		// try to get the email from the local and global configurations.
+		String email = rc.getString("user", null, "email");
+
+		if (email == null) {
+			// try to get the email for the system property GIT_XXX_EMAIL
+			email = system().getenv(envKey);
+		}
+
+		if (email == null) {
+			// try to construct an email
+			String username = system().getProperty(Constants.OS_USER_NAME_KEY);
+			if (username == null){
+				username = Constants.UNKNOWN_USER_DEFAULT;
+			}
+			email = username + "@" + system().getHostname();
+		}
+
+		return email;
+	}
+

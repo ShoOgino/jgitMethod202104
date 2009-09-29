@@ -1,0 +1,16 @@
+	public void testEquals() {
+		final RawText a = new RawText(Constants.encodeASCII("foo-a\nfoo-b\n"));
+		final RawText b = new RawText(Constants.encodeASCII("foo-b\nfoo-c\n"));
+
+		assertEquals(2, a.size());
+		assertEquals(2, b.size());
+
+		// foo-a != foo-b
+		assertFalse(a.equals(0, b, 0));
+		assertFalse(b.equals(0, a, 0));
+
+		// foo-b == foo-b
+		assertTrue(a.equals(1, b, 0));
+		assertTrue(b.equals(0, a, 1));
+	}
+

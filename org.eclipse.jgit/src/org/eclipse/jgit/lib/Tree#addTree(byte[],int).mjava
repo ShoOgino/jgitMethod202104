@@ -1,0 +1,32 @@
+	/**
+	 * Adds a new or existing Tree with the specified name to this tree.
+	 * Trees are added if necessary as the name may contain '/':s.
+	 *
+	 * @param s an array containing the name
+	 * @param offset when the name starts in the tree.
+	 *
+	 * @return a {@link FileTreeEntry} for the added tree.
+	 * @throws IOException
+	 */
+	public Tree addTree(final byte[] s, final int offset) throws IOException {
+		int slash;
+		int p;
+
+		for (slash = offset; slash < s.length && s[slash] != '/'; slash++) {
+			// search for path component terminator
+		}
+
+		ensureLoaded();
+		p = binarySearch(contents, s, (byte)'/', offset, slash);
+		if (p >= 0 && slash < s.length && contents[p] instanceof Tree)
+			return ((Tree) contents[p]).addTree(s, slash + 1);
+
+		final byte[] newName = substring(s, offset, slash);
+		if (p >= 0)
+			throw new EntryExistsException(RawParseUtils.decode(newName));
+
+		final Tree t = new Tree(this, newName);
+		insertEntry(p, t);
+		return slash == s.length ? t : t.addTree(s, slash + 1);
+	}
+

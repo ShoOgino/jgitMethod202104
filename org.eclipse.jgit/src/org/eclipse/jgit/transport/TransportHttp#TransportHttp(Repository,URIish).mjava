@@ -1,0 +1,15 @@
+	TransportHttp(final Repository local, final URIish uri)
+			throws NotSupportedException {
+		super(local, uri);
+		try {
+			String uriString = uri.toString();
+			if (!uriString.endsWith("/"))
+				uriString += "/";
+			baseUrl = new URL(uriString);
+			objectsUrl = new URL(baseUrl, "objects/");
+		} catch (MalformedURLException e) {
+			throw new NotSupportedException("Invalid URL " + uri, e);
+		}
+		proxySelector = ProxySelector.getDefault();
+	}
+

@@ -1,0 +1,48 @@
+	String getScriptText(Charset[] charsetGuess) {
+		if (getHunks().isEmpty()) {
+			// If we have no hunks then we can safely assume the entire
+			// patch is a binary style patch, or a meta-data only style
+			// patch. Either way the encoding of the headers should be
+			// strictly 7-bit US-ASCII and the body is either 7-bit ASCII
+			// (due to the base 85 encoding used for a BinaryHunk) or is
+			// arbitrary noise we have chosen to ignore and not understand
+			// (e.g. the message "Binary files ... differ").
+			//
+			return extractBinaryString(buf, startOffset, endOffset);
+		}
+
+		if (charsetGuess != null && charsetGuess.length != getParentCount() + 1)
+			throw new IllegalArgumentException("Expected "
+					+ (getParentCount() + 1) + " character encoding guesses");
+
+		if (trySimpleConversion(charsetGuess)) {
+			Charset cs = charsetGuess != null ? charsetGuess[0] : null;
+			if (cs == null)
+				cs = Constants.CHARSET;
+			try {
+				return decodeNoFallback(cs, buf, startOffset, endOffset);
+			} catch (CharacterCodingException cee) {
+				// Try the much slower, more-memory intensive version which
+				// can handle a character set conversion patch.
+			}
+		}
+
+		final StringBuilder r = new StringBuilder(endOffset - startOffset);
+
+		// Always treat the headers as US-ASCII; Git file names are encoded
+		// in a C style escape if any character has the high-bit set.
+		//
+		final int hdrEnd = getHunks().get(0).getStartOffset();
+		for (int ptr = startOffset; ptr < hdrEnd;) {
+			final int eol = Math.min(hdrEnd, nextLF(buf, ptr));
+			r.append(extractBinaryString(buf, ptr, eol));
+			ptr = eol;
+		}
+
+		final String[] files = extractFileLines(charsetGuess);
+		final int[] offsets = new int[files.length];
+		for (final HunkHeader h : getHunks())
+			h.extractFileLines(r, files, offsets);
+		return r.toString();
+	}
+

@@ -1,0 +1,10 @@
+	private DirCacheEntry toEntry(final int stage, final TreeWalk tw) {
+		final DirCacheEntry e = new DirCacheEntry(tw.getRawPath(), stage);
+		final AbstractTreeIterator i;
+
+		i = tw.getTree(0, AbstractTreeIterator.class);
+		e.setFileMode(tw.getFileMode(0));
+		e.setObjectIdFromRaw(i.idBuffer(), i.idOffset());
+		return e;
+	}
+

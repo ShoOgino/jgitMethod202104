@@ -1,0 +1,18 @@
+		/**
+		 * Guess if a directory contains a Git repository.
+		 * <p>
+		 * This method guesses by looking for the existence of some key files
+		 * and directories.
+		 *
+		 * @param dir
+		 *            the location of the directory to examine.
+		 * @return true if the directory "looks like" a Git repository; false if
+		 *         it doesn't look enough like a Git directory to really be a
+		 *         Git directory.
+		 */
+		public static boolean isGitRepository(final File dir) {
+			return FS.resolve(dir, "objects").exists()
+					&& FS.resolve(dir, "refs").exists()
+					&& isValidHead(new File(dir, Constants.HEAD));
+		}
+

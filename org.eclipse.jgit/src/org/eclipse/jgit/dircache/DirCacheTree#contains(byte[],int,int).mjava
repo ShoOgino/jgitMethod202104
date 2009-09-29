@@ -1,0 +1,11 @@
+	final boolean contains(final byte[] a, int aOff, final int aLen) {
+		final byte[] e = encodedName;
+		final int eLen = e.length;
+		for (int eOff = 0; eOff < eLen && aOff < aLen; eOff++, aOff++)
+			if (e[eOff] != a[aOff])
+				return false;
+		if (aOff == aLen)
+			return false;
+		return a[aOff] == '/';
+	}
+

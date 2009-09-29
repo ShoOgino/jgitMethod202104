@@ -1,0 +1,26 @@
+	/**
+	 * Set a configuration value.
+	 *
+	 * <pre>
+	 * [section &quot;subsection&quot;]
+	 *         name = value
+	 * </pre>
+	 *
+	 * @param section
+	 *            section name, e.g "branch"
+	 * @param subsection
+	 *            optional subsection value, e.g. a branch name
+	 * @param name
+	 *            parameter name, e.g. "filemode"
+	 * @param values
+	 *            list of zero or more values for this key.
+	 */
+	public void setStringList(final String section, final String subsection,
+			final String name, final List<String> values) {
+		State src, res;
+		do {
+			src = state.get();
+			res = replaceStringList(src, section, subsection, name, values);
+		} while (!state.compareAndSet(src, res));
+	}
+

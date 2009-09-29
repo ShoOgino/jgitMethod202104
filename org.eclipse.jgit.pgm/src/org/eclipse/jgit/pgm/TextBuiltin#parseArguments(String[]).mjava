@@ -1,0 +1,28 @@
+	/**
+	 * Parses the command line arguments prior to running.
+	 * <p>
+	 * This method should only be invoked by {@link #execute(String[])}, prior
+	 * to calling {@link #run()}. The default implementation parses all
+	 * arguments into this object's instance fields.
+	 *
+	 * @param args
+	 *            the arguments supplied on the command line, if any.
+	 */
+	protected void parseArguments(final String[] args) {
+		final CmdLineParser clp = new CmdLineParser(this);
+		try {
+			clp.parseArgument(args);
+		} catch (CmdLineException err) {
+			if (!help) {
+				System.err.println("fatal: " + err.getMessage());
+				System.exit(1);
+			}
+		}
+
+		if (help) {
+			printUsageAndExit(clp);
+		}
+
+		argWalk = clp.getRevWalkGently();
+	}
+

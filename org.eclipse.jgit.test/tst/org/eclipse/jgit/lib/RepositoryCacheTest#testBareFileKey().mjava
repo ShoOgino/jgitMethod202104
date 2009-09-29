@@ -1,0 +1,14 @@
+	public void testBareFileKey() throws IOException {
+		Repository bare = createNewEmptyRepo(true);
+		File gitdir = bare.getDirectory();
+		File parent = gitdir.getParentFile();
+		String name = gitdir.getName();
+		assertTrue(name.endsWith(".git"));
+		name = name.substring(0, name.length() - 4);
+
+		assertEquals(gitdir, FileKey.exact(gitdir).getFile());
+
+		assertEquals(gitdir, FileKey.lenient(gitdir).getFile());
+		assertEquals(gitdir, FileKey.lenient(new File(parent, name)).getFile());
+	}
+

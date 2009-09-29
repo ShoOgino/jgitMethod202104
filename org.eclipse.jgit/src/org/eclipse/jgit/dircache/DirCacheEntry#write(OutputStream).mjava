@@ -1,0 +1,14 @@
+	void write(final OutputStream os) throws IOException {
+		final int pathLen = path.length;
+		os.write(info, infoOffset, INFO_LEN);
+		os.write(path, 0, pathLen);
+
+		// Index records are padded out to the next 8 byte alignment
+		// for historical reasons related to how C Git read the files.
+		//
+		final int actLen = INFO_LEN + pathLen;
+		final int expLen = (actLen + 8) & ~7;
+		if (actLen != expLen)
+			os.write(nullpad, 0, expLen - actLen);
+	}
+

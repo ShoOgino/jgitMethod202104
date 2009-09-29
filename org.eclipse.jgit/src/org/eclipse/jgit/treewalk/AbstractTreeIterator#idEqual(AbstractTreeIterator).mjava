@@ -1,0 +1,16 @@
+	/**
+	 * Check if the current entry of both iterators has the same id.
+	 * <p>
+	 * This method is faster than {@link #getEntryObjectId()} as it does not
+	 * require copying the bytes out of the buffers. A direct {@link #idBuffer}
+	 * compare operation is performed.
+	 * 
+	 * @param otherIterator
+	 *            the other iterator to test against.
+	 * @return true if both iterators have the same object id; false otherwise.
+	 */
+	public boolean idEqual(final AbstractTreeIterator otherIterator) {
+		return ObjectId.equals(idBuffer(), idOffset(),
+				otherIterator.idBuffer(), otherIterator.idOffset());
+	}
+

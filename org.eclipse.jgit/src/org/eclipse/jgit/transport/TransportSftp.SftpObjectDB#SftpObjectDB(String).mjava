@@ -1,0 +1,19 @@
+		SftpObjectDB(String path) throws TransportException {
+			if (path.startsWith("/~"))
+				path = path.substring(1);
+			if (path.startsWith("~/"))
+				path = path.substring(2);
+			try {
+				ftp = newSftp();
+				ftp.cd(path);
+				ftp.cd("objects");
+				objectsPath = ftp.pwd();
+			} catch (TransportException err) {
+				close();
+				throw err;
+			} catch (SftpException je) {
+				throw new TransportException("Can't enter " + path + "/objects"
+						+ ": " + je.getMessage(), je);
+			}
+		}
+

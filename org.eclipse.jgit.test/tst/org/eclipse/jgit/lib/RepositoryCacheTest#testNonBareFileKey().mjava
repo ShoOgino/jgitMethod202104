@@ -1,0 +1,13 @@
+	public void testNonBareFileKey() {
+		File gitdir = db.getDirectory();
+		File parent = gitdir.getParentFile();
+		File other = new File(parent, "notagit");
+		assertEquals(gitdir, FileKey.exact(gitdir).getFile());
+		assertEquals(parent, FileKey.exact(parent).getFile());
+		assertEquals(other, FileKey.exact(other).getFile());
+
+		assertEquals(gitdir, FileKey.lenient(gitdir).getFile());
+		assertEquals(gitdir, FileKey.lenient(parent).getFile());
+		assertEquals(other, FileKey.lenient(other).getFile());
+	}
+

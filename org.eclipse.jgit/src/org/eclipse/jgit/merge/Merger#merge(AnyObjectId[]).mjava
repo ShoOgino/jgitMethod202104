@@ -1,0 +1,40 @@
+	/**
+	 * Merge together two or more tree-ish objects.
+	 * <p>
+	 * Any tree-ish may be supplied as inputs. Commits and/or tags pointing at
+	 * trees or commits may be passed as input objects.
+	 *
+	 * @param tips
+	 *            source trees to be combined together. The merge base is not
+	 *            included in this set.
+	 * @return true if the merge was completed without conflicts; false if the
+	 *         merge strategy cannot handle this merge or there were conflicts
+	 *         preventing it from automatically resolving all paths.
+	 * @throws IncorrectObjectTypeException
+	 *             one of the input objects is not a commit, but the strategy
+	 *             requires it to be a commit.
+	 * @throws IOException
+	 *             one or more sources could not be read, or outputs could not
+	 *             be written to the Repository.
+	 */
+	public boolean merge(final AnyObjectId[] tips) throws IOException {
+		sourceObjects = new RevObject[tips.length];
+		for (int i = 0; i < tips.length; i++)
+			sourceObjects[i] = walk.parseAny(tips[i]);
+
+		sourceCommits = new RevCommit[sourceObjects.length];
+		for (int i = 0; i < sourceObjects.length; i++) {
+			try {
+				sourceCommits[i] = walk.parseCommit(sourceObjects[i]);
+			} catch (IncorrectObjectTypeException err) {
+				sourceCommits[i] = null;
+			}
+		}
+
+		sourceTrees = new RevTree[sourceObjects.length];
+		for (int i = 0; i < sourceObjects.length; i++)
+			sourceTrees[i] = walk.parseTree(sourceObjects[i]);
+
+		return mergeImpl();
+	}
+

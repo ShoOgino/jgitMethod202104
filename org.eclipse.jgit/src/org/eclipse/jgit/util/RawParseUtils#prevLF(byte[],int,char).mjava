@@ -1,0 +1,25 @@
+	/**
+	 * Locate the previous position before either the given character or LF.
+	 * <p>
+	 * This method stops on the first match it finds from either chrA or '\n'.
+	 *
+	 * @param b
+	 *            buffer to scan.
+	 * @param ptr
+	 *            position within buffer to start looking for chrA or LF at.
+	 * @param chrA
+	 *            character to find.
+	 * @return new position just before the first chrA or LF to be found, -1 for
+	 *         not found
+	 */
+	public static final int prevLF(final byte[] b, int ptr, final char chrA) {
+		if (ptr == b.length)
+			--ptr;
+		while (ptr >= 0) {
+			final byte c = b[ptr--];
+			if (c == chrA || c == '\n')
+				return ptr;
+		}
+		return ptr;
+	}
+

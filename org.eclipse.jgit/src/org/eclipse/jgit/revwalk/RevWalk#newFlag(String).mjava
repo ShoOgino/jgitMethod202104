@@ -1,0 +1,18 @@
+	/**
+	 * Create a new flag for application use during walking.
+	 * <p>
+	 * Applications are only assured to be able to create 24 unique flags on any
+	 * given revision walker instance. Any flags beyond 24 are offered only if
+	 * the implementation has extra free space within its internal storage.
+	 * 
+	 * @param name
+	 *            description of the flag, primarily useful for debugging.
+	 * @return newly constructed flag instance.
+	 * @throws IllegalArgumentException
+	 *             too many flags have been reserved on this revision walker.
+	 */
+	public RevFlag newFlag(final String name) {
+		final int m = allocFlag();
+		return new RevFlag(this, name, m);
+	}
+

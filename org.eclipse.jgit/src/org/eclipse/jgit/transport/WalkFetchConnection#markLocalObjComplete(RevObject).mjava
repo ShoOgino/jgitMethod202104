@@ -1,0 +1,20 @@
+	private void markLocalObjComplete(RevObject obj) throws IOException {
+		while (obj.getType() == Constants.OBJ_TAG) {
+			obj.add(COMPLETE);
+			obj = ((RevTag) obj).getObject();
+			revWalk.parseHeaders(obj);
+		}
+
+		switch (obj.getType()) {
+		case Constants.OBJ_BLOB:
+			obj.add(COMPLETE);
+			break;
+		case Constants.OBJ_COMMIT:			
+			pushLocalCommit((RevCommit) obj);
+			break;
+		case Constants.OBJ_TREE:
+			markTreeComplete((RevTree) obj);
+			break;
+		}
+	}
+

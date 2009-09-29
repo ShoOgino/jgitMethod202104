@@ -1,0 +1,12 @@
+	/**
+	 * Close the resources utilized by this repository
+	 */
+	public void close() {
+		UnpackedObjectCache.purge(this);
+		WindowCache.purge(this);
+		synchronized (this) {
+			loadedIdx = null;
+			reverseIdx = null;
+		}
+	}
+

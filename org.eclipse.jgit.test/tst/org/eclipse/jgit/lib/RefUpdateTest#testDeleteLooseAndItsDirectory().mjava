@@ -1,0 +1,29 @@
+	/**
+	 * Delete a loose ref and make sure the directory in refs is deleted too,
+	 * and the reflog dir too
+	 *
+	 * @throws IOException
+	 */
+	public void testDeleteLooseAndItsDirectory() throws IOException {
+		ObjectId pid = db.resolve("refs/heads/c^");
+		RefUpdate updateRef = db.updateRef("refs/heads/z/c");
+		updateRef.setNewObjectId(pid);
+		updateRef.setForceUpdate(true);
+		updateRef.setRefLogMessage("new test ref", false);
+		Result update = updateRef.update();
+		assertEquals(Result.NEW, update); // internal
+		assertTrue(new File(db.getDirectory(), Constants.R_HEADS + "z")
+				.exists());
+		assertTrue(new File(db.getDirectory(), "logs/refs/heads/z").exists());
+
+		// The real test here
+		RefUpdate updateRef2 = db.updateRef("refs/heads/z/c");
+		updateRef2.setForceUpdate(true);
+		Result delete = updateRef2.delete();
+		assertEquals(Result.FORCED, delete);
+		assertNull(db.resolve("refs/heads/z/c"));
+		assertFalse(new File(db.getDirectory(), Constants.R_HEADS + "z")
+				.exists());
+		assertFalse(new File(db.getDirectory(), "logs/refs/heads/z").exists());
+	}
+

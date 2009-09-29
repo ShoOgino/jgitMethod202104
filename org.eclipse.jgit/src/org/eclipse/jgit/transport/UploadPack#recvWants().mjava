@@ -1,0 +1,39 @@
+	private void recvWants() throws IOException {
+		boolean isFirst = true;
+		for (;; isFirst = false) {
+			String line;
+			try {
+				line = pckIn.readString();
+			} catch (EOFException eof) {
+				if (isFirst)
+					break;
+				throw eof;
+			}
+
+			if (line == PacketLineIn.END)
+				break;
+			if (!line.startsWith("want ") || line.length() < 45)
+				throw new PackProtocolException("expected want; got " + line);
+
+			if (isFirst && line.length() > 45) {
+				String opt = line.substring(45);
+				if (opt.startsWith(" "))
+					opt = opt.substring(1);
+				for (String c : opt.split(" "))
+					options.add(c);
+				line = line.substring(0, 45);
+			}
+
+			final ObjectId id = ObjectId.fromString(line.substring(5));
+			final RevObject o;
+			try {
+				o = walk.parseAny(id);
+			} catch (IOException e) {
+				throw new PackProtocolException(id.name() + " not valid", e);
+			}
+			if (!o.has(ADVERTISED))
+				throw new PackProtocolException(id.name() + " not valid");
+			want(o);
+		}
+	}
+

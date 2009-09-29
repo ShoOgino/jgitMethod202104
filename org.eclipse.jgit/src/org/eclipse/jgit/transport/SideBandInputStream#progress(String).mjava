@@ -1,0 +1,24 @@
+	private void progress(String pkt) {
+		pkt = progressBuffer + pkt;
+		for (;;) {
+			final int lf = pkt.indexOf('\n');
+			final int cr = pkt.indexOf('\r');
+			final int s;
+			if (0 <= lf && 0 <= cr)
+				s = Math.min(lf, cr);
+			else if (0 <= lf)
+				s = lf;
+			else if (0 <= cr)
+				s = cr;
+			else
+				break;
+
+			final String msg = pkt.substring(0, s);
+			if (doProgressLine(msg))
+				pkt = pkt.substring(s + 1);
+			else
+				break;
+		}
+		progressBuffer = pkt;
+	}
+

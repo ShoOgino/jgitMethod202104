@@ -1,0 +1,21 @@
+	private PackedObjectLoader open(final ObjectToPack otp) throws IOException {
+		for (;;) {
+			PackedObjectLoader reuse = otp.useLoader();
+			if (reuse == null) {
+				return null;
+			}
+
+			try {
+				reuse.beginCopyRawData();
+				return reuse;
+			} catch (IOException err) {
+				// The pack we found the object in originally is gone, or
+				// it has been overwritten with a different layout.
+				//
+				otp.clearDeltaBase();
+				searchForReuse(new ArrayList<PackedObjectLoader>(), otp);
+				continue;
+			}
+		}
+	}
+

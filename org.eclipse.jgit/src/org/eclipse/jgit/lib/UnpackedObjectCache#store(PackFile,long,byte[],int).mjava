@@ -1,0 +1,18 @@
+	static synchronized void store(final PackFile pack, final long position,
+			final byte[] data, final int objectType) {
+		if (data.length > maxByteCount)
+			return; // Too large to cache.
+
+		final Slot e = cache[hash(position)];
+		clearEntry(e);
+
+		openByteCount += data.length;
+		releaseMemory();
+
+		e.provider = pack;
+		e.position = position;
+		e.sz = data.length;
+		e.data = new SoftReference<Entry>(new Entry(data, objectType));
+		moveToHead(e);
+	}
+

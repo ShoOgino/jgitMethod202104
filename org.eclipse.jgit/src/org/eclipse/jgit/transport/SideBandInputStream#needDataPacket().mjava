@@ -1,0 +1,31 @@
+	private void needDataPacket() throws IOException {
+		if (eof || (channel == CH_DATA && available > 0))
+			return;
+		for (;;) {
+			available = pckIn.readLength();
+			if (available == 0) {
+				eof = true;
+				return;
+			}
+
+			channel = in.read();
+			available -= 5; // length header plus channel indicator
+			if (available == 0)
+				continue;
+
+			switch (channel) {
+			case CH_DATA:
+				return;
+			case CH_PROGRESS:
+				progress(readString(available));
+
+				continue;
+			case CH_ERROR:
+				eof = true;
+				throw new TransportException("remote: " + readString(available));
+			default:
+				throw new PackProtocolException("Invalid channel " + channel);
+			}
+		}
+	}
+

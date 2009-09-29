@@ -1,0 +1,29 @@
+		/**
+		 * Guess the proper path for a Git repository.
+		 * <p>
+		 * The method performs some basic guessing to locate the repository.
+		 * Searched paths are:
+		 * <ol>
+		 * <li>{@code directory} // assume exact match</li>
+		 * <li>{@code directory} + "/.git" // assume working directory</li>
+		 * <li>{@code directory} + ".git" // assume bare</li>
+		 * </ol>
+		 *
+		 * @param directory
+		 *            location to guess from. Several permutations are tried.
+		 * @return the actual directory location if a better match is found;
+		 *         null if there is no suitable match.
+		 */
+		public static File resolve(final File directory) {
+			if (isGitRepository(directory))
+				return directory;
+			if (isGitRepository(new File(directory, ".git")))
+				return new File(directory, ".git");
+
+			final String name = directory.getName();
+			final File parent = directory.getParentFile();
+			if (isGitRepository(new File(parent, name + ".git")))
+				return new File(parent, name + ".git");
+			return null;
+		}
+

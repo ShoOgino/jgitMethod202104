@@ -1,0 +1,45 @@
+	public void testParse_GitBinaryLiteral() throws IOException {
+		final Patch p = parseTestPatchFile();
+		final int[] binsizes = { 359, 393, 372, 404 };
+		assertEquals(5, p.getFiles().size());
+		assertTrue(p.getErrors().isEmpty());
+
+		for (int i = 0; i < 4; i++) {
+			final FileHeader fh = p.getFiles().get(i);
+			assertSame(FileHeader.ChangeType.ADD, fh.getChangeType());
+			assertNotNull(fh.getOldId());
+			assertNotNull(fh.getNewId());
+			assertEquals(ObjectId.zeroId().name(), fh.getOldId().name());
+			assertSame(FileMode.REGULAR_FILE, fh.getNewMode());
+			assertTrue(fh.getNewName().startsWith(
+					"org.spearce.egit.ui/icons/toolbar/"));
+			assertSame(FileHeader.PatchType.GIT_BINARY, fh.getPatchType());
+			assertTrue(fh.getHunks().isEmpty());
+			assertTrue(fh.hasMetaDataChanges());
+
+			final BinaryHunk fwd = fh.getForwardBinaryHunk();
+			final BinaryHunk rev = fh.getReverseBinaryHunk();
+			assertNotNull(fwd);
+			assertNotNull(rev);
+			assertEquals(binsizes[i], fwd.getSize());
+			assertEquals(0, rev.getSize());
+
+			assertSame(fh, fwd.getFileHeader());
+			assertSame(fh, rev.getFileHeader());
+
+			assertSame(BinaryHunk.Type.LITERAL_DEFLATED, fwd.getType());
+			assertSame(BinaryHunk.Type.LITERAL_DEFLATED, rev.getType());
+		}
+
+		final FileHeader fh = p.getFiles().get(4);
+		assertEquals("org.spearce.egit.ui/plugin.xml", fh.getNewName());
+		assertSame(FileHeader.ChangeType.MODIFY, fh.getChangeType());
+		assertSame(FileHeader.PatchType.UNIFIED, fh.getPatchType());
+		assertFalse(fh.hasMetaDataChanges());
+		assertEquals("ee8a5a0", fh.getNewId().name());
+		assertNull(fh.getForwardBinaryHunk());
+		assertNull(fh.getReverseBinaryHunk());
+		assertEquals(1, fh.getHunks().size());
+		assertEquals(272, fh.getHunks().get(0).getOldImage().getStartLine());
+	}
+

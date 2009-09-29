@@ -1,0 +1,35 @@
+	private void writeCommands(final Collection<RemoteRefUpdate> refUpdates,
+			final ProgressMonitor monitor) throws IOException {
+		final String capabilities = enableCapabilities();
+		for (final RemoteRefUpdate rru : refUpdates) {
+			if (!capableDeleteRefs && rru.isDelete()) {
+				rru.setStatus(Status.REJECTED_NODELETE);
+				continue;
+			}
+
+			final StringBuilder sb = new StringBuilder();
+			final Ref advertisedRef = getRef(rru.getRemoteName());
+			final ObjectId oldId = (advertisedRef == null ? ObjectId.zeroId()
+					: advertisedRef.getObjectId());
+			sb.append(oldId.name());
+			sb.append(' ');
+			sb.append(rru.getNewObjectId().name());
+			sb.append(' ');
+			sb.append(rru.getRemoteName());
+			if (!sentCommand) {
+				sentCommand = true;
+				sb.append(capabilities);
+			}
+
+			pckOut.writeString(sb.toString());
+			rru.setStatus(sentCommand ? Status.AWAITING_REPORT : Status.OK);
+			if (!rru.isDelete())
+				writePack = true;
+		}
+
+		if (monitor.isCancelled())
+			throw new TransportException(uri, "push cancelled");
+		pckOut.end();
+		outNeedsEnd = false;
+	}
+

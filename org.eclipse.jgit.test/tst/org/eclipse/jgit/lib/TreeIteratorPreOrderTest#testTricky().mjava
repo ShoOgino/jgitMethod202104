@@ -1,0 +1,34 @@
+	public void testTricky() throws IOException {
+		Tree tree = new Tree(db);
+		tree.addFile("a.b");
+		tree.addFile("a.c");
+		tree.addFile("a/b.b/b");
+		tree.addFile("a/b");
+		tree.addFile("a/c");
+		tree.addFile("a=c");
+		tree.addFile("a=d");
+
+		TreeIterator i = makeIterator(tree);
+		assertTrue(i.hasNext());
+		assertEquals("", i.next().getFullName());
+		assertTrue(i.hasNext());
+		assertEquals("a.b", i.next().getFullName());
+		assertTrue(i.hasNext());
+		assertEquals("a.c", i.next().getFullName());
+		assertTrue(i.hasNext());
+		assertEquals("a", i.next().getFullName());
+		assertTrue(i.hasNext());
+		assertEquals("a/b", i.next().getFullName());
+		assertTrue(i.hasNext());
+		assertEquals("a/b.b", i.next().getFullName());
+		assertTrue(i.hasNext());
+		assertEquals("a/b.b/b", i.next().getFullName());
+		assertTrue(i.hasNext());
+		assertEquals("a/c", i.next().getFullName());
+		assertTrue(i.hasNext());
+		assertEquals("a=c", i.next().getFullName());
+		assertTrue(i.hasNext());
+		assertEquals("a=d", i.next().getFullName());
+		assertFalse(i.hasNext());
+	}
+

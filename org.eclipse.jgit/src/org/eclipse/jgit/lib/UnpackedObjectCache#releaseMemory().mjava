@@ -1,0 +1,17 @@
+	private static void releaseMemory() {
+		while (openByteCount > maxByteCount && lruTail != null) {
+			final Slot currOldest = lruTail;
+			final Slot nextOldest = currOldest.lruPrev;
+
+			clearEntry(currOldest);
+			currOldest.lruPrev = null;
+			currOldest.lruNext = null;
+
+			if (nextOldest == null)
+				lruHead = null;
+			else
+				nextOldest.lruNext = null;
+			lruTail = nextOldest;
+		}
+	}
+

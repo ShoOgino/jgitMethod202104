@@ -1,0 +1,9 @@
+	public void testReadMissing_RealIndex() throws Exception {
+		final File idx = new File(db.getDirectory(), "index");
+		assertFalse(idx.exists());
+
+		final DirCache dc = DirCache.read(db);
+		assertNotNull(dc);
+		assertEquals(0, dc.getEntryCount());
+	}
+

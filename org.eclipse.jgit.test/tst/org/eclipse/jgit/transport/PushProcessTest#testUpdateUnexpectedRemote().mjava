@@ -1,0 +1,16 @@
+	/**
+	 * Test for remote ref update with expected old object set, when old object
+	 * is not that expected one.
+	 *
+	 * @throws IOException
+	 */
+	public void testUpdateUnexpectedRemote() throws IOException {
+		final RemoteRefUpdate rru = new RemoteRefUpdate(db,
+				"2c349335b7f797072cf729c4f3bb0914ecb6dec9",
+				"refs/heads/master", false, null, ObjectId
+						.fromString("0000000000000000000000000000000000000001"));
+		final Ref ref = new Ref(Ref.Storage.LOOSE, "refs/heads/master",
+				ObjectId.fromString("ac7e7e44c1885efb472ad54a78327d66bfc4ecef"));
+		testOneUpdateStatus(rru, ref, Status.REJECTED_REMOTE_CHANGED, null);
+	}
+

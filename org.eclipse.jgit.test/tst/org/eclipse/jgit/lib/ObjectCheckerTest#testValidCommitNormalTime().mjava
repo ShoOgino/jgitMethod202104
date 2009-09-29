@@ -1,0 +1,16 @@
+	public void testValidCommitNormalTime() throws CorruptObjectException {
+		final StringBuilder b = new StringBuilder();
+		final String when = "1222757360 -0730";
+
+		b.append("tree ");
+		b.append("be9bfa841874ccc9f2ef7c48d0c76226f89b7189");
+		b.append('\n');
+
+		b.append("author A. U. Thor <author@localhost> " + when + "\n");
+		b.append("committer A. U. Thor <author@localhost> " + when + "\n");
+
+		final byte[] data = Constants.encodeASCII(b.toString());
+		checker.checkCommit(data);
+		checker.check(Constants.OBJ_COMMIT, data);
+	}
+

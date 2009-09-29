@@ -1,0 +1,35 @@
+	public void testMirror() throws Exception {
+		readConfig("[remote \"spearce\"]\n"
+				+ "url = http://www.spearce.org/egit.git\n"
+				+ "fetch = +refs/heads/*:refs/heads/*\n"
+				+ "fetch = refs/tags/*:refs/tags/*\n");
+
+		final RemoteConfig rc = new RemoteConfig(config, "spearce");
+		final List<URIish> allURIs = rc.getURIs();
+		RefSpec spec;
+
+		assertEquals("spearce", rc.getName());
+		assertNotNull(allURIs);
+		assertNotNull(rc.getFetchRefSpecs());
+		assertNotNull(rc.getPushRefSpecs());
+
+		assertEquals(1, allURIs.size());
+		assertEquals("http://www.spearce.org/egit.git", allURIs.get(0));
+
+		assertEquals(2, rc.getFetchRefSpecs().size());
+
+		spec = rc.getFetchRefSpecs().get(0);
+		assertTrue(spec.isForceUpdate());
+		assertTrue(spec.isWildcard());
+		assertEquals("refs/heads/*", spec.getSource());
+		assertEquals("refs/heads/*", spec.getDestination());
+
+		spec = rc.getFetchRefSpecs().get(1);
+		assertFalse(spec.isForceUpdate());
+		assertTrue(spec.isWildcard());
+		assertEquals("refs/tags/*", spec.getSource());
+		assertEquals("refs/tags/*", spec.getDestination());
+
+		assertEquals(0, rc.getPushRefSpecs().size());
+	}
+

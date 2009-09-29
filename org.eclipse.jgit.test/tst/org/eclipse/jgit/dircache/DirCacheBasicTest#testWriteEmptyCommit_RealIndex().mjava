@@ -1,0 +1,17 @@
+	public void testWriteEmptyCommit_RealIndex() throws Exception {
+		final File idx = new File(db.getDirectory(), "index");
+		final File lck = new File(db.getDirectory(), "index.lock");
+		assertFalse(idx.exists());
+		assertFalse(lck.exists());
+
+		final DirCache dc = DirCache.lock(db);
+		assertEquals(0, lck.length());
+		dc.write();
+		assertEquals(12 + 20, lck.length());
+
+		assertTrue(dc.commit());
+		assertTrue(idx.exists());
+		assertFalse(lck.exists());
+		assertEquals(12 + 20, idx.length());
+	}
+

@@ -1,0 +1,26 @@
+	public void testOneByte() throws IOException {
+		final TemporaryBuffer b = new TemporaryBuffer();
+		final byte test = (byte) new TestRng(getName()).nextInt();
+		try {
+			b.write(test);
+			b.close();
+			assertEquals(1, b.length());
+			{
+				final byte[] r = b.toByteArray();
+				assertNotNull(r);
+				assertEquals(1, r.length);
+				assertEquals(test, r[0]);
+			}
+			{
+				final ByteArrayOutputStream o = new ByteArrayOutputStream();
+				b.writeTo(o, null);
+				o.close();
+				final byte[] r = o.toByteArray();
+				assertEquals(1, r.length);
+				assertEquals(test, r[0]);
+			}
+		} finally {
+			b.destroy();
+		}
+	}
+

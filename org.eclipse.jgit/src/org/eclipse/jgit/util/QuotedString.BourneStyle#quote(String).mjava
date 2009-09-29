@@ -1,0 +1,23 @@
+		@Override
+		public String quote(final String in) {
+			final StringBuilder r = new StringBuilder();
+			r.append('\'');
+			int start = 0, i = 0;
+			for (; i < in.length(); i++) {
+				switch (in.charAt(i)) {
+				case '\'':
+				case '!':
+					r.append(in, start, i);
+					r.append('\'');
+					r.append('\\');
+					r.append(in.charAt(i));
+					r.append('\'');
+					start = i + 1;
+					break;
+				}
+			}
+			r.append(in, start, i);
+			r.append('\'');
+			return r.toString();
+		}
+

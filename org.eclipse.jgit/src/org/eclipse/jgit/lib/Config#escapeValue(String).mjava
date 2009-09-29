@@ -1,0 +1,68 @@
+	/**
+	 * Escape the value before saving
+	 *
+	 * @param x
+	 *            the value to escape
+	 * @return the escaped value
+	 */
+	private static String escapeValue(final String x) {
+		boolean inquote = false;
+		int lineStart = 0;
+		final StringBuffer r = new StringBuffer(x.length());
+		for (int k = 0; k < x.length(); k++) {
+			final char c = x.charAt(k);
+			switch (c) {
+			case '\n':
+				if (inquote) {
+					r.append('"');
+					inquote = false;
+				}
+				r.append("\\n\\\n");
+				lineStart = r.length();
+				break;
+
+			case '\t':
+				r.append("\\t");
+				break;
+
+			case '\b':
+				r.append("\\b");
+				break;
+
+			case '\\':
+				r.append("\\\\");
+				break;
+
+			case '"':
+				r.append("\\\"");
+				break;
+
+			case ';':
+			case '#':
+				if (!inquote) {
+					r.insert(lineStart, '"');
+					inquote = true;
+				}
+				r.append(c);
+				break;
+
+			case ' ':
+				if (!inquote && r.length() > 0
+						&& r.charAt(r.length() - 1) == ' ') {
+					r.insert(lineStart, '"');
+					inquote = true;
+				}
+				r.append(' ');
+				break;
+
+			default:
+				r.append(c);
+				break;
+			}
+		}
+		if (inquote) {
+			r.append('"');
+		}
+		return r.toString();
+	}
+

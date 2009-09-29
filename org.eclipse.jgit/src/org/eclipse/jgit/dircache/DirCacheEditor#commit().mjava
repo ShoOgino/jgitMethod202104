@@ -1,0 +1,11 @@
+	@Override
+	public boolean commit() throws IOException {
+		if (edits.isEmpty()) {
+			// No changes? Don't rewrite the index.
+			//
+			cache.unlock();
+			return true;
+		}
+		return super.commit();
+	}
+

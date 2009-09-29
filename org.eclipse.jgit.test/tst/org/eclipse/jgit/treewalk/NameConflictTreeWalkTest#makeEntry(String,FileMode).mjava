@@ -1,0 +1,10 @@
+	private DirCacheEntry makeEntry(final String path, final FileMode mode)
+			throws Exception {
+		final byte[] pathBytes = Constants.encode(path);
+		final DirCacheEntry ent = new DirCacheEntry(path);
+		ent.setFileMode(mode);
+		ent.setObjectId(new ObjectWriter(db).computeBlobSha1(pathBytes.length,
+				new ByteArrayInputStream(pathBytes)));
+		return ent;
+	}
+

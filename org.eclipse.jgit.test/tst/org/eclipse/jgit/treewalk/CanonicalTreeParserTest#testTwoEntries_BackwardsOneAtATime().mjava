@@ -1,0 +1,18 @@
+	public void testTwoEntries_BackwardsOneAtATime() throws Exception {
+		ctp.reset(tree2);
+		ctp.next(2);
+		assertTrue(ctp.eof());
+
+		ctp.back(1);
+		assertFalse(ctp.eof());
+		assertEquals(m644.getBits(), ctp.mode);
+		assertEquals("foo", path());
+		assertEquals(hash_foo, ctp.getEntryObjectId());
+
+		ctp.back(1);
+		assertFalse(ctp.eof());
+		assertEquals(m644.getBits(), ctp.mode);
+		assertEquals("a", path());
+		assertEquals(hash_a, ctp.getEntryObjectId());
+	}
+

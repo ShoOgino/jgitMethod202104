@@ -1,0 +1,32 @@
+	private void reopenConnection() throws NotSupportedException,
+			TransportException {
+		if (conn != null)
+			return;
+
+		conn = transport.openFetch();
+
+		// Since we opened a new connection we cannot be certain
+		// that the system we connected to has the same exact set
+		// of objects available (think round-robin DNS and mirrors
+		// that aren't updated at the same time).
+		//
+		// We rebuild our askFor list using only the refs that the
+		// new connection has offered to us.
+		//
+		final HashMap<ObjectId, Ref> avail = new HashMap<ObjectId, Ref>();
+		for (final Ref r : conn.getRefs())
+			avail.put(r.getObjectId(), r);
+
+		final Collection<Ref> wants = new ArrayList<Ref>(askFor.values());
+		askFor.clear();
+		for (final Ref want : wants) {
+			final Ref newRef = avail.get(want.getObjectId());
+			if (newRef != null) {
+				askFor.put(newRef.getObjectId(), newRef);
+			} else {
+				removeFetchHeadRecord(want.getObjectId());
+				removeTrackingRefUpdate(want.getObjectId());
+			}
+		}
+	}
+

@@ -1,0 +1,64 @@
+	int parseBody(final Patch script, final int end) {
+		final byte[] buf = file.buf;
+		int c = nextLF(buf, startOffset), last = c;
+
+		old.nDeleted = 0;
+		old.nAdded = 0;
+
+		SCAN: for (; c < end; last = c, c = nextLF(buf, c)) {
+			switch (buf[c]) {
+			case ' ':
+			case '\n':
+				nContext++;
+				continue;
+
+			case '-':
+				old.nDeleted++;
+				continue;
+
+			case '+':
+				old.nAdded++;
+				continue;
+
+			case '\\': // Matches "\ No newline at end of file"
+				continue;
+
+			default:
+				break SCAN;
+			}
+		}
+
+		if (last < end && nContext + old.nDeleted - 1 == old.lineCount
+				&& nContext + old.nAdded == newLineCount
+				&& match(buf, last, Patch.SIG_FOOTER) >= 0) {
+			// This is an extremely common occurrence of "corruption".
+			// Users add footers with their signatures after this mark,
+			// and git diff adds the git executable version number.
+			// Let it slide; the hunk otherwise looked sound.
+			//
+			old.nDeleted--;
+			return last;
+		}
+
+		if (nContext + old.nDeleted < old.lineCount) {
+			final int missingCount = old.lineCount - (nContext + old.nDeleted);
+			script.error(buf, startOffset, "Truncated hunk, at least "
+					+ missingCount + " old lines is missing");
+
+		} else if (nContext + old.nAdded < newLineCount) {
+			final int missingCount = newLineCount - (nContext + old.nAdded);
+			script.error(buf, startOffset, "Truncated hunk, at least "
+					+ missingCount + " new lines is missing");
+
+		} else if (nContext + old.nDeleted > old.lineCount
+				|| nContext + old.nAdded > newLineCount) {
+			final String oldcnt = old.lineCount + ":" + newLineCount;
+			final String newcnt = (nContext + old.nDeleted) + ":"
+					+ (nContext + old.nAdded);
+			script.warn(buf, startOffset, "Hunk header " + oldcnt
+					+ " does not match body line count of " + newcnt);
+		}
+
+		return c;
+	}
+

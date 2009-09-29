@@ -1,0 +1,23 @@
+	private boolean carryOntoOne(final RevCommit p, final int carry) {
+		final boolean haveAll = (p.flags & carry) == carry;
+		p.flags |= carry;
+
+		if ((p.flags & recarryMask) == recarryTest) {
+			// We were popped without being a merge base, but we just got
+			// voted to be one. Inject ourselves back at the front of the
+			// pending queue and tell all of our ancestors they are within
+			// the merge base now.
+			//
+			p.flags &= ~POPPED;
+			pending.add(p);
+			carryOntoHistory(p, branchMask | MERGE_BASE);
+			return true;
+		}
+
+		// If we already had all carried flags, our parents do too.
+		// Return true to stop the caller from running down this leg
+		// of the revision graph any further.
+		//
+		return haveAll;
+	}
+

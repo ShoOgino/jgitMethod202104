@@ -1,0 +1,10 @@
+	private static void loadIdentity(final JSch sch, final File priv) {
+		if (priv.isFile()) {
+			try {
+				sch.addIdentity(priv.getAbsolutePath());
+			} catch (JSchException e) {
+				// Instead, pretend the key doesn't exist.
+			}
+		}
+	}
+

@@ -1,0 +1,21 @@
+	private void recreateRefs() throws Exception {
+		final Map<String, Ref> refs = computeNewRefs();
+		new RefWriter(refs.values()) {
+			@Override
+			protected void writeFile(final String name, final byte[] content)
+					throws IOException {
+				final File file = new File(db.getDirectory(), name);
+				final LockFile lck = new LockFile(file);
+				if (!lck.lock())
+					throw new ObjectWritingException("Can't write " + file);
+				try {
+					lck.write(content);
+				} catch (IOException ioe) {
+					throw new ObjectWritingException("Can't write " + file);
+				}
+				if (!lck.commit())
+					throw new ObjectWritingException("Can't write " + file);
+			}
+		}.writePackedRefs();
+	}
+

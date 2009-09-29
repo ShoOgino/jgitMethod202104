@@ -1,0 +1,13 @@
+	public void testEmptyCache_CreateEmptyCacheTree() throws Exception {
+		final DirCache dc = DirCache.read(db);
+		final DirCacheTree tree = dc.getCacheTree(true);
+		assertNotNull(tree);
+		assertSame(tree, dc.getCacheTree(false));
+		assertSame(tree, dc.getCacheTree(true));
+		assertEquals("", tree.getNameString());
+		assertEquals("", tree.getPathString());
+		assertEquals(0, tree.getChildCount());
+		assertEquals(0, tree.getEntrySpan());
+		assertFalse(tree.isValid());
+	}
+

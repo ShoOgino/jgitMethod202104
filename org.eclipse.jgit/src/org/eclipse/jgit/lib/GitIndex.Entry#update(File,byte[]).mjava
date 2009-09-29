@@ -1,0 +1,22 @@
+		/**
+		 * Update this index entry with stat and SHA-1 information if it looks
+		 * like the file has been modified in the workdir.
+		 *
+		 * @param f
+		 *            file in work dir
+		 * @param newContent
+		 *            the new content of the file
+		 * @return true if a change occurred
+		 * @throws IOException
+		 */
+		public boolean update(File f, byte[] newContent) throws IOException {
+			boolean modified = false;
+			size = newContent.length;
+			ObjectWriter writer = new ObjectWriter(db);
+			ObjectId newsha1 = writer.writeBlob(newContent);
+			if (!newsha1.equals(sha1))
+				modified = true;
+			sha1 = newsha1;
+			return modified;
+		}
+

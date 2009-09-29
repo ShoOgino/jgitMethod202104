@@ -1,0 +1,11 @@
+	private FetchResult fetchFromBundle(final Repository newRepo,
+			final byte[] bundle) throws URISyntaxException,
+			NotSupportedException, TransportException {
+		final URIish uri = new URIish("in-memory://");
+		final ByteArrayInputStream in = new ByteArrayInputStream(bundle);
+		final RefSpec rs = new RefSpec("refs/heads/*:refs/heads/*");
+		final Set<RefSpec> refs = Collections.singleton(rs);
+		return new TransportBundleStream(newRepo, uri, in).fetch(
+				NullProgressMonitor.INSTANCE, refs);
+	}
+

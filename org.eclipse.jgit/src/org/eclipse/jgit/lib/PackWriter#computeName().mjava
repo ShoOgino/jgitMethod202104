@@ -1,0 +1,15 @@
+	/**
+	 * Computes SHA-1 of lexicographically sorted objects ids written in this
+	 * pack, as used to name a pack file in repository.
+	 *
+	 * @return ObjectId representing SHA-1 name of a pack that was created.
+	 */
+	public ObjectId computeName() {
+		final MessageDigest md = Constants.newMessageDigest();
+		for (ObjectToPack otp : sortByName()) {
+			otp.copyRawTo(buf, 0);
+			md.update(buf, 0, Constants.OBJECT_ID_LENGTH);
+		}
+		return ObjectId.fromRaw(md.digest());
+	}
+

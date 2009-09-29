@@ -1,0 +1,10 @@
+	public void testFilter_Negate_ALL() throws Exception {
+		final RevCommit a = commit();
+		final RevCommit b = commit(a);
+		final RevCommit c = commit(b);
+
+		rw.setRevFilter(RevFilter.ALL.negate());
+		markStart(c);
+		assertNull(rw.next());
+	}
+

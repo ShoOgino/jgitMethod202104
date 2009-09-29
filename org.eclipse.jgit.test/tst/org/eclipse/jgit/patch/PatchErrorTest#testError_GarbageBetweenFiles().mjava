@@ -1,0 +1,26 @@
+	public void testError_GarbageBetweenFiles() throws IOException {
+		final Patch p = parseTestPatchFile();
+		assertEquals(2, p.getFiles().size());
+		{
+			final FileHeader fh = p.getFiles().get(0);
+			assertEquals(
+					"org.eclipse.jgit.test/tst/org/spearce/jgit/lib/RepositoryConfigTest.java",
+					fh.getNewName());
+			assertEquals(1, fh.getHunks().size());
+		}
+		{
+			final FileHeader fh = p.getFiles().get(1);
+			assertEquals(
+					"org.eclipse.jgit/src/org/spearce/jgit/lib/RepositoryConfig.java",
+					fh.getNewName());
+			assertEquals(1, fh.getHunks().size());
+		}
+
+		assertEquals(1, p.getErrors().size());
+		final FormatError e = p.getErrors().get(0);
+		assertSame(FormatError.Severity.WARNING, e.getSeverity());
+		assertEquals("Unexpected hunk trailer", e.getMessage());
+		assertEquals(926, e.getOffset());
+		assertEquals("I AM NOT HERE\n", e.getLineText());
+	}
+

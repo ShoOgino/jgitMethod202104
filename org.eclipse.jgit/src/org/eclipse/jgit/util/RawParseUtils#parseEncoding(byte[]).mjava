@@ -1,0 +1,21 @@
+	/**
+	 * Parse the "encoding " header into a character set reference.
+	 * <p>
+	 * Locates the "encoding " header (if present) by first calling
+	 * {@link #encoding(byte[], int)} and then returns the proper character set
+	 * to apply to this buffer to evaluate its contents as character data.
+	 * <p>
+	 * If no encoding header is present, {@link Constants#CHARSET} is assumed.
+	 * 
+	 * @param b
+	 *            buffer to scan.
+	 * @return the Java character set representation. Never null.
+	 */
+	public static Charset parseEncoding(final byte[] b) {
+		final int enc = encoding(b, 0);
+		if (enc < 0)
+			return Constants.CHARSET;
+		final int lf = nextLF(b, enc);
+		return Charset.forName(decode(Constants.CHARSET, b, enc, lf - 1));
+	}
+

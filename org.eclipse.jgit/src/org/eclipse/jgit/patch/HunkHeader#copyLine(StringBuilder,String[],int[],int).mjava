@@ -1,0 +1,13 @@
+	void copyLine(final StringBuilder sb, final String[] text,
+			final int[] offsets, final int fileIdx) {
+		final String s = text[fileIdx];
+		final int start = offsets[fileIdx];
+		int end = s.indexOf('\n', start);
+		if (end < 0)
+			end = s.length();
+		else
+			end++;
+		sb.append(s, start, end);
+		offsets[fileIdx] = end;
+	}
+

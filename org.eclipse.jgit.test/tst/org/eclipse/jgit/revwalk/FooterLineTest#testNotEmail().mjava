@@ -1,0 +1,15 @@
+	public void testNotEmail() {
+		final RevCommit commit = parse("subject\n\nbody of commit\n" + "\n"
+				+ "Acked-by: Main Tain Er\n");
+		final List<FooterLine> footers = commit.getFooterLines();
+		FooterLine f;
+
+		assertNotNull(footers);
+		assertEquals(1, footers.size());
+
+		f = footers.get(0);
+		assertEquals("Acked-by", f.getKey());
+		assertEquals("Main Tain Er", f.getValue());
+		assertNull(f.getEmailAddress());
+	}
+

@@ -1,0 +1,21 @@
+	/**
+	 * Create a new JSch session for the requested address.
+	 *
+	 * @param hc
+	 *            host configuration
+	 * @param user
+	 *            login to authenticate as.
+	 * @param host
+	 *            server name to connect to.
+	 * @param port
+	 *            port number of the SSH daemon (typically 22).
+	 * @return new session instance, but otherwise unconfigured.
+	 * @throws JSchException
+	 *             the session could not be created.
+	 */
+	protected Session createSession(final OpenSshConfig.Host hc,
+			final String user, final String host, final int port)
+			throws JSchException {
+		return getJSch(hc).getSession(user, host, port);
+	}
+

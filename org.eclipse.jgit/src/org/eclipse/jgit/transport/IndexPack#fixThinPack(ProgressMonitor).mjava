@@ -1,0 +1,41 @@
+	private void fixThinPack(final ProgressMonitor progress) throws IOException {
+		growEntries();
+
+		packDigest.reset();
+		originalEOF = packOut.length() - 20;
+		final Deflater def = new Deflater(Deflater.DEFAULT_COMPRESSION, false);
+		final List<DeltaChain> missing = new ArrayList<DeltaChain>(64);
+		long end = originalEOF;
+		for (final DeltaChain baseId : baseById) {
+			if (baseId.head == null)
+				continue;
+			final ObjectLoader ldr = repo.openObject(readCurs, baseId);
+			if (ldr == null) {
+				missing.add(baseId);
+				continue;
+			}
+			final byte[] data = ldr.getCachedBytes();
+			final int typeCode = ldr.getType();
+			final PackedObjectInfo oe;
+
+			crc.reset();
+			packOut.seek(end);
+			writeWhole(def, typeCode, data);
+			oe = new PackedObjectInfo(end, (int) crc.getValue(), baseId);
+			entries[entryCount++] = oe;
+			end = packOut.getFilePointer();
+
+			resolveChildDeltas(oe.getOffset(), typeCode, data, oe);
+			if (progress.isCancelled())
+				throw new IOException("Download cancelled during indexing");
+		}
+		def.end();
+
+		for (final DeltaChain base : missing) {
+			if (base.head != null)
+				throw new MissingObjectException(base, "delta base");
+		}
+
+		fixHeaderFooter(packcsum, packDigest.digest());
+	}
+

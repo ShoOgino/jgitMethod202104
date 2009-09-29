@@ -1,0 +1,41 @@
+	private void putImpl(final String bucket, final String key,
+			final byte[] csum, final TemporaryBuffer buf,
+			ProgressMonitor monitor, String monitorTask) throws IOException {
+		if (monitor == null)
+			monitor = NullProgressMonitor.INSTANCE;
+		if (monitorTask == null)
+			monitorTask = "Uploading " + key;
+
+		final String md5str = Base64.encodeBytes(csum);
+		final long len = buf.length();
+		final String lenstr = String.valueOf(len);
+		for (int curAttempt = 0; curAttempt < maxAttempts; curAttempt++) {
+			final HttpURLConnection c = open("PUT", bucket, key);
+			c.setRequestProperty("Content-Length", lenstr);
+			c.setRequestProperty("Content-MD5", md5str);
+			c.setRequestProperty(X_AMZ_ACL, acl);
+			encryption.request(c, X_AMZ_META);
+			authorize(c);
+			c.setDoOutput(true);
+			c.setFixedLengthStreamingMode((int) len);
+			monitor.beginTask(monitorTask, (int) (len / 1024));
+			final OutputStream os = c.getOutputStream();
+			try {
+				buf.writeTo(os, monitor);
+			} finally {
+				monitor.endTask();
+				os.close();
+			}
+
+			switch (HttpSupport.response(c)) {
+			case HttpURLConnection.HTTP_OK:
+				return;
+			case HttpURLConnection.HTTP_INTERNAL_ERROR:
+				continue;
+			default:
+				throw error("Writing", key, c);
+			}
+		}
+		throw maxAttempts("Writing", key);
+	}
+

@@ -1,0 +1,11 @@
+	public Tree getTree() throws IOException {
+		if (treeObj == null) {
+			treeObj = objdb.mapTree(getTreeId());
+			if (treeObj == null) {
+				throw new MissingObjectException(getTreeId(),
+						Constants.TYPE_TREE);
+			}
+		}
+		return treeObj;
+	}
+

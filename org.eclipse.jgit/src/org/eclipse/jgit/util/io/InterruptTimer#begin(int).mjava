@@ -1,0 +1,14 @@
+	/**
+	 * Arm the interrupt timer before entering a blocking operation.
+	 *
+	 * @param timeout
+	 *            number of milliseconds before the interrupt should trigger.
+	 *            Must be > 0.
+	 */
+	public void begin(final int timeout) {
+		if (timeout <= 0)
+			throw new IllegalArgumentException("Invalid timeout: " + timeout);
+		Thread.interrupted();
+		state.begin(timeout);
+	}
+

@@ -1,0 +1,23 @@
+	/**
+	 * Open a new transport instance to connect two repositories.
+	 * <p>
+	 * This method assumes {@link Operation#FETCH}.
+	 * 
+	 * @param local
+	 *            existing local repository.
+	 * @param remote
+	 *            location of the remote repository - may be URI or remote
+	 *            configuration name.
+	 * @return the new transport instance. Never null. In case of multiple URIs
+	 *         in remote configuration, only the first is chosen.
+	 * @throws URISyntaxException
+	 *             the location is not a remote defined in the configuration
+	 *             file and is not a well-formed URL.
+	 * @throws NotSupportedException
+	 *             the protocol specified is not supported.
+	 */
+	public static Transport open(final Repository local, final String remote)
+			throws NotSupportedException, URISyntaxException {
+		return open(local, remote, Operation.FETCH);
+	}
+

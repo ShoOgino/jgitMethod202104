@@ -1,0 +1,16 @@
+	public void testEnsurePathCapacityGrows() throws Exception {
+		final FakeTreeIterator i = new FakeTreeIterator("ab", FileMode.TREE);
+		final int want = 384;
+		final byte[] origpath = i.path;
+		assertEquals(i.path[0], 'a');
+		assertEquals(i.path[1], 'b');
+		assertTrue(i.path.length < want);
+
+		i.ensurePathCapacity(want, 2);
+
+		assertNotSame(origpath, i.path);
+		assertEquals(512, i.path.length);
+		assertEquals(i.path[0], 'a');
+		assertEquals(i.path[1], 'b');
+	}
+

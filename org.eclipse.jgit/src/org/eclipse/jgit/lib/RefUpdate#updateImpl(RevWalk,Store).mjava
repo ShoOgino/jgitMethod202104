@@ -1,0 +1,40 @@
+	private Result updateImpl(final RevWalk walk, final Store store)
+			throws IOException {
+		final LockFile lock;
+		RevObject newObj;
+		RevObject oldObj;
+
+		if (isNameConflicting())
+			return Result.LOCK_FAILURE;
+		lock = new LockFile(looseFile);
+		if (!lock.lock())
+			return Result.LOCK_FAILURE;
+		try {
+			oldValue = db.idOf(getName());
+			if (expValue != null) {
+				final ObjectId o;
+				o = oldValue != null ? oldValue : ObjectId.zeroId();
+				if (!AnyObjectId.equals(expValue, o))
+					return Result.LOCK_FAILURE;
+			}
+			if (oldValue == null)
+				return store.store(lock, Result.NEW);
+
+			newObj = safeParse(walk, newValue);
+			oldObj = safeParse(walk, oldValue);
+			if (newObj == oldObj)
+				return store.store(lock, Result.NO_CHANGE);
+
+			if (newObj instanceof RevCommit && oldObj instanceof RevCommit) {
+				if (walk.isMergedInto((RevCommit) oldObj, (RevCommit) newObj))
+					return store.store(lock, Result.FAST_FORWARD);
+			}
+
+			if (isForceUpdate())
+				return store.store(lock, Result.FORCED);
+			return Result.REJECTED;
+		} finally {
+			lock.unlock();
+		}
+	}
+

@@ -1,0 +1,13 @@
+	/**
+	 * Create a new writer instance.
+	 *
+	 * @param dst
+	 *            the stream this instance outputs to. If not already buffered
+	 *            it will be automatically wrapped in a buffered stream.
+	 */
+	protected PackIndexWriter(final OutputStream dst) {
+		out = new DigestOutputStream(dst instanceof BufferedOutputStream ? dst
+				: new BufferedOutputStream(dst), Constants.newMessageDigest());
+		tmp = new byte[4 + Constants.OBJECT_ID_LENGTH];
+	}
+

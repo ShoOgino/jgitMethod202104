@@ -1,0 +1,55 @@
+	public void testParse_OneFileCc() throws IOException {
+		final Patch p = parseTestPatchFile();
+		assertEquals(1, p.getFiles().size());
+		assertTrue(p.getErrors().isEmpty());
+
+		final CombinedFileHeader cfh = (CombinedFileHeader) p.getFiles().get(0);
+
+		assertEquals("org.spearce.egit.ui/src/org/spearce/egit/ui/UIText.java",
+				cfh.getNewName());
+		assertEquals(cfh.getNewName(), cfh.getOldName());
+
+		assertEquals(98, cfh.startOffset);
+
+		assertEquals(2, cfh.getParentCount());
+		assertSame(cfh.getOldId(0), cfh.getOldId());
+		assertEquals("169356b", cfh.getOldId(0).name());
+		assertEquals("dd8c317", cfh.getOldId(1).name());
+		assertEquals("fd85931", cfh.getNewId().name());
+
+		assertSame(cfh.getOldMode(0), cfh.getOldMode());
+		assertSame(FileMode.REGULAR_FILE, cfh.getOldMode(0));
+		assertSame(FileMode.REGULAR_FILE, cfh.getOldMode(1));
+		assertSame(FileMode.EXECUTABLE_FILE, cfh.getNewMode());
+		assertSame(FileHeader.ChangeType.MODIFY, cfh.getChangeType());
+		assertSame(FileHeader.PatchType.UNIFIED, cfh.getPatchType());
+
+		assertEquals(1, cfh.getHunks().size());
+		{
+			final CombinedHunkHeader h = cfh.getHunks().get(0);
+
+			assertSame(cfh, h.getFileHeader());
+			assertEquals(346, h.startOffset);
+			assertEquals(764, h.endOffset);
+
+			assertSame(h.getOldImage(0), h.getOldImage());
+			assertSame(cfh.getOldId(0), h.getOldImage(0).getId());
+			assertSame(cfh.getOldId(1), h.getOldImage(1).getId());
+
+			assertEquals(55, h.getOldImage(0).getStartLine());
+			assertEquals(12, h.getOldImage(0).getLineCount());
+			assertEquals(3, h.getOldImage(0).getLinesAdded());
+			assertEquals(0, h.getOldImage(0).getLinesDeleted());
+
+			assertEquals(163, h.getOldImage(1).getStartLine());
+			assertEquals(13, h.getOldImage(1).getLineCount());
+			assertEquals(2, h.getOldImage(1).getLinesAdded());
+			assertEquals(0, h.getOldImage(1).getLinesDeleted());
+
+			assertEquals(163, h.getNewStartLine());
+			assertEquals(15, h.getNewLineCount());
+
+			assertEquals(10, h.getLinesContext());
+		}
+	}
+

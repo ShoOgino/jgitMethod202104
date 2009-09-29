@@ -1,0 +1,7 @@
+	private void processBlob(final RevObject obj) throws TransportException {
+		if (!local.hasObject(obj))
+			throw new TransportException("Cannot read blob " + obj.name(),
+					new MissingObjectException(obj, Constants.TYPE_BLOB));
+		obj.add(COMPLETE);
+	}
+

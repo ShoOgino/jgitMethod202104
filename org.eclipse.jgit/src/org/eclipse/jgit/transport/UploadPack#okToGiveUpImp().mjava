@@ -1,0 +1,17 @@
+	private boolean okToGiveUpImp() throws PackProtocolException {
+		if (commonBase.isEmpty())
+			return false;
+
+		try {
+			for (final Iterator<RevCommit> i = wantCommits.iterator(); i
+					.hasNext();) {
+				final RevCommit want = i.next();
+				if (wantSatisfied(want))
+					i.remove();
+			}
+		} catch (IOException e) {
+			throw new PackProtocolException("internal revision error", e);
+		}
+		return wantCommits.isEmpty();
+	}
+

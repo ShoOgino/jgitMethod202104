@@ -1,0 +1,14 @@
+	public void testNoMagicRefCharacters() {
+		assertValid(false, "refs/heads/master^");
+		assertValid(false, "refs/heads/^master");
+		assertValid(false, "^refs/heads/master");
+
+		assertValid(false, "refs/heads/master~");
+		assertValid(false, "refs/heads/~master");
+		assertValid(false, "~refs/heads/master");
+
+		assertValid(false, "refs/heads/master:");
+		assertValid(false, "refs/heads/:master");
+		assertValid(false, ":refs/heads/master");
+	}
+

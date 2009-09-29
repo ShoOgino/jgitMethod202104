@@ -1,0 +1,12 @@
+	@Override
+	public boolean remove(final Object o) {
+		final RevFlag flag = (RevFlag) o;
+		if ((mask & flag.mask) == 0)
+			return false;
+		mask &= ~flag.mask;
+		for (int i = 0; i < active.size(); i++)
+			if (active.get(i).mask == flag.mask)
+				active.remove(i);
+		return true;
+	}
+

@@ -1,0 +1,32 @@
+	/**
+	 * Apply a flag to all commits matching the specified filter.
+	 * <p>
+	 * Same as <code>applyFlag(matching, flag, 0, size())</code>, but without
+	 * the incremental behavior.
+	 * 
+	 * @param matching
+	 *            the filter to test commits with. If the filter includes a
+	 *            commit it will have the flag set; if the filter does not
+	 *            include the commit the flag will be unset.
+	 * @param flag
+	 *            the flag to apply (or remove). Applications are responsible
+	 *            for allocating this flag from the source RevWalk.
+	 * @throws IOException
+	 *             revision filter needed to read additional objects, but an
+	 *             error occurred while reading the pack files or loose objects
+	 *             of the repository.
+	 * @throws IncorrectObjectTypeException
+	 *             revision filter needed to read additional objects, but an
+	 *             object was not of the correct type. Repository corruption may
+	 *             have occurred.
+	 * @throws MissingObjectException
+	 *             revision filter needed to read additional objects, but an
+	 *             object that should be present was not found. Repository
+	 *             corruption may have occurred.
+	 */
+	public void applyFlag(final RevFilter matching, final RevFlag flag)
+			throws MissingObjectException, IncorrectObjectTypeException,
+			IOException {
+		applyFlag(matching, flag, 0, size());
+	}
+

@@ -1,0 +1,16 @@
+	private static List<URIish> getURIs(final RemoteConfig cfg,
+			final Operation op) {
+		switch (op) {
+		case FETCH:
+			return cfg.getURIs();
+		case PUSH: {
+			List<URIish> uris = cfg.getPushURIs();
+			if (uris.isEmpty())
+				uris = cfg.getURIs();
+			return uris;
+		}
+		default:
+			throw new IllegalArgumentException(op.toString());
+		}
+	}
+

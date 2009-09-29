@@ -1,0 +1,18 @@
+	/**
+	 * Test partial results of iterator comparing to content of well-known
+	 * (prepared) dense index, that may need multi-level indexing.
+	 */
+	public void testIteratorReturnedValues2() {
+		Iterator<PackIndex.MutableEntry> iter = denseIdx.iterator();
+		while (!iter.next().name().equals(
+				"0a3d7772488b6b106fb62813c4d6d627918d9181")) {
+			// just iterating
+		}
+		assertEquals("1004d0d7ac26fbf63050a234c9b88a46075719d3", iter.next()
+				.name()); // same level-1
+		assertEquals("10da5895682013006950e7da534b705252b03be6", iter.next()
+				.name()); // same level-1
+		assertEquals("1203b03dc816ccbb67773f28b3c19318654b0bc8", iter.next()
+				.name());
+	}
+

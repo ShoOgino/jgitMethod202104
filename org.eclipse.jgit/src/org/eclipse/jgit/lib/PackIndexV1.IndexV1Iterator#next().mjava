@@ -1,0 +1,15 @@
+		public MutableEntry next() {
+			for (; levelOne < idxdata.length; levelOne++) {
+				if (idxdata[levelOne] == null)
+					continue;
+				if (levelTwo < idxdata[levelOne].length) {
+					entry.offset = NB.decodeUInt32(idxdata[levelOne], levelTwo);
+					levelTwo += Constants.OBJECT_ID_LENGTH + 4;
+					returnedNumber++;
+					return entry;
+				}
+				levelTwo = 0;
+			}
+			throw new NoSuchElementException();
+		}
+

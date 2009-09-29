@@ -1,0 +1,9 @@
+	@Override
+	public AbstractTreeIterator createSubtreeIterator(final Repository repo)
+			throws IncorrectObjectTypeException, IOException {
+		if (currentSubtree == null)
+			throw new IncorrectObjectTypeException(getEntryObjectId(),
+					Constants.TYPE_TREE);
+		return new DirCacheIterator(this, currentSubtree);
+	}
+

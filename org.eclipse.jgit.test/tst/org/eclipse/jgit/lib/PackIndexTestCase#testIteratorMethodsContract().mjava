@@ -1,0 +1,25 @@
+	/**
+	 * Test contracts of Iterator methods and this implementation remove()
+	 * limitations.
+	 */
+	public void testIteratorMethodsContract() {
+		Iterator<PackIndex.MutableEntry> iter = smallIdx.iterator();
+		while (iter.hasNext()) {
+			iter.next();
+		}
+
+		try {
+			iter.next();
+			fail("next() unexpectedly returned element");
+		} catch (NoSuchElementException x) {
+			// expected
+		}
+
+		try {
+			iter.remove();
+			fail("remove() shouldn't be implemented");
+		} catch (UnsupportedOperationException x) {
+			// expected
+		}
+	}
+

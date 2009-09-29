@@ -1,0 +1,11 @@
+	private void deleteAllRefs() throws Exception {
+		final RevWalk rw = new RevWalk(db);
+		for (final Ref r : db.getAllRefs().values()) {
+			if (Constants.HEAD.equals(r.getName()))
+				continue;
+			final RefUpdate u = db.updateRef(r.getName());
+			u.setForceUpdate(true);
+			u.delete(rw);
+		}
+	}
+

@@ -1,0 +1,26 @@
+	/**
+	 * Test RefSpec to RemoteRefUpdate conversion with wildcard RefSpec.
+	 *
+	 * @throws IOException
+	 */
+	public void testFindRemoteRefUpdatesWildcardNoTracking() throws IOException {
+		transport = Transport.open(db, remoteConfig);
+		final Collection<RemoteRefUpdate> result = transport
+				.findRemoteRefUpdatesFor(Collections.nCopies(1, new RefSpec(
+						"+refs/heads/*:refs/heads/test/*")));
+
+		assertEquals(12, result.size());
+		boolean foundA = false;
+		boolean foundB = false;
+		for (final RemoteRefUpdate rru : result) {
+			if ("refs/heads/a".equals(rru.getSrcRef())
+					&& "refs/heads/test/a".equals(rru.getRemoteName()))
+				foundA = true;
+			if ("refs/heads/b".equals(rru.getSrcRef())
+					&& "refs/heads/test/b".equals(rru.getRemoteName()))
+				foundB = true;
+		}
+		assertTrue(foundA);
+		assertTrue(foundB);
+	}
+

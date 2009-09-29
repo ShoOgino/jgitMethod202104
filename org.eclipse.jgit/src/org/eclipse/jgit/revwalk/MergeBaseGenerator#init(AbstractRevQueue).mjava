@@ -1,0 +1,22 @@
+	void init(final AbstractRevQueue p) {
+		try {
+			for (;;) {
+				final RevCommit c = p.next();
+				if (c == null)
+					break;
+				add(c);
+			}
+		} finally {
+			// Always free the flags immediately. This ensures the flags
+			// will be available for reuse when the walk resets.
+			//
+			walker.freeFlag(branchMask);
+
+			// Setup the condition used by carryOntoOne to detect a late
+			// merge base and produce it on the next round.
+			//
+			recarryTest = branchMask | POPPED;
+			recarryMask = branchMask | POPPED | MERGE_BASE;
+		}
+	}
+

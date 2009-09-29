@@ -1,0 +1,16 @@
+	/**
+	 * Try to establish the lock for appending.
+	 * 
+	 * @return true if the lock is now held by the caller; false if it is held
+	 *         by someone else.
+	 * @throws IOException
+	 *             the temporary output file could not be created. The caller
+	 *             does not hold the lock.
+	 */
+	public boolean lockForAppend() throws IOException {
+		if (!lock())
+			return false;
+		copyCurrentContent();
+		return true;
+	}
+

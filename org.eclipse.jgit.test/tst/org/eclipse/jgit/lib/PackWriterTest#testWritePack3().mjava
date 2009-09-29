@@ -1,0 +1,30 @@
+	/**
+	 * Create pack basing on fixed objects list, then precisely verify content.
+	 * No delta reuse here.
+	 *
+	 * @throws IOException
+	 * @throws MissingObjectException
+	 *
+	 */
+	public void testWritePack3() throws MissingObjectException, IOException {
+		writer.setReuseDeltas(false);
+		final ObjectId forcedOrder[] = new ObjectId[] {
+				ObjectId.fromString("82c6b885ff600be425b4ea96dee75dca255b69e7"),
+				ObjectId.fromString("c59759f143fb1fe21c197981df75a7ee00290799"),
+				ObjectId.fromString("aabf2ffaec9b497f0950352b3e582d73035c2035"),
+				ObjectId.fromString("902d5476fa249b7abc9d84c611577a81381f0327"),
+				ObjectId.fromString("5b6e7c66c276e7610d4a73c70ec1a1f7c1003259"),
+				ObjectId.fromString("6ff87c4664981e4397625791c8ea3bbb5f2279a3") };
+		final RevWalk parser = new RevWalk(db);
+		final RevObject forcedOrderRevs[] = new RevObject[forcedOrder.length];
+		for (int i = 0; i < forcedOrder.length; i++)
+			forcedOrderRevs[i] = parser.parseAny(forcedOrder[i]);
+
+		createVerifyOpenPack(Arrays.asList(forcedOrderRevs).iterator());
+
+		assertEquals(forcedOrder.length, writer.getObjectsNumber());
+		verifyObjectsOrder(forcedOrder);
+		assertEquals("ed3f96b8327c7c66b0f8f70056129f0769323d86", writer
+				.computeName().name());
+	}
+

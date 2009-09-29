@@ -1,0 +1,18 @@
+	private void markLocalRefsComplete(final Set<ObjectId> have) throws TransportException {
+		for (final Ref r : local.getAllRefs().values()) {
+			try {
+				markLocalObjComplete(revWalk.parseAny(r.getObjectId()));
+			} catch (IOException readError) {
+				throw new TransportException("Local ref " + r.getName()
+						+ " is missing object(s).", readError);
+			}
+		}
+		for (final ObjectId id : have) {
+			try {
+				markLocalObjComplete(revWalk.parseAny(id));
+			} catch (IOException readError) {
+				throw new TransportException("Missing assumed "+id.name(), readError);
+			}
+		}
+	}
+

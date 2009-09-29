@@ -1,0 +1,35 @@
+	public void testCull() throws Exception {
+		final RevBlob f1 = blob("1");
+		final RevBlob f2 = blob("2");
+		final RevBlob f3 = blob("3");
+		final RevBlob f4 = blob("4");
+
+		final RevTree ta = tree(file("a/1", f1), file("c/3", f3));
+		final RevCommit a = commit(ta);
+
+		final RevTree tb = tree(file("a/1", f2), file("c/3", f3));
+		final RevCommit b1 = commit(tb, a);
+		final RevCommit b2 = commit(tb, b1);
+
+		final RevTree tc = tree(file("a/1", f4));
+		final RevCommit c1 = commit(tc, a);
+		final RevCommit c2 = commit(tc, c1);
+
+		markStart(b2);
+		markUninteresting(c2);
+
+		assertCommit(b2, objw.next());
+		assertCommit(b1, objw.next());
+		assertNull(objw.next());
+
+		assertTrue(a.has(RevFlag.UNINTERESTING));
+		assertTrue(ta.has(RevFlag.UNINTERESTING));
+		assertTrue(f1.has(RevFlag.UNINTERESTING));
+		assertTrue(f3.has(RevFlag.UNINTERESTING));
+
+		assertSame(tb, objw.nextObject());
+		assertSame(get(tb, "a"), objw.nextObject());
+		assertSame(f2, objw.nextObject());
+		assertNull(objw.nextObject());
+	}
+

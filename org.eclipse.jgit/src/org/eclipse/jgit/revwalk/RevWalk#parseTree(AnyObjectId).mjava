@@ -1,0 +1,38 @@
+	/**
+	 * Locate a reference to a tree.
+	 * <p>
+	 * This method only returns successfully if the tree object exists, is
+	 * verified to be a tree.
+	 *
+	 * @param id
+	 *            name of the tree object, or a commit or annotated tag that may
+	 *            reference a tree.
+	 * @return reference to the tree object. Never null.
+	 * @throws MissingObjectException
+	 *             the supplied tree does not exist.
+	 * @throws IncorrectObjectTypeException
+	 *             the supplied id is not a tree, a commit or an annotated tag.
+	 * @throws IOException
+	 *             a pack file or loose object could not be read.
+	 */
+	public RevTree parseTree(final AnyObjectId id)
+			throws MissingObjectException, IncorrectObjectTypeException,
+			IOException {
+		RevObject c = parseAny(id);
+		while (c instanceof RevTag) {
+			c = ((RevTag) c).getObject();
+			parseHeaders(c);
+		}
+
+		final RevTree t;
+		if (c instanceof RevCommit)
+			t = ((RevCommit) c).getTree();
+		else if (!(c instanceof RevTree))
+			throw new IncorrectObjectTypeException(id.toObjectId(),
+					Constants.TYPE_TREE);
+		else
+			t = (RevTree) c;
+		parseHeaders(t);
+		return t;
+	}
+

@@ -1,0 +1,26 @@
+	public void testObjectMovedToNewPack1()
+			throws IncorrectObjectTypeException, IOException {
+		// Create an object and pack it. Then remove that pack and put the
+		// object into a different pack file, with some other object. We
+		// still should be able to access the objects.
+		//
+		final Repository eden = createNewEmptyRepo();
+		final RevObject o1 = writeBlob(eden, "o1");
+		final File[] out1 = pack(eden, o1);
+		assertEquals(o1.name(), parse(o1).name());
+
+		final RevObject o2 = writeBlob(eden, "o2");
+		pack(eden, o2, o1);
+
+		// Force close, and then delete, the old pack.
+		//
+		whackCache();
+		delete(out1);
+
+		// Now here is the interesting thing. Will git figure the new
+		// object exists in the new pack, and not the old one.
+		//
+		assertEquals(o2.name(), parse(o2).name());
+		assertEquals(o1.name(), parse(o1).name());
+	}
+

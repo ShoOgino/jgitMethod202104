@@ -1,0 +1,89 @@
+	private void downloadObject(final ProgressMonitor pm, final AnyObjectId id)
+			throws TransportException {
+		if (local.hasObject(id))
+			return;
+
+		for (;;) {
+			// Try a pack file we know about, but don't have yet. Odds are
+			// that if it has this object, it has others related to it so
+			// getting the pack is a good bet.
+			//
+			if (downloadPackedObject(pm, id))
+				return;
+
+			// Search for a loose object over all alternates, starting
+			// from the one we last successfully located an object through.
+			//
+			final String idStr = id.name();
+			final String subdir = idStr.substring(0, 2);
+			final String file = idStr.substring(2);
+			final String looseName = subdir + "/" + file;
+
+			for (int i = lastRemoteIdx; i < remotes.size(); i++) {
+				if (downloadLooseObject(id, looseName, remotes.get(i))) {
+					lastRemoteIdx = i;
+					return;
+				}
+			}
+			for (int i = 0; i < lastRemoteIdx; i++) {
+				if (downloadLooseObject(id, looseName, remotes.get(i))) {
+					lastRemoteIdx = i;
+					return;
+				}
+			}
+
+			// Try to obtain more pack information and search those.
+			//
+			while (!noPacksYet.isEmpty()) {
+				final WalkRemoteObjectDatabase wrr = noPacksYet.removeFirst();
+				final Collection<String> packNameList;
+				try {
+					pm.beginTask("Listing packs", ProgressMonitor.UNKNOWN);
+					packNameList = wrr.getPackNames();
+				} catch (IOException e) {
+					// Try another repository.
+					//
+					recordError(id, e);
+					continue;
+				} finally {
+					pm.endTask();
+				}
+
+				if (packNameList == null || packNameList.isEmpty())
+					continue;
+				for (final String packName : packNameList) {
+					if (packsConsidered.add(packName))
+						unfetchedPacks.add(new RemotePack(wrr, packName));
+				}
+				if (downloadPackedObject(pm, id))
+					return;
+			}
+
+			// Try to expand the first alternate we haven't expanded yet.
+			//
+			Collection<WalkRemoteObjectDatabase> al = expandOneAlternate(id, pm);
+			if (al != null && !al.isEmpty()) {
+				for (final WalkRemoteObjectDatabase alt : al) {
+					remotes.add(alt);
+					noPacksYet.add(alt);
+					noAlternatesYet.add(alt);
+				}
+				continue;
+			}
+
+			// We could not obtain the object. There may be reasons why.
+			//
+			List<Throwable> failures = fetchErrors.get(id.copy());
+			final TransportException te;
+
+			te = new TransportException("Cannot get " + id.name() + ".");
+			if (failures != null && !failures.isEmpty()) {
+				if (failures.size() == 1)
+					te.initCause(failures.get(0));
+				else
+					te.initCause(new CompoundException(failures));
+			}
+			throw te;
+		}
+	}
+

@@ -1,0 +1,38 @@
+	private static boolean duplicateName(final byte[] raw,
+			final int thisNamePos, final int thisNameEnd) {
+		final int sz = raw.length;
+		int nextPtr = thisNameEnd + 1 + Constants.OBJECT_ID_LENGTH;
+		for (;;) {
+			int nextMode = 0;
+			for (;;) {
+				if (nextPtr >= sz)
+					return false;
+				final byte c = raw[nextPtr++];
+				if (' ' == c)
+					break;
+				nextMode <<= 3;
+				nextMode += c - '0';
+			}
+
+			final int nextNamePos = nextPtr;
+			for (;;) {
+				if (nextPtr == sz)
+					return false;
+				final byte c = raw[nextPtr++];
+				if (c == 0)
+					break;
+			}
+			if (nextNamePos + 1 == nextPtr)
+				return false;
+
+			final int cmp = pathCompare(raw, thisNamePos, thisNameEnd,
+					FileMode.TREE.getBits(), nextNamePos, nextPtr - 1, nextMode);
+			if (cmp < 0)
+				return false;
+			else if (cmp == 0)
+				return true;
+
+			nextPtr += Constants.OBJECT_ID_LENGTH;
+		}
+	}
+

@@ -1,0 +1,26 @@
+	/**
+	 * Read a standard Git packed-refs file to discover known references.
+	 *
+	 * @param avail
+	 *            return collection of references. Any existing entries will be
+	 *            replaced if they are found in the packed-refs file.
+	 * @throws TransportException
+	 *             an error occurred reading from the packed refs file.
+	 */
+	protected void readPackedRefs(final Map<String, Ref> avail)
+			throws TransportException {
+		try {
+			final BufferedReader br = openReader(ROOT_DIR
+					+ Constants.PACKED_REFS);
+			try {
+				readPackedRefsImpl(avail, br);
+			} finally {
+				br.close();
+			}
+		} catch (FileNotFoundException notPacked) {
+			// Perhaps it wasn't worthwhile, or is just an older repository.
+		} catch (IOException e) {
+			throw new TransportException(getURI(), "error in packed-refs", e);
+		}
+	}
+

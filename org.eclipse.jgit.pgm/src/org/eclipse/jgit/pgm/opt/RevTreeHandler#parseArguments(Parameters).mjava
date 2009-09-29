@@ -1,0 +1,27 @@
+	@Override
+	public int parseArguments(final Parameters params) throws CmdLineException {
+		final String name = params.getParameter(0);
+		final ObjectId id;
+		try {
+			id = clp.getRepository().resolve(name);
+		} catch (IOException e) {
+			throw new CmdLineException(e.getMessage());
+		}
+		if (id == null)
+			throw new CmdLineException(name + " is not a tree");
+
+		final RevTree c;
+		try {
+			c = clp.getRevWalk().parseTree(id);
+		} catch (MissingObjectException e) {
+			throw new CmdLineException(name + " is not a tree");
+		} catch (IncorrectObjectTypeException e) {
+			throw new CmdLineException(name + " is not a tree");
+		} catch (IOException e) {
+			throw new CmdLineException("cannot read " + name + ": "
+					+ e.getMessage());
+		}
+		setter.addValue(c);
+		return 1;
+	}
+

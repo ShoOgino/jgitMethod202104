@@ -1,0 +1,43 @@
+		private Ref readRef(final TreeMap<String, Ref> avail,
+				final String path, final String name) throws TransportException {
+			final String line;
+			try {
+				final BufferedReader br = openReader(path);
+				try {
+					line = br.readLine();
+				} finally {
+					br.close();
+				}
+			} catch (FileNotFoundException noRef) {
+				return null;
+			} catch (IOException err) {
+				throw new TransportException("Cannot read " + objectsPath + "/"
+						+ path + ": " + err.getMessage(), err);
+			}
+
+			if (line == null)
+				throw new TransportException("Empty ref: " + name);
+
+			if (line.startsWith("ref: ")) {
+				final String p = line.substring("ref: ".length());
+				Ref r = readRef(avail, ROOT_DIR + p, p);
+				if (r == null)
+					r = avail.get(p);
+				if (r != null) {
+					r = new Ref(loose(r), name, r.getObjectId(), r
+							.getPeeledObjectId(), true);
+					avail.put(name, r);
+				}
+				return r;
+			}
+
+			if (ObjectId.isId(line)) {
+				final Ref r = new Ref(loose(avail.get(name)), name, ObjectId
+						.fromString(line));
+				avail.put(r.getName(), r);
+				return r;
+			}
+
+			throw new TransportException("Bad ref: " + name + ": " + line);
+		}
+

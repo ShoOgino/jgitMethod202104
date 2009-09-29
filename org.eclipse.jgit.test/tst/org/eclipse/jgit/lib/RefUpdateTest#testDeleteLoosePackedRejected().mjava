@@ -1,0 +1,15 @@
+	/**
+	 * Try to delete a ref. Delete requires force.
+	 *
+	 * @throws IOException
+	 */
+	public void testDeleteLoosePackedRejected() throws IOException {
+		ObjectId pid = db.resolve("refs/heads/c^");
+		ObjectId oldpid = db.resolve("refs/heads/c");
+		RefUpdate updateRef = db.updateRef("refs/heads/c");
+		updateRef.setNewObjectId(pid);
+		Result update = updateRef.update();
+		assertEquals(Result.REJECTED, update);
+		assertEquals(oldpid, db.resolve("refs/heads/c"));
+	}
+

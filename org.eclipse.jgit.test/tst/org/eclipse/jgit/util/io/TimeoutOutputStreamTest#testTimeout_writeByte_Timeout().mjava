@@ -1,0 +1,11 @@
+	public void testTimeout_writeByte_Timeout() throws IOException {
+		beginWrite();
+		try {
+			os.write('\n');
+			fail("incorrectly write a byte");
+		} catch (InterruptedIOException e) {
+			// expected
+		}
+		assertTimeout();
+	}
+

@@ -1,0 +1,12 @@
+	public void testAlias_OptionsSet() throws Exception {
+		config("Host orcz\n" + "\tHostName repo.or.cz\n" + "\tPort 2222\n"
+				+ "\tUser jex\n" + "\tIdentityFile .ssh/id_jex\n"
+				+ "\tForwardX11 no\n");
+		final Host h = osc.lookup("orcz");
+		assertNotNull(h);
+		assertEquals("repo.or.cz", h.getHostName());
+		assertEquals("jex", h.getUser());
+		assertEquals(2222, h.getPort());
+		assertEquals(new File(home, ".ssh/id_jex"), h.getIdentityFile());
+	}
+

@@ -1,0 +1,9 @@
+	protected void setUp() throws Exception {
+		super.setUp();
+		out = new PipedOutputStream();
+		in = new FullPipeInputStream(out);
+		timer = new InterruptTimer();
+		os = new TimeoutOutputStream(out, timer);
+		os.setTimeout(timeout);
+	}
+

@@ -1,0 +1,29 @@
+	void extractFileLines(final StringBuilder sb, final String[] text,
+			final int[] offsets) {
+		final byte[] buf = file.buf;
+		int ptr = startOffset;
+		int eol = nextLF(buf, ptr);
+		if (endOffset <= eol)
+			return;
+		copyLine(sb, text, offsets, 0);
+		SCAN: for (ptr = eol; ptr < endOffset; ptr = eol) {
+			eol = nextLF(buf, ptr);
+			switch (buf[ptr]) {
+			case ' ':
+			case '\n':
+			case '\\':
+				copyLine(sb, text, offsets, 0);
+				skipLine(text, offsets, 1);
+				break;
+			case '-':
+				copyLine(sb, text, offsets, 0);
+				break;
+			case '+':
+				copyLine(sb, text, offsets, 1);
+				break;
+			default:
+				break SCAN;
+			}
+		}
+	}
+

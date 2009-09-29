@@ -1,0 +1,17 @@
+	public String toString() {
+		final StringBuffer r = new StringBuffer();
+		final SimpleDateFormat dtfmt;
+		dtfmt = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy Z", Locale.US);
+		dtfmt.setTimeZone(getTimeZone());
+
+		r.append("PersonIdent[");
+		r.append(getName());
+		r.append(", ");
+		r.append(getEmailAddress());
+		r.append(", ");
+		r.append(dtfmt.format(Long.valueOf(when)));
+		r.append("]");
+
+		return r.toString();
+	}
+

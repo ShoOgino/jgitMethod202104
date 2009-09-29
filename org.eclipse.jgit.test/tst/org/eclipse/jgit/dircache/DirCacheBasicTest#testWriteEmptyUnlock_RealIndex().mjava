@@ -1,0 +1,16 @@
+	public void testWriteEmptyUnlock_RealIndex() throws Exception {
+		final File idx = new File(db.getDirectory(), "index");
+		final File lck = new File(db.getDirectory(), "index.lock");
+		assertFalse(idx.exists());
+		assertFalse(lck.exists());
+
+		final DirCache dc = DirCache.lock(db);
+		assertEquals(0, lck.length());
+		dc.write();
+		assertEquals(12 + 20, lck.length());
+
+		dc.unlock();
+		assertFalse(idx.exists());
+		assertFalse(lck.exists());
+	}
+

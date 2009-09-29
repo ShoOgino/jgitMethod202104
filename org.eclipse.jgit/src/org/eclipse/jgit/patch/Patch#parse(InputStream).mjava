@@ -1,0 +1,18 @@
+	/**
+	 * Parse a patch received from an InputStream.
+	 * <p>
+	 * Multiple parse calls on the same instance will concatenate the patch
+	 * data, but each parse input must start with a valid file header (don't
+	 * split a single file across parse calls).
+	 *
+	 * @param is
+	 *            the stream to read the patch data from. The stream is read
+	 *            until EOF is reached.
+	 * @throws IOException
+	 *             there was an error reading from the input stream.
+	 */
+	public void parse(final InputStream is) throws IOException {
+		final byte[] buf = readFully(is);
+		parse(buf, 0, buf.length);
+	}
+

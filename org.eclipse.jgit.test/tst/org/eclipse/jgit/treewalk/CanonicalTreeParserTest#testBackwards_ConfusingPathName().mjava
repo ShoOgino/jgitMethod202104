@@ -1,0 +1,20 @@
+	public void testBackwards_ConfusingPathName() throws Exception {
+		final String aVeryConfusingName = "confusing 644 entry 755 and others";
+		ctp.reset(mktree(entry(m644, "a", hash_a), entry(mt, aVeryConfusingName,
+				hash_sometree), entry(m644, "foo", hash_foo)));
+		ctp.next(3);
+		assertTrue(ctp.eof());
+
+		ctp.back(2);
+		assertFalse(ctp.eof());
+		assertEquals(mt.getBits(), ctp.mode);
+		assertEquals(aVeryConfusingName, path());
+		assertEquals(hash_sometree, ctp.getEntryObjectId());
+
+		ctp.back(1);
+		assertFalse(ctp.eof());
+		assertEquals(m644.getBits(), ctp.mode);
+		assertEquals("a", path());
+		assertEquals(hash_a, ctp.getEntryObjectId());
+	}
+

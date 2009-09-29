@@ -1,0 +1,16 @@
+	private static void reportDeleteFailure(final String name,
+			boolean failOnError, final File e) {
+		String severity;
+		if (failOnError)
+			severity = "Error";
+		else
+			severity = "Warning";
+		String msg = severity + ": Failed to delete " + e;
+		if (name != null)
+			msg += " in " + name;
+		if (failOnError)
+			fail(msg);
+		else
+			System.out.println(msg);
+	}
+

@@ -1,0 +1,32 @@
+	public void testDecodeUInt64() {
+		assertEquals(0L, NB.decodeUInt64(b(0, 0, 0, 0, 0, 0, 0, 0), 0));
+		assertEquals(0L, NB.decodeUInt64(padb(3, 0, 0, 0, 0, 0, 0, 0, 0), 3));
+
+		assertEquals(3L, NB.decodeUInt64(b(0, 0, 0, 0, 0, 0, 0, 3), 0));
+		assertEquals(3L, NB.decodeUInt64(padb(3, 0, 0, 0, 0, 0, 0, 0, 3), 3));
+
+		assertEquals(0xdeadbeefL, NB.decodeUInt64(b(0, 0, 0, 0, 0xde, 0xad,
+				0xbe, 0xef), 0));
+		assertEquals(0xdeadbeefL, NB.decodeUInt64(padb(3, 0, 0, 0, 0, 0xde,
+				0xad, 0xbe, 0xef), 3));
+
+		assertEquals(0x0310adefL, NB.decodeUInt64(b(0, 0, 0, 0, 0x03, 0x10,
+				0xad, 0xef), 0));
+		assertEquals(0x0310adefL, NB.decodeUInt64(padb(3, 0, 0, 0, 0, 0x03,
+				0x10, 0xad, 0xef), 3));
+
+		assertEquals(0xc0ffee78deadbeefL, NB.decodeUInt64(b(0xc0, 0xff, 0xee,
+				0x78, 0xde, 0xad, 0xbe, 0xef), 0));
+		assertEquals(0xc0ffee78deadbeefL, NB.decodeUInt64(padb(3, 0xc0, 0xff,
+				0xee, 0x78, 0xde, 0xad, 0xbe, 0xef), 3));
+
+		assertEquals(0x00000000ffffffffL, NB.decodeUInt64(b(0, 0, 0, 0, 0xff,
+				0xff, 0xff, 0xff), 0));
+		assertEquals(0x00000000ffffffffL, NB.decodeUInt64(padb(3, 0, 0, 0, 0,
+				0xff, 0xff, 0xff, 0xff), 3));
+		assertEquals(0xffffffffffffffffL, NB.decodeUInt64(b(0xff, 0xff, 0xff,
+				0xff, 0xff, 0xff, 0xff, 0xff), 0));
+		assertEquals(0xffffffffffffffffL, NB.decodeUInt64(padb(3, 0xff, 0xff,
+				0xff, 0xff, 0xff, 0xff, 0xff, 0xff), 3));
+	}
+

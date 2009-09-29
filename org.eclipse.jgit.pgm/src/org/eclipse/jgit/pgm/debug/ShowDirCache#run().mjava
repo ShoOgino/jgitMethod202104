@@ -1,0 +1,24 @@
+	@Override
+	protected void run() throws Exception {
+		final SimpleDateFormat fmt;
+		fmt = new SimpleDateFormat("yyyyMMdd,HHmmss.SSS");
+
+		final DirCache cache = DirCache.read(db);
+		for (int i = 0; i < cache.getEntryCount(); i++) {
+			final DirCacheEntry ent = cache.getEntry(i);
+			final FileMode mode = FileMode.fromBits(ent.getRawMode());
+			final int len = ent.getLength();
+			final Date mtime = new Date(ent.getLastModified());
+
+			out.print(mode);
+			out.format(" %6d", len);
+			out.print(' ');
+			out.print(fmt.format(mtime));
+			out.print(' ');
+			out.print(ent.getObjectId().name());
+			out.print('\t');
+			out.print(ent.getPathString());
+			out.println();
+		}
+	}
+

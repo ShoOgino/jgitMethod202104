@@ -1,0 +1,18 @@
+	/**
+	 * Create an iterator for a subtree of an existing iterator.
+	 * 
+	 * @param p
+	 *            parent tree iterator.
+	 */
+	protected AbstractTreeIterator(final AbstractTreeIterator p) {
+		parent = p;
+		path = p.path;
+		pathOffset = p.pathLen + 1;
+		try {
+			path[pathOffset - 1] = '/';
+		} catch (ArrayIndexOutOfBoundsException e) {
+			growPath(p.pathLen);
+			path[pathOffset - 1] = '/';
+		}
+	}
+

@@ -1,0 +1,19 @@
+	public void testRenameBranchNoPreviousLog() throws IOException {
+		assertFalse("precondition, no log on old branchg", new File(db
+				.getDirectory(), "logs/refs/heads/b").exists());
+		ObjectId rb = db.resolve("refs/heads/b");
+		ObjectId oldHead = db.resolve(Constants.HEAD);
+		assertFalse(rb.equals(oldHead)); // assumption for this test
+		RefRename renameRef = db.renameRef("refs/heads/b",
+				"refs/heads/new/name");
+		Result result = renameRef.rename();
+		assertEquals(Result.RENAMED, result);
+		assertEquals(rb, db.resolve("refs/heads/new/name"));
+		assertNull(db.resolve("refs/heads/b"));
+		assertEquals(1, db.getReflogReader("new/name").getReverseEntries().size());
+		assertEquals("Branch: renamed b to new/name", db.getReflogReader("new/name")
+				.getLastEntry().getComment());
+		assertFalse(new File(db.getDirectory(), "logs/refs/heads/b").exists());
+		assertEquals(oldHead, db.resolve(Constants.HEAD)); // unchanged
+	}
+

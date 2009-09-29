@@ -1,0 +1,20 @@
+		public synchronized void run() {
+			while (!terminated && callingThread.isAlive()) {
+				try {
+					if (0 < deadline) {
+						final long delay = deadline - now();
+						if (delay <= 0) {
+							deadline = 0;
+							callingThread.interrupt();
+						} else {
+							wait(delay);
+						}
+					} else {
+						wait(1000);
+					}
+				} catch (InterruptedException e) {
+					// Treat an interrupt as notice to examine state.
+				}
+			}
+		}
+

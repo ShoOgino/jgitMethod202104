@@ -1,0 +1,28 @@
+	/**
+	 * Add an already existing tree object for walking.
+	 * <p>
+	 * The position of this tree is returned to the caller, in case the caller
+	 * has lost track of the order they added the trees into the walker.
+	 * <p>
+	 * The tree must have the same root as existing trees in the walk.
+	 * 
+	 * @param id
+	 *            identity of the tree object the caller wants walked.
+	 * @return position of this tree within the walker.
+	 * @throws MissingObjectException
+	 *             the given tree object does not exist in this repository.
+	 * @throws IncorrectObjectTypeException
+	 *             the given object id does not denote a tree, but instead names
+	 *             some other non-tree type of object. Note that commits are not
+	 *             trees, even if they are sometimes called a "tree-ish".
+	 * @throws CorruptObjectException
+	 *             the object claimed to be a tree, but its contents did not
+	 *             appear to be a tree. The repository may have data corruption.
+	 * @throws IOException
+	 *             a loose object or pack file could not be read.
+	 */
+	public int addTree(final ObjectId id) throws MissingObjectException,
+			IncorrectObjectTypeException, CorruptObjectException, IOException {
+		return addTree(parserFor(id));
+	}
+

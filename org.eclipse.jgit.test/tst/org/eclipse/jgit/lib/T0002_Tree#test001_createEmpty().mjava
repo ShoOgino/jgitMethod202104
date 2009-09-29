@@ -1,0 +1,18 @@
+	public void test001_createEmpty() throws IOException {
+		final Tree t = new Tree(db);
+		assertTrue("isLoaded", t.isLoaded());
+		assertTrue("isModified", t.isModified());
+		assertTrue("no parent", t.getParent() == null);
+		assertTrue("isRoot", t.isRoot());
+		assertTrue("no name", t.getName() == null);
+		assertTrue("no nameUTF8", t.getNameUTF8() == null);
+		assertTrue("has entries array", t.members() != null);
+		assertTrue("entries is empty", t.members().length == 0);
+		assertEquals("full name is empty", "", t.getFullName());
+		assertTrue("no id", t.getId() == null);
+		assertTrue("tree is self", t.getTree() == t);
+		assertTrue("database is r", t.getRepository() == db);
+		assertTrue("no foo child", t.findTreeMember("foo") == null);
+		assertTrue("no foo child", t.findBlobMember("foo") == null);
+	}
+

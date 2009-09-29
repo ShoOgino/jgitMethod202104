@@ -1,0 +1,77 @@
+	void processEntry(TreeEntry h, TreeEntry m, Entry i) throws IOException {
+				ObjectId iId = (i == null ? null : i.getObjectId());
+				ObjectId mId = (m == null ? null : m.getId());
+				ObjectId hId = (h == null ? null : h.getId());
+				
+				String name = (i != null ? i.getName() : 
+					(h != null ? h.getFullName() :
+						m.getFullName()));
+				
+				if (i == null) {
+					/*
+				    I (index)                H        M        Result
+			        -------------------------------------------------------
+			        0 nothing             nothing  nothing  (does not happen)
+			        1 nothing             nothing  exists   use M
+			        2 nothing             exists   nothing  remove path from index
+			        3 nothing             exists   exists   use M */
+					
+					if (h == null) {
+						updated.put(name,mId);
+					} else if (m == null) {
+						removed.add(name);
+					} else {
+						updated.put(name, mId);
+					}
+				} else if (h == null) {
+					/*
+					  clean I==H  I==M       H        M        Result
+			         -----------------------------------------------------
+			        4 yes   N/A   N/A     nothing  nothing  keep index
+			        5 no    N/A   N/A     nothing  nothing  keep index
+			
+			        6 yes   N/A   yes     nothing  exists   keep index
+			        7 no    N/A   yes     nothing  exists   keep index
+			        8 yes   N/A   no      nothing  exists   fail
+			        9 no    N/A   no      nothing  exists   fail       */
+					
+					if (m == null || mId.equals(iId)) {
+						if (hasParentBlob(merge, name)) {
+							if (i.isModified(root, true)) {
+								conflicts.add(name);
+							} else {
+								removed.add(name);
+							}
+						}
+					} else {
+						conflicts.add(name);
+					}
+				} else if (m == null) {
+					/*
+					10 yes   yes   N/A     exists   nothing  remove path from index
+			        11 no    yes   N/A     exists   nothing  fail
+			        12 yes   no    N/A     exists   nothing  fail
+			        13 no    no    N/A     exists   nothing  fail
+					 */
+			
+					if (hId.equals(iId)) {
+						if (i.isModified(root, true)) {
+							conflicts.add(name);
+						} else {
+							removed.add(name);
+						}
+					} else {
+						conflicts.add(name);
+					}
+				} else {
+					if (!hId.equals(mId) && !hId.equals(iId)
+							&& !mId.equals(iId)) {
+						conflicts.add(name);
+					} else if (hId.equals(iId) && !mId.equals(iId)) {
+						if (i.isModified(root, true))
+							conflicts.add(name);
+						else updated.put(name, mId);
+					}
+				} 
+			}
+

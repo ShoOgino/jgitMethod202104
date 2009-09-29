@@ -1,0 +1,20 @@
+	private void verifyOpenPack(final boolean thin) throws IOException {
+		if (thin) {
+			final InputStream is = new ByteArrayInputStream(os.toByteArray());
+			final IndexPack indexer = new IndexPack(db, is, packBase);
+			try {
+				indexer.index(new TextProgressMonitor());
+				fail("indexer should grumble about missing object");
+			} catch (IOException x) {
+				// expected
+			}
+		}
+		final InputStream is = new ByteArrayInputStream(os.toByteArray());
+		final IndexPack indexer = new IndexPack(db, is, packBase);
+		indexer.setKeepEmpty(true);
+		indexer.setFixThin(thin);
+		indexer.setIndexVersion(2);
+		indexer.index(new TextProgressMonitor());
+		pack = new PackFile(indexFile, packFile);
+	}
+

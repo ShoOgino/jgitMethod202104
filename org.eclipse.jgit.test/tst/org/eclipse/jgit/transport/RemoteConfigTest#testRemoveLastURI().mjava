@@ -1,0 +1,22 @@
+	public void testRemoveLastURI() throws Exception {
+		readConfig("");
+
+		final URIish a = new URIish("/some/dir");
+		final URIish b = new URIish("/another/dir");
+		final URIish c = new URIish("/more/dirs");
+		final RemoteConfig rc = new RemoteConfig(config, "backup");
+		assertTrue(rc.addURI(a));
+		assertTrue(rc.addURI(b));
+		assertTrue(rc.addURI(c));
+
+		assertEquals(3, rc.getURIs().size());
+		assertSame(a, rc.getURIs().get(0));
+		assertSame(b, rc.getURIs().get(1));
+		assertSame(c, rc.getURIs().get(2));
+
+		assertTrue(rc.removeURI(c));
+		assertEquals(2, rc.getURIs().size());
+		assertSame(a, rc.getURIs().get(0));
+		assertSame(b, rc.getURIs().get(1));
+	}
+

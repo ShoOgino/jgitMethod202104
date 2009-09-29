@@ -1,0 +1,24 @@
+	public void testCheckoutOutChanges() throws IOException {
+		setupCase(mk("foo"), mk("foo/bar"), mk("foo"));
+		checkout();
+		
+		assertFalse(new File(trash, "foo").isFile());
+		assertTrue(new File(trash, "foo/bar").isFile());
+		recursiveDelete(new File(trash, "foo"));
+
+		setupCase(mk("foo/bar"), mk("foo"), mk("foo/bar"));
+		checkout();
+		
+		assertFalse(new File(trash, "foo/bar").isFile());
+		assertTrue(new File(trash, "foo").isFile());
+		
+		setupCase(mk("foo"), mkmap("foo", "qux"), mkmap("foo", "bar"));
+		
+		try {
+			checkout();
+			fail("did not throw exception");
+		} catch (CheckoutConflictException e) {
+			// should have thrown
+		}
+	}
+

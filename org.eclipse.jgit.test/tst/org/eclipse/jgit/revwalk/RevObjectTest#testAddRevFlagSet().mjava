@@ -1,0 +1,14 @@
+	public void testAddRevFlagSet() throws Exception {
+		final RevCommit a = commit();
+		final RevFlag flag1 = rw.newFlag("flag1");
+		final RevFlag flag2 = rw.newFlag("flag2");
+		final RevFlagSet s = new RevFlagSet();
+		s.add(flag1);
+		s.add(flag2);
+
+		assertEquals(0, a.flags);
+
+		a.add(s);
+		assertEquals(flag1.mask | flag2.mask, a.flags);
+	}
+

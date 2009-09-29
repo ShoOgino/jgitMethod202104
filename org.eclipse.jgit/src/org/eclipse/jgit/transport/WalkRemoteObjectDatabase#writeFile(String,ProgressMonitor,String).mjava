@@ -1,0 +1,32 @@
+	/**
+	 * Open a remote file for writing.
+	 * <p>
+	 * Path may start with <code>../</code> to request writing of a file that
+	 * resides in the repository itself.
+	 * <p>
+	 * The requested path may or may not exist. If the path already exists as a
+	 * file the file should be truncated and completely replaced.
+	 * <p>
+	 * This method creates any missing parent directories, if necessary.
+	 *
+	 * @param path
+	 *            name of the file to write, relative to the current object
+	 *            database.
+	 * @return stream to write into this file. Caller must close the stream to
+	 *         complete the write request. The stream is not buffered and each
+	 *         write may cause a network request/response so callers should
+	 *         buffer to smooth out small writes.
+	 * @param monitor
+	 *            (optional) progress monitor to post write completion to during
+	 *            the stream's close method.
+	 * @param monitorTask
+	 *            (optional) task name to display during the close method.
+	 * @throws IOException
+	 *             writing is not supported, or attempting to write the file
+	 *             failed, possibly due to permissions or remote disk full, etc.
+	 */
+	OutputStream writeFile(final String path, final ProgressMonitor monitor,
+			final String monitorTask) throws IOException {
+		throw new IOException("Writing of '" + path + "' not supported.");
+	}
+

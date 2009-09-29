@@ -1,0 +1,19 @@
+	/**
+	 * Include an object (and everything reachable from it) in the bundle.
+	 *
+	 * @param name
+	 *            name the recipient can discover this object as from the
+	 *            bundle's list of advertised refs . The name must be a valid
+	 *            ref format and must not have already been included in this
+	 *            bundle writer.
+	 * @param id
+	 *            object to pack. Multiple refs may point to the same object.
+	 */
+	public void include(final String name, final AnyObjectId id) {
+		if (!Repository.isValidRefName(name))
+			throw new IllegalArgumentException("Invalid ref name: " + name);
+		if (include.containsKey(name))
+			throw new IllegalStateException("Duplicate ref: " + name);
+		include.put(name, id.toObjectId());
+	}
+

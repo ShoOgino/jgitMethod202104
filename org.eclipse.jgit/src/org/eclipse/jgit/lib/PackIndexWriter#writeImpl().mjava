@@ -1,0 +1,24 @@
+	/**
+	 * Writes the index file to {@link #out}.
+	 * <p>
+	 * Implementations should go something like:
+	 *
+	 * <pre>
+	 * writeFanOutTable();
+	 * for (final PackedObjectInfo po : entries)
+	 * 	writeOneEntry(po);
+	 * writeChecksumFooter();
+	 * </pre>
+	 *
+	 * <p>
+	 * Where the logic for <code>writeOneEntry</code> is specific to the index
+	 * format in use. Additional headers/footers may be used if necessary and
+	 * the {@link #entries} collection may be iterated over more than once if
+	 * necessary. Implementors therefore have complete control over the data.
+	 *
+	 * @throws IOException
+	 *             an error occurred while writing to the output stream, or this
+	 *             index format cannot store the object data supplied.
+	 */
+	protected abstract void writeImpl() throws IOException;
+

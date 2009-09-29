@@ -1,0 +1,21 @@
+	/**
+	 * Clean a previously quoted input, decoding the result via UTF-8.
+	 * <p>
+	 * This method must match quote such that:
+	 *
+	 * <pre>
+	 * a.equals(dequote(quote(a)));
+	 * </pre>
+	 *
+	 * is true for any <code>a</code>.
+	 *
+	 * @param in
+	 *            a Unicode string to remove quoting from.
+	 * @return the cleaned string.
+	 * @see #dequote(byte[], int, int)
+	 */
+	public String dequote(final String in) {
+		final byte[] b = Constants.encode(in);
+		return dequote(b, 0, b.length);
+	}
+

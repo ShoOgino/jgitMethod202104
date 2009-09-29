@@ -1,0 +1,27 @@
+	/**
+	 * Remove the given flag from all commits.
+	 * <p>
+	 * This method is actually implemented in terms of:
+	 * <code>applyFlag(RevFilter.NONE, flag, rangeBegin, rangeEnd)</code>.
+	 * 
+	 * @param flag
+	 *            the flag to remove. Applications are responsible for
+	 *            allocating this flag from the source RevWalk.
+	 * @param rangeBegin
+	 *            first commit within the list to begin testing at, inclusive.
+	 *            Must not be negative, but may be beyond the end of the list.
+	 * @param rangeEnd
+	 *            last commit within the list to end testing at, exclusive. If
+	 *            smaller than or equal to <code>rangeBegin</code> then no
+	 *            commits will be tested.
+	 */
+	public void clearFlag(final RevFlag flag, final int rangeBegin,
+			final int rangeEnd) {
+		try {
+			applyFlag(RevFilter.NONE, flag, rangeBegin, rangeEnd);
+		} catch (IOException e) {
+			// Never happen. The filter we use does not throw any
+			// exceptions, for any reason.
+		}
+	}
+

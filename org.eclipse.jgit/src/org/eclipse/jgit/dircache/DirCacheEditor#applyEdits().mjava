@@ -1,0 +1,36 @@
+	private void applyEdits() {
+		Collections.sort(edits, EDIT_CMP);
+
+		final int maxIdx = cache.getEntryCount();
+		int lastIdx = 0;
+		for (final PathEdit e : edits) {
+			int eIdx = cache.findEntry(e.path, e.path.length);
+			final boolean missing = eIdx < 0;
+			if (eIdx < 0)
+				eIdx = -(eIdx + 1);
+			final int cnt = Math.min(eIdx, maxIdx) - lastIdx;
+			if (cnt > 0)
+				fastKeep(lastIdx, cnt);
+			lastIdx = missing ? eIdx : cache.nextEntry(eIdx);
+
+			if (e instanceof DeletePath)
+				continue;
+			if (e instanceof DeleteTree) {
+				lastIdx = cache.nextEntry(e.path, e.path.length, eIdx);
+				continue;
+			}
+
+			final DirCacheEntry ent;
+			if (missing)
+				ent = new DirCacheEntry(e.path);
+			else
+				ent = cache.getEntry(eIdx);
+			e.apply(ent);
+			fastAdd(ent);
+		}
+
+		final int cnt = maxIdx - lastIdx;
+		if (cnt > 0)
+			fastKeep(lastIdx, cnt);
+	}
+

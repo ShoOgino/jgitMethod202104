@@ -1,0 +1,11 @@
+	private static File findGitDir() {
+		File current = new File(".").getAbsoluteFile();
+		while (current != null) {
+			final File gitDir = new File(current, ".git");
+			if (gitDir.isDirectory())
+				return gitDir;
+			current = current.getParentFile();
+		}
+		return null;
+	}
+

@@ -1,0 +1,27 @@
+	@Override
+	void openObjectInAllPacks1(final Collection<PackedObjectLoader> out,
+			final WindowCursor curs, final AnyObjectId objectId)
+			throws IOException {
+		PackList pList = packList.get();
+		SEARCH: for (;;) {
+			for (final PackFile p : pList.packs) {
+				try {
+					final PackedObjectLoader ldr = p.get(curs, objectId);
+					if (ldr != null) {
+						out.add(ldr);
+					}
+				} catch (PackMismatchException e) {
+					// Pack was modified; refresh the entire pack list.
+					//
+					pList = scanPacks(pList);
+					continue SEARCH;
+				} catch (IOException e) {
+					// Assume the pack is corrupted.
+					//
+					removePack(p);
+				}
+			}
+			break SEARCH;
+		}
+	}
+

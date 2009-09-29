@@ -1,0 +1,7 @@
+	synchronized boolean endWindowCache() {
+		final boolean r = --activeWindows == 0;
+		if (r && activeCopyRawData == 0)
+			doClose();
+		return r;
+	}
+

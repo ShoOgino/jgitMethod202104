@@ -1,0 +1,32 @@
+	/**
+	 * Parse a name line (e.g. author, committer, tagger) into a PersonIdent.
+	 * <p>
+	 * When passing in a value for <code>nameB</code> callers should use the
+	 * return value of {@link #author(byte[], int)} or
+	 * {@link #committer(byte[], int)}, as these methods provide the proper
+	 * position within the buffer.
+	 * 
+	 * @param raw
+	 *            the buffer to parse character data from.
+	 * @param nameB
+	 *            first position of the identity information. This should be the
+	 *            first position after the space which delimits the header field
+	 *            name (e.g. "author" or "committer") from the rest of the
+	 *            identity line.
+	 * @return the parsed identity. Never null.
+	 */
+	public static PersonIdent parsePersonIdent(final byte[] raw, final int nameB) {
+		final Charset cs = parseEncoding(raw);
+		final int emailB = nextLF(raw, nameB, '<');
+		final int emailE = nextLF(raw, emailB, '>');
+
+		final String name = decode(cs, raw, nameB, emailB - 2);
+		final String email = decode(cs, raw, emailB, emailE - 1);
+
+		final MutableInteger ptrout = new MutableInteger();
+		final long when = parseLongBase10(raw, emailE + 1, ptrout);
+		final int tz = parseTimeZoneOffset(raw, ptrout.value);
+
+		return new PersonIdent(name, email, when * 1000L, tz);
+	}
+

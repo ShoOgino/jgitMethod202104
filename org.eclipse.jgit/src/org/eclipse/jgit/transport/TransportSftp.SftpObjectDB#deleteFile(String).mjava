@@ -1,0 +1,30 @@
+		@Override
+		void deleteFile(final String path) throws IOException {
+			try {
+				ftp.rm(path);
+			} catch (SftpException je) {
+				if (je.id == ChannelSftp.SSH_FX_NO_SUCH_FILE)
+					return;
+				throw new TransportException("Can't delete " + objectsPath
+						+ "/" + path + ": " + je.getMessage(), je);
+			}
+
+			// Prune any now empty directories.
+			//
+			String dir = path;
+			int s = dir.lastIndexOf('/');
+			while (s > 0) {
+				try {
+					dir = dir.substring(0, s);
+					ftp.rmdir(dir);
+					s = dir.lastIndexOf('/');
+				} catch (SftpException je) {
+					// If we cannot delete it, leave it alone. It may have
+					// entries still in it, or maybe we lack write access on
+					// the parent. Either way it isn't a fatal error.
+					//
+					break;
+				}
+			}
+		}
+

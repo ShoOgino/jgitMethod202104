@@ -1,0 +1,11 @@
+	private void createVerifyOpenPack(final Collection<ObjectId> interestings,
+			final Collection<ObjectId> uninterestings, final boolean thin,
+			final boolean ignoreMissingUninteresting)
+			throws MissingObjectException, IOException {
+		writer.setThin(thin);
+		writer.setIgnoreMissingUninteresting(ignoreMissingUninteresting);
+		writer.preparePack(interestings, uninterestings);
+		writer.writePack(cos);
+		verifyOpenPack(thin);
+	}
+

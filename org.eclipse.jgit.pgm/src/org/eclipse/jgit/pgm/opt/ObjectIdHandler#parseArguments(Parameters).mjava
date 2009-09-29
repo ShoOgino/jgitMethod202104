@@ -1,0 +1,17 @@
+	@Override
+	public int parseArguments(final Parameters params) throws CmdLineException {
+		final String name = params.getParameter(0);
+		final ObjectId id;
+		try {
+			id = clp.getRepository().resolve(name);
+		} catch (IOException e) {
+			throw new CmdLineException(e.getMessage());
+		}
+		if (id != null) {
+			setter.addValue(id);
+			return 1;
+		}
+
+		throw new CmdLineException(name + " is not an object");
+	}
+

@@ -1,0 +1,29 @@
+	/**
+	 * Can this string be safely handled by a substring filter?
+	 * 
+	 * @param pattern
+	 *            the pattern text proposed by the user.
+	 * @return true if a substring filter can perform this pattern match; false
+	 *         if {@link PatternMatchRevFilter} must be used instead.
+	 */
+	public static boolean safe(final String pattern) {
+		for (int i = 0; i < pattern.length(); i++) {
+			final char c = pattern.charAt(i);
+			switch (c) {
+			case '.':
+			case '?':
+			case '*':
+			case '+':
+			case '{':
+			case '}':
+			case '(':
+			case ')':
+			case '[':
+			case ']':
+			case '\\':
+				return false;
+			}
+		}
+		return true;
+	}
+

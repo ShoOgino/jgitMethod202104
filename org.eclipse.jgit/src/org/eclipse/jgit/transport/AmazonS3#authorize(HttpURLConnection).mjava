@@ -1,0 +1,47 @@
+	private void authorize(final HttpURLConnection c) throws IOException {
+		final Map<String, List<String>> reqHdr = c.getRequestProperties();
+		final SortedMap<String, String> sigHdr = new TreeMap<String, String>();
+		for (final Map.Entry<String, List<String>> entry : reqHdr.entrySet()) {
+			final String hdr = entry.getKey();
+			if (isSignedHeader(hdr))
+				sigHdr.put(StringUtils.toLowerCase(hdr), toCleanString(entry.getValue()));
+		}
+
+		final StringBuilder s = new StringBuilder();
+		s.append(c.getRequestMethod());
+		s.append('\n');
+
+		s.append(remove(sigHdr, "content-md5"));
+		s.append('\n');
+
+		s.append(remove(sigHdr, "content-type"));
+		s.append('\n');
+
+		s.append(remove(sigHdr, "date"));
+		s.append('\n');
+
+		for (final Map.Entry<String, String> e : sigHdr.entrySet()) {
+			s.append(e.getKey());
+			s.append(':');
+			s.append(e.getValue());
+			s.append('\n');
+		}
+
+		final String host = c.getURL().getHost();
+		s.append('/');
+		s.append(host.substring(0, host.length() - DOMAIN.length() - 1));
+		s.append(c.getURL().getPath());
+
+		final String sec;
+		try {
+			final Mac m = Mac.getInstance(HMAC);
+			m.init(privateKey);
+			sec = Base64.encodeBytes(m.doFinal(s.toString().getBytes("UTF-8")));
+		} catch (NoSuchAlgorithmException e) {
+			throw new IOException("No " + HMAC + " support:" + e.getMessage());
+		} catch (InvalidKeyException e) {
+			throw new IOException("Invalid key: " + e.getMessage());
+		}
+		c.setRequestProperty("Authorization", "AWS " + publicKey + ":" + sec);
+	}
+

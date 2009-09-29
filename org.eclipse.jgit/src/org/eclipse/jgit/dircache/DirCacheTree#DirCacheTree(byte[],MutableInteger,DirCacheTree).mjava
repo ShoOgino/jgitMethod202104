@@ -1,0 +1,49 @@
+	DirCacheTree(final byte[] in, final MutableInteger off,
+			final DirCacheTree myParent) {
+		parent = myParent;
+
+		int ptr = RawParseUtils.next(in, off.value, '\0');
+		final int nameLen = ptr - off.value - 1;
+		if (nameLen > 0) {
+			encodedName = new byte[nameLen];
+			System.arraycopy(in, off.value, encodedName, 0, nameLen);
+		} else
+			encodedName = NO_NAME;
+
+		entrySpan = RawParseUtils.parseBase10(in, ptr, off);
+		final int subcnt = RawParseUtils.parseBase10(in, off.value, off);
+		off.value = RawParseUtils.next(in, off.value, '\n');
+
+		if (entrySpan >= 0) {
+			// Valid trees have a positive entry count and an id of a
+			// tree object that should exist in the object database.
+			//
+			id = ObjectId.fromRaw(in, off.value);
+			off.value += Constants.OBJECT_ID_LENGTH;
+		}
+
+		if (subcnt > 0) {
+			boolean alreadySorted = true;
+			children = new DirCacheTree[subcnt];
+			for (int i = 0; i < subcnt; i++) {
+				children[i] = new DirCacheTree(in, off, this);
+
+				// C Git's ordering differs from our own; it prefers to
+				// sort by length first. This sometimes produces a sort
+				// we do not desire. On the other hand it may have been
+				// created by us, and be sorted the way we want.
+				//
+				if (alreadySorted && i > 0
+						&& TREE_CMP.compare(children[i - 1], children[i]) > 0)
+					alreadySorted = false;
+			}
+			if (!alreadySorted)
+				Arrays.sort(children, 0, subcnt, TREE_CMP);
+		} else {
+			// Leaf level trees have no children, only (file) entries.
+			//
+			children = NO_CHILDREN;
+		}
+		childCnt = subcnt;
+	}
+

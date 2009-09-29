@@ -1,0 +1,44 @@
+	@Override
+	protected void run() throws Exception {
+		if (delete || deleteForce)
+			delete(deleteForce);
+		else {
+			if (branches.size() > 2)
+				throw die("Too many refs given\n" + new CmdLineParser(this).printExample(ExampleMode.ALL));
+
+			if (branches.size() > 0) {
+				String newHead = branches.get(0);
+				String startBranch;
+				if (branches.size() == 2)
+					startBranch = branches.get(1);
+				else
+					startBranch = Constants.HEAD;
+				Ref startRef = db.getRef(startBranch);
+				ObjectId startAt = db.resolve(startBranch + "^0");
+				if (startRef != null)
+					startBranch = startRef.getName();
+				else
+					startBranch = startAt.name();
+				startBranch = db.shortenRefName(startBranch);
+				String newRefName = newHead;
+				if (!newRefName.startsWith(Constants.R_HEADS))
+					newRefName = Constants.R_HEADS + newRefName;
+				if (!Repository.isValidRefName(newRefName))
+					throw die(String.format("%s is not a valid ref name", newRefName));
+				if (!createForce && db.resolve(newRefName) != null)
+					throw die(String.format("branch %s already exists", newHead));
+				RefUpdate updateRef = db.updateRef(newRefName);
+				updateRef.setNewObjectId(startAt);
+				updateRef.setForceUpdate(createForce);
+				updateRef.setRefLogMessage("branch: Created from " + startBranch, false);
+				Result update = updateRef.update();
+				if (update == Result.REJECTED)
+					throw die(String.format("Could not create branch %s: %s", newHead, update.toString()));
+			} else {
+				if (verbose)
+					rw = new RevWalk(db);
+				list();
+			}
+		}
+	}
+

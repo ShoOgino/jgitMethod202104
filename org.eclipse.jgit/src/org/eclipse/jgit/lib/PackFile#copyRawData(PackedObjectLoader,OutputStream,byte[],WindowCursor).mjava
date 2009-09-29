@@ -1,0 +1,40 @@
+	final void copyRawData(final PackedObjectLoader loader,
+			final OutputStream out, final byte buf[], final WindowCursor curs)
+			throws IOException {
+		final long objectOffset = loader.objectOffset;
+		final long dataOffset = loader.dataOffset;
+		final int cnt = (int) (findEndOffset(objectOffset) - dataOffset);
+		final PackIndex idx = idx();
+
+		if (idx.hasCRC32Support()) {
+			final CRC32 crc = new CRC32();
+			int headerCnt = (int) (dataOffset - objectOffset);
+			while (headerCnt > 0) {
+				final int toRead = Math.min(headerCnt, buf.length);
+				readFully(objectOffset, buf, 0, toRead, curs);
+				crc.update(buf, 0, toRead);
+				headerCnt -= toRead;
+			}
+			final CheckedOutputStream crcOut = new CheckedOutputStream(out, crc);
+			copyToStream(dataOffset, buf, cnt, crcOut, curs);
+			final long computed = crc.getValue();
+
+			final ObjectId id = findObjectForOffset(objectOffset);
+			final long expected = idx.findCRC32(id);
+			if (computed != expected)
+				throw new CorruptObjectException("Object at " + dataOffset
+						+ " in " + getPackFile() + " has bad zlib stream");
+		} else {
+			try {
+				curs.inflateVerify(this, dataOffset);
+			} catch (DataFormatException dfe) {
+				final CorruptObjectException coe;
+				coe = new CorruptObjectException("Object at " + dataOffset
+						+ " in " + getPackFile() + " has bad zlib stream");
+				coe.initCause(dfe);
+				throw coe;
+			}
+			copyToStream(dataOffset, buf, cnt, out, curs);
+		}
+	}
+

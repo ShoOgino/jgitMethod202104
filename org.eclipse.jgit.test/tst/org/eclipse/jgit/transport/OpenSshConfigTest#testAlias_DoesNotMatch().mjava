@@ -1,0 +1,10 @@
+	public void testAlias_DoesNotMatch() throws Exception {
+		config("Host orcz\n" + "\tHostName repo.or.cz\n");
+		final Host h = osc.lookup("repo.or.cz");
+		assertNotNull(h);
+		assertEquals("repo.or.cz", h.getHostName());
+		assertEquals("jex_junit", h.getUser());
+		assertEquals(22, h.getPort());
+		assertNull(h.getIdentityFile());
+	}
+

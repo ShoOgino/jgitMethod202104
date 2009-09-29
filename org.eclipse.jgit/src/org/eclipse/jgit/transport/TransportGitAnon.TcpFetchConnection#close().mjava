@@ -1,0 +1,15 @@
+		@Override
+		public void close() {
+			super.close();
+
+			if (sock != null) {
+				try {
+					sock.close();
+				} catch (IOException err) {
+					// Ignore errors during close.
+				} finally {
+					sock = null;
+				}
+			}
+		}
+

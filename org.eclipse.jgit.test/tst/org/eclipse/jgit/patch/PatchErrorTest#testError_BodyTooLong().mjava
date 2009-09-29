@@ -1,0 +1,13 @@
+	public void testError_BodyTooLong() throws IOException {
+		final Patch p = parseTestPatchFile();
+		assertEquals(1, p.getFiles().size());
+		assertEquals(1, p.getErrors().size());
+
+		final FormatError e = p.getErrors().get(0);
+		assertSame(FormatError.Severity.WARNING, e.getSeverity());
+		assertEquals("Hunk header 4:11 does not match body line count of 4:12",
+				e.getMessage());
+		assertEquals(349, e.getOffset());
+		assertTrue(e.getLineText().startsWith("@@ -109,4 +109,11 @@ assert"));
+	}
+

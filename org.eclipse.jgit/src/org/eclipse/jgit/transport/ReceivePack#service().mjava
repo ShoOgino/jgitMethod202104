@@ -1,0 +1,47 @@
+	private void service() throws IOException {
+		sendAdvertisedRefs();
+		recvCommands();
+		if (!commands.isEmpty()) {
+			enableCapabilities();
+
+			if (needPack()) {
+				try {
+					receivePack();
+					if (isCheckReceivedObjects())
+						checkConnectivity();
+					unpackError = null;
+				} catch (IOException err) {
+					unpackError = err;
+				} catch (RuntimeException err) {
+					unpackError = err;
+				} catch (Error err) {
+					unpackError = err;
+				}
+			}
+
+			if (unpackError == null) {
+				validateCommands();
+				executeCommands();
+			}
+			unlockPack();
+
+			if (reportStatus) {
+				sendStatusReport(true, new Reporter() {
+					void sendString(final String s) throws IOException {
+						pckOut.writeString(s + "\n");
+					}
+				});
+				pckOut.end();
+			} else if (msgs != null) {
+				sendStatusReport(false, new Reporter() {
+					void sendString(final String s) throws IOException {
+						msgs.println(s);
+					}
+				});
+				msgs.flush();
+			}
+
+			postReceive.onPostReceive(this, filterCommands(Result.OK));
+		}
+	}
+

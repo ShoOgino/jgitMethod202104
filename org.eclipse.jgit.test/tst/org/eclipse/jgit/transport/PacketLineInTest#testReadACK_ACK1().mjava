@@ -1,0 +1,11 @@
+	public void testReadACK_ACK1() throws IOException {
+		final ObjectId expid = ObjectId
+				.fromString("fcfcfb1fd94829c1a1704f894fc111d14770d34e");
+		final MutableObjectId actid = new MutableObjectId();
+
+		init("0031ACK fcfcfb1fd94829c1a1704f894fc111d14770d34e\n");
+		assertSame(PacketLineIn.AckNackResult.ACK, in.readACK(actid));
+		assertTrue(actid.equals(expid));
+		assertEOF();
+	}
+

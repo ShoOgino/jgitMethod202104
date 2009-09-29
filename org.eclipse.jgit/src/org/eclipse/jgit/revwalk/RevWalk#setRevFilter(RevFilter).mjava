@@ -1,0 +1,25 @@
+	/**
+	 * Set the commit filter for this walker.
+	 * <p>
+	 * Multiple filters may be combined by constructing an arbitrary tree of
+	 * <code>AndRevFilter</code> or <code>OrRevFilter</code> instances to
+	 * describe the boolean expression required by the application. Custom
+	 * filter implementations may also be constructed by applications.
+	 * <p>
+	 * Note that filters are not thread-safe and may not be shared by concurrent
+	 * RevWalk instances. Every RevWalk must be supplied its own unique filter,
+	 * unless the filter implementation specifically states it is (and always
+	 * will be) thread-safe. Callers may use {@link RevFilter#clone()} to create
+	 * a unique filter tree for this RevWalk instance.
+	 * 
+	 * @param newFilter
+	 *            the new filter. If null the special {@link RevFilter#ALL}
+	 *            filter will be used instead, as it matches every commit.
+	 * @see org.eclipse.jgit.revwalk.filter.AndRevFilter
+	 * @see org.eclipse.jgit.revwalk.filter.OrRevFilter
+	 */
+	public void setRevFilter(final RevFilter newFilter) {
+		assertNotStarted();
+		filter = newFilter != null ? newFilter : RevFilter.ALL;
+	}
+

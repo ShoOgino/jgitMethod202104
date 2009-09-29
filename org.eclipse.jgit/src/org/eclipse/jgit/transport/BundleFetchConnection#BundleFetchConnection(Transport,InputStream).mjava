@@ -1,0 +1,23 @@
+	BundleFetchConnection(Transport transportBundle, final InputStream src) throws TransportException {
+		transport = transportBundle;
+		bin = new BufferedInputStream(src, IndexPack.BUFFER_SIZE);
+		try {
+			switch (readSignature()) {
+			case 2:
+				readBundleV2();
+				break;
+			default:
+				throw new TransportException(transport.uri, "not a bundle");
+			}
+		} catch (TransportException err) {
+			close();
+			throw err;
+		} catch (IOException err) {
+			close();
+			throw new TransportException(transport.uri, err.getMessage(), err);
+		} catch (RuntimeException err) {
+			close();
+			throw new TransportException(transport.uri, err.getMessage(), err);
+		}
+	}
+

@@ -1,0 +1,16 @@
+	void add(final RevObject c) {
+		Block b = tail;
+		if (b == null) {
+			b = free.newBlock();
+			b.add(c);
+			head = b;
+			tail = b;
+			return;
+		} else if (b.isFull()) {
+			b = free.newBlock();
+			tail.next = b;
+			tail = b;
+		}
+		b.add(c);
+	}
+

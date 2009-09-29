@@ -1,0 +1,8 @@
+	@Override
+	public FetchConnection openFetch() throws TransportException {
+		final String up = getOptionUploadPack();
+		if ("git-upload-pack".equals(up) || "git upload-pack".equals(up))
+			return new InternalLocalFetchConnection();
+		return new ForkLocalFetchConnection();
+	}
+

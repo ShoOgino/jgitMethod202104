@@ -1,0 +1,17 @@
+		private void add(final int tree, final int stage) throws IOException {
+			final AbstractTreeIterator i = getTree(tree);
+			if (i != null) {
+				if (FileMode.TREE.equals(tw.getRawMode(tree))) {
+					builder.addTree(tw.getRawPath(), stage, db, tw
+							.getObjectId(tree));
+				} else {
+					final DirCacheEntry e;
+
+					e = new DirCacheEntry(tw.getRawPath(), stage);
+					e.setObjectIdFromRaw(i.idBuffer(), i.idOffset());
+					e.setFileMode(tw.getFileMode(tree));
+					builder.add(e);
+				}
+			}
+		}
+

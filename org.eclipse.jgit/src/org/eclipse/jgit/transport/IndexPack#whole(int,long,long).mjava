@@ -1,0 +1,15 @@
+	private void whole(final int type, final long pos, final long sz)
+			throws IOException {
+		final byte[] data = inflateFromInput(sz);
+		objectDigest.update(Constants.encodedTypeString(type));
+		objectDigest.update((byte) ' ');
+		objectDigest.update(Constants.encodeASCII(sz));
+		objectDigest.update((byte) 0);
+		objectDigest.update(data);
+		tempObjectId.fromRaw(objectDigest.digest(), 0);
+
+		verifySafeObject(tempObjectId, type, data);
+		final int crc32 = (int) crc.getValue();
+		entries[entryCount++] = new PackedObjectInfo(pos, crc32, tempObjectId);
+	}
+

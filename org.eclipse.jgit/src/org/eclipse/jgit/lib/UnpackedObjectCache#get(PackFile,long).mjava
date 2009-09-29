@@ -1,0 +1,12 @@
+	static synchronized Entry get(final PackFile pack, final long position) {
+		final Slot e = cache[hash(position)];
+		if (e.provider == pack && e.position == position) {
+			final Entry buf = e.data.get();
+			if (buf != null) {
+				moveToHead(e);
+				return buf;
+			}
+		}
+		return null;
+	}
+

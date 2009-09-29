@@ -1,0 +1,47 @@
+	public void tryRenameWhenLocked(String toLock, String fromName,
+			String toName, String headPointsTo) throws IOException {
+		// setup
+		db.writeSymref(Constants.HEAD, headPointsTo);
+		ObjectId oldfromId = db.resolve(fromName);
+		ObjectId oldHeadId = db.resolve(Constants.HEAD);
+		RefLogWriter.writeReflog(db, oldfromId, oldfromId, "Just a message",
+				fromName);
+		List<org.eclipse.jgit.lib.ReflogReader.Entry> oldFromLog = db
+				.getReflogReader(fromName).getReverseEntries();
+		List<org.eclipse.jgit.lib.ReflogReader.Entry> oldHeadLog = oldHeadId != null ? db
+				.getReflogReader(Constants.HEAD).getReverseEntries() : null;
+
+		assertTrue("internal check, we have a log", new File(db.getDirectory(),
+				"logs/" + fromName).exists());
+
+		// "someone" has branch X locked
+		LockFile lockFile = new LockFile(new File(db.getDirectory(), toLock));
+		try {
+			assertTrue(lockFile.lock());
+
+			// Now this is our test
+			RefRename renameRef = db.renameRef(fromName, toName);
+			Result result = renameRef.rename();
+			assertEquals(Result.LOCK_FAILURE, result);
+
+			// Check that the involved refs are the same despite the failure
+			assertExists(false, toName);
+			if (!toLock.equals(toName))
+				assertExists(false, toName + ".lock");
+			assertExists(true, toLock + ".lock");
+			if (!toLock.equals(fromName))
+				assertExists(false, "logs/" + fromName + ".lock");
+			assertExists(false, "logs/" + toName + ".lock");
+			assertEquals(oldHeadId, db.resolve(Constants.HEAD));
+			assertEquals(oldfromId, db.resolve(fromName));
+			assertNull(db.resolve(toName));
+			assertEquals(oldFromLog.toString(), db.getReflogReader(fromName)
+					.getReverseEntries().toString());
+			if (oldHeadId != null)
+				assertEquals(oldHeadLog, db.getReflogReader(Constants.HEAD)
+						.getReverseEntries());
+		} finally {
+			lockFile.unlock();
+		}
+	}
+

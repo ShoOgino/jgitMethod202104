@@ -1,0 +1,17 @@
+	private WindowCache(final WindowCacheConfig cfg) {
+		super(tableSize(cfg), lockCount(cfg));
+		maxFiles = cfg.getPackedGitOpenFiles();
+		maxBytes = cfg.getPackedGitLimit();
+		mmap = cfg.isPackedGitMMAP();
+		windowSizeShift = bits(cfg.getPackedGitWindowSize());
+		windowSize = 1 << windowSizeShift;
+
+		openFiles = new AtomicInteger();
+		openBytes = new AtomicLong();
+
+		if (maxFiles < 1)
+			throw new IllegalArgumentException("Open files must be >= 1");
+		if (maxBytes < windowSize)
+			throw new IllegalArgumentException("Window size must be < limit");
+	}
+

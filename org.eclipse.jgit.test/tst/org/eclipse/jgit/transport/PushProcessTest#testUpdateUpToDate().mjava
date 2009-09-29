@@ -1,0 +1,14 @@
+	/**
+	 * Test for remote ref update, when it is already up to date.
+	 *
+	 * @throws IOException
+	 */
+	public void testUpdateUpToDate() throws IOException {
+		final RemoteRefUpdate rru = new RemoteRefUpdate(db,
+				"2c349335b7f797072cf729c4f3bb0914ecb6dec9",
+				"refs/heads/master", false, null, null);
+		final Ref ref = new Ref(Ref.Storage.LOOSE, "refs/heads/master",
+				ObjectId.fromString("2c349335b7f797072cf729c4f3bb0914ecb6dec9"));
+		testOneUpdateStatus(rru, ref, Status.UP_TO_DATE, null);
+	}
+

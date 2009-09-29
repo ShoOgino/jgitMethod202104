@@ -1,0 +1,22 @@
+	/**
+	 * Test RefSpec to RemoteRefUpdate conversion with simple RefSpec - no
+	 * wildcard, no tracking ref in repo configuration.
+	 *
+	 * @throws IOException
+	 */
+	public void testFindRemoteRefUpdatesNoWildcardNoTracking()
+			throws IOException {
+		transport = Transport.open(db, remoteConfig);
+		final Collection<RemoteRefUpdate> result = transport
+				.findRemoteRefUpdatesFor(Collections.nCopies(1, new RefSpec(
+						"refs/heads/master:refs/heads/x")));
+
+		assertEquals(1, result.size());
+		final RemoteRefUpdate rru = result.iterator().next();
+		assertNull(rru.getExpectedOldObjectId());
+		assertFalse(rru.isForceUpdate());
+		assertEquals("refs/heads/master", rru.getSrcRef());
+		assertEquals(db.resolve("refs/heads/master"), rru.getNewObjectId());
+		assertEquals("refs/heads/x", rru.getRemoteName());
+	}
+

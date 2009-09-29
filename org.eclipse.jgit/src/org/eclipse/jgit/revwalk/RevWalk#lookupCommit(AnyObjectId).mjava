@@ -1,0 +1,19 @@
+	/**
+	 * Locate a reference to a commit without loading it.
+	 * <p>
+	 * The commit may or may not exist in the repository. It is impossible to
+	 * tell from this method's return value.
+	 * 
+	 * @param id
+	 *            name of the commit object.
+	 * @return reference to the commit object. Never null.
+	 */
+	public RevCommit lookupCommit(final AnyObjectId id) {
+		RevCommit c = (RevCommit) objects.get(id);
+		if (c == null) {
+			c = createCommit(id);
+			objects.add(c);
+		}
+		return c;
+	}
+

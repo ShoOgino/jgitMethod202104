@@ -1,0 +1,58 @@
+	/**
+	 * Apply a flag to all commits matching the specified filter.
+	 * <p>
+	 * This version allows incremental testing and application, such as from a
+	 * background thread that needs to periodically halt processing and send
+	 * updates to the UI.
+	 * 
+	 * @param matching
+	 *            the filter to test commits with. If the filter includes a
+	 *            commit it will have the flag set; if the filter does not
+	 *            include the commit the flag will be unset.
+	 * @param flag
+	 *            the flag to apply (or remove). Applications are responsible
+	 *            for allocating this flag from the source RevWalk.
+	 * @param rangeBegin
+	 *            first commit within the list to begin testing at, inclusive.
+	 *            Must not be negative, but may be beyond the end of the list.
+	 * @param rangeEnd
+	 *            last commit within the list to end testing at, exclusive. If
+	 *            smaller than or equal to <code>rangeBegin</code> then no
+	 *            commits will be tested.
+	 * @throws IOException
+	 *             revision filter needed to read additional objects, but an
+	 *             error occurred while reading the pack files or loose objects
+	 *             of the repository.
+	 * @throws IncorrectObjectTypeException
+	 *             revision filter needed to read additional objects, but an
+	 *             object was not of the correct type. Repository corruption may
+	 *             have occurred.
+	 * @throws MissingObjectException
+	 *             revision filter needed to read additional objects, but an
+	 *             object that should be present was not found. Repository
+	 *             corruption may have occurred.
+	 */
+	public void applyFlag(final RevFilter matching, final RevFlag flag,
+			int rangeBegin, int rangeEnd) throws MissingObjectException,
+			IncorrectObjectTypeException, IOException {
+		final RevWalk w = flag.getRevWalk();
+		rangeEnd = Math.min(rangeEnd, size());
+		while (rangeBegin < rangeEnd) {
+			int index = rangeBegin;
+			Block s = contents;
+			while (s.shift > 0) {
+				final int i = index >> s.shift;
+				index -= i << s.shift;
+				s = (Block) s.contents[i];
+			}
+
+			while (rangeBegin++ < rangeEnd && index < BLOCK_SIZE) {
+				final RevCommit c = (RevCommit) s.contents[index++];
+				if (matching.include(w, c))
+					c.add(flag);
+				else
+					c.remove(flag);
+			}
+		}
+	}
+

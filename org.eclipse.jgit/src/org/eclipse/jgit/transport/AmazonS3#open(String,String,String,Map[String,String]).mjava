@@ -1,0 +1,37 @@
+	private HttpURLConnection open(final String method, final String bucket,
+			final String key, final Map<String, String> args)
+			throws IOException {
+		final StringBuilder urlstr = new StringBuilder();
+		urlstr.append("http://");
+		urlstr.append(bucket);
+		urlstr.append('.');
+		urlstr.append(DOMAIN);
+		urlstr.append('/');
+		if (key.length() > 0)
+			HttpSupport.encode(urlstr, key);
+		if (!args.isEmpty()) {
+			final Iterator<Map.Entry<String, String>> i;
+
+			urlstr.append('?');
+			i = args.entrySet().iterator();
+			while (i.hasNext()) {
+				final Map.Entry<String, String> e = i.next();
+				urlstr.append(e.getKey());
+				urlstr.append('=');
+				HttpSupport.encode(urlstr, e.getValue());
+				if (i.hasNext())
+					urlstr.append('&');
+			}
+		}
+
+		final URL url = new URL(urlstr.toString());
+		final Proxy proxy = HttpSupport.proxyFor(proxySelector, url);
+		final HttpURLConnection c;
+
+		c = (HttpURLConnection) url.openConnection(proxy);
+		c.setRequestMethod(method);
+		c.setRequestProperty("User-Agent", "jgit/1.0");
+		c.setRequestProperty("Date", httpNow());
+		return c;
+	}
+

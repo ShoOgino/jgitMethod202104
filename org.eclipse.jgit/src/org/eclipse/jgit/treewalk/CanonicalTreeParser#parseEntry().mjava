@@ -1,0 +1,29 @@
+	private void parseEntry() {
+		int ptr = currPtr;
+		byte c = raw[ptr++];
+		int tmp = c - '0';
+		for (;;) {
+			c = raw[ptr++];
+			if (' ' == c)
+				break;
+			tmp <<= 3;
+			tmp += c - '0';
+		}
+		mode = tmp;
+
+		tmp = pathOffset;
+		for (;; tmp++) {
+			c = raw[ptr++];
+			if (c == 0)
+				break;
+			try {
+				path[tmp] = c;
+			} catch (ArrayIndexOutOfBoundsException e) {
+				growPath(tmp);
+				path[tmp] = c;
+			}
+		}
+		pathLen = tmp;
+		nextPtr = ptr + Constants.OBJECT_ID_LENGTH;
+	}
+

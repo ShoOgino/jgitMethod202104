@@ -1,0 +1,53 @@
+	public void setUp() throws Exception {
+		super.setUp();
+		configure();
+		final String name = getClass().getName() + "." + getName();
+		recursiveDelete(trashParent, true, name, false); // Cleanup old failed stuff
+		trash = new File(trashParent,"trash"+System.currentTimeMillis()+"."+(testcount++));
+		trash_git = new File(trash, ".git").getCanonicalFile();
+		if (shutdownhook == null) {
+			shutdownhook = new Thread() {
+				@Override
+				public void run() {
+					// This may look superfluous, but is an extra attempt
+					// to clean up. First GC to release as many resources
+					// as possible and then try to clean up one test repo
+					// at a time (to record problems) and finally to drop
+					// the directory containing all test repositories.
+					System.gc();
+					for (Runnable r : shutDownCleanups)
+						r.run();
+					recursiveDelete(trashParent, false, null, false);
+				}
+			};
+			Runtime.getRuntime().addShutdownHook(shutdownhook);
+		}
+
+		final MockSystemReader mockSystemReader = new MockSystemReader();
+		mockSystemReader.userGitConfig = new FileBasedConfig(new File(
+				trash_git, "usergitconfig"));
+		SystemReader.setInstance(mockSystemReader);
+
+		db = new Repository(trash_git);
+		db.create();
+
+		final String[] packs = {
+				"pack-34be9032ac282b11fa9babdc2b2a93ca996c9c2f",
+				"pack-df2982f284bbabb6bdb59ee3fcc6eb0983e20371",
+				"pack-9fb5b411fe6dfa89cc2e6b89d2bd8e5de02b5745",
+				"pack-546ff360fe3488adb20860ce3436a2d6373d2796",
+				"pack-cbdeda40019ae0e6e789088ea0f51f164f489d14",
+				"pack-e6d07037cbcf13376308a0a995d1fa48f8f76aaa",
+				"pack-3280af9c07ee18a87705ef50b0cc4cd20266cf12"
+		};
+		final File packDir = new File(db.getObjectsDirectory(), "pack");
+		for (int k = 0; k < packs.length; k++) {
+			copyFile(JGitTestUtil.getTestResourceFile(packs[k] + ".pack"), new File(packDir,
+					packs[k] + ".pack"));
+			copyFile(JGitTestUtil.getTestResourceFile(packs[k] + ".idx"), new File(packDir,
+					packs[k] + ".idx"));
+		}
+
+		copyFile(JGitTestUtil.getTestResourceFile("packed-refs"), new File(trash_git,"packed-refs"));
+	}
+

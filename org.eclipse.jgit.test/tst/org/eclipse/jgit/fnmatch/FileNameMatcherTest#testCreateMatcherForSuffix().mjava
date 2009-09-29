@@ -1,0 +1,31 @@
+	public void testCreateMatcherForSuffix() throws Exception {
+		final String pattern = "helloworld";
+		final FileNameMatcher matcher = new FileNameMatcher(pattern, null);
+		matcher.append("hello");
+		final FileNameMatcher childMatcher = matcher.createMatcherForSuffix();
+		assertEquals(false, matcher.isMatch());
+		assertEquals(true, matcher.canAppendMatch());
+		assertEquals(false, childMatcher.isMatch());
+		assertEquals(true, childMatcher.canAppendMatch());
+		matcher.append("world");
+		assertEquals(true, matcher.isMatch());
+		assertEquals(false, matcher.canAppendMatch());
+		assertEquals(false, childMatcher.isMatch());
+		assertEquals(true, childMatcher.canAppendMatch());
+		childMatcher.append("world");
+		assertEquals(true, matcher.isMatch());
+		assertEquals(false, matcher.canAppendMatch());
+		assertEquals(true, childMatcher.isMatch());
+		assertEquals(false, childMatcher.canAppendMatch());
+		childMatcher.reset();
+		assertEquals(true, matcher.isMatch());
+		assertEquals(false, matcher.canAppendMatch());
+		assertEquals(false, childMatcher.isMatch());
+		assertEquals(true, childMatcher.canAppendMatch());
+		childMatcher.append("world");
+		assertEquals(true, matcher.isMatch());
+		assertEquals(false, matcher.canAppendMatch());
+		assertEquals(true, childMatcher.isMatch());
+		assertEquals(false, childMatcher.canAppendMatch());
+	}
+

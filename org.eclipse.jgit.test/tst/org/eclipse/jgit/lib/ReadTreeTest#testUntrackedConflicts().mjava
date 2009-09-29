@@ -1,0 +1,26 @@
+	public void testUntrackedConflicts() throws IOException { 
+		setupCase(null, mk("foo"), null);
+		writeTrashFile("foo", "foo");
+		go();
+		
+		assertConflict("foo");
+		
+		recursiveDelete(new File(trash, "foo"));
+		setupCase(null, mk("foo"), null);
+		writeTrashFile("foo/bar/baz", "");
+		writeTrashFile("foo/blahblah", "");
+		go();
+
+		assertConflict("foo/bar/baz");
+		assertConflict("foo/blahblah");
+		
+		recursiveDelete(new File(trash, "foo"));
+		
+		setupCase(mkmap("foo/bar", "", "foo/baz", ""), 
+				mk("foo"), mkmap("foo/bar", "", "foo/baz", ""));
+		assertTrue(new File(trash, "foo/bar").exists());
+		go();
+		
+		assertNoConflicts();
+	}
+

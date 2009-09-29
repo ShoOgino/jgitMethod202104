@@ -1,0 +1,17 @@
+	/** @return this iterator, or its parent, if the tree is at eof. */
+	public CanonicalTreeParser next() {
+		CanonicalTreeParser p = this;
+		for (;;) {
+			p.next(1);
+			if (p.eof() && p.parent != null) {
+				// Parent was left pointing at the entry for us; advance
+				// the parent to the next entry, possibly unwinding many
+				// levels up the tree.
+				//
+				p = (CanonicalTreeParser) p.parent;
+				continue;
+			}
+			return p;
+		}
+	}
+

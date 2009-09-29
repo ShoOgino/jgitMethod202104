@@ -1,0 +1,33 @@
+	private void parseEntry() {
+		currentEntry = cache.getEntry(ptr);
+		final byte[] cep = currentEntry.path;
+
+		if (nextSubtreePos != tree.getChildCount()) {
+			final DirCacheTree s = tree.getChild(nextSubtreePos);
+			if (s.contains(cep, pathOffset, cep.length)) {
+				// The current position is the first file of this subtree.
+				// Use the subtree instead as the current position.
+				//
+				currentSubtree = s;
+				nextSubtreePos++;
+
+				if (s.isValid())
+					s.getObjectId().copyRawTo(subtreeId, 0);
+				else
+					Arrays.fill(subtreeId, (byte) 0);
+				mode = FileMode.TREE.getBits();
+				path = cep;
+				pathLen = pathOffset + s.nameLength();
+				return;
+			}
+		}
+
+		// The current position is a file/symlink/gitlink so we
+		// do not have a subtree located here.
+		//
+		mode = currentEntry.getRawMode();
+		path = cep;
+		pathLen = cep.length;
+		currentSubtree = null;
+	}
+

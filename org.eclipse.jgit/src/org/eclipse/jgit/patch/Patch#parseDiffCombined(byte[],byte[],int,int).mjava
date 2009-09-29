@@ -1,0 +1,14 @@
+	private int parseDiffCombined(final byte[] hdr, final byte[] buf,
+			final int start, final int end) {
+		final CombinedFileHeader fh = new CombinedFileHeader(buf, start);
+		int ptr = fh.parseGitFileName(start + hdr.length, end);
+		if (ptr < 0)
+			return skipFile(buf, start);
+
+		ptr = fh.parseGitHeaders(ptr, end);
+		ptr = parseHunks(fh, ptr, end);
+		fh.endOffset = ptr;
+		addFile(fh);
+		return ptr;
+	}
+

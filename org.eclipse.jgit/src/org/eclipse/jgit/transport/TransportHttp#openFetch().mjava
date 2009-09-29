@@ -1,0 +1,8 @@
+	@Override
+	public FetchConnection openFetch() throws TransportException {
+		final HttpObjectDB c = new HttpObjectDB(objectsUrl);
+		final WalkFetchConnection r = new WalkFetchConnection(this, c);
+		r.available(c.readAdvertisedRefs());
+		return r;
+	}
+

@@ -1,0 +1,10 @@
+	public void testReadACK_Invalid1() {
+		init("HELO");
+		try {
+			in.readACK(new MutableObjectId());
+			fail("incorrectly accepted invalid packet header");
+		} catch (IOException e) {
+			assertEquals("Invalid packet line header: HELO", e.getMessage());
+		}
+	}
+

@@ -1,0 +1,34 @@
+	void extractFileLines(final OutputStream[] out) throws IOException {
+		final byte[] buf = file.buf;
+		int ptr = startOffset;
+		int eol = nextLF(buf, ptr);
+		if (endOffset <= eol)
+			return;
+
+		// Treat the hunk header as though it were from the ancestor,
+		// as it may have a function header appearing after it which
+		// was copied out of the ancestor file.
+		//
+		out[0].write(buf, ptr, eol - ptr);
+
+		SCAN: for (ptr = eol; ptr < endOffset; ptr = eol) {
+			eol = nextLF(buf, ptr);
+			switch (buf[ptr]) {
+			case ' ':
+			case '\n':
+			case '\\':
+				out[0].write(buf, ptr, eol - ptr);
+				out[1].write(buf, ptr, eol - ptr);
+				break;
+			case '-':
+				out[0].write(buf, ptr, eol - ptr);
+				break;
+			case '+':
+				out[1].write(buf, ptr, eol - ptr);
+				break;
+			default:
+				break SCAN;
+			}
+		}
+	}
+

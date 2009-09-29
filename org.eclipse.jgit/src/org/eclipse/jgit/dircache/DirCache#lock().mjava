@@ -1,0 +1,21 @@
+	/**
+	 * Try to establish an update lock on the cache file.
+	 *
+	 * @return true if the lock is now held by the caller; false if it is held
+	 *         by someone else.
+	 * @throws IOException
+	 *             the output file could not be created. The caller does not
+	 *             hold the lock.
+	 */
+	public boolean lock() throws IOException {
+		if (liveFile == null)
+			throw new IOException("DirCache does not have a backing file");
+		final LockFile tmp = new LockFile(liveFile);
+		if (tmp.lock()) {
+			tmp.setNeedStatInformation(true);
+			myLock = tmp;
+			return true;
+		}
+		return false;
+	}
+

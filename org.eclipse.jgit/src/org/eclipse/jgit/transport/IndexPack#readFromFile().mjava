@@ -1,0 +1,10 @@
+	// Consume exactly one byte from the buffer and return it.
+	private int readFromFile() throws IOException {
+		if (bAvail == 0)
+			fillFromFile(1);
+		bAvail--;
+		final int b = buf[bOffset++] & 0xff;
+		crc.update(b);
+		return b;
+	}
+

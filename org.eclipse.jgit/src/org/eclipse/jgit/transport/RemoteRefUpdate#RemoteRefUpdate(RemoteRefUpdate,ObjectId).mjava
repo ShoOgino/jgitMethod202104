@@ -1,0 +1,23 @@
+	/**
+	 * Create a new instance of this object basing on existing instance for
+	 * configuration. State (like {@link #getMessage()}, {@link #getStatus()})
+	 * of base object is not shared. Expected old object id is set up from
+	 * scratch, as this constructor may be used for 2-stage push: first one
+	 * being dry run, second one being actual push.
+	 *
+	 * @param base
+	 *            configuration base.
+	 * @param newExpectedOldObjectId
+	 *            new expected object id value.
+	 * @throws IOException
+	 *             when I/O error occurred during creating
+	 *             {@link TrackingRefUpdate} for local tracking branch or srcRef
+	 *             of base object no longer can be resolved to any object.
+	 */
+	public RemoteRefUpdate(final RemoteRefUpdate base,
+			final ObjectId newExpectedOldObjectId) throws IOException {
+		this(base.localDb, base.srcRef, base.remoteName, base.forceUpdate,
+				(base.trackingRefUpdate == null ? null : base.trackingRefUpdate
+						.getLocalName()), newExpectedOldObjectId);
+	}
+

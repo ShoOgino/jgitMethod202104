@@ -1,0 +1,10 @@
+	public void testParseGitFileName_SrcFooCNonStandardPrefix() {
+		final String name = "src/foo/bar/argh/code.c";
+		final String header = "project-v-1.0/" + name + " mydev/" + name + "\n";
+		final FileHeader fh = data(header + "-");
+		assertEquals(header.length(), fh.parseGitFileName(0, fh.buf.length));
+		assertEquals(name, fh.getOldName());
+		assertSame(fh.getOldName(), fh.getNewName());
+		assertFalse(fh.hasMetaDataChanges());
+	}
+

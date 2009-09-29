@@ -1,0 +1,29 @@
+	/**
+	 * Open a single file for reading.
+	 * <p>
+	 * Implementors should make every attempt possible to ensure
+	 * {@link FileNotFoundException} is used when the remote object does not
+	 * exist. However when fetching over HTTP some misconfigured servers may
+	 * generate a 200 OK status message (rather than a 404 Not Found) with an
+	 * HTML formatted message explaining the requested resource does not exist.
+	 * Callers such as {@link WalkFetchConnection} are prepared to handle this
+	 * by validating the content received, and assuming content that fails to
+	 * match its hash is an incorrectly phrased FileNotFoundException.
+	 * 
+	 * @param path
+	 *            location of the file to read, relative to this objects
+	 *            directory (e.g.
+	 *            <code>cb/95df6ab7ae9e57571511ef451cf33767c26dd2</code> or
+	 *            <code>pack/pack-035760ab452d6eebd123add421f253ce7682355a.pack</code>).
+	 * @return a stream to read from the file. Never null.
+	 * @throws FileNotFoundException
+	 *             the requested file does not exist at the given location.
+	 * @throws IOException
+	 *             The connection is unable to read the remote's file, and the
+	 *             failure occurred prior to being able to determine if the file
+	 *             exists, or after it was determined to exist but before the
+	 *             stream could be created.
+	 */
+	abstract FileStream open(String path) throws FileNotFoundException,
+			IOException;
+

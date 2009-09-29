@@ -1,0 +1,58 @@
+	/**
+	 * Parse a remote block from an existing configuration file.
+	 * <p>
+	 * This constructor succeeds even if the requested remote is not defined
+	 * within the supplied configuration file. If that occurs then there will be
+	 * no URIs and no ref specifications known to the new instance.
+	 * 
+	 * @param rc
+	 *            the existing configuration to get the remote settings from.
+	 *            The configuration must already be loaded into memory.
+	 * @param remoteName
+	 *            subsection key indicating the name of this remote.
+	 * @throws URISyntaxException
+	 *             one of the URIs within the remote's configuration is invalid.
+	 */
+	public RemoteConfig(final Config rc, final String remoteName)
+			throws URISyntaxException {
+		name = remoteName;
+
+		String[] vlst;
+		String val;
+
+		vlst = rc.getStringList(SECTION, name, KEY_URL);
+		uris = new ArrayList<URIish>(vlst.length);
+		for (final String s : vlst)
+			uris.add(new URIish(s));
+
+		vlst = rc.getStringList(SECTION, name, KEY_PUSHURL);
+		pushURIs = new ArrayList<URIish>(vlst.length);
+		for (final String s : vlst)
+			pushURIs.add(new URIish(s));
+
+		vlst = rc.getStringList(SECTION, name, KEY_FETCH);
+		fetch = new ArrayList<RefSpec>(vlst.length);
+		for (final String s : vlst)
+			fetch.add(new RefSpec(s));
+
+		vlst = rc.getStringList(SECTION, name, KEY_PUSH);
+		push = new ArrayList<RefSpec>(vlst.length);
+		for (final String s : vlst)
+			push.add(new RefSpec(s));
+
+		val = rc.getString(SECTION, name, KEY_UPLOADPACK);
+		if (val == null)
+			val = DEFAULT_UPLOAD_PACK;
+		uploadpack = val;
+
+		val = rc.getString(SECTION, name, KEY_RECEIVEPACK);
+		if (val == null)
+			val = DEFAULT_RECEIVE_PACK;
+		receivepack = val;
+
+		val = rc.getString(SECTION, name, KEY_TAGOPT);
+		tagopt = TagOpt.fromOption(val);
+		mirror = rc.getBoolean(SECTION, name, KEY_MIRROR, DEFAULT_MIRROR);
+		timeout = rc.getInt(SECTION, name, KEY_TIMEOUT, 0);
+	}
+

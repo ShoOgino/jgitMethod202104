@@ -1,0 +1,21 @@
+	private void insertChild(final int stIdx, final DirCacheTree st) {
+		final DirCacheTree[] c = children;
+		if (childCnt + 1 <= c.length) {
+			if (stIdx < childCnt)
+				System.arraycopy(c, stIdx, c, stIdx + 1, childCnt - stIdx);
+			c[stIdx] = st;
+			childCnt++;
+			return;
+		}
+
+		final int n = c.length;
+		final DirCacheTree[] a = new DirCacheTree[n + 1];
+		if (stIdx > 0)
+			System.arraycopy(c, 0, a, 0, stIdx);
+		a[stIdx] = st;
+		if (stIdx < n)
+			System.arraycopy(c, stIdx, a, stIdx + 1, n - stIdx);
+		children = a;
+		childCnt++;
+	}
+

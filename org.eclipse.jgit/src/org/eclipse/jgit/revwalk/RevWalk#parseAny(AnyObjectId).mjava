@@ -1,0 +1,57 @@
+	/**
+	 * Locate a reference to any object and immediately parse its headers.
+	 * <p>
+	 * This method only returns successfully if the object exists and was parsed
+	 * without error. Parsing an object can be expensive as the type must be
+	 * determined. For blobs this may mean the blob content was unpacked
+	 * unnecessarily, and thrown away.
+	 * 
+	 * @param id
+	 *            name of the object.
+	 * @return reference to the object. Never null.
+	 * @throws MissingObjectException
+	 *             the supplied does not exist.
+	 * @throws IOException
+	 *             a pack file or loose object could not be read.
+	 */
+	public RevObject parseAny(final AnyObjectId id)
+			throws MissingObjectException, IOException {
+		RevObject r = objects.get(id);
+		if (r == null) {
+			final ObjectLoader ldr = db.openObject(curs, id);
+			if (ldr == null)
+				throw new MissingObjectException(id.toObjectId(), "unknown");
+			final byte[] data = ldr.getCachedBytes();
+			final int type = ldr.getType();
+			switch (type) {
+			case Constants.OBJ_COMMIT: {
+				final RevCommit c = createCommit(id);
+				c.parseCanonical(this, data);
+				r = c;
+				break;
+			}
+			case Constants.OBJ_TREE: {
+				r = new RevTree(id);
+				r.flags |= PARSED;
+				break;
+			}
+			case Constants.OBJ_BLOB: {
+				r = new RevBlob(id);
+				r.flags |= PARSED;
+				break;
+			}
+			case Constants.OBJ_TAG: {
+				final RevTag t = new RevTag(id);
+				t.parseCanonical(this, data);
+				r = t;
+				break;
+			}
+			default:
+				throw new IllegalArgumentException("Bad object type: " + type);
+			}
+			objects.add(r);
+		} else
+			parseHeaders(r);
+		return r;
+	}
+

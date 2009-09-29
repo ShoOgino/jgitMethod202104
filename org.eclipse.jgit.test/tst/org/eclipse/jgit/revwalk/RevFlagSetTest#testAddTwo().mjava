@@ -1,0 +1,12 @@
+	public void testAddTwo() {
+		final RevFlag flag1 = rw.newFlag("flag_1");
+		final RevFlag flag2 = rw.newFlag("flag_2");
+		assertTrue((flag1.mask & flag2.mask) == 0);
+
+		final RevFlagSet set = new RevFlagSet();
+		assertTrue(set.add(flag1));
+		assertTrue(set.add(flag2));
+		assertEquals(flag1.mask | flag2.mask, set.mask);
+		assertEquals(2, set.size());
+	}
+

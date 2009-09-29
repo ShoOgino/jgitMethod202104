@@ -1,0 +1,11 @@
+	private void assertTimeout() {
+		// Our timeout was supposed to be ~250 ms. Since this is a timing
+		// test we can't assume we spent *exactly* the timeout period, as
+		// there may be other activity going on in the system. Instead we
+		// look for the delta between the start and end times to be within
+		// 50 ms of the expected timeout.
+		//
+		final long wait = now() - start;
+		assertTrue(Math.abs(wait - timeout) < 50);
+	}
+

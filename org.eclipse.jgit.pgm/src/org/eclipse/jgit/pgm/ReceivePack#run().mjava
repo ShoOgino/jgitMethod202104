@@ -1,0 +1,13 @@
+	@Override
+	protected void run() throws Exception {
+		final org.eclipse.jgit.transport.ReceivePack rp;
+
+		if (new File(dstGitdir, ".git").isDirectory())
+			dstGitdir = new File(dstGitdir, ".git");
+		db = new Repository(dstGitdir);
+		if (!db.getObjectsDirectory().isDirectory())
+			throw die("'" + dstGitdir.getPath() + "' not a git repository");
+		rp = new org.eclipse.jgit.transport.ReceivePack(db);
+		rp.receive(System.in, System.out, System.err);
+	}
+

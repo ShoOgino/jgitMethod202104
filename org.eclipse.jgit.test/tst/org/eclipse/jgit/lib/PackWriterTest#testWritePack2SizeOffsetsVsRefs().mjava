@@ -1,0 +1,19 @@
+	/**
+	 * Compare sizes of packs created using
+	 * {@link #testWritePack2DeltasReuseRefs()} and
+	 * {@link #testWritePack2DeltasReuseOffsets()}. The pack with delta bases
+	 * written as offsets should be smaller.
+	 *
+	 * @throws Exception
+	 */
+	public void testWritePack2SizeOffsetsVsRefs() throws Exception {
+		testWritePack2DeltasReuseRefs();
+		final long sizePack2DeltasRefs = cos.length();
+		tearDown();
+		setUp();
+		testWritePack2DeltasReuseOffsets();
+		final long sizePack2DeltasOffsets = cos.length();
+
+		assertTrue(sizePack2DeltasRefs > sizePack2DeltasOffsets);
+	}
+

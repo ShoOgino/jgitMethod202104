@@ -1,0 +1,35 @@
+	public void testReadIndex_DirCacheTree() throws Exception {
+		final Map<String, CGitIndexRecord> cList = readLsFiles();
+		final Map<String, CGitLsTreeRecord> cTree = readLsTree();
+		final DirCache dc = new DirCache(index);
+		assertEquals(0, dc.getEntryCount());
+		dc.read();
+		assertEquals(cList.size(), dc.getEntryCount());
+
+		final DirCacheTree jTree = dc.getCacheTree(false);
+		assertNotNull(jTree);
+		assertEquals("", jTree.getNameString());
+		assertEquals("", jTree.getPathString());
+		assertTrue(jTree.isValid());
+		assertEquals(ObjectId
+				.fromString("698dd0b8d0c299f080559a1cffc7fe029479a408"), jTree
+				.getObjectId());
+		assertEquals(cList.size(), jTree.getEntrySpan());
+
+		final ArrayList<CGitLsTreeRecord> subtrees = new ArrayList<CGitLsTreeRecord>();
+		for (final CGitLsTreeRecord r : cTree.values()) {
+			if (FileMode.TREE.equals(r.mode))
+				subtrees.add(r);
+		}
+		assertEquals(subtrees.size(), jTree.getChildCount());
+
+		for (int i = 0; i < jTree.getChildCount(); i++) {
+			final DirCacheTree sj = jTree.getChild(i);
+			final CGitLsTreeRecord sc = subtrees.get(i);
+			assertEquals(sc.path, sj.getNameString());
+			assertEquals(sc.path + "/", sj.getPathString());
+			assertTrue(sj.isValid());
+			assertEquals(sc.id, sj.getObjectId());
+		}
+	}
+

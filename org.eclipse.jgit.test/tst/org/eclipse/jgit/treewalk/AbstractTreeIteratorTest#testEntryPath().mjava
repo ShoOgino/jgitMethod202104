@@ -1,0 +1,12 @@
+	public void testEntryPath() {
+		FakeTreeIterator i = new FakeTreeIterator("a/b/cd", FileMode.TREE);
+		assertEquals("a/b/cd", i.getEntryPathString());
+		assertEquals(2, i.getNameLength());
+		byte[] b = new byte[3];
+		b[0] = 0x0a;
+		i.getName(b, 1);
+		assertEquals(0x0a, b[0]);
+		assertEquals('c', b[1]);
+		assertEquals('d', b[2]);
+	}
+

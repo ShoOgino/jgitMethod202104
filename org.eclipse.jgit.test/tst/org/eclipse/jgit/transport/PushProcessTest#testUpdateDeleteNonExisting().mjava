@@ -1,0 +1,12 @@
+	/**
+	 * Test for remote ref deletion (try), when that ref doesn't exist on remote
+	 * repo.
+	 *
+	 * @throws IOException
+	 */
+	public void testUpdateDeleteNonExisting() throws IOException {
+		final RemoteRefUpdate rru = new RemoteRefUpdate(db, null,
+				"refs/heads/master", false, null, null);
+		testOneUpdateStatus(rru, null, Status.NON_EXISTING, null);
+	}
+

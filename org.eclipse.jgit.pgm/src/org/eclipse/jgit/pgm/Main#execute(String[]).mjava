@@ -1,0 +1,60 @@
+	private void execute(final String[] argv) throws Exception {
+		final CmdLineParser clp = new CmdLineParser(this);
+		try {
+			clp.parseArgument(argv);
+		} catch (CmdLineException err) {
+			if (argv.length > 0 && !help) {
+				System.err.println("fatal: " + err.getMessage());
+				System.exit(1);
+			}
+		}
+
+		if (argv.length == 0 || help) {
+			final String ex = clp.printExample(ExampleMode.ALL);
+			System.err.println("jgit" + ex + " command [ARG ...]");
+			if (help) {
+				System.err.println();
+				clp.printUsage(System.err);
+				System.err.println();
+			} else if (subcommand == null) {
+				System.err.println();
+				System.err.println("The most commonly used commands are:");
+				final CommandRef[] common = CommandCatalog.common();
+				int width = 0;
+				for (final CommandRef c : common)
+					width = Math.max(width, c.getName().length());
+				width += 2;
+
+				for (final CommandRef c : common) {
+					System.err.print(' ');
+					System.err.print(c.getName());
+					for (int i = c.getName().length(); i < width; i++)
+						System.err.print(' ');
+					System.err.print(c.getUsage());
+					System.err.println();
+				}
+				System.err.println();
+			}
+			System.exit(1);
+		}
+
+		final TextBuiltin cmd = subcommand;
+		if (cmd.requiresRepository()) {
+			if (gitdir == null)
+				gitdir = findGitDir();
+			if (gitdir == null || !gitdir.isDirectory()) {
+				System.err.println("error: can't find git directory");
+				System.exit(1);
+			}
+			cmd.init(new Repository(gitdir), gitdir);
+		} else {
+			cmd.init(null, gitdir);
+		}
+		try {
+			cmd.execute(arguments.toArray(new String[arguments.size()]));
+		} finally {
+			if (cmd.out != null)
+				cmd.out.flush();
+		}
+	}
+

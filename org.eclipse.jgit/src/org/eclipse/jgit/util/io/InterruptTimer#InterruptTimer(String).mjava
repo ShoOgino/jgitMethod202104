@@ -1,0 +1,15 @@
+	/**
+	 * Create a new timer to signal on interrupt on the caller.
+	 * <p>
+	 * The timer thread is created in the calling thread's ThreadGroup.
+	 *
+	 * @param threadName
+	 *            name of the timer thread.
+	 */
+	public InterruptTimer(final String threadName) {
+		state = new AlarmState();
+		autoKiller = new AutoKiller(state);
+		thread = new AlarmThread(threadName, state);
+		thread.start();
+	}
+

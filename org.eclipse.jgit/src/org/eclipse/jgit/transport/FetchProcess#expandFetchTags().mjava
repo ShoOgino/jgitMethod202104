@@ -1,0 +1,11 @@
+	private void expandFetchTags() throws TransportException {
+		final Map<String, Ref> haveRefs = transport.local.getAllRefs();
+		for (final Ref r : conn.getRefs()) {
+			if (!isTag(r))
+				continue;
+			final Ref local = haveRefs.get(r.getName());
+			if (local == null || !r.getObjectId().equals(local.getObjectId()))
+				wantTag(r);
+		}
+	}
+

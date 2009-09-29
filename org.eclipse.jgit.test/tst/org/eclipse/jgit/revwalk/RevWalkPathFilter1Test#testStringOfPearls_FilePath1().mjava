@@ -1,0 +1,16 @@
+	public void testStringOfPearls_FilePath1() throws Exception {
+		final RevCommit a = commit(tree(file("d/f", blob("a"))));
+		final RevCommit b = commit(tree(file("d/f", blob("a"))), a);
+		final RevCommit c = commit(tree(file("d/f", blob("b"))), b);
+		filter("d/f");
+		markStart(c);
+
+		assertCommit(c, rw.next());
+		assertEquals(1, c.getParentCount());
+		assertCommit(a, c.getParent(0)); // b was skipped
+
+		assertCommit(a, rw.next());
+		assertEquals(0, a.getParentCount());
+		assertNull(rw.next());
+	}
+

@@ -1,0 +1,32 @@
+	/**
+	 * Create a new Git repository initializing the necessary files and
+	 * directories.
+	 *
+	 * @param bare
+	 *            if true, a bare repository is created.
+	 *
+	 * @throws IOException
+	 *             in case of IO problem
+	 */
+	public void create(boolean bare) throws IOException {
+		final RepositoryConfig cfg = getConfig();
+		if (cfg.getFile().exists()) {
+			throw new IllegalStateException("Repository already exists: "
+					+ gitDir);
+		}
+		gitDir.mkdirs();
+		refs.create();
+		objectDatabase.create();
+
+		new File(gitDir, "branches").mkdir();
+		new File(gitDir, "remotes").mkdir();
+		final String master = Constants.R_HEADS + Constants.MASTER;
+		refs.link(Constants.HEAD, master);
+
+		cfg.setInt("core", null, "repositoryformatversion", 0);
+		cfg.setBoolean("core", null, "filemode", true);
+		if (bare)
+			cfg.setBoolean("core", null, "bare", true);
+		cfg.save();
+	}
+

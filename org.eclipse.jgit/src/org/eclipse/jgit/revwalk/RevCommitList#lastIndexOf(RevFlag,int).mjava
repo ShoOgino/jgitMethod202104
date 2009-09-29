@@ -1,0 +1,32 @@
+	/**
+	 * Find the next commit that has the given flag set.
+	 * 
+	 * @param flag
+	 *            the flag to test commits against.
+	 * @param begin
+	 *            first commit index to test at. Applications may wish to begin
+	 *            at <code>size()-1</code>, to test the last commit in the
+	 *            list.
+	 * @return index of the first commit at or before index <code>begin</code>
+	 *         that has the specified flag set on it; -1 if no match is found.
+	 */
+	public int lastIndexOf(final RevFlag flag, int begin) {
+		begin = Math.min(begin, size() - 1);
+		while (begin >= 0) {
+			int index = begin;
+			Block s = contents;
+			while (s.shift > 0) {
+				final int i = index >> s.shift;
+				index -= i << s.shift;
+				s = (Block) s.contents[i];
+			}
+
+			while (begin-- >= 0 && index >= 0) {
+				final RevCommit c = (RevCommit) s.contents[index--];
+				if (c.has(flag))
+					return begin;
+			}
+		}
+		return -1;
+	}
+

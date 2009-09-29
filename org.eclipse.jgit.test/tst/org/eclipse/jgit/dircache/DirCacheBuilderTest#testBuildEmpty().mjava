@@ -1,0 +1,15 @@
+	public void testBuildEmpty() throws Exception {
+		{
+			final DirCache dc = DirCache.lock(db);
+			final DirCacheBuilder b = dc.builder();
+			assertNotNull(b);
+			b.finish();
+			dc.write();
+			assertTrue(dc.commit());
+		}
+		{
+			final DirCache dc = DirCache.read(db);
+			assertEquals(0, dc.getEntryCount());
+		}
+	}
+

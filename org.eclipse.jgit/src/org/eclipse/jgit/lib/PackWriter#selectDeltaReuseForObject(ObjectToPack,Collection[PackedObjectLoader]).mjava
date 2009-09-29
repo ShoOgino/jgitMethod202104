@@ -1,0 +1,26 @@
+	private void selectDeltaReuseForObject(final ObjectToPack otp,
+			final Collection<PackedObjectLoader> loaders) throws IOException {
+		PackedObjectLoader bestLoader = null;
+		ObjectId bestBase = null;
+
+		for (PackedObjectLoader loader : loaders) {
+			ObjectId idBase = loader.getDeltaBase();
+			if (idBase == null)
+				continue;
+			ObjectToPack otpBase = objectsMap.get(idBase);
+
+			// only if base is in set of objects to write or thin-pack's edge
+			if ((otpBase != null || (thin && edgeObjects.get(idBase) != null))
+			// select smallest possible delta if > 1 available
+					&& isBetterDeltaReuseLoader(bestLoader, loader)) {
+				bestLoader = loader;
+				bestBase = (otpBase != null ? otpBase : idBase);
+			}
+		}
+
+		if (bestLoader != null) {
+			otp.setReuseLoader(bestLoader);
+			otp.setDeltaBase(bestBase);
+		}
+	}
+

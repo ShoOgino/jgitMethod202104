@@ -1,0 +1,23 @@
+	private void readBundleV2() throws IOException {
+		final byte[] hdrbuf = new byte[1024];
+		final LinkedHashMap<String, Ref> avail = new LinkedHashMap<String, Ref>();
+		for (;;) {
+			String line = readLine(hdrbuf);
+			if (line.length() == 0)
+				break;
+
+			if (line.charAt(0) == '-') {
+				prereqs.add(ObjectId.fromString(line.substring(1, 41)));
+				continue;
+			}
+
+			final String name = line.substring(41, line.length());
+			final ObjectId id = ObjectId.fromString(line.substring(0, 40));
+			final Ref prior = avail.put(name, new Ref(Ref.Storage.NETWORK,
+					name, id));
+			if (prior != null)
+				throw duplicateAdvertisement(name);
+		}
+		available(avail);
+	}
+

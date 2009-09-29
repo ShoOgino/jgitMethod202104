@@ -1,0 +1,12 @@
+	String readStringRaw() throws IOException {
+		int len = readLength();
+		if (len == 0)
+			return END;
+
+		len -= 4; // length header (4 bytes)
+
+		final byte[] raw = new byte[len];
+		NB.readFully(in, raw, 0, len);
+		return RawParseUtils.decode(Constants.CHARSET, raw, 0, len);
+	}
+

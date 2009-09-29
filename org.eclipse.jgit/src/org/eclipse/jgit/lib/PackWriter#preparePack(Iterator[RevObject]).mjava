@@ -1,0 +1,41 @@
+	/**
+	 * Prepare the list of objects to be written to the pack stream.
+	 * <p>
+	 * Iterator <b>exactly</b> determines which objects are included in a pack
+	 * and order they appear in pack (except that objects order by type is not
+	 * needed at input). This order should conform general rules of ordering
+	 * objects in git - by recency and path (type and delta-base first is
+	 * internally secured) and responsibility for guaranteeing this order is on
+	 * a caller side. Iterator must return each id of object to write exactly
+	 * once.
+	 * </p>
+	 * <p>
+	 * When iterator returns object that has {@link RevFlag#UNINTERESTING} flag,
+	 * this object won't be included in an output pack. Instead, it is recorded
+	 * as edge-object (known to remote repository) for thin-pack. In such a case
+	 * writer may pack objects with delta base object not within set of objects
+	 * to pack, but belonging to party repository - those marked with
+	 * {@link RevFlag#UNINTERESTING} flag. This type of pack is used only for
+	 * transport.
+	 * </p>
+	 *
+	 * @param objectsSource
+	 *            iterator of object to store in a pack; order of objects within
+	 *            each type is important, ordering by type is not needed;
+	 *            allowed types for objects are {@link Constants#OBJ_COMMIT},
+	 *            {@link Constants#OBJ_TREE}, {@link Constants#OBJ_BLOB} and
+	 *            {@link Constants#OBJ_TAG}; objects returned by iterator may
+	 *            be later reused by caller as object id and type are internally
+	 *            copied in each iteration; if object returned by iterator has
+	 *            {@link RevFlag#UNINTERESTING} flag set, it won't be included
+	 *            in a pack, but is considered as edge-object for thin-pack.
+	 * @throws IOException
+	 *             when some I/O problem occur during reading objects.
+	 */
+	public void preparePack(final Iterator<RevObject> objectsSource)
+			throws IOException {
+		while (objectsSource.hasNext()) {
+			addObject(objectsSource.next());
+		}
+	}
+

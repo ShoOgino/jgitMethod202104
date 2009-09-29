@@ -1,0 +1,15 @@
+	/**
+	 * Obtain a copy of the bytes of this object.
+	 * <p>
+	 * Unlike {@link #getCachedBytes()} this method returns an array that might
+	 * be modified by the caller.
+	 * 
+	 * @return the bytes of this object.
+	 */
+	public final byte[] getBytes() {
+		final byte[] data = getCachedBytes();
+		final byte[] copy = new byte[data.length];
+		System.arraycopy(data, 0, copy, 0, data.length);
+		return copy;
+	}
+

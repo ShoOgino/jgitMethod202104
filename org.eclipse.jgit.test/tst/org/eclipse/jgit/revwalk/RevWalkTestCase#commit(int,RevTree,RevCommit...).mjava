@@ -1,0 +1,12 @@
+	protected RevCommit commit(final int secDelta, final RevTree tree,
+			final RevCommit... parents) throws Exception {
+		tick(secDelta);
+		final Commit c = new Commit(db);
+		c.setTreeId(tree);
+		c.setParentIds(parents);
+		c.setAuthor(new PersonIdent(jauthor, new Date(nowTick)));
+		c.setCommitter(new PersonIdent(jcommitter, new Date(nowTick)));
+		c.setMessage("");
+		return rw.lookupCommit(ow.writeCommit(c));
+	}
+

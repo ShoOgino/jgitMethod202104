@@ -1,0 +1,13 @@
+	public void testFilter_NONE_Or_MY_ALL() throws Exception {
+		final RevCommit a = commit();
+		final RevCommit b = commit(a);
+		final RevCommit c = commit(b);
+
+		rw.setRevFilter(OrRevFilter.create(RevFilter.NONE, MY_ALL));
+		markStart(c);
+		assertCommit(c, rw.next());
+		assertCommit(b, rw.next());
+		assertCommit(a, rw.next());
+		assertNull(rw.next());
+	}
+

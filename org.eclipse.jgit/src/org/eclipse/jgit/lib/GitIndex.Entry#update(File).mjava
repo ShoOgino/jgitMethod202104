@@ -1,0 +1,32 @@
+		/**
+		 * Update this index entry with stat and SHA-1 information if it looks
+		 * like the file has been modified in the workdir.
+		 *
+		 * @param f
+		 *            file in work dir
+		 * @return true if a change occurred
+		 * @throws IOException
+		 */
+		public boolean update(File f) throws IOException {
+			long lm = f.lastModified() * 1000000L;
+			boolean modified = mtime != lm;
+			mtime = lm;
+			if (size != f.length())
+				modified = true;
+			if (config_filemode()) {
+				if (File_canExecute(f) != FileMode.EXECUTABLE_FILE.equals(mode)) {
+					mode = FileMode.EXECUTABLE_FILE.getBits();
+					modified = true;
+				}
+			}
+			if (modified) {
+				size = (int) f.length();
+				ObjectWriter writer = new ObjectWriter(db);
+				ObjectId newsha1 = writer.writeBlob(f);
+				if (!newsha1.equals(sha1))
+					modified = true;
+				sha1 = newsha1;
+			}
+			return modified;
+		}
+

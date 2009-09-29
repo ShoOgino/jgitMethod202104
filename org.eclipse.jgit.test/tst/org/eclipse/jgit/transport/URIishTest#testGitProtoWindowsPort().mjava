@@ -1,0 +1,12 @@
+	public void testGitProtoWindowsPort() throws Exception {
+		final String str = "git://example.com:338/D:/m y";
+		URIish u = new URIish(str);
+		assertEquals("git", u.getScheme());
+		assertTrue(u.isRemote());
+		assertEquals("D:/m y", u.getPath());
+		assertEquals(338, u.getPort());
+		assertEquals("example.com", u.getHost());
+		assertEquals(str, u.toString());
+		assertEquals(u, new URIish(str));
+	}
+

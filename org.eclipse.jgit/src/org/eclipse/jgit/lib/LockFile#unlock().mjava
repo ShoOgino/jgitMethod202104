@@ -1,0 +1,29 @@
+	/**
+	 * Unlock this file and abort this change.
+	 * <p>
+	 * The temporary file (if created) is deleted before returning.
+	 */
+	public void unlock() {
+		if (os != null) {
+			if (fLck != null) {
+				try {
+					fLck.release();
+				} catch (IOException ioe) {
+					// Huh?
+				}
+				fLck = null;
+			}
+			try {
+				os.close();
+			} catch (IOException ioe) {
+				// Ignore this
+			}
+			os = null;
+		}
+
+		if (haveLck) {
+			haveLck = false;
+			lck.delete();
+		}
+	}
+

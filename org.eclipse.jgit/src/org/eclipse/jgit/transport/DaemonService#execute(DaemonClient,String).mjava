@@ -1,0 +1,14 @@
+	void execute(final DaemonClient client, final String commandLine)
+			throws IOException {
+		final String name = commandLine.substring(command.length() + 1);
+		final Repository db = client.getDaemon().openRepository(name);
+		if (db == null)
+			return;
+		try {
+			if (isEnabledFor(db))
+				execute(client, db);
+		} finally {
+			db.close();
+		}
+	}
+

@@ -1,0 +1,21 @@
+	@Override
+	public Iterator<RevFlag> iterator() {
+		final Iterator<RevFlag> i = active.iterator();
+		return new Iterator<RevFlag>() {
+			private RevFlag current;
+
+			public boolean hasNext() {
+				return i.hasNext();
+			}
+
+			public RevFlag next() {
+				return current = i.next();
+			}
+
+			public void remove() {
+				mask &= ~current.mask;
+				i.remove();
+			}
+		};
+	}
+

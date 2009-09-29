@@ -1,0 +1,22 @@
+	private void queueWants(final Collection<Ref> want)
+			throws TransportException {
+		final HashSet<ObjectId> inWorkQueue = new HashSet<ObjectId>();
+		for (final Ref r : want) {
+			final ObjectId id = r.getObjectId();
+			try {
+				final RevObject obj = revWalk.parseAny(id);
+				if (obj.has(COMPLETE))
+					continue;
+				if (inWorkQueue.add(id)) {
+					obj.add(IN_WORK_QUEUE);
+					workQueue.add(obj);
+				}
+			} catch (MissingObjectException e) {
+				if (inWorkQueue.add(id))
+					workQueue.add(id);
+			} catch (IOException e) {
+				throw new TransportException("Cannot read " + id.name(), e);
+			}
+		}
+	}
+

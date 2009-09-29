@@ -1,0 +1,9 @@
+	private synchronized static Inflater getImpl() {
+		if (openInflaterCount > 0) {
+			final Inflater r = inflaterCache[--openInflaterCount];
+			inflaterCache[openInflaterCount] = null;
+			return r;
+		}
+		return null;
+	}
+

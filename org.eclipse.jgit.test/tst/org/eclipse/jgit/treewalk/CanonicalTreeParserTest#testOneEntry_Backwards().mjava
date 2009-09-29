@@ -1,0 +1,14 @@
+	public void testOneEntry_Backwards() throws Exception {
+		ctp.reset(tree1);
+		ctp.next(1);
+		assertFalse(ctp.first());
+		assertTrue(ctp.eof());
+
+		ctp.back(1);
+		assertTrue(ctp.first());
+		assertFalse(ctp.eof());
+		assertEquals(m644.getBits(), ctp.mode);
+		assertEquals("a", path());
+		assertEquals(hash_a, ctp.getEntryObjectId());
+	}
+

@@ -1,0 +1,32 @@
+	public void testUploadPack() throws Exception {
+		readConfig("[remote \"example\"]\n"
+				+ "url = user@example.com:egit.git\n"
+				+ "fetch = +refs/heads/*:refs/remotes/example/*\n"
+				+ "uploadpack = /path/to/git/git-upload-pack\n"
+				+ "receivepack = /path/to/git/git-receive-pack\n");
+
+		final RemoteConfig rc = new RemoteConfig(config, "example");
+		final List<URIish> allURIs = rc.getURIs();
+		RefSpec spec;
+
+		assertEquals("example", rc.getName());
+		assertNotNull(allURIs);
+		assertNotNull(rc.getFetchRefSpecs());
+		assertNotNull(rc.getPushRefSpecs());
+
+		assertEquals(1, allURIs.size());
+		assertEquals("user@example.com:egit.git", allURIs.get(0));
+
+		assertEquals(1, rc.getFetchRefSpecs().size());
+		spec = rc.getFetchRefSpecs().get(0);
+		assertTrue(spec.isForceUpdate());
+		assertTrue(spec.isWildcard());
+		assertEquals("refs/heads/*", spec.getSource());
+		assertEquals("refs/remotes/example/*", spec.getDestination());
+
+		assertEquals(0, rc.getPushRefSpecs().size());
+
+		assertEquals("/path/to/git/git-upload-pack", rc.getUploadPack());
+		assertEquals("/path/to/git/git-receive-pack", rc.getReceivePack());
+	}
+

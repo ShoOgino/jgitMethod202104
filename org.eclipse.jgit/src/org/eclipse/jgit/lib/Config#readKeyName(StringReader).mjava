@@ -1,0 +1,47 @@
+	private static String readKeyName(final StringReader in)
+			throws ConfigInvalidException {
+		final StringBuffer name = new StringBuffer();
+		for (;;) {
+			int c = in.read();
+			if (c < 0)
+				throw new ConfigInvalidException("Unexpected end of config file");
+
+			if ('=' == c)
+				break;
+
+			if (' ' == c || '\t' == c) {
+				for (;;) {
+					c = in.read();
+					if (c < 0)
+						throw new ConfigInvalidException("Unexpected end of config file");
+
+					if ('=' == c)
+						break;
+
+					if (';' == c || '#' == c || '\n' == c) {
+						in.reset();
+						break;
+					}
+
+					if (' ' == c || '\t' == c)
+						continue; // Skipped...
+					throw new ConfigInvalidException("Bad entry delimiter");
+				}
+				break;
+			}
+
+			if (Character.isLetterOrDigit((char) c) || c == '-') {
+				// From the git-config man page:
+				// The variable names are case-insensitive and only
+				// alphanumeric characters and - are allowed.
+				name.append((char) c);
+			} else if ('\n' == c) {
+				in.reset();
+				name.append((char) c);
+				break;
+			} else
+				throw new ConfigInvalidException("Bad entry name: " + name);
+		}
+		return name.toString();
+	}
+

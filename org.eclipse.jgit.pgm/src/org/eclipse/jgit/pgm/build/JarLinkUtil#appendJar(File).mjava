@@ -1,0 +1,13 @@
+	private void appendJar(final File jarPath) throws IOException {
+		final ZipFile zf = new ZipFile(jarPath);
+		final Enumeration<? extends ZipEntry> e = zf.entries();
+		while (e.hasMoreElements()) {
+			final ZipEntry ze = e.nextElement();
+			final String name = ze.getName();
+			if (chosenSources.get(name) == jarPath)
+				appendEntry(name, ze.getSize(), ze.getTime(), zf
+						.getInputStream(ze));
+		}
+		zf.close();
+	}
+

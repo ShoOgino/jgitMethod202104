@@ -1,0 +1,20 @@
+		public MutableEntry next() {
+			for (; levelOne < names.length; levelOne++) {
+				if (levelTwo < names[levelOne].length) {
+					int idx = levelTwo / (Constants.OBJECT_ID_LENGTH / 4) * 4;
+					long offset = NB.decodeUInt32(offset32[levelOne], idx);
+					if ((offset & IS_O64) != 0) {
+						idx = (8 * (int) (offset & ~IS_O64));
+						offset = NB.decodeUInt64(offset64, idx);
+					}
+					entry.offset = offset;
+
+					levelTwo += Constants.OBJECT_ID_LENGTH / 4;
+					returnedNumber++;
+					return entry;
+				}
+				levelTwo = 0;
+			}
+			throw new NoSuchElementException();
+		}
+

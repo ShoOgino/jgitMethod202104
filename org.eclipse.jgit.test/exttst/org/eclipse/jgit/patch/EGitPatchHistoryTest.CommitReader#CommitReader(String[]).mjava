@@ -1,0 +1,13 @@
+		CommitReader(final String[] args) throws IOException {
+			final String[] realArgs = new String[3 + args.length + 1];
+			realArgs[0] = "git";
+			realArgs[1] = "log";
+			realArgs[2] = "--pretty=format:commit %H";
+			System.arraycopy(args, 0, realArgs, 3, args.length);
+			realArgs[3 + args.length] = "a4b98ed15ea5f165a7aa0f2fd2ea6fcce6710925";
+
+			proc = Runtime.getRuntime().exec(realArgs);
+			proc.getOutputStream().close();
+			proc.getErrorStream().close();
+		}
+

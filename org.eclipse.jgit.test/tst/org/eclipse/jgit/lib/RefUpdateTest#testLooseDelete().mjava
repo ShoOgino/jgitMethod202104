@@ -1,0 +1,9 @@
+	public void testLooseDelete() throws IOException {
+		final String newRef = "refs/heads/abc";
+		RefUpdate ref = updateRef(newRef);
+		ref.update(); // create loose ref
+		ref = updateRef(newRef); // refresh
+		delete(ref, Result.NO_CHANGE);
+		assertNull(db.getReflogReader("refs/heads/abc"));
+	}
+

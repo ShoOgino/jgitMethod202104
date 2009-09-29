@@ -1,0 +1,21 @@
+	private void updateFETCH_HEAD(final FetchResult result) throws IOException {
+		final LockFile lock = new LockFile(new File(transport.local
+				.getDirectory(), "FETCH_HEAD"));
+		try {
+			if (lock.lock()) {
+				final Writer w = new OutputStreamWriter(lock.getOutputStream());
+				try {
+					for (final FetchHeadRecord h : fetchHeadUpdates) {
+						h.write(w);
+						result.add(h);
+					}
+				} finally {
+					w.close();
+				}
+				lock.commit();
+			}
+		} finally {
+			lock.unlock();
+		}
+	}
+

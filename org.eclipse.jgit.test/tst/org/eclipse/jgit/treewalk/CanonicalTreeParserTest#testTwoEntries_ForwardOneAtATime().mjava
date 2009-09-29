@@ -1,0 +1,20 @@
+	public void testTwoEntries_ForwardOneAtATime() throws Exception {
+		ctp.reset(tree2);
+
+		assertTrue(ctp.first());
+		assertFalse(ctp.eof());
+		assertEquals(m644.getBits(), ctp.mode);
+		assertEquals("a", path());
+		assertEquals(hash_a, ctp.getEntryObjectId());
+
+		ctp.next(1);
+		assertFalse(ctp.eof());
+		assertEquals(m644.getBits(), ctp.mode);
+		assertEquals("foo", path());
+		assertEquals(hash_foo, ctp.getEntryObjectId());
+
+		ctp.next(1);
+		assertFalse(ctp.first());
+		assertTrue(ctp.eof());
+	}
+

@@ -1,0 +1,23 @@
+	@Override
+	protected void run() throws Exception {
+		final CommandRef[] list = CommandCatalog.all();
+
+		int width = 0;
+		for (final CommandRef c : list)
+			width = Math.max(width, c.getName().length());
+		width += 2;
+
+		for (final CommandRef c : list) {
+			System.err.print(c.isCommon() ? '*' : ' ');
+			System.err.print(' ');
+
+			System.err.print(c.getName());
+			for (int i = c.getName().length(); i < width; i++)
+				System.err.print(' ');
+
+			pretty.print(c);
+			System.err.println();
+		}
+		System.err.println();
+	}
+

@@ -1,0 +1,18 @@
+	public void testAdded() throws IOException {
+		GitIndex index = new GitIndex(db);
+		writeTrashFile("file1", "file1");
+		writeTrashFile("dir/subfile", "dir/subfile");
+		Tree tree = new Tree(db);
+
+		index.add(trash, new File(trash, "file1"));
+		index.add(trash, new File(trash, "dir/subfile"));
+		IndexDiff diff = new IndexDiff(tree, index);
+		diff.diff();
+		assertEquals(2, diff.getAdded().size());
+		assertTrue(diff.getAdded().contains("file1"));
+		assertTrue(diff.getAdded().contains("dir/subfile"));
+		assertEquals(0, diff.getChanged().size());
+		assertEquals(0, diff.getModified().size());
+		assertEquals(0, diff.getRemoved().size());
+	}
+

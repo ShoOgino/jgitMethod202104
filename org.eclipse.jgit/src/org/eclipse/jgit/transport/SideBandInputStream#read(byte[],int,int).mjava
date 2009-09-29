@@ -1,0 +1,18 @@
+	@Override
+	public int read(final byte[] b, int off, int len) throws IOException {
+		int r = 0;
+		while (len > 0) {
+			needDataPacket();
+			if (eof)
+				break;
+			final int n = in.read(b, off, Math.min(len, available));
+			if (n < 0)
+				break;
+			r += n;
+			off += n;
+			len -= n;
+			available -= n;
+		}
+		return eof && r == 0 ? -1 : r;
+	}
+

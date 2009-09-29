@@ -1,0 +1,32 @@
+	public void testDF_SkipsSeenSubtree() throws Exception {
+		final DirCache tree0 = DirCache.read(db);
+		final DirCache tree1 = DirCache.read(db);
+		{
+			final DirCacheBuilder b0 = tree0.builder();
+			final DirCacheBuilder b1 = tree1.builder();
+
+			b0.add(makeEntry("a", REGULAR_FILE));
+			b1.add(makeEntry("a.b", EXECUTABLE_FILE));
+			b1.add(makeEntry("a/b", REGULAR_FILE));
+			b0.add(makeEntry("a0b", SYMLINK));
+			b1.add(makeEntry("a0b", SYMLINK));
+
+			b0.finish();
+			b1.finish();
+			assertEquals(2, tree0.getEntryCount());
+			assertEquals(3, tree1.getEntryCount());
+		}
+
+		final NameConflictTreeWalk tw = new NameConflictTreeWalk(db);
+		tw.reset();
+		tw.addTree(new DirCacheIterator(tree0));
+		tw.addTree(new DirCacheIterator(tree1));
+
+		assertModes("a", REGULAR_FILE, TREE, tw);
+		assertTrue(tw.isSubtree());
+		tw.enterSubtree();
+		assertModes("a/b", MISSING, REGULAR_FILE, tw);
+		assertModes("a.b", MISSING, EXECUTABLE_FILE, tw);
+		assertModes("a0b", SYMLINK, SYMLINK, tw);
+	}
+

@@ -1,0 +1,19 @@
+	@Override
+	protected ObjectDatabase[] loadAlternates() throws IOException {
+		final BufferedReader br = open(alternatesFile);
+		final List<ObjectDatabase> l = new ArrayList<ObjectDatabase>(4);
+		try {
+			String line;
+			while ((line = br.readLine()) != null) {
+				l.add(openAlternate(line));
+			}
+		} finally {
+			br.close();
+		}
+
+		if (l.isEmpty()) {
+			return NO_ALTERNATES;
+		}
+		return l.toArray(new ObjectDatabase[l.size()]);
+	}
+

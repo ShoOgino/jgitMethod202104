@@ -1,0 +1,22 @@
+	/**
+	 * Delete a ref that exists both as packed and loose. Make sure the ref
+	 * cannot be resolved after delete.
+	 *
+	 * @throws IOException
+	 */
+	public void testDeleteLoosePacked() throws IOException {
+		ObjectId pid = db.resolve("refs/heads/c^");
+		RefUpdate updateRef = db.updateRef("refs/heads/c");
+		updateRef.setNewObjectId(pid);
+		updateRef.setForceUpdate(true);
+		Result update = updateRef.update();
+		assertEquals(Result.FORCED, update); // internal
+
+		// The real test here
+		RefUpdate updateRef2 = db.updateRef("refs/heads/c");
+		updateRef2.setForceUpdate(true);
+		Result delete = updateRef2.delete();
+		assertEquals(Result.FORCED, delete);
+		assertNull(db.resolve("refs/heads/c"));
+	}
+

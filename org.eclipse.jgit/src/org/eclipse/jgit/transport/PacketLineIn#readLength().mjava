@@ -1,0 +1,14 @@
+	int readLength() throws IOException {
+		NB.readFully(in, lenbuffer, 0, 4);
+		try {
+			final int len = RawParseUtils.parseHexInt16(lenbuffer, 0);
+			if (len != 0 && len < 4)
+				throw new ArrayIndexOutOfBoundsException();
+			return len;
+		} catch (ArrayIndexOutOfBoundsException err) {
+			throw new IOException("Invalid packet line header: "
+					+ (char) lenbuffer[0] + (char) lenbuffer[1]
+					+ (char) lenbuffer[2] + (char) lenbuffer[3]);
+		}
+	}
+

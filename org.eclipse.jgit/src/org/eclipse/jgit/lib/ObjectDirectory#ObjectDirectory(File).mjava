@@ -1,0 +1,14 @@
+	/**
+	 * Initialize a reference to an on-disk object directory.
+	 *
+	 * @param dir
+	 *            the location of the <code>objects</code> directory.
+	 */
+	public ObjectDirectory(final File dir) {
+		objects = dir;
+		infoDirectory = new File(objects, "info");
+		packDirectory = new File(objects, "pack");
+		alternatesFile = new File(infoDirectory, "alternates");
+		packList = new AtomicReference<PackList>(NO_PACKS);
+	}
+

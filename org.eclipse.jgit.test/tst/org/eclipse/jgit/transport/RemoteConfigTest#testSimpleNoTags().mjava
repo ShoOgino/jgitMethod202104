@@ -1,0 +1,9 @@
+	public void testSimpleNoTags() throws Exception {
+		readConfig("[remote \"spearce\"]\n"
+				+ "url = http://www.spearce.org/egit.git\n"
+				+ "fetch = +refs/heads/*:refs/remotes/spearce/*\n"
+				+ "tagopt = --no-tags\n");
+		final RemoteConfig rc = new RemoteConfig(config, "spearce");
+		assertSame(TagOpt.NO_TAGS, rc.getTagOpt());
+	}
+

@@ -1,0 +1,21 @@
+	/**
+	 * Materialize an object that doesn't yet exist in the cache.
+	 * <p>
+	 * This method is invoked by {@link #getOrLoad(PackFile, long)} when the
+	 * specified entity does not yet exist in the cache. Internal locking
+	 * ensures that at most one thread can call this method for each unique
+	 * <code>(pack,position)</code>, but multiple threads can call this method
+	 * concurrently for different <code>(pack,position)</code> tuples.
+	 *
+	 * @param pack
+	 *            the file to materialize the entry from.
+	 * @param position
+	 *            offset within the file of the entry.
+	 * @return the materialized object. Must never be null.
+	 * @throws IOException
+	 *             the method was unable to materialize the object for this
+	 *             input pair. The usual reasons would be file corruption, file
+	 *             not found, out of file descriptors, etc.
+	 */
+	protected abstract V load(PackFile pack, long position) throws IOException;
+

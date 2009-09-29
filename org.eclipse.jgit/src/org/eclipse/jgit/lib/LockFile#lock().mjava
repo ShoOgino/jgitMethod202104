@@ -1,0 +1,40 @@
+	/**
+	 * Try to establish the lock.
+	 * 
+	 * @return true if the lock is now held by the caller; false if it is held
+	 *         by someone else.
+	 * @throws IOException
+	 *             the temporary output file could not be created. The caller
+	 *             does not hold the lock.
+	 */
+	public boolean lock() throws IOException {
+		lck.getParentFile().mkdirs();
+		if (lck.createNewFile()) {
+			haveLck = true;
+			try {
+				os = new FileOutputStream(lck);
+				try {
+					fLck = os.getChannel().tryLock();
+					if (fLck == null)
+						throw new OverlappingFileLockException();
+				} catch (OverlappingFileLockException ofle) {
+					// We cannot use unlock() here as this file is not
+					// held by us, but we thought we created it. We must
+					// not delete it, as it belongs to some other process.
+					//
+					haveLck = false;
+					try {
+						os.close();
+					} catch (IOException ioe) {
+						// Fail by returning haveLck = false.
+					}
+					os = null;
+				}
+			} catch (IOException ioe) {
+				unlock();
+				throw ioe;
+			}
+		}
+		return haveLck;
+	}
+

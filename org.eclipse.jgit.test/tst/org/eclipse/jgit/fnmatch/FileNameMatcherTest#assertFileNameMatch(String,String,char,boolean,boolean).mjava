@@ -1,0 +1,11 @@
+	private void assertFileNameMatch(final String pattern, final String input,
+			final char excludedCharacter, final boolean matchExpected,
+			final boolean appendCanMatchExpected)
+			throws InvalidPatternException {
+		final FileNameMatcher matcher = new FileNameMatcher(pattern,
+				new Character(excludedCharacter));
+		matcher.append(input);
+		assertEquals(matchExpected, matcher.isMatch());
+		assertEquals(appendCanMatchExpected, matcher.canAppendMatch());
+	}
+

@@ -1,0 +1,20 @@
+	public void testFileKeyOpenNew() throws IOException {
+		final Repository n = createNewEmptyRepo(true);
+		final File gitdir = n.getDirectory();
+		n.close();
+		recursiveDelete(gitdir);
+		assertFalse(gitdir.exists());
+
+		try {
+			new FileKey(gitdir).open(true);
+			fail("incorrectly opened a non existant repository");
+		} catch (RepositoryNotFoundException e) {
+			assertEquals("repository not found: " + gitdir, e.getMessage());
+		}
+
+		final Repository o = new FileKey(gitdir).open(false);
+		assertNotNull(o);
+		assertEquals(gitdir, o.getDirectory());
+		assertFalse(gitdir.exists());
+	}
+

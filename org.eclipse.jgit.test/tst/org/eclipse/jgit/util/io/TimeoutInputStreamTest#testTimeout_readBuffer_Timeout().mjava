@@ -1,0 +1,11 @@
+	public void testTimeout_readBuffer_Timeout() throws IOException {
+		beginRead();
+		try {
+			NB.readFully(is, new byte[512], 0, 512);
+			fail("incorrectly read bytes");
+		} catch (InterruptedIOException e) {
+			// expected
+		}
+		assertTimeout();
+	}
+

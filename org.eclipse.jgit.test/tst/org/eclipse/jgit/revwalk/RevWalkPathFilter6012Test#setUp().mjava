@@ -1,0 +1,31 @@
+	public void setUp() throws Exception {
+		super.setUp();
+
+		// Test graph was stolen from git-core t6012-rev-list-simplify
+		// (by Junio C Hamano in 65347030590bcc251a9ff2ed96487a0f1b9e9fa8)
+		//
+		final RevBlob zF = blob("zF");
+		final RevBlob zH = blob("zH");
+		final RevBlob zI = blob("zI");
+		final RevBlob zS = blob("zS");
+		final RevBlob zY = blob("zY");
+
+		a = commit(tree(file(pF, zH)));
+		b = commit(tree(file(pF, zI)), a);
+		c = commit(tree(file(pF, zI)), a);
+		d = commit(tree(file(pA, zS), file(pF, zI)), c);
+		parse(d);
+		e = commit(d.getTree(), d, b);
+		f = commit(tree(file(pA, zS), file(pE, zY), file(pF, zI)), e);
+		parse(f);
+		g = commit(tree(file(pE, zY), file(pF, zI)), b);
+		h = commit(f.getTree(), g, f);
+		i = commit(tree(file(pA, zS), file(pE, zY), file(pF, zF)), h);
+
+		byName = new HashMap<RevCommit, String>();
+		for (Field z : RevWalkPathFilter6012Test.class.getDeclaredFields()) {
+			if (z.getType() == RevCommit.class)
+				byName.put((RevCommit) z.get(this), z.getName());
+		}
+	}
+

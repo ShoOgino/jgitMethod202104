@@ -1,0 +1,13 @@
+		@Override
+		FileStream open(final String path) throws IOException {
+			try {
+				final SftpATTRS a = ftp.lstat(path);
+				return new FileStream(ftp.get(path), a.getSize());
+			} catch (SftpException je) {
+				if (je.id == ChannelSftp.SSH_FX_NO_SUCH_FILE)
+					throw new FileNotFoundException(path);
+				throw new TransportException("Can't get " + objectsPath + "/"
+						+ path + ": " + je.getMessage(), je);
+			}
+		}
+

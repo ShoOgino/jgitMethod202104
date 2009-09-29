@@ -1,0 +1,42 @@
+	/**
+	 * Read a standard Git alternates file to discover other object databases.
+	 * <p>
+	 * This method is suitable for reading the standard formats of the
+	 * alternates file, such as found in <code>objects/info/alternates</code>
+	 * or <code>objects/info/http-alternates</code> within a Git repository.
+	 * <p>
+	 * Alternates appear one per line, with paths expressed relative to this
+	 * object database.
+	 * 
+	 * @param listPath
+	 *            location of the alternate file to read, relative to this
+	 *            object database (e.g. <code>info/alternates</code>).
+	 * @return the list of discovered alternates. Empty list if the file exists,
+	 *         but no entries were discovered.
+	 * @throws FileNotFoundException
+	 *             the requested file does not exist at the given location.
+	 * @throws IOException
+	 *             The connection is unable to read the remote's file, and the
+	 *             failure occurred prior to being able to determine if the file
+	 *             exists, or after it was determined to exist but before the
+	 *             stream could be created.
+	 */
+	Collection<WalkRemoteObjectDatabase> readAlternates(final String listPath)
+			throws IOException {
+		final BufferedReader br = openReader(listPath);
+		try {
+			final Collection<WalkRemoteObjectDatabase> alts = new ArrayList<WalkRemoteObjectDatabase>();
+			for (;;) {
+				String line = br.readLine();
+				if (line == null)
+					break;
+				if (!line.endsWith("/"))
+					line += "/";
+				alts.add(openAlternate(line));
+			}
+			return alts;
+		} finally {
+			br.close();
+		}
+	}
+

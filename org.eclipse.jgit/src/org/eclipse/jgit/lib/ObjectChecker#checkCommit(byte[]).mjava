@@ -1,0 +1,33 @@
+	/**
+	 * Check a commit for errors.
+	 *
+	 * @param raw
+	 *            the commit data. The array is never modified.
+	 * @throws CorruptObjectException
+	 *             if any error was detected.
+	 */
+	public void checkCommit(final byte[] raw) throws CorruptObjectException {
+		int ptr = 0;
+
+		if ((ptr = match(raw, ptr, tree)) < 0)
+			throw new CorruptObjectException("no tree header");
+		if ((ptr = id(raw, ptr)) < 0 || raw[ptr++] != '\n')
+			throw new CorruptObjectException("invalid tree");
+
+		while (match(raw, ptr, parent) >= 0) {
+			ptr += parent.length;
+			if ((ptr = id(raw, ptr)) < 0 || raw[ptr++] != '\n')
+				throw new CorruptObjectException("invalid parent");
+		}
+
+		if ((ptr = match(raw, ptr, author)) < 0)
+			throw new CorruptObjectException("no author");
+		if ((ptr = personIdent(raw, ptr)) < 0 || raw[ptr++] != '\n')
+			throw new CorruptObjectException("invalid author");
+
+		if ((ptr = match(raw, ptr, committer)) < 0)
+			throw new CorruptObjectException("no committer");
+		if ((ptr = personIdent(raw, ptr)) < 0 || raw[ptr++] != '\n')
+			throw new CorruptObjectException("invalid committer");
+	}
+

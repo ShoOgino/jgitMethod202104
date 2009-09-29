@@ -1,0 +1,13 @@
+	/**
+	 * Create an iterator to walk the merge base.
+	 *
+	 * @return an iterator over the caller-specified merge base, or the natural
+	 *         merge base of the two input commits.
+	 * @throws IOException
+	 */
+	protected AbstractTreeIterator mergeBase() throws IOException {
+		if (baseTree != null)
+			return openTree(baseTree);
+		return mergeBase(0, 1);
+	}
+

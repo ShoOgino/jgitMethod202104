@@ -1,0 +1,35 @@
+	private void markTreeComplete(final RevTree tree) throws IOException {
+		if (tree.has(COMPLETE))
+			return;
+		tree.add(COMPLETE);
+		treeWalk.reset(tree);
+		while (treeWalk.next()) {
+			final FileMode mode = treeWalk.getFileMode(0);
+			final int sType = mode.getObjectType();
+
+			switch (sType) {
+			case Constants.OBJ_BLOB:
+				treeWalk.getObjectId(idBuffer, 0);
+				revWalk.lookupAny(idBuffer, sType).add(COMPLETE);
+				continue;
+
+			case Constants.OBJ_TREE: {
+				treeWalk.getObjectId(idBuffer, 0);
+				final RevObject o = revWalk.lookupAny(idBuffer, sType);
+				if (!o.has(COMPLETE)) {
+					o.add(COMPLETE);
+					treeWalk.enterSubtree();
+				}
+				continue;
+			}
+			default:
+				if (FileMode.GITLINK.equals(mode))
+					continue;
+				treeWalk.getObjectId(idBuffer, 0);
+				throw new CorruptObjectException("Invalid mode " + mode
+						+ " for " + idBuffer.name() + " "
+						+ treeWalk.getPathString() + " in " + tree.name() + ".");
+			}
+		}
+	}
+

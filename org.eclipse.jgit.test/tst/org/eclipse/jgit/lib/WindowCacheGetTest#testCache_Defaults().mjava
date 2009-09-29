@@ -1,0 +1,11 @@
+	public void testCache_Defaults() throws IOException {
+		final WindowCacheConfig cfg = new WindowCacheConfig();
+		WindowCache.reconfigure(cfg);
+		doCacheTests();
+		checkLimits(cfg);
+
+		final WindowCache cache = WindowCache.getInstance();
+		assertEquals(6, cache.getOpenFiles());
+		assertEquals(17346, cache.getOpenBytes());
+	}
+

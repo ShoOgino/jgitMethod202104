@@ -1,0 +1,16 @@
+	private V scan(Entry<V> n, final PackFile pack, final long position) {
+		for (; n != null; n = n.next) {
+			final Ref<V> r = n.ref;
+			if (r.pack == pack && r.position == position) {
+				final V v = r.get();
+				if (v != null) {
+					hit(r);
+					return v;
+				}
+				n.kill();
+				break;
+			}
+		}
+		return null;
+	}
+

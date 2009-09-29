@@ -1,0 +1,26 @@
+	public void testTwoCommitDeepTree1() throws Exception {
+		final RevBlob f0 = blob("0");
+		final RevBlob f1 = blob("0v2");
+		final RevTree ta = tree(file("a/b/0", f0));
+		final RevTree tb = tree(file("a/b/1", f1));
+		final RevCommit a = commit(ta);
+		final RevCommit b = commit(tb, a);
+		markStart(b);
+
+		assertCommit(b, objw.next());
+		assertCommit(a, objw.next());
+		assertNull(objw.next());
+
+		assertSame(tb, objw.nextObject());
+		assertSame(get(tb, "a"), objw.nextObject());
+		assertSame(get(tb, "a/b"), objw.nextObject());
+		assertSame(f1, objw.nextObject());
+
+		assertSame(ta, objw.nextObject());
+		assertSame(get(ta, "a"), objw.nextObject());
+		assertSame(get(ta, "a/b"), objw.nextObject());
+		assertSame(f0, objw.nextObject());
+
+		assertNull(objw.nextObject());
+	}
+

@@ -1,0 +1,9 @@
+	public void testReadMissing_TempIndex() throws Exception {
+		final File idx = new File(db.getDirectory(), "tmp_index");
+		assertFalse(idx.exists());
+
+		final DirCache dc = DirCache.read(idx);
+		assertNotNull(dc);
+		assertEquals(0, dc.getEntryCount());
+	}
+

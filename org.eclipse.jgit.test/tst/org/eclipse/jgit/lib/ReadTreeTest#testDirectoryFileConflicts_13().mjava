@@ -1,0 +1,10 @@
+	public void testDirectoryFileConflicts_13() throws Exception {
+		// 13
+		cleanUpDF();
+		setupCase(mk("DF"), mk("DF/DF"), mk("DF"));
+		writeTrashFile("DF", "asdfsdf");
+		go();
+		assertConflict("DF");
+		assertUpdated("DF/DF");
+	}
+

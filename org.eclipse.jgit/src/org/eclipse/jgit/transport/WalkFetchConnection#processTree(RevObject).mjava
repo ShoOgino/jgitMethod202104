@@ -1,0 +1,30 @@
+	private void processTree(final RevObject obj) throws TransportException {
+		try {
+			treeWalk.reset(obj);
+			while (treeWalk.next()) {
+				final FileMode mode = treeWalk.getFileMode(0);
+				final int sType = mode.getObjectType();
+
+				switch (sType) {
+				case Constants.OBJ_BLOB:
+				case Constants.OBJ_TREE:
+					treeWalk.getObjectId(idBuffer, 0);
+					needs(revWalk.lookupAny(idBuffer, sType));
+					continue;
+
+				default:
+					if (FileMode.GITLINK.equals(mode))
+						continue;
+					treeWalk.getObjectId(idBuffer, 0);
+					throw new CorruptObjectException("Invalid mode " + mode
+							+ " for " + idBuffer.name() + " "
+							+ treeWalk.getPathString() + " in "
+							+ obj.getId().name() + ".");
+				}
+			}
+		} catch (IOException ioe) {
+			throw new TransportException("Cannot read tree " + obj.name(), ioe);
+		}
+		obj.add(COMPLETE);
+	}
+

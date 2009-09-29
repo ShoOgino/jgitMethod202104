@@ -1,0 +1,9 @@
+	private void processCommit(final RevObject obj) throws TransportException {
+		final RevCommit commit = (RevCommit) obj;
+		markLocalCommitsComplete(commit.getCommitTime());
+		needs(commit.getTree());
+		for (final RevCommit p : commit.getParents())
+			needs(p);
+		obj.add(COMPLETE);
+	}
+

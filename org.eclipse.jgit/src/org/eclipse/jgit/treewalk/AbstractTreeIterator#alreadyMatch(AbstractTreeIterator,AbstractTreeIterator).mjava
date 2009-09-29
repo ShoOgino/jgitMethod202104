@@ -1,0 +1,14 @@
+	private static int alreadyMatch(AbstractTreeIterator a,
+			AbstractTreeIterator b) {
+		for (;;) {
+			final AbstractTreeIterator ap = a.parent;
+			final AbstractTreeIterator bp = b.parent;
+			if (ap == null || bp == null)
+				return 0;
+			if (ap.matches == bp.matches)
+				return a.pathOffset;
+			a = ap;
+			b = bp;
+		}
+	}
+

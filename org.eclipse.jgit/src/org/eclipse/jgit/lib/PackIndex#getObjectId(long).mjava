@@ -1,0 +1,21 @@
+	/**
+	 * Get ObjectId for the n-th object entry returned by {@link #iterator()}.
+	 * <p>
+	 * This method is a constant-time replacement for the following loop:
+	 *
+	 * <pre>
+	 * Iterator&lt;MutableEntry&gt; eItr = index.iterator();
+	 * int curPosition = 0;
+	 * while (eItr.hasNext() &amp;&amp; curPosition++ &lt; nthPosition)
+	 * 	eItr.next();
+	 * ObjectId result = eItr.next().toObjectId();
+	 * </pre>
+	 *
+	 * @param nthPosition
+	 *            position within the traversal of {@link #iterator()} that the
+	 *            caller needs the object for. The first returned
+	 *            {@link MutableEntry} is 0, the second is 1, etc.
+	 * @return the ObjectId for the corresponding entry.
+	 */
+	abstract ObjectId getObjectId(long nthPosition);
+

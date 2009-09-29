@@ -1,0 +1,15 @@
+	@Override
+	protected void writeImpl() throws IOException {
+		writeFanOutTable();
+
+		for (final PackedObjectInfo oe : entries) {
+			if (!canStore(oe))
+				throw new IOException("Pack too large for index version 1");
+			NB.encodeInt32(tmp, 0, (int) oe.getOffset());
+			oe.copyRawTo(tmp, 4);
+			out.write(tmp);
+		}
+
+		writeChecksumFooter();
+	}
+

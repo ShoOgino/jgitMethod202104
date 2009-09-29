@@ -1,0 +1,16 @@
+	/**
+	 * Set path buffer capacity to the specified size
+	 *
+	 * @param capacity
+	 *            the new size
+	 * @param len
+	 *            the amount of bytes to copy
+	 */
+	private void setPathCapacity(int capacity, int len) {
+		final byte[] o = path;
+		final byte[] n = new byte[capacity];
+		System.arraycopy(o, 0, n, 0, len);
+		for (AbstractTreeIterator p = this; p != null && p.path == o; p = p.parent)
+			p.path = n;
+	}
+

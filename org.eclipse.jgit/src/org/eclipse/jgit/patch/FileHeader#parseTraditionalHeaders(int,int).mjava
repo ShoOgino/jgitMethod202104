@@ -1,0 +1,23 @@
+	int parseTraditionalHeaders(int ptr, final int end) {
+		while (ptr < end) {
+			final int eol = nextLF(buf, ptr);
+			if (isHunkHdr(buf, ptr, eol) >= 1) {
+				// First hunk header; break out and parse them later.
+				break;
+
+			} else if (match(buf, ptr, OLD_NAME) >= 0) {
+				parseOldName(ptr, eol);
+
+			} else if (match(buf, ptr, NEW_NAME) >= 0) {
+				parseNewName(ptr, eol);
+
+			} else {
+				// Possibly an empty patch.
+				break;
+			}
+
+			ptr = eol;
+		}
+		return ptr;
+	}
+

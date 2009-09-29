@@ -1,0 +1,26 @@
+	@Override
+	public void parseArgument(final String... args) throws CmdLineException {
+		final ArrayList<String> tmp = new ArrayList<String>(args.length);
+		for (int argi = 0; argi < args.length; argi++) {
+			final String str = args[argi];
+			if (str.equals("--")) {
+				while (argi < args.length)
+					tmp.add(args[argi++]);
+				break;
+			}
+
+			if (str.startsWith("--")) {
+				final int eq = str.indexOf('=');
+				if (eq > 0) {
+					tmp.add(str.substring(0, eq));
+					tmp.add(str.substring(eq + 1));
+					continue;
+				}
+			}
+
+			tmp.add(str);
+		}
+
+		super.parseArgument(tmp.toArray(new String[tmp.size()]));
+	}
+

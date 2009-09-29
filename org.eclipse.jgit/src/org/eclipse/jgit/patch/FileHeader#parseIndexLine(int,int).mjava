@@ -1,0 +1,14 @@
+	void parseIndexLine(int ptr, final int end) {
+		// "index $asha1..$bsha1[ $mode]" where $asha1 and $bsha1
+		// can be unique abbreviations
+		//
+		final int dot2 = nextLF(buf, ptr, '.');
+		final int mode = nextLF(buf, dot2, ' ');
+
+		oldId = AbbreviatedObjectId.fromString(buf, ptr, dot2 - 1);
+		newId = AbbreviatedObjectId.fromString(buf, dot2 + 1, mode - 1);
+
+		if (mode < end)
+			newMode = oldMode = parseFileMode(mode, end);
+	}
+

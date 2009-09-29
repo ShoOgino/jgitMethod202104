@@ -1,0 +1,18 @@
+	/**
+	 * Create a filter around many filters, all of which must match.
+	 * 
+	 * @param list
+	 *            list of filters to match against. Must contain at least 2
+	 *            filters.
+	 * @return a filter that must match all input filters.
+	 */
+	public static TreeFilter create(final TreeFilter[] list) {
+		if (list.length == 2)
+			return create(list[0], list[1]);
+		if (list.length < 2)
+			throw new IllegalArgumentException("At least two filters needed.");
+		final TreeFilter[] subfilters = new TreeFilter[list.length];
+		System.arraycopy(list, 0, subfilters, 0, list.length);
+		return new List(subfilters);
+	}
+

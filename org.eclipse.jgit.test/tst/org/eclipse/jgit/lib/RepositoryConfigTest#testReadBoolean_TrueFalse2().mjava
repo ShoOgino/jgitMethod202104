@@ -1,0 +1,9 @@
+	public void testReadBoolean_TrueFalse2() throws ConfigInvalidException {
+		final Config c = parse("[s]\na = TrUe\nb = fAlSe\n");
+		assertEquals("TrUe", c.getString("s", null, "a"));
+		assertEquals("fAlSe", c.getString("s", null, "b"));
+
+		assertTrue(c.getBoolean("s", "a", false));
+		assertFalse(c.getBoolean("s", "b", true));
+	}
+

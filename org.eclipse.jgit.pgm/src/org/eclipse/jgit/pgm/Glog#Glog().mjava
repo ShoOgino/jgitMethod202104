@@ -1,0 +1,30 @@
+	Glog() {
+		frame = new JFrame();
+		frame.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(final WindowEvent e) {
+				frame.dispose();
+			}
+		});
+
+		graphPane = new CommitGraphPane();
+
+		final JScrollPane graphScroll = new JScrollPane(graphPane);
+
+		final JPanel buttons = new JPanel(new FlowLayout());
+		final JButton repaint = new JButton();
+		repaint.setText("Repaint");
+		repaint.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				graphPane.repaint();
+			}
+		});
+		buttons.add(repaint);
+
+		final JPanel world = new JPanel(new BorderLayout());
+		world.add(buttons, BorderLayout.SOUTH);
+		world.add(graphScroll, BorderLayout.CENTER);
+
+		frame.getContentPane().add(world);
+	}
+

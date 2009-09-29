@@ -1,0 +1,23 @@
+	/**
+	 * Set the common ancestor tree.
+	 *
+	 * @param id
+	 *            common base treeish; null to automatically compute the common
+	 *            base from the input commits during
+	 *            {@link #merge(AnyObjectId, AnyObjectId)}.
+	 * @throws IncorrectObjectTypeException
+	 *             the object is not a treeish.
+	 * @throws MissingObjectException
+	 *             the object does not exist.
+	 * @throws IOException
+	 *             the object could not be read.
+	 */
+	public void setBase(final AnyObjectId id) throws MissingObjectException,
+			IncorrectObjectTypeException, IOException {
+		if (id != null) {
+			baseTree = walk.parseTree(id);
+		} else {
+			baseTree = null;
+		}
+	}
+

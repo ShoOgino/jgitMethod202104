@@ -1,0 +1,12 @@
+	@Override
+	public void flush() throws IOException {
+		try {
+			beginWrite();
+			dst.flush();
+		} catch (InterruptedIOException e) {
+			throw writeTimedOut();
+		} finally {
+			endWrite();
+		}
+	}
+

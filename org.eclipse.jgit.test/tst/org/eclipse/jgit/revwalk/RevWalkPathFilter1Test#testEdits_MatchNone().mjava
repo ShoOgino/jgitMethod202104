@@ -1,0 +1,10 @@
+	public void testEdits_MatchNone() throws Exception {
+		final RevCommit a = commit(tree(file("0", blob("a"))));
+		final RevCommit b = commit(tree(file("0", blob("b"))), a);
+		final RevCommit c = commit(tree(file("0", blob("c"))), b);
+		final RevCommit d = commit(tree(file("0", blob("d"))), c);
+		filter("a");
+		markStart(d);
+		assertNull(rw.next());
+	}
+

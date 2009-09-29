@@ -1,0 +1,20 @@
+	public void testSort_COMMIT_TIME_DESC_OutOfOrder1() throws Exception {
+		// Despite being out of order time-wise, a strand-of-pearls must
+		// still maintain topological order.
+		//
+		final RevCommit a = commit();
+		final RevCommit b = commit(a);
+		final RevCommit c = commit(-5, b);
+		final RevCommit d = commit(10, c);
+		assertTrue(parse(a).getCommitTime() < parse(d).getCommitTime());
+		assertTrue(parse(c).getCommitTime() < parse(b).getCommitTime());
+
+		rw.sort(RevSort.COMMIT_TIME_DESC);
+		markStart(d);
+		assertCommit(d, rw.next());
+		assertCommit(c, rw.next());
+		assertCommit(b, rw.next());
+		assertCommit(a, rw.next());
+		assertNull(rw.next());
+	}
+

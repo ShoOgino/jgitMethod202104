@@ -1,0 +1,18 @@
+	/**
+	 * Add a single repository to the set that is exported by this daemon.
+	 * <p>
+	 * The existence (or lack-thereof) of <code>git-daemon-export-ok</code> is
+	 * ignored by this method. The repository is always published.
+	 *
+	 * @param name
+	 *            name the repository will be published under.
+	 * @param db
+	 *            the repository instance.
+	 */
+	public void exportRepository(String name, final Repository db) {
+		if (!name.endsWith(".git"))
+			name = name + ".git";
+		exports.put(name, db);
+		RepositoryCache.register(db);
+	}
+

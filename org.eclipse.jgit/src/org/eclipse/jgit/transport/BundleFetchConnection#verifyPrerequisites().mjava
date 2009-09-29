@@ -1,0 +1,58 @@
+	private void verifyPrerequisites() throws TransportException {
+		if (prereqs.isEmpty())
+			return;
+
+		final RevWalk rw = new RevWalk(transport.local);
+		final RevFlag PREREQ = rw.newFlag("PREREQ");
+		final RevFlag SEEN = rw.newFlag("SEEN");
+
+		final List<ObjectId> missing = new ArrayList<ObjectId>();
+		final List<RevObject> commits = new ArrayList<RevObject>();
+		for (final ObjectId p : prereqs) {
+			try {
+				final RevCommit c = rw.parseCommit(p);
+				if (!c.has(PREREQ)) {
+					c.add(PREREQ);
+					commits.add(c);
+				}
+			} catch (MissingObjectException notFound) {
+				missing.add(p);
+			} catch (IOException err) {
+				throw new TransportException(transport.uri, "Cannot read commit "
+						+ p.name(), err);
+			}
+		}
+		if (!missing.isEmpty())
+			throw new MissingBundlePrerequisiteException(transport.uri, missing);
+
+		for (final Ref r : transport.local.getAllRefs().values()) {
+			try {
+				rw.markStart(rw.parseCommit(r.getObjectId()));
+			} catch (IOException readError) {
+				// If we cannot read the value of the ref skip it.
+			}
+		}
+
+		int remaining = commits.size();
+		try {
+			RevCommit c;
+			while ((c = rw.next()) != null) {
+				if (c.has(PREREQ)) {
+					c.add(SEEN);
+					if (--remaining == 0)
+						break;
+				}
+			}
+		} catch (IOException err) {
+			throw new TransportException(transport.uri, "Cannot read object", err);
+		}
+
+		if (remaining > 0) {
+			for (final RevObject o : commits) {
+				if (!o.has(SEEN))
+					missing.add(o);
+			}
+			throw new MissingBundlePrerequisiteException(transport.uri, missing);
+		}
+	}
+

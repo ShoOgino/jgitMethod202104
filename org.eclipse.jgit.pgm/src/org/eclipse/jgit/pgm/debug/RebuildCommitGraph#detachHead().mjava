@@ -1,0 +1,14 @@
+	private void detachHead() throws IOException {
+		final String head = db.getFullBranch();
+		final ObjectId id = db.resolve(Constants.HEAD);
+		if (!ObjectId.isId(head) && id != null) {
+			final LockFile lf;
+			lf = new LockFile(new File(db.getDirectory(), Constants.HEAD));
+			if (!lf.lock())
+				throw new IOException("Cannot lock HEAD");
+			lf.write(id);
+			if (!lf.commit())
+				throw new IOException("Cannot deatch HEAD");
+		}
+	}
+

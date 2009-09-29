@@ -1,0 +1,64 @@
+	private Map<String, RemoteRefUpdate> prepareRemoteUpdates()
+			throws TransportException {
+		final Map<String, RemoteRefUpdate> result = new HashMap<String, RemoteRefUpdate>();
+		for (final RemoteRefUpdate rru : toPush.values()) {
+			final Ref advertisedRef = connection.getRef(rru.getRemoteName());
+			final ObjectId advertisedOld = (advertisedRef == null ? ObjectId
+					.zeroId() : advertisedRef.getObjectId());
+
+			if (rru.getNewObjectId().equals(advertisedOld)) {
+				if (rru.isDelete()) {
+					// ref does exist neither locally nor remotely
+					rru.setStatus(Status.NON_EXISTING);
+				} else {
+					// same object - nothing to do
+					rru.setStatus(Status.UP_TO_DATE);
+				}
+				continue;
+			}
+
+			// caller has explicitly specified expected old object id, while it
+			// has been changed in the mean time - reject
+			if (rru.isExpectingOldObjectId()
+					&& !rru.getExpectedOldObjectId().equals(advertisedOld)) {
+				rru.setStatus(Status.REJECTED_REMOTE_CHANGED);
+				continue;
+			}
+
+			// create ref (hasn't existed on remote side) and delete ref
+			// are always fast-forward commands, feasible at this level
+			if (advertisedOld.equals(ObjectId.zeroId()) || rru.isDelete()) {
+				rru.setFastForward(true);
+				result.put(rru.getRemoteName(), rru);
+				continue;
+			}
+
+			// check for fast-forward:
+			// - both old and new ref must point to commits, AND
+			// - both of them must be known for us, exist in repository, AND
+			// - old commit must be ancestor of new commit
+			boolean fastForward = true;
+			try {
+				RevObject oldRev = walker.parseAny(advertisedOld);
+				final RevObject newRev = walker.parseAny(rru.getNewObjectId());
+				if (!(oldRev instanceof RevCommit)
+						|| !(newRev instanceof RevCommit)
+						|| !walker.isMergedInto((RevCommit) oldRev,
+								(RevCommit) newRev))
+					fastForward = false;
+			} catch (MissingObjectException x) {
+				fastForward = false;
+			} catch (Exception x) {
+				throw new TransportException(transport.getURI(),
+						"reading objects from local repository failed: "
+								+ x.getMessage(), x);
+			}
+			rru.setFastForward(fastForward);
+			if (!fastForward && !rru.isForceUpdate())
+				rru.setStatus(Status.REJECTED_NONFASTFORWARD);
+			else
+				result.put(rru.getRemoteName(), rru);
+		}
+		return result;
+	}
+

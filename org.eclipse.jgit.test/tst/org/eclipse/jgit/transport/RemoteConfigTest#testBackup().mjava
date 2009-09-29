@@ -1,0 +1,36 @@
+	public void testBackup() throws Exception {
+		readConfig("[remote \"backup\"]\n"
+				+ "url = http://www.spearce.org/egit.git\n"
+				+ "url = user@repo.or.cz:/srv/git/egit.git\n"
+				+ "push = +refs/heads/*:refs/heads/*\n"
+				+ "push = refs/tags/*:refs/tags/*\n");
+
+		final RemoteConfig rc = new RemoteConfig(config, "backup");
+		final List<URIish> allURIs = rc.getURIs();
+		RefSpec spec;
+
+		assertEquals("backup", rc.getName());
+		assertNotNull(allURIs);
+		assertNotNull(rc.getFetchRefSpecs());
+		assertNotNull(rc.getPushRefSpecs());
+
+		assertEquals(2, allURIs.size());
+		assertEquals("http://www.spearce.org/egit.git", allURIs.get(0));
+		assertEquals("user@repo.or.cz:/srv/git/egit.git", allURIs.get(1));
+
+		assertEquals(0, rc.getFetchRefSpecs().size());
+
+		assertEquals(2, rc.getPushRefSpecs().size());
+		spec = rc.getPushRefSpecs().get(0);
+		assertTrue(spec.isForceUpdate());
+		assertTrue(spec.isWildcard());
+		assertEquals("refs/heads/*", spec.getSource());
+		assertEquals("refs/heads/*", spec.getDestination());
+
+		spec = rc.getPushRefSpecs().get(1);
+		assertFalse(spec.isForceUpdate());
+		assertTrue(spec.isWildcard());
+		assertEquals("refs/tags/*", spec.getSource());
+		assertEquals("refs/tags/*", spec.getDestination());
+	}
+

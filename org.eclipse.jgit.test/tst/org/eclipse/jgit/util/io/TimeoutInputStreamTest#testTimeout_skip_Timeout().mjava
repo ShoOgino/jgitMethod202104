@@ -1,0 +1,11 @@
+	public void testTimeout_skip_Timeout() throws IOException {
+		beginRead();
+		try {
+			is.skip(1024);
+			fail("incorrectly skipped bytes");
+		} catch (InterruptedIOException e) {
+			// expected
+		}
+		assertTimeout();
+	}
+

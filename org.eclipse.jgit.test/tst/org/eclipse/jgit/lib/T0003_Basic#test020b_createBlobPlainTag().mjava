@@ -1,0 +1,13 @@
+	public void test020b_createBlobPlainTag() throws IOException {
+		test020_createBlobTag();
+		Tag t = new Tag(db);
+		t.setTag("test020b");
+		t.setObjId(ObjectId.fromString("e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"));
+		t.tag();
+		
+		Tag mapTag = db.mapTag("test020b");
+		assertEquals("e69de29bb2d1d6434b8b29ae775ad8c2e48c5391", mapTag.getObjId().name());
+		
+		// We do not repeat the plain tag test for other object types
+	}
+

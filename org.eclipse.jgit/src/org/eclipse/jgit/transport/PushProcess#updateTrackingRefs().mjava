@@ -1,0 +1,18 @@
+	private void updateTrackingRefs() {
+		for (final RemoteRefUpdate rru : toPush.values()) {
+			final Status status = rru.getStatus();
+			if (rru.hasTrackingRefUpdate()
+					&& (status == Status.UP_TO_DATE || status == Status.OK)) {
+				// update local tracking branch only when there is a chance that
+				// it has changed; this is possible for:
+				// -updated (OK) status,
+				// -up to date (UP_TO_DATE) status
+				try {
+					rru.updateTrackingRef(walker);
+				} catch (IOException e) {
+					// ignore as RefUpdate has stored I/O error status
+				}
+			}
+		}
+	}
+

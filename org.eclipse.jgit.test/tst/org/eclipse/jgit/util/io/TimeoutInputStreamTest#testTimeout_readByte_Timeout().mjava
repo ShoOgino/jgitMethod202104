@@ -1,0 +1,11 @@
+	public void testTimeout_readByte_Timeout() throws IOException {
+		beginRead();
+		try {
+			is.read();
+			fail("incorrectly read a byte");
+		} catch (InterruptedIOException e) {
+			// expected
+		}
+		assertTimeout();
+	}
+

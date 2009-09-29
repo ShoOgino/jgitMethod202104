@@ -1,0 +1,33 @@
+	private void formatEdits(final OutputStream out, final RawText a,
+			final RawText b, final EditList edits) throws IOException {
+		for (int curIdx = 0; curIdx < edits.size();) {
+			Edit curEdit = edits.get(curIdx);
+			final int endIdx = findCombinedEnd(edits, curIdx);
+			final Edit endEdit = edits.get(endIdx);
+
+			int aCur = Math.max(0, curEdit.getBeginA() - context);
+			int bCur = Math.max(0, curEdit.getBeginB() - context);
+			final int aEnd = Math.min(a.size(), endEdit.getEndA() + context);
+			final int bEnd = Math.min(b.size(), endEdit.getEndB() + context);
+
+			writeHunkHeader(out, aCur, aEnd, bCur, bEnd);
+
+			while (aCur < aEnd || bCur < bEnd) {
+				if (aCur < curEdit.getBeginA() || endIdx + 1 < curIdx) {
+					writeLine(out, ' ', a, aCur);
+					aCur++;
+					bCur++;
+
+				} else if (aCur < curEdit.getEndA()) {
+					writeLine(out, '-', a, aCur++);
+
+				} else if (bCur < curEdit.getEndB()) {
+					writeLine(out, '+', b, bCur++);
+				}
+
+				if (end(curEdit, aCur, bCur) && ++curIdx < edits.size())
+					curEdit = edits.get(curIdx);
+			}
+		}
+	}
+

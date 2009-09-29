@@ -1,0 +1,34 @@
+	/**
+	 * Write arbitrary data to the temporary file.
+	 * 
+	 * @param content
+	 *            the bytes to store in the temporary file. No additional bytes
+	 *            are added, so if the file must end with an LF it must appear
+	 *            at the end of the byte array.
+	 * @throws IOException
+	 *             the temporary file could not be written. The lock is released
+	 *             before throwing the underlying IO exception to the caller.
+	 * @throws RuntimeException
+	 *             the temporary file could not be written. The lock is released
+	 *             before throwing the underlying exception to the caller.
+	 */
+	public void write(final byte[] content) throws IOException {
+		requireLock();
+		try {
+			os.write(content);
+			os.flush();
+			fLck.release();
+			os.close();
+			os = null;
+		} catch (IOException ioe) {
+			unlock();
+			throw ioe;
+		} catch (RuntimeException ioe) {
+			unlock();
+			throw ioe;
+		} catch (Error ioe) {
+			unlock();
+			throw ioe;
+		}
+	}
+

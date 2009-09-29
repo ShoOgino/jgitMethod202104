@@ -1,0 +1,17 @@
+	public void setUp() throws Exception {
+		super.setUp();
+
+		// We build the entries backwards so that on POSIX systems we
+		// are likely to get the entries in the trash directory in the
+		// opposite order of what they should be in for the iteration.
+		// This should stress the sorting code better than doing it in
+		// the correct order.
+		//
+		mtime = new long[paths.length];
+		for (int i = paths.length - 1; i >= 0; i--) {
+			final String s = paths[i];
+			writeTrashFile(s, s);
+			mtime[i] = new File(trash, s).lastModified();
+		}
+	}
+

@@ -1,0 +1,38 @@
+	/**
+	 * @return this configuration, formatted as a Git style text file.
+	 */
+	public String toText() {
+		final StringBuilder out = new StringBuilder();
+		for (final Entry e : state.get().entryList) {
+			if (e.prefix != null)
+				out.append(e.prefix);
+			if (e.section != null && e.name == null) {
+				out.append('[');
+				out.append(e.section);
+				if (e.subsection != null) {
+					out.append(' ');
+					out.append('"');
+					out.append(escapeValue(e.subsection));
+					out.append('"');
+				}
+				out.append(']');
+			} else if (e.section != null && e.name != null) {
+				if (e.prefix == null || "".equals(e.prefix))
+					out.append('\t');
+				out.append(e.name);
+				if (e.value != null) {
+					if (MAGIC_EMPTY_VALUE != e.value) {
+						out.append(" = ");
+						out.append(escapeValue(e.value));
+					}
+				}
+				if (e.suffix != null)
+					out.append(' ');
+			}
+			if (e.suffix != null)
+				out.append(e.suffix);
+			out.append('\n');
+		}
+		return out.toString();
+	}
+

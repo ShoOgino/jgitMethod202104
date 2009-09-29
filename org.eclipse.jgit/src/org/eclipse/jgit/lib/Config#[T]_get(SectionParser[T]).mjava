@@ -1,0 +1,23 @@
+	/**
+	 * Obtain a handle to a parsed set of configuration values.
+	 *
+	 * @param <T>
+	 *            type of configuration model to return.
+	 * @param parser
+	 *            parser which can create the model if it is not already
+	 *            available in this configuration file. The parser is also used
+	 *            as the key into a cache and must obey the hashCode and equals
+	 *            contract in order to reuse a parsed model.
+	 * @return the parsed object instance, which is cached inside this config.
+	 */
+	@SuppressWarnings("unchecked")
+	public <T> T get(final SectionParser<T> parser) {
+		final State myState = getState();
+		T obj = (T) myState.cache.get(parser);
+		if (obj == null) {
+			obj = parser.parse(this);
+			myState.cache.put(parser, obj);
+		}
+		return obj;
+	}
+

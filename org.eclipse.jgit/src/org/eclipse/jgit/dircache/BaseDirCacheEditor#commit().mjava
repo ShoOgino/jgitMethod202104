@@ -1,0 +1,23 @@
+	/**
+	 * Finish, write, commit this change, and release the index lock.
+	 * <p>
+	 * If this method fails (returns false) the lock is still released.
+	 * <p>
+	 * This is a utility method for applications as the finish-write-commit
+	 * pattern is very common after using a builder to update entries.
+	 *
+	 * @return true if the commit was successful and the file contains the new
+	 *         data; false if the commit failed and the file remains with the
+	 *         old data.
+	 * @throws IllegalStateException
+	 *             the lock is not held.
+	 * @throws IOException
+	 *             the output file could not be created. The caller no longer
+	 *             holds the lock.
+	 */
+	public boolean commit() throws IOException {
+		finish();
+		cache.write();
+		return cache.commit();
+	}
+

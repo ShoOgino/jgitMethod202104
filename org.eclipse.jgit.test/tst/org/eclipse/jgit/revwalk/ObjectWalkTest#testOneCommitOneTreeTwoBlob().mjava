@@ -1,0 +1,16 @@
+	public void testOneCommitOneTreeTwoBlob() throws Exception {
+		final RevBlob f0 = blob("0");
+		final RevBlob f1 = blob("1");
+		final RevTree t = tree(file("0", f0), file("1", f1), file("2", f1));
+		final RevCommit a = commit(t);
+		markStart(a);
+
+		assertCommit(a, objw.next());
+		assertNull(objw.next());
+
+		assertSame(t, objw.nextObject());
+		assertSame(f0, objw.nextObject());
+		assertSame(f1, objw.nextObject());
+		assertNull(objw.nextObject());
+	}
+

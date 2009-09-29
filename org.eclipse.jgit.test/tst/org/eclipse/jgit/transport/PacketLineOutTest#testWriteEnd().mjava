@@ -1,0 +1,19 @@
+	public void testWriteEnd() throws IOException {
+		final int[] flushCnt = new int[1];
+		final OutputStream mockout = new OutputStream() {
+			@Override
+			public void write(int arg0) throws IOException {
+				rawOut.write(arg0);
+			}
+
+			@Override
+			public void flush() throws IOException {
+				flushCnt[0]++;
+			}
+		};
+
+		new PacketLineOut(mockout).end();
+		assertBuffer("0000");
+		assertEquals(1, flushCnt[0]);
+	}
+

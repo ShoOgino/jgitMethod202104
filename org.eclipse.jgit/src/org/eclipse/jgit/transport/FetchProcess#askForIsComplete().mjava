@@ -1,0 +1,16 @@
+	private boolean askForIsComplete() throws TransportException {
+		try {
+			final ObjectWalk ow = new ObjectWalk(transport.local);
+			for (final ObjectId want : askFor.keySet())
+				ow.markStart(ow.parseAny(want));
+			for (final Ref ref : transport.local.getAllRefs().values())
+				ow.markUninteresting(ow.parseAny(ref.getObjectId()));
+			ow.checkConnectivity();
+			return true;
+		} catch (MissingObjectException e) {
+			return false;
+		} catch (IOException e) {
+			throw new TransportException("Unable to check connectivity.", e);
+		}
+	}
+

@@ -1,0 +1,14 @@
+	public void testThreeEntries_Seek2() throws Exception {
+		ctp.reset(tree3);
+
+		ctp.next(2);
+		assertFalse(ctp.eof());
+		assertFalse(ctp.eof());
+		assertEquals(m644.getBits(), ctp.mode);
+		assertEquals("foo", path());
+		assertEquals(hash_foo, ctp.getEntryObjectId());
+
+		ctp.next(1);
+		assertTrue(ctp.eof());
+	}
+

@@ -1,0 +1,60 @@
+	void extractFileLines(final StringBuilder sb, final String[] text,
+			final int[] offsets) {
+		final byte[] buf = file.buf;
+		int ptr = startOffset;
+		int eol = nextLF(buf, ptr);
+		if (endOffset <= eol)
+			return;
+		copyLine(sb, text, offsets, 0);
+		SCAN: for (ptr = eol; ptr < endOffset; ptr = eol) {
+			eol = nextLF(buf, ptr);
+
+			if (eol - ptr < old.length + 1) {
+				// Line isn't long enough to mention the state of each
+				// ancestor. It must be the end of the hunk.
+				break SCAN;
+			}
+
+			switch (buf[ptr]) {
+			case ' ':
+			case '-':
+			case '+':
+				break;
+
+			default:
+				// Line can't possibly be part of this hunk; the first
+				// ancestor information isn't recognizable.
+				//
+				break SCAN;
+			}
+
+			boolean copied = false;
+			for (int ancestor = 0; ancestor < old.length; ancestor++) {
+				switch (buf[ptr + ancestor]) {
+				case ' ':
+				case '-':
+					if (copied)
+						skipLine(text, offsets, ancestor);
+					else {
+						copyLine(sb, text, offsets, ancestor);
+						copied = true;
+					}
+					continue;
+
+				case '+':
+					continue;
+
+				default:
+					break SCAN;
+				}
+			}
+			if (!copied) {
+				// If none of the ancestors caused the copy then this line
+				// must be new across the board, so it only appears in the
+				// text of the new file.
+				//
+				copyLine(sb, text, offsets, old.length);
+			}
+		}
+	}
+

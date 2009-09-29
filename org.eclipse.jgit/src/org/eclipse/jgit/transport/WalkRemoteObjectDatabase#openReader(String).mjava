@@ -1,0 +1,23 @@
+	/**
+	 * Open a buffered reader around a file.
+	 * <p>
+	 * This is shorthand for calling {@link #open(String)} and then wrapping it
+	 * in a reader suitable for line oriented files like the alternates list.
+	 * 
+	 * @return a stream to read from the file. Never null.
+	 * @param path
+	 *            location of the file to read, relative to this objects
+	 *            directory (e.g. <code>info/packs</code>).
+	 * @throws FileNotFoundException
+	 *             the requested file does not exist at the given location.
+	 * @throws IOException
+	 *             The connection is unable to read the remote's file, and the
+	 *             failure occurred prior to being able to determine if the file
+	 *             exists, or after it was determined to exist but before the
+	 *             stream could be created.
+	 */
+	BufferedReader openReader(final String path) throws IOException {
+		final InputStream is = open(path).in;
+		return new BufferedReader(new InputStreamReader(is, Constants.CHARSET));
+	}
+

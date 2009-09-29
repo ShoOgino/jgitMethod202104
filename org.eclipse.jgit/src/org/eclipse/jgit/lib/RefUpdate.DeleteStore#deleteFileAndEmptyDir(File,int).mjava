@@ -1,0 +1,14 @@
+		private void deleteFileAndEmptyDir(final File file, final int depth)
+				throws IOException {
+			if (file.isFile()) {
+				if (!file.delete())
+					throw new IOException("File cannot be deleted: " + file);
+				File dir = file.getParentFile();
+				for  (int i = 0; i < depth; ++i) {
+					if (!dir.delete())
+						break; // ignore problem here
+					dir = dir.getParentFile();
+				}
+			}
+		}
+

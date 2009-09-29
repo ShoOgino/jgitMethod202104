@@ -1,0 +1,12 @@
+		private void read(ByteBuffer buf) throws CorruptObjectException {
+			signature = buf.getInt();
+			version = buf.getInt();
+			entries = buf.getInt();
+			if (signature != 0x44495243)
+				throw new CorruptObjectException("Index signature is invalid: "
+						+ signature);
+			if (version != 2)
+				throw new CorruptObjectException(
+						"Unknown index version (or corrupt index):" + version);
+		}
+

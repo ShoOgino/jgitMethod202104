@@ -1,0 +1,49 @@
+	/**
+	 * Reset this walker to run over a set of existing trees.
+	 * 
+	 * @param ids
+	 *            the trees we need to parse. The walker will execute over this
+	 *            many parallel trees if the reset is successful.
+	 * @throws MissingObjectException
+	 *             the given tree object does not exist in this repository.
+	 * @throws IncorrectObjectTypeException
+	 *             the given object id does not denote a tree, but instead names
+	 *             some other non-tree type of object. Note that commits are not
+	 *             trees, even if they are sometimes called a "tree-ish".
+	 * @throws CorruptObjectException
+	 *             the object claimed to be a tree, but its contents did not
+	 *             appear to be a tree. The repository may have data corruption.
+	 * @throws IOException
+	 *             a loose object or pack file could not be read.
+	 */
+	public void reset(final AnyObjectId[] ids) throws MissingObjectException,
+			IncorrectObjectTypeException, CorruptObjectException, IOException {
+		final int oldLen = trees.length;
+		final int newLen = ids.length;
+		final AbstractTreeIterator[] r = newLen == oldLen ? trees
+				: new AbstractTreeIterator[newLen];
+		for (int i = 0; i < newLen; i++) {
+			AbstractTreeIterator o;
+
+			if (i < oldLen) {
+				o = trees[i];
+				while (o.parent != null)
+					o = o.parent;
+				if (o instanceof CanonicalTreeParser && o.pathOffset == 0) {
+					o.matches = null;
+					o.matchShift = 0;
+					((CanonicalTreeParser) o).reset(db, ids[i], curs);
+					r[i] = o;
+					continue;
+				}
+			}
+
+			o = parserFor(ids[i]);
+			r[i] = o;
+		}
+
+		trees = r;
+		advance = false;
+		depth = 0;
+	}
+

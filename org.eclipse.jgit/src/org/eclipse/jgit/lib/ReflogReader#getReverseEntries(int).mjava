@@ -1,0 +1,24 @@
+	/**
+	 * @param max
+	 *            max numer of entries to read
+	 * @return all reflog entries in reverse order
+	 * @throws IOException
+	 */
+	public List<Entry> getReverseEntries(int max) throws IOException {
+		final byte[] log;
+		try {
+			log = NB.readFully(logName);
+		} catch (FileNotFoundException e) {
+			return Collections.emptyList();
+		}
+
+		int rs = RawParseUtils.prevLF(log, log.length);
+		List<Entry> ret = new ArrayList<Entry>();
+		while (rs >= 0 && max-- > 0) {
+			rs = RawParseUtils.prevLF(log, rs);
+			Entry entry = new Entry(log, rs < 0 ? 0 : rs + 2);
+			ret.add(entry);
+		}
+		return ret;
+	}
+

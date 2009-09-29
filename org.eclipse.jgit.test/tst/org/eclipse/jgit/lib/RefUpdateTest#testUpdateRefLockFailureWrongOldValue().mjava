@@ -1,0 +1,15 @@
+	/**
+	 * Try modify a ref, but get wrong expected old value
+	 *
+	 * @throws IOException
+	 */
+	public void testUpdateRefLockFailureWrongOldValue() throws IOException {
+		ObjectId pid = db.resolve("refs/heads/master");
+		RefUpdate updateRef = db.updateRef("refs/heads/master");
+		updateRef.setNewObjectId(pid);
+		updateRef.setExpectedOldObjectId(db.resolve("refs/heads/master^"));
+		Result update = updateRef.update();
+		assertEquals(Result.LOCK_FAILURE, update);
+		assertEquals(pid, db.resolve("refs/heads/master"));
+	}
+

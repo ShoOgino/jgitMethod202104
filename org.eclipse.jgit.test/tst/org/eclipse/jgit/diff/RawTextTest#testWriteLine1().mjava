@@ -1,0 +1,8 @@
+	public void testWriteLine1() throws IOException {
+		final RawText a = new RawText(Constants.encodeASCII("foo-a\nfoo-b\n"));
+		final ByteArrayOutputStream o = new ByteArrayOutputStream();
+		a.writeLine(o, 0);
+		final byte[] r = o.toByteArray();
+		assertEquals("foo-a", RawParseUtils.decode(r));
+	}
+

@@ -1,0 +1,23 @@
+	/**
+	 * Set the message to include in the reflog.
+	 * 
+	 * @param msg
+	 *            the message to describe this change. It may be null
+	 *            if appendStatus is null in order not to append to the reflog
+	 * @param appendStatus
+	 *            true if the status of the ref change (fast-forward or
+	 *            forced-update) should be appended to the user supplied
+	 *            message.
+	 */
+	public void setRefLogMessage(final String msg, final boolean appendStatus) {
+		if (msg == null && !appendStatus)
+			disableRefLog();
+		else if (msg == null && appendStatus) {
+			refLogMessage = "";
+			refLogIncludeResult = true;
+		} else {
+			refLogMessage = msg;
+			refLogIncludeResult = appendStatus;
+		}
+	}
+

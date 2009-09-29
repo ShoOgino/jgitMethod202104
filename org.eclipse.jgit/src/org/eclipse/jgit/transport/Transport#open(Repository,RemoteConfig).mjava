@@ -1,0 +1,23 @@
+	/**
+	 * Open a new transport instance to connect two repositories.
+	 * <p>
+	 * This method assumes {@link Operation#FETCH}.
+	 * 
+	 * @param local
+	 *            existing local repository.
+	 * @param cfg
+	 *            configuration describing how to connect to the remote
+	 *            repository.
+	 * @return the new transport instance. Never null. In case of multiple URIs
+	 *         in remote configuration, only the first is chosen.
+	 * @throws NotSupportedException
+	 *             the protocol specified is not supported.
+	 * @throws IllegalArgumentException
+	 *             if provided remote configuration doesn't have any URI
+	 *             associated.
+	 */
+	public static Transport open(final Repository local, final RemoteConfig cfg)
+			throws NotSupportedException {
+		return open(local, cfg, Operation.FETCH);
+	}
+

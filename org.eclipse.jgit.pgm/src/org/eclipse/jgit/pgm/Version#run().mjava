@@ -1,0 +1,11 @@
+	@Override
+	protected void run() throws Exception {
+		final Package pkg = getClass().getPackage();
+		if (pkg == null || pkg.getImplementationVersion() == null)
+			throw die("Cannot read package information.");
+
+		out.print("jgit version ");
+		out.print(pkg.getImplementationVersion());
+		out.println();
+	}
+

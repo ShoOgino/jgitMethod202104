@@ -1,0 +1,13 @@
+	/**
+	 * Is this entry always thought to be unmodified?
+	 * <p>
+	 * Most entries in the index do not have this flag set. Users may however
+	 * set them on if the file system stat() costs are too high on this working
+	 * directory, such as on NFS or SMB volumes.
+	 *
+	 * @return true if we must assume the entry is unmodified.
+	 */
+	public boolean isAssumeValid() {
+		return (info[infoOffset + P_FLAGS] & ASSUME_VALID) != 0;
+	}
+

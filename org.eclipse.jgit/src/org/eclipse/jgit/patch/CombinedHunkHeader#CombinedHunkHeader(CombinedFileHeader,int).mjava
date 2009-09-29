@@ -1,0 +1,14 @@
+	CombinedHunkHeader(final CombinedFileHeader fh, final int offset) {
+		super(fh, offset, null);
+		old = new CombinedOldImage[fh.getParentCount()];
+		for (int i = 0; i < old.length; i++) {
+			final int imagePos = i;
+			old[i] = new CombinedOldImage() {
+				@Override
+				public AbbreviatedObjectId getId() {
+					return fh.getOldId(imagePos);
+				}
+			};
+		}
+	}
+

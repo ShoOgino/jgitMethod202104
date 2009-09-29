@@ -1,0 +1,22 @@
+	private String readStringLongTimeout() throws IOException {
+		if (timeoutIn == null)
+			return pckIn.readString();
+
+		// The remote side may need a lot of time to choke down the pack
+		// we just sent them. There may be many deltas that need to be
+		// resolved by the remote. Its hard to say how long the other
+		// end is going to be silent. Taking 10x the configured timeout
+		// or the time spent transferring the pack, whichever is larger,
+		// gives the other side some reasonable window to process the data,
+		// but this is just a wild guess.
+		//
+		final int oldTimeout = timeoutIn.getTimeout();
+		final int sendTime = (int) Math.min(packTransferTime, 28800000L);
+		try {
+			timeoutIn.setTimeout(10 * Math.max(sendTime, oldTimeout));
+			return pckIn.readString();
+		} finally {
+			timeoutIn.setTimeout(oldTimeout);
+		}
+	}
+

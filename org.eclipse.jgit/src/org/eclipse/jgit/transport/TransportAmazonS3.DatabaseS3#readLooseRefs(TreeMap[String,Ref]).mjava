@@ -1,0 +1,11 @@
+		private void readLooseRefs(final TreeMap<String, Ref> avail)
+				throws TransportException {
+			try {
+				for (final String n : s3.list(bucket, resolveKey(ROOT_DIR
+						+ "refs")))
+					readRef(avail, "refs/" + n);
+			} catch (IOException e) {
+				throw new TransportException(getURI(), "cannot list refs", e);
+			}
+		}
+

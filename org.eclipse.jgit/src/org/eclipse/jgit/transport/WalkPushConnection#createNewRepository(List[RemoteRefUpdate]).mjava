@@ -1,0 +1,20 @@
+	private void createNewRepository(final List<RemoteRefUpdate> updates)
+			throws TransportException {
+		try {
+			final String ref = "ref: " + pickHEAD(updates) + "\n";
+			final byte[] bytes = Constants.encode(ref);
+			dest.writeFile(ROOT_DIR + Constants.HEAD, bytes);
+		} catch (IOException e) {
+			throw new TransportException(uri, "cannot create HEAD", e);
+		}
+
+		try {
+			final String config = "[core]\n"
+					+ "\trepositoryformatversion = 0\n";
+			final byte[] bytes = Constants.encode(config);
+			dest.writeFile(ROOT_DIR + "config", bytes);
+		} catch (IOException e) {
+			throw new TransportException(uri, "cannot create config", e);
+		}
+	}
+

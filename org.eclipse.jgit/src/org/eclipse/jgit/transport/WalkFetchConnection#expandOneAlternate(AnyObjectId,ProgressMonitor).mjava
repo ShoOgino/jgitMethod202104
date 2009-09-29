@@ -1,0 +1,21 @@
+	private Collection<WalkRemoteObjectDatabase> expandOneAlternate(
+			final AnyObjectId id, final ProgressMonitor pm) {
+		while (!noAlternatesYet.isEmpty()) {
+			final WalkRemoteObjectDatabase wrr = noAlternatesYet.removeFirst();
+			try {
+				pm.beginTask("Listing alternates", ProgressMonitor.UNKNOWN);
+				Collection<WalkRemoteObjectDatabase> altList = wrr
+						.getAlternates();
+				if (altList != null && !altList.isEmpty())
+					return altList;
+			} catch (IOException e) {
+				// Try another repository.
+				//
+				recordError(id, e);
+			} finally {
+				pm.endTask();
+			}
+		}
+		return null;
+	}
+

@@ -1,0 +1,17 @@
+	@Override
+	public int parseArguments(final Parameters params) throws CmdLineException {
+		final String name = params.getParameter(0);
+		final CommandRef cr = CommandCatalog.get(name);
+		if (cr == null)
+			throw new CmdLineException(MessageFormat.format(
+					"{0} is not a jgit command", name));
+
+		// Force option parsing to stop. Everything after us should
+		// be arguments known only to this command and must not be
+		// recognized by the current parser.
+		//
+		owner.stopOptionParsing();
+		setter.addValue(cr.create());
+		return 1;
+	}
+

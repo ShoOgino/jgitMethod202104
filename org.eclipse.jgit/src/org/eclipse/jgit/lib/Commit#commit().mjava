@@ -1,0 +1,11 @@
+	/**
+	 * Persist this commit object
+	 *
+	 * @throws IOException
+	 */
+	public void commit() throws IOException {
+		if (getCommitId() != null)
+			throw new IllegalStateException("exists " + getCommitId());
+		setCommitId(new ObjectWriter(objdb).writeCommit(this));
+	}
+

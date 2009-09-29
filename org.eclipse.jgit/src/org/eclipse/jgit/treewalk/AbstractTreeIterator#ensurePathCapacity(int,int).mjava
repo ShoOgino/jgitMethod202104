@@ -1,0 +1,19 @@
+	/**
+	 * Ensure that path is capable to hold at least {@code capacity} bytes
+	 *
+	 * @param capacity
+	 *            the amount of bytes to hold
+	 * @param len
+	 *            the amount of live bytes in path buffer
+	 */
+	protected void ensurePathCapacity(final int capacity, final int len) {
+		if (path.length >= capacity)
+			return;
+		final byte[] o = path;
+		int current = o.length;
+		int newCapacity = current;
+		while (newCapacity < capacity && newCapacity > 0)
+			newCapacity <<= 1;
+		setPathCapacity(newCapacity, len);
+	}
+

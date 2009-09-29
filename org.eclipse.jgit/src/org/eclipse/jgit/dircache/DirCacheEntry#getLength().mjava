@@ -1,0 +1,17 @@
+	/**
+	 * Get the cached size (in bytes) of this file.
+	 * <p>
+	 * One of the indicators that the file has been modified by an application
+	 * changing the working tree is if the size of the file (in bytes) differs
+	 * from the size stored in this entry.
+	 * <p>
+	 * Note that this is the length of the file in the working directory, which
+	 * may differ from the size of the decompressed blob if work tree filters
+	 * are being used, such as LF<->CRLF conversion.
+	 *
+	 * @return cached size of the working directory file, in bytes.
+	 */
+	public int getLength() {
+		return NB.decodeInt32(info, infoOffset + P_SIZE);
+	}
+

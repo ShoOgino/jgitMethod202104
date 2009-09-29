@@ -1,0 +1,129 @@
+	private void negotiate(final ProgressMonitor monitor) throws IOException,
+			CancelledException {
+		final MutableObjectId ackId = new MutableObjectId();
+		int resultsPending = 0;
+		int havesSent = 0;
+		int havesSinceLastContinue = 0;
+		boolean receivedContinue = false;
+		boolean receivedAck = false;
+		boolean sendHaves = true;
+
+		negotiateBegin();
+		while (sendHaves) {
+			final RevCommit c = walk.next();
+			if (c == null)
+				break;
+
+			pckOut.writeString("have " + c.getId().name() + "\n");
+			havesSent++;
+			havesSinceLastContinue++;
+
+			if ((31 & havesSent) != 0) {
+				// We group the have lines into blocks of 32, each marked
+				// with a flush (aka end). This one is within a block so
+				// continue with another have line.
+				//
+				continue;
+			}
+
+			if (monitor.isCancelled())
+				throw new CancelledException();
+
+			pckOut.end();
+			resultsPending++; // Each end will cause a result to come back.
+
+			if (havesSent == 32) {
+				// On the first block we race ahead and try to send
+				// more of the second block while waiting for the
+				// remote to respond to our first block request.
+				// This keeps us one block ahead of the peer.
+				//
+				continue;
+			}
+
+			for (;;) {
+				final PacketLineIn.AckNackResult anr;
+
+				anr = pckIn.readACK(ackId);
+				if (anr == PacketLineIn.AckNackResult.NAK) {
+					// More have lines are necessary to compute the
+					// pack on the remote side. Keep doing that.
+					//
+					resultsPending--;
+					break;
+				}
+
+				if (anr == PacketLineIn.AckNackResult.ACK) {
+					// The remote side is happy and knows exactly what
+					// to send us. There is no further negotiation and
+					// we can break out immediately.
+					//
+					multiAck = false;
+					resultsPending = 0;
+					receivedAck = true;
+					sendHaves = false;
+					break;
+				}
+
+				if (anr == PacketLineIn.AckNackResult.ACK_CONTINUE) {
+					// The server knows this commit (ackId). We don't
+					// need to send any further along its ancestry, but
+					// we need to continue to talk about other parts of
+					// our local history.
+					//
+					markCommon(walk.parseAny(ackId));
+					receivedAck = true;
+					receivedContinue = true;
+					havesSinceLastContinue = 0;
+				}
+
+				if (monitor.isCancelled())
+					throw new CancelledException();
+			}
+
+			if (receivedContinue && havesSinceLastContinue > MAX_HAVES) {
+				// Our history must be really different from the remote's.
+				// We just sent a whole slew of have lines, and it did not
+				// recognize any of them. Avoid sending our entire history
+				// to them by giving up early.
+				//
+				break;
+			}
+		}
+
+		// Tell the remote side we have run out of things to talk about.
+		//
+		if (monitor.isCancelled())
+			throw new CancelledException();
+		pckOut.writeString("done\n");
+		pckOut.flush();
+
+		if (!receivedAck) {
+			// Apparently if we have never received an ACK earlier
+			// there is one more result expected from the done we
+			// just sent to the remote.
+			//
+			multiAck = false;
+			resultsPending++;
+		}
+
+		while (resultsPending > 0 || multiAck) {
+			final PacketLineIn.AckNackResult anr;
+
+			anr = pckIn.readACK(ackId);
+			resultsPending--;
+
+			if (anr == PacketLineIn.AckNackResult.ACK)
+				break; // commit negotiation is finished.
+
+			if (anr == PacketLineIn.AckNackResult.ACK_CONTINUE) {
+				// There must be a normal ACK following this.
+				//
+				multiAck = true;
+			}
+
+			if (monitor.isCancelled())
+				throw new CancelledException();
+		}
+	}
+

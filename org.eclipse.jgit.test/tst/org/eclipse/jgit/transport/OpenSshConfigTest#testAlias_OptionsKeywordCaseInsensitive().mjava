@@ -1,0 +1,12 @@
+	public void testAlias_OptionsKeywordCaseInsensitive() throws Exception {
+		config("hOsT orcz\n" + "\thOsTnAmE repo.or.cz\n" + "\tPORT 2222\n"
+				+ "\tuser jex\n" + "\tidentityfile .ssh/id_jex\n"
+				+ "\tForwardX11 no\n");
+		final Host h = osc.lookup("orcz");
+		assertNotNull(h);
+		assertEquals("repo.or.cz", h.getHostName());
+		assertEquals("jex", h.getUser());
+		assertEquals(2222, h.getPort());
+		assertEquals(new File(home, ".ssh/id_jex"), h.getIdentityFile());
+	}
+

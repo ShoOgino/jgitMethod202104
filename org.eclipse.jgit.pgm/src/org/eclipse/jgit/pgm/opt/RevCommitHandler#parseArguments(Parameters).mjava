@@ -1,0 +1,27 @@
+	@Override
+	public int parseArguments(final Parameters params) throws CmdLineException {
+		String name = params.getParameter(0);
+
+		boolean interesting = true;
+		if (name.startsWith("^")) {
+			name = name.substring(1);
+			interesting = false;
+		}
+
+		final int dot2 = name.indexOf("..");
+		if (dot2 != -1) {
+			if (!option.isMultiValued())
+				throw new CmdLineException("Only one " + option.metaVar()
+						+ " expected in " + name + "." + "");
+
+			final String left = name.substring(0, dot2);
+			final String right = name.substring(dot2 + 2);
+			addOne(left, false);
+			addOne(right, true);
+			return 1;
+		}
+
+		addOne(name, interesting);
+		return 1;
+	}
+

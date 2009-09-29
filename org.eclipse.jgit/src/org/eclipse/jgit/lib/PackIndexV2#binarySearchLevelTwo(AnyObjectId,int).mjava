@@ -1,0 +1,22 @@
+	private int binarySearchLevelTwo(final AnyObjectId objId, final int levelOne) {
+		final int[] data = names[levelOne];
+		int high = offset32[levelOne].length >>> 2;
+		if (high == 0)
+			return -1;
+		int low = 0;
+		do {
+			final int mid = (low + high) >>> 1;
+			final int mid4 = mid << 2;
+			final int cmp;
+
+			cmp = objId.compareTo(data, mid4 + mid); // mid * 5
+			if (cmp < 0)
+				high = mid;
+			else if (cmp == 0) {
+				return mid;
+			} else
+				low = mid + 1;
+		} while (low < high);
+		return -1;
+	}
+

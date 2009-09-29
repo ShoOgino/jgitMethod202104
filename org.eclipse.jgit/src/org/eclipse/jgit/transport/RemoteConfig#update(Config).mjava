@@ -1,0 +1,36 @@
+	/**
+	 * Update this remote's definition within the configuration.
+	 * 
+	 * @param rc
+	 *            the configuration file to store ourselves into.
+	 */
+	public void update(final Config rc) {
+		final List<String> vlst = new ArrayList<String>();
+
+		vlst.clear();
+		for (final URIish u : getURIs())
+			vlst.add(u.toPrivateString());
+		rc.setStringList(SECTION, getName(), KEY_URL, vlst);
+
+		vlst.clear();
+		for (final URIish u : getPushURIs())
+			vlst.add(u.toPrivateString());
+		rc.setStringList(SECTION, getName(), KEY_PUSHURL, vlst);
+
+		vlst.clear();
+		for (final RefSpec u : getFetchRefSpecs())
+			vlst.add(u.toString());
+		rc.setStringList(SECTION, getName(), KEY_FETCH, vlst);
+
+		vlst.clear();
+		for (final RefSpec u : getPushRefSpecs())
+			vlst.add(u.toString());
+		rc.setStringList(SECTION, getName(), KEY_PUSH, vlst);
+
+		set(rc, KEY_UPLOADPACK, getUploadPack(), DEFAULT_UPLOAD_PACK);
+		set(rc, KEY_RECEIVEPACK, getReceivePack(), DEFAULT_RECEIVE_PACK);
+		set(rc, KEY_TAGOPT, getTagOpt().option(), TagOpt.AUTO_FOLLOW.option());
+		set(rc, KEY_MIRROR, mirror, DEFAULT_MIRROR);
+		set(rc, KEY_TIMEOUT, timeout, 0);
+	}
+

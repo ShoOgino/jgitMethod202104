@@ -1,0 +1,21 @@
+	private void extendStringToMatchByOneCharacter(final char c) {
+		final List<Head> newHeads = listForLocalUseage;
+		newHeads.clear();
+		List<Head> lastAddedHeads = null;
+		for (int i = 0; i < heads.size(); i++) {
+			final Head head = heads.get(i);
+			final List<Head> headsToAdd = head.getNextHeads(c);
+			// Why the next performance optimization isn't wrong:
+			// Some times two heads return the very same list.
+			// We save future effort if we don't add these heads again.
+			// This is the case with the heads "a" and "*" of "a*b" which
+			// both can return the list ["*","b"]
+			if (headsToAdd != lastAddedHeads) {
+				newHeads.addAll(headsToAdd);
+				lastAddedHeads = headsToAdd;
+			}
+		}
+		listForLocalUseage = heads;
+		heads = newHeads;
+	}
+

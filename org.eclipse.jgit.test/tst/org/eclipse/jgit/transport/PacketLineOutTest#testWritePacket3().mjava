@@ -1,0 +1,19 @@
+	public void testWritePacket3() throws IOException {
+		final int buflen = SideBandOutputStream.MAX_BUF
+				- SideBandOutputStream.HDR_SIZE;
+		final byte[] buf = new byte[buflen];
+		for (int i = 0; i < buf.length; i++) {
+			buf[i] = (byte) i;
+		}
+		out.writePacket(buf);
+		out.flush();
+
+		final byte[] act = rawOut.toByteArray();
+		final String explen = Integer.toString(buf.length + 4, 16);
+		assertEquals(4 + buf.length, act.length);
+		assertEquals(new String(act, 0, 4, "UTF-8"), explen);
+		for (int i = 0, j = 4; i < buf.length; i++, j++) {
+			assertEquals(buf[i], act[j]);
+		}
+	}
+

@@ -1,0 +1,22 @@
+	private TreeEntry findMember(final byte[] s, final byte slast, final int offset)
+			throws IOException {
+		int slash;
+		int p;
+
+		for (slash = offset; slash < s.length && s[slash] != '/'; slash++) {
+			// search for path component terminator
+		}
+
+		ensureLoaded();
+		byte xlast = slash<s.length ? (byte)'/' : slast;
+		p = binarySearch(contents, s, xlast, offset, slash);
+		if (p >= 0) {
+			final TreeEntry r = contents[p];
+			if (slash < s.length-1)
+				return r instanceof Tree ? ((Tree) r).findMember(s, slast, slash + 1)
+						: null;
+			return r;
+		}
+		return null;
+	}
+

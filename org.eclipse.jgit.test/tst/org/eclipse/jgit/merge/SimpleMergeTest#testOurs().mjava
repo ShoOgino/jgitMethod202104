@@ -1,0 +1,7 @@
+	public void testOurs() throws IOException {
+		Merger ourMerger = MergeStrategy.OURS.newMerger(db);
+		boolean merge = ourMerger.merge(new ObjectId[] { db.resolve("a"), db.resolve("c") });
+		assertTrue(merge);
+		assertEquals(db.mapTree("a").getId(), ourMerger.getResultTreeId());
+	}
+

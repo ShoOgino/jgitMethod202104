@@ -1,0 +1,32 @@
+	/**
+	 * Write the entry records from memory to disk.
+	 * <p>
+	 * The cache must be locked first by calling {@link #lock()} and receiving
+	 * true as the return value. Applications are encouraged to lock the index,
+	 * then invoke {@link #read()} to ensure the in-memory data is current,
+	 * prior to updating the in-memory entries.
+	 * <p>
+	 * Once written the lock is closed and must be either committed with
+	 * {@link #commit()} or rolled back with {@link #unlock()}.
+	 *
+	 * @throws IOException
+	 *             the output file could not be created. The caller no longer
+	 *             holds the lock.
+	 */
+	public void write() throws IOException {
+		final LockFile tmp = myLock;
+		requireLocked(tmp);
+		try {
+			writeTo(new BufferedOutputStream(tmp.getOutputStream()));
+		} catch (IOException err) {
+			tmp.unlock();
+			throw err;
+		} catch (RuntimeException err) {
+			tmp.unlock();
+			throw err;
+		} catch (Error err) {
+			tmp.unlock();
+			throw err;
+		}
+	}
+

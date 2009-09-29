@@ -1,0 +1,14 @@
+	/**
+	 * Change the JVM-wide factory to a different implementation.
+	 * 
+	 * @param newFactory
+	 *            factory for future sessions to be created through. If null the
+	 *            default factory will be restored.s
+	 */
+	public static void setInstance(final SshSessionFactory newFactory) {
+		if (newFactory != null)
+			INSTANCE = newFactory;
+		else
+			INSTANCE = new DefaultSshSessionFactory();
+	}
+

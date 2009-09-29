@@ -1,0 +1,22 @@
+	/**
+	 * Test RefSpec to RemoteRefUpdate conversion with no-destination RefSpec
+	 * (destination should be set up for the same name as source).
+	 *
+	 * @throws IOException
+	 */
+	public void testFindRemoteRefUpdatesNoWildcardNoDestination()
+			throws IOException {
+		transport = Transport.open(db, remoteConfig);
+		final Collection<RemoteRefUpdate> result = transport
+				.findRemoteRefUpdatesFor(Collections.nCopies(1, new RefSpec(
+						"+refs/heads/master")));
+
+		assertEquals(1, result.size());
+		final RemoteRefUpdate rru = result.iterator().next();
+		assertNull(rru.getExpectedOldObjectId());
+		assertTrue(rru.isForceUpdate());
+		assertEquals("refs/heads/master", rru.getSrcRef());
+		assertEquals(db.resolve("refs/heads/master"), rru.getNewObjectId());
+		assertEquals("refs/heads/master", rru.getRemoteName());
+	}
+

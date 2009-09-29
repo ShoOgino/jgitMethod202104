@@ -1,0 +1,15 @@
+	/**
+	 * Obtain the length (in bytes) of the buffer.
+	 * <p>
+	 * The length is only accurate after {@link #close()} has been invoked.
+	 *
+	 * @return total length of the buffer, in bytes.
+	 */
+	public long length() {
+		if (onDiskFile != null)
+			return onDiskFile.length();
+
+		final Block last = last();
+		return ((long) blocks.size()) * Block.SZ - (Block.SZ - last.count);
+	}
+

@@ -1,0 +1,45 @@
+	private void negotiate() throws IOException {
+		ObjectId last = ObjectId.zeroId();
+		for (;;) {
+			String line;
+			try {
+				line = pckIn.readString();
+			} catch (EOFException eof) {
+				throw eof;
+			}
+
+			if (line == PacketLineIn.END) {
+				if (commonBase.isEmpty() || multiAck)
+					pckOut.writeString("NAK\n");
+				pckOut.flush();
+			} else if (line.startsWith("have ") && line.length() == 45) {
+				final ObjectId id = ObjectId.fromString(line.substring(5));
+				if (matchHave(id)) {
+					// Both sides have the same object; let the client know.
+					//
+					if (multiAck) {
+						last = id;
+						pckOut.writeString("ACK " + id.name() + " continue\n");
+					} else if (commonBase.size() == 1)
+						pckOut.writeString("ACK " + id.name() + "\n");
+				} else {
+					// They have this object; we don't.
+					//
+					if (multiAck && okToGiveUp())
+						pckOut.writeString("ACK " + id.name() + " continue\n");
+				}
+
+			} else if (line.equals("done")) {
+				if (commonBase.isEmpty())
+					pckOut.writeString("NAK\n");
+
+				else if (multiAck)
+					pckOut.writeString("ACK " + last.name() + "\n");
+				break;
+
+			} else {
+				throw new PackProtocolException("expected have; got " + line);
+			}
+		}
+	}
+

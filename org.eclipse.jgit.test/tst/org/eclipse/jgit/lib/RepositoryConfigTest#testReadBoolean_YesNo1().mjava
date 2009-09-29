@@ -1,0 +1,9 @@
+	public void testReadBoolean_YesNo1() throws ConfigInvalidException {
+		final Config c = parse("[s]\na = yes\nb = no\n");
+		assertEquals("yes", c.getString("s", null, "a"));
+		assertEquals("no", c.getString("s", null, "b"));
+
+		assertTrue(c.getBoolean("s", "a", false));
+		assertFalse(c.getBoolean("s", "b", true));
+	}
+

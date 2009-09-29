@@ -1,0 +1,56 @@
+	private int parseFile(final byte[] buf, int c, final int end) {
+		while (c < end) {
+			if (isHunkHdr(buf, c, end) >= 1) {
+				// If we find a disconnected hunk header we might
+				// have missed a file header previously. The hunk
+				// isn't valid without knowing where it comes from.
+				//
+				error(buf, c, "Hunk disconnected from file");
+				c = nextLF(buf, c);
+				continue;
+			}
+
+			// Valid git style patch?
+			//
+			if (match(buf, c, DIFF_GIT) >= 0)
+				return parseDiffGit(buf, c, end);
+			if (match(buf, c, DIFF_CC) >= 0)
+				return parseDiffCombined(DIFF_CC, buf, c, end);
+			if (match(buf, c, DIFF_COMBINED) >= 0)
+				return parseDiffCombined(DIFF_COMBINED, buf, c, end);
+
+			// Junk between files? Leading junk? Traditional
+			// (non-git generated) patch?
+			//
+			final int n = nextLF(buf, c);
+			if (n >= end) {
+				// Patches cannot be only one line long. This must be
+				// trailing junk that we should ignore.
+				//
+				return end;
+			}
+
+			if (n - c < 6) {
+				// A valid header must be at least 6 bytes on the
+				// first line, e.g. "--- a/b\n".
+				//
+				c = n;
+				continue;
+			}
+
+			if (match(buf, c, OLD_NAME) >= 0 && match(buf, n, NEW_NAME) >= 0) {
+				// Probably a traditional patch. Ensure we have at least
+				// a "@@ -0,0" smelling line next. We only check the "@@ -".
+				//
+				final int f = nextLF(buf, n);
+				if (f >= end)
+					return end;
+				if (isHunkHdr(buf, f, end) == 1)
+					return parseTraditionalPatch(buf, c, end);
+			}
+
+			c = n;
+		}
+		return c;
+	}
+

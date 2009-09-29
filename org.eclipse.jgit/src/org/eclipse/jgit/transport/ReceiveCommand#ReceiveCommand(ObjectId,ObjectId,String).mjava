@@ -1,0 +1,26 @@
+	/**
+	 * Create a new command for {@link ReceivePack}.
+	 *
+	 * @param oldId
+	 *            the old object id; must not be null. Use
+	 *            {@link ObjectId#zeroId()} to indicate a ref creation.
+	 * @param newId
+	 *            the new object id; must not be null. Use
+	 *            {@link ObjectId#zeroId()} to indicate a ref deletion.
+	 * @param name
+	 *            name of the ref being affected.
+	 */
+	public ReceiveCommand(final ObjectId oldId, final ObjectId newId,
+			final String name) {
+		this.oldId = oldId;
+		this.newId = newId;
+		this.name = name;
+
+		type = Type.UPDATE;
+		if (ObjectId.zeroId().equals(oldId))
+			type = Type.CREATE;
+		if (ObjectId.zeroId().equals(newId))
+			type = Type.DELETE;
+		status = Result.NOT_ATTEMPTED;
+	}
+

@@ -1,0 +1,10 @@
+	public void testParseGitFileName_SrcFooC() {
+		final String name = "src/foo/bar/argh/code.c";
+		final FileHeader fh = header(name);
+		assertEquals(gitLine(name).length(), fh.parseGitFileName(0,
+				fh.buf.length));
+		assertEquals(name, fh.getOldName());
+		assertSame(fh.getOldName(), fh.getNewName());
+		assertFalse(fh.hasMetaDataChanges());
+	}
+

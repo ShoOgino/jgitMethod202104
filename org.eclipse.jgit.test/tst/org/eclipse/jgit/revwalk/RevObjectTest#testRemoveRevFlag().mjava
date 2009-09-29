@@ -1,0 +1,11 @@
+	public void testRemoveRevFlag() throws Exception {
+		final RevCommit a = commit();
+		final RevFlag flag1 = rw.newFlag("flag1");
+		final RevFlag flag2 = rw.newFlag("flag2");
+		a.add(flag1);
+		a.add(flag2);
+		assertEquals(flag1.mask | flag2.mask, a.flags);
+		a.remove(flag2);
+		assertEquals(flag1.mask, a.flags);
+	}
+

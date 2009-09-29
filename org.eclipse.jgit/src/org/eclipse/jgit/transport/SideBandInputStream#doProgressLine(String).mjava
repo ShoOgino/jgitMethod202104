@@ -1,0 +1,35 @@
+	private boolean doProgressLine(final String msg) {
+		Matcher matcher;
+
+		matcher = P_BOUNDED.matcher(msg);
+		if (matcher.matches()) {
+			final String taskname = matcher.group(1);
+			if (!currentTask.equals(taskname)) {
+				currentTask = taskname;
+				lastCnt = 0;
+				final int tot = Integer.parseInt(matcher.group(3));
+				monitor.beginTask(currentTask, tot);
+			}
+			final int cnt = Integer.parseInt(matcher.group(2));
+			monitor.update(cnt - lastCnt);
+			lastCnt = cnt;
+			return true;
+		}
+
+		matcher = P_UNBOUNDED.matcher(msg);
+		if (matcher.matches()) {
+			final String taskname = matcher.group(1);
+			if (!currentTask.equals(taskname)) {
+				currentTask = taskname;
+				lastCnt = 0;
+				monitor.beginTask(currentTask, ProgressMonitor.UNKNOWN);
+			}
+			final int cnt = Integer.parseInt(matcher.group(2));
+			monitor.update(cnt - lastCnt);
+			lastCnt = cnt;
+			return true;
+		}
+
+		return false;
+	}
+

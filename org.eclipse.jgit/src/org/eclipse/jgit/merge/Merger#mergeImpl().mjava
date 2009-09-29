@@ -1,0 +1,19 @@
+	/**
+	 * Execute the merge.
+	 * <p>
+	 * This method is called from {@link #merge(AnyObjectId[])} after the
+	 * {@link #sourceObjects}, {@link #sourceCommits} and {@link #sourceTrees}
+	 * have been populated.
+	 *
+	 * @return true if the merge was completed without conflicts; false if the
+	 *         merge strategy cannot handle this merge or there were conflicts
+	 *         preventing it from automatically resolving all paths.
+	 * @throws IncorrectObjectTypeException
+	 *             one of the input objects is not a commit, but the strategy
+	 *             requires it to be a commit.
+	 * @throws IOException
+	 *             one or more sources could not be read, or outputs could not
+	 *             be written to the Repository.
+	 */
+	protected abstract boolean mergeImpl() throws IOException;
+

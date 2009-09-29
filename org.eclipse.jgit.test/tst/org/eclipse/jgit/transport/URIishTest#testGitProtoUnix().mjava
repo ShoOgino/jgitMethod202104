@@ -1,0 +1,11 @@
+	public void testGitProtoUnix() throws Exception {
+		final String str = "git://example.com/home/m y";
+		URIish u = new URIish(str);
+		assertEquals("git", u.getScheme());
+		assertTrue(u.isRemote());
+		assertEquals("example.com", u.getHost());
+		assertEquals("/home/m y", u.getPath());
+		assertEquals(str, u.toString());
+		assertEquals(u, new URIish(str));
+	}
+

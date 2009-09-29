@@ -1,0 +1,24 @@
+	@Override
+	protected void run() throws Exception {
+		final TreeWalk walk = new TreeWalk(db);
+		walk.reset(); // drop the first empty tree, which we do not need here
+		walk.setRecursive(recursive);
+		walk.addTree(tree);
+
+		while (walk.next()) {
+			final FileMode mode = walk.getFileMode(0);
+			if (mode == FileMode.TREE)
+				out.print('0');
+			out.print(mode);
+			out.print(' ');
+			out.print(Constants.typeString(mode.getObjectType()));
+
+			out.print(' ');
+			out.print(walk.getObjectId(0).name());
+
+			out.print('\t');
+			out.print(walk.getPathString());
+			out.println();
+		}
+	}
+

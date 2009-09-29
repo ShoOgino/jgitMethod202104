@@ -1,0 +1,17 @@
+	public void testProperlyCullAllAncestors2() throws Exception {
+		// Despite clock skew on c1 being very old it should not
+		// produce, neither should a or b, or any part of that chain.
+		//
+		final RevCommit a = commit();
+		final RevCommit b = commit(a);
+		final RevCommit c1 = commit(-5, b);
+		final RevCommit c2 = commit(10, b);
+		final RevCommit d = commit(c1, c2);
+
+		markStart(d);
+		markUninteresting(c1);
+		assertCommit(d, rw.next());
+		assertCommit(c2, rw.next());
+		assertNull(rw.next());
+	}
+

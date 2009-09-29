@@ -1,0 +1,12 @@
+	private IntList computeHashes() {
+		final IntList r = new IntList(lines.size());
+		r.add(0);
+		for (int lno = 1; lno < lines.size() - 1; lno++) {
+			final int ptr = lines.get(lno);
+			final int end = lines.get(lno + 1);
+			r.add(hashLine(content, ptr, end));
+		}
+		r.add(0);
+		return r;
+	}
+

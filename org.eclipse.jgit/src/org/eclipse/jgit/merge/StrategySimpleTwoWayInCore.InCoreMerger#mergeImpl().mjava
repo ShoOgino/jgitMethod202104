@@ -1,0 +1,57 @@
+		@Override
+		protected boolean mergeImpl() throws IOException {
+			tw.reset();
+			tw.addTree(mergeBase());
+			tw.addTree(sourceTrees[0]);
+			tw.addTree(sourceTrees[1]);
+
+			boolean hasConflict = false;
+			builder = cache.builder();
+			while (tw.next()) {
+				final int modeO = tw.getRawMode(T_OURS);
+				final int modeT = tw.getRawMode(T_THEIRS);
+				if (modeO == modeT && tw.idEqual(T_OURS, T_THEIRS)) {
+					add(T_OURS, DirCacheEntry.STAGE_0);
+					continue;
+				}
+
+				final int modeB = tw.getRawMode(T_BASE);
+				if (modeB == modeO && tw.idEqual(T_BASE, T_OURS))
+					add(T_THEIRS, DirCacheEntry.STAGE_0);
+				else if (modeB == modeT && tw.idEqual(T_BASE, T_THEIRS))
+					add(T_OURS, DirCacheEntry.STAGE_0);
+				else if (tw.isSubtree()) {
+					if (nonTree(modeB)) {
+						add(T_BASE, DirCacheEntry.STAGE_1);
+						hasConflict = true;
+					}
+					if (nonTree(modeO)) {
+						add(T_OURS, DirCacheEntry.STAGE_2);
+						hasConflict = true;
+					}
+					if (nonTree(modeT)) {
+						add(T_THEIRS, DirCacheEntry.STAGE_3);
+						hasConflict = true;
+					}
+					tw.enterSubtree();
+				} else {
+					add(T_BASE, DirCacheEntry.STAGE_1);
+					add(T_OURS, DirCacheEntry.STAGE_2);
+					add(T_THEIRS, DirCacheEntry.STAGE_3);
+					hasConflict = true;
+				}
+			}
+			builder.finish();
+			builder = null;
+
+			if (hasConflict)
+				return false;
+			try {
+				resultTree = cache.writeTree(getObjectWriter());
+				return true;
+			} catch (UnmergedPathException upe) {
+				resultTree = null;
+				return false;
+			}
+		}
+

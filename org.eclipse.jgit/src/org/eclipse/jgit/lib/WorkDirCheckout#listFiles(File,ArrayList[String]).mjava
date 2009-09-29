@@ -1,0 +1,10 @@
+	private void listFiles(File dir, ArrayList<String> list) {
+		for (File f : dir.listFiles()) {
+			if (f.isDirectory())
+				listFiles(f, list);
+			else {
+				list.add(Repository.stripWorkDir(root, f));
+			}
+		}
+	}
+

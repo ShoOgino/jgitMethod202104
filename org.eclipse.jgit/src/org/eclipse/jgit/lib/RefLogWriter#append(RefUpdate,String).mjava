@@ -1,0 +1,11 @@
+	static void append(final RefUpdate u, final String msg) throws IOException {
+		final ObjectId oldId = u.getOldObjectId();
+		final ObjectId newId = u.getNewObjectId();
+		final Repository db = u.getRepository();
+		final PersonIdent ident = u.getRefLogIdent();
+
+		appendOneRecord(oldId, newId, ident, msg, db, u.getName());
+		if (!u.getName().equals(u.getOrigName()))
+			appendOneRecord(oldId, newId, ident, msg, db, u.getOrigName());
+	}
+

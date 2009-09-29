@@ -1,0 +1,12 @@
+	private void safeDelete(final String path) {
+		if (path != null) {
+			try {
+				dest.deleteFile(path);
+			} catch (IOException cleanupFailure) {
+				// Ignore the deletion failure. We probably are
+				// already failing and were just trying to pick
+				// up after ourselves.
+			}
+		}
+	}
+

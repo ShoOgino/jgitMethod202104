@@ -1,0 +1,13 @@
+	public RevCommit next() {
+		final Block b = head;
+		if (b == null)
+			return null;
+
+		final RevCommit c = b.pop();
+		if (b.isEmpty()) {
+			head = b.next;
+			free.freeBlock(b);
+		}
+		return c;
+	}
+

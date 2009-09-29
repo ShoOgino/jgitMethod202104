@@ -1,0 +1,19 @@
+	/**
+	 * Lookup a supported service so it can be reconfigured.
+	 *
+	 * @param name
+	 *            name of the service; e.g. "receive-pack"/"git-receive-pack" or
+	 *            "upload-pack"/"git-upload-pack".
+	 * @return the service; null if this daemon implementation doesn't support
+	 *         the requested service type.
+	 */
+	public synchronized DaemonService getService(String name) {
+		if (!name.startsWith("git-"))
+			name = "git-" + name;
+		for (final DaemonService s : services) {
+			if (s.getCommandName().equals(name))
+				return s;
+		}
+		return null;
+	}
+

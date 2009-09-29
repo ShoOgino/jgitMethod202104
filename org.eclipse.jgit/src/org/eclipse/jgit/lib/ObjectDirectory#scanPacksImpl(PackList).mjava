@@ -1,0 +1,55 @@
+	private PackList scanPacksImpl(final PackList old) {
+		final Map<String, PackFile> forReuse = reuseMap(old);
+		final long lastRead = System.currentTimeMillis();
+		final long lastModified = packDirectory.lastModified();
+		final Set<String> names = listPackDirectory();
+		final List<PackFile> list = new ArrayList<PackFile>(names.size() >> 2);
+		boolean foundNew = false;
+		for (final String indexName : names) {
+			// Must match "pack-[0-9a-f]{40}.idx" to be an index.
+			//
+			if (indexName.length() != 49 || !indexName.endsWith(".idx"))
+				continue;
+
+			final String base = indexName.substring(0, indexName.length() - 4);
+			final String packName = base + ".pack";
+			if (!names.contains(packName)) {
+				// Sometimes C Git's HTTP fetch transport leaves a
+				// .idx file behind and does not download the .pack.
+				// We have to skip over such useless indexes.
+				//
+				continue;
+			}
+
+			final PackFile oldPack = forReuse.remove(packName);
+			if (oldPack != null) {
+				list.add(oldPack);
+				continue;
+			}
+
+			final File packFile = new File(packDirectory, packName);
+			final File idxFile = new File(packDirectory, indexName);
+			list.add(new PackFile(idxFile, packFile));
+			foundNew = true;
+		}
+
+		// If we did not discover any new files, the modification time was not
+		// changed, and we did not remove any files, then the set of files is
+		// the same as the set we were given. Instead of building a new object
+		// return the same collection.
+		//
+		if (!foundNew && lastModified == old.lastModified && forReuse.isEmpty())
+			return old.updateLastRead(lastRead);
+
+		for (final PackFile p : forReuse.values()) {
+			p.close();
+		}
+
+		if (list.isEmpty())
+			return new PackList(lastRead, lastModified, NO_PACKS.packs);
+
+		final PackFile[] r = list.toArray(new PackFile[list.size()]);
+		Arrays.sort(r, PackFile.SORT);
+		return new PackList(lastRead, lastModified, r);
+	}
+

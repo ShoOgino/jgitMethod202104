@@ -1,0 +1,9 @@
+	@Override
+	protected RevWalk createWalk() {
+		if (objects)
+			throw die("Cannot use --objects with glog");
+		final PlotWalk w = new PlotWalk(db);
+		w.sort(RevSort.BOUNDARY, true);
+		return w;
+	}
+

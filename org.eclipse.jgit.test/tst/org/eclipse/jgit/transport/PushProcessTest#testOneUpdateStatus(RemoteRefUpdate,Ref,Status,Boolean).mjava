@@ -1,0 +1,14 @@
+	private PushResult testOneUpdateStatus(final RemoteRefUpdate rru,
+			final Ref advertisedRef, final Status expectedStatus,
+			Boolean fastForward) throws NotSupportedException,
+			TransportException {
+		refUpdates.add(rru);
+		if (advertisedRef != null)
+			advertisedRefs.add(advertisedRef);
+		final PushResult result = executePush();
+		assertEquals(expectedStatus, rru.getStatus());
+		if (fastForward != null)
+			assertEquals(fastForward.booleanValue(), rru.isFastForward());
+		return result;
+	}
+

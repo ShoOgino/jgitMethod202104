@@ -1,0 +1,9 @@
+	private boolean config_filemode() {
+		// temporary til we can actually set parameters. We need to be able
+		// to change this for testing.
+		if (filemode != null)
+			return filemode.booleanValue();
+		RepositoryConfig config = db.getConfig();
+		return config.getBoolean("core", null, "filemode", true);
+	}
+

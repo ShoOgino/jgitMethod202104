@@ -1,0 +1,21 @@
+	/**
+	 * Writes reflog entry for ref specified by refName
+	 * 
+	 * @param repo
+	 *            repository to use
+	 * @param oldCommit
+	 *            previous commit
+	 * @param commit
+	 *            new commit
+	 * @param message
+	 *            reflog message
+	 * @param refName
+	 *            full ref name
+	 * @throws IOException
+	 * @deprecated rely upon {@link RefUpdate}'s automatic logging instead.
+	 */
+	public static void writeReflog(Repository repo, ObjectId oldCommit,
+			ObjectId commit, String message, String refName) throws IOException {
+		appendOneRecord(oldCommit, commit, null, message, repo, refName);
+	}
+

@@ -1,0 +1,29 @@
+	public void testParseRename100_NewStyle() {
+		final FileHeader fh = data("diff --git a/a b/ c/\\303\\205ngstr\\303\\266m\n"
+				+ "similarity index 100%\n"
+				+ "rename from a\n"
+				+ "rename to \" c/\\303\\205ngstr\\303\\266m\"\n");
+		int ptr = fh.parseGitFileName(0, fh.buf.length);
+		assertTrue(ptr > 0);
+		assertNull(fh.getOldName()); // can't parse names on a rename
+		assertNull(fh.getNewName());
+
+		ptr = fh.parseGitHeaders(ptr, fh.buf.length);
+		assertTrue(ptr > 0);
+
+		assertEquals("a", fh.getOldName());
+		assertEquals(" c/\u00c5ngstr\u00f6m", fh.getNewName());
+
+		assertSame(FileHeader.ChangeType.RENAME, fh.getChangeType());
+		assertSame(FileHeader.PatchType.UNIFIED, fh.getPatchType());
+		assertTrue(fh.hasMetaDataChanges());
+
+		assertNull(fh.getOldId());
+		assertNull(fh.getNewId());
+
+		assertNull(fh.getOldMode());
+		assertNull(fh.getNewMode());
+
+		assertEquals(100, fh.getScore());
+	}
+

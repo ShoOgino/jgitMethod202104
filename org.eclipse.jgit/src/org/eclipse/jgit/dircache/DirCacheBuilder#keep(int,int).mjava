@@ -1,0 +1,25 @@
+	/**
+	 * Add a range of existing entries from the destination cache.
+	 * <p>
+	 * The entries are placed at the end of the entry list. If any of the
+	 * entries causes the list to now be incorrectly sorted a final sorting
+	 * phase will be automatically enabled within {@link #finish()}.
+	 * <p>
+	 * This method copies from the destination cache, which has not yet been
+	 * updated with this editor's new table. So all offsets into the destination
+	 * cache are not affected by any updates that may be currently taking place
+	 * in this editor.
+	 * <p>
+	 * The internal entry table is automatically expanded if there is
+	 * insufficient space for the new additions.
+	 *
+	 * @param pos
+	 *            first entry to copy from the destination cache.
+	 * @param cnt
+	 *            number of entries to copy.
+	 */
+	public void keep(final int pos, int cnt) {
+		beforeAdd(cache.getEntry(pos));
+		fastKeep(pos, cnt);
+	}
+

@@ -1,0 +1,34 @@
+	private boolean skipEntry(final AbstractTreeIterator minRef)
+			throws CorruptObjectException {
+		// A tree D/F may have been handled earlier. We need to
+		// not report this path if it has already been reported.
+		//
+		for (final AbstractTreeIterator t : trees) {
+			if (t.matches == minRef || t.first())
+				continue;
+
+			int stepsBack = 0;
+			for (;;) {
+				stepsBack++;
+				t.back(1);
+
+				final int cmp = t.pathCompare(minRef, 0);
+				if (cmp == 0) {
+					// We have already seen this "$path" before. Skip it.
+					//
+					t.next(stepsBack);
+					return true;
+				} else if (cmp < 0 || t.first()) {
+					// We cannot find "$path" in t; it will never appear.
+					//
+					t.next(stepsBack);
+					break;
+				}
+			}
+		}
+
+		// We have never seen the current path before.
+		//
+		return false;
+	}
+

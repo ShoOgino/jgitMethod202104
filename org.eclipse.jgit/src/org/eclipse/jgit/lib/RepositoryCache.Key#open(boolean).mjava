@@ -1,0 +1,21 @@
+		/**
+		 * Called by {@link RepositoryCache#open(Key)} if it doesn't exist yet.
+		 * <p>
+		 * If a repository does not exist yet in the cache, the cache will call
+		 * this method to acquire a handle to it.
+		 *
+		 * @param mustExist
+		 *            true if the repository must exist in order to be opened;
+		 *            false if a new non-existent repository is permitted to be
+		 *            created (the caller is responsible for calling create).
+		 * @return the new repository instance.
+		 * @throws IOException
+		 *             the repository could not be read (likely its core.version
+		 *             property is not supported).
+		 * @throws RepositoryNotFoundException
+		 *             There is no repository at the given location, only thrown
+		 *             if {@code mustExist} is true.
+		 */
+		Repository open(boolean mustExist) throws IOException,
+				RepositoryNotFoundException;
+

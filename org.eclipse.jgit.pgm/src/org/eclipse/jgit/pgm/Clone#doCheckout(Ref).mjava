@@ -1,0 +1,20 @@
+	private void doCheckout(final Ref branch) throws IOException {
+		if (branch == null)
+			throw die("cannot checkout; no HEAD advertised by remote");
+		if (!Constants.HEAD.equals(branch.getName()))
+			db.writeSymref(Constants.HEAD, branch.getName());
+
+		final Commit commit = db.mapCommit(branch.getObjectId());
+		final RefUpdate u = db.updateRef(Constants.HEAD);
+		u.setNewObjectId(commit.getCommitId());
+		u.forceUpdate();
+
+		final GitIndex index = new GitIndex(db);
+		final Tree tree = commit.getTree();
+		final WorkDirCheckout co;
+
+		co = new WorkDirCheckout(db, db.getWorkDir(), index, tree);
+		co.checkout();
+		index.write();
+	}
+

@@ -1,0 +1,50 @@
+		void openIndex(final ProgressMonitor pm) throws IOException {
+			if (index != null)
+				return;
+			if (tmpIdx.isFile()) {
+				try {
+					index = PackIndex.open(tmpIdx);
+					return;
+				} catch (FileNotFoundException err) {
+					// Fall through and get the file.
+				}
+			}
+
+			final WalkRemoteObjectDatabase.FileStream s;
+			s = connection.open("pack/" + idxName);
+			pm.beginTask("Get " + idxName.substring(0, 12) + "..idx",
+					s.length < 0 ? ProgressMonitor.UNKNOWN
+							: (int) (s.length / 1024));
+			try {
+				final FileOutputStream fos = new FileOutputStream(tmpIdx);
+				try {
+					final byte[] buf = new byte[2048];
+					int cnt;
+					while (!pm.isCancelled() && (cnt = s.in.read(buf)) >= 0) {
+						fos.write(buf, 0, cnt);
+						pm.update(cnt / 1024);
+					}
+				} finally {
+					fos.close();
+				}
+			} catch (IOException err) {
+				tmpIdx.delete();
+				throw err;
+			} finally {
+				s.in.close();
+			}
+			pm.endTask();
+
+			if (pm.isCancelled()) {
+				tmpIdx.delete();
+				return;
+			}
+
+			try {
+				index = PackIndex.open(tmpIdx);
+			} catch (IOException e) {
+				tmpIdx.delete();
+				throw e;
+			}
+		}
+

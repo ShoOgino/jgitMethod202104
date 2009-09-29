@@ -1,0 +1,8 @@
+		synchronized void begin(final int timeout) {
+			if (terminated)
+				throw new IllegalStateException("Timer already terminated");
+			callingThread = Thread.currentThread();
+			deadline = now() + timeout;
+			notifyAll();
+		}
+

@@ -1,0 +1,11 @@
+		public FakeTreeIterator(String pathName, FileMode fileMode) {
+			super(prefix(pathName));
+			mode = fileMode.getBits();
+
+			final int s = pathName.lastIndexOf('/');
+			final byte[] name = Constants.encode(pathName.substring(s + 1));
+			ensurePathCapacity(pathOffset + name.length, pathOffset);
+			System.arraycopy(name, 0, path, pathOffset, name.length);
+			pathLen = pathOffset + name.length;
+		}
+

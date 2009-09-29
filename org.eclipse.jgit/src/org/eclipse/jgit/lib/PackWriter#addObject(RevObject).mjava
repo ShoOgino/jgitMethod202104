@@ -1,0 +1,34 @@
+	/**
+	 * Include one object to the output file.
+	 * <p>
+	 * Objects are written in the order they are added. If the same object is
+	 * added twice, it may be written twice, creating a larger than necessary
+	 * file.
+	 *
+	 * @param object
+	 *            the object to add.
+	 * @throws IncorrectObjectTypeException
+	 *             the object is an unsupported type.
+	 */
+	public void addObject(final RevObject object)
+			throws IncorrectObjectTypeException {
+		if (object.has(RevFlag.UNINTERESTING)) {
+			edgeObjects.add(object);
+			thin = true;
+			return;
+		}
+
+		final ObjectToPack otp = new ObjectToPack(object, object.getType());
+		try {
+			objectsLists[object.getType()].add(otp);
+		} catch (ArrayIndexOutOfBoundsException x) {
+			throw new IncorrectObjectTypeException(object,
+					"COMMIT nor TREE nor BLOB nor TAG");
+		} catch (UnsupportedOperationException x) {
+			// index pointing to "dummy" empty list
+			throw new IncorrectObjectTypeException(object,
+					"COMMIT nor TREE nor BLOB nor TAG");
+		}
+		objectsMap.add(otp);
+	}
+

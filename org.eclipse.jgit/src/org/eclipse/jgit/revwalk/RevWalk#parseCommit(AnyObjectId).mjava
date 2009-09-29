@@ -1,0 +1,31 @@
+	/**
+	 * Locate a reference to a commit and immediately parse its content.
+	 * <p>
+	 * Unlike {@link #lookupCommit(AnyObjectId)} this method only returns
+	 * successfully if the commit object exists, is verified to be a commit, and
+	 * was parsed without error.
+	 * 
+	 * @param id
+	 *            name of the commit object.
+	 * @return reference to the commit object. Never null.
+	 * @throws MissingObjectException
+	 *             the supplied commit does not exist.
+	 * @throws IncorrectObjectTypeException
+	 *             the supplied id is not a commit or an annotated tag.
+	 * @throws IOException
+	 *             a pack file or loose object could not be read.
+	 */
+	public RevCommit parseCommit(final AnyObjectId id)
+			throws MissingObjectException, IncorrectObjectTypeException,
+			IOException {
+		RevObject c = parseAny(id);
+		while (c instanceof RevTag) {
+			c = ((RevTag) c).getObject();
+			parseHeaders(c);
+		}
+		if (!(c instanceof RevCommit))
+			throw new IncorrectObjectTypeException(id.toObjectId(),
+					Constants.TYPE_COMMIT);
+		return (RevCommit) c;
+	}
+

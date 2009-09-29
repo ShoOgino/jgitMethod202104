@@ -1,0 +1,10 @@
+		CGitIndexRecord(final String line) {
+			final int tab = line.indexOf('\t');
+			final int sp1 = line.indexOf(' ');
+			final int sp2 = line.indexOf(' ', sp1 + 1);
+			mode = Integer.parseInt(line.substring(0, sp1), 8);
+			id = ObjectId.fromString(line.substring(sp1 + 1, sp2));
+			stage = Integer.parseInt(line.substring(sp2 + 1, tab));
+			path = line.substring(tab + 1);
+		}
+

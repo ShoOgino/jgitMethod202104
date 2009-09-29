@@ -1,0 +1,14 @@
+	private void add(final RevCommit c) {
+		final int flag = walker.allocFlag();
+		branchMask |= flag;
+		if ((c.flags & branchMask) != 0) {
+			// This should never happen. RevWalk ensures we get a
+			// commit admitted to the initial queue only once. If
+			// we see this marks aren't correctly erased.
+			//
+			throw new IllegalStateException("Stale RevFlags on " + c.name());
+		}
+		c.flags |= flag;
+		pending.add(c);
+	}
+

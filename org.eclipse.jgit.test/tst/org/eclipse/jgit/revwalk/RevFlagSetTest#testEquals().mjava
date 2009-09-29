@@ -1,0 +1,12 @@
+	public void testEquals() {
+		final RevFlag flag1 = rw.newFlag("flag_1");
+		final RevFlag flag2 = rw.newFlag("flag_2");
+		final RevFlagSet set = new RevFlagSet();
+		assertTrue(set.add(flag1));
+		assertTrue(set.add(flag2));
+
+		assertTrue(new RevFlagSet(set).equals(set));
+		assertTrue(new RevFlagSet(Arrays.asList(new RevFlag[] { flag1, flag2 }))
+				.equals(set));
+	}
+

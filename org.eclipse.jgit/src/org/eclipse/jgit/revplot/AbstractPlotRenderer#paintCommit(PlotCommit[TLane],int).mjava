@@ -1,0 +1,74 @@
+	/**
+	 * Paint one commit using the underlying graphics library.
+	 * 
+	 * @param commit
+	 *            the commit to render in this cell. Must not be null.
+	 * @param h
+	 *            total height (in pixels) of this cell.
+	 */
+	protected void paintCommit(final PlotCommit<TLane> commit, final int h) {
+		final int dotSize = computeDotSize(h);
+		final TLane myLane = commit.getLane();
+		final int myLaneX = laneC(myLane);
+		final TColor myColor = laneColor(myLane);
+
+		int maxCenter = 0;
+		for (final TLane passingLane : (TLane[]) commit.passingLanes) {
+			final int cx = laneC(passingLane);
+			final TColor c = laneColor(passingLane);
+			drawLine(c, cx, 0, cx, h, LINE_WIDTH);
+			maxCenter = Math.max(maxCenter, cx);
+		}
+
+		final int nParent = commit.getParentCount();
+		for (int i = 0; i < nParent; i++) {
+			final PlotCommit<TLane> p;
+			final TLane pLane;
+			final TColor pColor;
+			final int cx;
+
+			p = (PlotCommit<TLane>) commit.getParent(i);
+			pLane = p.getLane();
+			if (pLane == null)
+				continue;
+
+			pColor = laneColor(pLane);
+			cx = laneC(pLane);
+
+			if (Math.abs(myLaneX - cx) > LANE_WIDTH) {
+				if (myLaneX < cx) {
+					final int ix = cx - LANE_WIDTH / 2;
+					drawLine(pColor, myLaneX, h / 2, ix, h / 2, LINE_WIDTH);
+					drawLine(pColor, ix, h / 2, cx, h, LINE_WIDTH);
+				} else {
+					final int ix = cx + LANE_WIDTH / 2;
+					drawLine(pColor, myLaneX, h / 2, ix, h / 2, LINE_WIDTH);
+					drawLine(pColor, ix, h / 2, cx, h, LINE_WIDTH);
+				}
+			} else {
+				drawLine(pColor, myLaneX, h / 2, cx, h, LINE_WIDTH);
+			}
+			maxCenter = Math.max(maxCenter, cx);
+		}
+
+		final int dotX = myLaneX - dotSize / 2 - 1;
+		final int dotY = (h - dotSize) / 2;
+
+		if (commit.getChildCount() > 0)
+			drawLine(myColor, myLaneX, 0, myLaneX, dotY, LINE_WIDTH);
+
+		if (commit.has(RevFlag.UNINTERESTING))
+			drawBoundaryDot(dotX, dotY, dotSize, dotSize);
+		else
+			drawCommitDot(dotX, dotY, dotSize, dotSize);
+
+		int textx = Math.max(maxCenter + LANE_WIDTH / 2, dotX + dotSize) + 8;
+		int n = commit.refs == null ? 0 : commit.refs.length;
+		for (int i = 0; i < n; ++i) {
+			textx += drawLabel(textx + dotSize, h/2, commit.refs[i]);
+		}
+
+		final String msg = commit.getShortMessage();
+		drawText(msg, textx + dotSize + n*2, h / 2);
+	}
+

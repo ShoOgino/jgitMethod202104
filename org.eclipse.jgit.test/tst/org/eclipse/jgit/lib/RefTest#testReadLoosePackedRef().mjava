@@ -1,0 +1,20 @@
+	/**
+	 * Let an "outsider" create a loose ref with the same name as a packed one
+	 *
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
+	public void testReadLoosePackedRef() throws IOException,
+			InterruptedException {
+		Ref ref = db.getRef("refs/heads/master");
+		assertEquals(Storage.PACKED, ref.getStorage());
+		FileOutputStream os = new FileOutputStream(new File(db.getDirectory(),
+				"refs/heads/master"));
+		os.write(ref.getObjectId().name().getBytes());
+		os.write('\n');
+		os.close();
+
+		ref = db.getRef("refs/heads/master");
+		assertEquals(Storage.LOOSE_PACKED, ref.getStorage());
+	}
+

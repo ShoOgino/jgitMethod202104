@@ -1,0 +1,24 @@
+	private int parseGitBinary(final FileHeader fh, int c, final int end) {
+		final BinaryHunk postImage = new BinaryHunk(fh, c);
+		final int nEnd = postImage.parseHunk(c, end);
+		if (nEnd < 0) {
+			// Not a binary hunk.
+			//
+			error(fh.buf, c, "Missing forward-image in GIT binary patch");
+			return c;
+		}
+		c = nEnd;
+		postImage.endOffset = c;
+		fh.forwardBinaryHunk = postImage;
+
+		final BinaryHunk preImage = new BinaryHunk(fh, c);
+		final int oEnd = preImage.parseHunk(c, end);
+		if (oEnd >= 0) {
+			c = oEnd;
+			preImage.endOffset = c;
+			fh.reverseBinaryHunk = preImage;
+		}
+
+		return c;
+	}
+

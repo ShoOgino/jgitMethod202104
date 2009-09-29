@@ -1,0 +1,21 @@
+	@Override
+	public byte[] idBuffer() {
+		if (contentIdFromPtr == ptr)
+			return contentId;
+		switch (mode & FileMode.TYPE_MASK) {
+		case FileMode.TYPE_FILE:
+			contentIdFromPtr = ptr;
+			return contentId = idBufferBlob(entries[ptr]);
+		case FileMode.TYPE_SYMLINK:
+			// Java does not support symbolic links, so we should not
+			// have reached this particular part of the walk code.
+			//
+			return zeroid;
+		case FileMode.TYPE_GITLINK:
+			// TODO: Support obtaining current HEAD SHA-1 from nested repository
+			//
+			return zeroid;
+		}
+		return zeroid;
+	}
+

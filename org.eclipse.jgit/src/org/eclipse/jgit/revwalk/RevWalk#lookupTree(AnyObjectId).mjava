@@ -1,0 +1,19 @@
+	/**
+	 * Locate a reference to a tree without loading it.
+	 * <p>
+	 * The tree may or may not exist in the repository. It is impossible to tell
+	 * from this method's return value.
+	 * 
+	 * @param id
+	 *            name of the tree object.
+	 * @return reference to the tree object. Never null.
+	 */
+	public RevTree lookupTree(final AnyObjectId id) {
+		RevTree c = (RevTree) objects.get(id);
+		if (c == null) {
+			c = new RevTree(id);
+			objects.add(c);
+		}
+		return c;
+	}
+

@@ -1,0 +1,76 @@
+	private void sendStatusReport(final boolean forClient, final Reporter out)
+			throws IOException {
+		if (unpackError != null) {
+			out.sendString("unpack error " + unpackError.getMessage());
+			if (forClient) {
+				for (final ReceiveCommand cmd : commands) {
+					out.sendString("ng " + cmd.getRefName()
+							+ " n/a (unpacker error)");
+				}
+			}
+			return;
+		}
+
+		if (forClient)
+			out.sendString("unpack ok");
+		for (final ReceiveCommand cmd : commands) {
+			if (cmd.getResult() == Result.OK) {
+				if (forClient)
+					out.sendString("ok " + cmd.getRefName());
+				continue;
+			}
+
+			final StringBuilder r = new StringBuilder();
+			r.append("ng ");
+			r.append(cmd.getRefName());
+			r.append(" ");
+
+			switch (cmd.getResult()) {
+			case NOT_ATTEMPTED:
+				r.append("server bug; ref not processed");
+				break;
+
+			case REJECTED_NOCREATE:
+				r.append("creation prohibited");
+				break;
+
+			case REJECTED_NODELETE:
+				r.append("deletion prohibited");
+				break;
+
+			case REJECTED_NONFASTFORWARD:
+				r.append("non-fast forward");
+				break;
+
+			case REJECTED_CURRENT_BRANCH:
+				r.append("branch is currently checked out");
+				break;
+
+			case REJECTED_MISSING_OBJECT:
+				if (cmd.getMessage() == null)
+					r.append("missing object(s)");
+				else if (cmd.getMessage().length() == 2 * Constants.OBJECT_ID_LENGTH)
+					r.append("object " + cmd.getMessage() + " missing");
+				else
+					r.append(cmd.getMessage());
+				break;
+
+			case REJECTED_OTHER_REASON:
+				if (cmd.getMessage() == null)
+					r.append("unspecified reason");
+				else
+					r.append(cmd.getMessage());
+				break;
+
+			case LOCK_FAILURE:
+				r.append("failed to lock");
+				break;
+
+			case OK:
+				// We shouldn't have reached this case (see 'ok' case above).
+				continue;
+			}
+			out.sendString(r.toString());
+		}
+	}
+

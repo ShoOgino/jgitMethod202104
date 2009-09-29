@@ -1,0 +1,33 @@
+	/**
+	 * Check an object for parsing errors.
+	 *
+	 * @param objType
+	 *            type of the object. Must be a valid object type code in
+	 *            {@link Constants}.
+	 * @param raw
+	 *            the raw data which comprises the object. This should be in the
+	 *            canonical format (that is the format used to generate the
+	 *            ObjectId of the object). The array is never modified.
+	 * @throws CorruptObjectException
+	 *             if an error is identified.
+	 */
+	public void check(final int objType, final byte[] raw)
+			throws CorruptObjectException {
+		switch (objType) {
+		case Constants.OBJ_COMMIT:
+			checkCommit(raw);
+			break;
+		case Constants.OBJ_TAG:
+			checkTag(raw);
+			break;
+		case Constants.OBJ_TREE:
+			checkTree(raw);
+			break;
+		case Constants.OBJ_BLOB:
+			checkBlob(raw);
+			break;
+		default:
+			throw new CorruptObjectException("Invalid object type: " + objType);
+		}
+	}
+

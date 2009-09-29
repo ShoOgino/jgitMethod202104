@@ -1,0 +1,17 @@
+	public static File getTestResourceFile(final String fileName) {
+		if (fileName == null || fileName.length() <= 0) {
+			return null;
+		}
+		final URL url = cl().getResource(CLASSPATH_TO_RESOURCES + fileName);
+		if (url == null) {
+			// If URL is null then try to load it as it was being
+			// loaded previously
+			return new File("tst", fileName);
+		}
+		try {
+			return new File(url.toURI());
+		} catch(URISyntaxException e) {
+			return new File(url.getPath());
+		}
+	}
+

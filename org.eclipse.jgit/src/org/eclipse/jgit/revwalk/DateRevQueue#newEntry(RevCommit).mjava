@@ -1,0 +1,10 @@
+	private Entry newEntry(final RevCommit c) {
+		Entry r = free;
+		if (r == null)
+			r = new Entry();
+		else
+			free = r.next;
+		r.commit = c;
+		return r;
+	}
+

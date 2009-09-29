@@ -1,0 +1,15 @@
+	public boolean equals(final Object obj) {
+		if (!(obj instanceof RefSpec))
+			return false;
+		final RefSpec b = (RefSpec) obj;
+		if (isForceUpdate() != b.isForceUpdate())
+			return false;
+		if (isWildcard() != b.isWildcard())
+			return false;
+		if (!eq(getSource(), b.getSource()))
+			return false;
+		if (!eq(getDestination(), b.getDestination()))
+			return false;
+		return true;
+	}
+

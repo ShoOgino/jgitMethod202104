@@ -1,0 +1,47 @@
+	private void markReachable(final Set<ObjectId> have, final int maxTime)
+			throws IOException {
+		for (final Ref r : local.getAllRefs().values()) {
+			try {
+				final RevCommit o = walk.parseCommit(r.getObjectId());
+				o.add(REACHABLE);
+				reachableCommits.add(o);
+			} catch (IOException readError) {
+				// If we cannot read the value of the ref skip it.
+			}
+		}
+
+		for (final ObjectId id : have) {
+			try {
+				final RevCommit o = walk.parseCommit(id);
+				o.add(REACHABLE);
+				reachableCommits.add(o);
+			} catch (IOException readError) {
+				// If we cannot read the value of the ref skip it.
+			}
+		}
+
+		if (maxTime > 0) {
+			// Mark reachable commits until we reach maxTime. These may
+			// wind up later matching up against things we want and we
+			// can avoid asking for something we already happen to have.
+			//
+			final Date maxWhen = new Date(maxTime * 1000L);
+			walk.sort(RevSort.COMMIT_TIME_DESC);
+			walk.markStart(reachableCommits);
+			walk.setRevFilter(CommitTimeRevFilter.after(maxWhen));
+			for (;;) {
+				final RevCommit c = walk.next();
+				if (c == null)
+					break;
+				if (c.has(ADVERTISED) && !c.has(COMMON)) {
+					// This is actually going to be a common commit, but
+					// our peer doesn't know that fact yet.
+					//
+					c.add(COMMON);
+					c.carry(COMMON);
+					reachableCommits.add(c);
+				}
+			}
+		}
+	}
+

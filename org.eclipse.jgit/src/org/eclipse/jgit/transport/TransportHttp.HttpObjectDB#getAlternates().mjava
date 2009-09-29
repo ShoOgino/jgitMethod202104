@@ -1,0 +1,17 @@
+		@Override
+		Collection<WalkRemoteObjectDatabase> getAlternates() throws IOException {
+			try {
+				return readAlternates(INFO_HTTP_ALTERNATES);
+			} catch (FileNotFoundException err) {
+				// Fall through.
+			}
+
+			try {
+				return readAlternates(INFO_ALTERNATES);
+			} catch (FileNotFoundException err) {
+				// Fall through.
+			}
+
+			return null;
+		}
+

@@ -1,0 +1,12 @@
+	public void testInvalidTreeTruncatedInObjectId() {
+		final StringBuilder b = new StringBuilder();
+		b.append("100644 b\0\1\2");
+		final byte[] data = Constants.encodeASCII(b.toString());
+		try {
+			checker.checkTree(data);
+			fail("incorrectly accepted an invalid tree");
+		} catch (CorruptObjectException e) {
+			assertEquals("truncated in object id", e.getMessage());
+		}
+	}
+

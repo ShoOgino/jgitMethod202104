@@ -1,0 +1,21 @@
+		/**
+		 * Obtain a pointer to a location on disk.
+		 * <p>
+		 * The method performs some basic guessing to locate the repository.
+		 * Searched paths are:
+		 * <ol>
+		 * <li>{@code directory} // assume exact match</li>
+		 * <li>{@code directory} + "/.git" // assume working directory</li>
+		 * <li>{@code directory} + ".git" // assume bare</li>
+		 * </ol>
+		 *
+		 * @param directory
+		 *            location where the repository database might be.
+		 * @return a key for the given directory.
+		 * @see #exact(File)
+		 */
+		public static FileKey lenient(final File directory) {
+			final File gitdir = resolve(directory);
+			return new FileKey(gitdir != null ? gitdir : directory);
+		}
+

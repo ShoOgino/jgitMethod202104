@@ -1,0 +1,20 @@
+	public void testCrissCross() throws Exception {
+		// See http://marc.info/?l=git&m=111463358500362&w=2 for a nice
+		// description of what this test is creating. We don't have a
+		// clean merge base for d,e as they each merged the parents b,c
+		// in different orders.
+		//
+		final RevCommit a = commit();
+		final RevCommit b = commit(a);
+		final RevCommit c = commit(a);
+		final RevCommit d = commit(b, c);
+		final RevCommit e = commit(c, b);
+
+		rw.setRevFilter(RevFilter.MERGE_BASE);
+		markStart(d);
+		markStart(e);
+		assertCommit(c, rw.next());
+		assertCommit(b, rw.next());
+		assertNull(rw.next());
+	}
+

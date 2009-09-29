@@ -1,0 +1,22 @@
+	private void testOneType(final int typeCode) throws Exception {
+		final ObjectId id = id("9788669ad918b6fcce64af8882fc9a81cb6aba67");
+		final StringBuilder b = new StringBuilder();
+		b.append("object " + id.name() + "\n");
+		b.append("type " + Constants.typeString(typeCode) + "\n");
+		b.append("tag v1.2.3.4.5\n");
+		b.append("tagger A U. Thor <a_u_thor@example.com> 1218123387 +0700\n");
+		b.append("\n");
+
+		final RevWalk rw = new RevWalk(db);
+		final RevTag c;
+
+		c = new RevTag(id("9473095c4cb2f12aefe1db8a355fe3fafba42f67"));
+		assertNull(c.getObject());
+		assertNull(c.getTagName());
+
+		c.parseCanonical(rw, b.toString().getBytes("UTF-8"));
+		assertNotNull(c.getObject());
+		assertEquals(id, c.getObject().getId());
+		assertSame(rw.lookupAny(id, typeCode), c.getObject());
+	}
+

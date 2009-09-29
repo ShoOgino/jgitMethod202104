@@ -1,0 +1,22 @@
+	public void testAdd_InGitSortOrder() throws Exception {
+		final DirCache dc = DirCache.read(db);
+
+		final String[] paths = { "a.", "a.b", "a/b", "a0b" };
+		final DirCacheEntry[] ents = new DirCacheEntry[paths.length];
+		for (int i = 0; i < paths.length; i++)
+			ents[i] = new DirCacheEntry(paths[i]);
+
+		final DirCacheBuilder b = dc.builder();
+		for (int i = 0; i < ents.length; i++)
+			b.add(ents[i]);
+		b.finish();
+
+		assertEquals(paths.length, dc.getEntryCount());
+		for (int i = 0; i < paths.length; i++) {
+			assertSame(ents[i], dc.getEntry(i));
+			assertEquals(paths[i], dc.getEntry(i).getPathString());
+			assertEquals(i, dc.findEntry(paths[i]));
+			assertSame(ents[i], dc.getEntry(paths[i]));
+		}
+	}
+

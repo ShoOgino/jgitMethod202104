@@ -1,0 +1,30 @@
+	void write(final Writer pw) throws IOException {
+		final String type;
+		final String name;
+		if (sourceName.startsWith(R_HEADS)) {
+			type = "branch";
+			name = sourceName.substring(R_HEADS.length());
+		} else if (sourceName.startsWith(R_TAGS)) {
+			type = "tag";
+			name = sourceName.substring(R_TAGS.length());
+		} else if (sourceName.startsWith(R_REMOTES)) {
+			type = "remote branch";
+			name = sourceName.substring(R_REMOTES.length());
+		} else {
+			type = "";
+			name = sourceName;
+		}
+
+		pw.write(newValue.name());
+		pw.write('\t');
+		if (notForMerge)
+			pw.write("not-for-merge");
+		pw.write('\t');
+		pw.write(type);
+		pw.write(" '");
+		pw.write(name);
+		pw.write("' of ");
+		pw.write(sourceURI.toString());
+		pw.write("\n");
+	}
+

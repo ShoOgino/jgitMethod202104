@@ -1,0 +1,34 @@
+	/**
+	 * Atomically write a remote file.
+	 * <p>
+	 * This method attempts to perform as atomic of an update as it can,
+	 * reducing (or eliminating) the time that clients might be able to see
+	 * partial file content. This method is not suitable for very large
+	 * transfers as the complete content must be passed as an argument.
+	 * <p>
+	 * Path may start with <code>../</code> to request writing of a file that
+	 * resides in the repository itself.
+	 * <p>
+	 * The requested path may or may not exist. If the path already exists as a
+	 * file the file should be truncated and completely replaced.
+	 * <p>
+	 * This method creates any missing parent directories, if necessary.
+	 *
+	 * @param path
+	 *            name of the file to write, relative to the current object
+	 *            database.
+	 * @param data
+	 *            complete new content of the file.
+	 * @throws IOException
+	 *             writing is not supported, or attempting to write the file
+	 *             failed, possibly due to permissions or remote disk full, etc.
+	 */
+	void writeFile(final String path, final byte[] data) throws IOException {
+		final OutputStream os = writeFile(path, null, null);
+		try {
+			os.write(data);
+		} finally {
+			os.close();
+		}
+	}
+

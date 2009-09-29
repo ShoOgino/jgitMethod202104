@@ -1,0 +1,13 @@
+	BlockRevQueue(final Generator s) throws MissingObjectException,
+			IncorrectObjectTypeException, IOException {
+		free = new BlockFreeList();
+		outputType = s.outputType();
+		s.shareFreeList(this);
+		for (;;) {
+			final RevCommit c = s.next();
+			if (c == null)
+				break;
+			add(c);
+		}
+	}
+

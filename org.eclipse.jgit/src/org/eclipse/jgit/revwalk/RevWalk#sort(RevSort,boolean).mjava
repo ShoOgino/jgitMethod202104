@@ -1,0 +1,27 @@
+	/**
+	 * Add or remove a sorting strategy for the returned commits.
+	 * <p>
+	 * Multiple strategies can be applied at once, in which case some strategies
+	 * may take precedence over others. As an example, {@link RevSort#TOPO} must
+	 * take precedence over {@link RevSort#COMMIT_TIME_DESC}, otherwise it
+	 * cannot enforce its ordering.
+	 * 
+	 * @param s
+	 *            a sorting strategy to enable or disable.
+	 * @param use
+	 *            true if this strategy should be used, false if it should be
+	 *            removed.
+	 */
+	public void sort(final RevSort s, final boolean use) {
+		assertNotStarted();
+		if (use)
+			sorting.add(s);
+		else
+			sorting.remove(s);
+
+		if (sorting.size() > 1)
+			sorting.remove(RevSort.NONE);
+		else if (sorting.size() == 0)
+			sorting.add(RevSort.NONE);
+	}
+

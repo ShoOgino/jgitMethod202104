@@ -1,0 +1,31 @@
+	public void testCheckout() throws Exception {
+		// Prepare tree, remote it and checkout
+		GitIndex index = new GitIndex(db);
+		File aslashb = writeTrashFile("a/b", "data:a/b");
+		File acolonb = writeTrashFile("a:b", "data:a:b");
+		File adotb = writeTrashFile("a.b", "data:a.b");
+		index.add(trash, aslashb);
+		index.add(trash, acolonb);
+		index.add(trash, adotb);
+		index.write();
+		index.writeTree();
+		delete(aslashb);
+		delete(acolonb);
+		delete(adotb);
+		delete(aslashb.getParentFile());
+
+		GitIndex index2 = new GitIndex(db);
+		assertEquals(0, index2.getMembers().length);
+
+		index2.readTree(db.mapTree(ObjectId.fromString(
+				"c696abc3ab8e091c665f49d00eb8919690b3aec3")));
+
+		index2.checkout(trash);
+		assertEquals("data:a/b", content(aslashb));
+		assertEquals("data:a:b", content(acolonb));
+		assertEquals("data:a.b", content(adotb));
+
+		if (canrungitstatus)
+			assertEquals(0, system(trash, "git status"));
+	}
+

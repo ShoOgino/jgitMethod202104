@@ -1,0 +1,16 @@
+	public void testProperlyCullAllAncestors1() throws Exception {
+		// Credit goes to Junio C Hamano <gitster@pobox.com> for this
+		// test case in git-core (t/t6009-rev-list-parent.sh)
+		//
+		// We induce a clock skew so two is dated before one.
+		//
+		final RevCommit a = commit();
+		final RevCommit b = commit(-2400, a);
+		final RevCommit c = commit(b);
+		final RevCommit d = commit(c);
+
+		markStart(a);
+		markUninteresting(d);
+		assertNull(rw.next());
+	}
+

@@ -1,0 +1,17 @@
+	public void testFilterFootersIgnoreCase() {
+		final RevCommit commit = parse("subject\n\nbody of commit\n"
+				+ "Not-A-Footer-Line: this line must not be read as a footer\n"
+				+ "\n" // paragraph break, now footers appear in final block
+				+ "Signed-Off-By: A. U. Thor <a@example.com>\n"
+				+ "CC:            <some.mailing.list@example.com>\n"
+				+ "Acked-by: Some Reviewer <sr@example.com>\n"
+				+ "signed-off-by: Main Tain Er <mte@example.com>\n");
+		final List<String> footers = commit.getFooterLines("signed-off-by");
+
+		assertNotNull(footers);
+		assertEquals(2, footers.size());
+
+		assertEquals("A. U. Thor <a@example.com>", footers.get(0));
+		assertEquals("Main Tain Er <mte@example.com>", footers.get(1));
+	}
+

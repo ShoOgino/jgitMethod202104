@@ -1,0 +1,13 @@
+	private FetchResult runFetch() throws NotSupportedException,
+			URISyntaxException, TransportException {
+		final Transport tn = Transport.open(db, remoteName);
+		final FetchResult r;
+		try {
+			r = tn.fetch(new TextProgressMonitor(), null);
+		} finally {
+			tn.close();
+		}
+		showFetchResult(tn, r);
+		return r;
+	}
+
