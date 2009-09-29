@@ -7,7 +7,11 @@
 				break;
 
 			if (line.charAt(0) == '-') {
-				prereqs.add(ObjectId.fromString(line.substring(1, 41)));
+				ObjectId id = ObjectId.fromString(line.substring(1, 41));
+				String shortDesc = null;
+				if (line.length() > 42)
+					shortDesc = line.substring(42);
+				prereqs.put(id, shortDesc);
 				continue;
 			}
 

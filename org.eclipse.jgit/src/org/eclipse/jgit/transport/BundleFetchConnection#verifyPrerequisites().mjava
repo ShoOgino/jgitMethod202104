@@ -6,9 +6,10 @@
 		final RevFlag PREREQ = rw.newFlag("PREREQ");
 		final RevFlag SEEN = rw.newFlag("SEEN");
 
-		final List<ObjectId> missing = new ArrayList<ObjectId>();
+		final Map<ObjectId, String> missing = new HashMap<ObjectId, String>();
 		final List<RevObject> commits = new ArrayList<RevObject>();
-		for (final ObjectId p : prereqs) {
+		for (final Map.Entry<ObjectId, String> e : prereqs.entrySet()) {
+			ObjectId p = e.getKey();
 			try {
 				final RevCommit c = rw.parseCommit(p);
 				if (!c.has(PREREQ)) {
@@ -16,7 +17,7 @@
 					commits.add(c);
 				}
 			} catch (MissingObjectException notFound) {
-				missing.add(p);
+				missing.put(p, e.getValue());
 			} catch (IOException err) {
 				throw new TransportException(transport.uri, "Cannot read commit "
 						+ p.name(), err);
@@ -50,7 +51,7 @@
 		if (remaining > 0) {
 			for (final RevObject o : commits) {
 				if (!o.has(SEEN))
-					missing.add(o);
+					missing.put(o, prereqs.get(o));
 			}
 			throw new MissingBundlePrerequisiteException(transport.uri, missing);
 		}
