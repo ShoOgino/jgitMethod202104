@@ -1,0 +1,22 @@
+	/**
+	 * Creates a new empty repository.
+	 *
+	 * @param bare
+	 *            true to create a bare repository; false to make a repository
+	 *            within its working directory
+	 * @return the newly created repository, opened for access
+	 * @throws IOException
+	 *             the repository could not be created in the temporary area
+	 */
+	private Repository createRepository(boolean bare) throws IOException {
+		String uniqueId = System.currentTimeMillis() + "_" + (testCount++);
+		String gitdirName = "test" + uniqueId + (bare ? "" : "/") + ".git";
+		File gitdir = new File(trash, gitdirName).getCanonicalFile();
+		Repository db = new Repository(gitdir);
+
+		assertFalse(gitdir.exists());
+		db.create();
+		toClose.add(db);
+		return db;
+	}
+
