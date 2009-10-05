@@ -1,0 +1,18 @@
+	private void commit(final Tree t, String commitMsg, PersonIdent author,
+			PersonIdent committer) throws IOException {
+		final Commit commit = new Commit(db);
+		commit.setAuthor(author);
+		commit.setCommitter(committer);
+		commit.setMessage(commitMsg);
+		commit.setTree(t);
+		ObjectWriter writer = new ObjectWriter(db);
+		commit.setCommitId(writer.writeCommit(commit));
+
+		int nl = commitMsg.indexOf('\n');
+		final RefUpdate ru = db.updateRef(Constants.HEAD);
+		ru.setNewObjectId(commit.getCommitId());
+		ru.setRefLogMessage("commit : "
+				+ ((nl == -1) ? commitMsg : commitMsg.substring(0, nl)), false);
+		ru.forceUpdate();
+	}
+
