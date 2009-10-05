@@ -1,24 +1,7 @@
-	/**
-	 * Simple command line interface to {@link AmazonS3}.
-	 *
-	 * @param argv
-	 *            command line arguments. See usage for details.
-	 * @throws IOException
-	 *             an error occurred.
-	 */
-	public static void main(final String[] argv) throws IOException {
-		if (argv.length != 4) {
-			commandLineUsage();
-			return;
-		}
+	@Override
+	protected void run() throws Exception {
+		final AmazonS3 s3 = new AmazonS3(properties());
 
-		AwtAuthenticator.install();
-		HttpSupport.configureHttpProxy();
-
-		final AmazonS3 s3 = new AmazonS3(properties(new File(argv[0])));
-		final String op = argv[1];
-		final String bucket = argv[2];
-		final String key = argv[3];
 		if ("get".equals(op)) {
 			final URLConnection c = s3.get(bucket, key);
 			int len = c.getContentLength();
@@ -35,11 +18,14 @@
 			} finally {
 				in.close();
 			}
+
 		} else if ("ls".equals(op) || "list".equals(op)) {
 			for (final String k : s3.list(bucket, key))
 				System.out.println(k);
+
 		} else if ("rm".equals(op) || "delete".equals(op)) {
 			s3.delete(bucket, key);
+
 		} else if ("put".equals(op)) {
 			final OutputStream os = s3.beginPut(bucket, key, null, null);
 			final byte[] tmp = new byte[2048];
@@ -47,8 +33,9 @@
 			while ((n = System.in.read(tmp)) > 0)
 				os.write(tmp, 0, n);
 			os.close();
+
 		} else {
-			commandLineUsage();
+			throw die("Unsupported operation: " + op);
 		}
 	}
 
