@@ -1,4 +1,17 @@
-	void end() throws IOException {
+	/**
+	 * Write a packet end marker, sometimes referred to as a flush command.
+	 * <p>
+	 * Technically this is a magical packet type which can be detected
+	 * separately from an empty string or an empty packet.
+	 * <p>
+	 * Implicitly performs a flush on the underlying OutputStream to ensure the
+	 * peer will receive all data written thus far.
+	 *
+	 * @throws IOException
+	 *             the end marker could not be written, the stream is corrupted
+	 *             as the end marker may have been only partially written.
+	 */
+	public void end() throws IOException {
 		formatLength(0);
 		out.write(lenbuffer, 0, 4);
 		flush();
