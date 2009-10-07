@@ -30,7 +30,11 @@
 			final ObjectId newId = ObjectId.fromString(line.substring(41, 81));
 			final String name = line.substring(82);
 			final ReceiveCommand cmd = new ReceiveCommand(oldId, newId, name);
-			cmd.setRef(refs.get(cmd.getRefName()));
+			if (name.equals(Constants.HEAD)) {
+				cmd.setResult(Result.REJECTED_CURRENT_BRANCH);
+			} else {
+				cmd.setRef(refs.get(cmd.getRefName()));
+			}
 			commands.add(cmd);
 		}
 	}

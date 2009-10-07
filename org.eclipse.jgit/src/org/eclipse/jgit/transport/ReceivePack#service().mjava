@@ -1,5 +1,8 @@
 	private void service() throws IOException {
-		sendAdvertisedRefs();
+		if (biDirectionalPipe)
+			sendAdvertisedRefs();
+		else
+			refs = db.getAllRefs();
 		recvCommands();
 		if (!commands.isEmpty()) {
 			enableCapabilities();
