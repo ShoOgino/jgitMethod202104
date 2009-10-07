@@ -1,5 +1,13 @@
-	private void sendAdvertisedRefs() throws IOException {
-		final RefAdvertiser adv = new RefAdvertiser(pckOut, walk, ADVERTISED);
+	/**
+	 * Generate an advertisement of available refs and capabilities.
+	 *
+	 * @param adv
+	 *            the advertisement formatter.
+	 * @throws IOException
+	 *             the formatter failed to write an advertisement.
+	 */
+	public void sendAdvertisedRefs(final RefAdvertiser adv) throws IOException {
+		adv.init(walk, ADVERTISED);
 		adv.advertiseCapability(OPTION_INCLUDE_TAG);
 		adv.advertiseCapability(OPTION_MULTI_ACK_DETAILED);
 		adv.advertiseCapability(OPTION_MULTI_ACK);
@@ -11,6 +19,6 @@
 		adv.setDerefTags(true);
 		refs = db.getAllRefs();
 		adv.send(refs.values());
-		pckOut.end();
+		adv.end();
 	}
 

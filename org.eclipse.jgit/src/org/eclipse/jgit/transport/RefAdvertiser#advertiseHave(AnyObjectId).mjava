@@ -1,4 +1,18 @@
-	void advertiseHave(AnyObjectId id) throws IOException {
+	/**
+	 * Advertise one object is available using the magic {@code .have}.
+	 * <p>
+	 * The magic {@code .have} advertisement is not available for fetching by a
+	 * client, but can be used by a client when considering a delta base
+	 * candidate before transferring data in a push. Within the record created
+	 * by this method the ref name is simply the invalid string {@code .have}.
+	 *
+	 * @param id
+	 *            identity of the object that is assumed to exist.
+	 * @throws IOException
+	 *             the underlying output stream failed to write out an
+	 *             advertisement record.
+	 */
+	public void advertiseHave(AnyObjectId id) throws IOException {
 		RevObject obj = parseAnyOrNull(id);
 		if (obj != null) {
 			advertiseAnyOnce(obj, ".have");
