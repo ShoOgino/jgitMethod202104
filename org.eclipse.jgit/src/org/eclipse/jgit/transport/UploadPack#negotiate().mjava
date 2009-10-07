@@ -1,4 +1,4 @@
-	private void negotiate() throws IOException {
+	private boolean negotiate() throws IOException {
 		ObjectId last = ObjectId.zeroId();
 		for (;;) {
 			String line;
@@ -12,6 +12,9 @@
 				if (commonBase.isEmpty() || multiAck != MultiAck.OFF)
 					pckOut.writeString("NAK\n");
 				pckOut.flush();
+				if (!biDirectionalPipe)
+					return false;
+
 			} else if (line.startsWith("have ") && line.length() == 45) {
 				final ObjectId id = ObjectId.fromString(line.substring(5));
 				if (matchHave(id)) {
@@ -51,7 +54,8 @@
 
 				else if (multiAck != MultiAck.OFF)
 					pckOut.writeString("ACK " + last.name() + "\n");
-				break;
+
+				return true;
 
 			} else {
 				throw new PackProtocolException("expected have; got " + line);

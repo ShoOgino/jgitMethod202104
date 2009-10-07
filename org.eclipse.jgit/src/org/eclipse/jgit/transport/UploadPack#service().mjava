@@ -1,5 +1,17 @@
 	private void service() throws IOException {
-		sendAdvertisedRefs();
+		if (biDirectionalPipe)
+			sendAdvertisedRefs();
+		else {
+			refs = db.getAllRefs();
+			for (Ref r : refs.values()) {
+				try {
+					walk.parseAny(r.getObjectId()).add(ADVERTISED);
+				} catch (IOException e) {
+					// Skip missing/corrupt objects
+				}
+			}
+		}
+
 		recvWants();
 		if (wantAll.isEmpty())
 			return;
@@ -11,7 +23,7 @@
 		else
 			multiAck = MultiAck.OFF;
 
-		negotiate();
-		sendPack();
+		if (negotiate())
+			sendPack();
 	}
 
