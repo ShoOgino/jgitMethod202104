@@ -3,29 +3,29 @@
 	// Rule 0 is left out for obvious reasons :)
 	public void testRules1thru3_NoIndexEntry() throws IOException {
 		GitIndex index = new GitIndex(db);
-		
+
 		Tree head = new Tree(db);
 		FileTreeEntry headFile = head.addFile("foo");
 		ObjectId objectId = ObjectId.fromString("ba78e065e2c261d4f7b8f42107588051e87e18e9");
 		headFile.setId(objectId);
 		Tree merge = new Tree(db);
-		
+
 		WorkDirCheckout readTree = new WorkDirCheckout(db, trash, head, index, merge);
 		readTree.prescanTwoTrees();
-		
+
 		assertTrue(readTree.removed.contains("foo"));
-		
+
 		readTree = new WorkDirCheckout(db, trash, merge, index, head);
 		readTree.prescanTwoTrees();
-		
+
 		assertEquals(objectId, readTree.updated.get("foo"));
-		
+
 		ObjectId anotherId = ObjectId.fromString("ba78e065e2c261d4f7b8f42107588051e87e18ee");
 		merge.addFile("foo").setId(anotherId);
-		
+
 		readTree = new WorkDirCheckout(db, trash, head, index, merge);
 		readTree.prescanTwoTrees();
-		
+
 		assertEquals(anotherId, readTree.updated.get("foo"));
 	}
 

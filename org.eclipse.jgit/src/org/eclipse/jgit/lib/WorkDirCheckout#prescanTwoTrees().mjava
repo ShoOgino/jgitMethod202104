@@ -7,24 +7,24 @@
 				}
 				processEntry(treeEntry, auxEntry, indexEntry);
 			}
-	
+
 			@Override
 			public void finishVisitTree(Tree tree, Tree auxTree, String curDir) throws IOException {
 				if (curDir.length() == 0) return;
-				
+
 				if (auxTree != null) {
 					if (index.getEntry(curDir) != null)
 						removed.add(curDir);
-				} 
+				}
 			}
-			
+
 		}).walk();
-		
+
 		// if there's a conflict, don't list it under
 		// to-be-removed, since that messed up our next
 		// section
 		removed.removeAll(conflicts);
-		
+
 		for (String path : updated.keySet()) {
 			if (index.getEntry(path) == null) {
 				File file = new File(root, path);
@@ -35,8 +35,8 @@
 				}
 			}
 		}
-		
-		
+
+
 		conflicts.removeAll(removed);
 	}
 

@@ -9,11 +9,11 @@
 		idxMap.put("foo", "foo");
 		setupCase(null, null, idxMap);
 		theReadTree = go();
-		
+
 		assertTrue(theReadTree.updated.isEmpty());
 		assertTrue(theReadTree.removed.isEmpty());
 		assertTrue(theReadTree.conflicts.isEmpty());
-		
+
 		// rules 6 and 7
 		idxMap = new HashMap<String, String>();
 		idxMap.put("foo", "foo");
@@ -21,70 +21,70 @@
 		theReadTree = go();
 
 		assertAllEmpty();
-		
+
 		// rules 8 and 9
 		HashMap<String, String> mergeMap;
 		mergeMap = new HashMap<String, String>();
-		
+
 		mergeMap.put("foo", "merge");
 		setupCase(null, mergeMap, idxMap);
 		go();
-		
+
 		assertTrue(theReadTree.updated.isEmpty());
 		assertTrue(theReadTree.removed.isEmpty());
 		assertTrue(theReadTree.conflicts.contains("foo"));
-		
+
 		// rule 10
-		
+
 		HashMap<String, String> headMap = new HashMap<String, String>();
 		headMap.put("foo", "foo");
 		setupCase(headMap, null, idxMap);
 		go();
-		
+
 		assertTrue(theReadTree.removed.contains("foo"));
 		assertTrue(theReadTree.updated.isEmpty());
 		assertTrue(theReadTree.conflicts.isEmpty());
-		
+
 		// rule 11
 		setupCase(headMap, null, idxMap);
 		new File(trash, "foo").delete();
 		writeTrashFile("foo", "bar");
 		theIndex.getMembers()[0].forceRecheck();
 		go();
-		
+
 		assertTrue(theReadTree.removed.isEmpty());
 		assertTrue(theReadTree.updated.isEmpty());
 		assertTrue(theReadTree.conflicts.contains("foo"));
-		
+
 		// rule 12 & 13
 		headMap.put("foo", "head");
 		setupCase(headMap, null, idxMap);
 		go();
-		
+
 		assertTrue(theReadTree.removed.isEmpty());
 		assertTrue(theReadTree.updated.isEmpty());
 		assertTrue(theReadTree.conflicts.contains("foo"));
-		
+
 		// rules 14 & 15
 		setupCase(headMap, headMap, idxMap);
 		go();
-		
+
 		assertAllEmpty();
-		
+
 		// rules 16 & 17
 		setupCase(headMap, mergeMap, idxMap); go();
 		assertTrue(theReadTree.conflicts.contains("foo"));
-		
+
 		// rules 18 & 19
 		setupCase(headMap, idxMap, idxMap); go();
 		assertAllEmpty();
-		
+
 		// rule 20
 		setupCase(idxMap, mergeMap, idxMap); go();
 		assertTrue(theReadTree.updated.containsKey("foo"));
-		
+
 		// rules 21
-		setupCase(idxMap, mergeMap, idxMap); 
+		setupCase(idxMap, mergeMap, idxMap);
 		new File(trash, "foo").delete();
 		writeTrashFile("foo", "bar");
 		theIndex.getMembers()[0].forceRecheck();
