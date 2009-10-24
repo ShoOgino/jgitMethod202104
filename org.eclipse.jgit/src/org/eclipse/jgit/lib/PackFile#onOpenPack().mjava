@@ -2,7 +2,7 @@
 		final PackIndex idx = idx();
 		final byte[] buf = new byte[20];
 
-		NB.readFully(fd.getChannel(), 0, buf, 0, 12);
+		IO.readFully(fd.getChannel(), 0, buf, 0, 12);
 		if (RawParseUtils.match(buf, 0, Constants.PACK_SIGNATURE) != 4)
 			throw new IOException("Not a PACK file.");
 		final long vers = NB.decodeUInt32(buf, 4);
@@ -16,7 +16,7 @@
 					+ " index " + idx.getObjectCount()
 					+ ": " + getPackFile());
 
-		NB.readFully(fd.getChannel(), length - 20, buf, 0, 20);
+		IO.readFully(fd.getChannel(), length - 20, buf, 0, 20);
 		if (!Arrays.equals(buf, packChecksum))
 			throw new PackMismatchException("Pack checksum mismatch:"
 					+ " pack " + ObjectId.fromRaw(buf).name()
