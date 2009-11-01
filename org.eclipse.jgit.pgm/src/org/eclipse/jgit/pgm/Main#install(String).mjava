@@ -1,0 +1,14 @@
+	private static void install(final String name)
+			throws IllegalAccessException, InvocationTargetException,
+			NoSuchMethodException, ClassNotFoundException {
+		try {
+		Class.forName(name).getMethod("install").invoke(null);
+		} catch (InvocationTargetException e) {
+			if (e.getCause() instanceof RuntimeException)
+				throw (RuntimeException) e.getCause();
+			if (e.getCause() instanceof Error)
+				throw (Error) e.getCause();
+			throw e;
+		}
+	}
+

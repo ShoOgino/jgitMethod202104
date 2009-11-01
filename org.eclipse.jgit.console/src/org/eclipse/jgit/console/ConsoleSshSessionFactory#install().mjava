@@ -1,0 +1,8 @@
+	/** Install this session factory implementation into the JVM. */
+	public static void install() {
+		final ConsoleSshSessionFactory c = new ConsoleSshSessionFactory();
+		if (c.cons == null)
+			throw new NoClassDefFoundError("No System.console available");
+		SshSessionFactory.setInstance(c);
+	}
+

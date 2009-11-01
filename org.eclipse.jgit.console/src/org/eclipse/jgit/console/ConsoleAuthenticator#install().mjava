@@ -1,0 +1,8 @@
+	/** Install this authenticator implementation into the JVM. */
+	public static void install() {
+		final ConsoleAuthenticator c = new ConsoleAuthenticator();
+		if (c.cons == null)
+			throw new NoClassDefFoundError("No System.console available");
+		Authenticator.setDefault(c);
+	}
+
