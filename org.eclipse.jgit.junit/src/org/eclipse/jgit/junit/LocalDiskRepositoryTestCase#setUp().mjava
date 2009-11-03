@@ -1,0 +1,38 @@
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
+
+		if (shutdownHook == null) {
+			shutdownHook = new Thread() {
+				@Override
+				public void run() {
+					System.gc();
+					recursiveDelete("SHUTDOWN", trash, false, false);
+				}
+			};
+			Runtime.getRuntime().addShutdownHook(shutdownHook);
+		}
+
+		recursiveDelete(testName(), trash, true, false);
+
+		mockSystemReader = new MockSystemReader();
+		mockSystemReader.userGitConfig = new FileBasedConfig(new File(trash,
+				"usergitconfig"));
+		SystemReader.setInstance(mockSystemReader);
+
+		final long now = mockSystemReader.getCurrentTime();
+		final int tz = mockSystemReader.getTimezone(now);
+		author = new PersonIdent("J. Author", "jauthor@example.com");
+		author = new PersonIdent(author, now, tz);
+
+		committer = new PersonIdent("J. Committer", "jcommitter@example.com");
+		committer = new PersonIdent(committer, now, tz);
+
+		final WindowCacheConfig c = new WindowCacheConfig();
+		c.setPackedGitLimit(128 * WindowCacheConfig.KB);
+		c.setPackedGitWindowSize(8 * WindowCacheConfig.KB);
+		c.setPackedGitMMAP(useMMAP);
+		c.setDeltaBaseCacheLimit(8 * WindowCacheConfig.KB);
+		WindowCache.reconfigure(c);
+	}
+

@@ -1,0 +1,9 @@
+	private static void putPersonIdent(final Map<String, String> env,
+			final String type, final PersonIdent who) {
+		final String ident = who.toExternalString();
+		final String date = ident.substring(ident.indexOf("> ") + 2);
+		env.put("GIT_" + type + "_NAME", who.getName());
+		env.put("GIT_" + type + "_EMAIL", who.getEmailAddress());
+		env.put("GIT_" + type + "_DATE", date);
+	}
+

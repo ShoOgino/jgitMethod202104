@@ -1,0 +1,35 @@
+	/**
+	 * Run a hook script in the repository, returning the exit status.
+	 *
+	 * @param db
+	 *            repository the script should see in GIT_DIR environment
+	 * @param hook
+	 *            path of the hook script to execute, must be executable file
+	 *            type on this platform
+	 * @param args
+	 *            arguments to pass to the hook script
+	 * @return exit status code of the invoked hook
+	 * @throws IOException
+	 *             the hook could not be executed
+	 * @throws InterruptedException
+	 *             the caller was interrupted before the hook completed
+	 */
+	protected int runHook(final Repository db, final File hook,
+			final String... args) throws IOException, InterruptedException {
+		final String[] argv = new String[1 + args.length];
+		argv[0] = hook.getAbsolutePath();
+		System.arraycopy(args, 0, argv, 1, args.length);
+
+		final Map<String, String> env = cloneEnv();
+		env.put("GIT_DIR", db.getDirectory().getAbsolutePath());
+		putPersonIdent(env, "AUTHOR", author);
+		putPersonIdent(env, "COMMITTER", committer);
+
+		final File cwd = db.getWorkDir();
+		final Process p = Runtime.getRuntime().exec(argv, toEnvArray(env), cwd);
+		p.getOutputStream().close();
+		p.getErrorStream().close();
+		p.getInputStream().close();
+		return p.waitFor();
+	}
+

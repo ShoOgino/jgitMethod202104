@@ -1,0 +1,27 @@
+	/**
+	 * Create a string to a UTF-8 temporary file and return the path.
+	 *
+	 * @param body
+	 *            complete content to write to the file. If the file should end
+	 *            with a trailing LF, the string should end with an LF.
+	 * @return path of the temporary file created within the trash area.
+	 * @throws IOException
+	 *             the file could not be written.
+	 */
+	protected File write(final String body) throws IOException {
+		final File f = File.createTempFile("temp", "txt", trash);
+		try {
+			write(f, body);
+			return f;
+		} catch (Error e) {
+			f.delete();
+			throw e;
+		} catch (RuntimeException e) {
+			f.delete();
+			throw e;
+		} catch (IOException e) {
+			f.delete();
+			throw e;
+		}
+	}
+

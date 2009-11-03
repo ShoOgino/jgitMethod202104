@@ -1,0 +1,17 @@
+		public String[] promptKeyboardInteractive(final String destination,
+				final String name, final String instruction,
+				final String[] prompt, final boolean[] echo) {
+			cons.printf("%s: %s\n", destination, name);
+			cons.printf("%s\n", instruction);
+			final String[] response = new String[prompt.length];
+			for (int i = 0; i < prompt.length; i++) {
+				if (echo[i]) {
+					response[i] = cons.readLine("%s: ", prompt[i]);
+				} else {
+					final char[] p = cons.readPassword("%s: ", prompt[i]);
+					response[i] = p != null ? new String(p) : "";
+				}
+			}
+			return response;
+		}
+
