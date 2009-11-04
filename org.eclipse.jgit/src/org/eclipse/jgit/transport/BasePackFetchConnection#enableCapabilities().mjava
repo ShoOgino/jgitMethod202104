@@ -4,7 +4,14 @@
 			includeTags = wantCapability(line, OPTION_INCLUDE_TAG);
 		if (allowOfsDelta)
 			wantCapability(line, OPTION_OFS_DELTA);
-		multiAck = wantCapability(line, OPTION_MULTI_ACK);
+
+		if (wantCapability(line, OPTION_MULTI_ACK_DETAILED))
+			multiAck = MultiAck.DETAILED;
+		else if (wantCapability(line, OPTION_MULTI_ACK))
+			multiAck = MultiAck.CONTINUE;
+		else
+			multiAck = MultiAck.OFF;
+
 		if (thinPack)
 			thinPack = wantCapability(line, OPTION_THIN_PACK);
 		if (wantCapability(line, OPTION_SIDE_BAND_64K))
