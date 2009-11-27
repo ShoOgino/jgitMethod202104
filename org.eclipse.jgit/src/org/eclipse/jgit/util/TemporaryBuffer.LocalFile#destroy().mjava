@@ -1,0 +1,14 @@
+		@Override
+		public void destroy() {
+			super.destroy();
+
+			if (onDiskFile != null) {
+				try {
+					if (!onDiskFile.delete())
+						onDiskFile.deleteOnExit();
+				} finally {
+					onDiskFile = null;
+				}
+			}
+		}
+

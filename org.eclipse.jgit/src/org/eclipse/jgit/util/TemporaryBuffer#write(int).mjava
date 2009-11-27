@@ -1,14 +1,14 @@
 	@Override
 	public void write(final int b) throws IOException {
-		if (blocks == null) {
-			diskOut.write(b);
+		if (overflow != null) {
+			overflow.write(b);
 			return;
 		}
 
 		Block s = last();
 		if (s.isFull()) {
 			if (reachedInCoreLimit()) {
-				diskOut.write(b);
+				overflow.write(b);
 				return;
 			}
 

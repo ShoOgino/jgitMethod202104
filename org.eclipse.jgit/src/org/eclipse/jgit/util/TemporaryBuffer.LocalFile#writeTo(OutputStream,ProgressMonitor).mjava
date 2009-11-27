@@ -1,0 +1,21 @@
+		public void writeTo(final OutputStream os, ProgressMonitor pm)
+				throws IOException {
+			if (onDiskFile == null) {
+				super.writeTo(os, pm);
+				return;
+			}
+			if (pm == null)
+				pm = NullProgressMonitor.INSTANCE;
+			final FileInputStream in = new FileInputStream(onDiskFile);
+			try {
+				int cnt;
+				final byte[] buf = new byte[Block.SZ];
+				while ((cnt = in.read(buf)) >= 0) {
+					os.write(buf, 0, cnt);
+					pm.update(cnt / 1024);
+				}
+			} finally {
+				in.close();
+			}
+		}
+

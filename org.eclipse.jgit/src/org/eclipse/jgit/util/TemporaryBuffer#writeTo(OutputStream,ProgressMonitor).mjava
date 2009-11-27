@@ -8,8 +8,8 @@
 	 *            stream to send this buffer's complete content to.
 	 * @param pm
 	 *            if not null progress updates are sent here. Caller should
-	 *            initialize the task and the number of work units to
-	 *            <code>{@link #length()}/1024</code>.
+	 *            initialize the task and the number of work units to <code>
+	 *            {@link #length()}/1024</code>.
 	 * @throws IOException
 	 *             an error occurred reading from a temporary file on the local
 	 *             system, or writing to the output stream.
@@ -18,27 +18,9 @@
 			throws IOException {
 		if (pm == null)
 			pm = NullProgressMonitor.INSTANCE;
-		if (blocks != null) {
-			// Everything is in core so we can stream directly to the output.
-			//
-			for (final Block b : blocks) {
-				os.write(b.buffer, 0, b.count);
-				pm.update(b.count / 1024);
-			}
-		} else {
-			// Reopen the temporary file and copy the contents.
-			//
-			final FileInputStream in = new FileInputStream(onDiskFile);
-			try {
-				int cnt;
-				final byte[] buf = new byte[Block.SZ];
-				while ((cnt = in.read(buf)) >= 0) {
-					os.write(buf, 0, cnt);
-					pm.update(cnt / 1024);
-				}
-			} finally {
-				in.close();
-			}
+		for (final Block b : blocks) {
+			os.write(b.buffer, 0, b.count);
+			pm.update(b.count / 1024);
 		}
 	}
 

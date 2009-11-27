@@ -1,0 +1,18 @@
+		public byte[] toByteArray() throws IOException {
+			if (onDiskFile == null) {
+				return super.toByteArray();
+			}
+
+			final long len = length();
+			if (Integer.MAX_VALUE < len)
+				throw new OutOfMemoryError("Length exceeds maximum array size");
+			final byte[] out = new byte[(int) len];
+			final FileInputStream in = new FileInputStream(onDiskFile);
+			try {
+				IO.readFully(in, out, 0, (int) len);
+			} finally {
+				in.close();
+			}
+			return out;
+		}
+

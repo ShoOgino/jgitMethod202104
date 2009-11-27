@@ -2,20 +2,14 @@
 	public void destroy() {
 		blocks = null;
 
-		if (diskOut != null) {
+		if (overflow != null) {
 			try {
-				diskOut.close();
+				overflow.close();
 			} catch (IOException err) {
 				// We shouldn't encounter an error closing the file.
 			} finally {
-				diskOut = null;
+				overflow = null;
 			}
-		}
-
-		if (onDiskFile != null) {
-			if (!onDiskFile.delete())
-				onDiskFile.deleteOnExit();
-			onDiskFile = null;
 		}
 	}
 

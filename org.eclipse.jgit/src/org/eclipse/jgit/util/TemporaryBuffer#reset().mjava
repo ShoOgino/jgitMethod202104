@@ -1,0 +1,9 @@
+	/** Reset this buffer for reuse, purging all buffered content. */
+	public void reset() {
+		if (overflow != null) {
+			destroy();
+		}
+		blocks = new ArrayList<Block>(inCoreLimit / Block.SZ);
+		blocks.add(new Block());
+	}
+

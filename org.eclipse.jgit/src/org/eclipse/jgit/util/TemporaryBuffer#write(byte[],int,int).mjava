@@ -1,6 +1,6 @@
 	@Override
 	public void write(final byte[] b, int off, int len) throws IOException {
-		if (blocks != null) {
+		if (overflow == null) {
 			while (len > 0) {
 				Block s = last();
 				if (s.isFull()) {
@@ -20,6 +20,6 @@
 		}
 
 		if (len > 0)
-			diskOut.write(b, off, len);
+			overflow.write(b, off, len);
 	}
 
