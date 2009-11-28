@@ -1,0 +1,30 @@
+	@Override
+	public long skip(long len) throws IOException {
+		long cnt = 0;
+		while (0 < len) {
+			final InputStream in = head();
+			final long n = in.skip(len);
+			if (0 < n) {
+				cnt += n;
+				len -= n;
+
+			} else if (in == EOF) {
+				return cnt;
+
+			} else {
+				// Is this stream at EOF? We can't tell from skip alone.
+				// Read one byte to test for EOF, discard it if we aren't
+				// yet at EOF.
+				//
+				final int r = in.read();
+				if (r < 0) {
+					pop();
+				} else {
+					cnt += 1;
+					len -= 1;
+				}
+			}
+		}
+		return cnt;
+	}
+

@@ -1,0 +1,15 @@
+	public void testExceptionDuringClose() {
+		final UnionInputStream u = new UnionInputStream();
+		u.add(new ByteArrayInputStream(new byte[] { 1 }) {
+			public void close() throws IOException {
+				throw new IOException("I AM A TEST");
+			}
+		});
+		try {
+			u.close();
+			fail("close ignored inner stream exception");
+		} catch (IOException e) {
+			assertEquals("I AM A TEST", e.getMessage());
+		}
+	}
+

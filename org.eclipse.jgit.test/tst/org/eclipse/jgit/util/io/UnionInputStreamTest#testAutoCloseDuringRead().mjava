@@ -1,0 +1,30 @@
+	public void testAutoCloseDuringRead() throws IOException {
+		final UnionInputStream u = new UnionInputStream();
+		final boolean closed[] = new boolean[2];
+		u.add(new ByteArrayInputStream(new byte[] { 1 }) {
+			public void close() {
+				closed[0] = true;
+			}
+		});
+		u.add(new ByteArrayInputStream(new byte[] { 2 }) {
+			public void close() {
+				closed[1] = true;
+			}
+		});
+
+		assertFalse(closed[0]);
+		assertFalse(closed[1]);
+
+		assertEquals(1, u.read());
+		assertFalse(closed[0]);
+		assertFalse(closed[1]);
+
+		assertEquals(2, u.read());
+		assertTrue(closed[0]);
+		assertFalse(closed[1]);
+
+		assertEquals(-1, u.read());
+		assertTrue(closed[0]);
+		assertTrue(closed[1]);
+	}
+

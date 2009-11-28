@@ -1,0 +1,17 @@
+	@Override
+	public void close() throws IOException {
+		IOException err = null;
+
+		for (Iterator<InputStream> i = streams.iterator(); i.hasNext();) {
+			try {
+				i.next().close();
+			} catch (IOException closeError) {
+				err = closeError;
+			}
+			i.remove();
+		}
+
+		if (err != null)
+			throw err;
+	}
+

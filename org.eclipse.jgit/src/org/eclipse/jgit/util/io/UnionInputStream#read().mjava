@@ -1,0 +1,14 @@
+	@Override
+	public int read() throws IOException {
+		for (;;) {
+			final InputStream in = head();
+			final int r = in.read();
+			if (0 <= r)
+				return r;
+			else if (in == EOF)
+				return -1;
+			else
+				pop();
+		}
+	}
+
