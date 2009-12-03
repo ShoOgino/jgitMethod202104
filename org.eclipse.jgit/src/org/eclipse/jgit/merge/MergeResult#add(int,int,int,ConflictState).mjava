@@ -1,0 +1,30 @@
+	/**
+	 * Adds a new range from one of the merged sequences or from the common
+	 * predecessor. This method can add conflicting and non-conflicting ranges
+	 * controlled by the conflictState parameter
+	 *
+	 * @param srcIdx
+	 *            determines from which sequence this range comes. An index of
+	 *            x specifies the x+1 element in the list of sequences
+	 *            specified to the constructor
+	 * @param begin
+	 *            the first element from the specified sequence which should be
+	 *            included in the merge result. Indexes start with 0.
+	 * @param end
+	 *            specifies the end of the range to be added. The element this
+	 *            index points to is the first element which not added to the
+	 *            merge result. All elements between begin (including begin) and
+	 *            this element are added.
+	 * @param conflictState
+	 *            when set to NO_CONLICT a non-conflicting range is added.
+	 *            This will end implicitly all open conflicts added before.
+	 */
+	public void add(int srcIdx, int begin, int end, ConflictState conflictState) {
+		chunks.add(conflictState.ordinal());
+		chunks.add(srcIdx);
+		chunks.add(begin);
+		chunks.add(end);
+		if (conflictState != ConflictState.NO_CONFLICT)
+			containsConflicts = true;
+	}
+
