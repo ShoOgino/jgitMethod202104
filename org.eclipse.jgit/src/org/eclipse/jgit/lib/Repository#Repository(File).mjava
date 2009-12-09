@@ -1,6 +1,10 @@
 	/**
 	 * Construct a representation of a Git repository.
 	 *
+	 * The work tree, object directory, alternate object directories and index
+	 * file locations are deduced from the given git directory and the default
+	 * rules.
+	 *
 	 * @param d
 	 *            GIT_DIR (the location of the repository metadata).
 	 * @throws IOException
@@ -8,37 +12,6 @@
 	 *             accessed.
 	 */
 	public Repository(final File d) throws IOException {
-		gitDir = d.getAbsoluteFile();
-		refs = new RefDatabase(this);
-		objectDatabase = new ObjectDirectory(FS.resolve(gitDir, "objects"));
-
-		final FileBasedConfig userConfig;
-		userConfig = SystemReader.getInstance().openUserConfig();
-		try {
-			userConfig.load();
-		} catch (ConfigInvalidException e1) {
-			IOException e2 = new IOException("User config file "
-					+ userConfig.getFile().getAbsolutePath() + " invalid: "
-					+ e1);
-			e2.initCause(e1);
-			throw e2;
-		}
-		config = new RepositoryConfig(userConfig, FS.resolve(gitDir, "config"));
-
-		if (objectDatabase.exists()) {
-			try {
-				getConfig().load();
-			} catch (ConfigInvalidException e1) {
-				IOException e2 = new IOException("Unknown repository format");
-				e2.initCause(e1);
-				throw e2;
-			}
-			final String repositoryFormatVersion = getConfig().getString(
-					"core", null, "repositoryFormatVersion");
-			if (!"0".equals(repositoryFormatVersion)) {
-				throw new IOException("Unknown repository format \""
-						+ repositoryFormatVersion + "\"; expected \"0\".");
-			}
-		}
+		this(d, null, null, null, null); // go figure it out
 	}
 

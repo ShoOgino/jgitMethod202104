@@ -1,11 +1,6 @@
 	private ObjectDatabase openAlternate(final String location)
 			throws IOException {
 		final File objdir = FS.resolve(objects, location);
-		final File parent = objdir.getParentFile();
-		if (FileKey.isGitRepository(parent)) {
-			final Repository db = RepositoryCache.open(FileKey.exact(parent));
-			return new AlternateRepositoryDatabase(db);
-		}
-		return new ObjectDirectory(objdir);
+		return openAlternate(objdir);
 	}
 
