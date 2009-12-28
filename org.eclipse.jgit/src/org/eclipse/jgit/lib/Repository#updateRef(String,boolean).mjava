@@ -1,8 +1,10 @@
 	/**
 	 * Create a command to update, create or delete a ref in this repository.
 	 *
-	 * @param name
+	 * @param ref
 	 *            name of the ref the caller wants to modify.
+	 * @param detach
+	 *            true to create a detached head
 	 * @return an update command. The caller must finish populating this command
 	 *         and then invoke one of the update methods to actually make a
 	 *         change.
@@ -10,7 +12,7 @@
 	 *             a symbolic ref was passed in and could not be resolved back
 	 *             to the base ref, as the symbolic ref could not be read.
 	 */
-	RefUpdate newUpdate(final String name) throws IOException {
-		return newUpdate(name, false);
+	public RefUpdate updateRef(final String ref, final boolean detach) throws IOException {
+		return refs.newUpdate(ref, detach);
 	}
 
