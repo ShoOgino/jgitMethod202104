@@ -14,16 +14,7 @@
 					// Assume this server doesn't support smart HTTP fetch
 					// and fall back on dumb object walking.
 					//
-					HttpObjectDB d = new HttpObjectDB(objectsUrl);
-					WalkFetchConnection wfc = new WalkFetchConnection(this, d);
-					BufferedReader br = new BufferedReader(
-							new InputStreamReader(in, Constants.CHARSET));
-					try {
-						wfc.available(d.readAdvertisedImpl(br));
-					} finally {
-						br.close();
-					}
-					return wfc;
+					return newDumbConnection(in);
 				}
 			} finally {
 				in.close();
