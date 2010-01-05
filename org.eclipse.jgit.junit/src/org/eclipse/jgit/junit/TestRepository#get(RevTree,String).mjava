@@ -1,0 +1,31 @@
+	/**
+	 * Lookup an entry stored in a tree, failing if not present.
+	 *
+	 * @param tree
+	 *            the tree to search.
+	 * @param path
+	 *            the path to find the entry of.
+	 * @return the parsed object entry at this path, never null.
+	 * @throws AssertionFailedError
+	 *             if the path does not exist in the given tree.
+	 * @throws Exception
+	 */
+	public RevObject get(final RevTree tree, final String path)
+			throws AssertionFailedError, Exception {
+		final TreeWalk tw = new TreeWalk(db);
+		tw.setFilter(PathFilterGroup.createFromStrings(Collections
+				.singleton(path)));
+		tw.reset(tree);
+		while (tw.next()) {
+			if (tw.isSubtree() && !path.equals(tw.getPathString())) {
+				tw.enterSubtree();
+				continue;
+			}
+			final ObjectId entid = tw.getObjectId(0);
+			final FileMode entmode = tw.getFileMode(0);
+			return pool.lookupAny(entid, entmode.getObjectType());
+		}
+		Assert.fail("Can't find " + path + " in tree " + tree.name());
+		return null; // never reached.
+	}
+

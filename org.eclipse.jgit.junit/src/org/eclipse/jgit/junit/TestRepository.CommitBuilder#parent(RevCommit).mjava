@@ -1,0 +1,11 @@
+		public CommitBuilder parent(RevCommit p) throws Exception {
+			if (parents.isEmpty()) {
+				DirCacheBuilder b = tree.builder();
+				parseBody(p);
+				b.addTree(new byte[0], DirCacheEntry.STAGE_0, db, p.getTree());
+				b.finish();
+			}
+			parents.add(p);
+			return this;
+		}
+

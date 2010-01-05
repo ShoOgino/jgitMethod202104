@@ -1,0 +1,26 @@
+	/**
+	 * Construct an annotated tag object pointing at another object.
+	 * <p>
+	 * The tagger is the committer identity, at the current time as specified by
+	 * {@link #tick(int)}. The time is not increased.
+	 * <p>
+	 * The tag message is empty.
+	 *
+	 * @param name
+	 *            name of the tag. Traditionally a tag name should not start
+	 *            with {@code refs/tags/}.
+	 * @param dst
+	 *            object the tag should be pointed at.
+	 * @return the annotated tag object.
+	 * @throws Exception
+	 */
+	public RevTag tag(final String name, final RevObject dst) throws Exception {
+		final Tag t = new Tag(db);
+		t.setType(Constants.typeString(dst.getType()));
+		t.setObjId(dst.toObjectId());
+		t.setTag(name);
+		t.setTagger(new PersonIdent(committer, new Date(now)));
+		t.setMessage("");
+		return (RevTag) pool.lookupAny(writer.writeTag(t), Constants.OBJ_TAG);
+	}
+

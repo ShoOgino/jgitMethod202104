@@ -1,11 +1,5 @@
 	protected RevTag tag(final String name, final RevObject dst)
 			throws Exception {
-		final Tag t = new Tag(db);
-		t.setType(Constants.typeString(dst.getType()));
-		t.setObjId(dst.toObjectId());
-		t.setTag(name);
-		t.setTagger(new PersonIdent(committer, new Date(nowTick)));
-		t.setMessage("");
-		return (RevTag) rw.lookupAny(ow.writeTag(t), Constants.OBJ_TAG);
+		return util.tag(name, dst);
 	}
 

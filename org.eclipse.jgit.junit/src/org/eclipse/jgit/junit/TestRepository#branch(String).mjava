@@ -1,0 +1,17 @@
+	/**
+	 * Create a new branch builder for this repository.
+	 *
+	 * @param ref
+	 *            name of the branch to be constructed. If {@code ref} does not
+	 *            start with {@code refs/} the prefix {@code refs/heads/} will
+	 *            be added.
+	 * @return builder for the named branch.
+	 */
+	public BranchBuilder branch(String ref) {
+		if (Constants.HEAD.equals(ref)) {
+		} else if (ref.startsWith(Constants.R_REFS)) {
+		} else
+			ref = Constants.R_HEADS + ref;
+		return new BranchBuilder(ref);
+	}
+

@@ -1,0 +1,29 @@
+	/**
+	 * Update the dumb client server info files.
+	 *
+	 * @throws Exception
+	 */
+	public void updateServerInfo() throws Exception {
+		if (db.getObjectDatabase() instanceof ObjectDirectory) {
+			RefWriter rw = new RefWriter(db.getAllRefs().values()) {
+				@Override
+				protected void writeFile(final String name, final byte[] bin)
+						throws IOException {
+					final File p = new File(db.getDirectory(), name);
+					final LockFile lck = new LockFile(p);
+					if (!lck.lock())
+						throw new ObjectWritingException("Can't write " + p);
+					try {
+						lck.write(bin);
+					} catch (IOException ioe) {
+						throw new ObjectWritingException("Can't write " + p);
+					}
+					if (!lck.commit())
+						throw new ObjectWritingException("Can't write " + p);
+				}
+			};
+			rw.writePackedRefs();
+			rw.writeInfoRefs();
+		}
+	}
+

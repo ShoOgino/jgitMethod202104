@@ -1,0 +1,19 @@
+		public RevCommit create() throws Exception {
+			if (self == null) {
+				TestRepository.this.tick(tick);
+
+				final Commit c = new Commit(db);
+				c.setTreeId(pool.lookupTree(tree.writeTree(writer)));
+				c.setParentIds(parents.toArray(new RevCommit[parents.size()]));
+				c.setAuthor(new PersonIdent(author, new Date(now)));
+				c.setCommitter(new PersonIdent(committer, new Date(now)));
+				c.setMessage(message);
+
+				self = pool.lookupCommit(writer.writeCommit(c));
+
+				if (branch != null)
+					branch.update(self);
+			}
+			return self;
+		}
+

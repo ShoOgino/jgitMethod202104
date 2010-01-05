@@ -1,0 +1,18 @@
+	/**
+	 * Construct a tree from a specific listing of file entries.
+	 *
+	 * @param entries
+	 *            the files to include in the tree. The collection does not need
+	 *            to be sorted properly and may be empty.
+	 * @return reference to the tree specified by the entry list.
+	 * @throws Exception
+	 */
+	public RevTree tree(final DirCacheEntry... entries) throws Exception {
+		final DirCache dc = DirCache.newInCore();
+		final DirCacheBuilder b = dc.builder();
+		for (final DirCacheEntry e : entries)
+			b.add(e);
+		b.finish();
+		return pool.lookupTree(dc.writeTree(writer));
+	}
+

@@ -1,0 +1,39 @@
+	/**
+	 * Update a reference to point to an object.
+	 *
+	 * @param <T>
+	 *            type of the target object.
+	 * @param ref
+	 *            the name of the reference to update to. If {@code ref} does
+	 *            not start with {@code refs/} and is not the magic names
+	 *            {@code HEAD} {@code FETCH_HEAD} or {@code MERGE_HEAD}, then
+	 *            {@code refs/heads/} will be prefixed in front of the given
+	 *            name, thereby assuming it is a branch.
+	 * @param obj
+	 *            the target object.
+	 * @return the target object.
+	 * @throws Exception
+	 */
+	public <T extends AnyObjectId> T update(String ref, T obj) throws Exception {
+		if (Constants.HEAD.equals(ref)) {
+		} else if ("FETCH_HEAD".equals(ref)) {
+		} else if ("MERGE_HEAD".equals(ref)) {
+		} else if (ref.startsWith(Constants.R_REFS)) {
+		} else
+			ref = Constants.R_HEADS + ref;
+
+		RefUpdate u = db.updateRef(ref);
+		u.setNewObjectId(obj);
+		switch (u.forceUpdate()) {
+		case FAST_FORWARD:
+		case FORCED:
+		case NEW:
+		case NO_CHANGE:
+			updateServerInfo();
+			return obj;
+
+		default:
+			throw new IOException("Cannot write " + ref + " " + u.getResult());
+		}
+	}
+

@@ -1,0 +1,9 @@
+		CommitBuilder(BranchBuilder b) throws Exception {
+			branch = b;
+
+			Ref ref = db.getRef(branch.ref);
+			if (ref != null) {
+				parent(pool.parseCommit(ref.getObjectId()));
+			}
+		}
+

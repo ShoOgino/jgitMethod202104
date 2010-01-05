@@ -1,0 +1,11 @@
+		CommitBuilder(CommitBuilder prior) throws Exception {
+			branch = prior.branch;
+
+			DirCacheBuilder b = tree.builder();
+			for (int i = 0; i < prior.tree.getEntryCount(); i++)
+				b.add(prior.tree.getEntry(i));
+			b.finish();
+
+			parents.add(prior.create());
+		}
+
