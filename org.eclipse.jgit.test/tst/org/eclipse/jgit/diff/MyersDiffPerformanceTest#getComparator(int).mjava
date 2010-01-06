@@ -1,0 +1,10 @@
+	public static Comparator<PerfData> getComparator(final int whichPerf) {
+		return new Comparator<PerfData>() {
+			public int compare(PerfData o1, PerfData o2) {
+				double p1 = (whichPerf == 1) ? o1.perf1() : o1.perf2();
+				double p2 = (whichPerf == 1) ? o2.perf1() : o2.perf2();
+				return (p1 < p2) ? -1 : (p1 > p2) ? 1 : 0;
+			}
+		};
+	}
+

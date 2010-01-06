@@ -1,0 +1,14 @@
+		void initialize(int beginA, int endA, int beginB, int endB) {
+			this.beginA = beginA; this.endA = endA;
+			this.beginB = beginB; this.endB = endB;
+
+			// strip common parts on either end
+			int k = beginB - beginA;
+			this.beginA = forward.snake(k, beginA);
+			this.beginB = k + this.beginA;
+
+			k = endB - endA;
+			this.endA = backward.snake(k, endA);
+			this.endB = k + this.endA;
+		}
+

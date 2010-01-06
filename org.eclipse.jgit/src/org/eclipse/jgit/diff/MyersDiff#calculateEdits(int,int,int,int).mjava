@@ -1,0 +1,28 @@
+	/**
+	 * Calculates the differences between a given part of A against another given part of B
+	 * @param beginA start of the part of A which should be compared (0<=beginA<sizeof(A))
+	 * @param endA end of the part of A which should be compared (beginA<=endA<sizeof(A))
+	 * @param beginB start of the part of B which should be compared (0<=beginB<sizeof(B))
+	 * @param endB end of the part of B which should be compared (beginB<=endB<sizeof(B))
+	 */
+	protected void calculateEdits(int beginA, int endA,
+			int beginB, int endB) {
+		Edit edit = middle.calculate(beginA, endA, beginB, endB);
+
+		if (beginA < edit.beginA || beginB < edit.beginB) {
+			int k = edit.beginB - edit.beginA;
+			int x = middle.backward.snake(k, edit.beginA);
+			calculateEdits(beginA, x, beginB, k + x);
+		}
+
+		if (edit.getType() != Edit.Type.EMPTY)
+			edits.add(edits.size(), edit);
+
+		// after middle
+		if (endA > edit.endA || endB > edit.endB) {
+			int k = edit.endB - edit.endA;
+			int x = middle.forward.snake(k, edit.endA);
+			calculateEdits(x, endA, k + x, endB);
+		}
+	}
+

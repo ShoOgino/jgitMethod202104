@@ -1,0 +1,34 @@
+		/*
+		 * This function calculates the "middle" Edit of the shortest
+		 * edit path between the given subsequences of a and b.
+		 *
+		 * Once a forward path and a backward path meet, we found the
+		 * middle part.  From the last snake end point on both of them,
+		 * we construct the Edit.
+		 *
+		 * It is assumed that there is at least one edit in the range.
+		 */
+		// TODO: measure speed impact when this is synchronized
+		Edit calculate(int beginA, int endA, int beginB, int endB) {
+			if (beginA == endA || beginB == endB)
+				return new Edit(beginA, endA, beginB, endB);
+			this.beginA = beginA; this.endA = endA;
+			this.beginB = beginB; this.endB = endB;
+
+			/*
+			 * Following the conventions in Myers' paper, "k" is
+			 * the difference between the index into "b" and the
+			 * index into "a".
+			 */
+			int minK = beginB - endA;
+			int maxK = endB - beginA;
+
+			forward.initialize(beginB - beginA, beginA, minK, maxK);
+			backward.initialize(endB - endA, endA, minK, maxK);
+
+			for (int d = 1; ; d++)
+				if (forward.calculate(d) ||
+						backward.calculate(d))
+					return edit;
+		}
+

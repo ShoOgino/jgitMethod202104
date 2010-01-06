@@ -1,0 +1,22 @@
+			final boolean makeEdit(long snake1, long snake2) {
+				int x1 = snake2x(snake1), x2 = snake2x(snake2);
+				int y1 = snake2y(snake1), y2 = snake2y(snake2);
+				/*
+				 * Check for incompatible partial edit paths:
+				 * when there are ambiguities, we might have
+				 * hit incompatible (i.e. non-overlapping)
+				 * forward/backward paths.
+				 *
+				 * In that case, just pretend that we have
+				 * an empty edit at the end of one snake; this
+				 * will force a decision which path to take
+				 * in the next recursion step.
+				 */
+				if (x1 > x2 || y1 > y2) {
+					x1 = x2;
+					y1 = y2;
+				}
+				edit = new Edit(x1, x2, y1, y2);
+				return true;
+			}
+

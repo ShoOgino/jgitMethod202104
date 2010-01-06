@@ -1,0 +1,26 @@
+	/**
+	 * @return an iterator over the MergeChunks. The iterator does not support
+	 * the remove operation
+	 */
+	public Iterator<MergeChunk> iterator() {
+		return new Iterator<MergeChunk>() {
+			int idx;
+
+			public boolean hasNext() {
+				return (idx < chunks.size());
+			}
+
+			public MergeChunk next() {
+				ConflictState state = states[chunks.get(idx++)];
+				int srcIdx = chunks.get(idx++);
+				int begin = chunks.get(idx++);
+				int end = chunks.get(idx++);
+				return new MergeChunk(srcIdx, begin, end, state);
+			}
+
+			public void remove() {
+				throw new UnsupportedOperationException();
+			}
+		};
+	}
+

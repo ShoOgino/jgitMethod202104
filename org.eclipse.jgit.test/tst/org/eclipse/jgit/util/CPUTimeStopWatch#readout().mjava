@@ -1,0 +1,13 @@
+	/**
+	 * Return the elapsed CPU time in nanoseconds. In contrast to
+	 * {@link #stop()} the stopwatch will continue to run after this call.
+	 *
+	 * @return the elapsed CPU time in nanoseconds. When called on non-started
+	 *         stopwatches (either because {@link #start()} was never called or
+	 *         {@link #stop()} was called after the last call to
+	 *         {@link #start()}) this method will return 0.
+	 */
+	public long readout() {
+		return (start == 0) ? 0 : mxBean.getCurrentThreadCpuTime() - start;
+	}
+
