@@ -5,11 +5,18 @@
 			markRefsAdvertised();
 			markReachable(have, maxTimeWanted(want));
 
+			if (statelessRPC) {
+				state = new TemporaryBuffer.Heap(Integer.MAX_VALUE);
+				pckState = new PacketLineOut(state);
+			}
+
 			if (sendWants(want)) {
 				negotiate(monitor);
 
 				walk.dispose();
 				reachableCommits = null;
+				state = null;
+				pckState = null;
 
 				receivePack(monitor);
 			}

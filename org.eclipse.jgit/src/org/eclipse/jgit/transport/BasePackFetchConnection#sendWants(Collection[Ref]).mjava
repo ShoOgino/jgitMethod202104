@@ -1,4 +1,5 @@
 	private boolean sendWants(final Collection<Ref> want) throws IOException {
+		final PacketLineOut p = statelessRPC ? pckState : pckOut;
 		boolean first = true;
 		for (final Ref r : want) {
 			try {
@@ -21,10 +22,12 @@
 				first = false;
 			}
 			line.append('\n');
-			pckOut.writeString(line.toString());
+			p.writeString(line.toString());
 		}
-		pckOut.end();
+		if (first)
+			return false;
+		p.end();
 		outNeedsEnd = false;
-		return !first;
+		return true;
 	}
 

@@ -1,0 +1,29 @@
+	private void readSmartHeaders(final InputStream in, final String service)
+			throws IOException {
+		// A smart reply will have a '#' after the first 4 bytes, but
+		// a dumb reply cannot contain a '#' until after byte 41. Do a
+		// quick check to make sure its a smart reply before we parse
+		// as a pkt-line stream.
+		//
+		final byte[] magic = new byte[5];
+		IO.readFully(in, magic, 0, magic.length);
+		if (magic[4] != '#') {
+			throw new TransportException(uri, "expected pkt-line with"
+					+ " '# service=', got '" + RawParseUtils.decode(magic)
+					+ "'");
+		}
+
+		final PacketLineIn pckIn = new PacketLineIn(new UnionInputStream(
+				new ByteArrayInputStream(magic), in));
+		final String exp = "# service=" + service;
+		final String act = pckIn.readString();
+		if (!exp.equals(act)) {
+			throw new TransportException(uri, "expected '" + exp + "', got '"
+					+ act + "'");
+		}
+
+		while (pckIn.readString() != PacketLineIn.END) {
+			// for now, ignore the remaining header lines
+		}
+	}
+

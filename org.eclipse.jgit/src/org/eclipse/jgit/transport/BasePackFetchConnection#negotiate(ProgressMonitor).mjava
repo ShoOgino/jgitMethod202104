@@ -7,6 +7,9 @@
 		boolean receivedContinue = false;
 		boolean receivedAck = false;
 
+		if (statelessRPC)
+			state.writeTo(out, null);
+
 		negotiateBegin();
 		SEND_HAVES: for (;;) {
 			final RevCommit c = walk.next();
@@ -31,7 +34,7 @@
 			pckOut.end();
 			resultsPending++; // Each end will cause a result to come back.
 
-			if (havesSent == 32) {
+			if (havesSent == 32 && !statelessRPC) {
 				// On the first block we race ahead and try to send
 				// more of the second block while waiting for the
 				// remote to respond to our first block request.
@@ -41,9 +44,7 @@
 			}
 
 			READ_RESULT: for (;;) {
-				final PacketLineIn.AckNackResult anr;
-
-				anr = pckIn.readACK(ackId);
+				final AckNackResult anr = pckIn.readACK(ackId);
 				switch (anr) {
 				case NAK:
 					// More have lines are necessary to compute the
@@ -60,6 +61,8 @@
 					multiAck = MultiAck.OFF;
 					resultsPending = 0;
 					receivedAck = true;
+					if (statelessRPC)
+						state.writeTo(out, null);
 					break SEND_HAVES;
 
 				case ACK_CONTINUE:
@@ -70,7 +73,7 @@
 					// we need to continue to talk about other parts of
 					// our local history.
 					//
-					markCommon(walk.parseAny(ackId));
+					markCommon(walk.parseAny(ackId), anr);
 					receivedAck = true;
 					receivedContinue = true;
 					havesSinceLastContinue = 0;
@@ -81,13 +84,16 @@
 					throw new CancelledException();
 			}
 
+			if (statelessRPC)
+				state.writeTo(out, null);
+
 			if (receivedContinue && havesSinceLastContinue > MAX_HAVES) {
 				// Our history must be really different from the remote's.
 				// We just sent a whole slew of have lines, and it did not
 				// recognize any of them. Avoid sending our entire history
 				// to them by giving up early.
 				//
-				break;
+				break SEND_HAVES;
 			}
 		}
 
@@ -95,6 +101,11 @@
 		//
 		if (monitor.isCancelled())
 			throw new CancelledException();
+
+		// When statelessRPC is true we should always leave SEND_HAVES
+		// loop above while in the middle of a request. This allows us
+		// to just write done immediately.
+		//
 		pckOut.writeString("done\n");
 		pckOut.flush();
 
@@ -108,11 +119,8 @@
 		}
 
 		READ_RESULT: while (resultsPending > 0 || multiAck != MultiAck.OFF) {
-			final PacketLineIn.AckNackResult anr;
-
-			anr = pckIn.readACK(ackId);
+			final AckNackResult anr = pckIn.readACK(ackId);
 			resultsPending--;
-
 			switch (anr) {
 			case NAK:
 				// A NAK is a response to an end we queued earlier

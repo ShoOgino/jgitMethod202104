@@ -1,8 +1,39 @@
 	@Override
-	public FetchConnection openFetch() throws TransportException {
-		final HttpObjectDB c = new HttpObjectDB(objectsUrl);
-		final WalkFetchConnection r = new WalkFetchConnection(this, c);
-		r.available(c.readAdvertisedRefs());
-		return r;
+	public FetchConnection openFetch() throws TransportException,
+			NotSupportedException {
+		final String service = SVC_UPLOAD_PACK;
+		try {
+			final HttpURLConnection c = connect(service);
+			final InputStream in = openInputStream(c);
+			try {
+				if (isSmartHttp(c, service)) {
+					readSmartHeaders(in, service);
+					return new SmartHttpFetchConnection(in);
+
+				} else {
+					// Assume this server doesn't support smart HTTP fetch
+					// and fall back on dumb object walking.
+					//
+					HttpObjectDB d = new HttpObjectDB(objectsUrl);
+					WalkFetchConnection wfc = new WalkFetchConnection(this, d);
+					BufferedReader br = new BufferedReader(
+							new InputStreamReader(in, Constants.CHARSET));
+					try {
+						wfc.available(d.readAdvertisedImpl(br));
+					} finally {
+						br.close();
+					}
+					return wfc;
+				}
+			} finally {
+				in.close();
+			}
+		} catch (NotSupportedException err) {
+			throw err;
+		} catch (TransportException err) {
+			throw err;
+		} catch (IOException err) {
+			throw new TransportException(uri, "error reading info/refs", err);
+		}
 	}
 

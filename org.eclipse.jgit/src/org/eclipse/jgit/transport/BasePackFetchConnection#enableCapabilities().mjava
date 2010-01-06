@@ -1,4 +1,4 @@
-	private String enableCapabilities() {
+	private String enableCapabilities() throws TransportException {
 		final StringBuilder line = new StringBuilder();
 		if (includeTags)
 			includeTags = wantCapability(line, OPTION_INCLUDE_TAG);
@@ -18,6 +18,16 @@
 			sideband = true;
 		else if (wantCapability(line, OPTION_SIDE_BAND))
 			sideband = true;
+
+		if (statelessRPC && multiAck != MultiAck.DETAILED) {
+			// Our stateless RPC implementation relies upon the detailed
+			// ACK status to tell us common objects for reuse in future
+			// requests.  If its not enabled, we can't talk to the peer.
+			//
+			throw new PackProtocolException(uri, "stateless RPC requires "
+					+ OPTION_MULTI_ACK_DETAILED + " to be enabled");
+		}
+
 		return line.toString();
 	}
 
