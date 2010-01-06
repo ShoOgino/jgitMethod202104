@@ -1,0 +1,14 @@
+	private UrlPipeline[] getPipelines() throws ServletException {
+		UrlPipeline[] r = pipelines;
+		if (r == null) {
+			synchronized (bindings) {
+				r = pipelines;
+				if (r == null) {
+					r = createPipelines();
+					pipelines = r;
+				}
+			}
+		}
+		return r;
+	}
+

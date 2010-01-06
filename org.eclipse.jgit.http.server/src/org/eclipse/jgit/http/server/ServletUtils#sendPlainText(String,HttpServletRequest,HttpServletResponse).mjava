@@ -1,0 +1,31 @@
+	/**
+	 * Send a plain text response to a {@code GET} or {@code HEAD} HTTP request.
+	 * <p>
+	 * The text response is encoded in the Git character encoding, UTF-8.
+	 * <p>
+	 * If the user agent supports a compressed transfer encoding and the content
+	 * is large enough, the content may be compressed before sending.
+	 * <p>
+	 * The {@code ETag} and {@code Content-Length} headers are automatically set
+	 * by this method. {@code Content-Encoding} is conditionally set if the user
+	 * agent supports a compressed transfer. Callers are responsible for setting
+	 * any cache control headers.
+	 *
+	 * @param content
+	 *            to return to the user agent as this entity's body.
+	 * @param req
+	 *            the incoming request.
+	 * @param rsp
+	 *            the outgoing response.
+	 * @throws IOException
+	 *             the servlet API rejected sending the body.
+	 */
+	public static void sendPlainText(final String content,
+			final HttpServletRequest req, final HttpServletResponse rsp)
+			throws IOException {
+		final byte[] raw = content.getBytes(Constants.CHARACTER_ENCODING);
+		rsp.setContentType(TEXT_PLAIN);
+		rsp.setCharacterEncoding(Constants.CHARACTER_ENCODING);
+		send(raw, req, rsp);
+	}
+

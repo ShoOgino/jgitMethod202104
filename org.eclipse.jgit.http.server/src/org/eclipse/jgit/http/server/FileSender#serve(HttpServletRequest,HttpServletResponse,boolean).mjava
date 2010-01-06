@@ -1,0 +1,30 @@
+	void serve(final HttpServletRequest req, final HttpServletResponse rsp,
+			final boolean sendBody) throws IOException {
+		if (!initRangeRequest(req, rsp)) {
+			rsp.sendError(SC_REQUESTED_RANGE_NOT_SATISFIABLE);
+			return;
+		}
+
+		rsp.setHeader(HDR_ACCEPT_RANGES, "bytes");
+		rsp.setHeader(HDR_CONTENT_LENGTH, Long.toString(end - pos));
+
+		if (sendBody) {
+			final OutputStream out = rsp.getOutputStream();
+			try {
+				final byte[] buf = new byte[4096];
+				while (pos < end) {
+					final int r = (int) Math.min(buf.length, end - pos);
+					final int n = source.read(buf, 0, r);
+					if (n < 0) {
+						throw new EOFException("Unexpected EOF on " + path);
+					}
+					out.write(buf, 0, n);
+					pos += n;
+				}
+				out.flush();
+			} finally {
+				out.close();
+			}
+		}
+	}
+

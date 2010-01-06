@@ -1,0 +1,8 @@
+	public void doFilter(ServletRequest request, ServletResponse response,
+			FilterChain chain) throws IOException, ServletException {
+		if (isLocal(getRepository(request)))
+			chain.doFilter(request, response);
+		else
+			((HttpServletResponse) response).sendError(SC_FORBIDDEN);
+	}
+

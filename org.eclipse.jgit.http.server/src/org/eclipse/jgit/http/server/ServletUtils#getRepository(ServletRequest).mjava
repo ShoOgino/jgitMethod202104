@@ -1,0 +1,19 @@
+	/**
+	 * Get the selected repository from the request.
+	 *
+	 * @param req
+	 *            the current request.
+	 * @return the repository; never null.
+	 * @throws IllegalStateException
+	 *             the repository was not set by the filter, the servlet is
+	 *             being invoked incorrectly and the programmer should ensure
+	 *             the filter runs before the servlet.
+	 * @see #ATTRIBUTE_REPOSITORY
+	 */
+	public static Repository getRepository(final ServletRequest req) {
+		Repository db = (Repository) req.getAttribute(ATTRIBUTE_REPOSITORY);
+		if (db == null)
+			throw new IllegalStateException("Expected Repository attribute");
+		return db;
+	}
+

@@ -1,0 +1,39 @@
+	private void serve(final HttpServletRequest req,
+			final HttpServletResponse rsp, final boolean sendBody)
+			throws IOException {
+		final File obj = new File(objects(req), req.getPathInfo());
+		final FileSender sender;
+		try {
+			sender = new FileSender(obj);
+		} catch (FileNotFoundException e) {
+			rsp.sendError(SC_NOT_FOUND);
+			return;
+		}
+
+		try {
+			final String etag = etag(sender);
+			final long lastModified = (sender.getLastModified() / 1000) * 1000;
+
+			String ifNoneMatch = req.getHeader(HDR_IF_NONE_MATCH);
+			if (etag != null && etag.equals(ifNoneMatch)) {
+				rsp.sendError(SC_NOT_MODIFIED);
+				return;
+			}
+
+			long ifModifiedSince = req.getDateHeader(HDR_IF_MODIFIED_SINCE);
+			if (0 < lastModified && lastModified < ifModifiedSince) {
+				rsp.sendError(SC_NOT_MODIFIED);
+				return;
+			}
+
+			if (etag != null)
+				rsp.setHeader(HDR_ETAG, etag);
+			if (0 < lastModified)
+				rsp.setDateHeader(HDR_LAST_MODIFIED, lastModified);
+			rsp.setContentType(contentType);
+			sender.serve(req, rsp, sendBody);
+		} finally {
+			sender.close();
+		}
+	}
+

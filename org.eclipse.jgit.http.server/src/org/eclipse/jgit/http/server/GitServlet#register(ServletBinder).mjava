@@ -1,0 +1,9 @@
+	@Override
+	protected ServletBinder register(ServletBinder binder) {
+		if (resolver == null)
+			throw new IllegalStateException("No resolver available");
+		binder = binder.through(new NoCacheFilter());
+		binder = binder.through(new RepositoryFilter(resolver));
+		return binder;
+	}
+

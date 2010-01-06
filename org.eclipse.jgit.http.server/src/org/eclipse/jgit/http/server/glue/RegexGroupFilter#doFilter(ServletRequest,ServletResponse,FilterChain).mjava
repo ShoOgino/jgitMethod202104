@@ -1,0 +1,10 @@
+	public void doFilter(final ServletRequest request,
+			final ServletResponse rsp, final FilterChain chain)
+			throws IOException, ServletException {
+		final WrappedRequest[] g = groupsFor(request);
+		if (groupIdx < g.length)
+			chain.doFilter(g[groupIdx], rsp);
+		else
+			throw new ServletException("Invalid regex group " + (groupIdx + 1));
+	}
+

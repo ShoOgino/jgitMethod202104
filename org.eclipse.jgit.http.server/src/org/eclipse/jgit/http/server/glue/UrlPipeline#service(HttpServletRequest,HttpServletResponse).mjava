@@ -1,0 +1,24 @@
+	/**
+	 * Execute the filters and the servlet on the request.
+	 * <p>
+	 * Invoked by {@link MetaServlet} once {@link #match(HttpServletRequest)}
+	 * has determined this pipeline is the correct pipeline to handle the
+	 * current request.
+	 *
+	 * @param req
+	 *            current HTTP request.
+	 * @param rsp
+	 *            current HTTP response.
+	 * @throws ServletException
+	 *             request cannot be completed.
+	 * @throws IOException
+	 *             IO error prevents the request from being completed.
+	 */
+	void service(HttpServletRequest req, HttpServletResponse rsp)
+			throws ServletException, IOException {
+		if (0 < filters.length)
+			new Chain(filters, servlet).doFilter(req, rsp);
+		else
+			servlet.service(req, rsp);
+	}
+

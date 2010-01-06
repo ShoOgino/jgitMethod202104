@@ -1,0 +1,22 @@
+	FileSender(final File path) throws FileNotFoundException {
+		this.path = path;
+		this.source = new RandomAccessFile(path, "r");
+
+		try {
+			this.lastModified = path.lastModified();
+			this.fileLen = source.getChannel().size();
+			this.end = fileLen;
+		} catch (IOException e) {
+			try {
+				source.close();
+			} catch (IOException closeError) {
+				// Ignore any error closing the stream.
+			}
+
+			final FileNotFoundException r;
+			r = new FileNotFoundException("Cannot get length of " + path);
+			r.initCause(e);
+			throw r;
+		}
+	}
+

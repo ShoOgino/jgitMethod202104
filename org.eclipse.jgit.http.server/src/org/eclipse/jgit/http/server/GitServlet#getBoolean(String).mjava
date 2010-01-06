@@ -1,0 +1,11 @@
+	private boolean getBoolean(String param) throws ServletException {
+		String n = getInitParameter(param);
+		if (n == null)
+			return false;
+		try {
+			return StringUtils.toBoolean(n);
+		} catch (IllegalArgumentException err) {
+			throw new ServletException("Invalid boolean " + param + " = " + n);
+		}
+	}
+

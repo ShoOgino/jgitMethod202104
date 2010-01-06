@@ -1,0 +1,22 @@
+	/**
+	 * Initialize all contained filters and servlets.
+	 *
+	 * @param context
+	 *            the servlet container context our {@link MetaServlet} is
+	 *            running within.
+	 * @param inited
+	 *            <i>(input/output)</i> the set of filters and servlets which
+	 *            have already been initialized within the container context. If
+	 *            those same instances appear in this pipeline they are not
+	 *            initialized a second time. Filters and servlets that are first
+	 *            initialized by this pipeline will be added to this set.
+	 * @throws ServletException
+	 *             a filter or servlet is unable to initialize.
+	 */
+	void init(final ServletContext context, final Set<Object> inited)
+			throws ServletException {
+		for (Filter ref : filters)
+			initFilter(ref, context, inited);
+		initServlet(servlet, context, inited);
+	}
+

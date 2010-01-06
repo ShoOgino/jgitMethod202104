@@ -1,0 +1,11 @@
+	private File getFile(final String param) throws ServletException {
+		String n = getInitParameter(param);
+		if (n == null || "".equals(n))
+			throw new ServletException("Parameter " + param + " not set");
+
+		File path = new File(n);
+		if (!path.exists())
+			throw new ServletException(path + " (for " + param + ") not found");
+		return path;
+	}
+

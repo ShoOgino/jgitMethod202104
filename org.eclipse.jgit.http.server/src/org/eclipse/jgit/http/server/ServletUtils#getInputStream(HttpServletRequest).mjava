@@ -1,0 +1,25 @@
+	/**
+	 * Open the request input stream, automatically inflating if necessary.
+	 * <p>
+	 * This method automatically inflates the input stream if the request
+	 * {@code Content-Encoding} header was set to {@code gzip} or the legacy
+	 * {@code x-gzip}.
+	 *
+	 * @param req
+	 *            the incoming request whose input stream needs to be opened.
+	 * @return an input stream to read the raw, uncompressed request body.
+	 * @throws IOException
+	 *             if an input or output exception occurred.
+	 */
+	public static InputStream getInputStream(final HttpServletRequest req)
+			throws IOException {
+		InputStream in = req.getInputStream();
+		final String enc = req.getHeader(HDR_CONTENT_ENCODING);
+		if (ENCODING_GZIP.equals(enc) || "x-gzip".equals(enc)) //$NON-NLS-1$
+			in = new GZIPInputStream(in);
+		else if (enc != null)
+			throw new IOException(HDR_CONTENT_ENCODING + " \"" + enc + "\""
+					+ ": not supported by this library.");
+		return in;
+	}
+

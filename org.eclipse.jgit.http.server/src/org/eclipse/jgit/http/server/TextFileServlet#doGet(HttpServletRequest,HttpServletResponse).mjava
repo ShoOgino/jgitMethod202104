@@ -1,0 +1,10 @@
+	public void doGet(final HttpServletRequest req,
+			final HttpServletResponse rsp) throws IOException {
+		try {
+			rsp.setContentType(HttpSupport.TEXT_PLAIN);
+			send(read(req), req, rsp);
+		} catch (FileNotFoundException noFile) {
+			rsp.sendError(SC_NOT_FOUND);
+		}
+	}
+

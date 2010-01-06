@@ -1,0 +1,63 @@
+	@Override
+	public void init(final ServletConfig config) throws ServletException {
+		super.init(config);
+
+		if (resolver == null) {
+			final File root = getFile("base-path");
+			final boolean exportAll = getBoolean("export-all");
+			setRepositoryResolver(new FileResolver(root, exportAll));
+		}
+
+		initialized = true;
+
+		if (asIs != AsIsFileService.DISABLED) {
+			final IsLocalFilter mustBeLocal = new IsLocalFilter();
+			final AsIsFileFilter enabled = new AsIsFileFilter(asIs);
+
+			serve("*/" + Constants.INFO_REFS)//
+					.through(mustBeLocal)//
+					.through(enabled)//
+					.with(new InfoRefsServlet());
+
+			serve("*/" + Constants.HEAD)//
+					.through(mustBeLocal)//
+					.through(enabled)//
+					.with(new TextFileServlet(Constants.HEAD));
+
+			final String info_alternates = "objects/info/alternates";
+			serve("*/" + info_alternates)//
+					.through(mustBeLocal)//
+					.through(enabled)//
+					.with(new TextFileServlet(info_alternates));
+
+			final String http_alternates = "objects/info/http-alternates";
+			serve("*/" + http_alternates)//
+					.through(mustBeLocal)//
+					.through(enabled)//
+					.with(new TextFileServlet(http_alternates));
+
+			serve("*/objects/info/packs")//
+					.through(mustBeLocal)//
+					.through(enabled)//
+					.with(new InfoPacksServlet());
+
+			serveRegex("^/(.*)/objects/([0-9a-f]{2}/[0-9a-f]{38})$")//
+					.through(mustBeLocal)//
+					.through(enabled)//
+					.through(new RegexGroupFilter(2))//
+					.with(new ObjectFileServlet.Loose());
+
+			serveRegex("^/(.*)/objects/(pack/pack-[0-9a-f]{40}\\.pack)$")//
+					.through(mustBeLocal)//
+					.through(enabled)//
+					.through(new RegexGroupFilter(2))//
+					.with(new ObjectFileServlet.Pack());
+
+			serveRegex("^/(.*)/objects/(pack/pack-[0-9a-f]{40}\\.idx)$")//
+					.through(mustBeLocal)//
+					.through(enabled)//
+					.through(new RegexGroupFilter(2))//
+					.with(new ObjectFileServlet.PackIdx());
+		}
+	}
+

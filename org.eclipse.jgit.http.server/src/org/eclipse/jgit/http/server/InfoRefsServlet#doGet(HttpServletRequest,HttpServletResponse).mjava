@@ -1,0 +1,10 @@
+	public void doGet(final HttpServletRequest req,
+			final HttpServletResponse rsp) throws IOException {
+		// Assume a dumb client and send back the dumb client
+		// version of the info/refs file.
+		final byte[] raw = dumbHttp(req);
+		rsp.setContentType(HttpSupport.TEXT_PLAIN);
+		rsp.setCharacterEncoding(Constants.CHARACTER_ENCODING);
+		send(raw, req, rsp);
+	}
+

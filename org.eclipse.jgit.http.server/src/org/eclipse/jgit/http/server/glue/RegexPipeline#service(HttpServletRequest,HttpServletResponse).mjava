@@ -1,0 +1,49 @@
+	@Override
+	void service(HttpServletRequest req, HttpServletResponse rsp)
+			throws ServletException, IOException {
+		final String reqInfo = req.getPathInfo();
+		if (reqInfo == null) {
+			rsp.sendError(SC_NOT_FOUND);
+			return;
+		}
+
+		final Matcher cur = pattern.matcher(reqInfo);
+		if (!cur.matches()) {
+			rsp.sendError(SC_NOT_FOUND);
+			return;
+		}
+
+		final String reqPath = req.getServletPath();
+		final Object old = req.getAttribute(REGEX_GROUPS);
+		try {
+			if (1 <= cur.groupCount()) {
+				// If there are groups extract every capture group and
+				// build a request for them so RegexGroupFilter can pick
+				// a different capture group later. Continue using the
+				// first capture group as the path info.
+				WrappedRequest groups[] = new WrappedRequest[cur.groupCount()];
+				for (int groupId = 1; groupId <= cur.groupCount(); groupId++) {
+					final int s = cur.start(groupId);
+					final String path, info;
+
+					path = reqPath + reqInfo.substring(0, s);
+					info = cur.group(groupId);
+					groups[groupId - 1] = new WrappedRequest(req, path, info);
+				}
+				req.setAttribute(REGEX_GROUPS, groups);
+				super.service(groups[0], rsp);
+
+			} else {
+				// No capture groups were present, service the whole request.
+				final String path = reqPath + reqInfo;
+				final String info = null;
+				super.service(new WrappedRequest(req, path, info), rsp);
+			}
+		} finally {
+			if (old != null)
+				req.setAttribute(REGEX_GROUPS, old);
+			else
+				req.removeAttribute(REGEX_GROUPS);
+		}
+	}
+

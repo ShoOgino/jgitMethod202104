@@ -1,0 +1,32 @@
+	/**
+	 * Send a response to a {@code GET} or {@code HEAD} HTTP request.
+	 * <p>
+	 * If the user agent supports a compressed transfer encoding and the content
+	 * is large enough, the content may be compressed before sending.
+	 * <p>
+	 * The {@code ETag} and {@code Content-Length} headers are automatically set
+	 * by this method. {@code Content-Encoding} is conditionally set if the user
+	 * agent supports a compressed transfer. Callers are responsible for setting
+	 * {@code Content-Type} and any cache control headers.
+	 *
+	 * @param content
+	 *            to return to the user agent as this entity's body.
+	 * @param req
+	 *            the incoming request.
+	 * @param rsp
+	 *            the outgoing response.
+	 * @throws IOException
+	 *             the servlet API rejected sending the body.
+	 */
+	public static void send(byte[] content, final HttpServletRequest req,
+			final HttpServletResponse rsp) throws IOException {
+		content = sendInit(content, req, rsp);
+		final OutputStream out = rsp.getOutputStream();
+		try {
+			out.write(content);
+			out.flush();
+		} finally {
+			out.close();
+		}
+	}
+

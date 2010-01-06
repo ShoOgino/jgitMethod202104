@@ -1,0 +1,16 @@
+	/**
+	 * Destroy all contained filters and servlets.
+	 *
+	 * @param destroyed
+	 *            <i>(input/output)</i> the set of filters and servlets which
+	 *            have already been destroyed within the container context. If
+	 *            those same instances appear in this pipeline they are not
+	 *            destroyed a second time. Filters and servlets that are first
+	 *            destroyed by this pipeline will be added to this set.
+	 */
+	void destroy(final Set<Object> destroyed) {
+		for (Filter ref : filters)
+			destroyFilter(ref, destroyed);
+		destroyServlet(servlet, destroyed);
+	}
+

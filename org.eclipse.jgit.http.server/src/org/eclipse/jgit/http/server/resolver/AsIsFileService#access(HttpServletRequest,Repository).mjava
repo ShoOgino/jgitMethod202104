@@ -1,0 +1,28 @@
+	/**
+	 * Determine if access to any bare file of the repository is allowed.
+	 * <p>
+	 * This method silently succeeds if the request is allowed, or fails by
+	 * throwing a checked exception if access should be denied.
+	 * <p>
+	 * The default implementation of this method checks {@code http.getanyfile},
+	 * throwing {@link ServiceNotEnabledException} if it was explicitly set to
+	 * {@code false}, and otherwise succeeding silently.
+	 *
+	 * @param req
+	 *            current HTTP request, in case information from the request may
+	 *            help determine the access request.
+	 * @param db
+	 *            the repository the request would obtain a bare file from.
+	 * @throws ServiceNotEnabledException
+	 *             bare file access is not allowed on the target repository, by
+	 *             any user, for any reason.
+	 * @throws ServiceNotAuthorizedException
+	 *             bare file access is not allowed for this HTTP request and
+	 *             repository, such as due to a permission error.
+	 */
+	public void access(HttpServletRequest req, Repository db)
+			throws ServiceNotEnabledException, ServiceNotAuthorizedException {
+		if (!isEnabled(db))
+			throw new ServiceNotEnabledException();
+	}
+

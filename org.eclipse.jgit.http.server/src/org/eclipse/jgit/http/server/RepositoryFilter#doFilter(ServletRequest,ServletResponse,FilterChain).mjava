@@ -1,0 +1,43 @@
+	public void doFilter(final ServletRequest request,
+			final ServletResponse rsp, final FilterChain chain)
+			throws IOException, ServletException {
+		if (request.getAttribute(ATTRIBUTE_REPOSITORY) != null) {
+			context.log("Internal server error, request attribute "
+					+ ATTRIBUTE_REPOSITORY + " was already set when "
+					+ getClass().getName() + " was invoked.");
+			((HttpServletResponse) rsp).sendError(SC_INTERNAL_SERVER_ERROR);
+			return;
+		}
+
+		final HttpServletRequest req = (HttpServletRequest) request;
+
+		String name = req.getPathInfo();
+		if (name == null || name.length() == 0) {
+			((HttpServletResponse) rsp).sendError(SC_NOT_FOUND);
+			return;
+		}
+		if (name.startsWith("/"))
+			name = name.substring(1);
+
+		final Repository db;
+		try {
+			db = resolver.open(req, name);
+		} catch (RepositoryNotFoundException e) {
+			((HttpServletResponse) rsp).sendError(SC_NOT_FOUND);
+			return;
+		} catch (ServiceNotAuthorizedException e) {
+			((HttpServletResponse) rsp).sendError(SC_UNAUTHORIZED);
+			return;
+		} catch (ServiceNotEnabledException e) {
+			((HttpServletResponse) rsp).sendError(SC_FORBIDDEN);
+			return;
+		}
+		try {
+			request.setAttribute(ATTRIBUTE_REPOSITORY, db);
+			chain.doFilter(request, rsp);
+		} finally {
+			request.removeAttribute(ATTRIBUTE_REPOSITORY);
+			db.close();
+		}
+	}
+
