@@ -10,14 +10,26 @@
 
 		initialized = true;
 
+		if (receivePackFactory != ReceivePackFactory.DISABLED) {
+			serve("*/git-receive-pack")//
+					.with(new ReceivePackServlet(receivePackFactory));
+		}
+
+		ServletBinder refs = serve("*/" + Constants.INFO_REFS);
+		if (receivePackFactory != ReceivePackFactory.DISABLED) {
+			refs = refs.through(//
+					new ReceivePackServlet.InfoRefs(receivePackFactory));
+		}
+		if (asIs != AsIsFileService.DISABLED) {
+			refs = refs.through(new IsLocalFilter());
+			refs = refs.through(new AsIsFileFilter(asIs));
+			refs.with(new InfoRefsServlet());
+		} else
+			refs.with(new ErrorServlet(HttpServletResponse.SC_FORBIDDEN));
+
 		if (asIs != AsIsFileService.DISABLED) {
 			final IsLocalFilter mustBeLocal = new IsLocalFilter();
 			final AsIsFileFilter enabled = new AsIsFileFilter(asIs);
-
-			serve("*/" + Constants.INFO_REFS)//
-					.through(mustBeLocal)//
-					.through(enabled)//
-					.with(new InfoRefsServlet());
 
 			serve("*/" + Constants.HEAD)//
 					.through(mustBeLocal)//

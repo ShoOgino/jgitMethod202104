@@ -1,0 +1,19 @@
+	public ReceivePack create(final HttpServletRequest req, final Repository db)
+			throws ServiceNotEnabledException, ServiceNotAuthorizedException {
+		final ServiceConfig cfg = db.getConfig().get(CONFIG);
+		String user = req.getRemoteUser();
+
+		if (cfg.set) {
+			if (cfg.enabled) {
+				if (user == null || "".equals(user))
+					user = "anonymous";
+				return createFor(req, db, user);
+			}
+			throw new ServiceNotEnabledException();
+		}
+
+		if (user != null && !"".equals(user))
+			return createFor(req, db, user);
+		throw new ServiceNotAuthorizedException();
+	}
+
