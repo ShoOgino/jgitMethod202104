@@ -1,0 +1,8 @@
+	public UploadPack create(final HttpServletRequest req, final Repository db)
+			throws ServiceNotEnabledException, ServiceNotAuthorizedException {
+		if (db.getConfig().get(CONFIG).enabled)
+			return new UploadPack(db);
+		else
+			throw new ServiceNotEnabledException();
+	}
+
