@@ -4,6 +4,7 @@
 		final DeflaterOutputStream deflateStream;
 		final FileOutputStream fileStream;
 		ObjectId id = null;
+		Deflater def = null;
 
 		if (store) {
 			t = File.createTempFile("noz", null, r.getObjectsDirectory());
@@ -15,7 +16,7 @@
 
 		md.reset();
 		if (store) {
-			def.reset();
+			def = new Deflater(r.getConfig().getCore().getCompression());
 			deflateStream = new DeflaterOutputStream(fileStream, def);
 		} else
 			deflateStream = null;
@@ -68,6 +69,9 @@
 				} finally {
 					t.delete();
 				}
+			}
+			if (def != null) {
+				def.end();
 			}
 		}
 
