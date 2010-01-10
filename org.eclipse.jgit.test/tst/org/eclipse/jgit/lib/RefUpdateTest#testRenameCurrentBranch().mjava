@@ -1,6 +1,6 @@
 	public void testRenameCurrentBranch() throws IOException {
 		ObjectId rb = db.resolve("refs/heads/b");
-		db.writeSymref(Constants.HEAD, "refs/heads/b");
+		writeSymref(Constants.HEAD, "refs/heads/b");
 		ObjectId oldHead = db.resolve(Constants.HEAD);
 		assertTrue("internal test condition, b == HEAD", rb.equals(oldHead));
 		writeReflog(db, rb, rb, "Just a message", "refs/heads/b");

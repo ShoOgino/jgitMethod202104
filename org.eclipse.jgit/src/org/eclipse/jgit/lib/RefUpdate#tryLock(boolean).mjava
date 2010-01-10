@@ -4,11 +4,15 @@
 	 * If the locking was successful the implementor must set the current
 	 * identity value by calling {@link #setOldObjectId(ObjectId)}.
 	 *
+	 * @param deref
+	 *            true if the lock should be taken against the leaf level
+	 *            reference; false if it should be taken exactly against the
+	 *            current reference.
 	 * @return true if the lock was acquired and the reference is likely
 	 *         protected from concurrent modification; false if it failed.
 	 * @throws IOException
 	 *             the lock couldn't be taken due to an unexpected storage
 	 *             failure, and not because of a concurrent update.
 	 */
-	protected abstract boolean tryLock() throws IOException;
+	protected abstract boolean tryLock(boolean deref) throws IOException;
 

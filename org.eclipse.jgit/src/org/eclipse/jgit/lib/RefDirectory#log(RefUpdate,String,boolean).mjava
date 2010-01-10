@@ -1,4 +1,5 @@
-	void log(final RefUpdate update, final String msg) throws IOException {
+	void log(final RefUpdate update, final String msg, final boolean deref)
+			throws IOException {
 		final ObjectId oldId = update.getOldObjectId();
 		final ObjectId newId = update.getNewObjectId();
 		final Ref ref = update.getRef();
@@ -20,8 +21,11 @@
 		r.append('\n');
 		final byte[] rec = encode(r.toString());
 
-		if (ref.isSymbolic())
+		if (deref && ref.isSymbolic()) {
 			log(ref.getName(), rec);
-		log(ref.getLeaf().getName(), rec);
+			log(ref.getLeaf().getName(), rec);
+		} else {
+			log(ref.getName(), rec);
+		}
 	}
 

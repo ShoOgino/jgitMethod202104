@@ -1,6 +1,8 @@
 	@Override
-	protected boolean tryLock() throws IOException {
-		Ref dst = getRef().getLeaf();
+	protected boolean tryLock(boolean deref) throws IOException {
+		Ref dst = getRef();
+		if (deref)
+			dst = dst.getLeaf();
 		String name = dst.getName();
 		lock = new LockFile(database.fileFor(name));
 		if (lock.lock()) {
