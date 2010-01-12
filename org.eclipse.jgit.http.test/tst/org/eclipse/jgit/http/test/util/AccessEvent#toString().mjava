@@ -1,0 +1,26 @@
+	public String toString() {
+		StringBuilder b = new StringBuilder();
+		b.append(method);
+		b.append(' ');
+		b.append(uri);
+		if (!parameters.isEmpty()) {
+			b.append('?');
+			boolean first = true;
+			for (Map.Entry<String, String[]> e : parameters.entrySet()) {
+				for (String val : e.getValue()) {
+					if (!first) {
+						b.append('&');
+					}
+					first = false;
+
+					b.append(e.getKey());
+					b.append('=');
+					b.append(val);
+				}
+			}
+		}
+		b.append(' ');
+		b.append(status);
+		return b.toString();
+	}
+

@@ -1,0 +1,24 @@
+	public void testListRemote_Dumb_DetachedHEAD() throws Exception {
+		Repository src = remoteRepository.getRepository();
+		RefUpdate u = src.updateRef(Constants.HEAD, true);
+		RevCommit Q = remoteRepository.commit().message("Q").create();
+		u.setNewObjectId(Q);
+		assertEquals(RefUpdate.Result.FORCED, u.forceUpdate());
+
+		Repository dst = createBareRepository();
+		Ref head;
+		Transport t = Transport.open(dst, dumbAuthNoneURI);
+		try {
+			FetchConnection c = t.openFetch();
+			try {
+				head = c.getRef(Constants.HEAD);
+			} finally {
+				c.close();
+			}
+		} finally {
+			t.close();
+		}
+		assertNotNull("has " + Constants.HEAD, head);
+		assertEquals(Q, head.getObjectId());
+	}
+

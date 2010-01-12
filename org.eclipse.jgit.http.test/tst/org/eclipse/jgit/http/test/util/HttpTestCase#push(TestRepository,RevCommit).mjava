@@ -1,0 +1,14 @@
+	protected static Collection<RemoteRefUpdate> push(TestRepository from,
+			RevCommit q) throws IOException {
+		final Repository db = from.getRepository();
+		final String srcExpr = q.name();
+		final String dstName = master;
+		final boolean forceUpdate = true;
+		final String localName = null;
+		final ObjectId oldId = null;
+
+		RemoteRefUpdate u = new RemoteRefUpdate(db, srcExpr, dstName,
+				forceUpdate, localName, oldId);
+		return Collections.singleton(u);
+	}
+

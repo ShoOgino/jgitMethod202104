@@ -1,0 +1,48 @@
+	public void testListRemote() throws IOException {
+		Repository dst = createBareRepository();
+
+		assertEquals("http", remoteURI.getScheme());
+
+		Map<String, Ref> map;
+		Transport t = Transport.open(dst, remoteURI);
+		try {
+			// I didn't make up these public interface names, I just
+			// approved them for inclusion into the code base. Sorry.
+			// --spearce
+			//
+			assertTrue("isa TransportHttp", t instanceof TransportHttp);
+			assertTrue("isa HttpTransport", t instanceof HttpTransport);
+
+			FetchConnection c = t.openFetch();
+			try {
+				map = c.getRefsMap();
+			} finally {
+				c.close();
+			}
+		} finally {
+			t.close();
+		}
+
+		assertNotNull("have map of refs", map);
+		assertEquals(3, map.size());
+
+		assertNotNull("has " + master, map.get(master));
+		assertEquals(B, map.get(master).getObjectId());
+
+		assertNotNull("has " + Constants.HEAD, map.get(Constants.HEAD));
+		assertEquals(B, map.get(Constants.HEAD).getObjectId());
+
+		List<AccessEvent> requests = getRequests();
+		assertEquals(1, requests.size());
+
+		AccessEvent info = requests.get(0);
+		assertEquals("GET", info.getMethod());
+		assertEquals(join(remoteURI, "info/refs"), info.getPath());
+		assertEquals(1, info.getParameters().size());
+		assertEquals("git-upload-pack", info.getParameter("service"));
+		assertEquals(200, info.getStatus());
+		assertEquals("application/x-git-upload-pack-advertisement", info
+				.getResponseHeader(HDR_CONTENT_TYPE));
+		assertEquals("gzip", info.getResponseHeader(HDR_CONTENT_ENCODING));
+	}
+

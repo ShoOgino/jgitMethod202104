@@ -1,0 +1,42 @@
+	public void testPush_NotAuthorized() throws Exception {
+		final TestRepository src = createTestRepository();
+		final RevBlob Q_txt = src.blob("new text");
+		final RevCommit Q = src.commit().add("Q", Q_txt).create();
+		final Repository db = src.getRepository();
+		final String dstName = Constants.R_HEADS + "new.branch";
+		Transport t;
+
+		// push anonymous shouldn't be allowed.
+		//
+		t = Transport.open(db, remoteURI);
+		try {
+			final String srcExpr = Q.name();
+			final boolean forceUpdate = false;
+			final String localName = null;
+			final ObjectId oldId = null;
+
+			RemoteRefUpdate u = new RemoteRefUpdate(src.getRepository(),
+					srcExpr, dstName, forceUpdate, localName, oldId);
+			try {
+				t.push(NullProgressMonitor.INSTANCE, Collections.singleton(u));
+				fail("anonymous push incorrectly accepted without error");
+			} catch (TransportException e) {
+				final String status = "401 Unauthorized";
+				final String exp = remoteURI.toString() + ": " + status;
+				assertEquals(exp, e.getMessage());
+			}
+		} finally {
+			t.close();
+		}
+
+		List<AccessEvent> requests = getRequests();
+		assertEquals(1, requests.size());
+
+		AccessEvent info = requests.get(0);
+		assertEquals("GET", info.getMethod());
+		assertEquals(join(remoteURI, "info/refs"), info.getPath());
+		assertEquals(1, info.getParameters().size());
+		assertEquals("git-receive-pack", info.getParameter("service"));
+		assertEquals(401, info.getStatus());
+	}
+

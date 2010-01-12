@@ -1,0 +1,22 @@
+	public void testInitialClone_Loose() throws Exception {
+		Repository dst = createBareRepository();
+		assertFalse(dst.hasObject(A_txt));
+
+		Transport t = Transport.open(dst, remoteURI);
+		try {
+			t.fetch(NullProgressMonitor.INSTANCE, mirror(master));
+		} finally {
+			t.close();
+		}
+
+		assertTrue(dst.hasObject(A_txt));
+		assertEquals(B, dst.getRef(master).getObjectId());
+		fsck(dst, B);
+
+		List<AccessEvent> loose = getRequests(loose(remoteURI, A_txt));
+		assertEquals(1, loose.size());
+		assertEquals("GET", loose.get(0).getMethod());
+		assertEquals(0, loose.get(0).getParameters().size());
+		assertEquals(200, loose.get(0).getStatus());
+	}
+

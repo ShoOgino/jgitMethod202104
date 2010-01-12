@@ -1,0 +1,21 @@
+	/**
+	 * Get the URI to reference this server.
+	 * <p>
+	 * The returned URI includes the proper host name and port number, but does
+	 * not contain a path.
+	 *
+	 * @return URI to reference this server's root context.
+	 */
+	public URI getURI() {
+		assertAlreadySetUp();
+		String host = connector.getHost();
+		if (host.contains(":") && !host.startsWith("["))
+			host = "[" + host + "]";
+		final String uri = "http://" + host + ":" + getPort();
+		try {
+			return new URI(uri);
+		} catch (URISyntaxException e) {
+			throw new RuntimeException("Unexpected URI error on " + uri, e);
+		}
+	}
+

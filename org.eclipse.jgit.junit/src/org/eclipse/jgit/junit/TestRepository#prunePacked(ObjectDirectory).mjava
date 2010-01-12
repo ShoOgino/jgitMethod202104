@@ -1,0 +1,7 @@
+	private void prunePacked(ObjectDirectory odb) {
+		for (PackFile p : odb.getPacks()) {
+			for (MutableEntry e : p)
+				odb.fileFor(e.toObjectId()).delete();
+		}
+	}
+

@@ -1,0 +1,23 @@
+	/**
+	 * Create a new servlet context within the server.
+	 * <p>
+	 * This method should be invoked before the server is started, once for each
+	 * context the caller wants to register.
+	 *
+	 * @param path
+	 *            path of the context; use "/" for the root context if binding
+	 *            to the root is desired.
+	 * @return the context to add servlets into.
+	 */
+	public ServletContextHandler addContext(String path) {
+		assertNotYetSetUp();
+		if ("".equals(path))
+			path = "/";
+
+		ServletContextHandler ctx = new ServletContextHandler();
+		ctx.setContextPath(path);
+		contexts.addHandler(ctx);
+
+		return ctx;
+	}
+

@@ -4,26 +4,25 @@
 	 * @throws Exception
 	 */
 	public void updateServerInfo() throws Exception {
-		if (db.getObjectDatabase() instanceof ObjectDirectory) {
+		final ObjectDatabase odb = db.getObjectDatabase();
+		if (odb instanceof ObjectDirectory) {
 			RefWriter rw = new RefWriter(db.getAllRefs().values()) {
 				@Override
 				protected void writeFile(final String name, final byte[] bin)
 						throws IOException {
-					final File p = new File(db.getDirectory(), name);
-					final LockFile lck = new LockFile(p);
-					if (!lck.lock())
-						throw new ObjectWritingException("Can't write " + p);
-					try {
-						lck.write(bin);
-					} catch (IOException ioe) {
-						throw new ObjectWritingException("Can't write " + p);
-					}
-					if (!lck.commit())
-						throw new ObjectWritingException("Can't write " + p);
+					TestRepository.this.writeFile(name, bin);
 				}
 			};
 			rw.writePackedRefs();
 			rw.writeInfoRefs();
+
+			final StringBuilder w = new StringBuilder();
+			for (PackFile p : ((ObjectDirectory) odb).getPacks()) {
+				w.append("P ");
+				w.append(p.getPackFile().getName());
+				w.append('\n');
+			}
+			writeFile("objects/info/packs", Constants.encodeASCII(w.toString()));
 		}
 	}
 

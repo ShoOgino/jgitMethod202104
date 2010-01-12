@@ -1,0 +1,10 @@
+	private ServletContextHandler dumb(final String path) {
+		final File srcGit = remoteRepository.getRepository().getDirectory();
+		final URI base = srcGit.getParentFile().toURI();
+
+		ServletContextHandler ctx = server.addContext(path);
+		ctx.setResourceBase(base.toString());
+		ctx.addServlet(DefaultServlet.class, "/");
+		return ctx;
+	}
+

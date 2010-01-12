@@ -1,0 +1,22 @@
+	protected void setUp() throws Exception {
+		super.setUp();
+
+		final TestRepository src = createTestRepository();
+		final File srcGit = src.getRepository().getDirectory();
+		final URI base = srcGit.getParentFile().toURI();
+
+		ServletContextHandler app = server.addContext("/git");
+		app.setResourceBase(base.toString());
+		app.addServlet(DefaultServlet.class, "/");
+
+		server.setUp();
+
+		remoteRepository = src.getRepository();
+		remoteURI = toURIish(app, srcGit.getName());
+
+		A_txt = src.blob("A");
+		A = src.commit().add("A_txt", A_txt).create();
+		B = src.commit().parent(A).add("A_txt", "C").add("B", "B").create();
+		src.update(master, B);
+	}
+

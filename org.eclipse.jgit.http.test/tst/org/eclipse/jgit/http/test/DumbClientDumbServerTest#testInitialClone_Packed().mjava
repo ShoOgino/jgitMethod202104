@@ -1,0 +1,39 @@
+	public void testInitialClone_Packed() throws Exception {
+		new TestRepository(remoteRepository).packAndPrune();
+
+		Repository dst = createBareRepository();
+		assertFalse(dst.hasObject(A_txt));
+
+		Transport t = Transport.open(dst, remoteURI);
+		try {
+			t.fetch(NullProgressMonitor.INSTANCE, mirror(master));
+		} finally {
+			t.close();
+		}
+
+		assertTrue(dst.hasObject(A_txt));
+		assertEquals(B, dst.getRef(master).getObjectId());
+		fsck(dst, B);
+
+		List<AccessEvent> req;
+		AccessEvent event;
+
+		req = getRequests(loose(remoteURI, B));
+		assertEquals(1, req.size());
+		event = req.get(0);
+		assertEquals("GET", event.getMethod());
+		assertEquals(0, event.getParameters().size());
+		assertEquals(404, event.getStatus());
+
+		req = getRequests(join(remoteURI, "objects/info/packs"));
+		assertEquals(1, req.size());
+		event = req.get(0);
+		assertEquals("GET", event.getMethod());
+		assertEquals(0, event.getParameters().size());
+		assertEquals("no-cache", event.getRequestHeader(HDR_PRAGMA));
+		assertNotNull("has user-agent", event.getRequestHeader(HDR_USER_AGENT));
+		assertTrue("is jgit agent", event.getRequestHeader(HDR_USER_AGENT)
+				.startsWith("JGit/"));
+		assertEquals(200, event.getStatus());
+	}
+

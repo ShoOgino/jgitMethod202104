@@ -1,0 +1,33 @@
+	public void testExportOk() throws IOException {
+		final Repository a = createBareRepository();
+		final String name = a.getDirectory().getName();
+		final File base = a.getDirectory().getParentFile();
+		final File export = new File(a.getDirectory(), "git-daemon-export-ok");
+		FileResolver resolver;
+
+		assertFalse("no git-daemon-export-ok", export.exists());
+		resolver = new FileResolver(base, false /* require flag */);
+		try {
+			resolver.open(null, name);
+			fail("opened non-exported repository");
+		} catch (ServiceNotEnabledException e) {
+			assertEquals("Service not enabled", e.getMessage());
+		}
+
+		resolver = new FileResolver(base, true /* export all */);
+		try {
+			resolver.open(null, name).close();
+		} catch (ServiceNotEnabledException e) {
+			fail("did not honor export-all flag");
+		}
+
+		export.createNewFile();
+		assertTrue("has git-daemon-export-ok", export.exists());
+		resolver = new FileResolver(base, false /* require flag */);
+		try {
+			resolver.open(null, name).close();
+		} catch (ServiceNotEnabledException e) {
+			fail("did not honor git-daemon-export-ok");
+		}
+	}
+

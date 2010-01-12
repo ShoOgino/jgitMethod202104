@@ -1,0 +1,46 @@
+	public void testInitialClone_Small() throws Exception {
+		Repository dst = createBareRepository();
+		assertFalse(dst.hasObject(A_txt));
+
+		Transport t = Transport.open(dst, remoteURI);
+		try {
+			t.fetch(NullProgressMonitor.INSTANCE, mirror(master));
+		} finally {
+			t.close();
+		}
+
+		assertTrue(dst.hasObject(A_txt));
+		assertEquals(B, dst.getRef(master).getObjectId());
+		fsck(dst, B);
+
+		List<AccessEvent> requests = getRequests();
+		assertEquals(2, requests.size());
+
+		AccessEvent info = requests.get(0);
+		assertEquals("GET", info.getMethod());
+		assertEquals(join(remoteURI, "info/refs"), info.getPath());
+		assertEquals(1, info.getParameters().size());
+		assertEquals("git-upload-pack", info.getParameter("service"));
+		assertEquals(200, info.getStatus());
+		assertEquals("application/x-git-upload-pack-advertisement", info
+				.getResponseHeader(HDR_CONTENT_TYPE));
+		assertEquals("gzip", info.getResponseHeader(HDR_CONTENT_ENCODING));
+
+		AccessEvent service = requests.get(1);
+		assertEquals("POST", service.getMethod());
+		assertEquals(join(remoteURI, "git-upload-pack"), service.getPath());
+		assertEquals(0, service.getParameters().size());
+		assertNotNull("has content-length", service
+				.getRequestHeader(HDR_CONTENT_LENGTH));
+		assertNull("not chunked", service
+				.getRequestHeader(HDR_TRANSFER_ENCODING));
+		assertNull("no compression (too small)", service
+				.getRequestHeader(HDR_CONTENT_ENCODING));
+
+		assertEquals(200, service.getStatus());
+		assertEquals("application/x-git-upload-pack-result", service
+				.getResponseHeader(HDR_CONTENT_TYPE));
+		assertNull("no compression (never compressed)", service
+				.getResponseHeader(HDR_CONTENT_ENCODING));
+	}
+

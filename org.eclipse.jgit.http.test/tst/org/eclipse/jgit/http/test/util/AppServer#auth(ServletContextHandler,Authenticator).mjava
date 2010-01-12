@@ -1,0 +1,34 @@
+	private void auth(ServletContextHandler ctx, Authenticator authType) {
+		final String role = "can-access";
+
+		MappedLoginService users = new MappedLoginService() {
+			@Override
+			protected UserIdentity loadUser(String who) {
+				return null;
+			}
+
+			@Override
+			protected void loadUsers() throws IOException {
+				putUser(username, new Password(password), new String[] { role });
+			}
+		};
+
+		ConstraintMapping cm = new ConstraintMapping();
+		cm.setConstraint(new Constraint());
+		cm.getConstraint().setAuthenticate(true);
+		cm.getConstraint().setDataConstraint(Constraint.DC_NONE);
+		cm.getConstraint().setRoles(new String[] { role });
+		cm.setPathSpec("/*");
+
+		ConstraintSecurityHandler sec = new ConstraintSecurityHandler();
+		sec.setStrict(false);
+		sec.setRealmName(realm);
+		sec.setAuthenticator(authType);
+		sec.setLoginService(users);
+		sec.setConstraintMappings(new ConstraintMapping[] { cm });
+		sec.setHandler(ctx);
+
+		contexts.removeHandler(ctx);
+		contexts.addHandler(sec);
+	}
+

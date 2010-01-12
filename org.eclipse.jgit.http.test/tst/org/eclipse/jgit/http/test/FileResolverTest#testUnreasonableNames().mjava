@@ -1,0 +1,18 @@
+	public void testUnreasonableNames() throws ServiceNotEnabledException {
+		assertUnreasonable("");
+		assertUnreasonable("a\\b");
+		assertUnreasonable("../b");
+		assertUnreasonable("a/../b");
+		assertUnreasonable("a/./b");
+		assertUnreasonable("a//b");
+
+		if (new File("/foo").isAbsolute())
+			assertUnreasonable("/foo");
+
+		if (new File("//server/share").isAbsolute())
+			assertUnreasonable("//server/share");
+
+		if (new File("C:/windows").isAbsolute())
+			assertUnreasonable("C:/windows");
+	}
+

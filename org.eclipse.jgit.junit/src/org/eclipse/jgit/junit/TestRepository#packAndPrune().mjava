@@ -1,0 +1,43 @@
+	/**
+	 * Pack all reachable objects in the repository into a single pack file.
+	 * <p>
+	 * All loose objects are automatically pruned. Existing packs however are
+	 * not removed.
+	 *
+	 * @throws Exception
+	 */
+	public void packAndPrune() throws Exception {
+		final ObjectDirectory odb = (ObjectDirectory) db.getObjectDatabase();
+		final PackWriter pw = new PackWriter(db, NullProgressMonitor.INSTANCE);
+
+		Set<ObjectId> all = new HashSet<ObjectId>();
+		for (Ref r : db.getAllRefs().values())
+			all.add(r.getObjectId());
+		pw.preparePack(all, Collections.<ObjectId> emptySet());
+
+		final ObjectId name = pw.computeName();
+		FileOutputStream out;
+
+		final File pack = nameFor(odb, name, ".pack");
+		out = new FileOutputStream(pack);
+		try {
+			pw.writePack(out);
+		} finally {
+			out.close();
+		}
+		pack.setReadOnly();
+
+		final File idx = nameFor(odb, name, ".idx");
+		out = new FileOutputStream(idx);
+		try {
+			pw.writeIndex(out);
+		} finally {
+			out.close();
+		}
+		idx.setReadOnly();
+
+		odb.openPack(pack, idx);
+		updateServerInfo();
+		prunePacked(odb);
+	}
+

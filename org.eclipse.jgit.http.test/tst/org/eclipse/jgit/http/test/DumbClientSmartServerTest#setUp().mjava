@@ -1,0 +1,33 @@
+	protected void setUp() throws Exception {
+		super.setUp();
+
+		final TestRepository src = createTestRepository();
+		final String srcName = src.getRepository().getDirectory().getName();
+
+		ServletContextHandler app = server.addContext("/git");
+		GitServlet gs = new GitServlet();
+		gs.setRepositoryResolver(new RepositoryResolver() {
+			public Repository open(HttpServletRequest req, String name)
+					throws RepositoryNotFoundException,
+					ServiceNotEnabledException {
+				if (!name.equals(srcName))
+					throw new RepositoryNotFoundException(name);
+
+				final Repository db = src.getRepository();
+				db.incrementOpen();
+				return db;
+			}
+		});
+		app.addServlet(new ServletHolder(gs), "/*");
+
+		server.setUp();
+
+		remoteRepository = src.getRepository();
+		remoteURI = toURIish(app, srcName);
+
+		A_txt = src.blob("A");
+		A = src.commit().add("A_txt", A_txt).create();
+		B = src.commit().parent(A).add("A_txt", "C").add("B", "B").create();
+		src.update(master, B);
+	}
+

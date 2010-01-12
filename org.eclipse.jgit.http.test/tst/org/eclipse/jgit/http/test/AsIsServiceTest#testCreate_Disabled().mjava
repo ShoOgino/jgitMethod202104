@@ -1,0 +1,18 @@
+	public void testCreate_Disabled() throws ServiceNotAuthorizedException {
+		db.getConfig().setBoolean("http", null, "getanyfile", false);
+
+		try {
+			service.access(new R(null, "1.2.3.4"), db);
+			fail("Created session for anonymous user: null");
+		} catch (ServiceNotEnabledException e) {
+			// expected not authorized
+		}
+
+		try {
+			service.access(new R("bob", "1.2.3.4"), db);
+			fail("Created session for user: \"bob\"");
+		} catch (ServiceNotEnabledException e) {
+			// expected not authorized
+		}
+	}
+

@@ -1,0 +1,11 @@
+	protected static Set<RefSpec> mirror(String... refs) {
+		HashSet<RefSpec> r = new HashSet<RefSpec>();
+		for (String name : refs) {
+			RefSpec rs = new RefSpec(name);
+			rs = rs.setDestination(name);
+			rs = rs.setForceUpdate(true);
+			r.add(rs);
+		}
+		return r;
+	}
+

@@ -1,0 +1,19 @@
+	public void testNotAGitRepository() throws IOException,
+			ServiceNotEnabledException {
+		final Repository a = createBareRepository();
+		final String name = a.getDirectory().getName() + "-not-a-git";
+		final File base = a.getDirectory().getParentFile();
+		FileResolver resolver = new FileResolver(base, false);
+
+		try {
+			resolver.open(null, name);
+		} catch (RepositoryNotFoundException e) {
+			assertEquals("repository not found: " + name, e.getMessage());
+
+			Throwable why = e.getCause();
+			assertNotNull("has cause", why);
+			assertEquals("repository not found: "
+					+ new File(base, name).getAbsolutePath(), why.getMessage());
+		}
+	}
+

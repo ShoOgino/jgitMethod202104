@@ -1,0 +1,14 @@
+	public void testCreate_Enabled() throws ServiceNotEnabledException,
+			ServiceNotAuthorizedException {
+		db.getConfig().setBoolean("http", null, "uploadpack", true);
+		UploadPack up;
+
+		up = factory.create(new R(null, "1.2.3.4"), db);
+		assertNotNull("have UploadPack", up);
+		assertSame(db, up.getRepository());
+
+		up = factory.create(new R("bob", "1.2.3.4"), db);
+		assertNotNull("have UploadPack", up);
+		assertSame(db, up.getRepository());
+	}
+

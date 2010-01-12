@@ -1,0 +1,9 @@
+	public void testCreate_NullUser() throws ServiceNotEnabledException {
+		try {
+			factory.create(new R(null, "localhost"), db);
+			fail("Created session for anonymous user: null");
+		} catch (ServiceNotAuthorizedException e) {
+			// expected not authorized
+		}
+	}
+

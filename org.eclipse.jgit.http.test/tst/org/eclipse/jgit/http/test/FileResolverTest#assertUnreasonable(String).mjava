@@ -1,0 +1,12 @@
+	private void assertUnreasonable(String name)
+			throws ServiceNotEnabledException {
+		FileResolver r = new FileResolver(new File("."), false);
+		try {
+			r.open(null, name);
+			fail("Opened unreasonable name \"" + name + "\"");
+		} catch (RepositoryNotFoundException e) {
+			assertEquals("repository not found: " + name, e.getMessage());
+			assertNull("has no cause", e.getCause());
+		}
+	}
+

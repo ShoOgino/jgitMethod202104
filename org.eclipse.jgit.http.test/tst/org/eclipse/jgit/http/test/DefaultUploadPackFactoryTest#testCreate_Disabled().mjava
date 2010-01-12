@@ -1,0 +1,18 @@
+	public void testCreate_Disabled() throws ServiceNotAuthorizedException {
+		db.getConfig().setBoolean("http", null, "uploadpack", false);
+
+		try {
+			factory.create(new R(null, "localhost"), db);
+			fail("Created session for anonymous user: null");
+		} catch (ServiceNotEnabledException e) {
+			// expected not authorized
+		}
+
+		try {
+			factory.create(new R("bob", "localhost"), db);
+			fail("Created session for user: \"bob\"");
+		} catch (ServiceNotEnabledException e) {
+			// expected not authorized
+		}
+	}
+

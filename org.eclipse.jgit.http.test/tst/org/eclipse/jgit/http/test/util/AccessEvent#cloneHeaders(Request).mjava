@@ -1,0 +1,12 @@
+	private static Map<String, String> cloneHeaders(final Request req) {
+		Map<String, String> r = new TreeMap<String, String>();
+		Enumeration hn = req.getHeaderNames();
+		while (hn.hasMoreElements()) {
+			String key = (String) hn.nextElement();
+			if (!r.containsKey(key)) {
+				r.put(key, req.getHeader(key));
+			}
+		}
+		return Collections.unmodifiableMap(r);
+	}
+

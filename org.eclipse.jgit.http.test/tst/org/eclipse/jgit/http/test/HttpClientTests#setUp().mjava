@@ -1,0 +1,22 @@
+	protected void setUp() throws Exception {
+		super.setUp();
+
+		remoteRepository = createTestRepository();
+		remoteRepository.update(master, remoteRepository.commit().create());
+
+		ServletContextHandler dNone = dumb("/dnone");
+		ServletContextHandler dBasic = server.authBasic(dumb("/dbasic"));
+
+		ServletContextHandler sNone = smart("/snone");
+		ServletContextHandler sBasic = server.authBasic(smart("/sbasic"));
+
+		server.setUp();
+
+		final String srcName = nameOf(remoteRepository);
+		dumbAuthNoneURI = toURIish(dNone, srcName);
+		dumbAuthBasicURI = toURIish(dBasic, srcName);
+
+		smartAuthNoneURI = toURIish(sNone, srcName);
+		smartAuthBasicURI = toURIish(sBasic, srcName);
+	}
+

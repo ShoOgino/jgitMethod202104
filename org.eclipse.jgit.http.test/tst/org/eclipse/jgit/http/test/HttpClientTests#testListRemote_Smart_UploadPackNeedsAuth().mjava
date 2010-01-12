@@ -1,0 +1,17 @@
+	public void testListRemote_Smart_UploadPackNeedsAuth() throws Exception {
+		Repository dst = createBareRepository();
+		Transport t = Transport.open(dst, smartAuthBasicURI);
+		try {
+			try {
+				t.openFetch();
+				fail("connection opened even though service disabled");
+			} catch (TransportException err) {
+				String status = "401 Unauthorized";
+				String exp = smartAuthBasicURI + ": " + status;
+				assertEquals(exp, err.getMessage());
+			}
+		} finally {
+			t.close();
+		}
+	}
+

@@ -10,6 +10,10 @@
 					readSmartHeaders(in, service);
 					return new SmartHttpPushConnection(in);
 
+				} else if (!useSmartHttp) {
+					final String msg = "smart HTTP push disabled";
+					throw new NotSupportedException(msg);
+
 				} else {
 					final String msg = "remote does not support smart HTTP push";
 					throw new NotSupportedException(msg);

@@ -1,0 +1,13 @@
+	public void testInitUnderContainer_WithBasePath() throws Exception {
+		server = new AppServer();
+
+		ServletContextHandler app = server.addContext("/");
+		ServletHolder s = app.addServlet(GitServlet.class, "/git");
+		s.setInitOrder(1);
+		s.setInitParameter("base-path", ".");
+		s.setInitParameter("export-all", "true");
+
+		server.setUp();
+		assertTrue("no warnings", RecordingLogger.getWarnings().isEmpty());
+	}
+

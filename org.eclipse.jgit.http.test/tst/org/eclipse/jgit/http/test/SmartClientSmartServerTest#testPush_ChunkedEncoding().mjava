@@ -1,0 +1,58 @@
+	public void testPush_ChunkedEncoding() throws Exception {
+		final TestRepository src = createTestRepository();
+		final RevBlob Q_bin = src.blob(new TestRng("Q").nextBytes(128 * 1024));
+		final RevCommit Q = src.commit().add("Q", Q_bin).create();
+		final Repository db = src.getRepository();
+		final String dstName = Constants.R_HEADS + "new.branch";
+		Transport t;
+
+		enableReceivePack();
+
+		db.getConfig().setInt("core", null, "compression", 0);
+		db.getConfig().setInt("http", null, "postbuffer", 8 * 1024);
+		db.getConfig().save();
+
+		t = Transport.open(db, remoteURI);
+		try {
+			final String srcExpr = Q.name();
+			final boolean forceUpdate = false;
+			final String localName = null;
+			final ObjectId oldId = null;
+
+			RemoteRefUpdate u = new RemoteRefUpdate(src.getRepository(),
+					srcExpr, dstName, forceUpdate, localName, oldId);
+			t.push(NullProgressMonitor.INSTANCE, Collections.singleton(u));
+		} finally {
+			t.close();
+		}
+
+		assertTrue(remoteRepository.hasObject(Q_bin));
+		assertNotNull("has " + dstName, remoteRepository.getRef(dstName));
+		assertEquals(Q, remoteRepository.getRef(dstName).getObjectId());
+		fsck(remoteRepository, Q);
+
+		List<AccessEvent> requests = getRequests();
+		assertEquals(2, requests.size());
+
+		AccessEvent info = requests.get(0);
+		assertEquals("GET", info.getMethod());
+		assertEquals(join(remoteURI, "info/refs"), info.getPath());
+		assertEquals(1, info.getParameters().size());
+		assertEquals("git-receive-pack", info.getParameter("service"));
+		assertEquals(200, info.getStatus());
+		assertEquals("application/x-git-receive-pack-advertisement", info
+				.getResponseHeader(HDR_CONTENT_TYPE));
+
+		AccessEvent service = requests.get(1);
+		assertEquals("POST", service.getMethod());
+		assertEquals(join(remoteURI, "git-receive-pack"), service.getPath());
+		assertEquals(0, service.getParameters().size());
+		assertNull("no content-length", service
+				.getRequestHeader(HDR_CONTENT_LENGTH));
+		assertEquals("chunked", service.getRequestHeader(HDR_TRANSFER_ENCODING));
+
+		assertEquals(200, service.getStatus());
+		assertEquals("application/x-git-receive-pack-result", service
+				.getResponseHeader(HDR_CONTENT_TYPE));
+	}
+

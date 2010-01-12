@@ -1,0 +1,20 @@
+	private ServletContextHandler smart(final String path) {
+		GitServlet gs = new GitServlet();
+		gs.setRepositoryResolver(new RepositoryResolver() {
+			public Repository open(HttpServletRequest req, String name)
+					throws RepositoryNotFoundException,
+					ServiceNotEnabledException {
+				if (!name.equals(nameOf(remoteRepository)))
+					throw new RepositoryNotFoundException(name);
+
+				final Repository db = remoteRepository.getRepository();
+				db.incrementOpen();
+				return db;
+			}
+		});
+
+		ServletContextHandler ctx = server.addContext(path);
+		ctx.addServlet(new ServletHolder(gs), "/*");
+		return ctx;
+	}
+

@@ -1,0 +1,10 @@
+	public void testDefaultConstructor_NoBasePath() throws Exception {
+		GitServlet s = new GitServlet();
+		try {
+			s.init(new MockServletConfig());
+			fail("Init did not crash due to missing parameter");
+		} catch (ServletException e) {
+			assertTrue(e.getMessage().contains("base-path"));
+		}
+	}
+

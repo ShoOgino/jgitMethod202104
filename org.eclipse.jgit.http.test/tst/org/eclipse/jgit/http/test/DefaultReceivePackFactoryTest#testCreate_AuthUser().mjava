@@ -1,0 +1,17 @@
+	public void testCreate_AuthUser() throws ServiceNotEnabledException,
+			ServiceNotAuthorizedException {
+		ReceivePack rp;
+		rp = factory.create(new R("bob", "1.2.3.4"), db);
+		assertNotNull("have ReceivePack", rp);
+		assertSame(db, rp.getRepository());
+
+		PersonIdent id = rp.getRefLogIdent();
+		assertNotNull(id);
+		assertEquals("bob", id.getName());
+		assertEquals("bob@1.2.3.4", id.getEmailAddress());
+
+		// Should have inherited off the current system, which is mocked
+		assertEquals(author.getTimeZoneOffset(), id.getTimeZoneOffset());
+		assertEquals(author.getWhen(), id.getWhen());
+	}
+

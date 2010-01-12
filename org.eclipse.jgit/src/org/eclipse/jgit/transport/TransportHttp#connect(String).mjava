@@ -9,9 +9,11 @@
 				b.append('/');
 			b.append(Constants.INFO_REFS);
 
-			b.append(b.indexOf("?") < 0 ? '?' : '&');
-			b.append("service=");
-			b.append(service);
+			if (useSmartHttp) {
+				b.append(b.indexOf("?") < 0 ? '?' : '&');
+				b.append("service=");
+				b.append(service);
+			}
 
 			u = new URL(b.toString());
 		} catch (MalformedURLException e) {
@@ -20,8 +22,12 @@
 
 		try {
 			final HttpURLConnection conn = httpOpen(u);
-			String expType = "application/x-" + service + "-advertisement";
-			conn.setRequestProperty(HDR_ACCEPT, expType + ", */*");
+			if (useSmartHttp) {
+				String expType = "application/x-" + service + "-advertisement";
+				conn.setRequestProperty(HDR_ACCEPT, expType + ", */*");
+			} else {
+				conn.setRequestProperty(HDR_ACCEPT, "*/*");
+			}
 			final int status = HttpSupport.response(conn);
 			switch (status) {
 			case HttpURLConnection.HTTP_OK:

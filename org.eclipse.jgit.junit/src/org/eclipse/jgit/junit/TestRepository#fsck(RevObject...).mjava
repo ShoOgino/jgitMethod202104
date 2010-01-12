@@ -1,0 +1,46 @@
+	/**
+	 * Run consistency checks against the object database.
+	 * <p>
+	 * This method completes silently if the checks pass. A temporary revision
+	 * pool is constructed during the checking.
+	 *
+	 * @param tips
+	 *            the tips to start checking from; if not supplied the refs of
+	 *            the repository are used instead.
+	 * @throws MissingObjectException
+	 * @throws IncorrectObjectTypeException
+	 * @throws IOException
+	 */
+	public void fsck(RevObject... tips) throws MissingObjectException,
+			IncorrectObjectTypeException, IOException {
+		ObjectWalk ow = new ObjectWalk(db);
+		if (tips.length != 0) {
+			for (RevObject o : tips)
+				ow.markStart(ow.parseAny(o));
+		} else {
+			for (Ref r : db.getAllRefs().values())
+				ow.markStart(ow.parseAny(r.getObjectId()));
+		}
+
+		ObjectChecker oc = new ObjectChecker();
+		for (;;) {
+			final RevCommit o = ow.next();
+			if (o == null)
+				break;
+
+			final byte[] bin = db.openObject(o).getCachedBytes();
+			oc.checkCommit(bin);
+			assertHash(o, bin);
+		}
+
+		for (;;) {
+			final RevObject o = ow.nextObject();
+			if (o == null)
+				break;
+
+			final byte[] bin = db.openObject(o).getCachedBytes();
+			oc.check(o.getType(), bin);
+			assertHash(o, bin);
+		}
+	}
+

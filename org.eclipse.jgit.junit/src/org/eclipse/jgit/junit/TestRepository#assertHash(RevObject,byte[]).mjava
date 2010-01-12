@@ -1,0 +1,10 @@
+	private static void assertHash(RevObject id, byte[] bin) {
+		MessageDigest md = Constants.newMessageDigest();
+		md.update(Constants.encodedTypeString(id.getType()));
+		md.update((byte) ' ');
+		md.update(Constants.encodeASCII(bin.length));
+		md.update((byte) 0);
+		md.update(bin);
+		Assert.assertEquals(id.copy(), ObjectId.fromRaw(md.digest()));
+	}
+

@@ -1,0 +1,35 @@
+	public void testInitialClone_Packed() throws Exception {
+		new TestRepository(remoteRepository).packAndPrune();
+
+		Repository dst = createBareRepository();
+		assertFalse(dst.hasObject(A_txt));
+
+		Transport t = Transport.open(dst, remoteURI);
+		((TransportHttp) t).setUseSmartHttp(false);
+		try {
+			t.fetch(NullProgressMonitor.INSTANCE, mirror(master));
+		} finally {
+			t.close();
+		}
+
+		assertTrue(dst.hasObject(A_txt));
+		assertEquals(B, dst.getRef(master).getObjectId());
+		fsck(dst, B);
+
+		List<AccessEvent> req;
+
+		req = getRequests(loose(remoteURI, B));
+		assertEquals(1, req.size());
+		assertEquals("GET", req.get(0).getMethod());
+		assertEquals(0, req.get(0).getParameters().size());
+		assertEquals(404, req.get(0).getStatus());
+
+		req = getRequests(join(remoteURI, "objects/info/packs"));
+		assertEquals(1, req.size());
+		assertEquals("GET", req.get(0).getMethod());
+		assertEquals(0, req.get(0).getParameters().size());
+		assertEquals(200, req.get(0).getStatus());
+		assertEquals("text/plain;charset=UTF-8", req.get(0).getResponseHeader(
+				HDR_CONTENT_TYPE));
+	}
+

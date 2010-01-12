@@ -1,0 +1,12 @@
+	protected void setUp() throws Exception {
+		super.setUp();
+
+		server = new AppServer();
+
+		ServletContextHandler ctx = server.addContext("/");
+		ctx.addServlet(new ServletHolder(new ErrorServlet(404)), "/404");
+		ctx.addServlet(new ServletHolder(new ErrorServlet(500)), "/500");
+
+		server.setUp();
+	}
+

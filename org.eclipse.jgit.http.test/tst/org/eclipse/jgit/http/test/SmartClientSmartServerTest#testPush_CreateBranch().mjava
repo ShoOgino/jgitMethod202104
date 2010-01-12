@@ -1,0 +1,72 @@
+	public void testPush_CreateBranch() throws Exception {
+		final TestRepository src = createTestRepository();
+		final RevBlob Q_txt = src.blob("new text");
+		final RevCommit Q = src.commit().add("Q", Q_txt).create();
+		final Repository db = src.getRepository();
+		final String dstName = Constants.R_HEADS + "new.branch";
+		Transport t;
+
+		enableReceivePack();
+
+		t = Transport.open(db, remoteURI);
+		try {
+			final String srcExpr = Q.name();
+			final boolean forceUpdate = false;
+			final String localName = null;
+			final ObjectId oldId = null;
+
+			RemoteRefUpdate u = new RemoteRefUpdate(src.getRepository(),
+					srcExpr, dstName, forceUpdate, localName, oldId);
+			t.push(NullProgressMonitor.INSTANCE, Collections.singleton(u));
+		} finally {
+			t.close();
+		}
+
+		assertTrue(remoteRepository.hasObject(Q_txt));
+		assertNotNull("has " + dstName, remoteRepository.getRef(dstName));
+		assertEquals(Q, remoteRepository.getRef(dstName).getObjectId());
+		fsck(remoteRepository, Q);
+
+		final ReflogReader log = remoteRepository.getReflogReader(dstName);
+		assertNotNull("has log for " + dstName);
+
+		final ReflogReader.Entry last = log.getLastEntry();
+		assertNotNull("has last entry", last);
+		assertEquals(ObjectId.zeroId(), last.getOldId());
+		assertEquals(Q, last.getNewId());
+		assertEquals("anonymous", last.getWho().getName());
+
+		// Assumption: The host name we use to contact the server should
+		// be the server's own host name, because it should be the loopback
+		// network interface.
+		//
+		final String clientHost = remoteURI.getHost();
+		assertEquals("anonymous@" + clientHost, last.getWho().getEmailAddress());
+		assertEquals("push: created", last.getComment());
+
+		List<AccessEvent> requests = getRequests();
+		assertEquals(2, requests.size());
+
+		AccessEvent info = requests.get(0);
+		assertEquals("GET", info.getMethod());
+		assertEquals(join(remoteURI, "info/refs"), info.getPath());
+		assertEquals(1, info.getParameters().size());
+		assertEquals("git-receive-pack", info.getParameter("service"));
+		assertEquals(200, info.getStatus());
+		assertEquals("application/x-git-receive-pack-advertisement", info
+				.getResponseHeader(HDR_CONTENT_TYPE));
+
+		AccessEvent service = requests.get(1);
+		assertEquals("POST", service.getMethod());
+		assertEquals(join(remoteURI, "git-receive-pack"), service.getPath());
+		assertEquals(0, service.getParameters().size());
+		assertNotNull("has content-length", service
+				.getRequestHeader(HDR_CONTENT_LENGTH));
+		assertNull("not chunked", service
+				.getRequestHeader(HDR_TRANSFER_ENCODING));
+
+		assertEquals(200, service.getStatus());
+		assertEquals("application/x-git-receive-pack-result", service
+				.getResponseHeader(HDR_CONTENT_TYPE));
+	}
+
