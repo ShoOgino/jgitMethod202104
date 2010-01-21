@@ -1,0 +1,30 @@
+	/**
+	 * The constructor
+	 *
+	 * @param wrapped
+	 *            the wrapped database
+	 */
+	public CachedObjectDirectory(ObjectDirectory wrapped) {
+		super(wrapped);
+		File objects = wrapped.getDirectory();
+		String[] fanout = objects.list();
+		if (fanout == null)
+			fanout = new String[0];
+		for (String d : fanout) {
+			if (d.length() != 2)
+				continue;
+			String[] entries = new File(objects, d).list();
+			if (entries == null)
+				continue;
+			for (String e : entries) {
+				if (e.length() != Constants.OBJECT_ID_STRING_LENGTH - 2)
+					continue;
+				try {
+					unpackedObjects.add(ObjectId.fromString(d + e));
+				} catch (IllegalArgumentException notAnObject) {
+					// ignoring the file that does not represent loose object
+				}
+			}
+		}
+	}
+
