@@ -1,0 +1,14 @@
+	@Override
+	protected boolean tryLock() throws IOException {
+		Ref dst = getRef().getLeaf();
+		String name = dst.getName();
+		lock = new LockFile(database.fileFor(name));
+		if (lock.lock()) {
+			dst = database.getRef(name);
+			setOldObjectId(dst != null ? dst.getObjectId() : null);
+			return true;
+		} else {
+			return false;
+		}
+	}
+

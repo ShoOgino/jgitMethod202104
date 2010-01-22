@@ -1,5 +1,5 @@
 	/**
-	 * Peel a possibly unpeeled ref and updates it.
+	 * Peel a possibly unpeeled reference to an annotated tag.
 	 * <p>
 	 * If the ref cannot be peeled (as it does not refer to an annotated tag)
 	 * the peeled id stays null, but {@link Ref#isPeeled()} will be true.
@@ -12,6 +12,13 @@
 	 *         (or null).
 	 */
 	public Ref peel(final Ref ref) {
-		return refs.peel(ref);
+		try {
+			return refs.peel(ref);
+		} catch (IOException e) {
+			// Historical accident; if the reference cannot be peeled due
+			// to some sort of repository access problem we claim that the
+			// same as if the reference was not an annotated tag.
+			return ref;
+		}
 	}
 

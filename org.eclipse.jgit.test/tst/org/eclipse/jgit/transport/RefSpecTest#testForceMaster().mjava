@@ -8,12 +8,12 @@
 		assertEquals("+" + sn, rs.toString());
 		assertEquals(rs, new RefSpec(rs.toString()));
 
-		Ref r = new Ref(Ref.Storage.LOOSE, sn, null);
+		Ref r = new ObjectIdRef.Unpeeled(Ref.Storage.LOOSE, sn, null);
 		assertTrue(rs.matchSource(r));
 		assertFalse(rs.matchDestination(r));
 		assertSame(rs, rs.expandFromSource(r));
 
-		r = new Ref(Ref.Storage.LOOSE, sn + "-and-more", null);
+		r = new ObjectIdRef.Unpeeled(Ref.Storage.LOOSE, sn + "-and-more", null);
 		assertFalse(rs.matchSource(r));
 		assertFalse(rs.matchDestination(r));
 	}

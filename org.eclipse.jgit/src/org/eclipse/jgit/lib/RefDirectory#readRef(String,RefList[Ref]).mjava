@@ -1,0 +1,27 @@
+	private Ref readRef(String name, RefList<Ref> packed) throws IOException {
+		final RefList<LooseRef> curList = looseRefs.get();
+		final int idx = curList.find(name);
+		if (0 <= idx) {
+			final LooseRef o = curList.get(idx);
+			final LooseRef n = scanRef(o, name);
+			if (n == null) {
+				if (looseRefs.compareAndSet(curList, curList.remove(idx)))
+					modCnt.incrementAndGet();
+				return packed.get(name);
+			}
+
+			if (o == n)
+				return n;
+			if (looseRefs.compareAndSet(curList, curList.set(idx, n)))
+				modCnt.incrementAndGet();
+			return n;
+		}
+
+		final LooseRef n = scanRef(null, name);
+		if (n == null)
+			return packed.get(name);
+		if (looseRefs.compareAndSet(curList, curList.add(idx, n)))
+			modCnt.incrementAndGet();
+		return n;
+	}
+

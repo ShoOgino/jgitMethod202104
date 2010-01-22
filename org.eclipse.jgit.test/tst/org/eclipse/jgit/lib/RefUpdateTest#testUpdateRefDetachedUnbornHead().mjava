@@ -14,7 +14,7 @@
 		assertEquals(ppid, db.resolve("HEAD"));
 		Ref ref = db.getRef("HEAD");
 		assertEquals("HEAD", ref.getName());
-		assertEquals("HEAD", ref.getOrigName());
+		assertTrue("is detached", !ref.isSymbolic());
 
 		// the branch HEAD referred to is left untouched
 		assertNull(db.resolve("refs/heads/unborn"));

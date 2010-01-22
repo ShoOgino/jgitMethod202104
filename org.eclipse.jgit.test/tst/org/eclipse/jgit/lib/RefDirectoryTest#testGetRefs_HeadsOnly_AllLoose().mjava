@@ -1,0 +1,21 @@
+	public void testGetRefs_HeadsOnly_AllLoose() throws IOException {
+		Map<String, Ref> heads;
+		Ref a, b;
+
+		writeLooseRef("refs/heads/A", A);
+		writeLooseRef("refs/heads/B", B);
+		writeLooseRef("refs/tags/v1.0", v1_0);
+
+		heads = refdir.getRefs(R_HEADS);
+		assertEquals(2, heads.size());
+
+		a = heads.get("A");
+		b = heads.get("B");
+
+		assertEquals("refs/heads/A", a.getName());
+		assertEquals("refs/heads/B", b.getName());
+
+		assertEquals(A, a.getObjectId());
+		assertEquals(B, b.getObjectId());
+	}
+

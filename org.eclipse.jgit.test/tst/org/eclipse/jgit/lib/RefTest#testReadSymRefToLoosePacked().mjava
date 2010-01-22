@@ -8,6 +8,9 @@
 
 		db.writeSymref("HEAD", "refs/heads/master");
 		Ref ref = db.getRef("HEAD");
-		assertEquals(Ref.Storage.LOOSE_PACKED, ref.getStorage());
+		assertEquals(Ref.Storage.LOOSE, ref.getStorage());
+		ref = ref.getTarget();
+		assertEquals("refs/heads/master", ref.getName());
+		assertEquals(Ref.Storage.LOOSE, ref.getStorage());
 	}
 

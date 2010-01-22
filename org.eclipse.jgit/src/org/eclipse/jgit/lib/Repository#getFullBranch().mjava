@@ -1,18 +1,27 @@
 	/**
-	 * @return name of current branch
+	 * Get the name of the reference that {@code HEAD} points to.
+	 * <p>
+	 * This is essentially the same as doing:
+	 *
+	 * <pre>
+	 * return getRef(Constants.HEAD).getTarget().getName()
+	 * </pre>
+	 *
+	 * Except when HEAD is detached, in which case this method returns the
+	 * current ObjectId in hexadecimal string format.
+	 *
+	 * @return name of current branch (for example {@code refs/heads/master}) or
+	 *         an ObjectId in hex format if the current branch is detached.
 	 * @throws IOException
 	 */
 	public String getFullBranch() throws IOException {
-		final File ptr = new File(getDirectory(),Constants.HEAD);
-		final BufferedReader br = new BufferedReader(new FileReader(ptr));
-		String ref;
-		try {
-			ref = br.readLine();
-		} finally {
-			br.close();
-		}
-		if (ref.startsWith("ref: "))
-			ref = ref.substring(5);
-		return ref;
+		Ref head = getRef(Constants.HEAD);
+		if (head == null)
+			return null;
+		if (head.isSymbolic())
+			return head.getTarget().getName();
+		if (head.getObjectId() != null)
+			return head.getObjectId().name();
+		return null;
 	}
 

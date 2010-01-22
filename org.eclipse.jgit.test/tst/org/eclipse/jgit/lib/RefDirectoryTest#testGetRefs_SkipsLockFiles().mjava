@@ -1,0 +1,14 @@
+	public void testGetRefs_SkipsLockFiles() throws IOException {
+		Map<String, Ref> all;
+
+		writeLooseRef("refs/heads/master", A);
+		writeLooseRef("refs/heads/pu.lock", B);
+		all = refdir.getRefs(RefDatabase.ALL);
+
+		assertEquals(2, all.size());
+
+		assertTrue(all.containsKey(HEAD));
+		assertTrue(all.containsKey("refs/heads/master"));
+		assertFalse(all.containsKey("refs/heads/pu.lock"));
+	}
+

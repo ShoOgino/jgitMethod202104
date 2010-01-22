@@ -24,16 +24,15 @@
 				if (r == null)
 					r = readRef(avail, target);
 				if (r == null)
-					return null;
-				r = new Ref(r.getStorage(), rn, r.getObjectId(), r
-						.getPeeledObjectId(), r.isPeeled());
+					r = new ObjectIdRef.Unpeeled(Ref.Storage.NEW, target, null);
+				r = new SymbolicRef(rn, r);
 				avail.put(r.getName(), r);
 				return r;
 			}
 
 			if (ObjectId.isId(s)) {
-				final Ref r = new Ref(loose(avail.get(rn)), rn, ObjectId
-						.fromString(s));
+				final Ref r = new ObjectIdRef.Unpeeled(loose(avail.get(rn)),
+						rn, ObjectId.fromString(s));
 				avail.put(r.getName(), r);
 				return r;
 			}

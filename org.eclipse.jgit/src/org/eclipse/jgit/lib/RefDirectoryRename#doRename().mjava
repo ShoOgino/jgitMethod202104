@@ -1,0 +1,93 @@
+	@Override
+	protected Result doRename() throws IOException {
+		if (source.getRef().isSymbolic())
+			return Result.IO_FAILURE; // not supported
+
+		final RevWalk rw = new RevWalk(refdb.getRepository());
+		objId = source.getOldObjectId();
+		updateHEAD = needToUpdateHEAD();
+		tmp = refdb.newTemporaryUpdate();
+		try {
+			// First backup the source so its never unreachable.
+			tmp.setNewObjectId(objId);
+			tmp.setForceUpdate(true);
+			tmp.disableRefLog();
+			switch (tmp.update(rw)) {
+			case NEW:
+			case FORCED:
+			case NO_CHANGE:
+				break;
+			default:
+				return tmp.getResult();
+			}
+
+			// Save the source's log under the temporary name, we must do
+			// this before we delete the source, otherwise we lose the log.
+			if (!renameLog(source, tmp))
+				return Result.IO_FAILURE;
+
+			// If HEAD has to be updated, link it now to destination.
+			// We have to link before we delete, otherwise the delete
+			// fails because its the current branch.
+			RefUpdate dst = destination;
+			if (updateHEAD) {
+				if (!linkHEAD(destination)) {
+					renameLog(tmp, source);
+					return Result.LOCK_FAILURE;
+				}
+
+				// Replace the update operation so HEAD will log the rename.
+				dst = refdb.newUpdate(Constants.HEAD, false);
+				dst.setRefLogIdent(destination.getRefLogIdent());
+				dst.setRefLogMessage(destination.getRefLogMessage(), false);
+			}
+
+			// Delete the source name so its path is free for replacement.
+			source.setExpectedOldObjectId(objId);
+			source.setForceUpdate(true);
+			source.disableRefLog();
+			if (source.delete(rw) != Result.FORCED) {
+				renameLog(tmp, source);
+				if (updateHEAD)
+					linkHEAD(source);
+				return source.getResult();
+			}
+
+			// Move the log to the destination.
+			if (!renameLog(tmp, destination)) {
+				renameLog(tmp, source);
+				source.setExpectedOldObjectId(ObjectId.zeroId());
+				source.setNewObjectId(objId);
+				source.update(rw);
+				if (updateHEAD)
+					linkHEAD(source);
+				return Result.IO_FAILURE;
+			}
+
+			// Create the destination, logging the rename during the creation.
+			dst.setExpectedOldObjectId(ObjectId.zeroId());
+			dst.setNewObjectId(objId);
+			if (dst.update(rw) != Result.NEW) {
+				// If we didn't create the destination we have to undo
+				// our work. Put the log back and restore source.
+				if (renameLog(destination, tmp))
+					renameLog(tmp, source);
+				source.setExpectedOldObjectId(ObjectId.zeroId());
+				source.setNewObjectId(objId);
+				source.update(rw);
+				if (updateHEAD)
+					linkHEAD(source);
+				return dst.getResult();
+			}
+
+			return Result.RENAMED;
+		} finally {
+			// Always try to free the temporary name.
+			try {
+				refdb.delete(tmp);
+			} catch (IOException err) {
+				refdb.fileFor(tmp.getName()).delete();
+			}
+		}
+	}
+

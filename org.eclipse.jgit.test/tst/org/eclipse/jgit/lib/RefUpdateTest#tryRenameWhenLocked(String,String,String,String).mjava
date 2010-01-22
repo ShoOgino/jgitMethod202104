@@ -4,7 +4,7 @@
 		db.writeSymref(Constants.HEAD, headPointsTo);
 		ObjectId oldfromId = db.resolve(fromName);
 		ObjectId oldHeadId = db.resolve(Constants.HEAD);
-		RefLogWriter.writeReflog(db, oldfromId, oldfromId, "Just a message",
+		writeReflog(db, oldfromId, oldfromId, "Just a message",
 				fromName);
 		List<org.eclipse.jgit.lib.ReflogReader.Entry> oldFromLog = db
 				.getReflogReader(fromName).getReverseEntries();
@@ -38,8 +38,8 @@
 			assertEquals(oldFromLog.toString(), db.getReflogReader(fromName)
 					.getReverseEntries().toString());
 			if (oldHeadId != null)
-				assertEquals(oldHeadLog, db.getReflogReader(Constants.HEAD)
-						.getReverseEntries());
+				assertEquals(oldHeadLog.toString(), db.getReflogReader(
+						Constants.HEAD).getReverseEntries().toString());
 		} finally {
 			lockFile.unlock();
 		}

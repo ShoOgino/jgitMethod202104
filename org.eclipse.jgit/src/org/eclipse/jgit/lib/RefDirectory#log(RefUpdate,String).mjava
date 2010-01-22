@@ -1,0 +1,27 @@
+	void log(final RefUpdate update, final String msg) throws IOException {
+		final ObjectId oldId = update.getOldObjectId();
+		final ObjectId newId = update.getNewObjectId();
+		final Ref ref = update.getRef();
+
+		PersonIdent ident = update.getRefLogIdent();
+		if (ident == null)
+			ident = new PersonIdent(parent);
+		else
+			ident = new PersonIdent(ident);
+
+		final StringBuilder r = new StringBuilder();
+		r.append(ObjectId.toString(oldId));
+		r.append(' ');
+		r.append(ObjectId.toString(newId));
+		r.append(' ');
+		r.append(ident.toExternalString());
+		r.append('\t');
+		r.append(msg);
+		r.append('\n');
+		final byte[] rec = encode(r.toString());
+
+		if (ref.isSymbolic())
+			log(ref.getName(), rec);
+		log(ref.getLeaf().getName(), rec);
+	}
+

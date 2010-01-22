@@ -1,0 +1,30 @@
+	private void log(final String refName, final byte[] rec) throws IOException {
+		final File log = logFor(refName);
+		final boolean write;
+		if (isLogAllRefUpdates() && shouldAutoCreateLog(refName))
+			write = true;
+		else if (log.isFile())
+			write = true;
+		else
+			write = false;
+
+		if (write) {
+			FileOutputStream out;
+			try {
+				out = new FileOutputStream(log, true);
+			} catch (FileNotFoundException err) {
+				final File dir = log.getParentFile();
+				if (dir.exists())
+					throw err;
+				if (!dir.mkdirs() && !dir.isDirectory())
+					throw new IOException("Cannot create directory " + dir);
+				out = new FileOutputStream(log, true);
+			}
+			try {
+				out.write(rec);
+			} finally {
+				out.close();
+			}
+		}
+	}
+

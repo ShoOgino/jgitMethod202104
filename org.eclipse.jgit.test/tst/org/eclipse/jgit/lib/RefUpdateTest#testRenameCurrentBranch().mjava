@@ -3,8 +3,8 @@
 		db.writeSymref(Constants.HEAD, "refs/heads/b");
 		ObjectId oldHead = db.resolve(Constants.HEAD);
 		assertTrue("internal test condition, b == HEAD", rb.equals(oldHead));
-		RefLogWriter.writeReflog(db, rb, rb, "Just a message", "refs/heads/b");
-		assertTrue("no log on old branch", new File(db.getDirectory(),
+		writeReflog(db, rb, rb, "Just a message", "refs/heads/b");
+		assertTrue("log on old branch", new File(db.getDirectory(),
 				"logs/refs/heads/b").exists());
 		RefRename renameRef = db.renameRef("refs/heads/b",
 				"refs/heads/new/name");

@@ -1,0 +1,17 @@
+	public void testGetRefs_DeeplyNestedBranch() throws IOException {
+		String name = "refs/heads/a/b/c/d/e/f/g/h/i/j/k";
+		Map<String, Ref> all;
+		Ref r;
+
+		writeLooseRef(name, A);
+
+		all = refdir.getRefs(RefDatabase.ALL);
+		assertEquals(1, all.size());
+
+		r = all.get(name);
+		assertEquals(name, r.getName());
+		assertFalse(r.isSymbolic());
+		assertSame(LOOSE, r.getStorage());
+		assertEquals(A, r.getObjectId());
+	}
+

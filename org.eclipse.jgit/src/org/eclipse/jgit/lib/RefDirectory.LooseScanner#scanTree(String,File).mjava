@@ -1,0 +1,14 @@
+		private void scanTree(String prefix, File dir) {
+			final String[] entries = dir.list(LockFile.FILTER);
+			if (entries != null && 0 < entries.length) {
+				Arrays.sort(entries);
+				for (String name : entries) {
+					File e = new File(dir, name);
+					if (e.isDirectory())
+						scanTree(prefix + name + '/', e);
+					else
+						scanOne(prefix + name);
+				}
+			}
+		}
+

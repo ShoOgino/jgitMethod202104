@@ -13,7 +13,14 @@
 	public Result update(final RevWalk walk) throws IOException {
 		requireCanDoUpdate();
 		try {
-			return result = updateImpl(walk, new UpdateStore());
+			return result = updateImpl(walk, new Store() {
+				@Override
+				Result execute(Result status) throws IOException {
+					if (status == Result.NO_CHANGE)
+						return status;
+					return doUpdate(status);
+				}
+			});
 		} catch (IOException x) {
 			result = Result.IO_FAILURE;
 			throw x;

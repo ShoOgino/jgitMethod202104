@@ -1,0 +1,10 @@
+	private void putLooseRef(LooseRef ref) {
+		RefList<LooseRef> cList, nList;
+		do {
+			cList = looseRefs.get();
+			nList = cList.put(ref);
+		} while (!looseRefs.compareAndSet(cList, nList));
+		modCnt.incrementAndGet();
+		fireRefsChanged();
+	}
+

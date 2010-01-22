@@ -26,10 +26,13 @@
 		updateRef.setNewObjectId(oldValue);
 		update = updateRef.update();
 		assertEquals(Result.FAST_FORWARD, update);
+
 		allRefs = db.getAllRefs();
-		assertEquals("refs/heads/master", allRefs.get("refs/heads/master").getName());
-		assertEquals("refs/heads/master", allRefs.get("refs/heads/master").getOrigName());
-		assertEquals("refs/heads/master", allRefs.get("HEAD").getName());
-		assertEquals("HEAD", allRefs.get("HEAD").getOrigName());
+		Ref master = allRefs.get("refs/heads/master");
+		Ref head = allRefs.get("HEAD");
+		assertEquals("refs/heads/master", master.getName());
+		assertEquals("HEAD", head.getName());
+		assertTrue("is symbolic reference", head.isSymbolic());
+		assertSame(master, head.getTarget());
 	}
 

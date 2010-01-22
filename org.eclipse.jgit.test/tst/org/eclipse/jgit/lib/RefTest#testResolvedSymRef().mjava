@@ -1,0 +1,15 @@
+	public void testResolvedSymRef() throws IOException {
+		Ref ref = db.getRef(Constants.HEAD);
+		assertEquals(Constants.HEAD, ref.getName());
+		assertTrue("is symbolic ref", ref.isSymbolic());
+		assertSame(Ref.Storage.LOOSE, ref.getStorage());
+
+		Ref dst = ref.getTarget();
+		assertNotNull("has target", dst);
+		assertEquals("refs/heads/master", dst.getName());
+
+		assertSame(dst.getObjectId(), ref.getObjectId());
+		assertSame(dst.getPeeledObjectId(), ref.getPeeledObjectId());
+		assertEquals(dst.isPeeled(), ref.isPeeled());
+	}
+

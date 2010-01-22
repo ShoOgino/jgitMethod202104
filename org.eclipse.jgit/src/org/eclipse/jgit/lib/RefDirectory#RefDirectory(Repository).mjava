@@ -1,0 +1,12 @@
+	RefDirectory(final Repository db) {
+		parent = db;
+		gitDir = db.getDirectory();
+		refsDir = FS.resolve(gitDir, R_REFS);
+		logsDir = FS.resolve(gitDir, LOGS);
+		logsRefsDir = FS.resolve(gitDir, LOGS + '/' + R_REFS);
+		packedRefsFile = FS.resolve(gitDir, PACKED_REFS);
+
+		looseRefs.set(RefList.<LooseRef> emptyList());
+		packedRefs.set(PackedRefList.NO_PACKED_REFS);
+	}
+

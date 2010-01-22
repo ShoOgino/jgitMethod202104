@@ -1,0 +1,15 @@
+	public void testGetRefs_IgnoresGarbageRef2() throws IOException {
+		Map<String, Ref> heads;
+		Ref a;
+
+		writeLooseRef("refs/heads/A", A);
+		write(new File(diskRepo.getDirectory(), "refs/heads/bad"), "");
+
+		heads = refdir.getRefs(RefDatabase.ALL);
+		assertEquals(1, heads.size());
+
+		a = heads.get("refs/heads/A");
+		assertEquals("refs/heads/A", a.getName());
+		assertEquals(A, a.getObjectId());
+	}
+

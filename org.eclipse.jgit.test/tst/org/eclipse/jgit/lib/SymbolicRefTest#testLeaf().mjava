@@ -1,0 +1,31 @@
+	public void testLeaf() {
+		Ref a;
+		SymbolicRef b, c, d;
+
+		a = new ObjectIdRef.PeeledTag(Ref.Storage.PACKED, targetName, ID_A, ID_B);
+		b = new SymbolicRef("B", a);
+		c = new SymbolicRef("C", b);
+		d = new SymbolicRef("D", c);
+
+		assertSame(c, d.getTarget());
+		assertSame(b, c.getTarget());
+		assertSame(a, b.getTarget());
+
+		assertSame(a, d.getLeaf());
+		assertSame(a, c.getLeaf());
+		assertSame(a, b.getLeaf());
+		assertSame(a, a.getLeaf());
+
+		assertSame(ID_A, d.getObjectId());
+		assertSame(ID_A, c.getObjectId());
+		assertSame(ID_A, b.getObjectId());
+
+		assertTrue(d.isPeeled());
+		assertTrue(c.isPeeled());
+		assertTrue(b.isPeeled());
+
+		assertSame(ID_B, d.getPeeledObjectId());
+		assertSame(ID_B, c.getPeeledObjectId());
+		assertSame(ID_B, b.getPeeledObjectId());
+	}
+

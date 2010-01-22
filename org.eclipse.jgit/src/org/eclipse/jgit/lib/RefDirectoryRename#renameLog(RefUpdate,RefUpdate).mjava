@@ -1,0 +1,20 @@
+	private boolean renameLog(RefUpdate src, RefUpdate dst) {
+		File srcLog = refdb.logFor(src.getName());
+		File dstLog = refdb.logFor(dst.getName());
+
+		if (!srcLog.exists())
+			return true;
+
+		if (!rename(srcLog, dstLog))
+			return false;
+
+		try {
+			final int levels = RefDirectory.levelsIn(src.getName()) - 2;
+			RefDirectory.delete(srcLog, levels);
+			return true;
+		} catch (IOException e) {
+			rename(dstLog, srcLog);
+			return false;
+		}
+	}
+

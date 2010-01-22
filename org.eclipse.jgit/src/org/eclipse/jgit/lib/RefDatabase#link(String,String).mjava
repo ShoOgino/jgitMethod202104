@@ -1,19 +1,13 @@
 	/**
-	 * Writes a symref (e.g. HEAD) to disk
+	 * Create a symbolic reference from one name to another.
 	 *
 	 * @param name
-	 *            symref name
+	 *            the name of the reference. Should be {@link Constants#HEAD} or
+	 *            starting with {@link Constants#R_REFS}.
 	 * @param target
-	 *            pointed to ref
+	 *            the target of the reference.
 	 * @throws IOException
+	 *             the reference could not be created or overwritten.
 	 */
-	void link(final String name, final String target) throws IOException {
-		final byte[] content = Constants.encode("ref: " + target + "\n");
-		lockAndWriteFile(fileForRef(name), content);
-		synchronized (this) {
-			looseSymRefs.remove(name);
-			setModified();
-		}
-		db.fireRefsMaybeChanged();
-	}
+	public abstract void link(String name, String target) throws IOException;
 

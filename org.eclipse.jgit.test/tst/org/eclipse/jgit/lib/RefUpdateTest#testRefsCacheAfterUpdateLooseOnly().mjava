@@ -1,0 +1,29 @@
+	/**
+	 * Test case originating from
+	 * <a href="http://bugs.eclipse.org/285991">bug 285991</a>
+	 *
+	 * Make sure the in memory cache is updated properly after
+	 * update of symref.
+	 *
+	 * @throws Exception
+	 */
+	public void testRefsCacheAfterUpdateLooseOnly() throws Exception {
+		// Do not use the defalt repo for this case.
+		Map<String, Ref> allRefs = db.getAllRefs();
+		ObjectId oldValue = db.resolve("HEAD");
+		db.writeSymref(Constants.HEAD, "refs/heads/newref");
+		RefUpdate updateRef = db.updateRef(Constants.HEAD);
+		updateRef.setForceUpdate(true);
+		updateRef.setNewObjectId(oldValue);
+		Result update = updateRef.update();
+		assertEquals(Result.NEW, update);
+
+		allRefs = db.getAllRefs();
+		Ref head = allRefs.get("HEAD");
+		Ref newref = allRefs.get("refs/heads/newref");
+		assertEquals("refs/heads/newref", newref.getName());
+		assertEquals("HEAD", head.getName());
+		assertTrue("is symbolic reference", head.isSymbolic());
+		assertSame(newref, head.getTarget());
+	}
+

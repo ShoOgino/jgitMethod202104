@@ -1,0 +1,23 @@
+	public void testGetRefs_DiscoversNewLoose2() throws IOException {
+		Map<String, Ref> orig, next, news;
+
+		writeLooseRef("refs/heads/pu", A);
+		orig = refdir.getRefs(RefDatabase.ALL);
+
+		writeLooseRef("refs/heads/new/B", B);
+		news = refdir.getRefs("refs/heads/new/");
+		next = refdir.getRefs(RefDatabase.ALL);
+
+		assertEquals(1, orig.size());
+		assertEquals(2, next.size());
+		assertEquals(1, news.size());
+
+		assertTrue(orig.containsKey("refs/heads/pu"));
+		assertTrue(next.containsKey("refs/heads/pu"));
+		assertFalse(news.containsKey("refs/heads/pu"));
+
+		assertFalse(orig.containsKey("refs/heads/new/B"));
+		assertTrue(next.containsKey("refs/heads/new/B"));
+		assertTrue(news.containsKey("B"));
+	}
+

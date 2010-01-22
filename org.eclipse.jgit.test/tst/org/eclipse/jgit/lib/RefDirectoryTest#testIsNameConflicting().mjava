@@ -1,0 +1,21 @@
+	public void testIsNameConflicting() throws IOException {
+		writeLooseRef("refs/heads/a/b", A);
+		writePackedRef("refs/heads/q", B);
+
+		// new references cannot replace an existing container
+		assertTrue(refdir.isNameConflicting("refs"));
+		assertTrue(refdir.isNameConflicting("refs/heads"));
+		assertTrue(refdir.isNameConflicting("refs/heads/a"));
+
+		// existing reference is not conflicting
+		assertFalse(refdir.isNameConflicting("refs/heads/a/b"));
+
+		// new references are not conflicting
+		assertFalse(refdir.isNameConflicting("refs/heads/a/d"));
+		assertFalse(refdir.isNameConflicting("refs/heads/master"));
+
+		// existing reference must not be used as a container
+		assertTrue(refdir.isNameConflicting("refs/heads/a/b/c"));
+		assertTrue(refdir.isNameConflicting("refs/heads/q/master"));
+	}
+

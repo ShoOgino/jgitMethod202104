@@ -1,0 +1,25 @@
+	public void testGetRefs_DiscoversDeletedLoose4() throws IOException {
+		Map<String, Ref> orig, next;
+		Ref orig_r, next_r;
+
+		writeLooseRef("refs/heads/B", B);
+		writeLooseRef("refs/heads/master", A);
+		orig = refdir.getRefs(RefDatabase.ALL);
+
+		deleteLooseRef("refs/heads/master");
+		next = refdir.getRefs("refs/heads/");
+
+		assertEquals(3, orig.size());
+		assertEquals(1, next.size());
+
+		assertTrue(orig.containsKey("refs/heads/B"));
+		assertTrue(orig.containsKey("refs/heads/master"));
+		assertTrue(next.containsKey("B"));
+		assertFalse(next.containsKey("master"));
+
+		orig_r = orig.get("refs/heads/B");
+		next_r = next.get("B");
+		assertEquals(B, orig_r.getObjectId());
+		assertSame("uses cached instance", orig_r, next_r);
+	}
+

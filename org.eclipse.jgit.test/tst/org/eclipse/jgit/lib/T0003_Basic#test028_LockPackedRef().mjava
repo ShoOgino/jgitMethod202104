@@ -1,6 +1,8 @@
 	public void test028_LockPackedRef() throws IOException {
 		writeTrashFile(".git/packed-refs", "7f822839a2fe9760f386cbbbcb3f92c5fe81def7 refs/heads/foobar");
 		writeTrashFile(".git/HEAD", "ref: refs/heads/foobar\n");
+		BUG_WorkAroundRacyGitIssues("packed-refs");
+		BUG_WorkAroundRacyGitIssues("HEAD");
 
 		ObjectId resolve = db.resolve("HEAD");
 		assertEquals("7f822839a2fe9760f386cbbbcb3f92c5fe81def7", resolve.name());

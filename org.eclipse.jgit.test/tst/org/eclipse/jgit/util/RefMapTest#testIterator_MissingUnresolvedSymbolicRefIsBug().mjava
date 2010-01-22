@@ -1,0 +1,18 @@
+	public void testIterator_MissingUnresolvedSymbolicRefIsBug() {
+		final Ref master = newRef("refs/heads/master", ID_ONE);
+		final Ref headR = newRef("HEAD", master);
+
+		loose = toList(master);
+		// loose should have added newRef("HEAD", "refs/heads/master")
+		resolved = toList(headR);
+
+		RefMap map = new RefMap("", packed, loose, resolved);
+		Iterator<Ref> itr = map.values().iterator();
+		try {
+			itr.hasNext();
+			fail("iterator did not catch bad input");
+		} catch (IllegalStateException err) {
+			// expected
+		}
+	}
+

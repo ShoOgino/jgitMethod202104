@@ -1,0 +1,21 @@
+	public void testGetRefs_HeadsOnly_SymrefToPacked() throws IOException {
+		Map<String, Ref> heads;
+		Ref master, other;
+
+		writeLooseRef("refs/heads/other", "ref: refs/heads/master\n");
+		writePackedRef("refs/heads/master", A);
+
+		heads = refdir.getRefs(R_HEADS);
+		assertEquals(2, heads.size());
+
+		master = heads.get("master");
+		other = heads.get("other");
+
+		assertEquals("refs/heads/master", master.getName());
+		assertEquals(A, master.getObjectId());
+
+		assertEquals("refs/heads/other", other.getName());
+		assertEquals(A, other.getObjectId());
+		assertSame(master, other.getTarget());
+	}
+

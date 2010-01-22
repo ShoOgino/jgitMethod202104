@@ -1,0 +1,28 @@
+	public void testGetRefs_DiscoversNewLoose1() throws IOException {
+		Map<String, Ref> orig, next;
+		Ref orig_r, next_r;
+
+		writeLooseRef("refs/heads/master", A);
+		orig = refdir.getRefs(RefDatabase.ALL);
+
+		writeLooseRef("refs/heads/next", B);
+		next = refdir.getRefs(RefDatabase.ALL);
+
+		assertEquals(2, orig.size());
+		assertEquals(3, next.size());
+
+		assertFalse(orig.containsKey("refs/heads/next"));
+		assertTrue(next.containsKey("refs/heads/next"));
+
+		orig_r = orig.get("refs/heads/master");
+		next_r = next.get("refs/heads/master");
+		assertEquals(A, orig_r.getObjectId());
+		assertSame("uses cached instance", orig_r, next_r);
+		assertSame("same HEAD", orig_r, orig.get(HEAD).getTarget());
+		assertSame("same HEAD", orig_r, next.get(HEAD).getTarget());
+
+		next_r = next.get("refs/heads/next");
+		assertSame(LOOSE, next_r.getStorage());
+		assertEquals(B, next_r.getObjectId());
+	}
+

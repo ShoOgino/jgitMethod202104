@@ -1,0 +1,22 @@
+	/**
+	 * Determine if a proposed reference name overlaps with an existing one.
+	 * <p>
+	 * Reference names use '/' as a component separator, and may be stored in a
+	 * hierarchical storage such as a directory on the local filesystem.
+	 * <p>
+	 * If the reference "refs/heads/foo" exists then "refs/heads/foo/bar" must
+	 * not exist, as a reference cannot have a value and also be a container for
+	 * other references at the same time.
+	 * <p>
+	 * If the reference "refs/heads/foo/bar" exists than the reference
+	 * "refs/heads/foo" cannot exist, for the same reason.
+	 *
+	 * @param name
+	 *            proposed name.
+	 * @return true if the name overlaps with an existing reference; false if
+	 *         using this name right now would be safe.
+	 * @throws IOException
+	 *             the database could not be read to check for conflicts.
+	 */
+	public abstract boolean isNameConflicting(String name) throws IOException;
+

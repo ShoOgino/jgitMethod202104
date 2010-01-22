@@ -1,0 +1,36 @@
+	@Override
+	public Map<String, Ref> getRefs(String prefix) throws IOException {
+		final RefList<Ref> packed = getPackedRefs();
+		final RefList<LooseRef> oldLoose = looseRefs.get();
+
+		LooseScanner scan = new LooseScanner(oldLoose);
+		scan.scan(prefix);
+
+		RefList<LooseRef> loose;
+		if (scan.newLoose != null) {
+			loose = scan.newLoose.toRefList();
+			if (looseRefs.compareAndSet(oldLoose, loose))
+				modCnt.incrementAndGet();
+		} else
+			loose = oldLoose;
+		fireRefsChanged();
+
+		RefList.Builder<Ref> symbolic = scan.symbolic;
+		for (int idx = 0; idx < symbolic.size();) {
+			Ref ref = symbolic.get(idx);
+			ref = resolve(ref, 0, prefix, loose, packed);
+			if (ref != null && ref.getObjectId() != null) {
+				symbolic.set(idx, ref);
+				idx++;
+			} else {
+				// A broken symbolic reference, we have to drop it from the
+				// collections the client is about to receive. Should be a
+				// rare occurrence so pay a copy penalty.
+				loose = loose.remove(idx);
+				symbolic.remove(idx);
+			}
+		}
+
+		return new RefMap(prefix, packed, upcast(loose), symbolic.toRefList());
+	}
+
