@@ -1,0 +1,15 @@
+	@Override
+	public Ref getRef(final String needle) throws IOException {
+		final RefList<Ref> packed = getPackedRefs();
+		Ref ref = null;
+		for (String prefix : SEARCH_PATH) {
+			ref = readRef(prefix + needle, packed);
+			if (ref != null) {
+				ref = resolve(ref, 0, null, null, packed);
+				break;
+			}
+		}
+		fireRefsChanged();
+		return ref;
+	}
+

@@ -1,24 +1,18 @@
 	/**
-	 * Create a command to update, create or delete a ref in this repository.
+	 * Create a new update command to create, modify or delete a reference.
 	 *
 	 * @param name
-	 *            name of the ref the caller wants to modify.
+	 *            the name of the reference.
 	 * @param detach
-	 *            true to detach the ref, i.e. replace symref with object ref
-	 * @return an update command. The caller must finish populating this command
-	 *         and then invoke one of the update methods to actually make a
-	 *         change.
+	 *            if {@code true} and {@code name} is currently a
+	 *            {@link SymbolicRef}, the update will replace it with an
+	 *            {@link ObjectIdRef}. Otherwise, the update will recursively
+	 *            traverse {@link SymbolicRef}s and operate on the leaf
+	 *            {@link ObjectIdRef}.
+	 * @return a new update for the requested name; never null.
 	 * @throws IOException
-	 *             a symbolic ref was passed in and could not be resolved back
-	 *             to the base ref, as the symbolic ref could not be read.
+	 *             the reference space cannot be accessed.
 	 */
-	RefUpdate newUpdate(final String name, boolean detach) throws IOException {
-		refreshPackedRefs();
-		Ref r = readRefBasic(name, 0);
-		if (r == null)
-			r = new Ref(Ref.Storage.NEW, name, null);
-		else if (detach)
-			r = new Ref(Ref.Storage.NEW, name, r.getObjectId());
-		return new RefUpdate(this, r, fileForRef(r.getName()));
-	}
+	public abstract RefUpdate newUpdate(String name, boolean detach)
+			throws IOException;
 

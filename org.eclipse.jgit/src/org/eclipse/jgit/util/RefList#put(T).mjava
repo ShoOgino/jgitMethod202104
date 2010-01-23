@@ -1,0 +1,18 @@
+	/**
+	 * Store a reference, adding or replacing as necessary.
+	 * <p>
+	 * This list instance is not affected by the store. The correct position is
+	 * determined, and the item is added if missing, or replaced if existing.
+	 * Because this method copies the entire list, it runs in O(N + log N) time.
+	 *
+	 * @param ref
+	 *            the reference to store.
+	 * @return copy of this list, after performing the addition or replacement.
+	 */
+	public final RefList<T> put(T ref) {
+		int idx = find(ref.getName());
+		if (0 <= idx)
+			return set(idx, ref);
+		return add(idx, ref);
+	}
+

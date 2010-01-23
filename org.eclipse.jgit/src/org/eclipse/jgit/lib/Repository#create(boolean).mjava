@@ -19,8 +19,10 @@
 		objectDatabase.create();
 
 		new File(gitDir, "branches").mkdir();
-		final String master = Constants.R_HEADS + Constants.MASTER;
-		refs.link(Constants.HEAD, master);
+
+		RefUpdate head = updateRef(Constants.HEAD);
+		head.disableRefLog();
+		head.link(Constants.R_HEADS + Constants.MASTER);
 
 		cfg.setInt("core", null, "repositoryformatversion", 0);
 		cfg.setBoolean("core", null, "filemode", true);

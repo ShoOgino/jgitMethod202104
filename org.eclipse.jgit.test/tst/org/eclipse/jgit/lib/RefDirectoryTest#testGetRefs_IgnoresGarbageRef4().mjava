@@ -1,0 +1,32 @@
+	public void testGetRefs_IgnoresGarbageRef4() throws IOException {
+		Map<String, Ref> heads;
+		Ref a, b, c;
+
+		writeLooseRef("refs/heads/A", A);
+		writeLooseRef("refs/heads/B", B);
+		writeLooseRef("refs/heads/C", A);
+		heads = refdir.getRefs(RefDatabase.ALL);
+		assertEquals(3, heads.size());
+		assertTrue(heads.containsKey("refs/heads/A"));
+		assertTrue(heads.containsKey("refs/heads/B"));
+		assertTrue(heads.containsKey("refs/heads/C"));
+
+		writeLooseRef("refs/heads/B", "FAIL\n");
+		BUG_WorkAroundRacyGitIssues("refs/heads/B");
+
+		heads = refdir.getRefs(RefDatabase.ALL);
+		assertEquals(2, heads.size());
+
+		a = heads.get("refs/heads/A");
+		b = heads.get("refs/heads/B");
+		c = heads.get("refs/heads/C");
+
+		assertEquals("refs/heads/A", a.getName());
+		assertEquals(A, a.getObjectId());
+
+		assertNull("no refs/heads/B", b);
+
+		assertEquals("refs/heads/C", c.getName());
+		assertEquals(A, c.getObjectId());
+	}
+

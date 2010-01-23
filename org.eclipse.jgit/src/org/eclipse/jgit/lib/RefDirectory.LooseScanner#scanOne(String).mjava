@@ -1,0 +1,49 @@
+		private void scanOne(String name) {
+			LooseRef cur;
+
+			if (curIdx < curLoose.size()) {
+				do {
+					cur = curLoose.get(curIdx);
+					int cmp = RefComparator.compareTo(cur, name);
+					if (cmp < 0) {
+						// Reference is not loose anymore, its been deleted.
+						// Skip the name in the new result list.
+						if (newLoose == null)
+							newLoose = curLoose.copy(curIdx);
+						curIdx++;
+						cur = null;
+						continue;
+					}
+
+					if (cmp > 0) // Newly discovered loose reference.
+						cur = null;
+					break;
+				} while (curIdx < curLoose.size());
+			} else
+				cur = null; // Newly discovered loose reference.
+
+			LooseRef n;
+			try {
+				n = scanRef(cur, name);
+			} catch (IOException notValid) {
+				n = null;
+			}
+
+			if (n != null) {
+				if (cur != n && newLoose == null)
+					newLoose = curLoose.copy(curIdx);
+				if (newLoose != null)
+					newLoose.add(n);
+				if (n.isSymbolic())
+					symbolic.add(n);
+			} else if (cur != null) {
+				// Tragically, this file is no longer a loose reference.
+				// Kill our cached entry of it.
+				if (newLoose == null)
+					newLoose = curLoose.copy(curIdx);
+			}
+
+			if (cur != null)
+				curIdx++;
+		}
+

@@ -1,0 +1,18 @@
+	public void testEntryType() {
+		final Ref a = newRef("refs/heads/A", ID_ONE);
+		final Ref b = newRef("refs/heads/B", ID_TWO);
+
+		packed = toList(a, b);
+
+		RefMap map = new RefMap("refs/heads/", packed, loose, resolved);
+		Iterator<Map.Entry<String, Ref>> itr = map.entrySet().iterator();
+		Map.Entry<String, Ref> ent_a = itr.next();
+		Map.Entry<String, Ref> ent_b = itr.next();
+
+		assertEquals(ent_a.hashCode(), "A".hashCode());
+		assertTrue(ent_a.equals(ent_a));
+		assertFalse(ent_a.equals(ent_b));
+
+		assertEquals(a.toString(), ent_a.toString());
+	}
+

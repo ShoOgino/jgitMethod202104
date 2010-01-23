@@ -1,0 +1,52 @@
+	public void testGetRefs_CycleInSymbolicRef() throws IOException {
+		Map<String, Ref> all;
+		Ref r;
+
+		writeLooseRef("refs/1", "ref: refs/2\n");
+		writeLooseRef("refs/2", "ref: refs/3\n");
+		writeLooseRef("refs/3", "ref: refs/4\n");
+		writeLooseRef("refs/4", "ref: refs/5\n");
+		writeLooseRef("refs/5", "ref: refs/end\n");
+		writeLooseRef("refs/end", A);
+
+		all = refdir.getRefs(RefDatabase.ALL);
+		r = all.get("refs/1");
+		assertNotNull("has 1", r);
+
+		assertEquals("refs/1", r.getName());
+		assertEquals(A, r.getObjectId());
+		assertTrue(r.isSymbolic());
+
+		r = r.getTarget();
+		assertEquals("refs/2", r.getName());
+		assertEquals(A, r.getObjectId());
+		assertTrue(r.isSymbolic());
+
+		r = r.getTarget();
+		assertEquals("refs/3", r.getName());
+		assertEquals(A, r.getObjectId());
+		assertTrue(r.isSymbolic());
+
+		r = r.getTarget();
+		assertEquals("refs/4", r.getName());
+		assertEquals(A, r.getObjectId());
+		assertTrue(r.isSymbolic());
+
+		r = r.getTarget();
+		assertEquals("refs/5", r.getName());
+		assertEquals(A, r.getObjectId());
+		assertTrue(r.isSymbolic());
+
+		r = r.getTarget();
+		assertEquals("refs/end", r.getName());
+		assertEquals(A, r.getObjectId());
+		assertFalse(r.isSymbolic());
+
+		writeLooseRef("refs/5", "ref: refs/6\n");
+		writeLooseRef("refs/6", "ref: refs/end\n");
+		BUG_WorkAroundRacyGitIssues("refs/5");
+		all = refdir.getRefs(RefDatabase.ALL);
+		r = all.get("refs/1");
+		assertNull("mising 1 due to cycle", r);
+	}
+

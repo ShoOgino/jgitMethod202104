@@ -1,0 +1,33 @@
+		void scan(String prefix) {
+			if (ALL.equals(prefix)) {
+				scanOne(HEAD);
+				scanTree(R_REFS, refsDir);
+
+				// If any entries remain, they are deleted, drop them.
+				if (newLoose == null && curIdx < curLoose.size())
+					newLoose = curLoose.copy(curIdx);
+
+			} else if (prefix.startsWith(R_REFS) && prefix.endsWith("/")) {
+				curIdx = -(curLoose.find(prefix) + 1);
+				File dir = new File(refsDir, prefix.substring(R_REFS.length()));
+				scanTree(prefix, dir);
+
+				// Skip over entries still within the prefix; these have
+				// been removed from the directory.
+				while (curIdx < curLoose.size()) {
+					if (!curLoose.get(curIdx).getName().startsWith(prefix))
+						break;
+					if (newLoose == null)
+						newLoose = curLoose.copy(curIdx);
+					curIdx++;
+				}
+
+				// Keep any entries outside of the prefix space, we
+				// do not know anything about their status.
+				if (newLoose != null) {
+					while (curIdx < curLoose.size())
+						newLoose.add(curLoose.get(curIdx++));
+				}
+			}
+		}
+

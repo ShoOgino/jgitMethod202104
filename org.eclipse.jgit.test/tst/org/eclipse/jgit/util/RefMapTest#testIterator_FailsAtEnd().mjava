@@ -1,0 +1,16 @@
+	public void testIterator_FailsAtEnd() {
+		final Ref master = newRef("refs/heads/master", ID_ONE);
+		loose = toList(master);
+
+		RefMap map = new RefMap("", packed, loose, resolved);
+		Iterator<Ref> itr = map.values().iterator();
+		assertTrue(itr.hasNext());
+		assertSame(master, itr.next());
+		try {
+			itr.next();
+			fail("iterator allowed next");
+		} catch (NoSuchElementException err) {
+			// expected
+		}
+	}
+

@@ -1,0 +1,16 @@
+		private Ref resolveLoose(final Ref l) {
+			if (resolvedIdx < resolved.size()) {
+				Ref r = resolved.get(resolvedIdx);
+				int cmp = RefComparator.compareTo(l, r);
+				if (cmp == 0) {
+					resolvedIdx++;
+					return r;
+				} else if (cmp > 0) {
+					// WTF, we have a symbolic entry but no match
+					// in the loose collection. That's an error.
+					throw new IllegalStateException();
+				}
+			}
+			return l;
+		}
+

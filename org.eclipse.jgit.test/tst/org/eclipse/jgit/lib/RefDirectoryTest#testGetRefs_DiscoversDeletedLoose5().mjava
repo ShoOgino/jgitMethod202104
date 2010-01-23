@@ -1,0 +1,20 @@
+	public void testGetRefs_DiscoversDeletedLoose5() throws IOException {
+		Map<String, Ref> orig, next;
+
+		writeLooseRef("refs/heads/master", A);
+		writeLooseRef("refs/heads/pu", B);
+		orig = refdir.getRefs(RefDatabase.ALL);
+
+		deleteLooseRef("refs/heads/pu");
+		writeLooseRef("refs/tags/v1.0", v1_0);
+		next = refdir.getRefs(RefDatabase.ALL);
+
+		assertEquals(3, orig.size());
+		assertEquals(3, next.size());
+
+		assertTrue(orig.containsKey("refs/heads/pu"));
+		assertFalse(orig.containsKey("refs/tags/v1.0"));
+		assertFalse(next.containsKey("refs/heads/pu"));
+		assertTrue(next.containsKey("refs/tags/v1.0"));
+	}
+

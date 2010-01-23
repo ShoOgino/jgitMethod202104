@@ -1,0 +1,25 @@
+	public void testGetRefs_HeadOnOneBranch() throws IOException {
+		Map<String, Ref> all;
+		Ref head, master;
+
+		writeLooseRef("refs/heads/master", A);
+
+		all = refdir.getRefs(RefDatabase.ALL);
+		assertEquals(2, all.size());
+		assertTrue("has HEAD", all.containsKey(HEAD));
+		assertTrue("has master", all.containsKey("refs/heads/master"));
+
+		head = all.get(HEAD);
+		master = all.get("refs/heads/master");
+
+		assertEquals(HEAD, head.getName());
+		assertTrue(head.isSymbolic());
+		assertSame(LOOSE, head.getStorage());
+		assertSame("uses same ref as target", master, head.getTarget());
+
+		assertEquals("refs/heads/master", master.getName());
+		assertFalse(master.isSymbolic());
+		assertSame(LOOSE, master.getStorage());
+		assertEquals(A, master.getObjectId());
+	}
+

@@ -1,0 +1,17 @@
+	@Override
+	public String toString() {
+		StringBuilder r = new StringBuilder();
+		r.append("SymbolicRef[");
+		Ref cur = this;
+		while (cur.isSymbolic()) {
+			r.append(cur.getName());
+			r.append(" -> ");
+			cur = cur.getTarget();
+		}
+		r.append(cur.getName());
+		r.append('=');
+		r.append(ObjectId.toString(cur.getObjectId()));
+		r.append("]");
+		return r.toString();
+	}
+

@@ -1,0 +1,13 @@
+	public void testEmpty_WithPrefix() {
+		final Ref master = newRef("refs/heads/master", ID_ONE);
+		packed = toList(master);
+
+		RefMap map = new RefMap("refs/tags/", packed, loose, resolved);
+		assertTrue(map.isEmpty()); // before size was computed
+		assertEquals(0, map.size());
+		assertTrue(map.isEmpty()); // after size was computed
+
+		assertFalse(map.entrySet().iterator().hasNext());
+		assertFalse(map.keySet().iterator().hasNext());
+	}
+

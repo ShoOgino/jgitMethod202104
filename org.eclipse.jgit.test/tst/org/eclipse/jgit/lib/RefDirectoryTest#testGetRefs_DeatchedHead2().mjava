@@ -1,0 +1,25 @@
+	public void testGetRefs_DeatchedHead2() throws IOException {
+		Map<String, Ref> all;
+		Ref head, master;
+
+		writeLooseRef(HEAD, A);
+		writeLooseRef("refs/heads/master", B);
+		BUG_WorkAroundRacyGitIssues(HEAD);
+
+		all = refdir.getRefs(RefDatabase.ALL);
+		assertEquals(2, all.size());
+
+		head = all.get(HEAD);
+		master = all.get("refs/heads/master");
+
+		assertEquals(HEAD, head.getName());
+		assertFalse(head.isSymbolic());
+		assertSame(LOOSE, head.getStorage());
+		assertEquals(A, head.getObjectId());
+
+		assertEquals("refs/heads/master", master.getName());
+		assertFalse(master.isSymbolic());
+		assertSame(LOOSE, master.getStorage());
+		assertEquals(B, master.getObjectId());
+	}
+

@@ -1,0 +1,27 @@
+	/**
+	 * Locate an entry by name.
+	 *
+	 * @param name
+	 *            the name of the reference to find.
+	 * @return the index the reference is at. If the entry is not present
+	 *         returns a negative value. The insertion position for the given
+	 *         name can be computed from {@code -(index + 1)}.
+	 */
+	public final int find(String name) {
+		int high = cnt;
+		if (high == 0)
+			return -1;
+		int low = 0;
+		do {
+			final int mid = (low + high) >>> 1;
+			final int cmp = RefComparator.compareTo(list[mid], name);
+			if (cmp < 0)
+				low = mid + 1;
+			else if (cmp == 0)
+				return mid;
+			else
+				high = mid;
+		} while (low < high);
+		return -(low + 1);
+	}
+

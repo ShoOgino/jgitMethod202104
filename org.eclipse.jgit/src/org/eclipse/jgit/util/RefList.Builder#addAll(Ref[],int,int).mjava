@@ -1,0 +1,23 @@
+		/**
+		 * Add all items from a source array.
+		 * <p>
+		 * References must be added in sort order, or the array must be sorted
+		 * after additions are complete using {@link #sort()}.
+		 *
+		 * @param src
+		 *            the source array.
+		 * @param off
+		 *            position within {@code src} to start copying from.
+		 * @param cnt
+		 *            number of items to copy from {@code src}.
+		 */
+		public void addAll(Ref[] src, int off, int cnt) {
+			if (list.length < size + cnt) {
+				Ref[] n = new Ref[Math.max(size * 2, size + cnt)];
+				System.arraycopy(list, 0, n, 0, size);
+				list = n;
+			}
+			System.arraycopy(src, off, list, size, cnt);
+			size += cnt;
+		}
+

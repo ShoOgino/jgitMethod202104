@@ -1,0 +1,18 @@
+		@Override
+		public boolean equals(Object obj) {
+			if (obj instanceof Map.Entry) {
+				final Object key = ((Map.Entry) obj).getKey();
+				final Object val = ((Map.Entry) obj).getValue();
+				if (key instanceof String && val instanceof Ref) {
+					final Ref r = (Ref) val;
+					if (r.getName().equals(ref.getName())) {
+						final ObjectId a = r.getObjectId();
+						final ObjectId b = ref.getObjectId();
+						if (a != null && b != null && AnyObjectId.equals(a, b))
+							return true;
+					}
+				}
+			}
+			return false;
+		}
+

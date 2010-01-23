@@ -21,16 +21,17 @@
 				br = toBufferedReader(openInputStream(conn));
 				try {
 					String line = br.readLine();
-					if (line != null && line.startsWith("ref: ")) {
-						Ref src = refs.get(line.substring(5));
-						if (src != null) {
-							refs.put(Constants.HEAD, new Ref(
-									Ref.Storage.NETWORK, Constants.HEAD, src
-											.getName(), src.getObjectId()));
-						}
+					if (line != null && line.startsWith(RefDirectory.SYMREF)) {
+						String target = line.substring(RefDirectory.SYMREF.length());
+						Ref r = refs.get(target);
+						if (r == null)
+							r = new ObjectIdRef.Unpeeled(Ref.Storage.NEW, target, null);
+						r = new SymbolicRef(Constants.HEAD, r);
+						refs.put(r.getName(), r);
 					} else if (line != null && ObjectId.isId(line)) {
-						refs.put(Constants.HEAD, new Ref(Ref.Storage.NETWORK,
-								Constants.HEAD, ObjectId.fromString(line)));
+						Ref r = new ObjectIdRef.Unpeeled(Ref.Storage.NETWORK,
+								Constants.HEAD, ObjectId.fromString(line));
+						refs.put(r.getName(), r);
 					}
 				} finally {
 					br.close();

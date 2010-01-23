@@ -1,0 +1,16 @@
+	private RefList<LooseRef> getLooseRefs() {
+		final RefList<LooseRef> oldLoose = looseRefs.get();
+
+		LooseScanner scan = new LooseScanner(oldLoose);
+		scan.scan(ALL);
+
+		RefList<LooseRef> loose;
+		if (scan.newLoose != null) {
+			loose = scan.newLoose.toRefList();
+			if (looseRefs.compareAndSet(oldLoose, loose))
+				modCnt.incrementAndGet();
+		} else
+			loose = oldLoose;
+		return loose;
+	}
+

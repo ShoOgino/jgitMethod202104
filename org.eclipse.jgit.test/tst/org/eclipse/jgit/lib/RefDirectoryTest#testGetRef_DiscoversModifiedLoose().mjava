@@ -1,0 +1,14 @@
+	public void testGetRef_DiscoversModifiedLoose() throws IOException {
+		Map<String, Ref> all;
+
+		writeLooseRef("refs/heads/master", A);
+		all = refdir.getRefs(RefDatabase.ALL);
+		assertEquals(A, all.get(HEAD).getObjectId());
+
+		writeLooseRef("refs/heads/master", B);
+		BUG_WorkAroundRacyGitIssues("refs/heads/master");
+
+		Ref master = refdir.getRef("refs/heads/master");
+		assertEquals(B, master.getObjectId());
+	}
+

@@ -1,0 +1,23 @@
+	@Override
+	public Ref remove(Object key) {
+		String name = toRefName((String) key);
+		Ref res = null;
+		int idx;
+		if (0 <= (idx = packed.find(name))) {
+			res = packed.get(name);
+			packed = packed.remove(idx);
+			sizeIsValid = false;
+		}
+		if (0 <= (idx = loose.find(name))) {
+			res = loose.get(name);
+			loose = loose.remove(idx);
+			sizeIsValid = false;
+		}
+		if (0 <= (idx = resolved.find(name))) {
+			res = resolved.get(name);
+			resolved = resolved.remove(idx);
+			sizeIsValid = false;
+		}
+		return res;
+	}
+

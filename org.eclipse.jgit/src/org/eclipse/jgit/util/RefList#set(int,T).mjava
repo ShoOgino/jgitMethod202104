@@ -1,0 +1,19 @@
+	/**
+	 * Obtain a new copy of the list after changing one element.
+	 * <p>
+	 * This list instance is not affected by the replacement. Because this
+	 * method copies the entire list, it runs in O(N) time.
+	 *
+	 * @param idx
+	 *            index of the element to change.
+	 * @param ref
+	 *            the new value, must not be null.
+	 * @return copy of this list, after replacing {@code idx} with {@code ref} .
+	 */
+	public final RefList<T> set(int idx, T ref) {
+		Ref[] newList = new Ref[cnt];
+		System.arraycopy(list, 0, newList, 0, cnt);
+		newList[idx] = ref;
+		return new RefList<T>(newList, cnt);
+	}
+

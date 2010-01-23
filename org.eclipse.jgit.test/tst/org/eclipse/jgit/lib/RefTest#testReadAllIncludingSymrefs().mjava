@@ -4,9 +4,8 @@
 		updateRef.setNewObjectId(masterId);
 		updateRef.setForceUpdate(true);
 		updateRef.update();
-		db
-				.writeSymref("refs/remotes/origin/HEAD",
-						"refs/remotes/origin/master");
+		writeSymref("refs/remotes/origin/HEAD",
+					"refs/remotes/origin/master");
 
 		ObjectId r = db.resolve("refs/remotes/origin/HEAD");
 		assertEquals(masterId, r);
@@ -15,7 +14,7 @@
 		Ref refHEAD = allRefs.get("refs/remotes/origin/HEAD");
 		assertNotNull(refHEAD);
 		assertEquals(masterId, refHEAD.getObjectId());
-		assertTrue(refHEAD.isPeeled());
+		assertFalse(refHEAD.isPeeled());
 		assertNull(refHEAD.getPeeledObjectId());
 
 		Ref refmaster = allRefs.get("refs/remotes/origin/master");

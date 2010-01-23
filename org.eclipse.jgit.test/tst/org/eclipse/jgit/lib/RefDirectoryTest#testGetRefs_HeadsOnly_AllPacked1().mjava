@@ -1,0 +1,16 @@
+	public void testGetRefs_HeadsOnly_AllPacked1() throws IOException {
+		Map<String, Ref> heads;
+		Ref a;
+
+		deleteLooseRef(HEAD);
+		writePackedRef("refs/heads/A", A);
+
+		heads = refdir.getRefs(R_HEADS);
+		assertEquals(1, heads.size());
+
+		a = heads.get("A");
+
+		assertEquals("refs/heads/A", a.getName());
+		assertEquals(A, a.getObjectId());
+	}
+

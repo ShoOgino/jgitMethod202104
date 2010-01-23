@@ -1,0 +1,32 @@
+	private Ref resolve(final Ref ref, int depth, String prefix,
+			RefList<LooseRef> loose, RefList<Ref> packed) throws IOException {
+		if (ref.isSymbolic()) {
+			Ref dst = ref.getTarget();
+
+			if (MAX_SYMBOLIC_REF_DEPTH <= depth)
+				return null; // claim it doesn't exist
+
+			// If the cached value can be assumed to be current due to a
+			// recent scan of the loose directory, use it.
+			if (loose != null && dst.getName().startsWith(prefix)) {
+				int idx;
+				if (0 <= (idx = loose.find(dst.getName())))
+					dst = loose.get(idx);
+				else if (0 <= (idx = packed.find(dst.getName())))
+					dst = packed.get(idx);
+				else
+					return ref;
+			} else {
+				dst = readRef(dst.getName(), packed);
+				if (dst == null)
+					return ref;
+			}
+
+			dst = resolve(dst, depth + 1, prefix, loose, packed);
+			if (dst == null)
+				return null;
+			return new SymbolicRef(ref.getName(), dst);
+		}
+		return ref;
+	}
+

@@ -1,0 +1,47 @@
+	private RefList<Ref> parsePackedRefs(final BufferedReader br)
+			throws IOException {
+		RefList.Builder<Ref> all = new RefList.Builder<Ref>();
+		Ref last = null;
+		boolean peeled = false;
+		boolean needSort = false;
+
+		String p;
+		while ((p = br.readLine()) != null) {
+			if (p.charAt(0) == '#') {
+				if (p.startsWith(PACKED_REFS_HEADER)) {
+					p = p.substring(PACKED_REFS_HEADER.length());
+					peeled = p.contains(PACKED_REFS_PEELED);
+				}
+				continue;
+			}
+
+			if (p.charAt(0) == '^') {
+				if (last == null)
+					throw new IOException("Peeled line before ref.");
+
+				ObjectId id = ObjectId.fromString(p.substring(1));
+				last = new ObjectIdRef.PeeledTag(PACKED, last.getName(), last
+						.getObjectId(), id);
+				all.set(all.size() - 1, last);
+				continue;
+			}
+
+			int sp = p.indexOf(' ');
+			ObjectId id = ObjectId.fromString(p.substring(0, sp));
+			String name = copy(p, sp + 1, p.length());
+			ObjectIdRef cur;
+			if (peeled)
+				cur = new ObjectIdRef.PeeledNonTag(PACKED, name, id);
+			else
+				cur = new ObjectIdRef.Unpeeled(PACKED, name, id);
+			if (last != null && RefComparator.compareTo(last, cur) > 0)
+				needSort = true;
+			all.add(cur);
+			last = cur;
+		}
+
+		if (needSort)
+			all.sort();
+		return all.toRefList();
+	}
+

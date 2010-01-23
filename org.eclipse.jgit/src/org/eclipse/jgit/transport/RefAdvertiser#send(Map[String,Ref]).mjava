@@ -1,0 +1,22 @@
+	/**
+	 * Format an advertisement for the supplied refs.
+	 *
+	 * @param refs
+	 *            zero or more refs to format for the client. The collection is
+	 *            sorted before display if necessary, and therefore may appear
+	 *            in any order.
+	 * @throws IOException
+	 *             the underlying output stream failed to write out an
+	 *             advertisement record.
+	 */
+	public void send(final Map<String, Ref> refs) throws IOException {
+		for (final Ref r : getSortedRefs(refs)) {
+			final RevObject obj = parseAnyOrNull(r.getObjectId());
+			if (obj != null) {
+				advertiseAny(obj, r.getName());
+				if (derefTags && obj instanceof RevTag)
+					advertiseTag((RevTag) obj, r.getName() + "^{}");
+			}
+		}
+	}
+

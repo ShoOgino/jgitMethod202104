@@ -1,0 +1,17 @@
+	private PackedRefList readPackedRefs(long size, long mtime)
+			throws IOException {
+		final BufferedReader br;
+		try {
+			br = new BufferedReader(new InputStreamReader(new FileInputStream(
+					packedRefsFile), CHARSET));
+		} catch (FileNotFoundException noPackedRefs) {
+			// Ignore it and leave the new list empty.
+			return PackedRefList.NO_PACKED_REFS;
+		}
+		try {
+			return new PackedRefList(parsePackedRefs(br), size, mtime);
+		} finally {
+			br.close();
+		}
+	}
+

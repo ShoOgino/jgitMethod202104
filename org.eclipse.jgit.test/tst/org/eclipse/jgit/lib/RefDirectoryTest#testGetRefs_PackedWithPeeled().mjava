@@ -1,0 +1,34 @@
+	public void testGetRefs_PackedWithPeeled() throws IOException {
+		Map<String, Ref> all;
+
+		writePackedRefs("# pack-refs with: peeled \n" + //
+				A.name() + " refs/heads/master\n" + //
+				B.name() + " refs/heads/other\n" + //
+				v1_0.name() + " refs/tags/v1.0\n" + //
+				"^" + v1_0.getObject().name() + "\n");
+		all = refdir.getRefs(RefDatabase.ALL);
+
+		assertEquals(4, all.size());
+		final Ref head = all.get(HEAD);
+		final Ref master = all.get("refs/heads/master");
+		final Ref other = all.get("refs/heads/other");
+		final Ref tag = all.get("refs/tags/v1.0");
+
+		assertEquals(A, master.getObjectId());
+		assertTrue(master.isPeeled());
+		assertNull(master.getPeeledObjectId());
+
+		assertEquals(B, other.getObjectId());
+		assertTrue(other.isPeeled());
+		assertNull(other.getPeeledObjectId());
+
+		assertSame(master, head.getTarget());
+		assertEquals(A, head.getObjectId());
+		assertTrue(head.isPeeled());
+		assertNull(head.getPeeledObjectId());
+
+		assertEquals(v1_0, tag.getObjectId());
+		assertTrue(tag.isPeeled());
+		assertEquals(v1_0.getObject(), tag.getPeeledObjectId());
+	}
+

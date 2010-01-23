@@ -1,0 +1,6 @@
+	private static String copy(final String src, final int off, final int end) {
+		// Don't use substring since it could leave a reference to the much
+		// larger existing string. Force construction of a full new object.
+		return new StringBuilder(end - off).append(src, off, end).toString();
+	}
+

@@ -1,0 +1,49 @@
+	private LooseRef scanRef(LooseRef ref, String name) throws IOException {
+		final File path = fileFor(name);
+		final long modified = path.lastModified();
+
+		if (ref != null) {
+			if (ref.getLastModified() == modified)
+				return ref;
+			name = ref.getName();
+		} else if (modified == 0)
+			return null;
+
+		final byte[] buf;
+		try {
+			buf = IO.readFully(path, 4096);
+		} catch (FileNotFoundException noFile) {
+			return null; // doesn't exist; not a reference.
+		}
+
+		int n = buf.length;
+		if (n == 0)
+			return null; // empty file; not a reference.
+
+		if (isSymRef(buf, n)) {
+			// trim trailing whitespace
+			while (0 < n && Character.isWhitespace(buf[n - 1]))
+				n--;
+			if (n < 6) {
+				String content = RawParseUtils.decode(buf, 0, n);
+				throw new IOException("Not a ref: " + name + ": " + content);
+			}
+			final String target = RawParseUtils.decode(buf, 5, n);
+			return newSymbolicRef(modified, name, target);
+		}
+
+		if (n < OBJECT_ID_STRING_LENGTH)
+			return null; // impossibly short object identifier; not a reference.
+
+		final ObjectId id;
+		try {
+			id = ObjectId.fromString(buf, 0);
+		} catch (IllegalArgumentException notRef) {
+			while (0 < n && Character.isWhitespace(buf[n - 1]))
+				n--;
+			String content = RawParseUtils.decode(buf, 0, n);
+			throw new IOException("Not a ref: " + name + ": " + content);
+		}
+		return new LooseUnpeeled(modified, name, id);
+	}
+

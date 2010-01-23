@@ -1,0 +1,25 @@
+	public void testMerge_HeadMaster() {
+		final Ref master = newRef("refs/heads/master", ID_ONE);
+		final Ref headU = newRef("HEAD", "refs/heads/master");
+		final Ref headR = newRef("HEAD", master);
+
+		loose = toList(headU, master);
+		resolved = toList(headR);
+
+		RefMap map = new RefMap("", packed, loose, resolved);
+		assertEquals(2, map.size());
+		assertFalse(map.isEmpty());
+		assertTrue(map.containsKey("refs/heads/master"));
+		assertSame(master, map.get("refs/heads/master"));
+
+		// resolved overrides loose given same name
+		assertSame(headR, map.get("HEAD"));
+
+		Iterator<Ref> itr = map.values().iterator();
+		assertTrue(itr.hasNext());
+		assertSame(headR, itr.next());
+		assertTrue(itr.hasNext());
+		assertSame(master, itr.next());
+		assertFalse(itr.hasNext());
+	}
+

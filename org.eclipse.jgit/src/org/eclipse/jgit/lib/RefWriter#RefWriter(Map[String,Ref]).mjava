@@ -1,0 +1,12 @@
+	/**
+	 * @param refs
+	 *            the complete set of references. This should have been computed
+	 *            by applying updates to the advertised refs already discovered.
+	 */
+	public RefWriter(Map<String, Ref> refs) {
+		if (refs instanceof RefMap)
+			this.refs = refs.values();
+		else
+			this.refs = RefComparator.sort(refs.values());
+	}
+

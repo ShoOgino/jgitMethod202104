@@ -1,0 +1,10 @@
+	private static boolean rename(File src, File dst) {
+		if (src.renameTo(dst))
+			return true;
+
+		File dir = dst.getParentFile();
+		if ((dir.exists() || !dir.mkdirs()) && !dir.isDirectory())
+			return false;
+		return src.renameTo(dst);
+	}
+

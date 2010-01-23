@@ -1,0 +1,11 @@
+	@Override
+	public Ref get(Object key) {
+		String name = toRefName((String) key);
+		Ref ref = resolved.get(name);
+		if (ref == null)
+			ref = loose.get(name);
+		if (ref == null)
+			ref = packed.get(name);
+		return ref;
+	}
+

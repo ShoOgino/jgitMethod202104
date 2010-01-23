@@ -5,7 +5,7 @@
 	 */
 	public void testUpdateRefDetachedUnbornHead() throws Exception {
 		ObjectId ppid = db.resolve("refs/heads/master^");
-		db.writeSymref("HEAD", "refs/heads/unborn");
+		writeSymref("HEAD", "refs/heads/unborn");
 		RefUpdate updateRef = db.updateRef("HEAD", true);
 		updateRef.setForceUpdate(true);
 		updateRef.setNewObjectId(ppid);
@@ -14,7 +14,7 @@
 		assertEquals(ppid, db.resolve("HEAD"));
 		Ref ref = db.getRef("HEAD");
 		assertEquals("HEAD", ref.getName());
-		assertEquals("HEAD", ref.getOrigName());
+		assertTrue("is detached", !ref.isSymbolic());
 
 		// the branch HEAD referred to is left untouched
 		assertNull(db.resolve("refs/heads/unborn"));

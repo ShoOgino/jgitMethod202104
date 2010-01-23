@@ -1,0 +1,21 @@
+	public void testEmptyBuilder() {
+		RefList<Ref> list = new RefList.Builder<Ref>().toRefList();
+		assertEquals(0, list.size());
+		assertFalse(list.iterator().hasNext());
+		assertEquals(-1, list.find("a"));
+		assertEquals(-1, list.find("z"));
+		assertFalse(list.contains("a"));
+		assertNull(list.get("a"));
+		assertTrue(list.asList().isEmpty());
+		assertEquals("[]", list.toString());
+
+		// default array capacity should be 16, with no bounds checking.
+		assertNull(list.get(16 - 1));
+		try {
+			list.get(16);
+			fail("default RefList should have 16 element array");
+		} catch (ArrayIndexOutOfBoundsException err) {
+			// expected
+		}
+	}
+

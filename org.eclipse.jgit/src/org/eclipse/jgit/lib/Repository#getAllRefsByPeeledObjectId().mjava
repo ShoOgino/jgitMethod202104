@@ -5,8 +5,7 @@
 		Map<String, Ref> allRefs = getAllRefs();
 		Map<AnyObjectId, Set<Ref>> ret = new HashMap<AnyObjectId, Set<Ref>>(allRefs.size());
 		for (Ref ref : allRefs.values()) {
-			if (!ref.isPeeled())
-				ref = peel(ref);
+			ref = peel(ref);
 			AnyObjectId target = ref.getPeeledObjectId();
 			if (target == null)
 				target = ref.getObjectId();

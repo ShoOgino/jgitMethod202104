@@ -1,0 +1,19 @@
+	public void testEntryTypeSet() {
+		final Ref refA_one = newRef("refs/heads/A", ID_ONE);
+		final Ref refA_two = newRef("refs/heads/A", ID_TWO);
+
+		packed = toList(refA_one);
+
+		RefMap map = new RefMap("refs/heads/", packed, loose, resolved);
+		assertSame(refA_one, map.get("A"));
+
+		Map.Entry<String, Ref> ent = map.entrySet().iterator().next();
+		assertEquals("A", ent.getKey());
+		assertSame(refA_one, ent.getValue());
+
+		assertSame(refA_one, ent.setValue(refA_two));
+		assertSame(refA_two, ent.getValue());
+		assertSame(refA_two, map.get("A"));
+		assertEquals(1, map.size());
+	}
+

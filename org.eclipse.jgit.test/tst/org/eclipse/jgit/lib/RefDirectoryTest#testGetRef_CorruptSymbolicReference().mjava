@@ -1,0 +1,12 @@
+	public void testGetRef_CorruptSymbolicReference() throws IOException {
+		String name = "refs/heads/A";
+		writeLooseRef(name, "ref: \n");
+		try {
+			refdir.getRef(name);
+			fail("read an invalid reference");
+		} catch (IOException err) {
+			String msg = err.getMessage();
+			assertEquals("Not a ref: " + name + ": ref:", msg);
+		}
+	}
+

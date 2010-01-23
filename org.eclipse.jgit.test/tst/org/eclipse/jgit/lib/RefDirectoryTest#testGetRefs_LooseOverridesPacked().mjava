@@ -1,0 +1,15 @@
+	public void testGetRefs_LooseOverridesPacked() throws IOException {
+		Map<String, Ref> heads;
+		Ref a;
+
+		writeLooseRef("refs/heads/master", B);
+		writePackedRef("refs/heads/master", A);
+
+		heads = refdir.getRefs(R_HEADS);
+		assertEquals(1, heads.size());
+
+		a = heads.get("master");
+		assertEquals("refs/heads/master", a.getName());
+		assertEquals(B, a.getObjectId());
+	}
+

@@ -1,0 +1,21 @@
+	public void testRemove() {
+		final Ref master = newRef("refs/heads/master", ID_ONE);
+		final Ref headU = newRef("HEAD", "refs/heads/master");
+		final Ref headR = newRef("HEAD", master);
+
+		packed = toList(master);
+		loose = toList(headU, master);
+		resolved = toList(headR);
+
+		RefMap map = new RefMap("", packed, loose, resolved);
+		assertNull(map.remove("not.a.reference"));
+
+		assertSame(master, map.remove("refs/heads/master"));
+		assertNull(map.get("refs/heads/master"));
+
+		assertSame(headR, map.remove("HEAD"));
+		assertNull(map.get("HEAD"));
+
+		assertTrue(map.isEmpty());
+	}
+

@@ -1,0 +1,15 @@
+	public void testPut_CollapseResolved() {
+		final Ref master = newRef("refs/heads/master", ID_ONE);
+		final Ref headU = newRef("HEAD", "refs/heads/master");
+		final Ref headR = newRef("HEAD", master);
+		final Ref a = newRef("refs/heads/A", ID_ONE);
+
+		loose = toList(headU, master);
+		resolved = toList(headR);
+
+		RefMap map = new RefMap("", packed, loose, resolved);
+		assertNull(map.put(a.getName(), a));
+		assertSame(a, map.get(a.getName()));
+		assertSame(headR, map.get("HEAD"));
+	}
+

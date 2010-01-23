@@ -1,0 +1,12 @@
+	public void testAddToEmptyList() {
+		RefList<Ref> one = toList();
+		RefList<Ref> two = one.add(0, REF_B);
+		assertNotSame(one, two);
+
+		// one is not modified, but two is
+		assertEquals(0, one.size());
+		assertEquals(1, two.size());
+		assertFalse(two.isEmpty());
+		assertSame(REF_B, two.get(0));
+	}
+

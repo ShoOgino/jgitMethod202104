@@ -1,0 +1,14 @@
+	/**
+	 * Create a reference update to write a temporary reference.
+	 *
+	 * @return an update for a new temporary reference.
+	 * @throws IOException
+	 *             a temporary name cannot be allocated.
+	 */
+	RefDirectoryUpdate newTemporaryUpdate() throws IOException {
+		File tmp = File.createTempFile("renamed_", "_ref", refsDir);
+		String name = Constants.R_REFS + tmp.getName();
+		Ref ref = new ObjectIdRef.Unpeeled(NEW, name, null);
+		return new RefDirectoryUpdate(this, ref);
+	}
+

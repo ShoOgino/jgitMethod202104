@@ -1,0 +1,23 @@
+		public Entry<String, Ref> peek() {
+			if (packedIdx < packed.size() && looseIdx < loose.size()) {
+				Ref p = packed.get(packedIdx);
+				Ref l = loose.get(looseIdx);
+				int cmp = RefComparator.compareTo(p, l);
+				if (cmp < 0) {
+					packedIdx++;
+					return toEntry(p);
+				}
+
+				if (cmp == 0)
+					packedIdx++;
+				looseIdx++;
+				return toEntry(resolveLoose(l));
+			}
+
+			if (looseIdx < loose.size())
+				return toEntry(resolveLoose(loose.get(looseIdx++)));
+			if (packedIdx < packed.size())
+				return toEntry(packed.get(packedIdx++));
+			return null;
+		}
+

@@ -1,0 +1,17 @@
+	public void testBuilder_AddThenSort() {
+		RefList.Builder<Ref> builder = new RefList.Builder<Ref>(1);
+		builder.add(REF_B);
+		builder.add(REF_A);
+
+		RefList<Ref> list = builder.toRefList();
+		assertEquals(2, list.size());
+		assertSame(REF_B, list.get(0));
+		assertSame(REF_A, list.get(1));
+
+		builder.sort();
+		list = builder.toRefList();
+		assertEquals(2, list.size());
+		assertSame(REF_A, list.get(0));
+		assertSame(REF_B, list.get(1));
+	}
+

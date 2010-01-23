@@ -1,7 +1,7 @@
 	public void testRenameRefNameColission2avoided() throws IOException {
 		// setup
 		ObjectId rb = db.resolve("refs/heads/b");
-		db.writeSymref(Constants.HEAD, "refs/heads/prefix/a");
+		writeSymref(Constants.HEAD, "refs/heads/prefix/a");
 		RefUpdate updateRef = db.updateRef("refs/heads/prefix/a");
 		updateRef.setNewObjectId(rb);
 		updateRef.setRefLogMessage("Setup", false);
@@ -9,7 +9,7 @@
 		assertEquals(Result.FORCED, updateRef.update());
 		ObjectId oldHead = db.resolve(Constants.HEAD);
 		assertTrue(rb.equals(oldHead)); // assumption for this test
-		RefLogWriter.writeReflog(db, rb, rb, "Just a message",
+		writeReflog(db, rb, rb, "Just a message",
 				"refs/heads/prefix/a");
 		assertTrue("internal check, we have a log", new File(db.getDirectory(),
 				"logs/refs/heads/prefix/a").exists());

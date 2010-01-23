@@ -1,0 +1,16 @@
+	public void testGetRefs_TagsOnly_AllPacked() throws IOException {
+		Map<String, Ref> tags;
+		Ref a;
+
+		deleteLooseRef(HEAD);
+		writePackedRef("refs/tags/v1.0", v1_0);
+
+		tags = refdir.getRefs(R_TAGS);
+		assertEquals(1, tags.size());
+
+		a = tags.get("v1.0");
+
+		assertEquals("refs/tags/v1.0", a.getName());
+		assertEquals(v1_0, a.getObjectId());
+	}
+

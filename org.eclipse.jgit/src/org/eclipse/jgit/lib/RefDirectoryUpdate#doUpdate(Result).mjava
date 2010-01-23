@@ -1,0 +1,24 @@
+	@Override
+	protected Result doUpdate(final Result status) throws IOException {
+		lock.setNeedStatInformation(true);
+		lock.write(getNewObjectId());
+
+		String msg = getRefLogMessage();
+		if (msg != null) {
+			if (isRefLogIncludingResult()) {
+				String strResult = toResultString(status);
+				if (strResult != null) {
+					if (msg.length() > 0)
+						msg = msg + ": " + strResult;
+					else
+						msg = strResult;
+				}
+			}
+			database.log(this, msg, true);
+		}
+		if (!lock.commit())
+			return Result.LOCK_FAILURE;
+		database.stored(this, lock.getCommitLastModified());
+		return status;
+	}
+

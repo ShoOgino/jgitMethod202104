@@ -1,0 +1,27 @@
+	public void testIterable() {
+		RefList<Ref> list = toList(REF_A, REF_B, REF_c);
+
+		int idx = 0;
+		for (Ref ref : list)
+			assertSame(list.get(idx++), ref);
+		assertEquals(3, idx);
+
+		Iterator<Ref> i = RefList.emptyList().iterator();
+		try {
+			i.next();
+			fail("did not throw NoSuchElementException");
+		} catch (NoSuchElementException err) {
+			// expected
+		}
+
+		i = list.iterator();
+		assertTrue(i.hasNext());
+		assertSame(REF_A, i.next());
+		try {
+			i.remove();
+			fail("did not throw UnsupportedOperationException");
+		} catch (UnsupportedOperationException err) {
+			// expected
+		}
+	}
+

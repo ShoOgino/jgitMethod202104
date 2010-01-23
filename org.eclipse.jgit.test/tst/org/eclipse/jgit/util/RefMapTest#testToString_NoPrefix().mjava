@@ -1,0 +1,17 @@
+	public void testToString_NoPrefix() {
+		final Ref a = newRef("refs/heads/A", ID_ONE);
+		final Ref b = newRef("refs/heads/B", ID_TWO);
+
+		packed = toList(a, b);
+
+		StringBuilder exp = new StringBuilder();
+		exp.append("[");
+		exp.append(a.toString());
+		exp.append(", ");
+		exp.append(b.toString());
+		exp.append("]");
+
+		RefMap map = new RefMap("", packed, loose, resolved);
+		assertEquals(exp.toString(), map.toString());
+	}
+

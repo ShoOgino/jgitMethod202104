@@ -2,7 +2,9 @@
 	 * Close all resources used by this repository
 	 */
 	public void close() {
-		if (useCnt.decrementAndGet() == 0)
+		if (useCnt.decrementAndGet() == 0) {
 			objectDatabase.close();
+			refs.close();
+		}
 	}
 
