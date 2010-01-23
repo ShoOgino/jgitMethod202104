@@ -1,0 +1,21 @@
+	public void testBuilder_Set() {
+		RefList.Builder<Ref> builder = new RefList.Builder<Ref>();
+		builder.add(REF_A);
+		builder.add(REF_A);
+
+		assertEquals(2, builder.size());
+		assertSame(REF_A, builder.get(0));
+		assertSame(REF_A, builder.get(1));
+
+		RefList<Ref> list = builder.toRefList();
+		assertEquals(2, list.size());
+		assertSame(REF_A, list.get(0));
+		assertSame(REF_A, list.get(1));
+		builder.set(1, REF_B);
+
+		list = builder.toRefList();
+		assertEquals(2, list.size());
+		assertSame(REF_A, list.get(0));
+		assertSame(REF_B, list.get(1));
+	}
+

@@ -1,0 +1,19 @@
+	public void testPut_WithPrefix() {
+		final Ref refA_one = newRef("refs/heads/A", ID_ONE);
+		final Ref refA_two = newRef("refs/heads/A", ID_TWO);
+
+		packed = toList(refA_one);
+
+		RefMap map = new RefMap("refs/heads/", packed, loose, resolved);
+		assertSame(refA_one, map.get("A"));
+		assertSame(refA_one, map.put("A", refA_two));
+
+		// map changed, but packed, loose did not
+		assertSame(refA_two, map.get("A"));
+		assertSame(refA_one, packed.get(0));
+		assertEquals(0, loose.size());
+
+		assertSame(refA_two, map.put("A", refA_one));
+		assertSame(refA_one, map.get("A"));
+	}
+

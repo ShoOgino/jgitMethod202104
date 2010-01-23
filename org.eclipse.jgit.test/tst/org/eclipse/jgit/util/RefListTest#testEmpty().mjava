@@ -1,0 +1,17 @@
+	public void testEmpty() {
+		RefList<Ref> list = RefList.emptyList();
+		assertEquals(0, list.size());
+		assertTrue(list.isEmpty());
+		assertFalse(list.iterator().hasNext());
+		assertEquals(-1, list.find("a"));
+		assertEquals(-1, list.find("z"));
+		assertFalse(list.contains("a"));
+		assertNull(list.get("a"));
+		try {
+			list.get(0);
+			fail("RefList.emptyList should have 0 element array");
+		} catch (ArrayIndexOutOfBoundsException err) {
+			// expected
+		}
+	}
+

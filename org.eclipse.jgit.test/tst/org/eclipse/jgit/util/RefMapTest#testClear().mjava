@@ -1,0 +1,13 @@
+	public void testClear() {
+		final Ref master = newRef("refs/heads/master", ID_ONE);
+		loose = toList(master);
+
+		RefMap map = new RefMap("", packed, loose, resolved);
+		assertSame(master, map.get("refs/heads/master"));
+
+		map.clear();
+		assertNull(map.get("refs/heads/master"));
+		assertTrue(map.isEmpty());
+		assertEquals(0, map.size());
+	}
+

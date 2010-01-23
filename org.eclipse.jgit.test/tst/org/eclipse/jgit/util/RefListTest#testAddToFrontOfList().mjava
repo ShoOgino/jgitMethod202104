@@ -1,0 +1,13 @@
+	public void testAddToFrontOfList() {
+		RefList<Ref> one = toList(REF_A);
+		RefList<Ref> two = one.add(0, REF_B);
+		assertNotSame(one, two);
+
+		// one is not modified, but two is
+		assertEquals(1, one.size());
+		assertSame(REF_A, one.get(0));
+		assertEquals(2, two.size());
+		assertSame(REF_B, two.get(0));
+		assertSame(REF_A, two.get(1));
+	}
+

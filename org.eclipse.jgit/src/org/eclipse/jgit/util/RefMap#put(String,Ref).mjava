@@ -1,0 +1,28 @@
+	@Override
+	public Ref put(final String keyName, Ref value) {
+		String name = toRefName(keyName);
+
+		if (!name.equals(value.getName()))
+			throw new IllegalArgumentException();
+
+		if (!resolved.isEmpty()) {
+			// Collapse the resolved list into the loose list so we
+			// can discard it and stop joining the two together.
+			for (Ref ref : resolved)
+				loose = loose.put(ref);
+			resolved = RefList.emptyList();
+		}
+
+		int idx = loose.find(name);
+		if (0 <= idx) {
+			Ref prior = loose.get(name);
+			loose = loose.set(idx, value);
+			return prior;
+		} else {
+			Ref prior = get(keyName);
+			loose = loose.add(idx, value);
+			sizeIsValid = false;
+			return prior;
+		}
+	}
+

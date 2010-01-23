@@ -1,0 +1,16 @@
+	public void testIterator_RefusesRemove() {
+		final Ref master = newRef("refs/heads/master", ID_ONE);
+		loose = toList(master);
+
+		RefMap map = new RefMap("", packed, loose, resolved);
+		Iterator<Ref> itr = map.values().iterator();
+		assertTrue(itr.hasNext());
+		assertSame(master, itr.next());
+		try {
+			itr.remove();
+			fail("iterator allowed remove");
+		} catch (UnsupportedOperationException err) {
+			// expected
+		}
+	}
+

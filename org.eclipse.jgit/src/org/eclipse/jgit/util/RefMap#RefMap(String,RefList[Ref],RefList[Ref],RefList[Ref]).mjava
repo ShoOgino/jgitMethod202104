@@ -1,0 +1,27 @@
+	/**
+	 * Construct a map to merge 3 collections together.
+	 *
+	 * @param prefix
+	 *            prefix used to slice the lists down. Only references whose
+	 *            names start with this prefix will appear to reside in the map.
+	 *            Must not be null, use {@code ""} (the empty string) to select
+	 *            all list items.
+	 * @param packed
+	 *            items from the packed reference list, this is the last list
+	 *            searched.
+	 * @param loose
+	 *            items from the loose reference list, this list overrides
+	 *            {@code packed} if a name appears in both.
+	 * @param resolved
+	 *            resolved symbolic references. This list overrides the prior
+	 *            list {@code loose}, if an item appears in both. Items in this
+	 *            list <b>must</b> also appear in {@code loose}.
+	 */
+	public RefMap(String prefix, RefList<Ref> packed, RefList<Ref> loose,
+			RefList<Ref> resolved) {
+		this.prefix = prefix;
+		this.packed = packed;
+		this.loose = loose;
+		this.resolved = resolved;
+	}
+

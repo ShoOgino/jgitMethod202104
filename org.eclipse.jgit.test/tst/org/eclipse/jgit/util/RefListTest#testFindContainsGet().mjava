@@ -1,0 +1,25 @@
+	public void testFindContainsGet() {
+		RefList<Ref> list = toList(REF_A, REF_B, REF_c);
+
+		assertEquals(0, list.find("A"));
+		assertEquals(1, list.find("B"));
+		assertEquals(2, list.find("c"));
+
+		assertEquals(-1, list.find("0"));
+		assertEquals(-2, list.find("AB"));
+		assertEquals(-3, list.find("a"));
+		assertEquals(-4, list.find("z"));
+
+		assertSame(REF_A, list.get("A"));
+		assertSame(REF_B, list.get("B"));
+		assertSame(REF_c, list.get("c"));
+		assertNull(list.get("AB"));
+		assertNull(list.get("z"));
+
+		assertTrue(list.contains("A"));
+		assertTrue(list.contains("B"));
+		assertTrue(list.contains("c"));
+		assertFalse(list.contains("AB"));
+		assertFalse(list.contains("z"));
+	}
+

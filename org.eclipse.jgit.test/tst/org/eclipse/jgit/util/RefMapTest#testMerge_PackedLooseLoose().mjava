@@ -1,0 +1,28 @@
+	public void testMerge_PackedLooseLoose() {
+		final Ref refA = newRef("A", ID_ONE);
+		final Ref refB_ONE = newRef("B", ID_ONE);
+		final Ref refB_TWO = newRef("B", ID_TWO);
+		final Ref refc = newRef("c", ID_ONE);
+
+		packed = toList(refA, refB_ONE);
+		loose = toList(refB_TWO, refc);
+
+		RefMap map = new RefMap("", packed, loose, resolved);
+		assertEquals(3, map.size());
+		assertFalse(map.isEmpty());
+		assertTrue(map.containsKey(refA.getName()));
+		assertSame(refA, map.get(refA.getName()));
+
+		// loose overrides packed given same name
+		assertSame(refB_TWO, map.get(refB_ONE.getName()));
+
+		Iterator<Ref> itr = map.values().iterator();
+		assertTrue(itr.hasNext());
+		assertSame(refA, itr.next());
+		assertTrue(itr.hasNext());
+		assertSame(refB_TWO, itr.next());
+		assertTrue(itr.hasNext());
+		assertSame(refc, itr.next());
+		assertFalse(itr.hasNext());
+	}
+

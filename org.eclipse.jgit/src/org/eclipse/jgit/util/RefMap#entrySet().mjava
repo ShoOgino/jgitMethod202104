@@ -1,0 +1,41 @@
+	@Override
+	public Set<Entry<String, Ref>> entrySet() {
+		if (entrySet == null) {
+			entrySet = new AbstractSet<Entry<String, Ref>>() {
+				@Override
+				public Iterator<Entry<String, Ref>> iterator() {
+					return new SetIterator();
+				}
+
+				@Override
+				public int size() {
+					if (!sizeIsValid) {
+						size = 0;
+						Iterator<?> i = entrySet().iterator();
+						for (; i.hasNext(); i.next())
+							size++;
+						sizeIsValid = true;
+					}
+					return size;
+				}
+
+				@Override
+				public boolean isEmpty() {
+					if (sizeIsValid)
+						return 0 == size;
+					return !iterator().hasNext();
+				}
+
+				@Override
+				public void clear() {
+					packed = RefList.emptyList();
+					loose = RefList.emptyList();
+					resolved = RefList.emptyList();
+					size = 0;
+					sizeIsValid = true;
+				}
+			};
+		}
+		return entrySet;
+	}
+

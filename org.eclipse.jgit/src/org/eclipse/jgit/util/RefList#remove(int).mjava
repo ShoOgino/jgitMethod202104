@@ -1,0 +1,21 @@
+	/**
+	 * Remove an item at a specific index.
+	 * <p>
+	 * This list instance is not affected by the addition. Because this method
+	 * copies the entire list, it runs in O(N) time.
+	 *
+	 * @param idx
+	 *            position to remove the item from.
+	 * @return copy of this list, after making removing the item at {@code idx}.
+	 */
+	public final RefList<T> remove(int idx) {
+		if (cnt == 1)
+			return emptyList();
+		Ref[] newList = new Ref[cnt - 1];
+		if (0 < idx)
+			System.arraycopy(list, 0, newList, 0, idx);
+		if (idx + 1 < cnt)
+			System.arraycopy(list, idx + 1, newList, idx, cnt - (idx + 1));
+		return new RefList<T>(newList, cnt - 1);
+	}
+

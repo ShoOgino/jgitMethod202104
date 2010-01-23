@@ -1,0 +1,11 @@
+	public void testBuilder_AddAll() {
+		RefList.Builder<Ref> builder = new RefList.Builder<Ref>(1);
+		Ref[] src = { REF_A, REF_B, REF_c, REF_A };
+		builder.addAll(src, 1, 2);
+
+		RefList<Ref> list = builder.toRefList();
+		assertEquals(2, list.size());
+		assertSame(REF_B, list.get(0));
+		assertSame(REF_c, list.get(1));
+	}
+

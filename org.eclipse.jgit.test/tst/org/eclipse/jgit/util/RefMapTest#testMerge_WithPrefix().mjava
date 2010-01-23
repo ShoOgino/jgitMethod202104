@@ -1,0 +1,33 @@
+	public void testMerge_WithPrefix() {
+		final Ref a = newRef("refs/heads/A", ID_ONE);
+		final Ref b = newRef("refs/heads/foo/bar/B", ID_TWO);
+		final Ref c = newRef("refs/heads/foo/rab/C", ID_TWO);
+		final Ref g = newRef("refs/heads/g", ID_ONE);
+		packed = toList(a, b, c, g);
+
+		RefMap map = new RefMap("refs/heads/foo/", packed, loose, resolved);
+		assertEquals(2, map.size());
+
+		assertSame(b, map.get("bar/B"));
+		assertSame(c, map.get("rab/C"));
+		assertNull(map.get("refs/heads/foo/bar/B"));
+		assertNull(map.get("refs/heads/A"));
+
+		assertTrue(map.containsKey("bar/B"));
+		assertTrue(map.containsKey("rab/C"));
+		assertFalse(map.containsKey("refs/heads/foo/bar/B"));
+		assertFalse(map.containsKey("refs/heads/A"));
+
+		Iterator<Map.Entry<String, Ref>> itr = map.entrySet().iterator();
+		Map.Entry<String, Ref> ent;
+		assertTrue(itr.hasNext());
+		ent = itr.next();
+		assertEquals("bar/B", ent.getKey());
+		assertSame(b, ent.getValue());
+		assertTrue(itr.hasNext());
+		ent = itr.next();
+		assertEquals("rab/C", ent.getKey());
+		assertSame(c, ent.getValue());
+		assertFalse(itr.hasNext());
+	}
+

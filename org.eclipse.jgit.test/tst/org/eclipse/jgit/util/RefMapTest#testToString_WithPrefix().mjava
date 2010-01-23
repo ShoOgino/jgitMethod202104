@@ -1,0 +1,19 @@
+	public void testToString_WithPrefix() {
+		final Ref a = newRef("refs/heads/A", ID_ONE);
+		final Ref b = newRef("refs/heads/foo/B", ID_TWO);
+		final Ref c = newRef("refs/heads/foo/C", ID_TWO);
+		final Ref g = newRef("refs/heads/g", ID_ONE);
+
+		packed = toList(a, b, c, g);
+
+		StringBuilder exp = new StringBuilder();
+		exp.append("[");
+		exp.append(b.toString());
+		exp.append(", ");
+		exp.append(c.toString());
+		exp.append("]");
+
+		RefMap map = new RefMap("refs/heads/foo/", packed, loose, resolved);
+		assertEquals(exp.toString(), map.toString());
+	}
+

@@ -1,0 +1,18 @@
+	public void testPutReplaceEntry() {
+		Ref otherc = newRef(REF_c.getName());
+		assertNotSame(REF_c, otherc);
+
+		RefList<Ref> one = toList(REF_A, REF_c);
+		RefList<Ref> two = one.put(otherc);
+		assertNotSame(one, two);
+
+		// one is not modified, but two is
+		assertEquals(2, one.size());
+		assertSame(REF_A, one.get(0));
+		assertSame(REF_c, one.get(1));
+
+		assertEquals(2, two.size());
+		assertSame(REF_A, two.get(0));
+		assertSame(otherc, two.get(1));
+	}
+
