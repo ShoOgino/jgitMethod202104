@@ -3,14 +3,14 @@
 	 *
 	 * @param refs
 	 *            zero or more refs to format for the client. The collection is
-	 *            copied and sorted before display and therefore may appear in
-	 *            any order.
+	 *            sorted before display if necessary, and therefore may appear
+	 *            in any order.
 	 * @throws IOException
 	 *             the underlying output stream failed to write out an
 	 *             advertisement record.
 	 */
-	public void send(final Collection<Ref> refs) throws IOException {
-		for (final Ref r : RefComparator.sort(refs)) {
+	public void send(final Map<String, Ref> refs) throws IOException {
+		for (final Ref r : getSortedRefs(refs)) {
 			final RevObject obj = parseAnyOrNull(r.getObjectId());
 			if (obj != null) {
 				advertiseAny(obj, r.getName());
