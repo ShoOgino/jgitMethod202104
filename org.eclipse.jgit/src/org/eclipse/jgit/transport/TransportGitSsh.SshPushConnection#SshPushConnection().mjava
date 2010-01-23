@@ -20,6 +20,8 @@
 			try {
 				readAdvertisedRefs();
 			} catch (NoRemoteRepositoryException notFound) {
+				close();
+				checkExecFailure(exitStatus, getOptionReceivePack());
 				throw cleanNotFound(notFound);
 			}
 		}
