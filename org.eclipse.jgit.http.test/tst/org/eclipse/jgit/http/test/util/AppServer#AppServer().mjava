@@ -22,15 +22,12 @@
 		contexts = new ContextHandlerCollection();
 
 		log = new TestRequestLog();
-
-		final RequestLogHandler logHandler = new RequestLogHandler();
-		logHandler.setHandler(contexts);
-		logHandler.setRequestLog(log);
+		log.setHandler(contexts);
 
 		server = new Server();
 		server.setConnectors(new Connector[] { connector });
 		server.setThreadPool(pool);
-		server.setHandler(logHandler);
+		server.setHandler(log);
 
 		server.setStopAtShutdown(false);
 		server.setGracefulShutdown(0);
