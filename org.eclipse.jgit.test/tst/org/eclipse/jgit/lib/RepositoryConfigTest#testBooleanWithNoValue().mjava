@@ -1,0 +1,9 @@
+	public void testBooleanWithNoValue() throws ConfigInvalidException {
+		Config c = parse("[my]\n\tempty\n");
+		assertEquals("", c.getString("my", null, "empty"));
+		assertEquals(1, c.getStringList("my", null, "empty").length);
+		assertEquals("", c.getStringList("my", null, "empty")[0]);
+		assertTrue(c.getBoolean("my", "empty", false));
+		assertEquals("[my]\n\tempty\n", c.toText());
+	}
+
