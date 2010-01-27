@@ -12,6 +12,7 @@
 	public IndexPack(final Repository db, final InputStream src,
 			final File dstBase) throws IOException {
 		repo = db;
+		objectDatabase = db.getObjectDatabase().newCachedDatabase();
 		in = src;
 		inflater = InflaterCache.get();
 		readCurs = new WindowCursor();
