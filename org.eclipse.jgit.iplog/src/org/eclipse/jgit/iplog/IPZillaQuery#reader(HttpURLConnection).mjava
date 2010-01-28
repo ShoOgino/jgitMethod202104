@@ -1,0 +1,9 @@
+	private BufferedReader reader(HttpURLConnection conn)
+			throws UnsupportedEncodingException, IOException {
+		String encoding = conn.getContentEncoding();
+		InputStream in = conn.getInputStream();
+		if (encoding != null && !encoding.equals(""))
+			return new BufferedReader(new InputStreamReader(in, encoding));
+		return new BufferedReader(new InputStreamReader(in));
+	}
+

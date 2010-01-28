@@ -1,0 +1,12 @@
+	private Element createCommitter(Committer who) {
+		Element r = createElement("committer");
+		required(r, "id", who.getID());
+		required(r, "firstName", who.getFirstName());
+		required(r, "lastName", who.getLastName());
+		optional(r, "affiliation", who.getAffiliation());
+		required(r, "active", Boolean.toString(who.isActive()));
+		required(r, "hasCommits", Boolean.toString(who.hasCommits()));
+		optional(r, "comments", who.getComments());
+		return r;
+	}
+

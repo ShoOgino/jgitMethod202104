@@ -1,0 +1,36 @@
+	/**
+	 * Scan a Git repository's history to compute the changes within it.
+	 *
+	 * @param repo
+	 *            the repository to scan.
+	 * @param startCommit
+	 *            commit the IP log is needed for.
+	 * @param version
+	 *            symbolic label for the version.
+	 * @throws IOException
+	 *             the repository cannot be read.
+	 * @throws ConfigInvalidException
+	 *             the {@code .eclipse_iplog} file present at the top level of
+	 *             {@code startId} is not a valid configuration file.
+	 */
+	public void scan(Repository repo, RevCommit startCommit, String version)
+			throws IOException, ConfigInvalidException {
+		try {
+			db = repo;
+			rw = new RevWalk(db);
+			tw = new NameConflictTreeWalk(db);
+
+			RevCommit c = rw.parseCommit(startCommit);
+
+			loadEclipseIpLog(version, c);
+			loadCommitters(repo);
+			scanProjectCommits(c);
+			commits.add(c);
+		} finally {
+			WindowCursor.release(curs);
+			db = null;
+			rw = null;
+			tw = null;
+		}
+	}
+

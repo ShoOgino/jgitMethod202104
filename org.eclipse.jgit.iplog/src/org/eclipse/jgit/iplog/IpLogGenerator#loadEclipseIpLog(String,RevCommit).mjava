@@ -1,0 +1,23 @@
+	private void loadEclipseIpLog(String version, RevCommit commit)
+			throws IOException, ConfigInvalidException {
+		TreeWalk log = TreeWalk.forPath(db, IpLogMeta.IPLOG_CONFIG_FILE, commit
+				.getTree());
+		if (log == null)
+			return;
+
+		IpLogMeta meta = new IpLogMeta();
+		try {
+			meta.loadFrom(new BlobBasedConfig(null, db, log.getObjectId(0)));
+		} catch (ConfigInvalidException e) {
+			throw new ConfigInvalidException("Configuration file "
+					+ log.getPathString() + " in commit " + commit.name()
+					+ " is invalid", e);
+		}
+
+		for (Project p : meta.getProjects()) {
+			p.setVersion(version);
+			projects.put(p.getName(), p);
+		}
+		cqs.addAll(meta.getCQs());
+	}
+

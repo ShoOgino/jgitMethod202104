@@ -1,0 +1,25 @@
+	void loadFrom(Config cfg) {
+		projects.clear();
+		cqs.clear();
+
+		for (String id : cfg.getSubsections(S_PROJECT)) {
+			String name = cfg.getString(S_PROJECT, id, K_NAME);
+			Project project = new Project(id, name);
+			project.setComments(cfg.getString(S_PROJECT, id, K_COMMENTS));
+
+			for (String license : cfg.getStringList(S_PROJECT, id, K_LICENSE))
+				project.addLicense(license);
+			projects.add(project);
+		}
+
+		for (String id : cfg.getSubsections(S_CQ)) {
+			CQ cq = new CQ(Long.parseLong(id));
+			cq.setDescription(cfg.getString(S_CQ, id, K_DESCRIPTION));
+			cq.setLicense(cfg.getString(S_CQ, id, K_LICENSE));
+			cq.setUse(cfg.getString(S_CQ, id, K_USE));
+			cq.setState(cfg.getString(S_CQ, id, K_STATE));
+			cq.setComments(cfg.getString(S_CQ, id, K_COMMENTS));
+			cqs.add(cq);
+		}
+	}
+

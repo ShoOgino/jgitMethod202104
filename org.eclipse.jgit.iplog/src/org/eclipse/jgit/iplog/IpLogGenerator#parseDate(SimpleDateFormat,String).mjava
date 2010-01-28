@@ -1,0 +1,16 @@
+	private Date parseDate(SimpleDateFormat dt, String value)
+			throws IOException {
+		if ("NULL".equals(value) || "".equals(value) || value == null)
+			return null;
+		int dot = value.indexOf('.');
+		if (0 < dot)
+			value = value.substring(0, dot);
+		try {
+			return dt.parse(value);
+		} catch (ParseException e) {
+			IOException err = new IOException("Invalid date: " + value);
+			err.initCause(e);
+			throw err;
+		}
+	}
+
