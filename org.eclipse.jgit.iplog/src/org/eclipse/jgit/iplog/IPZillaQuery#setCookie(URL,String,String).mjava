@@ -1,0 +1,13 @@
+	private void setCookie(URL url, String name, String value)
+			throws IOException {
+		Map<String, List<String>> cols = new HashMap<String, List<String>>();
+		cols.put("Set-Cookie", Collections.singletonList(name + "=" + value));
+		try {
+			CookieHandler.getDefault().put(url.toURI(), cols);
+		} catch (URISyntaxException e) {
+			IOException err = new IOException("Invalid URI format:" + url);
+			err.initCause(e);
+			throw err;
+		}
+	}
+

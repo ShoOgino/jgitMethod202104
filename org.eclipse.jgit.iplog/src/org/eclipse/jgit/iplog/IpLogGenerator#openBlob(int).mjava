@@ -1,0 +1,8 @@
+	private byte[] openBlob(int side) throws IOException {
+		tw.getObjectId(idbuf, side);
+		ObjectLoader ldr = db.openObject(curs, idbuf);
+		if (ldr == null)
+			throw new MissingObjectException(idbuf.copy(), Constants.OBJ_BLOB);
+		return ldr.getCachedBytes();
+	}
+

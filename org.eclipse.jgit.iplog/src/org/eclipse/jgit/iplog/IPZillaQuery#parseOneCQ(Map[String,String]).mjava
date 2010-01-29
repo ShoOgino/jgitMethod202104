@@ -1,0 +1,65 @@
+	private CQ parseOneCQ(Map<String, String> row) {
+		long id = Long.parseLong(row.get("bug_id"));
+		String state = row.get("bug_severity");
+		String bug_status = row.get("bug_status");
+		String resolution = row.get("resolution");
+		String short_desc = row.get("short_desc");
+		String license = row.get("cf_license");
+
+		Set<String> keywords = new TreeSet<String>();
+		for (String w : row.get("keywords").split(", *"))
+			keywords.add(w);
+
+		// Skip any CQs that were not accepted.
+		//
+		if ("closed".equalsIgnoreCase(state)
+				|| "rejected".equalsIgnoreCase(state)
+				|| "withdrawn".equalsIgnoreCase(state))
+			return null;
+
+		// Skip any CQs under the EPL without nonepl keyword
+		// Skip any CQs with the EPL keyword
+		//
+		if (!keywords.contains("nonepl") && license.matches(RE_EPL))
+			return null;
+		if (keywords.contains("epl"))
+			return null;
+
+		// Work around CQs that were closed in the wrong state.
+		//
+		if ("new".equalsIgnoreCase(state)
+				|| "under_review".equalsIgnoreCase(state)
+				|| state.startsWith("awaiting_")) {
+			if ("RESOLVED".equalsIgnoreCase(bug_status)
+					|| "CLOSED".equalsIgnoreCase(bug_status)) {
+				if ("FIXED".equalsIgnoreCase(resolution))
+					state = "approved";
+				else
+					return null;
+			}
+		}
+
+		StringBuilder use = new StringBuilder();
+		for (String n : new String[] { "unmodified", "modified", "source",
+				"binary" }) {
+			if (keywords.contains(n)) {
+				if (use.length() > 0)
+					use.append(' ');
+				use.append(n);
+			}
+		}
+		if (keywords.contains("sourceandbinary")) {
+			if (use.length() > 0)
+				use.append(' ');
+			use.append("source & binary");
+		}
+
+		CQ cq = new CQ(id);
+		cq.setDescription(short_desc);
+		cq.setLicense(license);
+		cq.setState(state);
+		if (use.length() > 0)
+			cq.setUse(use.toString().trim());
+		return cq;
+	}
+

@@ -1,0 +1,62 @@
+	/**
+	 * Query the Eclipse Foundation's IPzilla database for CQ records.
+	 * <p>
+	 * Updates the local {@code .eclipse_iplog} configuration file with current
+	 * information by deleting CQs which are no longer relevant, and adding or
+	 * updating any CQs which currently exist in the database.
+	 *
+	 * @param file
+	 *            local file to update with current CQ records.
+	 * @param base
+	 *            base https:// URL of the IPzilla server.
+	 * @param username
+	 *            username to login to IPzilla as. Must be a Bugzilla username
+	 *            of someone authorized to query the project's IPzilla records.
+	 * @param password
+	 *            password for {@code username}.
+	 * @throws IOException
+	 *             IPzilla cannot be queried, or the local file cannot be read
+	 *             from or written to.
+	 * @throws ConfigInvalidException
+	 *             the local file cannot be read, as it is not a valid
+	 *             configuration file format.
+	 */
+	public void syncCQs(File file, URL base, String username, String password)
+			throws IOException, ConfigInvalidException {
+		if (!file.getParentFile().exists())
+			file.getParentFile().mkdirs();
+
+		LockFile lf = new LockFile(file);
+		if (!lf.lock())
+			throw new IOException("Cannot lock " + file);
+		try {
+			FileBasedConfig cfg = new FileBasedConfig(file);
+			cfg.load();
+			loadFrom(cfg);
+
+			IPZillaQuery ipzilla = new IPZillaQuery(base, username, password);
+			Set<CQ> current = ipzilla.getCQs(projects);
+
+			for (CQ cq : sort(current, CQ.COMPARATOR)) {
+				String id = Long.toString(cq.getID());
+
+				set(cfg, S_CQ, id, K_DESCRIPTION, cq.getDescription());
+				set(cfg, S_CQ, id, K_LICENSE, cq.getLicense());
+				set(cfg, S_CQ, id, K_USE, cq.getUse());
+				set(cfg, S_CQ, id, K_STATE, cq.getState());
+				set(cfg, S_CQ, id, K_COMMENTS, cq.getComments());
+			}
+
+			for (CQ cq : cqs) {
+				if (!current.contains(cq))
+					cfg.unsetSection(S_CQ, Long.toString(cq.getID()));
+			}
+
+			lf.write(Constants.encode(cfg.toText()));
+			if (!lf.commit())
+				throw new IOException("Cannot write " + file);
+		} finally {
+			lf.unlock();
+		}
+	}
+

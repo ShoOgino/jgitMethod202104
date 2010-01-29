@@ -1,0 +1,27 @@
+	@Override
+	protected void run() throws Exception {
+		if (CookieHandler.getDefault() == null)
+			CookieHandler.setDefault(new SimpleCookieManager());
+
+		final URL ipzilla = new URL(url);
+		if (username == null) {
+			final PasswordAuthentication auth = Authenticator
+					.requestPasswordAuthentication(ipzilla.getHost(), //
+							null, //
+							ipzilla.getPort(), //
+							ipzilla.getProtocol(), //
+							"IPZilla Password", //
+							ipzilla.getProtocol(), //
+							ipzilla, //
+							Authenticator.RequestorType.SERVER);
+			username = auth.getUserName();
+			password = new String(auth.getPassword());
+		}
+
+		if (output == null)
+			output = new File(db.getWorkDir(), IpLogMeta.IPLOG_CONFIG_FILE);
+
+		IpLogMeta meta = new IpLogMeta();
+		meta.syncCQs(output, ipzilla, username, password);
+	}
+

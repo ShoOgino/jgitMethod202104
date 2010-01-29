@@ -1,0 +1,23 @@
+	@Override
+	public Map<String, List<String>> get(URI uri,
+			Map<String, List<String>> requestHeaders) throws IOException {
+		String host = hostOf(uri);
+
+		Map<String, String> map = byHost.get(host);
+		if (map == null || map.isEmpty())
+			return requestHeaders;
+
+		Map<String, List<String>> r = new HashMap<String, List<String>>();
+		r.putAll(requestHeaders);
+		StringBuilder buf = new StringBuilder();
+		for (Map.Entry<String, String> e : map.entrySet()) {
+			if (buf.length() > 0)
+				buf.append("; ");
+			buf.append(e.getKey());
+			buf.append('=');
+			buf.append(e.getValue());
+		}
+		r.put("Cookie", Collections.singletonList(buf.toString()));
+		return Collections.unmodifiableMap(r);
+	}
+

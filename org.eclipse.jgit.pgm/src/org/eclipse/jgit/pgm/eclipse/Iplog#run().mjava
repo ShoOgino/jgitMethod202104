@@ -1,0 +1,46 @@
+	@Override
+	protected void run() throws Exception {
+		if (CookieHandler.getDefault() == null)
+			CookieHandler.setDefault(new SimpleCookieManager());
+
+		final IpLogGenerator log = new IpLogGenerator();
+
+		if (commitId == null) {
+			System.err.println("warning: No commit given on command line,"
+					+ " assuming " + Constants.HEAD);
+			commitId = db.resolve(Constants.HEAD);
+		}
+
+		final RevWalk rw = new RevWalk(db);
+		final RevObject start = rw.parseAny(commitId);
+		if (version == null && start instanceof RevTag)
+			version = ((RevTag) start).getTagName();
+		else if (version == null)
+			throw die(start.name() + " is not a tag, --version is required");
+
+		log.scan(db, rw.parseCommit(start), version);
+
+		if (output != null) {
+			if (!output.getParentFile().exists())
+				output.getParentFile().mkdirs();
+			LockFile lf = new LockFile(output);
+			if (!lf.lock())
+				throw die("Cannot lock " + output);
+			try {
+				OutputStream os = lf.getOutputStream();
+				try {
+					log.writeTo(os);
+				} finally {
+					os.close();
+				}
+				if (!lf.commit())
+					throw die("Cannot write " + output);
+			} finally {
+				lf.unlock();
+			}
+		} else {
+			log.writeTo(System.out);
+			System.out.flush();
+		}
+	}
+
