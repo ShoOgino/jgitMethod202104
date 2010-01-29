@@ -1,0 +1,16 @@
+	/**
+	 * Remove all configuration values under a single section.
+	 *
+	 * @param section
+	 *            section name, e.g "branch"
+	 * @param subsection
+	 *            optional subsection value, e.g. a branch name
+	 */
+	public void unsetSection(String section, String subsection) {
+		State src, res;
+		do {
+			src = state.get();
+			res = unsetSection(src, section, subsection);
+		} while (!state.compareAndSet(src, res));
+	}
+
