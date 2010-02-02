@@ -1,0 +1,10 @@
+	public void testCorruptChecksumAtFooter() throws Exception {
+		final DirCache dc = new DirCache(pathOf("gitgit.index.badchecksum"));
+		try {
+			dc.read();
+			fail("Cache loaded despite corrupt checksum");
+		} catch (CorruptObjectException err) {
+			assertEquals("DIRC checksum mismatch", err.getMessage());
+		}
+	}
+

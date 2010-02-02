@@ -35,13 +35,20 @@
 				//
 				break;
 			}
-			in.reset();
 
+			in.reset();
+			md.update(hdr, 0, 8);
+			IO.skipFully(in, 8);
+
+			long sz = NB.decodeUInt32(hdr, 4);
 			switch (NB.decodeInt32(hdr, 0)) {
 			case EXT_TREE: {
-				final byte[] raw = new byte[NB.decodeInt32(hdr, 4)];
-				md.update(hdr, 0, 8);
-				IO.skipFully(in, 8);
+				if (Integer.MAX_VALUE < sz) {
+					throw new CorruptObjectException("DIRC extension "
+							+ formatExtensionName(hdr) + " is too large at "
+							+ sz + " bytes.");
+				}
+				final byte[] raw = new byte[(int) sz];
 				IO.readFully(in, raw, 0, raw.length);
 				md.update(raw, 0, raw.length);
 				tree = new DirCacheTree(raw, new MutableInteger(), null);
@@ -51,18 +58,18 @@
 				if (hdr[0] >= 'A' && hdr[0] <= 'Z') {
 					// The extension is optional and is here only as
 					// a performance optimization. Since we do not
-					// understand it, we can safely skip past it.
+					// understand it, we can safely skip past it, after
+					// we include its data in our checksum.
 					//
-					IO.skipFully(in, NB.decodeUInt32(hdr, 4));
+					skipOptionalExtension(in, md, hdr, sz);
 				} else {
 					// The extension is not an optimization and is
 					// _required_ to understand this index format.
 					// Since we did not trap it above we must abort.
 					//
-					throw new CorruptObjectException("DIRC extension '"
-							+ Constants.CHARSET.decode(
-									ByteBuffer.wrap(hdr, 0, 4)).toString()
-							+ "' not supported by this version.");
+					throw new CorruptObjectException("DIRC extension "
+							+ formatExtensionName(hdr)
+							+ " not supported by this version.");
 				}
 			}
 		}
