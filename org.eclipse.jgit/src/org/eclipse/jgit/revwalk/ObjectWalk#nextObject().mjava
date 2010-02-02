@@ -14,18 +14,12 @@
 	 */
 	public RevObject nextObject() throws MissingObjectException,
 			IncorrectObjectTypeException, IOException {
-		fromTreeWalk = false;
-
-		if (nextSubtree != null) {
-			treeWalk = treeWalk.createSubtreeIterator0(db, nextSubtree, curs);
-			nextSubtree = null;
-		}
+		if (last != null)
+			treeWalk = last instanceof RevTree ? enter(last) : treeWalk.next();
 
 		while (!treeWalk.eof()) {
 			final FileMode mode = treeWalk.getEntryFileMode();
-			final int sType = mode.getObjectType();
-
-			switch (sType) {
+			switch (mode.getObjectType()) {
 			case Constants.OBJ_BLOB: {
 				treeWalk.getEntryObjectId(idBuffer);
 				final RevBlob o = lookupBlob(idBuffer);
@@ -34,7 +28,7 @@
 				o.flags |= SEEN;
 				if (shouldSkipObject(o))
 					break;
-				fromTreeWalk = true;
+				last = o;
 				return o;
 			}
 			case Constants.OBJ_TREE: {
@@ -45,8 +39,7 @@
 				o.flags |= SEEN;
 				if (shouldSkipObject(o))
 					break;
-				nextSubtree = o;
-				fromTreeWalk = true;
+				last = o;
 				return o;
 			}
 			default:
@@ -62,6 +55,7 @@
 			treeWalk = treeWalk.next();
 		}
 
+		last = null;
 		for (;;) {
 			final RevObject o = pendingObjects.next();
 			if (o == null)

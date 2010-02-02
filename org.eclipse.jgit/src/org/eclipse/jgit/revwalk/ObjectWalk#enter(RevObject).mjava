@@ -1,0 +1,12 @@
+	private CanonicalTreeParser enter(RevObject tree) throws IOException {
+		CanonicalTreeParser p = treeWalk.createSubtreeIterator0(db, tree, curs);
+		if (p.eof()) {
+			// We can't tolerate the subtree being an empty tree, as
+			// that will break us out early before we visit all names.
+			// If it is, advance to the parent's next record.
+			//
+			return treeWalk.next();
+		}
+		return p;
+	}
+
