@@ -7,8 +7,7 @@
 			if (!currentTask.equals(taskname)) {
 				currentTask = taskname;
 				lastCnt = 0;
-				final int tot = Integer.parseInt(matcher.group(3));
-				monitor.beginTask(currentTask, tot);
+				beginTask(Integer.parseInt(matcher.group(3)));
 			}
 			final int cnt = Integer.parseInt(matcher.group(2));
 			monitor.update(cnt - lastCnt);
@@ -22,7 +21,7 @@
 			if (!currentTask.equals(taskname)) {
 				currentTask = taskname;
 				lastCnt = 0;
-				monitor.beginTask(currentTask, ProgressMonitor.UNKNOWN);
+				beginTask(ProgressMonitor.UNKNOWN);
 			}
 			final int cnt = Integer.parseInt(matcher.group(2));
 			monitor.update(cnt - lastCnt);
