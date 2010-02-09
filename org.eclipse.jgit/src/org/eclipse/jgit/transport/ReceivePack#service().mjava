@@ -38,10 +38,9 @@
 			} else if (msgs != null) {
 				sendStatusReport(false, new Reporter() {
 					void sendString(final String s) throws IOException {
-						msgs.println(s);
+						msgs.write(s + "\n");
 					}
 				});
-				msgs.flush();
 			}
 
 			postReceive.onPostReceive(this, filterCommands(Result.OK));

@@ -15,6 +15,11 @@
 	 *            string must not end with an LF, and must not contain an LF.
 	 */
 	public void sendError(final String what) {
-		sendMessage("error", what);
+		try {
+			if (msgs != null)
+				msgs.write("error: " + what + "\n");
+		} catch (IOException e) {
+			// Ignore write failures.
+		}
 	}
 
