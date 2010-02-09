@@ -8,8 +8,8 @@
 				return;
 			}
 
-			channel = in.read();
-			available -= 5; // length header plus channel indicator
+			channel = rawIn.read();
+			available -= HDR_SIZE; // length header plus channel indicator
 			if (available == 0)
 				continue;
 
@@ -18,7 +18,6 @@
 				return;
 			case CH_PROGRESS:
 				progress(readString(available));
-
 				continue;
 			case CH_ERROR:
 				eof = true;
