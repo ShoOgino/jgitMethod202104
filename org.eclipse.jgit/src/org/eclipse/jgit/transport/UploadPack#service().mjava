@@ -2,7 +2,7 @@
 		if (biDirectionalPipe)
 			sendAdvertisedRefs(new PacketLineOutRefAdvertiser(pckOut));
 		else {
-			refs = db.getAllRefs();
+			refs = refFilter.filter(db.getAllRefs());
 			for (Ref r : refs.values()) {
 				try {
 					walk.parseAny(r.getObjectId()).add(ADVERTISED);
