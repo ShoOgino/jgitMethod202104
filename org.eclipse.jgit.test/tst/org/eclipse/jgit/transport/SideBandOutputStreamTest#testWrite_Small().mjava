@@ -1,9 +1,10 @@
 	public void testWrite_Small() throws IOException {
 		final SideBandOutputStream out;
-		out = new SideBandOutputStream(SideBandOutputStream.CH_DATA, pckOut);
+		out = new SideBandOutputStream(CH_DATA, SMALL_BUF, rawOut);
 		out.write('a');
 		out.write('b');
 		out.write('c');
-		assertBuffer("0006\001a0006\001b0006\001c");
+		out.flush();
+		assertBuffer("0008\001abc");
 	}
 

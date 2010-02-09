@@ -1,6 +1,26 @@
 	@Override
-	public void write(final byte[] b, final int off, final int len)
-			throws IOException {
-		pckOut.writeChannelPacket(channel, b, off, len);
+	public void write(final byte[] b, int off, int len) throws IOException {
+		while (0 < len) {
+			int capacity = buffer.length - cnt;
+			if (cnt == HDR_SIZE && capacity < len) {
+				// Our block to write is bigger than the packet size,
+				// stream it out as-is to avoid unnecessary copies.
+				PacketLineOut.formatLength(buffer, buffer.length);
+				out.write(buffer, 0, HDR_SIZE);
+				out.write(b, off, capacity);
+				off += capacity;
+				len -= capacity;
+
+			} else {
+				if (capacity == 0)
+					writeBuffer();
+
+				int n = Math.min(len, capacity);
+				System.arraycopy(b, off, buffer, cnt, n);
+				cnt += n;
+				off += n;
+				len -= n;
+			}
+		}
 	}
 

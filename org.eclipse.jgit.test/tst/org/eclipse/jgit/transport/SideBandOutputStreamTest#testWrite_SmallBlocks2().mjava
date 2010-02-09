@@ -1,0 +1,8 @@
+	public void testWrite_SmallBlocks2() throws IOException {
+		final SideBandOutputStream out;
+		out = new SideBandOutputStream(CH_DATA, 6, rawOut);
+		out.write(new byte[] { 'a', 'b', 'c' });
+		out.flush();
+		assertBuffer("0006\001a0006\001b0006\001c");
+	}
+
