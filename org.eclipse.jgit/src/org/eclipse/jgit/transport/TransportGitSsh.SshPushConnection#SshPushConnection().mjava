@@ -1,12 +1,14 @@
 		SshPushConnection() throws TransportException {
 			super(TransportGitSsh.this);
 			try {
-				channel = exec(getOptionReceivePack());
+				final MessageWriter msg = new MessageWriter();
+				setMessageWriter(msg);
+				channel = exec(getOptionReceivePack(), msg.getRawStream());
 
 				if (channel.isConnected())
 					init(channel.getInputStream(), outputStream(channel));
 				else
-					throw new TransportException(uri, errStream.toString());
+					throw new TransportException(uri, getMessages());
 
 			} catch (TransportException err) {
 				close();
@@ -20,9 +22,9 @@
 			try {
 				readAdvertisedRefs();
 			} catch (NoRemoteRepositoryException notFound) {
-				close();
-				checkExecFailure(exitStatus, getOptionReceivePack());
-				throw cleanNotFound(notFound);
+				final String msgs = getMessages();
+				checkExecFailure(exitStatus, getOptionReceivePack(), msgs);
+				throw cleanNotFound(notFound, msgs);
 			}
 		}
 

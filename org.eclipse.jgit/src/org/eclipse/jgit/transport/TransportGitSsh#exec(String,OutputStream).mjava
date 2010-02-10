@@ -1,12 +1,12 @@
-	ChannelExec exec(final String exe) throws TransportException {
+	ChannelExec exec(final String exe, final OutputStream err)
+			throws TransportException {
 		initSession();
 
 		final int tms = getTimeout() > 0 ? getTimeout() * 1000 : 0;
 		try {
 			final ChannelExec channel = (ChannelExec) sock.openChannel("exec");
 			channel.setCommand(commandFor(exe));
-			errStream = createErrorStream();
-			channel.setErrStream(errStream, true);
+			channel.setErrStream(err);
 			channel.connect(tms);
 			return channel;
 		} catch (JSchException je) {

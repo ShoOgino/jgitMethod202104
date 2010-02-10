@@ -1,8 +1,15 @@
-	private String enableCapabilities() {
+	private String enableCapabilities(final ProgressMonitor monitor) {
 		final StringBuilder line = new StringBuilder();
 		capableReport = wantCapability(line, CAPABILITY_REPORT_STATUS);
 		capableDeleteRefs = wantCapability(line, CAPABILITY_DELETE_REFS);
 		capableOfsDelta = wantCapability(line, CAPABILITY_OFS_DELTA);
+
+		capableSideBand = wantCapability(line, CAPABILITY_SIDE_BAND_64K);
+		if (capableSideBand) {
+			in = new SideBandInputStream(in, monitor, getMessageWriter());
+			pckIn = new PacketLineIn(in);
+		}
+
 		if (line.length() > 0)
 			line.setCharAt(0, '\0');
 		return line.toString();
