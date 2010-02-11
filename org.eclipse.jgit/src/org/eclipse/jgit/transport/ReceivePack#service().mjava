@@ -3,6 +3,8 @@
 			sendAdvertisedRefs(new PacketLineOutRefAdvertiser(pckOut));
 		else
 			refs = refFilter.filter(db.getAllRefs());
+		if (advertiseError != null)
+			return;
 		recvCommands();
 		if (!commands.isEmpty()) {
 			enableCapabilities();
