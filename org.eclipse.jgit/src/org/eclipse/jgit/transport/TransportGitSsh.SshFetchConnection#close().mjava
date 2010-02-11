@@ -1,5 +1,15 @@
 		@Override
 		public void close() {
+			if (errorThread != null) {
+				try {
+					errorThread.join();
+				} catch (InterruptedException e) {
+					// Stop waiting and return anyway.
+				} finally {
+					errorThread = null;
+				}
+			}
+
 			super.close();
 
 			if (channel != null) {

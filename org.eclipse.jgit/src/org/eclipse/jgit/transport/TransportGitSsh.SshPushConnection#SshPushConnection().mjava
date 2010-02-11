@@ -3,12 +3,16 @@
 			try {
 				final MessageWriter msg = new MessageWriter();
 				setMessageWriter(msg);
-				channel = exec(getOptionReceivePack(), msg.getRawStream());
 
-				if (channel.isConnected())
-					init(channel.getInputStream(), outputStream(channel));
-				else
-					throw new TransportException(uri, getMessages());
+				channel = exec(getOptionReceivePack());
+				if (!channel.isConnected())
+					throw new TransportException(uri, "connection failed");
+
+				final InputStream rpErr = channel.getErrStream();
+				errorThread = new StreamCopyThread(rpErr, msg.getRawStream());
+				errorThread.start();
+
+				init(channel.getInputStream(), outputStream(channel));
 
 			} catch (TransportException err) {
 				close();
