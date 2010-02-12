@@ -13,9 +13,8 @@
 	 * </p>
 	 *
 	 * @param packStream
-	 *            output stream of pack data. If the stream is not buffered it
-	 *            will be buffered by the writer. Caller is responsible for
-	 *            closing the stream.
+	 *            output stream of pack data. The stream should be buffered by
+	 *            the caller. The caller is responsible for closing the stream.
 	 * @throws IOException
 	 *             an error occurred reading a local object's data to include in
 	 *             the pack, or writing compressed object data to the output
@@ -25,8 +24,6 @@
 		if (reuseDeltas || reuseObjects)
 			searchForReuse();
 
-		if (!(packStream instanceof BufferedOutputStream))
-			packStream = new BufferedOutputStream(packStream);
 		out = new PackOutputStream(packStream);
 
 		writeMonitor.beginTask(WRITING_OBJECTS_PROGRESS, getObjectsNumber());
@@ -34,7 +31,6 @@
 		writeObjects();
 		writeChecksum();
 
-		out.flush();
 		windowCursor.release();
 		writeMonitor.endTask();
 	}

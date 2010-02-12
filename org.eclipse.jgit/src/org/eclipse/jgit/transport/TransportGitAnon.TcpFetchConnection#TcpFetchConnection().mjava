@@ -2,7 +2,13 @@
 			super(TransportGitAnon.this);
 			sock = openConnection();
 			try {
-				init(sock.getInputStream(), sock.getOutputStream());
+				InputStream sIn = sock.getInputStream();
+				OutputStream sOut = sock.getOutputStream();
+
+				sIn = new BufferedInputStream(sIn);
+				sOut = new BufferedOutputStream(sOut);
+
+				init(sIn, sOut);
 				service("git-upload-pack", pckOut);
 			} catch (IOException err) {
 				close();

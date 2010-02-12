@@ -10,8 +10,12 @@
 			errorReaderThread = new StreamCopyThread(rpErr, msg.getRawStream());
 			errorReaderThread.start();
 
-			final InputStream rpIn = receivePack.getInputStream();
-			final OutputStream rpOut = receivePack.getOutputStream();
+			InputStream rpIn = receivePack.getInputStream();
+			OutputStream rpOut = receivePack.getOutputStream();
+
+			rpIn = new BufferedInputStream(rpIn);
+			rpOut = new BufferedOutputStream(rpOut);
+
 			init(rpIn, rpOut);
 			readAdvertisedRefs();
 		}
