@@ -5,11 +5,6 @@
 
 			init(advertisement, DisabledOutputStream.INSTANCE);
 			outNeedsEnd = false;
-			try {
-				readAdvertisedRefs();
-			} catch (IOException err) {
-				close();
-				throw new TransportException(uri, "remote hung up", err);
-			}
+			readAdvertisedRefs();
 		}
 
