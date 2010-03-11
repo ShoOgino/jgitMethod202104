@@ -23,5 +23,19 @@
 					+ " failed: " + c.getResponseCode() + " "
 					+ c.getResponseMessage());
 		}
+
+		String content = readFully(c);
+		Matcher matcher = Pattern.compile("<title>(.*)</title>",
+				Pattern.CASE_INSENSITIVE).matcher(content);
+		if (!matcher.find()) {
+			throw new IOException("Login as " + username + " to " + login
+					+ " failed: Response not HTML as expected");
+		}
+
+		String title = matcher.group(1);
+		if (!"IPZilla Main Page".equals(title)) {
+			throw new IOException("Login as " + username + " to " + login
+					+ " failed; page title was \"" + title + "\"");
+		}
 	}
 

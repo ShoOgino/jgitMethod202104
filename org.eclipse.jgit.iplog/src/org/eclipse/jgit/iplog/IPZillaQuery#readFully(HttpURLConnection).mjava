@@ -1,0 +1,21 @@
+	private String readFully(HttpURLConnection c) throws IOException {
+		String enc = c.getContentEncoding();
+		Reader reader;
+		if (enc != null) {
+			reader = new InputStreamReader(c.getInputStream(), enc);
+		} else {
+			reader = new InputStreamReader(c.getInputStream(), "ISO-8859-1");
+		}
+		try {
+			StringBuilder b = new StringBuilder();
+			BufferedReader r = new BufferedReader(reader);
+			String line;
+			while ((line = r.readLine()) != null) {
+				b.append(line).append('\n');
+			}
+			return b.toString();
+		} finally {
+			reader.close();
+		}
+	}
+
