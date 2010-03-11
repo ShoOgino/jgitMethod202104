@@ -1,0 +1,12 @@
+	public void testJVMDefaultLocale() {
+		Locale.setDefault(Locale.ROOT);
+		NLS.useJVMDefaultLocale();
+		GermanTranslatedBundle bundle = GermanTranslatedBundle.get();
+		assertEquals(Locale.ROOT, bundle.getEffectiveLocale());
+
+		Locale.setDefault(Locale.GERMAN);
+		NLS.useJVMDefaultLocale();
+		bundle = GermanTranslatedBundle.get();
+		assertEquals(Locale.GERMAN, bundle.getEffectiveLocale());
+	}
+

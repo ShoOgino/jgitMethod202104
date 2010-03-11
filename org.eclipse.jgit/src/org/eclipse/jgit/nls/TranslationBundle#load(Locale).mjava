@@ -1,0 +1,43 @@
+	/**
+	 * Injects locale specific text in all instance fields of this instance.
+	 * Only public instance fields of type <code>String</code> are considered.
+	 * <p>
+	 * The name of this (sub)class plus the given <code>locale</code> parameter
+	 * define the resource bundle to be loaded. In other words the
+	 * <code>this.getClass().getName()</code> is used as the
+	 * <code>baseName</code> parameter in the
+	 * {@link ResourceBundle#getBundle(String, Locale)} parameter to load the
+	 * resource bundle.
+	 * <p>
+	 *
+	 * @param locale
+	 *            defines the locale to be used when loading the resource bundle
+	 * @exception TranslationBundleLoadingException see {@link TranslationBundleLoadingException}
+	 * @exception TranslationStringMissingException see {@link TranslationStringMissingException}
+	 */
+	void load(Locale locale) throws TranslationBundleLoadingException {
+		Class bundleClass = getClass();
+		ResourceBundle bundle;
+		try {
+			bundle = ResourceBundle.getBundle(bundleClass.getName(), locale);
+		} catch (MissingResourceException e) {
+			throw new TranslationBundleLoadingException(bundleClass, locale, e);
+		}
+		this.effectiveLocale = bundle.getLocale();
+
+		for (Field field : bundleClass.getFields()) {
+			if (field.getType().equals(String.class)) {
+				try {
+					String translatedText = bundle.getString(field.getName());
+					field.set(this, translatedText);
+				} catch (MissingResourceException e) {
+					throw new TranslationStringMissingException(bundleClass, locale, field.getName(), e);
+				} catch (IllegalArgumentException e) {
+					throw new Error(e);
+				} catch (IllegalAccessException e) {
+					throw new Error(e);
+				}
+			}
+		}
+	}
+

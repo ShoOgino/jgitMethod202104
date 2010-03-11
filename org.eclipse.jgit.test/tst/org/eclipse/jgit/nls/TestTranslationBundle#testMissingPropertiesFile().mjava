@@ -1,0 +1,11 @@
+	public void testMissingPropertiesFile() {
+		try {
+			new NoPropertiesBundle().load(Locale.ROOT);
+			fail("Expected TranslationBundleLoadingException");
+		} catch (TranslationBundleLoadingException e) {
+			assertEquals(NoPropertiesBundle.class, e.getBundleClass());
+			assertEquals(Locale.ROOT, e.getLocale());
+			// pass
+		}
+	}
+

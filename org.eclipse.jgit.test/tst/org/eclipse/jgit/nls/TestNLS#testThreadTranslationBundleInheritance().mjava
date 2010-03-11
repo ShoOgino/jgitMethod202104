@@ -1,0 +1,25 @@
+	public void testThreadTranslationBundleInheritance() throws InterruptedException {
+
+		class T extends Thread {
+			GermanTranslatedBundle bundle;
+			@Override
+			public void run() {
+				bundle = GermanTranslatedBundle.get();
+			}
+		}
+
+		NLS.setLocale(Locale.ROOT);
+		GermanTranslatedBundle mainThreadsBundle = GermanTranslatedBundle.get();
+		T t = new T();
+		t.start();
+		t.join();
+		assertSame(mainThreadsBundle, t.bundle);
+
+		NLS.setLocale(Locale.GERMAN);
+		mainThreadsBundle = GermanTranslatedBundle.get();
+		t = new T();
+		t.start();
+		t.join();
+		assertSame(mainThreadsBundle, t.bundle);
+	}
+

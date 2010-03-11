@@ -1,0 +1,16 @@
+	public void testNonTranslatedBundle() {
+		NonTranslatedBundle bundle = new NonTranslatedBundle();
+
+		bundle.load(Locale.ROOT);
+		assertEquals(Locale.ROOT, bundle.getEffectiveLocale());
+		assertEquals("Good morning {0}", bundle.goodMorning);
+
+		bundle.load(Locale.ENGLISH);
+		assertEquals(Locale.ROOT, bundle.getEffectiveLocale());
+		assertEquals("Good morning {0}", bundle.goodMorning);
+
+		bundle.load(Locale.GERMAN);
+		assertEquals(Locale.ROOT, bundle.getEffectiveLocale());
+		assertEquals("Good morning {0}", bundle.goodMorning);
+	}
+

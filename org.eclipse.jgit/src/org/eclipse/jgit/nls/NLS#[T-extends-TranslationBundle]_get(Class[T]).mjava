@@ -1,0 +1,9 @@
+	private <T extends TranslationBundle> T get(Class<T> type) {
+		TranslationBundle bundle = map.get(type);
+		if (bundle == null) {
+			bundle = GlobalBundleCache.lookupBundle(locale, type);
+			map.putIfAbsent(type, bundle);
+		}
+		return (T) bundle;
+	}
+

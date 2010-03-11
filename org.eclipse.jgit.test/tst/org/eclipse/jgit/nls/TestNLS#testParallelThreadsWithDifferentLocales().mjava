@@ -1,0 +1,40 @@
+	public void testParallelThreadsWithDifferentLocales() throws InterruptedException {
+
+		final CyclicBarrier barrier = new CyclicBarrier(2);
+
+		class T extends Thread {
+			Locale locale;
+			GermanTranslatedBundle bundle;
+			Exception e;
+
+			T(Locale locale) {
+				this.locale = locale;
+			}
+
+			@Override
+			public void run() {
+				try {
+					NLS.setLocale(locale);
+					barrier.await(); // wait for the other thread to set its locale
+					bundle = GermanTranslatedBundle.get();
+				} catch (InterruptedException e) {
+					this.e = e;
+				} catch (BrokenBarrierException e) {
+					this.e = e;
+				}
+			}
+		}
+
+		T t1 = new T(Locale.ROOT);
+		T t2 = new T(Locale.GERMAN);
+		t1.start();
+		t2.start();
+		t1.join();
+		t2.join();
+
+		assertNull("t1 was interrupted or barrier was broken", t1.e);
+		assertNull("t2 was interrupted or barrier was broken", t2.e);
+		assertEquals(Locale.ROOT, t1.bundle.getEffectiveLocale());
+		assertEquals(Locale.GERMAN, t2.bundle.getEffectiveLocale());
+	}
+

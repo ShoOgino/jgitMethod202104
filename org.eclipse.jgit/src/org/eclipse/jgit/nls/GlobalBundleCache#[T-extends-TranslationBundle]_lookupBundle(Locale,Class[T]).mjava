@@ -1,0 +1,36 @@
+	/**
+	 * Looks up for a translation bundle in the global cache. If found returns
+	 * the cached bundle. If not found creates a new instance puts it into the
+	 * cache and returns it.
+	 *
+	 * @param <T>
+	 *            required bundle type
+	 * @param locale
+	 *            the preferred locale
+	 * @param type
+	 *            required bundle type
+	 * @return an instance of the required bundle type
+	 * @exception TranslationBundleLoadingException see {@link TranslationBundle#load(Locale)}
+	 * @exception TranslationStringMissingException see {@link TranslationBundle#load(Locale)}
+	 */
+	static synchronized <T extends TranslationBundle> T lookupBundle(Locale locale, Class<T> type) {
+		try {
+			Map<Class, TranslationBundle> bundles = cachedBundles.get(locale);
+			if (bundles == null) {
+				bundles = new HashMap<Class, TranslationBundle>();
+				cachedBundles.put(locale, bundles);
+			}
+			TranslationBundle bundle = bundles.get(type);
+			if (bundle == null) {
+				bundle = type.newInstance();
+				bundle.load(locale);
+				bundles.put(type, bundle);
+			}
+			return (T) bundle;
+		} catch (InstantiationException e) {
+			throw new Error(e);
+		} catch (IllegalAccessException e) {
+			throw new Error(e);
+		}
+	}
+
