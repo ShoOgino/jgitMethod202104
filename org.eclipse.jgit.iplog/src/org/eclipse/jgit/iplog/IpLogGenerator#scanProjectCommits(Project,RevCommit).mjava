@@ -1,9 +1,14 @@
-	private void scanProjectCommits(RevCommit start) throws IOException {
+	private void scanProjectCommits(Project proj, RevCommit start)
+			throws IOException {
 		rw.reset();
 		rw.markStart(start);
 
 		RevCommit commit;
 		while ((commit = rw.next()) != null) {
+			if (proj.isSkippedCommit(commit)) {
+				continue;
+			}
+
 			final PersonIdent author = commit.getAuthorIdent();
 			final Date when = author.getWhen();
 
