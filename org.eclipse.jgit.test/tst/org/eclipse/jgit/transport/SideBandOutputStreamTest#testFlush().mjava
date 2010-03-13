@@ -12,16 +12,7 @@
 			}
 		};
 
-		new SideBandOutputStream(SideBandOutputStream.CH_DATA,
-				new PacketLineOut(mockout)).flush();
-		assertEquals(0, flushCnt[0]);
-
-		new SideBandOutputStream(SideBandOutputStream.CH_ERROR,
-				new PacketLineOut(mockout)).flush();
+		new SideBandOutputStream(CH_DATA, SMALL_BUF, mockout).flush();
 		assertEquals(1, flushCnt[0]);
-
-		new SideBandOutputStream(SideBandOutputStream.CH_PROGRESS,
-				new PacketLineOut(mockout)).flush();
-		assertEquals(2, flushCnt[0]);
 	}
 

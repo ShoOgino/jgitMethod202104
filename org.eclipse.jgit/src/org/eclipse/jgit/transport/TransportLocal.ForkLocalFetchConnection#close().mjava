@@ -11,5 +11,15 @@
 					uploadPack = null;
 				}
 			}
+
+			if (errorReaderThread != null) {
+				try {
+					errorReaderThread.join();
+				} catch (InterruptedException e) {
+					// Stop waiting and return anyway.
+				} finally {
+					errorReaderThread = null;
+				}
+			}
 		}
 

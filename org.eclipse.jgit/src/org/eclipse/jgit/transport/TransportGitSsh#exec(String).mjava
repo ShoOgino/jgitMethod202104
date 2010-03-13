@@ -5,8 +5,6 @@
 		try {
 			final ChannelExec channel = (ChannelExec) sock.openChannel("exec");
 			channel.setCommand(commandFor(exe));
-			errStream = createErrorStream();
-			channel.setErrStream(errStream, true);
 			channel.connect(tms);
 			return channel;
 		} catch (JSchException je) {

@@ -31,7 +31,7 @@
 				// Connection was used for object transfer. If we
 				// do another fetch we must open a new connection.
 				//
-				closeConnection();
+				closeConnection(result);
 			} else {
 				includedTags = false;
 			}
@@ -55,7 +55,7 @@
 				}
 			}
 		} finally {
-			closeConnection();
+			closeConnection(result);
 		}
 
 		final RevWalk walk = new RevWalk(transport.local);

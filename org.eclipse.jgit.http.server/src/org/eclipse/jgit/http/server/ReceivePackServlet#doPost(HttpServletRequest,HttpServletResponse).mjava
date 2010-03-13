@@ -7,11 +7,14 @@
 		}
 
 		final Repository db = getRepository(req);
-		final ByteArrayOutputStream out = new ByteArrayOutputStream();
 		try {
 			final ReceivePack rp = receivePackFactory.create(req, db);
 			rp.setBiDirectionalPipe(false);
+			rsp.setContentType(RSP_TYPE);
+
+			final SmartOutputStream out = new SmartOutputStream(req, rsp);
 			rp.receive(getInputStream(req), out, null);
+			out.close();
 
 		} catch (ServiceNotAuthorizedException e) {
 			rsp.sendError(SC_UNAUTHORIZED);
@@ -26,7 +29,5 @@
 			rsp.sendError(SC_INTERNAL_SERVER_ERROR);
 			return;
 		}
-
-		reply(rsp, out.toByteArray());
 	}
 

@@ -1,7 +1,8 @@
 	public void testWrite_CH_ERROR() throws IOException {
 		final SideBandOutputStream out;
-		out = new SideBandOutputStream(SideBandOutputStream.CH_ERROR, pckOut);
+		out = new SideBandOutputStream(CH_ERROR, SMALL_BUF, rawOut);
 		out.write(new byte[] { 'a', 'b', 'c' });
+		out.flush();
 		assertBuffer("0008\003abc");
 	}
 

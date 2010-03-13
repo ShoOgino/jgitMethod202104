@@ -8,8 +8,8 @@
 				return;
 			}
 
-			channel = in.read();
-			available -= 5; // length header plus channel indicator
+			channel = rawIn.read() & 0xff;
+			available -= HDR_SIZE; // length header plus channel indicator
 			if (available == 0)
 				continue;
 
@@ -18,11 +18,10 @@
 				return;
 			case CH_PROGRESS:
 				progress(readString(available));
-
 				continue;
 			case CH_ERROR:
 				eof = true;
-				throw new TransportException("remote: " + readString(available));
+				throw new TransportException(PFX_REMOTE + readString(available));
 			default:
 				throw new PackProtocolException("Invalid channel " + channel);
 			}
