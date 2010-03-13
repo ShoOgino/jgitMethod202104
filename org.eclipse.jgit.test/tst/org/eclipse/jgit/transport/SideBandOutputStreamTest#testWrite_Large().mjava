@@ -1,21 +1,21 @@
 	public void testWrite_Large() throws IOException {
-		final int buflen = SideBandOutputStream.MAX_BUF
-				- SideBandOutputStream.HDR_SIZE;
+		final int buflen = MAX_BUF - HDR_SIZE;
 		final byte[] buf = new byte[buflen];
 		for (int i = 0; i < buf.length; i++) {
 			buf[i] = (byte) i;
 		}
 
 		final SideBandOutputStream out;
-		out = new SideBandOutputStream(SideBandOutputStream.CH_DATA, pckOut);
+		out = new SideBandOutputStream(CH_DATA, MAX_BUF, rawOut);
 		out.write(buf);
+		out.flush();
 
 		final byte[] act = rawOut.toByteArray();
-		final String explen = Integer.toString(buf.length + 5, 16);
-		assertEquals(5 + buf.length, act.length);
+		final String explen = Integer.toString(buf.length + HDR_SIZE, 16);
+		assertEquals(HDR_SIZE + buf.length, act.length);
 		assertEquals(new String(act, 0, 4, "UTF-8"), explen);
 		assertEquals(1, act[4]);
-		for (int i = 0, j = 5; i < buf.length; i++, j++) {
+		for (int i = 0, j = HDR_SIZE; i < buf.length; i++, j++) {
 			assertEquals(buf[i], act[j]);
 		}
 	}

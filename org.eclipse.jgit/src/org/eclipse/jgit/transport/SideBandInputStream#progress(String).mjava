@@ -1,4 +1,4 @@
-	private void progress(String pkt) {
+	private void progress(String pkt) throws IOException {
 		pkt = progressBuffer + pkt;
 		for (;;) {
 			final int lf = pkt.indexOf('\n');
@@ -13,11 +13,8 @@
 			else
 				break;
 
-			final String msg = pkt.substring(0, s);
-			if (doProgressLine(msg))
-				pkt = pkt.substring(s + 1);
-			else
-				break;
+			doProgressLine(pkt.substring(0, s + 1));
+			pkt = pkt.substring(s + 1);
 		}
 		progressBuffer = pkt;
 	}

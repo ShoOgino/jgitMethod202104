@@ -5,8 +5,21 @@
 			writeCommands(refUpdates.values(), monitor);
 			if (writePack)
 				writePack(refUpdates, monitor);
-			if (sentCommand && capableReport)
-				readStatusReport(refUpdates);
+			if (sentCommand) {
+				if (capableReport)
+					readStatusReport(refUpdates);
+				if (capableSideBand) {
+					// Ensure the data channel is at EOF, so we know we have
+					// read all side-band data from all channels and have a
+					// complete copy of the messages (if any) buffered from
+					// the other data channels.
+					//
+					int b = in.read();
+					if (0 <= b)
+						throw new TransportException(uri, "expected EOF;"
+								+ " received '" + (char) b + "' instead");
+				}
+			}
 		} catch (TransportException e) {
 			throw e;
 		} catch (Exception e) {

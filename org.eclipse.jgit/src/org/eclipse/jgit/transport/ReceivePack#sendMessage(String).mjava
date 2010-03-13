@@ -9,6 +9,11 @@
 	 *            string must not end with an LF, and must not contain an LF.
 	 */
 	public void sendMessage(final String what) {
-		sendMessage("remote", what);
+		try {
+			if (msgs != null)
+				msgs.write(what + "\n");
+		} catch (IOException e) {
+			// Ignore write failures.
+		}
 	}
 

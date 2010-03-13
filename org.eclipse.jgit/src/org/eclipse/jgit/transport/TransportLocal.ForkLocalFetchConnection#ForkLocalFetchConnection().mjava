@@ -1,8 +1,21 @@
 		ForkLocalFetchConnection() throws TransportException {
 			super(TransportLocal.this);
-			uploadPack = startProcessWithErrStream(getOptionUploadPack());
-			final InputStream upIn = uploadPack.getInputStream();
-			final OutputStream upOut = uploadPack.getOutputStream();
+
+			final MessageWriter msg = new MessageWriter();
+			setMessageWriter(msg);
+
+			uploadPack = spawn(getOptionUploadPack());
+
+			final InputStream upErr = uploadPack.getErrorStream();
+			errorReaderThread = new StreamCopyThread(upErr, msg.getRawStream());
+			errorReaderThread.start();
+
+			InputStream upIn = uploadPack.getInputStream();
+			OutputStream upOut = uploadPack.getOutputStream();
+
+			upIn = new BufferedInputStream(upIn);
+			upOut = new BufferedOutputStream(upOut);
+
 			init(upIn, upOut);
 			readAdvertisedRefs();
 		}

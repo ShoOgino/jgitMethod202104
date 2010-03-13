@@ -1,0 +1,19 @@
+	NoRemoteRepositoryException cleanNotFound(NoRemoteRepositoryException nf,
+			String why) {
+		if (why == null || why.length() == 0)
+			return nf;
+
+		String path = uri.getPath();
+		if (uri.getScheme() != null && uri.getPath().startsWith("/~"))
+			path = uri.getPath().substring(1);
+
+		final StringBuilder pfx = new StringBuilder();
+		pfx.append("fatal: ");
+		sqAlways(pfx, path);
+		pfx.append(": ");
+		if (why.startsWith(pfx.toString()))
+			why = why.substring(pfx.length());
+
+		return new NoRemoteRepositoryException(uri, why);
+	}
+

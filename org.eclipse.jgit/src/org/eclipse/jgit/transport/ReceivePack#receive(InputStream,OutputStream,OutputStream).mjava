@@ -35,16 +35,8 @@
 
 			pckIn = new PacketLineIn(rawIn);
 			pckOut = new PacketLineOut(rawOut);
-			if (messages != null) {
-				msgs = new PrintWriter(new BufferedWriter(
-						new OutputStreamWriter(messages, Constants.CHARSET),
-						8192)) {
-					@Override
-					public void println() {
-						print('\n');
-					}
-				};
-			}
+			if (messages != null)
+				msgs = new OutputStreamWriter(messages, Constants.CHARSET);
 
 			enabledCapablities = new HashSet<String>();
 			commands = new ArrayList<ReceiveCommand>();
@@ -52,8 +44,19 @@
 			service();
 		} finally {
 			try {
-				if (msgs != null) {
+				if (pckOut != null)
+					pckOut.flush();
+				if (msgs != null)
 					msgs.flush();
+
+				if (sideBand) {
+					// If we are using side band, we need to send a final
+					// flush-pkt to tell the remote peer the side band is
+					// complete and it should stop decoding. We need to
+					// use the original output stream as rawOut is now the
+					// side band data channel.
+					//
+					new PacketLineOut(output).end();
 				}
 			} finally {
 				unlockPack();

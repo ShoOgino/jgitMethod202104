@@ -1,7 +1,8 @@
 	public void testWrite_CH_PROGRESS() throws IOException {
 		final SideBandOutputStream out;
-		out = new SideBandOutputStream(SideBandOutputStream.CH_PROGRESS, pckOut);
+		out = new SideBandOutputStream(CH_PROGRESS, SMALL_BUF, rawOut);
 		out.write(new byte[] { 'a', 'b', 'c' });
+		out.flush();
 		assertBuffer("0008\002abc");
 	}
 

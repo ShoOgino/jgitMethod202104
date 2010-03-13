@@ -1,8 +1,7 @@
 	@Override
 	public void write(final int b) throws IOException {
-		if (singleByteBuffer == null)
-			singleByteBuffer = new byte[1];
-		singleByteBuffer[0] = (byte) b;
-		write(singleByteBuffer);
+		if (cnt == buffer.length)
+			writeBuffer();
+		buffer[cnt++] = (byte) b;
 	}
 

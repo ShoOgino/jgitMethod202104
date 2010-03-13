@@ -7,8 +7,14 @@
 	 *             the formatter failed to write an advertisement.
 	 */
 	public void sendAdvertisedRefs(final RefAdvertiser adv) throws IOException {
+		if (advertiseError != null) {
+			adv.writeOne("ERR " + advertiseError);
+			return;
+		}
+
 		final RevFlag advertised = walk.newFlag("ADVERTISED");
 		adv.init(walk, advertised);
+		adv.advertiseCapability(CAPABILITY_SIDE_BAND_64K);
 		adv.advertiseCapability(CAPABILITY_DELETE_REFS);
 		adv.advertiseCapability(CAPABILITY_REPORT_STATUS);
 		if (allowOfsDelta)

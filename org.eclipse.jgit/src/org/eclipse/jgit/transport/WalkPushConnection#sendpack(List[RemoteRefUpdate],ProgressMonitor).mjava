@@ -47,6 +47,7 @@
 			final String wt = "Put " + base.substring(0, 12);
 			OutputStream os = dest.writeFile(pathPack, monitor, wt + "..pack");
 			try {
+				os = new BufferedOutputStream(os);
 				pw.writePack(os);
 			} finally {
 				os.close();
@@ -54,6 +55,7 @@
 
 			os = dest.writeFile(pathIdx, monitor, wt + "..idx");
 			try {
+				os = new BufferedOutputStream(os);
 				pw.writeIndex(os);
 			} finally {
 				os.close();
