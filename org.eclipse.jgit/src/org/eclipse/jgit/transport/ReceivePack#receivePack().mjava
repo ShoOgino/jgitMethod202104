@@ -8,8 +8,9 @@
 
 		ip = IndexPack.create(db, rawIn);
 		ip.setFixThin(true);
-		ip.setNeedNewObjectIds(needNewObjectIds);
-		ip.setNeedBaseObjectIds(needBaseObjectIds);
+		ip.setNeedNewObjectIds(needNewObjectIds || ensureObjectsProvidedVisible);
+		ip.setNeedBaseObjectIds(needBaseObjectIds
+				|| ensureObjectsProvidedVisible);
 		ip.setObjectChecking(isCheckReceivedObjects());
 		ip.index(NullProgressMonitor.INSTANCE);
 
