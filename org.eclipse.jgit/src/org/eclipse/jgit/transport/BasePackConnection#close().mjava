@@ -2,8 +2,10 @@
 	public void close() {
 		if (out != null) {
 			try {
-				if (outNeedsEnd)
+				if (outNeedsEnd) {
+					outNeedsEnd = false;
 					pckOut.end();
+				}
 				out.close();
 			} catch (IOException err) {
 				// Ignore any close errors.
