@@ -1,0 +1,10 @@
+		private static String H(String data) {
+			try {
+				MessageDigest md = newMD5();
+				md.update(data.getBytes("UTF-8"));
+				return LHEX(md.digest());
+			} catch (UnsupportedEncodingException e) {
+				throw new RuntimeException("UTF-8 encoding not available", e);
+			}
+		}
+
