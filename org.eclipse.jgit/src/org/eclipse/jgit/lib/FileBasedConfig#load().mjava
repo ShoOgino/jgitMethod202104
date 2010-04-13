@@ -10,6 +10,7 @@
 	 *             the file is not a properly formatted configuration file.
 	 */
 	public void load() throws IOException, ConfigInvalidException {
+		lastModified = getFile().lastModified();
 		try {
 			fromText(RawParseUtils.decode(IO.readFully(getFile())));
 		} catch (FileNotFoundException noFile) {

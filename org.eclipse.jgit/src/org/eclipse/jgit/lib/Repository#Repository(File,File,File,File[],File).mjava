@@ -40,26 +40,11 @@
 				throw new IllegalArgumentException("Either GIT_DIR or GIT_WORK_TREE must be passed to Repository constructor");
 		}
 
-		final FileBasedConfig userConfig;
 		userConfig = SystemReader.getInstance().openUserConfig();
-		try {
-			userConfig.load();
-		} catch (ConfigInvalidException e1) {
-			IOException e2 = new IOException("User config file "
-					+ userConfig.getFile().getAbsolutePath() + " invalid: "
-					+ e1);
-			e2.initCause(e1);
-			throw e2;
-		}
 		config = new RepositoryConfig(userConfig, FS.resolve(gitDir, "config"));
 
-		try {
-			getConfig().load();
-		} catch (ConfigInvalidException e1) {
-			IOException e2 = new IOException("Unknown repository format");
-			e2.initCause(e1);
-			throw e2;
-		}
+		loadUserConfig();
+		loadConfig();
 
 		if (workDir == null) {
 			String workTreeConfig = getConfig().getString("core", null, "worktree");

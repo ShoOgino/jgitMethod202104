@@ -16,11 +16,13 @@
 		if (!lf.lock())
 			throw new IOException("Cannot lock " + getFile());
 		try {
+			lf.setNeedStatInformation(true);
 			lf.write(out);
 			if (!lf.commit())
 				throw new IOException("Cannot commit write to " + getFile());
 		} finally {
 			lf.unlock();
 		}
+		lastModified = lf.getCommitLastModified();
 	}
 
