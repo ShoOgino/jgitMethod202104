@@ -35,7 +35,7 @@
 			worker = new Thread("JGit-Upload-Pack") {
 				public void run() {
 					try {
-						final UploadPack rp = new UploadPack(dst);
+						final UploadPack rp = createUploadPack(dst);
 						rp.upload(out_r, in_w, null);
 					} catch (IOException err) {
 						// Client side of the pipes should report the problem.

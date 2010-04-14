@@ -1,0 +1,19 @@
+	private void copy(TemporaryBuffer.Heap tinyPack, ObjectLoader ldr)
+			throws IOException {
+		final byte[] buf = new byte[64];
+		final byte[] content = ldr.getCachedBytes();
+		int dataLength = content.length;
+		int nextLength = dataLength >>> 4;
+		int size = 0;
+		buf[size++] = (byte) ((nextLength > 0 ? 0x80 : 0x00)
+				| (ldr.getType() << 4) | (dataLength & 0x0F));
+		dataLength = nextLength;
+		while (dataLength > 0) {
+			nextLength >>>= 7;
+			buf[size++] = (byte) ((nextLength > 0 ? 0x80 : 0x00) | (dataLength & 0x7F));
+			dataLength = nextLength;
+		}
+		tinyPack.write(buf, 0, size);
+		deflate(tinyPack, content);
+	}
+
