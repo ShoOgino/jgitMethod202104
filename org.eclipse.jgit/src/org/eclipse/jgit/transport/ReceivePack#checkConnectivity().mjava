@@ -2,7 +2,7 @@
 		final Set<ObjectId> baseObjects;
 
 		if (ensureObjectsProvidedVisible)
-			baseObjects = getBaseObjectIds();
+			baseObjects = ip.getBaseObjectIds();
 		else
 			baseObjects = Collections.emptySet();
 
@@ -36,9 +36,8 @@
 				   if (!b.has(RevFlag.UNINTERESTING))
 				     throw new MissingObjectException(b, b.getType());
 			}
-			for (ObjectId id : getNewObjectIds()) {
+			for (ObjectId id : ip.getNewObjectIds())
 				provided.add(id);
-			}
 		}
 
 		RevCommit c;
