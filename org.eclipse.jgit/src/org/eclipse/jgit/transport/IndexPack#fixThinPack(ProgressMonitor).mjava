@@ -1,6 +1,9 @@
 	private void fixThinPack(final ProgressMonitor progress) throws IOException {
 		growEntries();
 
+		if (needBaseObjectIds)
+			baseObjectIds = new ObjectIdSubclassMap<ObjectId>();
+
 		packDigest.reset();
 		originalEOF = packOut.length() - 20;
 		final Deflater def = new Deflater(Deflater.DEFAULT_COMPRESSION, false);
@@ -9,6 +12,8 @@
 		for (final DeltaChain baseId : baseById) {
 			if (baseId.head == null)
 				continue;
+			if (needBaseObjectIds)
+				baseObjectIds.add(baseId);
 			final ObjectLoader ldr = repo.openObject(readCurs, baseId);
 			if (ldr == null) {
 				missing.add(baseId);

@@ -1,8 +1,7 @@
-	/**
-	 *  @return the set of objects the incoming pack assumed for delta purposes
-	 */
-	public Set<ObjectId> getBaseObjectIds() {
-		return baseIds == null ?
-				Collections.<ObjectId>emptySet() : baseIds;
+	/** @return set of objects the incoming pack assumed for delta purposes */
+	public ObjectIdSubclassMap<ObjectId> getBaseObjectIds() {
+		if (baseObjectIds != null)
+			return baseObjectIds;
+		return new ObjectIdSubclassMap<ObjectId>();
 	}
 
