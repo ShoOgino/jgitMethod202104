@@ -1,0 +1,24 @@
+	/**
+	 * Validate all referenced but not supplied objects are reachable.
+	 * <p>
+	 * If enabled, this instance will verify that references to objects not
+	 * contained within the received pack are already reachable through at least
+	 * one other reference selected by the {@link #getRefFilter()} and displayed
+	 * as part of {@link #getAdvertisedRefs()}.
+	 * <p>
+	 * This feature is useful when the application doesn't trust the client to
+	 * not provide a forged SHA-1 reference to an object, in an attempt to
+	 * access parts of the DAG that they aren't allowed to see and which have
+	 * been hidden from them via the configured {@link RefFilter}.
+	 * <p>
+	 * Enabling this feature may imply at least some, if not all, of the same
+	 * functionality performed by {@link #setCheckReceivedObjects(boolean)}.
+	 * Applications are encouraged to enable both features, if desired.
+	 *
+	 * @param b
+	 *            {@code true} to enable the additional check.
+	 */
+	public void setCheckReferencedObjectsAreReachable(boolean b) {
+		this.checkReferencedIsReachable = b;
+	}
+
