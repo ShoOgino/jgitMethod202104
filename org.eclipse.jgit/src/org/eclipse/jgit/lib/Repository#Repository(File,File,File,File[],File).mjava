@@ -26,55 +26,6 @@
 	 */
 	public Repository(final File d, final File workTree, final File objectDir,
 			final File[] alternateObjectDir, final File indexFile) throws IOException {
-
-		if (workTree != null) {
-			workDir = workTree;
-			if (d == null)
-				gitDir = new File(workTree, Constants.DOT_GIT);
-			else
-				gitDir = d;
-		} else {
-			if (d != null)
-				gitDir = d;
-			else
-				throw new IllegalArgumentException(JGitText.get().eitherGIT_DIRorGIT_WORK_TREEmustBePassed);
-		}
-
-		userConfig = SystemReader.getInstance().openUserConfig();
-		config = new RepositoryConfig(userConfig, FS.resolve(gitDir, "config"));
-
-		loadUserConfig();
-		loadConfig();
-
-		if (workDir == null) {
-			String workTreeConfig = getConfig().getString("core", null, "worktree");
-			if (workTreeConfig != null) {
-				workDir = FS.resolve(d, workTreeConfig);
-			} else {
-				workDir = gitDir.getParentFile();
-			}
-		}
-
-		refs = new RefDirectory(this);
-		if (objectDir != null)
-			objectDatabase = new ObjectDirectory(FS.resolve(objectDir, ""),
-					alternateObjectDir);
-		else
-			objectDatabase = new ObjectDirectory(FS.resolve(gitDir, "objects"),
-					alternateObjectDir);
-
-		if (indexFile != null)
-			this.indexFile = indexFile;
-		else
-			this.indexFile = new File(gitDir, "index");
-
-		if (objectDatabase.exists()) {
-			final String repositoryFormatVersion = getConfig().getString(
-					"core", null, "repositoryFormatVersion");
-			if (!"0".equals(repositoryFormatVersion)) {
-				throw new IOException(MessageFormat.format(
-						JGitText.get().unknownRepositoryFormat2, repositoryFormatVersion));
-			}
-		}
+		this(d, workTree, objectDir, alternateObjectDir, indexFile, FS.DETECTED);
 	}
 

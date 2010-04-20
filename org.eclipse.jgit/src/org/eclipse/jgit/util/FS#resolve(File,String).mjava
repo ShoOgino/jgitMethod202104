@@ -16,7 +16,10 @@
 	 * @return the translated path. <code>new File(dir,name)</code> if this
 	 *         platform does not require path name translation.
 	 */
-	public static File resolve(final File dir, final String name) {
-		return INSTANCE.resolveImpl(dir, name);
+	public File resolve(final File dir, final String name) {
+		final File abspn = new File(name);
+		if (abspn.isAbsolute())
+			return abspn;
+		return new File(dir, name);
 	}
 

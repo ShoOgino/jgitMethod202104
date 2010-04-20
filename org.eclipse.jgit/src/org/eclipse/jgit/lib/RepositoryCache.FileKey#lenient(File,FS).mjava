@@ -11,11 +11,14 @@
 		 *
 		 * @param directory
 		 *            location where the repository database might be.
+		 * @param fs
+		 *            the file system abstraction which will be necessary to
+		 *            perform certain file system operations.
 		 * @return a key for the given directory.
-		 * @see #exact(File)
+		 * @see #exact(File, FS)
 		 */
-		public static FileKey lenient(final File directory) {
-			final File gitdir = resolve(directory);
-			return new FileKey(gitdir != null ? gitdir : directory);
+		public static FileKey lenient(final File directory, FS fs) {
+			final File gitdir = resolve(directory, fs);
+			return new FileKey(gitdir != null ? gitdir : directory, fs);
 		}
 

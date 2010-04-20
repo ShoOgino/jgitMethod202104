@@ -1,9 +1,9 @@
 	private ObjectDatabase openAlternate(File objdir) throws IOException {
 		final File parent = objdir.getParentFile();
-		if (FileKey.isGitRepository(parent)) {
-			final Repository db = RepositoryCache.open(FileKey.exact(parent));
+		if (FileKey.isGitRepository(parent, fs)) {
+			final Repository db = RepositoryCache.open(FileKey.exact(parent, fs));
 			return new AlternateRepositoryDatabase(db);
 		}
-		return new ObjectDirectory(objdir, null);
+		return new ObjectDirectory(objdir, null, fs);
 	}
 

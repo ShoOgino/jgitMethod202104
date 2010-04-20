@@ -1,0 +1,15 @@
+	/**
+	 * @param fs
+	 *            the file system abstraction which will be necessary to
+	 *            perform certain file system operations.
+	 * @return the new default JSch implementation.
+	 * @throws JSchException
+	 *             known host keys cannot be loaded.
+	 */
+	protected JSch createDefaultJSch(FS fs) throws JSchException {
+		final JSch jsch = new JSch();
+		knownHosts(jsch, fs);
+		identities(jsch, fs);
+		return jsch;
+	}
+

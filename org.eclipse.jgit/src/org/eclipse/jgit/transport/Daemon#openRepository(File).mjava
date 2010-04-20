@@ -1,6 +1,6 @@
 	private static Repository openRepository(final File gitdir) {
 		try {
-			return RepositoryCache.open(FileKey.exact(gitdir));
+			return RepositoryCache.open(FileKey.exact(gitdir, FS.DETECTED));
 		} catch (IOException err) {
 			// null signals it "wasn't found", which is all that is suitable
 			// for the remote client to know.

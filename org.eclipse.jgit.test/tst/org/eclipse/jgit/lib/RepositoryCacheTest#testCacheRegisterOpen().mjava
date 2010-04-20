@@ -1,10 +1,10 @@
 	public void testCacheRegisterOpen() throws Exception {
 		final File dir = db.getDirectory();
 		RepositoryCache.register(db);
-		assertSame(db, RepositoryCache.open(FileKey.exact(dir)));
+		assertSame(db, RepositoryCache.open(FileKey.exact(dir, db.getFS())));
 
 		assertEquals(".git", dir.getName());
 		final File parent = dir.getParentFile();
-		assertSame(db, RepositoryCache.open(FileKey.lenient(parent)));
+		assertSame(db, RepositoryCache.open(FileKey.lenient(parent, db.getFS())));
 	}
 

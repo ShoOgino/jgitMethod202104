@@ -3,9 +3,11 @@
 	 *
 	 * @param remote
 	 *            location of the remote repository.
+	 * @param fs
+	 *            type of filesystem the local repository is stored on.
 	 * @return true if the protocol is supported.
 	 */
-	public static boolean canHandleProtocol(final URIish remote) {
+	public static boolean canHandleProtocol(final URIish remote, final FS fs) {
 		if (TransportGitSsh.canHandle(remote))
 			return true;
 
@@ -21,10 +23,10 @@
 		else if (TransportAmazonS3.canHandle(remote))
 			return true;
 
-		else if (TransportBundleFile.canHandle(remote))
+		else if (TransportBundleFile.canHandle(remote, fs))
 			return true;
 
-		else if (TransportLocal.canHandle(remote))
+		else if (TransportLocal.canHandle(remote, fs))
 			return true;
 
 		return false;

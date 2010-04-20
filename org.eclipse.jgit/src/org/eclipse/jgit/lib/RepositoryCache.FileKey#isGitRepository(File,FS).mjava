@@ -6,13 +6,16 @@
 		 *
 		 * @param dir
 		 *            the location of the directory to examine.
+		 * @param fs
+		 *            the file system abstraction which will be necessary to
+		 *            perform certain file system operations.
 		 * @return true if the directory "looks like" a Git repository; false if
 		 *         it doesn't look enough like a Git directory to really be a
 		 *         Git directory.
 		 */
-		public static boolean isGitRepository(final File dir) {
-			return FS.resolve(dir, "objects").exists()
-					&& FS.resolve(dir, "refs").exists()
+		public static boolean isGitRepository(final File dir, FS fs) {
+			return fs.resolve(dir, "objects").exists()
+					&& fs.resolve(dir, "refs").exists()
 					&& isValidHead(new File(dir, Constants.HEAD));
 		}
 

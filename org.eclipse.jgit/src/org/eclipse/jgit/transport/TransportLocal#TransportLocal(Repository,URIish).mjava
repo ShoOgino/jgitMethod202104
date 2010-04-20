@@ -1,7 +1,7 @@
 	TransportLocal(final Repository local, final URIish uri) {
 		super(local, uri);
 
-		File d = FS.resolve(new File(PWD), uri.getPath()).getAbsoluteFile();
+		File d = local.getFS().resolve(new File(PWD), uri.getPath()).getAbsoluteFile();
 		if (new File(d, Constants.DOT_GIT).isDirectory())
 			d = new File(d, Constants.DOT_GIT);
 		remoteGitDir = d;

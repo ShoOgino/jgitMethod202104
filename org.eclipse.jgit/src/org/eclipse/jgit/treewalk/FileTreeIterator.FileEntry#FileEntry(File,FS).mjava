@@ -1,4 +1,4 @@
-		FileEntry(final File f) {
+		FileEntry(final File f, FS fs) {
 			file = f;
 
 			if (f.isDirectory()) {
@@ -6,7 +6,7 @@
 					mode = FileMode.GITLINK;
 				else
 					mode = FileMode.TREE;
-			} else if (FS.INSTANCE.canExecute(file))
+			} else if (fs.canExecute(file))
 				mode = FileMode.EXECUTABLE_FILE;
 			else
 				mode = FileMode.REGULAR_FILE;
