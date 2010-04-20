@@ -30,12 +30,6 @@
 					if (packOut == null)
 						throw new IOException("need packOut");
 					resolveDeltas(progress);
-					if (needBaseObjectIds) {
-						baseIds = new HashSet<ObjectId>();
-						for (DeltaChain c : baseById) {
-							baseIds.add(c);
-						}
-					}
 					if (entryCount < objectCount) {
 						if (!fixThin) {
 							throw new IOException("pack has "

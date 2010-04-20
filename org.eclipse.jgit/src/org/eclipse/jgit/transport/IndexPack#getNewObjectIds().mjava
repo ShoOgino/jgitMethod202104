@@ -1,6 +1,7 @@
 	/** @return the new objects that were sent by the user */
-	public Set<ObjectId> getNewObjectIds() {
-		return newObjectIds == null ?
-				Collections.<ObjectId>emptySet() : newObjectIds;
+	public ObjectIdSubclassMap<ObjectId> getNewObjectIds() {
+		if (newObjectIds != null)
+			return newObjectIds;
+		return new ObjectIdSubclassMap<ObjectId>();
 	}
 

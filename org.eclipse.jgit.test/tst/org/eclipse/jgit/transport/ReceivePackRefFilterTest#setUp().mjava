@@ -1,0 +1,32 @@
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
+
+		src = createBareRepository();
+		dst = createBareRepository();
+
+		// Fill dst with a some common history.
+		//
+		TestRepository d = new TestRepository(dst);
+		a = d.blob("a");
+		A = d.commit(d.tree(d.file("a", a)));
+		B = d.commit().parent(A).create();
+		d.update(R_MASTER, B);
+
+		// Clone from dst into src
+		//
+		Transport t = Transport.open(src, uriOf(dst));
+		try {
+			t.fetch(PM, Collections.singleton(new RefSpec("+refs/*:refs/*")));
+			assertEquals(B.copy(), src.resolve(R_MASTER));
+		} finally {
+			t.close();
+		}
+
+		// Now put private stuff into dst.
+		//
+		b = d.blob("b");
+		P = d.commit(d.tree(d.file("b", b)), A);
+		d.update(R_PRIVATE, P);
+	}
+

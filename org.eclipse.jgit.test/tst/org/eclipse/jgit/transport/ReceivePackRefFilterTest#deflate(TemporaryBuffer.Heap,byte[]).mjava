@@ -1,0 +1,13 @@
+	private void deflate(TemporaryBuffer.Heap tinyPack, final byte[] content)
+			throws IOException {
+		final Deflater deflater = new Deflater();
+		final byte[] buf = new byte[128];
+		deflater.setInput(content, 0, content.length);
+		deflater.finish();
+		do {
+			final int n = deflater.deflate(buf, 0, buf.length);
+			if (n > 0)
+				tinyPack.write(buf, 0, n);
+		} while (!deflater.finished());
+	}
+

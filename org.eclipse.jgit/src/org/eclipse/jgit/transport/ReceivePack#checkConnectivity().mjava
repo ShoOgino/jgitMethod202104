@@ -1,4 +1,13 @@
 	private void checkConnectivity() throws IOException {
+		ObjectIdSubclassMap<ObjectId> baseObjects = null;
+		ObjectIdSubclassMap<ObjectId> providedObjects = null;
+
+		if (checkReferencedIsReachable) {
+			baseObjects = ip.getBaseObjectIds();
+			providedObjects = ip.getNewObjectIds();
+		}
+		ip = null;
+
 		final ObjectWalk ow = new ObjectWalk(db);
 		for (final ReceiveCommand cmd : commands) {
 			if (cmd.getResult() != Result.NOT_ATTEMPTED)
@@ -7,34 +16,44 @@
 				continue;
 			ow.markStart(ow.parseAny(cmd.getNewId()));
 		}
-		for (final Ref ref : refs.values())
-			ow.markUninteresting(ow.parseAny(ref.getObjectId()));
+		for (final Ref ref : refs.values()) {
+			RevObject o = ow.parseAny(ref.getObjectId());
+			ow.markUninteresting(o);
 
-		ObjectIdSubclassMap<ObjectId> provided =
-			new ObjectIdSubclassMap<ObjectId>();
-		if (ensureObjectsProvidedVisible) {
-			for (ObjectId id : getBaseObjectIds()) {
+			if (checkReferencedIsReachable && !baseObjects.isEmpty()) {
+				while (o instanceof RevTag)
+					o = ((RevTag) o).getObject();
+				if (o instanceof RevCommit)
+					o = ((RevCommit) o).getTree();
+				if (o instanceof RevTree)
+					ow.markUninteresting(o);
+			}
+		}
+
+		if (checkReferencedIsReachable) {
+			for (ObjectId id : baseObjects) {
 				   RevObject b = ow.lookupAny(id, Constants.OBJ_BLOB);
 				   if (!b.has(RevFlag.UNINTERESTING))
 				     throw new MissingObjectException(b, b.getType());
-			}
-			for (ObjectId id : getNewObjectIds()) {
-				provided.add(id);
 			}
 		}
 
 		RevCommit c;
 		while ((c = ow.next()) != null) {
-			if (ensureObjectsProvidedVisible && !provided.contains(c))
+			if (checkReferencedIsReachable && !providedObjects.contains(c))
 				throw new MissingObjectException(c, Constants.TYPE_COMMIT);
 		}
 
 		RevObject o;
 		while ((o = ow.nextObject()) != null) {
-			if (o instanceof RevBlob && !db.hasObject(o))
-				throw new MissingObjectException(o, Constants.TYPE_BLOB);
+			if (checkReferencedIsReachable) {
+				if (providedObjects.contains(o))
+					continue;
+				else
+					throw new MissingObjectException(o, o.getType());
+			}
 
-			if (ensureObjectsProvidedVisible && !provided.contains(o))
+			if (o instanceof RevBlob && !db.hasObject(o))
 				throw new MissingObjectException(o, Constants.TYPE_BLOB);
 		}
 	}

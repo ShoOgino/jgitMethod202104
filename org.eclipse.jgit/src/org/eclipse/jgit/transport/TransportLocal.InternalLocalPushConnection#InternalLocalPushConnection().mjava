@@ -27,7 +27,7 @@
 			worker = new Thread("JGit-Receive-Pack") {
 				public void run() {
 					try {
-						final ReceivePack rp = new ReceivePack(dst);
+						final ReceivePack rp = createReceivePack(dst);
 						rp.receive(out_r, in_w, System.err);
 					} catch (IOException err) {
 						// Client side of the pipes should report the problem.

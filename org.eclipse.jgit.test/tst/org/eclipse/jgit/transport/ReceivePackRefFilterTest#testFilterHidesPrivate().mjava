@@ -1,0 +1,34 @@
+	public void testFilterHidesPrivate() throws Exception {
+		Map<String, Ref> refs;
+		TransportLocal t = new TransportLocal(src, uriOf(dst)) {
+			@Override
+			ReceivePack createReceivePack(final Repository db) {
+				db.close();
+				dst.incrementOpen();
+
+				final ReceivePack rp = super.createReceivePack(dst);
+				rp.setRefFilter(new HidePrivateFilter());
+				return rp;
+			}
+		};
+		try {
+			PushConnection c = t.openPush();
+			try {
+				refs = c.getRefsMap();
+			} finally {
+				c.close();
+			}
+		} finally {
+			t.close();
+		}
+
+		assertNotNull(refs);
+		assertNull("no private", refs.get(R_PRIVATE));
+		assertNull("no HEAD", refs.get(Constants.HEAD));
+		assertEquals(1, refs.size());
+
+		Ref master = refs.get(R_MASTER);
+		assertNotNull("has master", master);
+		assertEquals(B.copy(), master.getObjectId());
+	}
+
