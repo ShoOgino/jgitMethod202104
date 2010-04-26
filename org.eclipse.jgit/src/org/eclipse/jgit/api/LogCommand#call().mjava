@@ -1,0 +1,31 @@
+	/**
+	 * Executes the {@code Log} command with all the options and parameters
+	 * collected by the setter methods (e.g. {@link #add(AnyObjectId)},
+	 * {@link #not(AnyObjectId)}, ..) of this class. Each instance of this class
+	 * should only be used for one invocation of the command. Don't call this
+	 * method twice on an instance.
+	 *
+	 * @return an iteration over RevCommits
+	 */
+	public Iterable<RevCommit> call() throws NoHeadException,
+			JGitInternalException {
+		checkCallable();
+		if (!startSpecified) {
+			try {
+				ObjectId headId = repo.resolve(Constants.HEAD);
+				if (headId == null)
+					throw new NoHeadException(
+							"No HEAD exists and no explicit starting revision was specified");
+				add(headId);
+			} catch (IOException e) {
+				// all exceptions thrown by add() shouldn't occur and represent
+				// severe low-level exception which are therefore wrapped
+				throw new JGitInternalException(
+						"An exception occured while trying to add the Id of HEAD",
+						e);
+			}
+		}
+		setCallable(false);
+		return walk;
+	}
+

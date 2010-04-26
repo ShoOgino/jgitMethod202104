@@ -1,0 +1,24 @@
+	// try to work with Commands after command has been invoked. Should throw
+	// exceptions
+	public void testMultipleInvocations() throws NoHeadException,
+			ConcurrentRefUpdateException, NoMessageException,
+			UnmergedPathException {
+		Git git = new Git(db);
+		CommitCommand commitCmd = git.commit();
+		commitCmd.setMessage("initial commit").call();
+		try {
+			// check that setters can't be called after invocation
+			commitCmd.setAuthor(author);
+			fail("didn't catch the expected exception");
+		} catch (IllegalStateException e) {
+		}
+		LogCommand logCmd = git.log();
+		logCmd.call();
+		try {
+			// check that call can't be called twice
+			logCmd.call();
+			fail("didn't catch the expected exception");
+		} catch (IllegalStateException e) {
+		}
+	}
+

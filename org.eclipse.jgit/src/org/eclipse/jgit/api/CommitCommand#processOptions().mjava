@@ -1,0 +1,18 @@
+	/**
+	 * Sets default values for not explicitly specified options. Then validates
+	 * that all required data has been provided.
+	 *
+	 * @throws NoMessageException
+	 *             if the commit message has not been specified
+	 */
+	private void processOptions() throws NoMessageException {
+		if (message == null)
+			// as long as we don't suppport -C option we have to have
+			// an explicit message
+			throw new NoMessageException("commit message not specified");
+		if (committer == null)
+			committer = new PersonIdent(repo);
+		if (author == null)
+			author = committer;
+	}
+

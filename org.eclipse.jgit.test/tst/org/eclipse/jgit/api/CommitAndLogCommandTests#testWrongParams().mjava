@@ -1,0 +1,11 @@
+	// try to do a commit without specifying a message. Should fail!
+	public void testWrongParams() throws UnmergedPathException,
+			NoHeadException, ConcurrentRefUpdateException {
+		Git git = new Git(db);
+		try {
+			git.commit().setAuthor(author).call();
+			fail("Didn't get the expected exception");
+		} catch (NoMessageException e) {
+		}
+	}
+
