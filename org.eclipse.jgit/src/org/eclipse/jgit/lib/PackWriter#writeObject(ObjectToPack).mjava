@@ -21,12 +21,11 @@
 		final PackedObjectLoader reuse = open(otp);
 		if (reuse != null) {
 			try {
-				if (otp.isDeltaRepresentation()) {
-					writeDeltaObjectReuse(otp, reuse);
-				} else {
+				if (otp.isDeltaRepresentation())
+					writeDeltaObjectHeader(otp, reuse);
+				else
 					writeObjectHeader(otp.getType(), reuse.getSize());
-					reuse.copyRawData(out, buf, windowCursor);
-				}
+				reuse.copyRawData(out, buf, windowCursor);
 			} finally {
 				reuse.endCopyRawData();
 			}
