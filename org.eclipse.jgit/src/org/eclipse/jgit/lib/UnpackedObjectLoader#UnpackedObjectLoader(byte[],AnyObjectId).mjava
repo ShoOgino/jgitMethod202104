@@ -16,8 +16,13 @@
 				int avail = 0;
 				while (!inflater.finished() && avail < hdr.length)
 					try {
-						avail += inflater.inflate(hdr, avail, hdr.length
-								- avail);
+						int uncompressed = inflater.inflate(hdr, avail,
+								hdr.length - avail);
+						if (uncompressed == 0) {
+							throw new CorruptObjectException(id,
+									"bad stream, corrupt header");
+						}
+						avail += uncompressed;
 					} catch (DataFormatException dfe) {
 						final CorruptObjectException coe;
 						coe = new CorruptObjectException(id, "bad stream");
