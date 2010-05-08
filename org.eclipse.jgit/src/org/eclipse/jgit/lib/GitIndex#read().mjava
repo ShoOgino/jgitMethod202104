@@ -25,7 +25,11 @@
 			entries.clear();
 			for (int i = 0; i < header.entries; ++i) {
 				Entry entry = new Entry(buffer);
+				final GitIndex.Entry existing = entries.get(entry.name);
 				entries.put(entry.name, entry);
+				if (existing != null) {
+					entry.stages |= existing.stages;
+				}
 			}
 			lastCacheTime = cacheFile.lastModified();
 		} finally {
