@@ -4,10 +4,8 @@
 			final byte[] buf = new byte[BUFFER_SIZE];
 			for (;;) {
 				try {
-					if (doFlush) {
-						doFlush = false;
+					if (needFlush())
 						dst.flush();
-					}
 
 					final int n;
 					try {

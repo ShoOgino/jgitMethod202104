@@ -6,9 +6,7 @@
 	 * the request.
 	 */
 	public void flush() {
-		if (!doFlush) {
-			doFlush = true;
-			interrupt();
-		}
+		flushCounter.incrementAndGet();
+		interrupt();
 	}
 
