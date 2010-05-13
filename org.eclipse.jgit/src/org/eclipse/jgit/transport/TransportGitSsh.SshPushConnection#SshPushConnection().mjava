@@ -5,14 +5,13 @@
 				setMessageWriter(msg);
 
 				channel = exec(getOptionReceivePack());
-				if (!channel.isConnected())
-					throw new TransportException(uri, "connection failed");
 
 				final InputStream rpErr = channel.getErrStream();
 				errorThread = new StreamCopyThread(rpErr, msg.getRawStream());
 				errorThread.start();
 
 				init(channel.getInputStream(), outputStream(channel));
+				connect(channel);
 
 			} catch (TransportException err) {
 				close();
