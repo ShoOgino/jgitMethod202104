@@ -9,11 +9,11 @@
 	 * @param pack
 	 *            the file to purge all entries of.
 	 */
-	void removeAll(final PackFile pack) {
+	private void removeAll(final PackFile pack) {
 		for (int s = 0; s < tableSize; s++) {
-			final Entry<V> e1 = table.get(s);
+			final Entry e1 = table.get(s);
 			boolean hasDead = false;
-			for (Entry<V> e = e1; e != null; e = e.next) {
+			for (Entry e = e1; e != null; e = e.next) {
 				if (e.ref.pack == pack) {
 					e.kill();
 					hasDead = true;

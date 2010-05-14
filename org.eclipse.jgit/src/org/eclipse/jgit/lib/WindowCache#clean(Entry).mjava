@@ -1,0 +1,11 @@
+	private static Entry clean(Entry top) {
+		while (top != null && top.dead) {
+			top.ref.enqueue();
+			top = top.next;
+		}
+		if (top == null)
+			return null;
+		final Entry n = clean(top.next);
+		return n == top.next ? top : new Entry(n, top.ref);
+	}
+
