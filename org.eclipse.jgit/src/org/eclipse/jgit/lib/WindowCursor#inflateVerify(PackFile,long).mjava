@@ -1,9 +1,6 @@
 	void inflateVerify(final PackFile pack, long position)
 			throws IOException, DataFormatException {
-		if (inf == null)
-			inf = InflaterCache.get();
-		else
-			inf.reset();
+		prepareInflater();
 		for (;;) {
 			pin(pack, position);
 			window.inflateVerify(position, inf);
