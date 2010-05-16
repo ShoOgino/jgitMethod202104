@@ -1,11 +1,7 @@
 	private PackedObjectLoader open(final ObjectToPack otp) throws IOException {
-		for (;;) {
-			PackedObjectLoader reuse = otp.useLoader();
-			if (reuse == null) {
-				return null;
-			}
-
+		while (otp.isCopyable()) {
 			try {
+				PackedObjectLoader reuse = otp.getCopyLoader(windowCursor);
 				reuse.beginCopyRawData();
 				return reuse;
 			} catch (IOException err) {
@@ -13,9 +9,11 @@
 				// it has been overwritten with a different layout.
 				//
 				otp.clearDeltaBase();
+				otp.clearSourcePack();
 				searchForReuse(new ArrayList<PackedObjectLoader>(), otp);
 				continue;
 			}
 		}
+		return null;
 	}
 
