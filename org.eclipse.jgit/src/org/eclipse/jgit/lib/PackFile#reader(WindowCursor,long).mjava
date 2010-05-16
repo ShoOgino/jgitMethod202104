@@ -18,8 +18,8 @@
 		case Constants.OBJ_TREE:
 		case Constants.OBJ_BLOB:
 		case Constants.OBJ_TAG:
-			return new WholePackedObjectLoader(this, objOffset + p, objOffset,
-					typeCode, (int) dataSize);
+			return new WholePackedObjectLoader(this, objOffset, p, typeCode,
+					(int) dataSize);
 
 		case Constants.OBJ_OFS_DELTA: {
 			c = ib[p++] & 0xff;
@@ -30,13 +30,13 @@
 				ofs <<= 7;
 				ofs += (c & 127);
 			}
-			return new DeltaOfsPackedObjectLoader(this, objOffset + p,
-					objOffset, (int) dataSize, objOffset - ofs);
+			return new DeltaOfsPackedObjectLoader(this, objOffset, p,
+					(int) dataSize, objOffset - ofs);
 		}
 		case Constants.OBJ_REF_DELTA: {
 			readFully(objOffset + p, ib, 0, 20, curs);
-			return new DeltaRefPackedObjectLoader(this, objOffset + p + 20,
-					objOffset, (int) dataSize, ObjectId.fromRaw(ib));
+			return new DeltaRefPackedObjectLoader(this, objOffset, p + 20,
+					(int) dataSize, ObjectId.fromRaw(ib));
 		}
 		default:
 			throw new IOException("Unknown object type " + typeCode + ".");
