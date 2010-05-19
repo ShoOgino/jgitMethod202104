@@ -1,0 +1,31 @@
+	/**
+	 * Return the information stored in the file $GIT_DIR/MERGE_HEAD. In this
+	 * file operations triggering a merge will store the IDs of all heads which
+	 * should be merged together with HEAD.
+	 *
+	 * @return a list of {@link Commit}s which IDs are listed in the MERGE_HEAD
+	 *         file or {@code null} if this file doesn't exist. Also if the file
+	 *         exists but is empty {@code null} will be returned
+	 * @throws IOException
+	 */
+	public List<ObjectId> readMergeHeads() throws IOException {
+		File mergeHeadFile = new File(gitDir, Constants.MERGE_HEAD);
+		byte[] raw;
+		try {
+			raw = IO.readFully(mergeHeadFile);
+		} catch (FileNotFoundException notFound) {
+			return new LinkedList<ObjectId>();
+		}
+
+		if (raw.length == 0)
+			throw new IOException("MERGE_HEAD file empty: " + mergeHeadFile);
+
+		LinkedList<ObjectId> heads = new LinkedList<ObjectId>();
+		for (int p = 0; p < raw.length;) {
+			heads.add(ObjectId.fromString(raw, p));
+			p = RawParseUtils
+					.nextLF(raw, p + Constants.OBJECT_ID_STRING_LENGTH);
+		}
+		return heads;
+	}
+

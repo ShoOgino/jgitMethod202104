@@ -1,0 +1,41 @@
+	/**
+	 * Sets default values for not explicitly specified options. Then validates
+	 * that all required data has been provided.
+	 *
+	 * @param state
+	 *            the state of the repository we are working on
+	 *
+	 * @throws NoMessageException
+	 *             if the commit message has not been specified
+	 */
+	private void processOptions(RepositoryState state) throws NoMessageException {
+		if (committer == null)
+			committer = new PersonIdent(repo);
+		if (author == null)
+			author = committer;
+
+		// when doing a merge commit parse MERGE_HEAD and MERGE_MSG files
+		if (state == RepositoryState.MERGING_RESOLVED) {
+			try {
+				parents = repo.readMergeHeads();
+			} catch (IOException e) {
+				throw new JGitInternalException(MessageFormat.format(
+						JGitText.get().exceptionOccuredDuringReadingOfGIT_DIR,
+						Constants.MERGE_HEAD, e));
+			}
+			if (message == null) {
+				try {
+					message = repo.readMergeCommitMsg();
+				} catch (IOException e) {
+					throw new JGitInternalException(MessageFormat.format(
+							JGitText.get().exceptionOccuredDuringReadingOfGIT_DIR,
+							Constants.MERGE_MSG, e));
+				}
+			}
+		}
+		if (message == null)
+			// as long as we don't suppport -C option we have to have
+			// an explicit message
+			throw new NoMessageException(JGitText.get().commitMessageNotSpecified);
+	}
+

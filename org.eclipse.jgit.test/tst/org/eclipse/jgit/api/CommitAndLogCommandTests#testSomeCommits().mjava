@@ -1,5 +1,6 @@
 	public void testSomeCommits() throws NoHeadException, NoMessageException,
-			UnmergedPathException, ConcurrentRefUpdateException {
+			UnmergedPathException, ConcurrentRefUpdateException,
+			JGitInternalException, WrongRepositoryStateException {
 
 		// do 4 commits
 		Git git = new Git(db);
@@ -12,8 +13,8 @@
 
 		// check that all commits came in correctly
 		PersonIdent defaultCommitter = new PersonIdent(db);
-		PersonIdent expectedAuthors[] = new PersonIdent[] {
-				defaultCommitter, committer, author, author };
+		PersonIdent expectedAuthors[] = new PersonIdent[] { defaultCommitter,
+				committer, author, author };
 		PersonIdent expectedCommitters[] = new PersonIdent[] {
 				defaultCommitter, committer, defaultCommitter, committer };
 		String expectedMessages[] = new String[] { "initial commit",

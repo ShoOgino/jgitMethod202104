@@ -1,0 +1,20 @@
+	/**
+	 * Return the information stored in the file $GIT_DIR/MERGE_MSG. In this
+	 * file operations triggering a merge will store a template for the commit
+	 * message of the merge commit.
+	 *
+	 * @return a String containing the content of the MERGE_MSG file or
+	 *         {@code null} if this file doesn't exist
+	 * @throws IOException
+	 */
+	public String readMergeCommitMsg() throws IOException {
+		File mergeMsgFile = new File(gitDir, Constants.MERGE_MSG);
+		try {
+			return new String(IO.readFully(mergeMsgFile));
+		} catch (FileNotFoundException e) {
+			// MERGE_MSG file has disappeared in the meantime
+			// ignore it
+			return null;
+		}
+	}
+
