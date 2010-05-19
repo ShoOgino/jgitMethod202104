@@ -9,9 +9,9 @@
 				in.close();
 			}
 		} catch (FileNotFoundException e) {
-			throw die("no such file: " + propertyFile, e);
+			throw die(MessageFormat.format(CLIText.get().noSuchFile, propertyFile), e);
 		} catch (IOException e) {
-			throw die("cannot read " + propertyFile, e);
+			throw die(MessageFormat.format(CLIText.get().cannotReadBecause, propertyFile, e.getMessage()), e);
 		}
 	}
 

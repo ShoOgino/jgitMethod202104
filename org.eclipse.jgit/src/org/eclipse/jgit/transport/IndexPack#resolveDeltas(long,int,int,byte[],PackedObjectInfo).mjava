@@ -34,12 +34,12 @@
 			break;
 		}
 		default:
-			throw new IOException("Unknown object type " + typeCode + ".");
+			throw new IOException(MessageFormat.format(JGitText.get().unknownObjectType, typeCode));
 		}
 
 		final int crc32 = (int) crc.getValue();
 		if (oldCRC != crc32)
-			throw new IOException("Corruption detected re-reading at " + pos);
+			throw new IOException(MessageFormat.format(JGitText.get().corruptionDetectedReReadingAt, pos));
 		if (oe == null) {
 			objectDigest.update(Constants.encodedTypeString(type));
 			objectDigest.update((byte) ' ');

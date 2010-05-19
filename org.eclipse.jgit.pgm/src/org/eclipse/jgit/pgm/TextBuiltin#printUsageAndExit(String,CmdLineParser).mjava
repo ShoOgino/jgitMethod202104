@@ -5,16 +5,18 @@
 	 * @param clp
 	 */
 	public void printUsageAndExit(final String message, final CmdLineParser clp) {
-		System.err.println(message);
-		System.err.print("jgit ");
-		System.err.print(commandName);
-		clp.printSingleLineUsage(System.err);
-		System.err.println();
+		PrintWriter writer = new PrintWriter(System.err);
+		writer.println(message);
+		writer.print("jgit ");
+		writer.print(commandName);
+		clp.printSingleLineUsage(writer, getResourceBundle());
+		writer.println();
 
-		System.err.println();
-		clp.printUsage(System.err);
-		System.err.println();
+		writer.println();
+		clp.printUsage(writer, getResourceBundle());
+		writer.println();
 
+		writer.flush();
 		System.exit(1);
 	}
 

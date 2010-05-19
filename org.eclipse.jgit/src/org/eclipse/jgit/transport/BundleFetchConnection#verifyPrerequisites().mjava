@@ -19,8 +19,8 @@
 			} catch (MissingObjectException notFound) {
 				missing.put(p, e.getValue());
 			} catch (IOException err) {
-				throw new TransportException(transport.uri, "Cannot read commit "
-						+ p.name(), err);
+				throw new TransportException(transport.uri
+						, MessageFormat.format(JGitText.get().cannotReadCommit, p.name()), err);
 			}
 		}
 		if (!missing.isEmpty())
@@ -45,7 +45,7 @@
 				}
 			}
 		} catch (IOException err) {
-			throw new TransportException(transport.uri, "Cannot read object", err);
+			throw new TransportException(transport.uri, JGitText.get().cannotReadObject, err);
 		}
 
 		if (remaining > 0) {

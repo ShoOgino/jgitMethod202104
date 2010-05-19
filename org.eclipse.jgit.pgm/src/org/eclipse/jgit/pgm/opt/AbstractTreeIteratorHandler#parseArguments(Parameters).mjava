@@ -12,7 +12,7 @@
 			try {
 				dirc = DirCache.read(new File(name));
 			} catch (IOException e) {
-				throw new CmdLineException(name + " is not an index file", e);
+				throw new CmdLineException(MessageFormat.format(CLIText.get().notAnIndexFile, name), e);
 			}
 			setter.addValue(new DirCacheIterator(dirc));
 			return 1;
@@ -25,19 +25,18 @@
 			throw new CmdLineException(e.getMessage());
 		}
 		if (id == null)
-			throw new CmdLineException(name + " is not a tree");
+			throw new CmdLineException(MessageFormat.format(CLIText.get().notATree, name));
 
 		final CanonicalTreeParser p = new CanonicalTreeParser();
 		final WindowCursor curs = new WindowCursor();
 		try {
 			p.reset(clp.getRepository(), clp.getRevWalk().parseTree(id), curs);
 		} catch (MissingObjectException e) {
-			throw new CmdLineException(name + " is not a tree");
+			throw new CmdLineException(MessageFormat.format(CLIText.get().notATree, name));
 		} catch (IncorrectObjectTypeException e) {
-			throw new CmdLineException(name + " is not a tree");
+			throw new CmdLineException(MessageFormat.format(CLIText.get().notATree, name));
 		} catch (IOException e) {
-			throw new CmdLineException("cannot read " + name + ": "
-					+ e.getMessage());
+			throw new CmdLineException(MessageFormat.format(CLIText.get().cannotReadBecause, name, e.getMessage()));
 		} finally {
 			curs.release();
 		}

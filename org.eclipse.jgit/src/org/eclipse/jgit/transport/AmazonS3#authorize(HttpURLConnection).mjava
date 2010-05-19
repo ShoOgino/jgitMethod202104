@@ -38,9 +38,9 @@
 			m.init(privateKey);
 			sec = Base64.encodeBytes(m.doFinal(s.toString().getBytes("UTF-8")));
 		} catch (NoSuchAlgorithmException e) {
-			throw new IOException("No " + HMAC + " support:" + e.getMessage());
+			throw new IOException(MessageFormat.format(JGitText.get().noHMACsupport, HMAC, e.getMessage()));
 		} catch (InvalidKeyException e) {
-			throw new IOException("Invalid key: " + e.getMessage());
+			throw new IOException(MessageFormat.format(JGitText.get().invalidKey, e.getMessage()));
 		}
 		c.setRequestProperty("Authorization", "AWS " + publicKey + ":" + sec);
 	}

@@ -2,8 +2,7 @@
 			throws TransportException {
 		final Ref src = conn.getRef(spec.getSource());
 		if (src == null) {
-			throw new TransportException("Remote does not have "
-					+ spec.getSource() + " available for fetch.");
+			throw new TransportException(MessageFormat.format(JGitText.get().remoteDoesNotHaveSpec, spec.getSource()));
 		}
 		if (matched.add(src))
 			want(src, spec);

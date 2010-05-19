@@ -48,7 +48,7 @@
 					input = in.read();
 				}
 				if (']' != input)
-					throw new ConfigInvalidException("Bad group header");
+					throw new ConfigInvalidException(JGitText.get().badGroupHeader);
 				e.suffix = "";
 
 			} else if (last != null) {
@@ -64,7 +64,7 @@
 					e.value = readValue(in, false, -1);
 
 			} else
-				throw new ConfigInvalidException("Invalid line in config file");
+				throw new ConfigInvalidException(JGitText.get().invalidLineInConfigFile);
 		}
 
 		state.set(newState(newEntries));

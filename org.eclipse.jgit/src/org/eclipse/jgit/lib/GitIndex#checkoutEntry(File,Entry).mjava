@@ -15,7 +15,7 @@
 		ByteBuffer buffer = ByteBuffer.wrap(bytes);
 		int j = channel.write(buffer);
 		if (j != bytes.length)
-			throw new IOException("Could not write file " + file);
+			throw new IOException(MessageFormat.format(JGitText.get().couldNotWriteFile, file));
 		channel.close();
 		if (config_filemode() && File_hasExecute()) {
 			if (FileMode.EXECUTABLE_FILE.equals(e.mode)) {

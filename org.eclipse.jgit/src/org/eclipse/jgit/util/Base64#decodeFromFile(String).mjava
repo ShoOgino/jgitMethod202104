@@ -22,7 +22,7 @@
             // Check for size of file
             if( file.length() > Integer.MAX_VALUE )
             {
-                System.err.println( "File is too big for this convenience method (" + file.length() + " bytes)." );
+                System.err.println(MessageFormat.format(JGitText.get().fileIsTooBigForThisConvenienceMethod, file.length()));
                 return null;
             }   // end if: file too big for int index
             buffer = new byte[ (int)file.length() ];
@@ -43,7 +43,7 @@
         }   // end try
         catch( java.io.IOException e )
         {
-            System.err.println( "Error decoding from file " + filename );
+            System.err.println(MessageFormat.format(JGitText.get().errorDecodingFromFile, filename));
         }   // end catch: IOException
         finally
         {

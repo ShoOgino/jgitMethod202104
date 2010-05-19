@@ -19,7 +19,8 @@
 			buffer.order(ByteOrder.BIG_ENDIAN);
 			int j = channel.read(buffer);
 			if (j != buffer.capacity())
-				throw new IOException("Could not read index in one go, only "+j+" out of "+buffer.capacity()+" read");
+				throw new IOException(MessageFormat.format(JGitText.get().couldNotReadIndexInOneGo
+						, j, buffer.capacity()));
 			buffer.flip();
 			header = new Header(buffer);
 			entries.clear();

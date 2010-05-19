@@ -4,23 +4,22 @@
 
 		IO.readFully(fd.getChannel(), 0, buf, 0, 12);
 		if (RawParseUtils.match(buf, 0, Constants.PACK_SIGNATURE) != 4)
-			throw new IOException("Not a PACK file.");
+			throw new IOException(JGitText.get().notAPACKFile);
 		final long vers = NB.decodeUInt32(buf, 4);
 		final long packCnt = NB.decodeUInt32(buf, 8);
 		if (vers != 2 && vers != 3)
-			throw new IOException("Unsupported pack version " + vers + ".");
+			throw new IOException(MessageFormat.format(JGitText.get().unsupportedPackVersion, vers));
 
 		if (packCnt != idx.getObjectCount())
-			throw new PackMismatchException("Pack object count mismatch:"
-					+ " pack " + packCnt
-					+ " index " + idx.getObjectCount()
-					+ ": " + getPackFile());
+			throw new PackMismatchException(MessageFormat.format(
+					JGitText.get().packObjectCountMismatch, packCnt, idx.getObjectCount(), getPackFile()));
 
 		IO.readFully(fd.getChannel(), length - 20, buf, 0, 20);
 		if (!Arrays.equals(buf, packChecksum))
-			throw new PackMismatchException("Pack checksum mismatch:"
-					+ " pack " + ObjectId.fromRaw(buf).name()
-					+ " index " + ObjectId.fromRaw(idx.packChecksum).name()
-					+ ": " + getPackFile());
+			throw new PackMismatchException(MessageFormat.format(
+					JGitText.get().packObjectCountMismatch
+					, ObjectId.fromRaw(buf).name()
+					, ObjectId.fromRaw(idx.packChecksum).name()
+					, getPackFile()));
 	}
 

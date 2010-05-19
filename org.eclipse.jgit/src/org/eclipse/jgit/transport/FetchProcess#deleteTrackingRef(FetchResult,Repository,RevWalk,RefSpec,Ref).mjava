@@ -17,13 +17,12 @@
 			case FORCED:
 				break;
 			default:
-				throw new TransportException(transport.getURI(),
-						"Cannot delete stale tracking ref " + name + ": "
-								+ u.getResult().name());
+				throw new TransportException(transport.getURI(), MessageFormat.format(
+						JGitText.get().cannotDeleteStaleTrackingRef2, name, u.getResult().name()));
 			}
 		} catch (IOException e) {
-			throw new TransportException(transport.getURI(),
-					"Cannot delete stale tracking ref " + name, e);
+			throw new TransportException(transport.getURI(), MessageFormat.format(
+					JGitText.get().cannotDeleteStaleTrackingRef, name), e);
 		}
 	}
 

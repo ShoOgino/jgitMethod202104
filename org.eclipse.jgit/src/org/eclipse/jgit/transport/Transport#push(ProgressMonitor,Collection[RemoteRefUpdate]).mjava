@@ -45,12 +45,11 @@
 			try {
 				toPush = findRemoteRefUpdatesFor(push);
 			} catch (final IOException e) {
-				throw new TransportException(
-						"Problem with resolving push ref specs locally: "
-								+ e.getMessage(), e);
+				throw new TransportException(MessageFormat.format(
+						JGitText.get().problemWithResolvingPushRefSpecsLocally, e.getMessage()), e);
 			}
 			if (toPush.isEmpty())
-				throw new TransportException("Nothing to push.");
+				throw new TransportException(JGitText.get().nothingToPush);
 		}
 		final PushProcess pushProcess = new PushProcess(this, toPush);
 		return pushProcess.execute(monitor);

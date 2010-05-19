@@ -15,9 +15,8 @@
 		this.toPush = new HashMap<String, RemoteRefUpdate>();
 		for (final RemoteRefUpdate rru : toPush) {
 			if (this.toPush.put(rru.getRemoteName(), rru) != null)
-				throw new TransportException(
-						"Duplicate remote ref update is illegal. Affected remote name: "
-								+ rru.getRemoteName());
+				throw new TransportException(MessageFormat.format(
+						JGitText.get().duplicateRemoteRefUpdateIsIllegal, rru.getRemoteName()));
 		}
 	}
 

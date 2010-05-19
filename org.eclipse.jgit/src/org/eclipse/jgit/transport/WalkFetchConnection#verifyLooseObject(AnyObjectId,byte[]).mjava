@@ -30,18 +30,15 @@
 		idBuffer.fromRaw(objectDigest.digest(), 0);
 
 		if (!AnyObjectId.equals(id, idBuffer)) {
-			throw new TransportException("Incorrect hash for " + id.name()
-					+ "; computed " + idBuffer.name() + " as a "
-					+ Constants.typeString(uol.getType()) + " from "
-					+ compressed.length + " bytes.");
+			throw new TransportException(MessageFormat.format(JGitText.get().incorrectHashFor
+					, id.name(), idBuffer.name(), Constants.typeString(uol.getType()), compressed.length));
 		}
 		if (objCheck != null) {
 			try {
 				objCheck.check(uol.getType(), uol.getCachedBytes());
 			} catch (CorruptObjectException e) {
-				throw new TransportException("Invalid "
-						+ Constants.typeString(uol.getType()) + " "
-						+ id.name() + ":" + e.getMessage());
+				throw new TransportException(MessageFormat.format(JGitText.get().transportExceptionInvalid
+						, Constants.typeString(uol.getType()), id.name(), e.getMessage()));
 			}
 		}
 	}

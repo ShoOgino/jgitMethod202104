@@ -1,28 +1,15 @@
 	@Override
 	protected void run() throws Exception {
 		if (!really && !db.getAllRefs().isEmpty()) {
-			final StringBuilder m = new StringBuilder();
-			m.append("fatal: ");
-			m.append("This program will destroy the repository:");
-			m.append("\n");
-			m.append("fatal:\n");
-			m.append("fatal:    ");
-			m.append(db.getDirectory().getAbsolutePath());
-			m.append("\n");
-			m.append("fatal:\n");
-			m.append("fatal: ");
-			m.append("To continue, add ");
-			m.append(REALLY);
-			m.append(" to the command line");
-			m.append("\n");
-			m.append("fatal:");
-			System.err.println(m);
-			throw die("Need approval to destroy current repository");
+			System.err.println(
+				MessageFormat.format(CLIText.get().fatalThisProgramWillDestroyTheRepository
+					, db.getDirectory().getAbsolutePath(), REALLY));
+			throw die(CLIText.get().needApprovalToDestroyCurrentRepository);
 		}
 		if (!refList.isFile())
-			throw die("no such file: " + refList.getPath());
+			throw die(MessageFormat.format(CLIText.get().noSuchFile, refList.getPath()));
 		if (!graph.isFile())
-			throw die("no such file: " + graph.getPath());
+			throw die(MessageFormat.format(CLIText.get().noSuchFile, graph.getPath()));
 
 		recreateCommitGraph();
 		detachHead();

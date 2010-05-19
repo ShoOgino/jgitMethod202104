@@ -21,7 +21,7 @@
 			throws CorruptObjectException, IOException {
 		final DirCache c = new DirCache(indexLocation);
 		if (!c.lock())
-			throw new IOException("Cannot lock " + indexLocation);
+			throw new IOException(MessageFormat.format(JGitText.get().cannotLock, indexLocation));
 
 		try {
 			c.read();

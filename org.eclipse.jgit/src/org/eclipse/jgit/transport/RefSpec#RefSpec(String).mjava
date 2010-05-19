@@ -28,7 +28,7 @@
 		if (c == 0) {
 			s = s.substring(1);
 			if (isWildcard(s))
-				throw new IllegalArgumentException("Invalid wildcards " + spec);
+				throw new IllegalArgumentException(MessageFormat.format(JGitText.get().invalidWildcards, spec));
 			dstName = s;
 		} else if (c > 0) {
 			srcName = s.substring(0, c);
@@ -36,10 +36,10 @@
 			if (isWildcard(srcName) && isWildcard(dstName))
 				wildcard = true;
 			else if (isWildcard(srcName) || isWildcard(dstName))
-				throw new IllegalArgumentException("Invalid wildcards " + spec);
+				throw new IllegalArgumentException(MessageFormat.format(JGitText.get().invalidWildcards, spec));
 		} else {
 			if (isWildcard(s))
-				throw new IllegalArgumentException("Invalid wildcards " + spec);
+				throw new IllegalArgumentException(MessageFormat.format(JGitText.get().invalidWildcards, spec));
 			srcName = s;
 		}
 	}

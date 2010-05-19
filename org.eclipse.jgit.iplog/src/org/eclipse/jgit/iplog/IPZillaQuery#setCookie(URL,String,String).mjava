@@ -5,7 +5,7 @@
 		try {
 			CookieHandler.getDefault().put(url.toURI(), cols);
 		} catch (URISyntaxException e) {
-			IOException err = new IOException("Invalid URI format:" + url);
+			IOException err = new IOException(MessageFormat.format(IpLogText.get().invalidURIFormat, url));
 			err.initCause(e);
 			throw err;
 		}

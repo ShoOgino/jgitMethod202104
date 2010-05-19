@@ -6,7 +6,7 @@
 	 */
 	public void tag() throws IOException {
 		if (getTagId() != null)
-			throw new IllegalStateException("exists " + getTagId());
+			throw new IllegalStateException(MessageFormat.format(JGitText.get().illegalStateExists, getTagId()));
 		final ObjectId id;
 		final RefUpdate ru;
 
@@ -22,6 +22,6 @@
 		ru.setNewObjectId(id);
 		ru.setRefLogMessage("tagged " + getTag(), false);
 		if (ru.forceUpdate() == RefUpdate.Result.LOCK_FAILURE)
-			throw new ObjectWritingException("Unable to lock tag " + getTag());
+			throw new ObjectWritingException(MessageFormat.format(JGitText.get().unableToLockTag, getTag()));
 	}
 

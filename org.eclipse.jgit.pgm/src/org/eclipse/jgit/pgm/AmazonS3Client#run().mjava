@@ -11,7 +11,7 @@
 				while (len > 0) {
 					final int n = in.read(tmp);
 					if (n < 0)
-						throw new EOFException("Expected " + len + " bytes.");
+						throw new EOFException(MessageFormat.format(CLIText.get().expectedNumberOfbytes, len));
 					System.out.write(tmp, 0, n);
 					len -= n;
 				}
@@ -35,7 +35,7 @@
 			os.close();
 
 		} else {
-			throw die("Unsupported operation: " + op);
+			throw die(MessageFormat.format(CLIText.get().unsupportedOperation, op));
 		}
 	}
 

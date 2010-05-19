@@ -9,13 +9,13 @@
 		IO.readFully(in, hdr, 0, 12);
 		md.update(hdr, 0, 12);
 		if (!is_DIRC(hdr))
-			throw new CorruptObjectException("Not a DIRC file.");
+			throw new CorruptObjectException(JGitText.get().notADIRCFile);
 		final int ver = NB.decodeInt32(hdr, 4);
 		if (ver != 2)
-			throw new CorruptObjectException("Unknown DIRC version " + ver);
+			throw new CorruptObjectException(MessageFormat.format(JGitText.get().unknownDIRCVersion, ver));
 		entryCnt = NB.decodeInt32(hdr, 8);
 		if (entryCnt < 0)
-			throw new CorruptObjectException("DIRC has too many entries.");
+			throw new CorruptObjectException(JGitText.get().DIRCHasTooManyEntries);
 
 		// Load the individual file entries.
 		//
@@ -44,9 +44,8 @@
 			switch (NB.decodeInt32(hdr, 0)) {
 			case EXT_TREE: {
 				if (Integer.MAX_VALUE < sz) {
-					throw new CorruptObjectException("DIRC extension "
-							+ formatExtensionName(hdr) + " is too large at "
-							+ sz + " bytes.");
+					throw new CorruptObjectException(MessageFormat.format(JGitText.get().DIRCExtensionIsTooLargeAt
+							, formatExtensionName(hdr), sz));
 				}
 				final byte[] raw = new byte[(int) sz];
 				IO.readFully(in, raw, 0, raw.length);
@@ -67,16 +66,15 @@
 					// _required_ to understand this index format.
 					// Since we did not trap it above we must abort.
 					//
-					throw new CorruptObjectException("DIRC extension "
-							+ formatExtensionName(hdr)
-							+ " not supported by this version.");
+					throw new CorruptObjectException(MessageFormat.format(JGitText.get().DIRCExtensionNotSupportedByThisVersion
+							, formatExtensionName(hdr)));
 				}
 			}
 		}
 
 		final byte[] exp = md.digest();
 		if (!Arrays.equals(exp, hdr)) {
-			throw new CorruptObjectException("DIRC checksum mismatch");
+			throw new CorruptObjectException(JGitText.get().DIRCChecksumMismatch);
 		}
 	}
 

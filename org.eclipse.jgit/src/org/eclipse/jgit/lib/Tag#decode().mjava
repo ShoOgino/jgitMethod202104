@@ -6,18 +6,18 @@
 						new ByteArrayInputStream(raw)));
 				String n = br.readLine();
 				if (n == null || !n.startsWith("object ")) {
-					throw new CorruptObjectException(tagId, "no object");
+					throw new CorruptObjectException(tagId, JGitText.get().corruptObjectNoObject);
 				}
 				objId = ObjectId.fromString(n.substring(7));
 				n = br.readLine();
 				if (n == null || !n.startsWith("type ")) {
-					throw new CorruptObjectException(tagId, "no type");
+					throw new CorruptObjectException(tagId, JGitText.get().corruptObjectNoType);
 				}
 				type = n.substring("type ".length());
 				n = br.readLine();
 
 				if (n == null || !n.startsWith("tag ")) {
-					throw new CorruptObjectException(tagId, "no tag name");
+					throw new CorruptObjectException(tagId, JGitText.get().corruptObjectNoTagName);
 				}
 				tag = n.substring("tag ".length());
 				n = br.readLine();
@@ -25,13 +25,13 @@
 				// We should see a "tagger" header here, but some repos have tags
 				// without it.
 				if (n == null)
-					throw new CorruptObjectException(tagId, "no tagger header");
+					throw new CorruptObjectException(tagId, JGitText.get().corruptObjectNoTaggerHeader);
 
 				if (n.length()>0)
 					if (n.startsWith("tagger "))
 						tagger = new PersonIdent(n.substring("tagger ".length()));
 					else
-						throw new CorruptObjectException(tagId, "no tagger/bad header");
+						throw new CorruptObjectException(tagId, JGitText.get().corruptObjectNoTaggerBadHeader);
 
 				// Message should start with an empty line, but
 				StringBuilder tempMessage = new StringBuilder();

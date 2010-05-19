@@ -3,15 +3,14 @@
 			try {
 				markLocalObjComplete(revWalk.parseAny(r.getObjectId()));
 			} catch (IOException readError) {
-				throw new TransportException("Local ref " + r.getName()
-						+ " is missing object(s).", readError);
+				throw new TransportException(MessageFormat.format(JGitText.get().localRefIsMissingObjects, r.getName()), readError);
 			}
 		}
 		for (final ObjectId id : have) {
 			try {
 				markLocalObjComplete(revWalk.parseAny(id));
 			} catch (IOException readError) {
-				throw new TransportException("Missing assumed "+id.name(), readError);
+				throw new TransportException(MessageFormat.format(JGitText.get().transportExceptionMissingAssumed, id.name()), readError);
 			}
 		}
 	}

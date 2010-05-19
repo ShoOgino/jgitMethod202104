@@ -4,9 +4,8 @@
 			try {
 				objCheck.check(type, data);
 			} catch (CorruptObjectException e) {
-				throw new IOException("Invalid "
-						+ Constants.typeString(type) + " " + id.name()
-						+ ":" + e.getMessage());
+				throw new IOException(MessageFormat.format(JGitText.get().invalidObject
+						, Constants.typeString(type) , id.name() , e.getMessage()));
 			}
 		}
 
@@ -14,7 +13,7 @@
 		if (ldr != null) {
 			final byte[] existingData = ldr.getCachedBytes();
 			if (ldr.getType() != type || !Arrays.equals(data, existingData)) {
-				throw new IOException("Collision on " + id.name());
+				throw new IOException(MessageFormat.format(JGitText.get().collisionOn, id.name()));
 			}
 		}
 	}

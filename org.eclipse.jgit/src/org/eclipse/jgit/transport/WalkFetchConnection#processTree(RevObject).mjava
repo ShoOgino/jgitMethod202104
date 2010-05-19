@@ -16,14 +16,12 @@
 					if (FileMode.GITLINK.equals(mode))
 						continue;
 					treeWalk.getObjectId(idBuffer, 0);
-					throw new CorruptObjectException("Invalid mode " + mode
-							+ " for " + idBuffer.name() + " "
-							+ treeWalk.getPathString() + " in "
-							+ obj.getId().name() + ".");
+					throw new CorruptObjectException(MessageFormat.format(JGitText.get().invalidModeFor
+							, mode, idBuffer.name(), treeWalk.getPathString(), obj.getId().name()));
 				}
 			}
 		} catch (IOException ioe) {
-			throw new TransportException("Cannot read tree " + obj.name(), ioe);
+			throw new TransportException(MessageFormat.format(JGitText.get().cannotReadTree, obj.name()), ioe);
 		}
 		obj.add(COMPLETE);
 	}

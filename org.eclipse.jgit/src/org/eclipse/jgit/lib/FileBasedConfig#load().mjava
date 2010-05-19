@@ -16,11 +16,11 @@
 		} catch (FileNotFoundException noFile) {
 			clear();
 		} catch (IOException e) {
-			final IOException e2 = new IOException("Cannot read " + getFile());
+			final IOException e2 = new IOException(MessageFormat.format(JGitText.get().cannotReadFile, getFile()));
 			e2.initCause(e);
 			throw e2;
 		} catch (ConfigInvalidException e) {
-			throw new ConfigInvalidException("Cannot read " + getFile(), e);
+			throw new ConfigInvalidException(MessageFormat.format(JGitText.get().cannotReadFile, getFile()), e);
 		}
 	}
 

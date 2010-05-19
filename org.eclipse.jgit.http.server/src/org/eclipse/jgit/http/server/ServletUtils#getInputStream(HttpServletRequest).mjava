@@ -18,8 +18,8 @@
 		if (ENCODING_GZIP.equals(enc) || "x-gzip".equals(enc)) //$NON-NLS-1$
 			in = new GZIPInputStream(in);
 		else if (enc != null)
-			throw new IOException(HDR_CONTENT_ENCODING + " \"" + enc + "\""
-					+ ": not supported by this library.");
+			throw new IOException(MessageFormat.format(HttpServerText.get().encodingNotSupportedByThisLibrary
+					, HDR_CONTENT_ENCODING, enc));
 		return in;
 	}
 

@@ -17,7 +17,7 @@
 
 			u = new URL(b.toString());
 		} catch (MalformedURLException e) {
-			throw new NotSupportedException("Invalid URL " + uri, e);
+			throw new NotSupportedException(MessageFormat.format(JGitText.get().invalidURL, uri), e);
 		}
 
 		try {
@@ -34,10 +34,10 @@
 				return conn;
 
 			case HttpURLConnection.HTTP_NOT_FOUND:
-				throw new NoRemoteRepositoryException(uri, u + " not found");
+				throw new NoRemoteRepositoryException(uri, MessageFormat.format(JGitText.get().URLNotFound, u));
 
 			case HttpURLConnection.HTTP_FORBIDDEN:
-				throw new TransportException(uri, service + " not permitted");
+				throw new TransportException(uri, MessageFormat.format(JGitText.get().serviceNotPermitted, service));
 
 			default:
 				String err = status + " " + conn.getResponseMessage();
@@ -48,7 +48,7 @@
 		} catch (TransportException e) {
 			throw e;
 		} catch (IOException e) {
-			throw new TransportException(uri, "cannot open " + service, e);
+			throw new TransportException(uri, MessageFormat.format(JGitText.get().cannotOpenService, service), e);
 		}
 	}
 

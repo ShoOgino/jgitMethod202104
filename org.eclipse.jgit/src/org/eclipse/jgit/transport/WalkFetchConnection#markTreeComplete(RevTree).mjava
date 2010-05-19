@@ -26,9 +26,8 @@
 				if (FileMode.GITLINK.equals(mode))
 					continue;
 				treeWalk.getObjectId(idBuffer, 0);
-				throw new CorruptObjectException("Invalid mode " + mode
-						+ " for " + idBuffer.name() + " "
-						+ treeWalk.getPathString() + " in " + tree.name() + ".");
+				throw new CorruptObjectException(MessageFormat.format(JGitText.get().corruptObjectInvalidMode3
+						, mode, idBuffer.name(), treeWalk.getPathString(), tree.name()));
 			}
 		}
 	}

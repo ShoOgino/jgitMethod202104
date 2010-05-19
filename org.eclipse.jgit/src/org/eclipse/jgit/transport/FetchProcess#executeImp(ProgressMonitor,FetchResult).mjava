@@ -7,8 +7,8 @@
 			final Set<Ref> matched = new HashSet<Ref>();
 			for (final RefSpec spec : toFetch) {
 				if (spec.getSource() == null)
-					throw new TransportException(
-							"Source ref not specified for refspec: " + spec);
+					throw new TransportException(MessageFormat.format(
+							JGitText.get().sourceRefNotSpecifiedForRefspec, spec));
 
 				if (spec.isWildcard())
 					expandWildcard(spec, matched);
@@ -66,8 +66,8 @@
 				u.update(walk);
 				result.add(u);
 			} catch (IOException err) {
-				throw new TransportException("Failure updating tracking ref "
-						+ u.getLocalName() + ": " + err.getMessage(), err);
+				throw new TransportException(MessageFormat.format(
+						JGitText.get().failureUpdatingTrackingRef, u.getLocalName(), err.getMessage()), err);
 			}
 		}
 
@@ -75,8 +75,8 @@
 			try {
 				updateFETCH_HEAD(result);
 			} catch (IOException err) {
-				throw new TransportException("Failure updating FETCH_HEAD: "
-						+ err.getMessage(), err);
+				throw new TransportException(MessageFormat.format(
+						JGitText.get().failureUpdatingFETCH_HEAD, err.getMessage()), err);
 			}
 		}
 	}

@@ -1,14 +1,14 @@
 	@Override
 	protected void run() throws Exception {
 		if (localName != null && gitdir != null)
-			throw die("conflicting usage of --git-dir and arguments");
+			throw die(CLIText.get().conflictingUsageOf_git_dir_andArguments);
 
 		final URIish uri = new URIish(sourceUri);
 		if (localName == null) {
 			try {
 				localName = uri.getHumanishName();
 			} catch (IllegalArgumentException e) {
-				throw die("cannot guess local name from " + sourceUri);
+				throw die(MessageFormat.format(CLIText.get().cannotGuessLocalNameFrom, sourceUri));
 			}
 		}
 		if (gitdir == null)
@@ -19,8 +19,8 @@
 		db.getConfig().setBoolean("core", null, "bare", false);
 		db.getConfig().save();
 
-		out.println("Initialized empty Git repository in "
-				+ gitdir.getAbsolutePath());
+		out.format(CLIText.get().initializedEmptyGitRepositoryIn, gitdir.getAbsolutePath());
+		out.println();
 		out.flush();
 
 		saveRemote(uri);

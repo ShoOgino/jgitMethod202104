@@ -2,7 +2,7 @@
 			final WindowCursor curs) throws DataFormatException, IOException {
 		final byte[] dstbuf = new byte[totalSize];
 		if (curs.inflate(this, position, dstbuf, 0) != totalSize)
-			throw new EOFException("Short compressed stream at " + position);
+			throw new EOFException(MessageFormat.format(JGitText.get().shortCompressedStreamAt, position));
 		return dstbuf;
 	}
 

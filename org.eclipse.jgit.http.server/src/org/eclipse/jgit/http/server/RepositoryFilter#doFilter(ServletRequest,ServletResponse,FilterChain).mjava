@@ -2,9 +2,9 @@
 			final ServletResponse rsp, final FilterChain chain)
 			throws IOException, ServletException {
 		if (request.getAttribute(ATTRIBUTE_REPOSITORY) != null) {
-			context.log("Internal server error, request attribute "
-					+ ATTRIBUTE_REPOSITORY + " was already set when "
-					+ getClass().getName() + " was invoked.");
+			context.log(MessageFormat.format(HttpServerText.get().internalServerErrorRequestAttributeWasAlreadySet
+					, ATTRIBUTE_REPOSITORY
+					, getClass().getName()));
 			((HttpServletResponse) rsp).sendError(SC_INTERNAL_SERVER_ERROR);
 			return;
 		}

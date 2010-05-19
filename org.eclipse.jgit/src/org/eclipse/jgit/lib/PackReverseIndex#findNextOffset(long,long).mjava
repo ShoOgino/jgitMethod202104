@@ -18,9 +18,9 @@
 		if (offset <= Integer.MAX_VALUE) {
 			final int i32 = Arrays.binarySearch(offsets32, (int) offset);
 			if (i32 < 0)
-				throw new CorruptObjectException(
-						"Can't find object in (reverse) pack index for the specified offset "
-								+ offset);
+				throw new CorruptObjectException(MessageFormat.format(
+						JGitText.get().cantFindObjectInReversePackIndexForTheSpecifiedOffset
+						, offset));
 
 			if (i32 + 1 == offsets32.length) {
 				if (offsets64.length > 0)
@@ -31,9 +31,9 @@
 		} else {
 			final int i64 = Arrays.binarySearch(offsets64, offset);
 			if (i64 < 0)
-				throw new CorruptObjectException(
-						"Can't find object in (reverse) pack index for the specified offset "
-								+ offset);
+				throw new CorruptObjectException(MessageFormat.format(
+						JGitText.get().cantFindObjectInReversePackIndexForTheSpecifiedOffset
+						, offset));
 
 			if (i64 + 1 == offsets64.length)
 				return maxOffset;

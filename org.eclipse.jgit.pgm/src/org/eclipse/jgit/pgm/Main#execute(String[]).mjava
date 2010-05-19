@@ -1,24 +1,26 @@
 	private void execute(final String[] argv) throws Exception {
 		final CmdLineParser clp = new CmdLineParser(this);
+		PrintWriter writer = new PrintWriter(System.err);
 		try {
 			clp.parseArgument(argv);
 		} catch (CmdLineException err) {
 			if (argv.length > 0 && !help) {
-				System.err.println("fatal: " + err.getMessage());
+				writer.println(MessageFormat.format(CLIText.get().fatalError, err.getMessage()));
+				writer.flush();
 				System.exit(1);
 			}
 		}
 
 		if (argv.length == 0 || help) {
-			final String ex = clp.printExample(ExampleMode.ALL);
-			System.err.println("jgit" + ex + " command [ARG ...]");
+			final String ex = clp.printExample(ExampleMode.ALL, CLIText.get().resourceBundle());
+			writer.println("jgit" + ex + " command [ARG ...]");
 			if (help) {
-				System.err.println();
-				clp.printUsage(System.err);
-				System.err.println();
+				writer.println();
+				clp.printUsage(writer, CLIText.get().resourceBundle());
+				writer.println();
 			} else if (subcommand == null) {
-				System.err.println();
-				System.err.println("The most commonly used commands are:");
+				writer.println();
+				writer.println(CLIText.get().mostCommonlyUsedCommandsAre);
 				final CommandRef[] common = CommandCatalog.common();
 				int width = 0;
 				for (final CommandRef c : common)
@@ -26,15 +28,16 @@
 				width += 2;
 
 				for (final CommandRef c : common) {
-					System.err.print(' ');
-					System.err.print(c.getName());
+					writer.print(' ');
+					writer.print(c.getName());
 					for (int i = c.getName().length(); i < width; i++)
-						System.err.print(' ');
-					System.err.print(c.getUsage());
-					System.err.println();
+						writer.print(' ');
+					writer.print(CLIText.get().resourceBundle().getString(c.getUsage()));
+					writer.println();
 				}
-				System.err.println();
+				writer.println();
 			}
+			writer.flush();
 			System.exit(1);
 		}
 
@@ -80,7 +83,8 @@
 				altobjectdirs = null;
 
 			if (gitdir == null || !gitdir.isDirectory()) {
-				System.err.println("error: can't find git directory");
+				writer.println(CLIText.get().cantFindGitDirectory);
+				writer.flush();
 				System.exit(1);
 			}
 			cmd.init(new Repository(gitdir, gitworktree, objectdir, altobjectdirs, indexfile), gitdir);

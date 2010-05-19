@@ -27,8 +27,8 @@
 				pack.saveCache(objectOffset, cachedBytes, objectType);
 		} catch (DataFormatException dfe) {
 			final CorruptObjectException coe;
-			coe = new CorruptObjectException("Object at " + objectOffset
-					+ " in " + pack.getPackFile() + " has bad zlib stream");
+			coe = new CorruptObjectException(MessageFormat.format(JGitText.get().objectAtHasBadZlibStream,
+					objectOffset, pack.getPackFile()));
 			coe.initCause(dfe);
 			throw coe;
 		}

@@ -4,7 +4,7 @@
 		for (;;) {
 			int c = in.read();
 			if (c < 0)
-				throw new ConfigInvalidException("Unexpected end of config file");
+				throw new ConfigInvalidException(JGitText.get().unexpectedEndOfConfigFile);
 
 			if (']' == c) {
 				in.reset();
@@ -15,7 +15,7 @@
 				for (;;) {
 					c = in.read();
 					if (c < 0)
-						throw new ConfigInvalidException("Unexpected end of config file");
+						throw new ConfigInvalidException(JGitText.get().unexpectedEndOfConfigFile);
 
 					if ('"' == c) {
 						in.reset();
@@ -24,7 +24,7 @@
 
 					if (' ' == c || '\t' == c)
 						continue; // Skipped...
-					throw new ConfigInvalidException("Bad section entry: " + name);
+					throw new ConfigInvalidException(MessageFormat.format(JGitText.get().badSectionEntry, name));
 				}
 				break;
 			}
@@ -32,7 +32,7 @@
 			if (Character.isLetterOrDigit((char) c) || '.' == c || '-' == c)
 				name.append((char) c);
 			else
-				throw new ConfigInvalidException("Bad section entry: " + name);
+				throw new ConfigInvalidException(MessageFormat.format(JGitText.get().badSectionEntry, name));
 		}
 		return name.toString();
 	}

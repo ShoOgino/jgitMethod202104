@@ -8,7 +8,7 @@
 		File tmpIndex = new File(cacheFile.getAbsoluteFile() + ".tmp");
 		File lock = new File(cacheFile.getAbsoluteFile() + ".lock");
 		if (!lock.createNewFile())
-			throw new IOException("Index file is in use");
+			throw new IOException(JGitText.get().indexFileIsInUse);
 		try {
 			FileOutputStream fileOutputStream = new FileOutputStream(tmpIndex);
 			FileChannel fc = fileOutputStream.getChannel();
@@ -40,10 +40,10 @@
 			if (cacheFile.exists())
 				if (!cacheFile.delete())
 					throw new IOException(
-						"Could not rename delete old index");
+						JGitText.get().couldNotRenameDeleteOldIndex);
 			if (!tmpIndex.renameTo(cacheFile))
 				throw new IOException(
-						"Could not rename temporary index file to index");
+						JGitText.get().couldNotRenameTemporaryIndexFileToIndex);
 			changed = false;
 			statDirty = false;
 			lastCacheTime = cacheFile.lastModified();
@@ -51,10 +51,10 @@
 		} finally {
 			if (!lock.delete())
 				throw new IOException(
-						"Could not delete lock file. Should not happen");
+						JGitText.get().couldNotDeleteLockFileShouldNotHappen);
 			if (tmpIndex.exists() && !tmpIndex.delete())
 				throw new IOException(
-						"Could not delete temporary index file. Should not happen");
+						JGitText.get().couldNotDeleteTemporaryIndexFileShouldNotHappen);
 		}
 	}
 

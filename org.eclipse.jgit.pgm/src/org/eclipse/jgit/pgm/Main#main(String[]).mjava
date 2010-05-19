@@ -14,17 +14,17 @@
 			configureHttpProxy();
 			me.execute(argv);
 		} catch (Die err) {
-			System.err.println("fatal: " + err.getMessage());
+			System.err.println(MessageFormat.format(CLIText.get().fatalError, err.getMessage()));
 			if (me.showStackTrace)
 				err.printStackTrace();
 			System.exit(128);
 		} catch (Exception err) {
 			if (!me.showStackTrace && err.getCause() != null
 					&& err instanceof TransportException)
-				System.err.println("fatal: " + err.getCause().getMessage());
+				System.err.println(MessageFormat.format(CLIText.get().fatalError, err.getCause().getMessage()));
 
 			if (err.getClass().getName().startsWith("org.eclipse.jgit.errors.")) {
-				System.err.println("fatal: " + err.getMessage());
+				System.err.println(MessageFormat.format(CLIText.get().fatalError, err.getMessage()));
 				if (me.showStackTrace)
 					err.printStackTrace();
 				System.exit(128);

@@ -6,7 +6,7 @@
 			dstGitdir = new File(dstGitdir, Constants.DOT_GIT);
 		db = new Repository(dstGitdir);
 		if (!db.getObjectsDirectory().isDirectory())
-			throw die("'" + dstGitdir.getPath() + "' not a git repository");
+			throw die(MessageFormat.format(CLIText.get().notAGitRepository, dstGitdir.getPath()));
 		rp = new org.eclipse.jgit.transport.ReceivePack(db);
 		rp.receive(System.in, System.out, System.err);
 	}

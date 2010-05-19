@@ -43,7 +43,7 @@
 				// other requested old id is invalid.
 				//
 				cmd.setResult(Result.REJECTED_OTHER_REASON,
-						"invalid old id sent");
+						JGitText.get().invalidOldIdSent);
 				continue;
 			}
 
@@ -51,7 +51,7 @@
 				if (ref == null) {
 					// The ref must have been advertised in order to be updated.
 					//
-					cmd.setResult(Result.REJECTED_OTHER_REASON, "no such ref");
+					cmd.setResult(Result.REJECTED_OTHER_REASON, JGitText.get().noSuchRef);
 					continue;
 				}
 
@@ -60,7 +60,7 @@
 					// object id we advertised.
 					//
 					cmd.setResult(Result.REJECTED_OTHER_REASON,
-							"invalid old id sent");
+							JGitText.get().invalidOldIdSent);
 					continue;
 				}
 
@@ -103,7 +103,7 @@
 
 			if (!cmd.getRefName().startsWith(Constants.R_REFS)
 					|| !Repository.isValidRefName(cmd.getRefName())) {
-				cmd.setResult(Result.REJECTED_OTHER_REASON, "funny refname");
+				cmd.setResult(Result.REJECTED_OTHER_REASON, JGitText.get().funnyRefname);
 			}
 		}
 	}

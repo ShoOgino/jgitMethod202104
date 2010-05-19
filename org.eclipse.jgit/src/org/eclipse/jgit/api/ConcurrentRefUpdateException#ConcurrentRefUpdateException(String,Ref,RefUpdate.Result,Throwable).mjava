@@ -1,7 +1,7 @@
 	ConcurrentRefUpdateException(String message, Ref ref,
 			RefUpdate.Result rc, Throwable cause) {
-		super((rc == null) ? message : message
-				+ ". RefUpdate return code was: " + rc, cause);
+		super((rc == null) ? message : message + ". "
+				+ MessageFormat.format(JGitText.get().refUpdateReturnCodeWas, rc), cause);
 		this.rc = rc;
 		this.ref = ref;
 	}

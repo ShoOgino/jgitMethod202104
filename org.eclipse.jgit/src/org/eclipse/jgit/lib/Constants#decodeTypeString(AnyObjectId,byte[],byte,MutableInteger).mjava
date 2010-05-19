@@ -29,7 +29,7 @@
 						|| typeString[position + 2] != 'o'
 						|| typeString[position + 3] != 'b'
 						|| typeString[position + 4] != endMark)
-					throw new CorruptObjectException(id, "invalid type");
+					throw new CorruptObjectException(id, JGitText.get().corruptObjectInvalidType);
 				offset.value = position + 5;
 				return Constants.OBJ_BLOB;
 
@@ -40,7 +40,7 @@
 						|| typeString[position + 4] != 'i'
 						|| typeString[position + 5] != 't'
 						|| typeString[position + 6] != endMark)
-					throw new CorruptObjectException(id, "invalid type");
+					throw new CorruptObjectException(id, JGitText.get().corruptObjectInvalidType);
 				offset.value = position + 7;
 				return Constants.OBJ_COMMIT;
 
@@ -49,7 +49,7 @@
 				case 'a':
 					if (typeString[position + 2] != 'g'
 							|| typeString[position + 3] != endMark)
-						throw new CorruptObjectException(id, "invalid type");
+						throw new CorruptObjectException(id, JGitText.get().corruptObjectInvalidType);
 					offset.value = position + 4;
 					return Constants.OBJ_TAG;
 
@@ -57,19 +57,19 @@
 					if (typeString[position + 2] != 'e'
 							|| typeString[position + 3] != 'e'
 							|| typeString[position + 4] != endMark)
-						throw new CorruptObjectException(id, "invalid type");
+						throw new CorruptObjectException(id, JGitText.get().corruptObjectInvalidType);
 					offset.value = position + 5;
 					return Constants.OBJ_TREE;
 
 				default:
-					throw new CorruptObjectException(id, "invalid type");
+					throw new CorruptObjectException(id, JGitText.get().corruptObjectInvalidType);
 				}
 
 			default:
-				throw new CorruptObjectException(id, "invalid type");
+				throw new CorruptObjectException(id, JGitText.get().corruptObjectInvalidType);
 			}
 		} catch (ArrayIndexOutOfBoundsException bad) {
-			throw new CorruptObjectException(id, "invalid type");
+			throw new CorruptObjectException(id, JGitText.get().corruptObjectInvalidType);
 		}
 	}
 

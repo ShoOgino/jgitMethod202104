@@ -17,18 +17,17 @@
 	 */
 	void load(Locale locale) throws TranslationBundleLoadingException {
 		Class bundleClass = getClass();
-		ResourceBundle bundle;
 		try {
-			bundle = ResourceBundle.getBundle(bundleClass.getName(), locale);
+			resourceBundle = ResourceBundle.getBundle(bundleClass.getName(), locale);
 		} catch (MissingResourceException e) {
 			throw new TranslationBundleLoadingException(bundleClass, locale, e);
 		}
-		this.effectiveLocale = bundle.getLocale();
+		this.effectiveLocale = resourceBundle.getLocale();
 
 		for (Field field : bundleClass.getFields()) {
 			if (field.getType().equals(String.class)) {
 				try {
-					String translatedText = bundle.getString(field.getName());
+					String translatedText = resourceBundle.getString(field.getName());
 					field.set(this, translatedText);
 				} catch (MissingResourceException e) {
 					throw new TranslationStringMissingException(bundleClass, locale, field.getName(), e);

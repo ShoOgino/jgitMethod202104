@@ -4,7 +4,7 @@
 		for (;;) {
 			int c = in.read();
 			if (c < 0)
-				throw new ConfigInvalidException("Unexpected end of config file");
+				throw new ConfigInvalidException(JGitText.get().unexpectedEndOfConfigFile);
 
 			if ('=' == c)
 				break;
@@ -13,7 +13,7 @@
 				for (;;) {
 					c = in.read();
 					if (c < 0)
-						throw new ConfigInvalidException("Unexpected end of config file");
+						throw new ConfigInvalidException(JGitText.get().unexpectedEndOfConfigFile);
 
 					if ('=' == c)
 						break;
@@ -25,7 +25,7 @@
 
 					if (' ' == c || '\t' == c)
 						continue; // Skipped...
-					throw new ConfigInvalidException("Bad entry delimiter");
+					throw new ConfigInvalidException(JGitText.get().badEntryDelimiter);
 				}
 				break;
 			}
@@ -40,7 +40,7 @@
 				name.append((char) c);
 				break;
 			} else
-				throw new ConfigInvalidException("Bad entry name: " + name);
+				throw new ConfigInvalidException(MessageFormat.format(JGitText.get().badEntryName, name));
 		}
 		return name.toString();
 	}

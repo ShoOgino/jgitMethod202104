@@ -20,25 +20,25 @@
 								hdr.length - avail);
 						if (uncompressed == 0) {
 							throw new CorruptObjectException(id,
-									"bad stream, corrupt header");
+									JGitText.get().corruptObjectBadStreamCorruptHeader);
 						}
 						avail += uncompressed;
 					} catch (DataFormatException dfe) {
 						final CorruptObjectException coe;
-						coe = new CorruptObjectException(id, "bad stream");
+						coe = new CorruptObjectException(id, JGitText.get().corruptObjectBadStream);
 						coe.initCause(dfe);
 						throw coe;
 					}
 				if (avail < 5)
-					throw new CorruptObjectException(id, "no header");
+					throw new CorruptObjectException(id, JGitText.get().corruptObjectNoHeader);
 
 				final MutableInteger p = new MutableInteger();
 				objectType = Constants.decodeTypeString(id, hdr, (byte) ' ', p);
 				objectSize = RawParseUtils.parseBase10(hdr, p.value, p);
 				if (objectSize < 0)
-					throw new CorruptObjectException(id, "negative size");
+					throw new CorruptObjectException(id, JGitText.get().corruptObjectNegativeSize);
 				if (hdr[p.value++] != 0)
-					throw new CorruptObjectException(id, "garbage after size");
+					throw new CorruptObjectException(id, JGitText.get().corruptObjectGarbageAfterSize);
 				bytes = new byte[objectSize];
 				if (p.value < avail)
 					System.arraycopy(hdr, p.value, bytes, 0, avail - p.value);
@@ -63,7 +63,7 @@
 					objectType = typeCode;
 					break;
 				default:
-					throw new CorruptObjectException(id, "invalid type");
+					throw new CorruptObjectException(id, JGitText.get().corruptObjectInvalidType);
 				}
 
 				objectSize = size;

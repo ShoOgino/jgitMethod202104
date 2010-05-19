@@ -22,9 +22,8 @@
 			throws NotSupportedException {
 		final List<URIish> uris = getURIs(cfg, op);
 		if (uris.isEmpty())
-			throw new IllegalArgumentException(
-					"Remote config \""
-					+ cfg.getName() + "\" has no URIs associated");
+			throw new IllegalArgumentException(MessageFormat.format(
+					JGitText.get().remoteConfigHasNoURIAssociated, cfg.getName()));
 		final Transport tn = open(local, uris.get(0));
 		tn.applyConfig(cfg);
 		return tn;

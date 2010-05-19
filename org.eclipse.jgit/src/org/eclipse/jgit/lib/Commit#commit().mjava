@@ -5,7 +5,7 @@
 	 */
 	public void commit() throws IOException {
 		if (getCommitId() != null)
-			throw new IllegalStateException("exists " + getCommitId());
+			throw new IllegalStateException(MessageFormat.format(JGitText.get().commitAlreadyExists, getCommitId()));
 		setCommitId(new ObjectWriter(objdb).writeCommit(this));
 	}
 

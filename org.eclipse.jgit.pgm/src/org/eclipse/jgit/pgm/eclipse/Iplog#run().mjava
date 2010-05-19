@@ -6,8 +6,8 @@
 		final IpLogGenerator log = new IpLogGenerator();
 
 		if (commitId == null) {
-			System.err.println("warning: No commit given on command line,"
-					+ " assuming " + Constants.HEAD);
+			System.err.println(MessageFormat.format(
+				CLIText.get().warningNoCommitGivenOnCommandLine, Constants.HEAD));
 			commitId = db.resolve(Constants.HEAD);
 		}
 
@@ -16,7 +16,7 @@
 		if (version == null && start instanceof RevTag)
 			version = ((RevTag) start).getTagName();
 		else if (version == null)
-			throw die(start.name() + " is not a tag, --version is required");
+			throw die(MessageFormat.format(CLIText.get().notATagVersionIsRequired, start.name()));
 
 		log.scan(db, rw.parseCommit(start), version);
 
@@ -25,7 +25,7 @@
 				output.getParentFile().mkdirs();
 			LockFile lf = new LockFile(output);
 			if (!lf.lock())
-				throw die("Cannot lock " + output);
+				throw die(MessageFormat.format(CLIText.get().cannotLock, output));
 			try {
 				OutputStream os = lf.getOutputStream();
 				try {
@@ -34,7 +34,7 @@
 					os.close();
 				}
 				if (!lf.commit())
-					throw die("Cannot write " + output);
+					throw die(MessageFormat.format(CLIText.get().cannotWrite, output));
 			} finally {
 				lf.unlock();
 			}

@@ -6,12 +6,12 @@
 		if (v == null)
 			v = "";
 		if (!version.equals(v))
-			throw new IOException("Unsupported encryption version: " + v);
+			throw new IOException(MessageFormat.format(JGitText.get().unsupportedEncryptionVersion, v));
 
 		v = u.getHeaderField(p + JETS3T_CRYPTO_ALG);
 		if (v == null)
 			v = "";
 		if (!name.equals(v))
-			throw new IOException("Unsupported encryption algorithm: " + v);
+			throw new IOException(JGitText.get().unsupportedEncryptionAlgorithm + v);
 	}
 

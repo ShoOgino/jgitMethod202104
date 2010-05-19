@@ -17,8 +17,7 @@
 
 		final URL u = new URL((s.indexOf("://") == -1) ? "http://" + s : s);
 		if (!"http".equals(u.getProtocol()))
-			throw new MalformedURLException("Invalid http_proxy: " + s
-					+ ": Only http supported.");
+			throw new MalformedURLException(MessageFormat.format(CLIText.get().invalidHttpProxyOnlyHttpSupported, s));
 
 		final String proxyHost = u.getHost();
 		final int proxyPort = u.getPort();

@@ -18,14 +18,14 @@
 		while (rawPtr < rawSize) {
 			int c = raw[rawPtr++];
 			if (c < '0' || c > '7')
-				throw new CorruptObjectException(getId(), "invalid entry mode");
+				throw new CorruptObjectException(getId(), JGitText.get().corruptObjectInvalidEntryMode);
 			int mode = c - '0';
 			for (;;) {
 				c = raw[rawPtr++];
 				if (' ' == c)
 					break;
 				else if (c < '0' || c > '7')
-					throw new CorruptObjectException(getId(), "invalid mode");
+					throw new CorruptObjectException(getId(), JGitText.get().corruptObjectInvalidMode);
 				mode <<= 3;
 				mode += c - '0';
 			}
@@ -52,8 +52,8 @@
 			else if (FileMode.GITLINK.equals(mode))
 				ent = new GitlinkTreeEntry(this, id, name);
 			else
-				throw new CorruptObjectException(getId(), "Invalid mode: "
-						+ Integer.toOctalString(mode));
+				throw new CorruptObjectException(getId(), MessageFormat.format(
+						JGitText.get().corruptObjectInvalidMode2, Integer.toOctalString(mode)));
 			temp[nextIndex++] = ent;
 		}
 

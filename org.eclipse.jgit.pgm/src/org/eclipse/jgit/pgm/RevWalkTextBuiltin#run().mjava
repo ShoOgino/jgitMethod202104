@@ -16,7 +16,7 @@
 		if (commits.isEmpty()) {
 			final ObjectId head = db.resolve(Constants.HEAD);
 			if (head == null)
-				throw die("Cannot resolve " + Constants.HEAD);
+				throw die(MessageFormat.format(CLIText.get().cannotResolve, Constants.HEAD));
 			commits.add(walk.parseCommit(head));
 		}
 		for (final RevCommit c : commits) {
@@ -33,9 +33,8 @@
 			final long end = System.currentTimeMillis();
 			System.err.print(n);
 			System.err.print(' ');
-			System.err.print(end - start);
-			System.err.print(" ms");
-			System.err.println();
+			System.err.println(MessageFormat.format(
+					CLIText.get().timeInMilliSeconds, end - start));
 		}
 	}
 

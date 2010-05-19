@@ -13,7 +13,8 @@
 	public static final AbbreviatedObjectId fromString(final byte[] buf,
 			final int offset, final int end) {
 		if (end - offset > Constants.OBJECT_ID_STRING_LENGTH)
-			throw new IllegalArgumentException("Invalid id");
+			throw new IllegalArgumentException(MessageFormat.format(JGitText.get().invalidIdLength
+					, end - offset, Constants.OBJECT_ID_STRING_LENGTH));
 		return fromHexString(buf, offset, end);
 	}
 

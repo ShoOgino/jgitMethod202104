@@ -17,7 +17,7 @@
 					try {
 						xr = XMLReaderFactory.createXMLReader();
 					} catch (SAXException e) {
-						throw new IOException("No XML parser available.");
+						throw new IOException(JGitText.get().noXMLParserAvailable);
 					}
 					xr.setContentHandler(this);
 					final InputStream in = c.getInputStream();
@@ -25,7 +25,7 @@
 						xr.parse(new InputSource(in));
 					} catch (SAXException parsingError) {
 						final IOException p;
-						p = new IOException("Error listing " + prefix);
+						p = new IOException(MessageFormat.format(JGitText.get().errorListing, prefix));
 						p.initCause(parsingError);
 						throw p;
 					} finally {

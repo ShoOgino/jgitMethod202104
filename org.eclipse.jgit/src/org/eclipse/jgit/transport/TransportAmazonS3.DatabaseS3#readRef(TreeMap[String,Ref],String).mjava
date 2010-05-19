@@ -12,11 +12,12 @@
 			} catch (FileNotFoundException noRef) {
 				return null;
 			} catch (IOException err) {
-				throw new TransportException(getURI(), "read " + ref, err);
+				throw new TransportException(getURI(), MessageFormat.format(
+						JGitText.get().transportExceptionReadRef, ref), err);
 			}
 
 			if (s == null)
-				throw new TransportException(getURI(), "Empty ref: " + rn);
+				throw new TransportException(getURI(), MessageFormat.format(JGitText.get().transportExceptionEmptyRef, rn));
 
 			if (s.startsWith("ref: ")) {
 				final String target = s.substring("ref: ".length());
@@ -37,6 +38,6 @@
 				return r;
 			}
 
-			throw new TransportException(getURI(), "Bad ref: " + rn + ": " + s);
+			throw new TransportException(getURI(), MessageFormat.format(JGitText.get().transportExceptionBadRef, rn, s));
 		}
 

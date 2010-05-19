@@ -21,20 +21,19 @@
 					indexOneObject();
 					progress.update(1);
 					if (progress.isCancelled())
-						throw new IOException("Download cancelled");
+						throw new IOException(JGitText.get().downloadCancelled);
 				}
 				readPackFooter();
 				endInput();
 				progress.endTask();
 				if (deltaCount > 0) {
 					if (packOut == null)
-						throw new IOException("need packOut");
+						throw new IOException(JGitText.get().needPackOut);
 					resolveDeltas(progress);
 					if (entryCount < objectCount) {
 						if (!fixThin) {
-							throw new IOException("pack has "
-									+ (objectCount - entryCount)
-									+ " unresolved deltas");
+							throw new IOException(MessageFormat.format(
+									JGitText.get().packHasUnresolvedDeltas, (objectCount - entryCount)));
 						}
 						fixThinPack(progress);
 					}

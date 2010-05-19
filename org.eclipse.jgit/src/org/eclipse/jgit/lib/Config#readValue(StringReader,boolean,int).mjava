@@ -6,13 +6,13 @@
 			int c = in.read();
 			if (c < 0) {
 				if (value.length() == 0)
-					throw new ConfigInvalidException("Unexpected end of config file");
+					throw new ConfigInvalidException(JGitText.get().unexpectedEndOfConfigFile);
 				break;
 			}
 
 			if ('\n' == c) {
 				if (quote)
-					throw new ConfigInvalidException("Newline in quotes not allowed");
+					throw new ConfigInvalidException(JGitText.get().newlineInQuotesNotAllowed);
 				in.reset();
 				break;
 			}
@@ -41,7 +41,7 @@
 				c = in.read();
 				switch (c) {
 				case -1:
-					throw new ConfigInvalidException("End of file in escape");
+					throw new ConfigInvalidException(JGitText.get().endOfFileInEscape);
 				case '\n':
 					continue;
 				case 't':
@@ -60,7 +60,7 @@
 					value.append('"');
 					continue;
 				default:
-					throw new ConfigInvalidException("Bad escape: " + ((char) c));
+					throw new ConfigInvalidException(MessageFormat.format(JGitText.get().badEscape, ((char) c)));
 				}
 			}
 

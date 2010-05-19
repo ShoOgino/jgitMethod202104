@@ -12,7 +12,7 @@
 	public boolean commit() {
 		if (os != null) {
 			unlock();
-			throw new IllegalStateException("Lock on " + ref + " not closed.");
+			throw new IllegalStateException(MessageFormat.format(JGitText.get().lockOnNotClosed, ref));
 		}
 
 		saveStatInformation();

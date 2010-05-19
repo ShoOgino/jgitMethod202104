@@ -4,7 +4,7 @@
 			delete(deleteForce);
 		else {
 			if (branches.size() > 2)
-				throw die("Too many refs given\n" + new CmdLineParser(this).printExample(ExampleMode.ALL));
+				throw die(CLIText.get().tooManyRefsGiven + new CmdLineParser(this).printExample(ExampleMode.ALL));
 
 			if (rename) {
 				String src, dst;
@@ -13,15 +13,15 @@
 					if (head != null && head.isSymbolic())
 						src = head.getLeaf().getName();
 					else
-						throw die("Cannot rename detached HEAD");
+						throw die(CLIText.get().cannotRenameDetachedHEAD);
 					dst = branches.get(0);
 				} else {
 					src = branches.get(0);
 					final Ref old = db.getRef(src);
 					if (old == null)
-						throw die(String.format("%s does not exist", src));
+						throw die(MessageFormat.format(CLIText.get().doesNotExist, src));
 					if (!old.getName().startsWith(Constants.R_HEADS))
-						throw die(String.format("%s is not a branch", src));
+						throw die(MessageFormat.format(CLIText.get().notABranch, src));
 					src = old.getName();
 					dst = branches.get(1);
 				}
@@ -29,11 +29,11 @@
 				if (!dst.startsWith(Constants.R_HEADS))
 					dst = Constants.R_HEADS + dst;
 				if (!Repository.isValidRefName(dst))
-					throw die(String.format("%s is not a valid ref name", dst));
+					throw die(MessageFormat.format(CLIText.get().notAValidRefName, dst));
 
 				RefRename r = db.renameRef(src, dst);
 				if (r.rename() != Result.RENAMED)
-					throw die(String.format("%s cannot be renamed", src));
+					throw die(MessageFormat.format(CLIText.get().cannotBeRenamed, src));
 
 			} else if (branches.size() > 0) {
 				String newHead = branches.get(0);
@@ -53,16 +53,16 @@
 				if (!newRefName.startsWith(Constants.R_HEADS))
 					newRefName = Constants.R_HEADS + newRefName;
 				if (!Repository.isValidRefName(newRefName))
-					throw die(String.format("%s is not a valid ref name", newRefName));
+					throw die(MessageFormat.format(CLIText.get().notAValidRefName, newRefName));
 				if (!createForce && db.resolve(newRefName) != null)
-					throw die(String.format("branch %s already exists", newHead));
+					throw die(MessageFormat.format(CLIText.get().branchAlreadyExists, newHead));
 				RefUpdate updateRef = db.updateRef(newRefName);
 				updateRef.setNewObjectId(startAt);
 				updateRef.setForceUpdate(createForce);
-				updateRef.setRefLogMessage("branch: Created from " + startBranch, false);
+				updateRef.setRefLogMessage(MessageFormat.format(CLIText.get().branchCreatedFrom, startBranch), false);
 				Result update = updateRef.update();
 				if (update == Result.REJECTED)
-					throw die(String.format("Could not create branch %s: %s", newHead, update.toString()));
+					throw die(MessageFormat.format(CLIText.get().couldNotCreateBranch, newHead, update.toString()));
 			} else {
 				if (verbose)
 					rw = new RevWalk(db);

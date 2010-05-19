@@ -14,10 +14,8 @@
 			final ObjectId id = e.getId();
 
 			if (id == null)
-				throw new ObjectWritingException("Object at path \""
-						+ e.getFullName() + "\" does not have an id assigned."
-						+ "  All object ids must be assigned prior"
-						+ " to writing a tree.");
+				throw new ObjectWritingException(MessageFormat.format(
+						JGitText.get().objectAtPathDoesNotHaveId, e.getFullName()));
 
 			e.getMode().copyTo(o);
 			o.write(' ');

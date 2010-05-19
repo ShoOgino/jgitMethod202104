@@ -15,8 +15,8 @@
 	 */
 	public void add(final DirCacheEntry newEntry) {
 		if (newEntry.getRawMode() == 0)
-			throw new IllegalArgumentException("FileMode not set for path "
-					+ newEntry.getPathString());
+			throw new IllegalArgumentException(MessageFormat.format(JGitText.get().fileModeNotSetForPath
+					, newEntry.getPathString()));
 		beforeAdd(newEntry);
 		fastAdd(newEntry);
 	}

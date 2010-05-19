@@ -8,13 +8,13 @@
 	public PersonIdent(final String in) {
 		final int lt = in.indexOf('<');
 		if (lt == -1) {
-			throw new IllegalArgumentException("Malformed PersonIdent string"
-					+ " (no < was found): " + in);
+			throw new IllegalArgumentException(MessageFormat.format(
+					JGitText.get().malformedpersonIdentString, in));
 		}
 		final int gt = in.indexOf('>', lt);
 		if (gt == -1) {
-			throw new IllegalArgumentException("Malformed PersonIdent string"
-					+ " (no > was found): " + in);
+			throw new IllegalArgumentException(MessageFormat.format(
+					JGitText.get().malformedpersonIdentString, in));
 		}
 		final int sp = in.indexOf(' ', gt + 2);
 		if (sp == -1) {

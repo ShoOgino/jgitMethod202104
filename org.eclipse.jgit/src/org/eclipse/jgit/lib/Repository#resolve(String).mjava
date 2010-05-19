@@ -66,7 +66,7 @@
 							pnum = Integer.parseInt(parentnum);
 						} catch (NumberFormatException e) {
 							throw new RevisionSyntaxException(
-									"Invalid commit parent number",
+									JGitText.get().invalidCommitParentNumber,
 									revstr);
 						}
 						if (pnum != 0) {
@@ -192,7 +192,7 @@
 					dist = Integer.parseInt(distnum);
 				} catch (NumberFormatException e) {
 					throw new RevisionSyntaxException(
-							"Invalid ancestry length", revstr);
+							JGitText.get().invalidAncestryLength, revstr);
 				}
 				while (dist > 0) {
 					final ObjectId[] parents = ((Commit) ref).getParentIds();
@@ -216,7 +216,7 @@
 					}
 				}
 				if (time != null)
-					throw new RevisionSyntaxException("reflogs not yet supported by revision parser", revstr);
+					throw new RevisionSyntaxException(JGitText.get().reflogsNotYetSupportedByRevisionParser, revstr);
 				i = m - 1;
 				break;
 			default:

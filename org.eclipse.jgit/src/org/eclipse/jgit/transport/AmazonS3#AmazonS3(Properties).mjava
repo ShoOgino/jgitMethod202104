@@ -29,11 +29,11 @@
 	public AmazonS3(final Properties props) {
 		publicKey = props.getProperty("accesskey");
 		if (publicKey == null)
-			throw new IllegalArgumentException("Missing accesskey.");
+			throw new IllegalArgumentException(JGitText.get().missingAccesskey);
 
 		final String secret = props.getProperty("secretkey");
 		if (secret == null)
-			throw new IllegalArgumentException("Missing secretkey.");
+			throw new IllegalArgumentException(JGitText.get().missingSecretkey);
 		privateKey = new SecretKeySpec(Constants.encodeASCII(secret), HMAC);
 
 		final String pacl = props.getProperty("acl", "PRIVATE");
@@ -59,9 +59,9 @@
 				encryption = WalkEncryption.NONE;
 			}
 		} catch (InvalidKeySpecException e) {
-			throw new IllegalArgumentException("Invalid encryption", e);
+			throw new IllegalArgumentException(JGitText.get().invalidEncryption, e);
 		} catch (NoSuchAlgorithmException e) {
-			throw new IllegalArgumentException("Invalid encryption", e);
+			throw new IllegalArgumentException(JGitText.get().invalidEncryption, e);
 		}
 
 		maxAttempts = Integer.parseInt(props.getProperty(

@@ -76,7 +76,7 @@
 			List<Throwable> failures = fetchErrors.get(id.copy());
 			final TransportException te;
 
-			te = new TransportException("Cannot get " + id.name() + ".");
+			te = new TransportException(MessageFormat.format(JGitText.get().cannotGet, id.name()));
 			if (failures != null && !failures.isEmpty()) {
 				if (failures.size() == 1)
 					te.initCause(failures.get(0));

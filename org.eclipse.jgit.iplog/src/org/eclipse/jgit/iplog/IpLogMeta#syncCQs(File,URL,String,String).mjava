@@ -28,7 +28,7 @@
 
 		LockFile lf = new LockFile(file);
 		if (!lf.lock())
-			throw new IOException("Cannot lock " + file);
+			throw new IOException(MessageFormat.format(IpLogText.get().cannotLock, file));
 		try {
 			FileBasedConfig cfg = new FileBasedConfig(file);
 			cfg.load();
@@ -54,7 +54,7 @@
 
 			lf.write(Constants.encode(cfg.toText()));
 			if (!lf.commit())
-				throw new IOException("Cannot write " + file);
+				throw new IOException(MessageFormat.format(IpLogText.get().cannotWrite, file));
 		} finally {
 			lf.unlock();
 		}

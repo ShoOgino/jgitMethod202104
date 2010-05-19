@@ -13,7 +13,7 @@
 	public RefSpec setSourceDestination(final String source,
 			final String destination) {
 		if (isWildcard(source) != isWildcard(destination))
-			throw new IllegalArgumentException("Source/Destination must match.");
+			throw new IllegalStateException(JGitText.get().sourceDestinationMustMatch);
 		final RefSpec r = new RefSpec(this);
 		r.wildcard = isWildcard(source);
 		r.srcName = source;

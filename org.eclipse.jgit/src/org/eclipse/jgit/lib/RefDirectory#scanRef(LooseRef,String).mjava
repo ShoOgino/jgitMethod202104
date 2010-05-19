@@ -26,7 +26,7 @@
 				n--;
 			if (n < 6) {
 				String content = RawParseUtils.decode(buf, 0, n);
-				throw new IOException("Not a ref: " + name + ": " + content);
+				throw new IOException(MessageFormat.format(JGitText.get().notARef, name, content));
 			}
 			final String target = RawParseUtils.decode(buf, 5, n);
 			return newSymbolicRef(modified, name, target);
@@ -42,7 +42,7 @@
 			while (0 < n && Character.isWhitespace(buf[n - 1]))
 				n--;
 			String content = RawParseUtils.decode(buf, 0, n);
-			throw new IOException("Not a ref: " + name + ": " + content);
+			throw new IOException(MessageFormat.format(JGitText.get().notARef, name, content));
 		}
 		return new LooseUnpeeled(modified, name, id);
 	}

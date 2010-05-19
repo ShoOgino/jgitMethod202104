@@ -15,7 +15,7 @@
 			final String n = u.getRemoteName();
 			if (!n.startsWith("refs/") || !Repository.isValidRefName(n)) {
 				u.setStatus(Status.REJECTED_OTHER_REASON);
-				u.setMessage("funny refname");
+				u.setMessage(JGitText.get().funnyRefname);
 				continue;
 			}
 
@@ -57,14 +57,14 @@
 					u.setStatus(Status.REJECTED_OTHER_REASON);
 					u.setMessage(err.getMessage());
 				}
-				throw new TransportException(uri, "failed updating refs", err);
+				throw new TransportException(uri, JGitText.get().failedUpdatingRefs, err);
 			}
 		}
 
 		try {
 			refWriter.writeInfoRefs();
 		} catch (IOException err) {
-			throw new TransportException(uri, "failed updating refs", err);
+			throw new TransportException(uri, JGitText.get().failedUpdatingRefs, err);
 		}
 	}
 

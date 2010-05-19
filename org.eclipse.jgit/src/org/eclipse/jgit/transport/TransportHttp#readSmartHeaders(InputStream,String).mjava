@@ -8,9 +8,8 @@
 		final byte[] magic = new byte[5];
 		IO.readFully(in, magic, 0, magic.length);
 		if (magic[4] != '#') {
-			throw new TransportException(uri, "expected pkt-line with"
-					+ " '# service=', got '" + RawParseUtils.decode(magic)
-					+ "'");
+			throw new TransportException(uri, MessageFormat.format(
+					JGitText.get().expectedPktLineWithService, RawParseUtils.decode(magic)));
 		}
 
 		final PacketLineIn pckIn = new PacketLineIn(new UnionInputStream(
@@ -18,8 +17,8 @@
 		final String exp = "# service=" + service;
 		final String act = pckIn.readString();
 		if (!exp.equals(act)) {
-			throw new TransportException(uri, "expected '" + exp + "', got '"
-					+ act + "'");
+			throw new TransportException(uri, MessageFormat.format(
+					JGitText.get().expectedGot, exp, act));
 		}
 
 		while (pckIn.readString() != PacketLineIn.END) {

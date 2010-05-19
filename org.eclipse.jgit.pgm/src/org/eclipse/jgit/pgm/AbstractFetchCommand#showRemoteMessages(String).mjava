@@ -1,4 +1,5 @@
 	static void showRemoteMessages(String pkt) {
+		PrintWriter writer = new PrintWriter(System.err);
 		while (0 < pkt.length()) {
 			final int lf = pkt.indexOf('\n');
 			final int cr = pkt.indexOf('\r');
@@ -10,17 +11,21 @@
 			else if (0 <= cr)
 				s = cr;
 			else {
-				System.err.println("remote: " + pkt);
+				writer.format(CLIText.get().remoteMessage, pkt);
+				writer.println();
 				break;
 			}
 
-			if (pkt.charAt(s) == '\r')
-				System.err.print("remote: " + pkt.substring(0, s) + "\r");
-			else
-				System.err.println("remote: " + pkt.substring(0, s));
+			if (pkt.charAt(s) == '\r') {
+				writer.format(CLIText.get().remoteMessage, pkt.substring(0, s));
+				writer.print('\r');
+			} else {
+				writer.format(CLIText.get().remoteMessage, pkt.substring(0, s));
+				writer.println();
+			}
 
 			pkt = pkt.substring(s + 1);
 		}
-		System.err.flush();
+		writer.flush();
 	}
 

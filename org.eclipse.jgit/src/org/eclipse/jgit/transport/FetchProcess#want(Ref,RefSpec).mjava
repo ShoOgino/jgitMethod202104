@@ -10,9 +10,8 @@
 			} catch (IOException err) {
 				// Bad symbolic ref? That is the most likely cause.
 				//
-				throw new TransportException("Cannot resolve"
-						+ " local tracking ref " + spec.getDestination()
-						+ " for updating.", err);
+				throw new TransportException( MessageFormat.format(
+						JGitText.get().cannotResolveLocalTrackingRefForUpdating, spec.getDestination()), err);
 			}
 		}
 

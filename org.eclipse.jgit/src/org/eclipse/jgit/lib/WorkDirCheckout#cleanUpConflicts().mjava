@@ -2,7 +2,7 @@
 		for (String c : conflicts) {
 			File conflict = new File(root, c);
 			if (!conflict.delete())
-				throw new CheckoutConflictException("Cannot delete file: " + c);
+				throw new CheckoutConflictException(MessageFormat.format(JGitText.get().cannotDeleteFile, c));
 			removeEmptyParents(conflict);
 		}
 		for (String r : removed) {

@@ -9,7 +9,8 @@
 		if (packed.contains(name)) {
 			LockFile lck = new LockFile(packedRefsFile);
 			if (!lck.lock())
-				throw new IOException("Cannot lock " + packedRefsFile);
+				throw new IOException(MessageFormat.format(
+					JGitText.get().cannotLockFile, packedRefsFile));
 			try {
 				PackedRefList cur = readPackedRefs(0, 0);
 				int idx = cur.find(name);

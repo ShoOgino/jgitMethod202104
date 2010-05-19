@@ -3,11 +3,11 @@
 		final int p = fillFromInput(hdrln);
 		for (int k = 0; k < Constants.PACK_SIGNATURE.length; k++)
 			if (buf[p + k] != Constants.PACK_SIGNATURE[k])
-				throw new IOException("Not a PACK file.");
+				throw new IOException(JGitText.get().notAPACKFile);
 
 		final long vers = NB.decodeUInt32(buf, p + 4);
 		if (vers != 2 && vers != 3)
-			throw new IOException("Unsupported pack version " + vers + ".");
+			throw new IOException(MessageFormat.format(JGitText.get().unsupportedPackVersion, vers));
 		objectCount = NB.decodeUInt32(buf, p + 8);
 		use(hdrln);
 	}

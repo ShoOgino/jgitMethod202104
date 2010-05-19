@@ -8,6 +8,6 @@
 	public ServletBinder serve(String path) {
 		if (path.startsWith("*"))
 			return register(new SuffixPipeline.Binder(path.substring(1)));
-		throw new IllegalArgumentException("\"" + path + "\" not supported");
+		throw new IllegalArgumentException(MessageFormat.format(HttpServerText.get().pathNotSupported, path));
 	}
 

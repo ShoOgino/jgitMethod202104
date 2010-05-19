@@ -1,7 +1,7 @@
 	AckNackResult readACK(final MutableObjectId returnedId) throws IOException {
 		final String line = readString();
 		if (line.length() == 0)
-			throw new PackProtocolException("Expected ACK/NAK, found EOF");
+			throw new PackProtocolException(JGitText.get().expectedACKNAKFoundEOF);
 		if ("NAK".equals(line))
 			return AckNackResult.NAK;
 		if (line.startsWith("ACK ")) {
@@ -17,6 +17,6 @@
 			else if (arg.equals(" ready"))
 				return AckNackResult.ACK_READY;
 		}
-		throw new PackProtocolException("Expected ACK/NAK, got: " + line);
+		throw new PackProtocolException(MessageFormat.format(JGitText.get().expectedACKNAKGot, line));
 	}
 

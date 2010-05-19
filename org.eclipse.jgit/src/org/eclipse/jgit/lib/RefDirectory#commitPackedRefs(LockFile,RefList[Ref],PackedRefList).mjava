@@ -8,18 +8,16 @@
 				try {
 					lck.write(content);
 				} catch (IOException ioe) {
-					throw new ObjectWritingException("Unable to write " + name,
-							ioe);
+					throw new ObjectWritingException(MessageFormat.format(JGitText.get().unableToWrite, name), ioe);
 				}
 				try {
 					lck.waitForStatChange();
 				} catch (InterruptedException e) {
 					lck.unlock();
-					throw new ObjectWritingException("Interrupted writing "
-							+ name);
+					throw new ObjectWritingException(MessageFormat.format(JGitText.get().interruptedWriting, name));
 				}
 				if (!lck.commit())
-					throw new ObjectWritingException("Unable to write " + name);
+					throw new ObjectWritingException(MessageFormat.format(JGitText.get().unableToWrite, name));
 
 				packedRefs.compareAndSet(oldPackedList, new PackedRefList(refs,
 						content.length, lck.getCommitLastModified()));

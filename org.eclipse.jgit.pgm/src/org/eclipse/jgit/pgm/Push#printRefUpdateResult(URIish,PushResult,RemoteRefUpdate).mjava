@@ -2,7 +2,7 @@
 			final PushResult result, final RemoteRefUpdate rru) {
 		if (!shownURI) {
 			shownURI = true;
-			out.format("To %s\n", uri);
+			out.println(MessageFormat.format(CLIText.get().pushTo, uri));
 		}
 
 		final String remoteName = rru.getRemoteName();
@@ -28,7 +28,7 @@
 							.name()
 							+ (fastForward ? ".." : "...")
 							+ rru.getNewObjectId().abbreviate(db).name();
-					final String message = fastForward ? null : "forced update";
+					final String message = fastForward ? null : CLIText.get().forcedUpdate;
 					printUpdateLine(flag, summary, srcRef, remoteName, message);
 				}
 			}
@@ -40,17 +40,18 @@
 
 		case REJECTED_NODELETE:
 			printUpdateLine('!', "[rejected]", null, remoteName,
-					"remote side does not support deleting refs");
+					CLIText.get().remoteSideDoesNotSupportDeletingRefs);
 			break;
 
 		case REJECTED_NONFASTFORWARD:
 			printUpdateLine('!', "[rejected]", srcRef, remoteName,
-					"non-fast forward");
+					CLIText.get().nonFastForward);
 			break;
 
 		case REJECTED_REMOTE_CHANGED:
-			final String message = "remote ref object changed - is not expected one "
-					+ rru.getExpectedOldObjectId().abbreviate(db).name();
+			final String message = MessageFormat.format(
+					CLIText.get().remoteRefObjectChangedIsNotExpectedOne
+					, rru.getExpectedOldObjectId().abbreviate(db).name());
 			printUpdateLine('!', "[rejected]", srcRef, remoteName, message);
 			break;
 

@@ -17,7 +17,7 @@
 		super(base);
 		final ObjectLoader loader = r.openBlob(objectId);
 		if (loader == null)
-			throw new IOException("Blob not found: " + objectId);
+			throw new IOException(MessageFormat.format(JGitText.get().blobNotFound, objectId));
 		fromText(RawParseUtils.decode(loader.getBytes()));
 	}
 

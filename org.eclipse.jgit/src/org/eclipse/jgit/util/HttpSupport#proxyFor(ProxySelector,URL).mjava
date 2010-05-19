@@ -16,7 +16,7 @@
 			return proxySelector.select(u.toURI()).get(0);
 		} catch (URISyntaxException e) {
 			final ConnectException err;
-			err = new ConnectException("Cannot determine proxy for " + u);
+			err = new ConnectException(MessageFormat.format(JGitText.get().cannotDetermineProxyFor, u));
 			err.initCause(e);
 			throw err;
 		}

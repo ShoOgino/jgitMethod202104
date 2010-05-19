@@ -37,7 +37,7 @@
 			if (d != null)
 				gitDir = d;
 			else
-				throw new IllegalArgumentException("Either GIT_DIR or GIT_WORK_TREE must be passed to Repository constructor");
+				throw new IllegalArgumentException(JGitText.get().eitherGIT_DIRorGIT_WORK_TREEmustBePassed);
 		}
 
 		userConfig = SystemReader.getInstance().openUserConfig();
@@ -72,8 +72,8 @@
 			final String repositoryFormatVersion = getConfig().getString(
 					"core", null, "repositoryFormatVersion");
 			if (!"0".equals(repositoryFormatVersion)) {
-				throw new IOException("Unknown repository format \""
-						+ repositoryFormatVersion + "\"; expected \"0\".");
+				throw new IOException(MessageFormat.format(
+						JGitText.get().unknownRepositoryFormat2, repositoryFormatVersion));
 			}
 		}
 	}

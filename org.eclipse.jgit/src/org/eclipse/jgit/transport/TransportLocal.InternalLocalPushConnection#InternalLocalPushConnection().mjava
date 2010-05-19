@@ -5,7 +5,7 @@
 			try {
 				dst = new Repository(remoteGitDir);
 			} catch (IOException err) {
-				throw new TransportException(uri, "not a git directory");
+				throw new TransportException(uri, JGitText.get().notAGitDirectory);
 			}
 
 			final PipedInputStream in_r;
@@ -21,7 +21,7 @@
 				out_w = new PipedOutputStream(out_r);
 			} catch (IOException err) {
 				dst.close();
-				throw new TransportException(uri, "cannot connect pipes", err);
+				throw new TransportException(uri, JGitText.get().cannotConnectPipes, err);
 			}
 
 			worker = new Thread("JGit-Receive-Pack") {

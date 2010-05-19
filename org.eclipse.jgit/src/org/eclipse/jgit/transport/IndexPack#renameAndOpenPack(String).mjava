@@ -40,7 +40,7 @@
 			// to create it. There is no way to move this pack in.
 			//
 			cleanupTemporaryFiles();
-			throw new IOException("Cannot create " + packDir.getAbsolutePath());
+			throw new IOException(MessageFormat.format(JGitText.get().cannotCreateDirectory, packDir.getAbsolutePath()));
 		}
 
 		if (finalPack.exists()) {
@@ -56,7 +56,7 @@
 			//
 			try {
 				if (!keep.lock(lockMessage))
-					throw new IOException("Cannot lock pack in " + finalPack);
+					throw new IOException(MessageFormat.format(JGitText.get().cannotLockPackIn, finalPack));
 			} catch (IOException e) {
 				cleanupTemporaryFiles();
 				throw e;
@@ -66,7 +66,7 @@
 		if (!dstPack.renameTo(finalPack)) {
 			cleanupTemporaryFiles();
 			keep.unlock();
-			throw new IOException("Cannot move pack to " + finalPack);
+			throw new IOException(MessageFormat.format(JGitText.get().cannotMovePackTo, finalPack));
 		}
 
 		if (!dstIdx.renameTo(finalIdx)) {
@@ -74,7 +74,7 @@
 			keep.unlock();
 			if (!finalPack.delete())
 				finalPack.deleteOnExit();
-			throw new IOException("Cannot move index to " + finalIdx);
+			throw new IOException(MessageFormat.format(JGitText.get().cannotMoveIndexTo, finalIdx));
 		}
 
 		try {

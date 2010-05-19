@@ -5,10 +5,10 @@
 			final LockFile lf;
 			lf = new LockFile(new File(db.getDirectory(), Constants.HEAD));
 			if (!lf.lock())
-				throw new IOException("Cannot lock HEAD");
+				throw new IOException(MessageFormat.format(CLIText.get().cannotLock, Constants.HEAD));
 			lf.write(id);
 			if (!lf.commit())
-				throw new IOException("Cannot deatch HEAD");
+				throw new IOException(CLIText.get().cannotDeatchHEAD);
 		}
 	}
 

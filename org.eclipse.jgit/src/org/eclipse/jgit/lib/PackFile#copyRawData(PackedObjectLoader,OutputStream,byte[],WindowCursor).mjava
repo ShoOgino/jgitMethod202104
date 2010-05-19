@@ -22,15 +22,15 @@
 			final ObjectId id = findObjectForOffset(objectOffset);
 			final long expected = idx.findCRC32(id);
 			if (computed != expected)
-				throw new CorruptObjectException("Object at " + objectOffset
-						+ " in " + getPackFile() + " has bad zlib stream");
+				throw new CorruptObjectException(MessageFormat.format(
+						JGitText.get().objectAtHasBadZlibStream, objectOffset, getPackFile()));
 		} else {
 			try {
 				curs.inflateVerify(this, dataOffset);
 			} catch (DataFormatException dfe) {
 				final CorruptObjectException coe;
-				coe = new CorruptObjectException("Object at " + objectOffset
-						+ " in " + getPackFile() + " has bad zlib stream");
+				coe = new CorruptObjectException(MessageFormat.format(
+						JGitText.get().objectAtHasBadZlibStream, objectOffset, getPackFile()));
 				coe.initCause(dfe);
 				throw coe;
 			}

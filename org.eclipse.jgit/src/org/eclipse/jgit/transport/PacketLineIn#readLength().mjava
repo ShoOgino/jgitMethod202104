@@ -6,9 +6,9 @@
 				throw new ArrayIndexOutOfBoundsException();
 			return len;
 		} catch (ArrayIndexOutOfBoundsException err) {
-			throw new IOException("Invalid packet line header: "
-					+ (char) lineBuffer[0] + (char) lineBuffer[1]
-					+ (char) lineBuffer[2] + (char) lineBuffer[3]);
+			throw new IOException(MessageFormat.format(JGitText.get().invalidPacketLineHeader,
+					"" + (char) lineBuffer[0] + (char) lineBuffer[1]
+					+ (char) lineBuffer[2] + (char) lineBuffer[3]));
 		}
 	}
 

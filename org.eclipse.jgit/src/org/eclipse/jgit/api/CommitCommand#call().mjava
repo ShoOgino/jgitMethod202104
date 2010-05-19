@@ -29,7 +29,7 @@
 			Ref head = repo.getRef(Constants.HEAD);
 			if (head == null)
 				throw new NoHeadException(
-						"Commit on repo without HEAD currently not supported");
+						JGitText.get().commitOnRepoWithoutHEADCurrentlyNotSupported);
 
 			// determine the current HEAD and the commit it is referring to
 			ObjectId parentID = repo.resolve(Constants.HEAD + "^{commit}");
@@ -70,15 +70,11 @@
 				case REJECTED:
 				case LOCK_FAILURE:
 					throw new ConcurrentRefUpdateException(
-							"Could lock HEAD during commit", ru.getRef(), rc);
+							JGitText.get().couldNotLockHEAD, ru.getRef(), rc);
 				default:
-					throw new JGitInternalException(
-							"Updating the ref "
-									+ Constants.HEAD
-									+ " to "
-									+ commitId.toString()
-									+ " failed. ReturnCode from RefUpdate.update() was "
-									+ rc);
+					throw new JGitInternalException(MessageFormat.format(
+							JGitText.get().updatingRefFailed
+							, Constants.HEAD, commitId.toString(), rc));
 				}
 			} finally {
 				index.unlock();
@@ -90,7 +86,7 @@
 			throw e;
 		} catch (IOException e) {
 			throw new JGitInternalException(
-					"Exception caught during execution of commit command", e);
+					JGitText.get().exceptionCaughtDuringExecutionOfCommitCommand, e);
 		}
 	}
 

@@ -7,14 +7,14 @@
 				final File file = new File(db.getDirectory(), name);
 				final LockFile lck = new LockFile(file);
 				if (!lck.lock())
-					throw new ObjectWritingException("Can't write " + file);
+					throw new ObjectWritingException(MessageFormat.format(CLIText.get().cantWrite, file));
 				try {
 					lck.write(content);
 				} catch (IOException ioe) {
-					throw new ObjectWritingException("Can't write " + file);
+					throw new ObjectWritingException(MessageFormat.format(CLIText.get().cantWrite, file));
 				}
 				if (!lck.commit())
-					throw new ObjectWritingException("Can't write " + file);
+					throw new ObjectWritingException(MessageFormat.format(CLIText.get().cantWrite, file));
 			}
 		}.writePackedRefs();
 	}
