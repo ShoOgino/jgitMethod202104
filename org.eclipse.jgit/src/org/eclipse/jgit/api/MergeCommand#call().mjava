@@ -1,0 +1,68 @@
+	/**
+	 * Executes the {@code Merge} command with all the options and parameters
+	 * collected by the setter methods (e.g. {@link #include(Ref)}) of this
+	 * class. Each instance of this class should only be used for one invocation
+	 * of the command. Don't call this method twice on an instance.
+	 *
+	 * @return the result of the merge
+	 */
+	public MergeResult call() throws NoHeadException,
+			ConcurrentRefUpdateException, CheckoutConflictException,
+			InvalidMergeHeadsException {
+		checkCallable();
+
+		if (commits.size() != 1)
+			throw new InvalidMergeHeadsException(
+					commits.isEmpty() ? JGitText.get().noMergeHeadSpecified
+							: MessageFormat.format(
+									JGitText.get().mergeStrategyDoesNotSupportHeads,
+									mergeStrategy.getName(), commits.size()));
+
+		try {
+			Ref head = repo.getRef(Constants.HEAD);
+			if (head == null)
+				throw new NoHeadException(JGitText.get().commitOnRepoWithoutHEADCurrentlyNotSupported);
+			StringBuilder refLogMessage = new StringBuilder("merge ");
+
+			// Check for FAST_FORWARD, ALREADY_UP_TO_DATE
+			RevWalk revWalk = new RevWalk(repo);
+			RevCommit headCommit = revWalk.lookupCommit(head.getObjectId());
+
+			Ref ref = commits.get(0);
+
+			refLogMessage.append(ref.getName());
+
+			// handle annotated tags
+			ObjectId objectId = ref.getPeeledObjectId();
+			if (objectId == null)
+				objectId = ref.getObjectId();
+
+			RevCommit srcCommit = revWalk.lookupCommit(objectId);
+			if (revWalk.isMergedInto(srcCommit, headCommit)) {
+				setCallable(false);
+				return new MergeResult(headCommit,
+						MergeStatus.ALREADY_UP_TO_DATE, mergeStrategy);
+			} else if (revWalk.isMergedInto(headCommit, srcCommit)) {
+				// FAST_FORWARD detected: skip doing a real merge but only
+				// update HEAD
+				refLogMessage.append(": " + MergeStatus.FAST_FORWARD);
+				checkoutNewHead(revWalk, headCommit, srcCommit);
+				updateHead(refLogMessage, srcCommit, head.getObjectId());
+				setCallable(false);
+				return new MergeResult(srcCommit, MergeStatus.FAST_FORWARD,
+						mergeStrategy);
+			} else {
+				return new MergeResult(
+						headCommit,
+						MergeResult.MergeStatus.NOT_SUPPORTED,
+						mergeStrategy,
+						JGitText.get().onlyAlreadyUpToDateAndFastForwardMergesAreAvailable);
+			}
+		} catch (IOException e) {
+			throw new JGitInternalException(
+					MessageFormat.format(
+							JGitText.get().exceptionCaughtDuringExecutionOfMergeCommand,
+							e));
+		}
+	}
+

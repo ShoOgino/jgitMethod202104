@@ -1,0 +1,15 @@
+	public void testFastForward() throws Exception {
+		Git git = new Git(db);
+		RevCommit first = git.commit().setMessage("initial commit").call();
+		createBranch(first, "refs/heads/branch1");
+
+		RevCommit second = git.commit().setMessage("second commit").call();
+
+		checkoutBranch("refs/heads/branch1");
+
+		MergeResult result = git.merge().include(db.getRef(Constants.MASTER)).call();
+
+		assertEquals(MergeResult.MergeStatus.FAST_FORWARD, result.getMergeStatus());
+		assertEquals(second, result.getNewHead());
+	}
+

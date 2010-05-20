@@ -1,0 +1,27 @@
+	public void testMultipleHeads() throws Exception {
+		Git git = new Git(db);
+
+		addNewFileToIndex("file1");
+		RevCommit first = git.commit().setMessage("initial commit").call();
+		createBranch(first, "refs/heads/branch1");
+
+		addNewFileToIndex("file2");
+		RevCommit second = git.commit().setMessage("second commit").call();
+
+		addNewFileToIndex("file3");
+		git.commit().setMessage("third commit").call();
+
+		checkoutBranch("refs/heads/branch1");
+		assertFalse(new File(db.getWorkDir(), "file2").exists());
+		assertFalse(new File(db.getWorkDir(), "file3").exists());
+
+		MergeCommand merge = git.merge();
+		merge.include(second.getId());
+		merge.include(db.getRef(Constants.MASTER));
+		try {
+			merge.call();
+			fail("Expected exception not thrown when merging multiple heads");
+		} catch (InvalidMergeHeadsException e) {
+		}
+	}
+

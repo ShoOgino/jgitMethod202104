@@ -1,0 +1,20 @@
+	private void checkoutBranch(String branchName) throws Exception  {
+		File workDir = db.getWorkDir();
+		if (workDir != null) {
+			WorkDirCheckout workDirCheckout = new WorkDirCheckout(db,
+					workDir, db.mapCommit(Constants.HEAD).getTree(),
+					db.getIndex(), db.mapCommit(branchName).getTree());
+			workDirCheckout.setFailOnConflict(true);
+			try {
+				workDirCheckout.checkout();
+			} catch (CheckoutConflictException e) {
+				throw new JGitInternalException(
+						"Couldn't check out because of conflicts", e);
+			}
+		}
+
+		// update the HEAD
+		RefUpdate refUpdate = db.updateRef(Constants.HEAD);
+		refUpdate.link(branchName);
+	}
+

@@ -1,0 +1,8 @@
+	public void testMergeInItself() throws Exception {
+		Git git = new Git(db);
+		git.commit().setMessage("initial commit").call();
+
+		MergeResult result = git.merge().include(db.getRef(Constants.HEAD)).call();
+		assertEquals(MergeResult.MergeStatus.ALREADY_UP_TO_DATE, result.getMergeStatus());
+	}
+
