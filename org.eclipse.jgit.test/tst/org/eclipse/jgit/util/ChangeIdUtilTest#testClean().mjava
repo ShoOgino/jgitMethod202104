@@ -1,0 +1,10 @@
+	public void testClean() {
+		assertEquals("hej", ChangeIdUtil.clean("hej\n\n"));
+		assertEquals("hej\n\nsan", ChangeIdUtil.clean("hej\n\nsan\n\n"));
+		assertEquals("hej\nsan", ChangeIdUtil.clean("hej\n#men\nsan\n\n#men"));
+		assertEquals("hej\nsan", ChangeIdUtil.clean("hej\nsan\n\n#men"));
+		assertEquals("hej\nsan", ChangeIdUtil.clean("#no\nhej\nsan\n\n#men"));
+		assertEquals("hej\nsan", ChangeIdUtil
+				.clean("#no\nhej\nsan\nSigned-off-by: me \n#men"));
+	}
+

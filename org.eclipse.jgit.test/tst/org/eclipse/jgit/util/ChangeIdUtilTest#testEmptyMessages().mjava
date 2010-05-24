@@ -1,0 +1,18 @@
+	public void testEmptyMessages() throws Exception {
+		// Empty input must not produce a change id.
+		hookDoesNotModify("");
+		hookDoesNotModify(" ");
+		hookDoesNotModify("\n");
+		hookDoesNotModify("\n\n");
+		hookDoesNotModify("  \n  ");
+
+		hookDoesNotModify("#");
+		hookDoesNotModify("#\n");
+		hookDoesNotModify("# on branch master\n# Untracked files:\n");
+		hookDoesNotModify("\n# on branch master\n# Untracked files:\n");
+		hookDoesNotModify("\n\n# on branch master\n# Untracked files:\n");
+
+		hookDoesNotModify("\n# on branch master\ndiff --git a/src b/src\n"
+				+ "new file mode 100644\nindex 0000000..c78b7f0\n");
+	}
+

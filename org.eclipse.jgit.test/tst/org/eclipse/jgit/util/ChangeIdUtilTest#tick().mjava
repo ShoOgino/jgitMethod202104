@@ -1,0 +1,10 @@
+	/** Increment the {@link #author} and {@link #committer} times. */
+	protected void tick() {
+		final long delta = TimeUnit.MILLISECONDS.convert(5 * 60,
+				TimeUnit.SECONDS);
+		final long now = author.getWhen().getTime() + delta;
+
+		author = new PersonIdent(author, now, tz);
+		committer = new PersonIdent(committer, now, tz);
+	}
+

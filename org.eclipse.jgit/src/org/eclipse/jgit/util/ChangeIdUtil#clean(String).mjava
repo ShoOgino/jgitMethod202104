@@ -1,0 +1,11 @@
+	// package-private so the unit test can test this part only
+	static String clean(String msg) {
+		return msg.//
+				replaceAll("(?i)(?m)^Signed-off-by:.*$\n?", "").//
+				replaceAll("(?m)^#.*$\n?", "").//
+				replaceAll("(?m)\n\n\n+", "\\\n").//
+				replaceAll("\\n*$", "").//
+				replaceAll("(?s)\ndiff --git.*", "").//
+				trim();
+	}
+
