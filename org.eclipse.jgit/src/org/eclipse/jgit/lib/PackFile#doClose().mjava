@@ -1,13 +1,15 @@
 	private void doClose() {
-		if (fd != null) {
-			try {
-				fd.close();
-			} catch (IOException err) {
-				// Ignore a close event. We had it open only for reading.
-				// There should not be errors related to network buffers
-				// not flushed, etc.
+		synchronized (readLock) {
+			if (fd != null) {
+				try {
+					fd.close();
+				} catch (IOException err) {
+					// Ignore a close event. We had it open only for reading.
+					// There should not be errors related to network buffers
+					// not flushed, etc.
+				}
+				fd = null;
 			}
-			fd = null;
 		}
 	}
 

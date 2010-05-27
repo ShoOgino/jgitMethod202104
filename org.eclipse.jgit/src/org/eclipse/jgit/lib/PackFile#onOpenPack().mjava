@@ -2,7 +2,8 @@
 		final PackIndex idx = idx();
 		final byte[] buf = new byte[20];
 
-		IO.readFully(fd.getChannel(), 0, buf, 0, 12);
+		fd.seek(0);
+		fd.readFully(buf, 0, 12);
 		if (RawParseUtils.match(buf, 0, Constants.PACK_SIGNATURE) != 4)
 			throw new IOException(JGitText.get().notAPACKFile);
 		final long vers = NB.decodeUInt32(buf, 4);
@@ -14,7 +15,8 @@
 			throw new PackMismatchException(MessageFormat.format(
 					JGitText.get().packObjectCountMismatch, packCnt, idx.getObjectCount(), getPackFile()));
 
-		IO.readFully(fd.getChannel(), length - 20, buf, 0, 20);
+		fd.seek(length - 20);
+		fd.read(buf, 0, 20);
 		if (!Arrays.equals(buf, packChecksum))
 			throw new PackMismatchException(MessageFormat.format(
 					JGitText.get().packObjectCountMismatch

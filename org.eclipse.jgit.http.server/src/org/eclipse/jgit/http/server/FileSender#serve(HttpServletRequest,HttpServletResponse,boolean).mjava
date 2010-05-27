@@ -12,6 +12,7 @@
 			final OutputStream out = rsp.getOutputStream();
 			try {
 				final byte[] buf = new byte[4096];
+				source.seek(pos);
 				while (pos < end) {
 					final int r = (int) Math.min(buf.length, end - pos);
 					final int n = source.read(buf, 0, r);
