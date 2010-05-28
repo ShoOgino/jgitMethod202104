@@ -16,8 +16,19 @@
 			root.appendChild(createProject(project));
 			licenses.addAll(project.getLicenses());
 		}
+
+		if (!consumedProjects.isEmpty())
+			appendBlankLine(root);
+		for (Project project : sort(consumedProjects, Project.COMPARATOR)) {
+			root.appendChild(createConsumes(project));
+			licenses.addAll(project.getLicenses());
+		}
+
 		for (RevCommit c : sort(commits))
 			root.appendChild(createCommitMeta(c));
+
+		if (licenses.size() > 1)
+			appendBlankLine(root);
 		for (String name : sort(licenses))
 			root.appendChild(createLicense(name));
 
