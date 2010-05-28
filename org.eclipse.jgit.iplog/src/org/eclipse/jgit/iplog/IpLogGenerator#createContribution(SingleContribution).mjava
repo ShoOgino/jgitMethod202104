@@ -1,11 +1,10 @@
 	private Element createContribution(SingleContribution s) {
-		Element r = createElement("bug");
+		Element r = createElement("contribution");
 		required(r, "id", s.getID());
-		optional(r, "bug-id", s.getBugID());
+		required(r, "description", s.getSummary());
 		required(r, "size", s.getSize());
-		required(r, "type", "A"); // assume attachment type
-		required(r, "created", format(s.getCreated()));
-		required(r, "summary", s.getSummary());
+		if (reviewUrl != null)
+			optional(r, "url", reviewUrl + s.getID());
 		return r;
 	}
 
