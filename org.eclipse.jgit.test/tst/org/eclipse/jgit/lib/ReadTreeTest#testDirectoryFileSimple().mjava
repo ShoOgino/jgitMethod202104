@@ -12,19 +12,19 @@
 		recursiveDelete(new File(trash, "DF"));
 
 		theIndex.add(trash, writeTrashFile("DF", "DF"));
-		theReadTree = new WorkDirCheckout(db, trash, treeDF, theIndex, treeDFDF);
+		theReadTree = getCheckoutImpl(treeDF, theIndex, treeDFDF);
 		theReadTree.prescanTwoTrees();
 
-		assertTrue(theReadTree.removed.contains("DF"));
-		assertTrue(theReadTree.updated.containsKey("DF/DF"));
+		assertTrue(theReadTree.removed().contains("DF"));
+		assertTrue(theReadTree.updated().containsKey("DF/DF"));
 
 		recursiveDelete(new File(trash, "DF"));
 		theIndex = new GitIndex(db);
 		theIndex.add(trash, writeTrashFile("DF/DF", "DF/DF"));
 
-		theReadTree = new WorkDirCheckout(db, trash, treeDFDF, theIndex, treeDF);
+		theReadTree = getCheckoutImpl(treeDFDF, theIndex, treeDF);
 		theReadTree.prescanTwoTrees();
-		assertTrue(theReadTree.removed.contains("DF/DF"));
-		assertTrue(theReadTree.updated.containsKey("DF"));
+		assertTrue(theReadTree.removed().contains("DF/DF"));
+		assertTrue(theReadTree.updated().containsKey("DF"));
 	}
 

@@ -10,22 +10,22 @@
 		headFile.setId(objectId);
 		Tree merge = new Tree(db);
 
-		WorkDirCheckout readTree = new WorkDirCheckout(db, trash, head, index, merge);
+		Checkout readTree = getCheckoutImpl(head, index, merge);
 		readTree.prescanTwoTrees();
 
-		assertTrue(readTree.removed.contains("foo"));
+		assertTrue(readTree.removed().contains("foo"));
 
-		readTree = new WorkDirCheckout(db, trash, merge, index, head);
+		readTree = getCheckoutImpl(merge, index, head);
 		readTree.prescanTwoTrees();
 
-		assertEquals(objectId, readTree.updated.get("foo"));
+		assertEquals(objectId, readTree.updated().get("foo"));
 
 		ObjectId anotherId = ObjectId.fromString("ba78e065e2c261d4f7b8f42107588051e87e18ee");
 		merge.addFile("foo").setId(anotherId);
 
-		readTree = new WorkDirCheckout(db, trash, head, index, merge);
+		readTree = getCheckoutImpl(head, index, merge);
 		readTree.prescanTwoTrees();
 
-		assertEquals(anotherId, readTree.updated.get("foo"));
+		assertEquals(anotherId, readTree.updated().get("foo"));
 	}
 
