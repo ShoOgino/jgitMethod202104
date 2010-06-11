@@ -1,0 +1,11 @@
+	@Override
+	public void checkout() throws IOException {
+		DirCache dc = db.lockDirCache();
+		try {
+			dco = new DirCacheCheckout(db, theHead.getTreeId(), dc, theMerge.getTreeId());
+			dco.checkout();
+		} finally {
+			dc.unlock();
+		}
+	}
+

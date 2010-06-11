@@ -1,0 +1,12 @@
+	@Override
+	public void prescanTwoTrees(Tree head, Tree merge)
+			throws IllegalStateException, IOException {
+		DirCache dc = db.lockDirCache();
+		try {
+			dco = new DirCacheCheckout(db, head.getTreeId(), dc, merge.getTreeId());
+			dco.preScanTwoTrees();
+		} finally {
+			dc.unlock();
+		}
+	}
+

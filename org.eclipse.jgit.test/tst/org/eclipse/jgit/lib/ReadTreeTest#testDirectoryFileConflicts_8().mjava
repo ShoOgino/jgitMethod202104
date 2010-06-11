@@ -1,0 +1,9 @@
+	public void testDirectoryFileConflicts_8() throws Exception {
+		// 8
+		setupCase(mk("DF"), mk("DF"), mk("DF/DF"));
+		recursiveDelete(new File(db.getWorkTree(), "DF"));
+		writeTrashFile("DF", "xy");
+		go();
+		assertConflict("DF/DF");
+	}
+

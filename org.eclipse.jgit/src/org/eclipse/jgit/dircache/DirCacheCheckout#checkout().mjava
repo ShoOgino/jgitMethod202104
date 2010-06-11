@@ -1,0 +1,65 @@
+	/**
+	 * Execute this checkout
+	 *
+	 * @return <code>false</code> if this method could not delete all the files
+	 *         which should be deleted (e.g. because of of the files was
+	 *         locked). In this case {@link #getToBeDeleted()} lists the files
+	 *         which should be tried to be deleted outside of this method.
+	 *         Although <code>false</code> is returned the checkout was
+	 *         successful and the working tree was updated for all other files.
+	 *         <code>true</code> is returned when no such problem occurred
+	 *
+	 * @throws IOException
+	 */
+	public boolean checkout() throws IOException {
+		toBeDeleted.clear();
+		if (headCommitTree != null)
+			preScanTwoTrees();
+		else
+			prescanOneTree();
+
+		if (!conflicts.isEmpty()) {
+			if (failOnConflict) {
+				dc.unlock();
+				throw new CheckoutConflictException(conflicts.toArray(new String[conflicts.size()]));
+			} else
+				cleanUpConflicts();
+		}
+
+		// update our index
+		builder.finish();
+
+		File file=null;
+		String last = "";
+		for (String r : removed) {
+			file = new File(repo.getWorkTree(), r);
+			if (!file.delete())
+				toBeDeleted.add(r);
+			else {
+				if (!isSamePrefix(r, last))
+					removeEmptyParents(file);
+				last = r;
+			}
+		}
+		if (file != null)
+			removeEmptyParents(file);
+
+		for (String path : updated.keySet()) {
+			// ... create/overwrite this file ...
+			file = new File(repo.getWorkTree(), path);
+			file.getParentFile().mkdirs();
+			file.createNewFile();
+			DirCacheEntry entry = dc.getEntry(path);
+			checkoutEntry(file, entry, config_filemode());
+		}
+
+
+		// commit the index builder - a new index is persisted
+		if (!builder.commit()) {
+			dc.unlock();
+			throw new IndexWriteException();
+		}
+
+		return toBeDeleted == null;
+	}
+

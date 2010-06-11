@@ -1,0 +1,34 @@
+	/**
+	 * Scan index and merge tree (no HEAD). Used e.g. for initial checkout when
+	 * there is no head yet.
+	 *
+	 * @throws MissingObjectException
+	 * @throws IncorrectObjectTypeException
+	 * @throws CorruptObjectException
+	 * @throws IOException
+	 */
+	public void prescanOneTree()
+			throws MissingObjectException, IncorrectObjectTypeException,
+			CorruptObjectException, IOException {
+		removed.clear();
+		updated.clear();
+		conflicts.clear();
+
+		builder = dc.builder();
+
+		walk = new NameConflictTreeWalk(repo);
+		walk.reset();
+		walk.addTree(mergeCommitTree);
+		walk.addTree(new DirCacheBuildIterator(builder));
+		walk.addTree(workingTree);
+
+		while (walk.next()) {
+			processEntry(walk.getTree(0, CanonicalTreeParser.class),
+					walk.getTree(1, DirCacheBuildIterator.class),
+					walk.getTree(2, WorkingTreeIterator.class));
+			if (walk.isSubtree())
+				walk.enterSubtree();
+		}
+		conflicts.removeAll(removed);
+	}
+

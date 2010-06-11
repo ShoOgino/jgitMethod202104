@@ -1,0 +1,64 @@
+	/**
+	 * Updates the file in the working tree with content and mode from an entry
+	 * in the index. The new content is first written to a new temporary file in
+	 * the same directory as the real file. Then that new file is renamed to the
+	 * final filename.
+	 *
+	 * TODO: this method works directly on File IO, we may need another
+	 * abstraction (like WorkingTreeIterator). This way we could tell e.g.
+	 * Eclipse that Files in the workspace got changed
+	 *
+	 * @param f
+	 *            the file to be modified. The parent directory for this file
+	 *            has to exist already
+	 * @param entry
+	 *            the entry containing new mode and content
+	 * @param config_filemode
+	 *            whether the mode bits should be handled at all.
+	 * @throws IOException
+	 */
+	public void checkoutEntry(File f, DirCacheEntry entry,
+			boolean config_filemode) throws IOException {
+		ObjectLoader ol = repo.open(entry.getObjectId());
+		if (ol == null)
+			throw new MissingObjectException(entry.getObjectId(),
+					Constants.TYPE_BLOB);
+
+		byte[] bytes = ol.getCachedBytes();
+
+		File parentDir = f.getParentFile();
+		File tmpFile = File.createTempFile("._" + f.getName(), null, parentDir);
+		FileChannel channel = new FileOutputStream(tmpFile).getChannel();
+		ByteBuffer buffer = ByteBuffer.wrap(bytes);
+		try {
+			int j = channel.write(buffer);
+			if (j != bytes.length)
+				throw new IOException(MessageFormat.format(
+						JGitText.get().couldNotWriteFile, tmpFile));
+		} finally {
+			channel.close();
+		}
+		FS fs = repo.getFS();
+		if (config_filemode && fs.supportsExecute()) {
+			if (FileMode.EXECUTABLE_FILE.equals(entry.getRawMode())) {
+				if (!fs.canExecute(tmpFile))
+					fs.setExecute(tmpFile, true);
+			} else {
+				if (fs.canExecute(tmpFile))
+					fs.setExecute(tmpFile, false);
+			}
+		}
+		if (!tmpFile.renameTo(f)) {
+			// tried to rename which failed. Let' delete the target file and try
+			// again
+			f.delete();
+			if (!tmpFile.renameTo(f)) {
+				throw new IOException(MessageFormat.format(
+						JGitText.get().couldNotWriteFile, tmpFile.getPath(),
+						f.getPath()));
+			}
+		}
+		entry.setLastModified(f.lastModified());
+		entry.setLength((int) ol.getSize());
+	}
+

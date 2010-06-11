@@ -1,0 +1,22 @@
+	/**
+	 * This method implements how to handle conflicts when
+	 * {@link #failOnConflict} is false
+	 *
+	 * @throws CheckoutConflictException
+	 */
+	private void cleanUpConflicts() throws CheckoutConflictException {
+		// TODO: couldn't we delete unsaved worktree content here?
+		for (String c : conflicts) {
+			File conflict = new File(repo.getWorkTree(), c);
+			if (!conflict.delete())
+				throw new CheckoutConflictException(MessageFormat.format(
+						JGitText.get().cannotDeleteFile, c));
+			removeEmptyParents(conflict);
+		}
+		for (String r : removed) {
+			File file = new File(repo.getWorkTree(), r);
+			file.delete();
+			removeEmptyParents(file);
+		}
+	}
+

@@ -1,0 +1,21 @@
+	private boolean isModified(String path) throws CorruptObjectException, IOException {
+		NameConflictTreeWalk tw = new NameConflictTreeWalk(repo);
+		tw.reset();
+		tw.addTree(new DirCacheIterator(dc));
+		tw.addTree(new FileTreeIterator(repo.getWorkTree(), repo.getFS(), WorkingTreeOptions.createDefaultInstance()));
+		tw.setRecursive(true);
+		tw.setFilter(PathFilter.create(path));
+		DirCacheIterator dcIt;
+		WorkingTreeIterator wtIt;
+		while(tw.next()) {
+			dcIt = tw.getTree(0, DirCacheIterator.class);
+			wtIt = tw.getTree(1, WorkingTreeIterator.class);
+			if (dcIt == null || wtIt == null)
+				return true;
+			if (wtIt.isModified(dcIt.getDirCacheEntry(), true, config_filemode(), repo.getFS())) {
+				return true;
+			}
+		}
+		return false;
+	}
+

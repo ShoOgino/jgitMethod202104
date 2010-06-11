@@ -1,0 +1,26 @@
+	/**
+	 * Constructs a DirCacheCeckout for fast-forwarding from one tree to
+	 * another, merging it with the index
+	 *
+	 * @param repo
+	 *            the repository in which we do the checkout
+	 * @param headCommitTree
+	 *            the id of the tree of the head commit
+	 * @param dc
+	 *            the (already locked) Dircache for this repo
+	 * @param mergeCommitTree
+	 *            the id of the tree we want to fast-forward to
+	 * @param workingTree
+	 *            an iterator over the repositories Working Tree
+	 * @throws IOException
+	 */
+	public DirCacheCheckout(Repository repo, ObjectId headCommitTree, DirCache dc,
+			ObjectId mergeCommitTree, WorkingTreeIterator workingTree)
+			throws IOException {
+		this.repo = repo;
+		this.dc = dc;
+		this.headCommitTree = headCommitTree;
+		this.mergeCommitTree = mergeCommitTree;
+		this.workingTree = workingTree;
+	}
+

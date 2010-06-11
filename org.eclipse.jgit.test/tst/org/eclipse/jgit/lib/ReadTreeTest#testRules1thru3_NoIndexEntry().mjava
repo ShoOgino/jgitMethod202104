@@ -3,9 +3,8 @@
 	// Rule 0 is left out for obvious reasons :)
 	public void testRules1thru3_NoIndexEntry() throws IOException {
 		Tree head = new Tree(db);
-		FileTreeEntry headFile = head.addFile("foo");
-		ObjectId objectId = ObjectId.fromString("ba78e065e2c261d4f7b8f42107588051e87e18e9");
-		headFile.setId(objectId);
+		head = buildTree(mk("foo"));
+		ObjectId objectId = head.findBlobMember("foo").getId();
 		Tree merge = new Tree(db);
 
 		prescanTwoTrees(head, merge);
@@ -16,8 +15,8 @@
 
 		assertEquals(objectId, getUpdated().get("foo"));
 
-		ObjectId anotherId = ObjectId.fromString("ba78e065e2c261d4f7b8f42107588051e87e18ee");
-		merge.addFile("foo").setId(anotherId);
+		merge = buildTree(mkmap("foo", "a"));
+		ObjectId anotherId = merge.findBlobMember("foo").getId();
 
 		prescanTwoTrees(head, merge);
 

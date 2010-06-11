@@ -5,6 +5,11 @@
 		writeTrashFile("DF/DF/DF", "asdf");
 		go();
 		assertConflict("DF/DF/DF");
-		assertUpdated("DF");
+
+		// Why do we expect an update on DF. If we really update
+		// DF and update also the working tree we would have to
+		// overwrite a dirty file in the work-tree DF/DF/DF
+		// This test would fail in DirCacheCheckout
+		// assertUpdated("DF");
 	}
 

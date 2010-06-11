@@ -1,0 +1,32 @@
+	/**
+	 * A conflict is detected - add the three different stages to the index
+	 * @param path the path of the conflicting entry
+	 * @param e the previous index entry
+	 * @param h the first tree you want to merge (the HEAD)
+	 * @param m the second tree you want to merge
+	 */
+	private void conflict(String path, DirCacheEntry e, AbstractTreeIterator h, AbstractTreeIterator m) {
+		conflicts.add(path);
+
+		DirCacheEntry entry;
+		if (e != null) {
+			entry = new DirCacheEntry(e.getPathString(), DirCacheEntry.STAGE_1);
+			entry.copyMetaData(e);
+			builder.add(entry);
+		}
+
+		if (h != null && !FileMode.TREE.equals(h.getEntryFileMode())) {
+			entry = new DirCacheEntry(h.getEntryPathString(), DirCacheEntry.STAGE_2);
+			entry.setFileMode(h.getEntryFileMode());
+			entry.setObjectId(h.getEntryObjectId());
+			builder.add(entry);
+		}
+
+		if (m != null && !FileMode.TREE.equals(m.getEntryFileMode())) {
+			entry = new DirCacheEntry(m.getEntryPathString(), DirCacheEntry.STAGE_3);
+			entry.setFileMode(m.getEntryFileMode());
+			entry.setObjectId(m.getEntryObjectId());
+			builder.add(entry);
+		}
+	}
+
