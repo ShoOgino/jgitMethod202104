@@ -1,9 +1,9 @@
 	private static void writeLine(final OutputStream out, final char prefix,
-			final RawText text, final int cur) throws IOException {
+			final RawText text, final int cur, boolean noNewLineIndicator) throws IOException {
 		out.write(prefix);
 		text.writeLine(out, cur);
 		out.write('\n');
-		if (cur + 1 == text.size() && text.isMissingNewlineAtEnd())
-			out.write(noNewLine);
+		if (noNewLineIndicator)
+			writeNoNewLine(out);
 	}
 
