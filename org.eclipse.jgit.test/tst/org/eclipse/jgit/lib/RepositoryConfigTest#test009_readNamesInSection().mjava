@@ -1,0 +1,10 @@
+	public void test009_readNamesInSection() throws ConfigInvalidException {
+		String configString = "[core]\n" + "repositoryformatversion = 0\n"
+				+ "filemode = false\n" + "logallrefupdates = true\n";
+		final Config c = parse(configString);
+		Set<String> names = c.getNames("core");
+		assertEquals("Core section size", 3, names.size());
+		assertTrue("Core section should contain \"filemode\"", names
+				.contains("filemode"));
+	}
+
