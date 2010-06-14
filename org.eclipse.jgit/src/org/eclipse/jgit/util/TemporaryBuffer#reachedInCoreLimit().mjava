@@ -2,15 +2,7 @@
 		if (blocks.size() * Block.SZ < inCoreLimit)
 			return false;
 
-		overflow = overflow();
-
-		final Block last = blocks.remove(blocks.size() - 1);
-		for (final Block b : blocks)
-			overflow.write(b.buffer, 0, b.count);
-		blocks = null;
-
-		overflow = new BufferedOutputStream(overflow, Block.SZ);
-		overflow.write(last.buffer, 0, last.count);
+		switchToOverflow();
 		return true;
 	}
 
