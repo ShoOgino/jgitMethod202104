@@ -22,15 +22,15 @@
 
 			while (aCur < aEnd || bCur < bEnd) {
 				if (aCur < curEdit.getBeginA() || endIdx + 1 < curIdx) {
-					writeLine(out, ' ', a, aCur);
+					writeContextLine(out, a, aCur, isEndOfLineMissing(a, aCur));
 					aCur++;
 					bCur++;
-
 				} else if (aCur < curEdit.getEndA()) {
-					writeLine(out, '-', a, aCur++);
-
+					writeRemovedLine(out, a, aCur, isEndOfLineMissing(a, aCur));
+					aCur++;
 				} else if (bCur < curEdit.getEndB()) {
-					writeLine(out, '+', b, bCur++);
+					writeAddedLine(out, b, bCur, isEndOfLineMissing(b, bCur));
+					bCur++;
 				}
 
 				if (end(curEdit, aCur, bCur) && ++curIdx < edits.size())
