@@ -1,12 +1,18 @@
 	/**
 	 * Write a canonical tree to the object database.
 	 *
-	 * @param b
+	 * @param treeData
 	 *            the canonical encoding of the tree object.
 	 * @return SHA-1 of the tree
 	 * @throws IOException
 	 */
-	public ObjectId writeCanonicalTree(final byte[] b) throws IOException {
-		return writeTree(b.length, new ByteArrayInputStream(b));
+	public ObjectId writeCanonicalTree(byte[] treeData) throws IOException {
+		try {
+			ObjectId id = inserter.insert(OBJ_TREE, treeData);
+			inserter.flush();
+			return id;
+		} finally {
+			inserter.release();
+		}
 	}
 

@@ -1,0 +1,35 @@
+	private File toTemp(final MessageDigest md, final int type, long len,
+			final InputStream is) throws IOException, FileNotFoundException,
+			Error {
+		boolean delete = true;
+		File tmp = File.createTempFile("noz", null, db.getDirectory());
+		try {
+			DigestOutputStream dOut = new DigestOutputStream(
+					compress(new FileOutputStream(tmp)), md);
+			try {
+				dOut.write(Constants.encodedTypeString(type));
+				dOut.write((byte) ' ');
+				dOut.write(Constants.encodeASCII(len));
+				dOut.write((byte) 0);
+
+				final byte[] buf = buffer();
+				while (len > 0) {
+					int n = is.read(buf, 0, (int) Math.min(len, buf.length));
+					if (n <= 0)
+						throw shortInput(len);
+					dOut.write(buf, 0, n);
+					len -= n;
+				}
+			} finally {
+				dOut.close();
+			}
+
+			tmp.setReadOnly();
+			delete = false;
+			return tmp;
+		} finally {
+			if (delete)
+				tmp.delete();
+		}
+	}
+

@@ -1,0 +1,23 @@
+	/**
+	 * Compute the name of an object, without inserting it.
+	 *
+	 * @param type
+	 *            type code of the object to store.
+	 * @param data
+	 *            complete content of the object.
+	 * @param off
+	 *            first position within {@code data}.
+	 * @param len
+	 *            number of bytes to copy from {@code data}.
+	 * @return the name of the object.
+	 */
+	public ObjectId idFor(int type, byte[] data, int off, int len) {
+		MessageDigest md = digest();
+		md.update(Constants.encodedTypeString(type));
+		md.update((byte) ' ');
+		md.update(Constants.encodeASCII(len));
+		md.update((byte) 0);
+		md.update(data, off, len);
+		return ObjectId.fromRaw(md.digest());
+	}
+

@@ -1,0 +1,20 @@
+	/**
+	 * Insert a single object into the store, returning its unique name.
+	 *
+	 * @param type
+	 *            type code of the object to store.
+	 * @param data
+	 *            complete content of the object.
+	 * @param off
+	 *            first position within {@code data}.
+	 * @param len
+	 *            number of bytes to copy from {@code data}.
+	 * @return the name of the object.
+	 * @throws IOException
+	 *             the object could not be stored.
+	 */
+	public ObjectId insert(int type, byte[] data, int off, int len)
+			throws IOException {
+		return insert(type, len, new ByteArrayInputStream(data, off, len));
+	}
+

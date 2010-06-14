@@ -1,6 +1,8 @@
 	/**
 	 * Initialize a reference to an on-disk object directory.
 	 *
+	 * @param cfg
+	 *            configuration this directory consults for write settings.
 	 * @param dir
 	 *            the location of the <code>objects</code> directory.
 	 * @param alternateObjectDir
@@ -9,7 +11,8 @@
 	 *            the file system abstraction which will be necessary to
 	 *            perform certain file system operations.
 	 */
-	public ObjectDirectory(final File dir, File[] alternateObjectDir, FS fs) {
+	public ObjectDirectory(final Config cfg, final File dir, File[] alternateObjectDir, FS fs) {
+		config = cfg;
 		objects = dir;
 		this.alternateObjectDir = alternateObjectDir;
 		infoDirectory = new File(objects, "info");
