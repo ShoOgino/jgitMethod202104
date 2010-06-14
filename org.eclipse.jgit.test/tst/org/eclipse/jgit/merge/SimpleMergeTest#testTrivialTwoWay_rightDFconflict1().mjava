@@ -20,7 +20,7 @@
 			t.finish();
 		}
 
-		final ObjectWriter ow = new ObjectWriter(db);
+		final ObjectInserter ow = db.newObjectInserter();
 		final ObjectId b = commit(ow, treeB, new ObjectId[] {});
 		final ObjectId o = commit(ow, treeO, new ObjectId[] { b });
 		final ObjectId t = commit(ow, treeT, new ObjectId[] { b });

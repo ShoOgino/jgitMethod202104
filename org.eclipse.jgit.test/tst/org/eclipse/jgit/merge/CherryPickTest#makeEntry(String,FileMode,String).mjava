@@ -2,9 +2,8 @@
 			final String content) throws Exception {
 		final DirCacheEntry ent = new DirCacheEntry(path);
 		ent.setFileMode(mode);
-		final byte[] contentBytes = Constants.encode(content);
-		ent.setObjectId(new ObjectWriter(db).computeBlobSha1(
-				contentBytes.length, new ByteArrayInputStream(contentBytes)));
+		ent.setObjectId(new ObjectInserter.Formatter().idFor(OBJ_BLOB,
+				Constants.encode(content)));
 		return ent;
 	}
 

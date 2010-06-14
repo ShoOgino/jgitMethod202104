@@ -13,6 +13,13 @@
 		for (final DirCacheEntry e : entries)
 			b.add(e);
 		b.finish();
-		return pool.lookupTree(dc.writeTree(writer));
+		ObjectId root;
+		try {
+			root = dc.writeTree(inserter);
+			inserter.flush();
+		} finally {
+			inserter.release();
+		}
+		return pool.lookupTree(root);
 	}
 

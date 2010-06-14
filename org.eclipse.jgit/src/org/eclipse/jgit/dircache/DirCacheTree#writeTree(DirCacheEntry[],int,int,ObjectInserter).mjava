@@ -23,7 +23,7 @@
 	 *             an unexpected error occurred writing to the object store.
 	 */
 	ObjectId writeTree(final DirCacheEntry[] cache, int cIdx,
-			final int pathOffset, final ObjectWriter ow)
+			final int pathOffset, final ObjectInserter ow)
 			throws UnmergedPathException, IOException {
 		if (id == null) {
 			final int endIdx = cIdx + entrySpan;
@@ -58,7 +58,7 @@
 				entryIdx++;
 			}
 
-			id = ow.writeCanonicalTree(out.toByteArray());
+			id = ow.insert(Constants.OBJ_TREE, out.toByteArray());
 		}
 		return id;
 	}
