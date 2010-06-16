@@ -5,6 +5,7 @@
 	 */
 	public void scanForRepoChanges() throws IOException {
 		getAllRefs(); // This will look for changes to refs
-		getIndex(); // This will detect changes in the index
+		if (!isBare())
+			getIndex(); // This will detect changes in the index
 	}
 

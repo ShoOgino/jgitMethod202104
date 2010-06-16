@@ -1,0 +1,10 @@
+	public void testNotBare_CreateRepositoryFromGitDirOnlyWithBareConfigFalse()
+			throws Exception {
+		File gitDir = getFile("workdir", "repoWithBareConfigFalse", "child");
+		setBare(gitDir, false);
+		Repository repo = new Repository(gitDir, null);
+		assertFalse(repo.isBare());
+		assertWorkdirPath(repo, "workdir", "repoWithBareConfigFalse");
+		assertGitdirPath(repo, "workdir", "repoWithBareConfigFalse", "child");
+	}
+
