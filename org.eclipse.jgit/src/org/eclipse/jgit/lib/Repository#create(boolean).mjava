@@ -11,7 +11,8 @@
 	public void create(boolean bare) throws IOException {
 		final RepositoryConfig cfg = getConfig();
 		if (cfg.getFile().exists()) {
-			throw new IllegalStateException(MessageFormat.format(JGitText.get().repositoryAlreadyExists, gitDir));
+			throw new IllegalStateException(MessageFormat.format(
+					JGitText.get().repositoryAlreadyExists, gitDir));
 		}
 		gitDir.mkdirs();
 		refs.create();
@@ -23,12 +24,17 @@
 		head.disableRefLog();
 		head.link(Constants.R_HEADS + Constants.MASTER);
 
-		cfg.setInt("core", null, "repositoryformatversion", 0);
-		cfg.setBoolean("core", null, "filemode", true);
+		cfg.setInt(ConfigConstants.CONFIG_CORE_SECTION, null,
+				ConfigConstants.CONFIG_KEY_REPO_FORMAT_VERSION, 0);
+		cfg.setBoolean(ConfigConstants.CONFIG_CORE_SECTION, null,
+				ConfigConstants.CONFIG_KEY_FILEMODE, true);
 		if (bare)
-			cfg.setBoolean("core", null, "bare", true);
-		cfg.setBoolean("core", null, "logallrefupdates", !bare);
-		cfg.setBoolean("core", null, "autocrlf", false);
+			cfg.setBoolean(ConfigConstants.CONFIG_CORE_SECTION, null,
+					ConfigConstants.CONFIG_KEY_BARE, true);
+		cfg.setBoolean(ConfigConstants.CONFIG_CORE_SECTION, null,
+				ConfigConstants.CONFIG_KEY_LOGALLREFUPDATES, !bare);
+		cfg.setBoolean(ConfigConstants.CONFIG_CORE_SECTION, null,
+				ConfigConstants.CONFIG_KEY_AUTOCRLF, false);
 		cfg.save();
 	}
 

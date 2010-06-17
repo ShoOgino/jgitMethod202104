@@ -7,15 +7,15 @@
 	 *            for default value in which case it depends on GIT_WORK_TREE.
 	 * @param workTree
 	 *            GIT_WORK_TREE (the root of the checkout). May be null for
-	 *            default value if GIT_DIR is
+	 *            default value if GIT_DIR is provided.
 	 * @param objectDir
 	 *            GIT_OBJECT_DIRECTORY (where objects and are stored). May be
 	 *            null for default value. Relative names ares resolved against
-	 *            GIT_WORK_TREE
+	 *            GIT_WORK_TREE.
 	 * @param alternateObjectDir
 	 *            GIT_ALTERNATE_OBJECT_DIRECTORIES (where more objects are read
 	 *            from). May be null for default value. Relative names ares
-	 *            resolved against GIT_WORK_TREE
+	 *            resolved against GIT_WORK_TREE.
 	 * @param indexFile
 	 *            GIT_INDEX_FILE (the location of the index file). May be null
 	 *            for default value. Relative names ares resolved against
@@ -28,8 +28,8 @@
 	 *             accessed.
 	 */
 	public Repository(final File d, final File workTree, final File objectDir,
-			final File[] alternateObjectDir, final File indexFile,
-			FS fs) throws IOException {
+			final File[] alternateObjectDir, final File indexFile, FS fs)
+			throws IOException {
 
 		if (workTree != null) {
 			workDir = workTree;
@@ -41,7 +41,8 @@
 			if (d != null)
 				gitDir = d;
 			else
-				throw new IllegalArgumentException(JGitText.get().eitherGIT_DIRorGIT_WORK_TREEmustBePassed);
+				throw new IllegalArgumentException(
+						JGitText.get().eitherGIT_DIRorGIT_WORK_TREEmustBePassed);
 		}
 
 		this.fs = fs;
@@ -53,11 +54,33 @@
 		loadConfig();
 
 		if (workDir == null) {
-			String workTreeConfig = getConfig().getString("core", null, "worktree");
+			// if the working directory was not provided explicitly,
+			// we need to decide if this is a "bare" repository or not
+			// first, we check the working tree configuration
+			String workTreeConfig = getConfig().getString(
+					ConfigConstants.CONFIG_CORE_SECTION, null,
+					ConfigConstants.CONFIG_KEY_WORKTREE);
 			if (workTreeConfig != null) {
+				// the working tree configuration wins
 				workDir = fs.resolve(d, workTreeConfig);
-			} else {
+			} else if (getConfig().getString(
+					ConfigConstants.CONFIG_CORE_SECTION, null,
+					ConfigConstants.CONFIG_KEY_BARE) != null) {
+				// we have asserted that a value for the "bare" flag was set
+				if (!getConfig().getBoolean(ConfigConstants.CONFIG_CORE_SECTION,
+						ConfigConstants.CONFIG_KEY_BARE, true))
+					// the "bare" flag is false -> use the parent of the
+					// meta data directory
+					workDir = gitDir.getParentFile();
+				else
+					// the "bare" flag is true
+					workDir = null;
+			} else if (Constants.DOT_GIT.equals(gitDir.getName())) {
+				// no value for the "bare" flag, but the meta data directory
+				// is named ".git" -> use the parent of the meta data directory
 				workDir = gitDir.getParentFile();
+			} else {
+				workDir = null;
 			}
 		}
 
@@ -76,10 +99,12 @@
 
 		if (objectDatabase.exists()) {
 			final String repositoryFormatVersion = getConfig().getString(
-					"core", null, "repositoryFormatVersion");
+					ConfigConstants.CONFIG_CORE_SECTION, null,
+					ConfigConstants.CONFIG_KEY_REPO_FORMAT_VERSION);
 			if (!"0".equals(repositoryFormatVersion)) {
 				throw new IOException(MessageFormat.format(
-						JGitText.get().unknownRepositoryFormat2, repositoryFormatVersion));
+						JGitText.get().unknownRepositoryFormat2,
+						repositoryFormatVersion));
 			}
 		}
 	}
