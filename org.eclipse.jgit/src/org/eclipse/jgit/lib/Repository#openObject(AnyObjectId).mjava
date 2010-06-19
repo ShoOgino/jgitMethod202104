@@ -8,11 +8,11 @@
 	 */
 	public ObjectLoader openObject(final AnyObjectId id)
 			throws IOException {
-		final WindowCursor wc = new WindowCursor();
 		try {
-			return openObject(wc, id);
-		} finally {
-			wc.release();
+			return getObjectDatabase().openObject(id);
+		} catch (MissingObjectException notFound) {
+			// Legacy API, return null
+			return null;
 		}
 	}
 

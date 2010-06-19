@@ -1,13 +1,18 @@
 	/**
-	 * Reset this parser to walk through the given tree.
+	 * Create a new parser for a tree appearing in a subset of a repository.
 	 *
+	 * @param prefix
+	 *            position of this iterator in the repository tree. The value
+	 *            may be null or the empty array to indicate the prefix is the
+	 *            root of the repository. A trailing slash ('/') is
+	 *            automatically appended if the prefix does not end in '/'.
 	 * @param repo
 	 *            repository to load the tree data from.
-	 * @param id
+	 * @param treeId
 	 *            identity of the tree being parsed; used only in exception
 	 *            messages if data corruption is found.
 	 * @param curs
-	 *            window cursor to use during repository access.
+	 *            a window cursor to use during data access from the repository.
 	 * @throws MissingObjectException
 	 *             the object supplied is not available from the repository.
 	 * @throws IncorrectObjectTypeException
@@ -16,19 +21,10 @@
 	 * @throws IOException
 	 *             a loose object or pack file could not be read.
 	 */
-	public void reset(final Repository repo, final AnyObjectId id,
-			final WindowCursor curs)
+	public CanonicalTreeParser(final byte[] prefix, final Repository repo,
+			final AnyObjectId treeId, final ObjectReader curs)
 			throws IncorrectObjectTypeException, IOException {
-		final ObjectLoader ldr = repo.openObject(curs, id);
-		if (ldr == null) {
-			final ObjectId me = id.toObjectId();
-			throw new MissingObjectException(me, Constants.TYPE_TREE);
-		}
-		final byte[] subtreeData = ldr.getCachedBytes();
-		if (ldr.getType() != Constants.OBJ_TREE) {
-			final ObjectId me = id.toObjectId();
-			throw new IncorrectObjectTypeException(me, Constants.TYPE_TREE);
-		}
-		reset(subtreeData);
+		super(prefix);
+		reset(repo, treeId, curs);
 	}
 

@@ -1,0 +1,24 @@
+	/**
+	 * Open an object from this database.
+	 * <p>
+	 * This is a one-shot call interface which may be faster than allocating a
+	 * {@link #newReader()} to perform the lookup.
+	 *
+	 * @param objectId
+	 *            identity of the object to open.
+	 * @return a {@link ObjectLoader} for accessing the object.
+	 * @throws MissingObjectException
+	 *             the object does not exist.
+	 * @throws IOException
+	 *             the object store cannot be accessed.
+	 */
+	public ObjectLoader openObject(final AnyObjectId objectId)
+			throws IOException {
+		final ObjectReader or = newReader();
+		try {
+			return or.openObject(objectId);
+		} finally {
+			or.release();
+		}
+	}
+

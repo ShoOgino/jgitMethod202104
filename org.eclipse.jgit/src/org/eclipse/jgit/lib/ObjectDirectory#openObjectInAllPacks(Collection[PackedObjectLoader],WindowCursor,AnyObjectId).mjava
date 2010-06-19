@@ -1,4 +1,3 @@
-	@Override
 	void openObjectInAllPacks(final Collection<PackedObjectLoader> out,
 			final WindowCursor curs, final AnyObjectId objectId)
 			throws IOException {
@@ -23,5 +22,8 @@
 			}
 			break SEARCH;
 		}
+
+		for (AlternateHandle h : myAlternates())
+			h.db.openObjectInAllPacks(out, curs, objectId);
 	}
 

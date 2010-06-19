@@ -4,6 +4,11 @@
 	 *         known shared repositories.
 	 */
 	public boolean hasObject(AnyObjectId objectId) {
-		return getObjectDatabase().hasObject(objectId);
+		try {
+			return getObjectDatabase().hasObject(objectId);
+		} catch (IOException e) {
+			// Legacy API, assume error means "no"
+			return false;
+		}
 	}
 

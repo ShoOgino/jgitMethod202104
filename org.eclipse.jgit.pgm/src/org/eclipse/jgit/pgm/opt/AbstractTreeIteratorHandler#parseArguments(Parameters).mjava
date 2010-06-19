@@ -28,7 +28,7 @@
 			throw new CmdLineException(MessageFormat.format(CLIText.get().notATree, name));
 
 		final CanonicalTreeParser p = new CanonicalTreeParser();
-		final WindowCursor curs = new WindowCursor();
+		final ObjectReader curs = clp.getRepository().newObjectReader();
 		try {
 			p.reset(clp.getRepository(), clp.getRevWalk().parseTree(id), curs);
 		} catch (MissingObjectException e) {

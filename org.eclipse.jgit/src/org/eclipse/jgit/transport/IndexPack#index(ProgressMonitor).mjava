@@ -55,7 +55,13 @@
 					inflater = null;
 					objectDatabase.close();
 				}
-				readCurs = WindowCursor.release(readCurs);
+
+				try {
+					if (readCurs != null)
+						readCurs.release();
+				} finally {
+					readCurs = null;
+				}
 
 				progress.endTask();
 				if (packOut != null)

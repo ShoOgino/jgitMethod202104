@@ -9,12 +9,16 @@
 			}
 		}
 
-		final ObjectLoader ldr = objectDatabase.openObject(readCurs, id);
-		if (ldr != null) {
+		try {
+			final ObjectLoader ldr = readCurs.openObject(id, type);
 			final byte[] existingData = ldr.getCachedBytes();
 			if (ldr.getType() != type || !Arrays.equals(data, existingData)) {
 				throw new IOException(MessageFormat.format(JGitText.get().collisionOn, id.name()));
 			}
+		} catch (MissingObjectException notLocal) {
+			// This is OK, we don't have a copy of the object locally
+			// but the API throws when we try to read it as usually its
+			// an error to read something that doesn't exist.
 		}
 	}
 
