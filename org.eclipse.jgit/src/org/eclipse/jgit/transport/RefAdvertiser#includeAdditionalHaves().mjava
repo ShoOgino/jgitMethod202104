@@ -6,6 +6,7 @@
 	 *             advertisement record.
 	 */
 	public void includeAdditionalHaves() throws IOException {
-		additionalHaves(walk.getRepository().getObjectDatabase());
+		for (ObjectId id : walk.getRepository().getAdditionalHaves())
+			advertiseHave(id);
 	}
 
