@@ -1,7 +1,5 @@
 	/**
 	 * Open an object from this database.
-	 * <p>
-	 * Alternates (if present) are searched automatically.
 	 *
 	 * @param curs
 	 *            temporary working space associated with the calling thread.
@@ -11,19 +9,6 @@
 	 *         object, or null if the object does not exist.
 	 * @throws IOException
 	 */
-	public final ObjectLoader openObject(final WindowCursor curs,
-			final AnyObjectId objectId) throws IOException {
-		ObjectLoader ldr;
-
-		ldr = openObjectImpl1(curs, objectId);
-		if (ldr != null) {
-			return ldr;
-		}
-
-		ldr = openObjectImpl2(curs, objectId.name(), objectId);
-		if (ldr != null) {
-			return ldr;
-		}
-		return null;
-	}
+	public abstract ObjectLoader openObject(WindowCursor curs,
+			AnyObjectId objectId) throws IOException;
 
