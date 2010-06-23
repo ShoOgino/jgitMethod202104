@@ -1,7 +1,8 @@
 	@Override
 	protected void run() throws Exception {
 		if (indexVersion == -1)
-			indexVersion = db.getConfig().getCore().getPackIndexVersion();
+			indexVersion = db.getConfig().get(CoreConfig.KEY)
+					.getPackIndexVersion();
 		final BufferedInputStream in;
 		final org.eclipse.jgit.transport.IndexPack ip;
 		in = new BufferedInputStream(System.in);

@@ -25,7 +25,8 @@
 
 		base = new File(objdir, n.substring(0, n.length() - suffix.length()));
 		final IndexPack ip = new IndexPack(db, is, base);
-		ip.setIndexVersion(db.getConfig().getCore().getPackIndexVersion());
+		ip.setIndexVersion(db.getConfig().get(CoreConfig.KEY)
+				.getPackIndexVersion());
 		return ip;
 	}
 
