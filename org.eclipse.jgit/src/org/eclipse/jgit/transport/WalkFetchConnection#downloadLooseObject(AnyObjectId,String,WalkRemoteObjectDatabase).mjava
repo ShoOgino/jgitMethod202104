@@ -3,8 +3,7 @@
 			throws TransportException {
 		try {
 			final byte[] compressed = remote.open(looseName).toArray();
-			verifyLooseObject(id, compressed);
-			saveLooseObject(id, compressed);
+			verifyAndInsertLooseObject(id, compressed);
 			return true;
 		} catch (FileNotFoundException e) {
 			// Not available in a loose format from this alternate?

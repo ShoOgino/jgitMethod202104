@@ -1,5 +1,5 @@
-	private void verifyLooseObject(final AnyObjectId id, final byte[] compressed)
-			throws IOException {
+	private void verifyAndInsertLooseObject(final AnyObjectId id,
+			final byte[] compressed) throws IOException {
 		final UnpackedObjectLoader uol;
 		try {
 			uol = new UnpackedObjectLoader(compressed);
@@ -21,25 +21,22 @@
 			throw e;
 		}
 
-		objectDigest.reset();
-		objectDigest.update(Constants.encodedTypeString(uol.getType()));
-		objectDigest.update((byte) ' ');
-		objectDigest.update(Constants.encodeASCII(uol.getSize()));
-		objectDigest.update((byte) 0);
-		objectDigest.update(uol.getCachedBytes());
-		idBuffer.fromRaw(objectDigest.digest(), 0);
-
-		if (!AnyObjectId.equals(id, idBuffer)) {
-			throw new TransportException(MessageFormat.format(JGitText.get().incorrectHashFor
-					, id.name(), idBuffer.name(), Constants.typeString(uol.getType()), compressed.length));
-		}
+		final int type = uol.getType();
+		final byte[] raw = uol.getCachedBytes();
 		if (objCheck != null) {
 			try {
-				objCheck.check(uol.getType(), uol.getCachedBytes());
+				objCheck.check(type, raw);
 			} catch (CorruptObjectException e) {
 				throw new TransportException(MessageFormat.format(JGitText.get().transportExceptionInvalid
-						, Constants.typeString(uol.getType()), id.name(), e.getMessage()));
+						, Constants.typeString(type), id.name(), e.getMessage()));
 			}
 		}
+
+		ObjectId act = inserter.insert(type, raw);
+		if (!AnyObjectId.equals(id, act)) {
+			throw new TransportException(MessageFormat.format(JGitText.get().incorrectHashFor
+					, id.name(), act.name(), Constants.typeString(type), compressed.length));
+		}
+		inserter.flush();
 	}
 
