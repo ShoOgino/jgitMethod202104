@@ -1,0 +1,19 @@
+	/**
+	 * Add ceiling directories to the search list.
+	 * <p>
+	 * This setting handles several ceiling directories at once, and is provided
+	 * to support {@code GIT_CEILING_DIRECTORIES}.
+	 *
+	 * @param inList
+	 *            directory paths to stop searching at. The collection's
+	 *            contents is copied to an internal list.
+	 * @return {@code this} (for chaining calls).
+	 */
+	public B addCeilingDirectories(Collection<File> inList) {
+		if (inList != null) {
+			for (File path : inList)
+				addCeilingDirectory(path);
+		}
+		return self();
+	}
+

@@ -1,0 +1,19 @@
+	/**
+	 * Add an alternate object directory to the search list.
+	 * <p>
+	 * This setting handles one alternate directory at a time, and is provided
+	 * to support {@code GIT_ALTERNATE_OBJECT_DIRECTORIES}.
+	 *
+	 * @param other
+	 *            another objects directory to search after the standard one.
+	 * @return {@code this} (for chaining calls).
+	 */
+	public B addAlternateObjectDirectory(File other) {
+		if (other != null) {
+			if (alternateObjectDirectories == null)
+				alternateObjectDirectories = new LinkedList<File>();
+			alternateObjectDirectories.add(other);
+		}
+		return self();
+	}
+

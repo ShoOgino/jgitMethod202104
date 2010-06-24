@@ -1,0 +1,27 @@
+	FileRepository(final BaseRepositoryBuilder options) throws IOException {
+		super(options);
+
+		userConfig = SystemReader.getInstance().openUserConfig(getFS());
+		repoConfig = new FileBasedConfig(userConfig, getFS().resolve(getDirectory(), "config"));
+
+		loadUserConfig();
+		loadRepoConfig();
+
+		refs = new RefDirectory(this);
+		objectDatabase = new ObjectDirectory(repoConfig, //
+				options.getObjectDirectory(), //
+				options.getAlternateObjectDirectories(), //
+				getFS());
+
+		if (objectDatabase.exists()) {
+			final String repositoryFormatVersion = getConfig().getString(
+					ConfigConstants.CONFIG_CORE_SECTION, null,
+					ConfigConstants.CONFIG_KEY_REPO_FORMAT_VERSION);
+			if (!"0".equals(repositoryFormatVersion)) {
+				throw new IOException(MessageFormat.format(
+						JGitText.get().unknownRepositoryFormat2,
+						repositoryFormatVersion));
+			}
+		}
+	}
+

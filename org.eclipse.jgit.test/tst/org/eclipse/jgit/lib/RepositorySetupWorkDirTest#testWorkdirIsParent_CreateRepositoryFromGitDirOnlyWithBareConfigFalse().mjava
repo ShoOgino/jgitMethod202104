@@ -2,7 +2,7 @@
 			throws Exception {
 		File gitDir = getFile("workdir", "repoWithBareConfigTrue", "child");
 		setBare(gitDir, false);
-		Repository repo = new FileRepository(gitDir, null);
+		FileRepository repo = new FileRepositoryBuilder().setGitDir(gitDir).build();
 		assertWorkdirPath(repo, "workdir", "repoWithBareConfigTrue");
 	}
 

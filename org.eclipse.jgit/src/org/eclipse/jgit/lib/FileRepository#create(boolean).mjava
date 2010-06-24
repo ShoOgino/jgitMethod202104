@@ -12,13 +12,13 @@
 		final FileBasedConfig cfg = getConfig();
 		if (cfg.getFile().exists()) {
 			throw new IllegalStateException(MessageFormat.format(
-					JGitText.get().repositoryAlreadyExists, gitDir));
+					JGitText.get().repositoryAlreadyExists, getDirectory()));
 		}
-		gitDir.mkdirs();
+		getDirectory().mkdirs();
 		refs.create();
 		objectDatabase.create();
 
-		new File(gitDir, "branches").mkdir();
+		new File(getDirectory(), "branches").mkdir();
 
 		RefUpdate head = updateRef(Constants.HEAD);
 		head.disableRefLog();

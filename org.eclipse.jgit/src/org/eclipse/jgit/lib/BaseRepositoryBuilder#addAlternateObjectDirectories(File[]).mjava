@@ -1,0 +1,19 @@
+	/**
+	 * Add alternate object directories to the search list.
+	 * <p>
+	 * This setting handles several alternate directories at once, and is
+	 * provided to support {@code GIT_ALTERNATE_OBJECT_DIRECTORIES}.
+	 *
+	 * @param inList
+	 *            other object directories to search after the standard one. The
+	 *            array's contents is copied to an internal list.
+	 * @return {@code this} (for chaining calls).
+	 */
+	public B addAlternateObjectDirectories(File[] inList) {
+		if (inList != null) {
+			for (File path : inList)
+				addAlternateObjectDirectory(path);
+		}
+		return self();
+	}
+

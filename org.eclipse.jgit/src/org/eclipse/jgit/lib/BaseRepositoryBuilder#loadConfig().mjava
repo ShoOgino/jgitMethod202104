@@ -1,0 +1,31 @@
+	/**
+	 * Parse and load the repository specific configuration.
+	 * <p>
+	 * The default implementation reads {@code gitDir/config}, or returns an
+	 * empty configuration if gitDir was not set.
+	 *
+	 * @return the repository's configuration.
+	 * @throws IOException
+	 *             the configuration is not available.
+	 */
+	protected Config loadConfig() throws IOException {
+		if (getGitDir() != null) {
+			// We only want the repository's configuration file, and not
+			// the user file, as these parameters must be unique to this
+			// repository and not inherited from other files.
+			//
+			File path = safeFS().resolve(getGitDir(), "config");
+			FileBasedConfig cfg = new FileBasedConfig(path);
+			try {
+				cfg.load();
+			} catch (ConfigInvalidException err) {
+				throw new IllegalArgumentException(MessageFormat.format(
+						JGitText.get().repositoryConfigFileInvalid, path
+								.getAbsolutePath(), err.getMessage()));
+			}
+			return cfg;
+		} else {
+			return new Config();
+		}
+	}
+

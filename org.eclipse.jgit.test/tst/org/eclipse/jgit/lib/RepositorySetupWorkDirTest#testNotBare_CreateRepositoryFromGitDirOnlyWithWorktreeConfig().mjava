@@ -3,7 +3,7 @@
 		File gitDir = getFile("workdir", "repoWithConfig");
 		File workTree = getFile("workdir", "treeRoot");
 		setWorkTree(gitDir, workTree);
-		Repository repo = new FileRepository(gitDir, null);
+		FileRepository repo = new FileRepositoryBuilder().setGitDir(gitDir).build();
 		assertFalse(repo.isBare());
 		assertWorkdirPath(repo, "workdir", "treeRoot");
 		assertGitdirPath(repo, "workdir", "repoWithConfig");

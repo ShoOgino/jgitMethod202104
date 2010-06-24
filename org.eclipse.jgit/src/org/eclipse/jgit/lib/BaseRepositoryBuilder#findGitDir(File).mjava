@@ -1,0 +1,33 @@
+	/**
+	 * Configure {@code GIT_DIR} by searching up the file system.
+	 * <p>
+	 * Starts from the supplied directory path and scans up through the parent
+	 * directory tree until a Git repository is found. Success can be determined
+	 * by checking for {@code getGitDir() != null}.
+	 * <p>
+	 * The search can be limited to specific spaces of the local filesystem by
+	 * {@link #addCeilingDirectory(File)}, or inheriting the list through a
+	 * prior call to {@link #readEnvironment()}.
+	 *
+	 * @param current
+	 *            directory to begin searching in.
+	 * @return {@code this} (for chaining calls).
+	 */
+	public B findGitDir(File current) {
+		if (getGitDir() == null) {
+			FS tryFS = safeFS();
+			while (current != null) {
+				File dir = new File(current, DOT_GIT);
+				if (FileKey.isGitRepository(dir, tryFS)) {
+					setGitDir(dir);
+					break;
+				}
+
+				current = current.getParentFile();
+				if (current != null && ceilingDirectories.contains(current))
+					break;
+			}
+		}
+		return self();
+	}
+
