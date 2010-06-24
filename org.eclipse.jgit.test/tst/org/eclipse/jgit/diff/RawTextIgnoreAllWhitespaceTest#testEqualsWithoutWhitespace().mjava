@@ -1,0 +1,22 @@
+	public void testEqualsWithoutWhitespace() {
+		final RawText a = new RawTextIgnoreAllWhitespace(Constants
+				.encodeASCII("foo-a\nfoo-b\nfoo\n"));
+		final RawText b = new RawTextIgnoreAllWhitespace(Constants
+				.encodeASCII("foo-b\nfoo-c\nf\n"));
+
+		assertEquals(3, a.size());
+		assertEquals(3, b.size());
+
+		// foo-a != foo-b
+		assertFalse(a.equals(0, b, 0));
+		assertFalse(b.equals(0, a, 0));
+
+		// foo-b == foo-b
+		assertTrue(a.equals(1, b, 0));
+		assertTrue(b.equals(0, a, 1));
+
+		// foo != f
+		assertFalse(a.equals(2, b, 2));
+		assertFalse(b.equals(2, a, 2));
+	}
+
