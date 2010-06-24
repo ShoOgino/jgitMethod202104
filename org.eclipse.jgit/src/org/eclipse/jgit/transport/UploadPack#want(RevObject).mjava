@@ -1,4 +1,4 @@
-	private void want(RevObject o) {
+	private void want(RevObject o) throws MissingObjectException, IOException {
 		if (!o.has(WANT)) {
 			o.add(WANT);
 			wantAll.add(o);
@@ -7,9 +7,7 @@
 				wantCommits.add((RevCommit) o);
 
 			else if (o instanceof RevTag) {
-				do {
-					o = ((RevTag) o).getObject();
-				} while (o instanceof RevTag);
+				o = walk.peel(o);
 				if (o instanceof RevCommit)
 					want(o);
 			}

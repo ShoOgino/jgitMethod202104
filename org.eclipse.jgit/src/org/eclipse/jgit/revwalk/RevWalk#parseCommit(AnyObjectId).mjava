@@ -18,11 +18,7 @@
 	public RevCommit parseCommit(final AnyObjectId id)
 			throws MissingObjectException, IncorrectObjectTypeException,
 			IOException {
-		RevObject c = parseAny(id);
-		while (c instanceof RevTag) {
-			c = ((RevTag) c).getObject();
-			parseHeaders(c);
-		}
+		RevObject c = peel(parseAny(id));
 		if (!(c instanceof RevCommit))
 			throw new IncorrectObjectTypeException(id.toObjectId(),
 					Constants.TYPE_COMMIT);

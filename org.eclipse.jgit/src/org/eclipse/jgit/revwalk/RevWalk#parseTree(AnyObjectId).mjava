@@ -18,11 +18,7 @@
 	public RevTree parseTree(final AnyObjectId id)
 			throws MissingObjectException, IncorrectObjectTypeException,
 			IOException {
-		RevObject c = parseAny(id);
-		while (c instanceof RevTag) {
-			c = ((RevTag) c).getObject();
-			parseHeaders(c);
-		}
+		RevObject c = peel(parseAny(id));
 
 		final RevTree t;
 		if (c instanceof RevCommit)
