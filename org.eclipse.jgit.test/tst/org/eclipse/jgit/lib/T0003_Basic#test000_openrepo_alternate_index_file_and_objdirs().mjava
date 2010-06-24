@@ -10,12 +10,12 @@
 		File indexFile = new File(trash, "idx");
 		File objDir = new File(trash, "../obj");
 		File[] altObjDirs = new File[] { db.getObjectsDirectory() };
-		Repository repo1initial = new Repository(new File(repo1Parent, Constants.DOT_GIT));
+		Repository repo1initial = new FileRepository(new File(repo1Parent, Constants.DOT_GIT));
 		repo1initial.create();
 		repo1initial.close();
 
 		File theDir = new File(repo1Parent, Constants.DOT_GIT);
-		Repository r = new Repository(theDir, null, objDir, altObjDirs,
+		Repository r = new FileRepository(theDir, null, objDir, altObjDirs,
 				indexFile);
 		assertEqualsPath(theDir, r.getDirectory());
 		assertEqualsPath(theDir.getParentFile(), r.getWorkDir());

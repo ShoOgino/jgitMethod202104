@@ -10,7 +10,9 @@
 	 *            temporary working space associated with the calling thread.
 	 * @throws IOException
 	 */
-	abstract void openObjectInAllPacks(final AnyObjectId objectId,
+	void openObjectInAllPacks(final AnyObjectId objectId,
 			final Collection<PackedObjectLoader> resultLoaders,
-			final WindowCursor curs) throws IOException;
+			final WindowCursor curs) throws IOException {
+		objectDatabase.openObjectInAllPacks(resultLoaders, curs, objectId);
+	}
 

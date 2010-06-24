@@ -2,7 +2,7 @@
 	protected void run() throws Exception {
 		if (gitdir == null)
 			gitdir = new File(bare ? "." : Constants.DOT_GIT);
-		db = new Repository(gitdir);
+		db = new FileRepository(gitdir);
 		db.create(bare);
 		out.println(MessageFormat.format(CLIText.get().initializedEmptyGitRepositoryIn, gitdir.getAbsolutePath()));
 	}
