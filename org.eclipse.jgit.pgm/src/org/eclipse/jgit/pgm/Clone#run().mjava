@@ -14,10 +14,11 @@
 		if (gitdir == null)
 			gitdir = new File(localName, Constants.DOT_GIT);
 
-		db = new FileRepository(gitdir);
-		db.create();
-		db.getConfig().setBoolean("core", null, "bare", false);
-		db.getConfig().save();
+		dst = new FileRepository(gitdir);
+		dst.create();
+		dst.getConfig().setBoolean("core", null, "bare", false);
+		dst.getConfig().save();
+		db = dst;
 
 		out.format(CLIText.get().initializedEmptyGitRepositoryIn, gitdir.getAbsolutePath());
 		out.println();

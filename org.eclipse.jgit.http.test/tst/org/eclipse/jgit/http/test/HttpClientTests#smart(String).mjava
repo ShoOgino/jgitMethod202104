@@ -4,10 +4,10 @@
 			public Repository open(HttpServletRequest req, String name)
 					throws RepositoryNotFoundException,
 					ServiceNotEnabledException {
-				if (!name.equals(nameOf(remoteRepository)))
+				final FileRepository db = remoteRepository.getRepository();
+				if (!name.equals(nameOf(db)))
 					throw new RepositoryNotFoundException(name);
 
-				final Repository db = remoteRepository.getRepository();
 				db.incrementOpen();
 				return db;
 			}

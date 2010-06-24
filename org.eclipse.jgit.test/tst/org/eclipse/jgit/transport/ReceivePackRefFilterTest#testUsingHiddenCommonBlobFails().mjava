@@ -1,7 +1,7 @@
 	public void testUsingHiddenCommonBlobFails() throws Exception {
 		// Try to use the 'b' blob that is hidden.
 		//
-		TestRepository s = new TestRepository(src);
+		TestRepository<Repository> s = new TestRepository<Repository>(src);
 		RevCommit N = s.commit().parent(B).add("q", s.blob("b")).create();
 
 		// But don't include it in the pack.
