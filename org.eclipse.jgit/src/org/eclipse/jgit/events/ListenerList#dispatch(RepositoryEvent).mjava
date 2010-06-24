@@ -1,0 +1,17 @@
+	/**
+	 * Dispatch an event to all interested listeners.
+	 * <p>
+	 * Listeners are selected by the type of listener the event delivers to.
+	 *
+	 * @param event
+	 *            the event to deliver.
+	 */
+	@SuppressWarnings("unchecked")
+	public void dispatch(RepositoryEvent event) {
+		List<ListenerHandle> list = lists.get(event.getListenerType());
+		if (list != null) {
+			for (ListenerHandle handle : list)
+				event.dispatch(handle.listener);
+		}
+	}
+

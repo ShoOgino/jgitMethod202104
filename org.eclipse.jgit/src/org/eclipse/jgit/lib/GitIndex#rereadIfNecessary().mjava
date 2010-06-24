@@ -5,7 +5,7 @@
 	public void rereadIfNecessary() throws IOException {
 		if (cacheFile.exists() && cacheFile.lastModified() != lastCacheTime) {
 			read();
-			db.fireIndexChanged();
+			db.fireEvent(new IndexChangedEvent());
 		}
 	}
 

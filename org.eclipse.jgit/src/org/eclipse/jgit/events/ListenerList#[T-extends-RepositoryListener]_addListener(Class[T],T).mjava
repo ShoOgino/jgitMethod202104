@@ -1,0 +1,18 @@
+	/**
+	 * Add a listener to the list.
+	 *
+	 * @param <T>
+	 *            the type of listener being registered.
+	 * @param type
+	 *            type of listener being registered.
+	 * @param listener
+	 *            the listener instance.
+	 * @return a handle to later remove the registration, if desired.
+	 */
+	public <T extends RepositoryListener> ListenerHandle addListener(
+			Class<T> type, T listener) {
+		ListenerHandle handle = new ListenerHandle(this, type, listener);
+		add(handle);
+		return handle;
+	}
+
