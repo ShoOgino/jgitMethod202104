@@ -48,10 +48,10 @@
 		this.fs = fs;
 
 		userConfig = SystemReader.getInstance().openUserConfig(fs);
-		config = new FileBasedConfig(userConfig, fs.resolve(gitDir, "config"));
+		repoConfig = new FileBasedConfig(userConfig, fs.resolve(gitDir, "config"));
 
 		loadUserConfig();
-		loadConfig();
+		loadRepoConfig();
 
 		if (workDir == null) {
 			// if the working directory was not provided explicitly,
