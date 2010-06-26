@@ -12,8 +12,8 @@
 		git.commit().setMessage("third commit").call();
 
 		checkoutBranch("refs/heads/branch1");
-		assertFalse(new File(db.getWorkDir(), "file2").exists());
-		assertFalse(new File(db.getWorkDir(), "file3").exists());
+		assertFalse(new File(db.getWorkTree(), "file2").exists());
+		assertFalse(new File(db.getWorkTree(), "file3").exists());
 
 		MergeCommand merge = git.merge();
 		merge.include(second.getId());
