@@ -1,17 +1,14 @@
 	private void searchForReuse() throws IOException {
 		initMonitor.beginTask(SEARCHING_REUSE_PROGRESS, getObjectsNumber());
-		final Collection<PackedObjectLoader> reuseLoaders = new ArrayList<PackedObjectLoader>();
 		for (List<LocalObjectToPack> list : objectsLists) {
-			for (LocalObjectToPack otp : list) {
+			for (ObjectToPack otp : list) {
 				if (initMonitor.isCancelled())
 					throw new IOException(
 							JGitText.get().packingCancelledDuringObjectsWriting);
-				reuseLoaders.clear();
-				searchForReuse(reuseLoaders, otp);
+				windowCursor.selectObjectRepresentation(this, otp);
 				initMonitor.update(1);
 			}
 		}
-
 		initMonitor.endTask();
 	}
 
