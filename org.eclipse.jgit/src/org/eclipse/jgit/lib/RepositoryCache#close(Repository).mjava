@@ -8,6 +8,9 @@
 	 *            repository to unregister.
 	 */
 	public static void close(final Repository db) {
-		cache.unregisterRepository(FileKey.exact(db.getDirectory(), db.getFS()));
+		if (db.getDirectory() != null) {
+			FileKey key = FileKey.exact(db.getDirectory(), db.getFS());
+			cache.unregisterRepository(key);
+		}
 	}
 

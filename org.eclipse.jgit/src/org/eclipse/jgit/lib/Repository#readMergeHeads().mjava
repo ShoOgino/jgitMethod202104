@@ -11,7 +11,7 @@
 	 *             if the repository is "bare"
 	 */
 	public List<ObjectId> readMergeHeads() throws IOException {
-		if (isBare())
+		if (isBare() || getDirectory() == null)
 			throw new IllegalStateException(
 					JGitText.get().bareRepositoryNoWorkdirAndIndex);
 
