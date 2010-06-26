@@ -18,7 +18,11 @@
 			return;
 		}
 
-		final LocalObjectToPack otp = windowCursor.newObjectToPack(object);
+		final ObjectToPack otp;
+		if (reuseSupport != null)
+			otp = reuseSupport.newObjectToPack(object);
+		else
+			otp = new ObjectToPack(object);
 		try {
 			objectsLists[object.getType()].add(otp);
 		} catch (ArrayIndexOutOfBoundsException x) {

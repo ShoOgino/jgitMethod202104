@@ -21,17 +21,18 @@
 	 *             stream.
 	 */
 	public void writePack(OutputStream packStream) throws IOException {
-		if (reuseDeltas || reuseObjects)
+		if ((reuseDeltas || reuseObjects) && reuseSupport != null)
 			searchForReuse();
 
-		out = new PackOutputStream(packStream);
+		out = new PackOutputStream(packStream, isDeltaBaseAsOffset());
 
 		writeMonitor.beginTask(WRITING_OBJECTS_PROGRESS, getObjectsNumber());
-		writeHeader();
+		out.writeFileHeader(PACK_VERSION_GENERATED, getObjectsNumber());
 		writeObjects();
 		writeChecksum();
 
-		windowCursor.release();
+		out = null;
+		reader.release();
 		writeMonitor.endTask();
 	}
 

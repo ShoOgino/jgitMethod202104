@@ -1,11 +1,11 @@
 	private void searchForReuse() throws IOException {
 		initMonitor.beginTask(SEARCHING_REUSE_PROGRESS, getObjectsNumber());
-		for (List<LocalObjectToPack> list : objectsLists) {
+		for (List<ObjectToPack> list : objectsLists) {
 			for (ObjectToPack otp : list) {
 				if (initMonitor.isCancelled())
 					throw new IOException(
 							JGitText.get().packingCancelledDuringObjectsWriting);
-				windowCursor.selectObjectRepresentation(this, otp);
+				reuseSupport.selectObjectRepresentation(this, otp);
 				initMonitor.update(1);
 			}
 		}

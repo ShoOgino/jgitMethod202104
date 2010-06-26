@@ -17,8 +17,12 @@
 	public PackWriter(final Repository repo, final ProgressMonitor imonitor,
 			final ProgressMonitor wmonitor) {
 		this.db = repo;
-		windowCursor = new WindowCursor((ObjectDirectory) repo
-				.getObjectDatabase());
+
+		reader = db.newObjectReader();
+		if (reader instanceof ObjectReuseAsIs)
+			reuseSupport = ((ObjectReuseAsIs) reader);
+		else
+			reuseSupport = null;
 
 		initMonitor = imonitor == null ? NullProgressMonitor.INSTANCE : imonitor;
 		writeMonitor = wmonitor == null ? NullProgressMonitor.INSTANCE : wmonitor;

@@ -1,11 +1,13 @@
 	private void writeWholeObjectDeflate(final ObjectToPack otp)
 			throws IOException {
-		final ObjectLoader loader = db.openObject(windowCursor, otp);
+		final ObjectLoader loader = db.openObject(reader, otp);
 		final byte[] data = loader.getCachedBytes();
-		writeObjectHeader(otp.getType(), data.length);
+		out.writeHeader(otp, data.length);
 		deflater.reset();
 		deflater.setInput(data, 0, data.length);
 		deflater.finish();
+
+		byte[] buf = out.getCopyBuffer();
 		do {
 			final int n = deflater.deflate(buf, 0, buf.length);
 			if (n > 0)
