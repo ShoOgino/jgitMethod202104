@@ -1,0 +1,9 @@
+	private long findDeltaBase(ObjectId baseId) throws IOException,
+			MissingObjectException {
+		long ofs = idx().findOffset(baseId);
+		if (ofs < 0)
+			throw new MissingObjectException(baseId,
+					JGitText.get().missingDeltaBase);
+		return ofs;
+	}
+
