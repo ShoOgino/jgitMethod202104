@@ -1,5 +1,8 @@
 	/**
 	 * Does the requested object exist in this database?
+	 * <p>
+	 * This is a one-shot call interface which may be faster than allocating a
+	 * {@link #newReader()} to perform the lookup.
 	 *
 	 * @param objectId
 	 *            identity of the object to test for existence of.
@@ -7,12 +10,12 @@
 	 * @throws IOException
 	 *             the object store cannot be accessed.
 	 */
-	public boolean hasObject(AnyObjectId objectId) throws IOException {
+	public boolean has(final AnyObjectId objectId) throws IOException {
+		final ObjectReader or = newReader();
 		try {
-			openObject(objectId);
-			return true;
-		} catch (MissingObjectException notFound) {
-			return false;
+			return or.has(objectId);
+		} finally {
+			or.release();
 		}
 	}
 
