@@ -1,0 +1,15 @@
+	private void searchForReuse(ProgressMonitor compressMonitor)
+			throws IOException {
+		compressMonitor.beginTask(SEARCHING_REUSE_PROGRESS, getObjectsNumber());
+		for (List<ObjectToPack> list : objectsLists) {
+			for (ObjectToPack otp : list) {
+				if (compressMonitor.isCancelled())
+					throw new IOException(
+							JGitText.get().packingCancelledDuringObjectsWriting);
+				reuseSupport.selectObjectRepresentation(this, otp);
+				compressMonitor.update(1);
+			}
+		}
+		compressMonitor.endTask();
+	}
+

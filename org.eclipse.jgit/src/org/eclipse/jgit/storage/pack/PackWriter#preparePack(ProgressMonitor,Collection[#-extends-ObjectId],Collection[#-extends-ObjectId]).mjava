@@ -10,6 +10,8 @@
 	 * recency, path and delta-base first.
 	 * </p>
 	 *
+	 * @param countingMonitor
+	 *            progress during object enumeration.
 	 * @param interestingObjects
 	 *            collection of objects to be marked as interesting (start
 	 *            points of graph traversal).
@@ -19,12 +21,14 @@
 	 * @throws IOException
 	 *             when some I/O problem occur during reading objects.
 	 */
-	public void preparePack(
+	public void preparePack(ProgressMonitor countingMonitor,
 			final Collection<? extends ObjectId> interestingObjects,
 			final Collection<? extends ObjectId> uninterestingObjects)
 			throws IOException {
+		if (countingMonitor == null)
+			countingMonitor = NullProgressMonitor.INSTANCE;
 		ObjectWalk walker = setUpWalker(interestingObjects,
 				uninterestingObjects);
-		findObjectsToPack(walker);
+		findObjectsToPack(countingMonitor, walker);
 	}
 

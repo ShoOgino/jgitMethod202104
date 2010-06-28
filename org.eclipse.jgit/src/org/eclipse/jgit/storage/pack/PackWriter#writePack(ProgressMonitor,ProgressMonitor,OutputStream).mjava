@@ -12,6 +12,10 @@
 	 * validated against existing checksum.
 	 * </p>
 	 *
+	 * @param compressMonitor
+	 *            progress monitor to report object compression work.
+	 * @param writeMonitor
+	 *            progress monitor to report the number of objects written.
 	 * @param packStream
 	 *            output stream of pack data. The stream should be buffered by
 	 *            the caller. The caller is responsible for closing the stream.
@@ -20,16 +24,23 @@
 	 *             the pack, or writing compressed object data to the output
 	 *             stream.
 	 */
-	public void writePack(OutputStream packStream) throws IOException {
-		if ((reuseDeltas || reuseObjects) && reuseSupport != null)
-			searchForReuse();
+	public void writePack(ProgressMonitor compressMonitor,
+			ProgressMonitor writeMonitor, OutputStream packStream)
+			throws IOException {
+		if (compressMonitor == null)
+			compressMonitor = NullProgressMonitor.INSTANCE;
+		if (writeMonitor == null)
+			writeMonitor = NullProgressMonitor.INSTANCE;
 
-		final PackOutputStream out = new PackOutputStream(packStream,
-				isDeltaBaseAsOffset());
+		if ((reuseDeltas || reuseObjects) && reuseSupport != null)
+			searchForReuse(compressMonitor);
+
+		final PackOutputStream out = new PackOutputStream(writeMonitor,
+				packStream, isDeltaBaseAsOffset());
 
 		writeMonitor.beginTask(WRITING_OBJECTS_PROGRESS, getObjectsNumber());
 		out.writeFileHeader(PACK_VERSION_GENERATED, getObjectsNumber());
-		writeObjects(out);
+		writeObjects(writeMonitor, out);
 		writeChecksum(out);
 
 		reader.release();

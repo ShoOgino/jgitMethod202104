@@ -1,0 +1,23 @@
+	/**
+	 * Create writer for specified repository.
+	 * <p>
+	 * Objects for packing are specified in {@link #preparePack(Iterator)} or
+	 * {@link #preparePack(ProgressMonitor, Collection, Collection)}.
+	 *
+	 * @param repo
+	 *            repository where objects are stored.
+	 */
+	public PackWriter(final Repository repo) {
+		this.db = repo;
+
+		reader = db.newObjectReader();
+		if (reader instanceof ObjectReuseAsIs)
+			reuseSupport = ((ObjectReuseAsIs) reader);
+		else
+			reuseSupport = null;
+
+		final CoreConfig coreConfig = db.getConfig().get(CoreConfig.KEY);
+		this.deflater = new Deflater(coreConfig.getCompression());
+		outputVersion = coreConfig.getPackIndexVersion();
+	}
+

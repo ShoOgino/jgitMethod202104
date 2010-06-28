@@ -13,8 +13,8 @@
 		while (otp.isReuseAsIs()) {
 			try {
 				reuseSupport.copyObjectAsIs(out, otp);
+				out.endObject();
 				otp.setCRC(out.getCRC32());
-				writeMonitor.update(1);
 				return;
 			} catch (StoredObjectRepresentationNotAvailableException gone) {
 				if (otp.getOffset() == out.length()) {
@@ -34,7 +34,7 @@
 		// If we reached here, reuse wasn't possible.
 		//
 		writeWholeObjectDeflate(out, otp);
+		out.endObject();
 		otp.setCRC(out.getCRC32());
-		writeMonitor.update(1);
 	}
 

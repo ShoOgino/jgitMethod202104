@@ -1,0 +1,18 @@
+	private void findObjectsToPack(final ProgressMonitor countingMonitor,
+			final ObjectWalk walker) throws MissingObjectException,
+			IncorrectObjectTypeException,			IOException {
+		countingMonitor.beginTask(COUNTING_OBJECTS_PROGRESS,
+				ProgressMonitor.UNKNOWN);
+		RevObject o;
+
+		while ((o = walker.next()) != null) {
+			addObject(o);
+			countingMonitor.update(1);
+		}
+		while ((o = walker.nextObject()) != null) {
+			addObject(o);
+			countingMonitor.update(1);
+		}
+		countingMonitor.endTask();
+	}
+
