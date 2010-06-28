@@ -1,12 +1,6 @@
 	final byte[] loadCanonical(final RevWalk walk) throws IOException,
 			MissingObjectException, IncorrectObjectTypeException,
 			CorruptObjectException {
-		final ObjectLoader ldr = walk.db.openObject(walk.curs, this);
-		if (ldr == null)
-			throw new MissingObjectException(this, getType());
-		final byte[] data = ldr.getCachedBytes();
-		if (getType() != ldr.getType())
-			throw new IncorrectObjectTypeException(this, getType());
-		return data;
+		return walk.curs.openObject(this, getType()).getCachedBytes();
 	}
 
