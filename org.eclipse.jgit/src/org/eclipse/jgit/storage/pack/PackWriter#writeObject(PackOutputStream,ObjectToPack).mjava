@@ -1,10 +1,11 @@
-	private void writeObject(final ObjectToPack otp) throws IOException {
+	private void writeObject(PackOutputStream out, final ObjectToPack otp)
+			throws IOException {
 		if (otp.isWritten())
 			return; // We shouldn't be here.
 
 		otp.markWantWrite();
 		if (otp.isDeltaRepresentation())
-			writeBaseFirst(otp);
+			writeBaseFirst(out, otp);
 
 		out.resetCRC32();
 		otp.setOffset(out.length());
@@ -32,7 +33,7 @@
 
 		// If we reached here, reuse wasn't possible.
 		//
-		writeWholeObjectDeflate(otp);
+		writeWholeObjectDeflate(out, otp);
 		otp.setCRC(out.getCRC32());
 		writeMonitor.update(1);
 	}

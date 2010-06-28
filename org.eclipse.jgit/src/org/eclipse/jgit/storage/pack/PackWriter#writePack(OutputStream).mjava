@@ -24,14 +24,14 @@
 		if ((reuseDeltas || reuseObjects) && reuseSupport != null)
 			searchForReuse();
 
-		out = new PackOutputStream(packStream, isDeltaBaseAsOffset());
+		final PackOutputStream out = new PackOutputStream(packStream,
+				isDeltaBaseAsOffset());
 
 		writeMonitor.beginTask(WRITING_OBJECTS_PROGRESS, getObjectsNumber());
 		out.writeFileHeader(PACK_VERSION_GENERATED, getObjectsNumber());
-		writeObjects();
-		writeChecksum();
+		writeObjects(out);
+		writeChecksum(out);
 
-		out = null;
 		reader.release();
 		writeMonitor.endTask();
 	}
