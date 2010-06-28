@@ -1,12 +1,15 @@
 	/**
 	 * Open an object from this database.
+	 * <p>
+	 * This is a one-shot call interface which may be faster than allocating a
+	 * {@link #newReader()} to perform the lookup.
 	 *
 	 * @param objectId
 	 *            identity of the object to open.
 	 * @param typeHint
 	 *            hint about the type of object being requested;
-	 *            {@link #OBJ_ANY} if the object type is not known, or does not
-	 *            matter to the caller.
+	 *            {@link ObjectReader#OBJ_ANY} if the object type is not known,
+	 *            or does not matter to the caller.
 	 * @return a {@link ObjectLoader} for accessing the object.
 	 * @throws MissingObjectException
 	 *             the object does not exist.
@@ -16,7 +19,14 @@
 	 * @throws IOException
 	 *             the object store cannot be accessed.
 	 */
-	public abstract ObjectLoader openObject(AnyObjectId objectId, int typeHint)
+	public ObjectLoader openObject(AnyObjectId objectId, int typeHint)
 			throws MissingObjectException, IncorrectObjectTypeException,
-			IOException;
+			IOException {
+		final ObjectReader or = newReader();
+		try {
+			return or.openObject(objectId, typeHint);
+		} finally {
+			or.release();
+		}
+	}
 

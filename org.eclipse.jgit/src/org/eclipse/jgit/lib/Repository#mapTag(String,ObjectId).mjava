@@ -6,12 +6,14 @@
 	 * @throws IOException for I/O error or unexpected object type.
 	 */
 	public Tag mapTag(final String refName, final ObjectId id) throws IOException {
-		final ObjectLoader or = openObject(id);
-		if (or == null)
+		final ObjectLoader or;
+		try {
+			or = open(id);
+		} catch (MissingObjectException notFound) {
 			return null;
-		final byte[] raw = or.getBytes();
-		if (Constants.OBJ_TAG == or.getType())
-			return new Tag(this, id, refName, raw);
+		}
+		if (or.getType() == Constants.OBJ_TAG)
+			return new Tag(this, id, refName, or.getCachedBytes());
 		return new Tag(this, id, refName, null);
 	}
 

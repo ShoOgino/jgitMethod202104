@@ -1,8 +1,8 @@
 	/**
-	 * Open an object from this database.
+	 * Open an object from this repository.
 	 * <p>
 	 * This is a one-shot call interface which may be faster than allocating a
-	 * {@link #newReader()} to perform the lookup.
+	 * {@link #newObjectReader()} to perform the lookup.
 	 *
 	 * @param objectId
 	 *            identity of the object to open.
@@ -12,8 +12,8 @@
 	 * @throws IOException
 	 *             the object store cannot be accessed.
 	 */
-	public ObjectLoader openObject(final AnyObjectId objectId)
-			throws IOException {
-		return openObject(objectId, ObjectReader.OBJ_ANY);
+	public ObjectLoader open(final AnyObjectId objectId)
+			throws MissingObjectException, IOException {
+		return getObjectDatabase().openObject(objectId);
 	}
 

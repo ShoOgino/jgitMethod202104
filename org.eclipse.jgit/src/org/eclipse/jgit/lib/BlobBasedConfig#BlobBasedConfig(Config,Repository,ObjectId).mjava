@@ -15,9 +15,7 @@
 	public BlobBasedConfig(Config base, final Repository r,
 			final ObjectId objectId) throws IOException, ConfigInvalidException {
 		super(base);
-		final ObjectLoader loader = r.openBlob(objectId);
-		if (loader == null)
-			throw new IOException(MessageFormat.format(JGitText.get().blobNotFound, objectId));
-		fromText(RawParseUtils.decode(loader.getBytes()));
+		ObjectLoader loader = r.open(objectId, Constants.OBJ_BLOB);
+		fromText(RawParseUtils.decode(loader.getCachedBytes()));
 	}
 
