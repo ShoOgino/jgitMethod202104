@@ -3,6 +3,7 @@
 		local = wt.local;
 		objCheck = wt.isCheckFetchedObjects() ? new ObjectChecker() : null;
 		inserter = local.newObjectInserter();
+		reader = local.newObjectReader();
 
 		remotes = new ArrayList<WalkRemoteObjectDatabase>();
 		remotes.add(w);
@@ -19,9 +20,9 @@
 		fetchErrors = new HashMap<ObjectId, List<Throwable>>();
 		packLocks = new ArrayList<PackLock>(4);
 
-		revWalk = new RevWalk(local);
+		revWalk = new RevWalk(reader);
 		revWalk.setRetainBody(false);
-		treeWalk = new TreeWalk(local);
+		treeWalk = new TreeWalk(reader);
 		COMPLETE = revWalk.newFlag("COMPLETE");
 		IN_WORK_QUEUE = revWalk.newFlag("IN_WORK_QUEUE");
 		LOCALLY_SEEN = revWalk.newFlag("LOCALLY_SEEN");

@@ -1,7 +1,14 @@
 	private void processBlob(final RevObject obj) throws TransportException {
-		if (!local.hasObject(obj))
-			throw new TransportException(MessageFormat.format(JGitText.get().cannotReadBlob, obj.name()),
-					new MissingObjectException(obj, Constants.TYPE_BLOB));
-		obj.add(COMPLETE);
+		try {
+			if (reader.has(obj, Constants.OBJ_BLOB))
+				obj.add(COMPLETE);
+			else
+				throw new TransportException(MessageFormat.format(JGitText
+						.get().cannotReadBlob, obj.name()),
+						new MissingObjectException(obj, Constants.TYPE_BLOB));
+		} catch (IOException error) {
+			throw new TransportException(MessageFormat.format(
+					JGitText.get().cannotReadBlob, obj.name()), error);
+		}
 	}
 
