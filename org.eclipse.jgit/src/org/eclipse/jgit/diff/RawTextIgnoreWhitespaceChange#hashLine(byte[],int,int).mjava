@@ -1,0 +1,15 @@
+	@Override
+	protected int hashLine(final byte[] raw, int ptr, int end) {
+		int hash = 5381;
+		end = trimTrailingWhitespace(raw, ptr, end);
+		while (ptr < end) {
+			byte c = raw[ptr];
+			hash = (hash << 5) ^ (c & 0xff);
+			if (isWhitespace(c))
+				ptr = trimLeadingWhitespace(raw, ptr, end);
+			else
+				ptr++;
+		}
+		return hash;
+	}
+
