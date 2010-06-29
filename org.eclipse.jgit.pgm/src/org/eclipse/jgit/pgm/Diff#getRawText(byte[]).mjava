@@ -1,7 +1,4 @@
-	private RawText getRawText(ObjectId id) throws IOException {
-		if (id.equals(ObjectId.zeroId()))
-			return new RawText(new byte[] {});
-		byte[] raw = db.openBlob(id).getCachedBytes();
+	private RawText getRawText(byte[] raw) {
 		if (ignoreWsAll)
 			return new RawTextIgnoreAllWhitespace(raw);
 		else if (ignoreWsTrailing)
