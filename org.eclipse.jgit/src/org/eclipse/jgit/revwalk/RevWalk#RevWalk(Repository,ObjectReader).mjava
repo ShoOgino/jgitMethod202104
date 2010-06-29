@@ -1,0 +1,14 @@
+	private RevWalk(final Repository repo, final ObjectReader or) {
+		repository = repo;
+		reader = or;
+		idBuffer = new MutableObjectId();
+		objects = new ObjectIdSubclassMap<RevObject>();
+		roots = new ArrayList<RevCommit>();
+		queue = new DateRevQueue();
+		pending = new StartGenerator(this);
+		sorting = EnumSet.of(RevSort.NONE);
+		filter = RevFilter.ALL;
+		treeFilter = TreeFilter.ALL;
+		retainBody = true;
+	}
+

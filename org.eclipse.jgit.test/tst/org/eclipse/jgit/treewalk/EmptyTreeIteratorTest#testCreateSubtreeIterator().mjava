@@ -1,6 +1,7 @@
 	public void testCreateSubtreeIterator() throws Exception {
 		final EmptyTreeIterator etp = new EmptyTreeIterator();
-		final AbstractTreeIterator sub = etp.createSubtreeIterator(db);
+		final ObjectReader reader = db.newObjectReader();
+		final AbstractTreeIterator sub = etp.createSubtreeIterator(reader);
 		assertNotNull(sub);
 		assertTrue(sub.first());
 		assertTrue(sub.eof());

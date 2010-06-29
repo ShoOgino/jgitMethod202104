@@ -5,7 +5,7 @@
 			return;
 		tree.flags |= UNINTERESTING;
 
-		treeWalk = treeWalk.resetRoot(db, tree, curs);
+		treeWalk = treeWalk.resetRoot(reader, tree);
 		while (!treeWalk.eof()) {
 			final FileMode mode = treeWalk.getEntryFileMode();
 			final int sType = mode.getObjectType();
@@ -21,7 +21,7 @@
 				final RevTree t = lookupTree(idBuffer);
 				if ((t.flags & UNINTERESTING) == 0) {
 					t.flags |= UNINTERESTING;
-					treeWalk = treeWalk.createSubtreeIterator0(db, t, curs);
+					treeWalk = treeWalk.createSubtreeIterator0(reader, t);
 					continue;
 				}
 				break;

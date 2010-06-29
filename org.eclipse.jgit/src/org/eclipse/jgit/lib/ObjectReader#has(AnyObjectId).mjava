@@ -8,11 +8,6 @@
 	 *             the object store cannot be accessed.
 	 */
 	public boolean has(AnyObjectId objectId) throws IOException {
-		try {
-			open(objectId);
-			return true;
-		} catch (MissingObjectException notFound) {
-			return false;
-		}
+		return has(objectId, OBJ_ANY);
 	}
 

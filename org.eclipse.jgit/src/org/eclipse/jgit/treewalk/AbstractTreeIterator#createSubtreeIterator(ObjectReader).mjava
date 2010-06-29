@@ -5,8 +5,8 @@
 	 * otherwise the caller would not be able to exit out of the subtree
 	 * iterator correctly and return to continue walking <code>this</code>.
 	 *
-	 * @param repo
-	 *            repository to load the tree data from.
+	 * @param reader
+	 *            reader to load the tree data from.
 	 * @return a new parser that walks over the current subtree.
 	 * @throws IncorrectObjectTypeException
 	 *             the current entry is not actually a tree and cannot be parsed
@@ -14,6 +14,7 @@
 	 * @throws IOException
 	 *             a loose object or pack file could not be read.
 	 */
-	public abstract AbstractTreeIterator createSubtreeIterator(Repository repo)
-			throws IncorrectObjectTypeException, IOException;
+	public abstract AbstractTreeIterator createSubtreeIterator(
+			ObjectReader reader) throws IncorrectObjectTypeException,
+			IOException;
 

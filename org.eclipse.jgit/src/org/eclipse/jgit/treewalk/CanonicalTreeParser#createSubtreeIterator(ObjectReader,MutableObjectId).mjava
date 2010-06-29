@@ -1,12 +1,12 @@
 	@Override
-	public CanonicalTreeParser createSubtreeIterator(final Repository repo,
-			final MutableObjectId idBuffer, final ObjectReader curs)
+	public CanonicalTreeParser createSubtreeIterator(final ObjectReader reader,
+			final MutableObjectId idBuffer)
 			throws IncorrectObjectTypeException, IOException {
 		idBuffer.fromRaw(idBuffer(), idOffset());
 		if (!FileMode.TREE.equals(mode)) {
 			final ObjectId me = idBuffer.toObjectId();
 			throw new IncorrectObjectTypeException(me, Constants.TYPE_TREE);
 		}
-		return createSubtreeIterator0(repo, idBuffer, curs);
+		return createSubtreeIterator0(reader, idBuffer);
 	}
 

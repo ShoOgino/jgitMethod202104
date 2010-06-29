@@ -2,19 +2,11 @@
 	 * Create a new revision walker for a given repository.
 	 *
 	 * @param repo
-	 *            the repository the walker will obtain data from.
+	 *            the repository the walker will obtain data from. An
+	 *            ObjectReader will be created by the walker, and must be
+	 *            released by the caller.
 	 */
 	public RevWalk(final Repository repo) {
-		db = repo;
-		curs = db.newObjectReader();
-		idBuffer = new MutableObjectId();
-		objects = new ObjectIdSubclassMap<RevObject>();
-		roots = new ArrayList<RevCommit>();
-		queue = new DateRevQueue();
-		pending = new StartGenerator(this);
-		sorting = EnumSet.of(RevSort.NONE);
-		filter = RevFilter.ALL;
-		treeFilter = TreeFilter.ALL;
-		retainBody = true;
+		this(repo, repo.newObjectReader());
 	}
 

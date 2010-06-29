@@ -1,13 +1,11 @@
 	/**
 	 * Reset this parser to walk through the given tree.
 	 *
-	 * @param repo
-	 *            repository to load the tree data from.
+	 * @param reader
+	 *            reader to use during repository access.
 	 * @param id
 	 *            identity of the tree being parsed; used only in exception
 	 *            messages if data corruption is found.
-	 * @param curs
-	 *            window cursor to use during repository access.
 	 * @throws MissingObjectException
 	 *             the object supplied is not available from the repository.
 	 * @throws IncorrectObjectTypeException
@@ -16,9 +14,8 @@
 	 * @throws IOException
 	 *             a loose object or pack file could not be read.
 	 */
-	public void reset(final Repository repo, final AnyObjectId id,
-			final ObjectReader curs)
+	public void reset(final ObjectReader reader, final AnyObjectId id)
 			throws IncorrectObjectTypeException, IOException {
-		reset(curs.open(id, Constants.OBJ_TREE).getCachedBytes());
+		reset(reader.open(id, Constants.OBJ_TREE).getCachedBytes());
 	}
 

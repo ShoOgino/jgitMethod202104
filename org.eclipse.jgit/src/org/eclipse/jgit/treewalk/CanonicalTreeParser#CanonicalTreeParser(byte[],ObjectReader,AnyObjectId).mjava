@@ -6,13 +6,11 @@
 	 *            may be null or the empty array to indicate the prefix is the
 	 *            root of the repository. A trailing slash ('/') is
 	 *            automatically appended if the prefix does not end in '/'.
-	 * @param repo
-	 *            repository to load the tree data from.
+	 * @param reader
+	 *            reader to load the tree data from.
 	 * @param treeId
 	 *            identity of the tree being parsed; used only in exception
 	 *            messages if data corruption is found.
-	 * @param curs
-	 *            a window cursor to use during data access from the repository.
 	 * @throws MissingObjectException
 	 *             the object supplied is not available from the repository.
 	 * @throws IncorrectObjectTypeException
@@ -21,10 +19,10 @@
 	 * @throws IOException
 	 *             a loose object or pack file could not be read.
 	 */
-	public CanonicalTreeParser(final byte[] prefix, final Repository repo,
-			final AnyObjectId treeId, final ObjectReader curs)
-			throws IncorrectObjectTypeException, IOException {
+	public CanonicalTreeParser(final byte[] prefix, final ObjectReader reader,
+			final AnyObjectId treeId) throws IncorrectObjectTypeException,
+			IOException {
 		super(prefix);
-		reset(repo, treeId, curs);
+		reset(reader, treeId);
 	}
 

@@ -27,10 +27,14 @@
 			final AnyObjectId... trees) throws MissingObjectException,
 			IncorrectObjectTypeException, CorruptObjectException, IOException {
 		final TreeWalk r = new TreeWalk(db);
-		r.setFilter(PathFilterGroup.createFromStrings(Collections
-				.singleton(path)));
-		r.setRecursive(r.getFilter().shouldBeRecursive());
-		r.reset(trees);
-		return r.next() ? r : null;
+		try {
+			r.setFilter(PathFilterGroup.createFromStrings(Collections
+					.singleton(path)));
+			r.setRecursive(r.getFilter().shouldBeRecursive());
+			r.reset(trees);
+			return r.next() ? r : null;
+		} finally {
+			r.release();
+		}
 	}
 

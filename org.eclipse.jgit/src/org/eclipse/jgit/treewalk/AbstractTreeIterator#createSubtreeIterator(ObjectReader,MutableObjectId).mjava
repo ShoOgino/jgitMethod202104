@@ -5,12 +5,10 @@
 	 * the caller would not be able to exit out of the subtree iterator
 	 * correctly and return to continue walking <code>this</code>.
 	 *
-	 * @param repo
-	 *            repository to load the tree data from.
+	 * @param reader
+	 *            reader to load the tree data from.
 	 * @param idBuffer
 	 *            temporary ObjectId buffer for use by this method.
-	 * @param curs
-	 *            window cursor to use during repository access.
 	 * @return a new parser that walks over the current subtree.
 	 * @throws IncorrectObjectTypeException
 	 *             the current entry is not actually a tree and cannot be parsed
@@ -18,9 +16,9 @@
 	 * @throws IOException
 	 *             a loose object or pack file could not be read.
 	 */
-	public AbstractTreeIterator createSubtreeIterator(final Repository repo,
-			final MutableObjectId idBuffer, final ObjectReader curs)
+	public AbstractTreeIterator createSubtreeIterator(
+			final ObjectReader reader, final MutableObjectId idBuffer)
 			throws IncorrectObjectTypeException, IOException {
-		return createSubtreeIterator(repo);
+		return createSubtreeIterator(reader);
 	}
 

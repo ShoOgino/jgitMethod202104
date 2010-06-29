@@ -5,21 +5,19 @@
 	 * called only once the current entry has been identified as a tree and its
 	 * identity has been converted into an ObjectId.
 	 *
-	 * @param repo
-	 *            repository to load the tree data from.
+	 * @param reader
+	 *            reader to load the tree data from.
 	 * @param id
 	 *            ObjectId of the tree to open.
-	 * @param curs
-	 *            window cursor to use during repository access.
 	 * @return a new parser that walks over the current subtree.
 	 * @throws IOException
 	 *             a loose object or pack file could not be read.
 	 */
 	public final CanonicalTreeParser createSubtreeIterator0(
-			final Repository repo, final AnyObjectId id, final ObjectReader curs)
+			final ObjectReader reader, final AnyObjectId id)
 			throws IOException {
 		final CanonicalTreeParser p = new CanonicalTreeParser(this);
-		p.reset(repo, id, curs);
+		p.reset(reader, id);
 		return p;
 	}
 

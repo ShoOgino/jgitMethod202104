@@ -7,11 +7,12 @@
 	 * All RevFlag instances are also invalidated, and must not be reused.
 	 */
 	public void dispose() {
+		reader.release();
 		freeFlags = APP_FLAGS;
 		delayFreeFlags = 0;
 		carryFlags = UNINTERESTING;
 		objects.clear();
-		curs.release();
+		reader.release();
 		roots.clear();
 		queue = new DateRevQueue();
 		pending = new StartGenerator(this);
