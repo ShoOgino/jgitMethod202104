@@ -8,16 +8,6 @@
 	 *            repository where objects are stored.
 	 */
 	public PackWriter(final Repository repo) {
-		this.db = repo;
-
-		reader = db.newObjectReader();
-		if (reader instanceof ObjectReuseAsIs)
-			reuseSupport = ((ObjectReuseAsIs) reader);
-		else
-			reuseSupport = null;
-
-		final CoreConfig coreConfig = db.getConfig().get(CoreConfig.KEY);
-		this.deflater = new Deflater(coreConfig.getCompression());
-		outputVersion = coreConfig.getPackIndexVersion();
+		this(repo, repo.newObjectReader());
 	}
 
