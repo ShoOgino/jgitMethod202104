@@ -9,7 +9,7 @@
 	 *            repository the caller wants to read the default index of.
 	 * @return a cache representing the contents of the specified index file (if
 	 *         it exists) or an empty cache if the file does not exist.
-	 * @throws IllegalStateException
+	 * @throws NoWorkTreeException
 	 *             if the repository is bare (lacks a working directory).
 	 * @throws IOException
 	 *             the index file is present but could not be read, or the lock
@@ -19,7 +19,7 @@
 	 *             library does not support.
 	 */
 	public static DirCache lock(final Repository db)
-			throws CorruptObjectException, IOException {
+			throws NoWorkTreeException, CorruptObjectException, IOException {
 		return lock(db.getIndexFile());
 	}
 

@@ -1,13 +1,12 @@
 	/**
 	 * @return the root directory of the working tree, where files are checked
 	 *         out for viewing and editing.
-	 * @throws IllegalStateException
+	 * @throws NoWorkTreeException
 	 *             if the repository is bare and has no working directory.
 	 */
-	public File getWorkTree() throws IllegalStateException {
+	public File getWorkTree() throws NoWorkTreeException {
 		if (isBare())
-			throw new IllegalStateException(
-					JGitText.get().bareRepositoryNoWorkdirAndIndex);
+			throw new NoWorkTreeException();
 		return workTree;
 	}
 

@@ -1,12 +1,11 @@
 	/**
 	 * @return the index file location
-	 * @throws IllegalStateException
+	 * @throws NoWorkTreeException
 	 *             if this is bare (see {@link #isBare()})
 	 */
-	public File getIndexFile() throws IllegalStateException {
+	public File getIndexFile() throws NoWorkTreeException {
 		if (isBare())
-			throw new IllegalStateException(
-					JGitText.get().bareRepositoryNoWorkdirAndIndex);
+			throw new NoWorkTreeException();
 		return indexFile;
 	}
 

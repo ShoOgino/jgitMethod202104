@@ -7,13 +7,12 @@
 	 *         file or {@code null} if this file doesn't exist. Also if the file
 	 *         exists but is empty {@code null} will be returned
 	 * @throws IOException
-	 * @throws IllegalStateException
+	 * @throws NoWorkTreeException
 	 *             if the repository is "bare"
 	 */
-	public List<ObjectId> readMergeHeads() throws IOException {
+	public List<ObjectId> readMergeHeads() throws IOException, NoWorkTreeException {
 		if (isBare() || getDirectory() == null)
-			throw new IllegalStateException(
-					JGitText.get().bareRepositoryNoWorkdirAndIndex);
+			throw new NoWorkTreeException();
 
 		File mergeHeadFile = new File(getDirectory(), Constants.MERGE_HEAD);
 		byte[] raw;
