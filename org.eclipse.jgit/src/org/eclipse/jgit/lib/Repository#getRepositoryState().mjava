@@ -28,7 +28,7 @@
 		if (new File(getDirectory(), "MERGE_HEAD").exists()) {
 			// we are merging - now check whether we have unmerged paths
 			try {
-				if (!DirCache.read(this).hasUnmergedPaths()) {
+				if (!readDirCache().hasUnmergedPaths()) {
 					// no unmerged paths -> return the MERGING_RESOLVED state
 					return RepositoryState.MERGING_RESOLVED;
 				}

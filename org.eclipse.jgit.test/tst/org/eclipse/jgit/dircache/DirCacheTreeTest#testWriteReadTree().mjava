@@ -8,7 +8,7 @@
 	 * @throws IOException
 	 */
 	public void testWriteReadTree() throws CorruptObjectException, IOException {
-		final DirCache dc = DirCache.lock(db);
+		final DirCache dc = db.lockDirCache();
 
 		final String A = String.format("a%2000s", "a");
 		final String B = String.format("b%2000s", "b");
@@ -24,7 +24,7 @@
 			b.add(ents[i]);
 
 		b.commit();
-		DirCache read = DirCache.read(db);
+		DirCache read = db.readDirCache();
 
 		assertEquals(paths.length, read.getEntryCount());
 		assertEquals(1, read.getCacheTree(true).getChildCount());

@@ -4,13 +4,13 @@
 		assertFalse(idx.exists());
 		assertFalse(lck.exists());
 		{
-			final DirCache dc = DirCache.lock(db);
+			final DirCache dc = db.lockDirCache();
 			dc.write();
 			assertTrue(dc.commit());
 			assertTrue(idx.exists());
 		}
 		{
-			final DirCache dc = DirCache.read(db);
+			final DirCache dc = db.readDirCache();
 			assertEquals(0, dc.getEntryCount());
 		}
 	}

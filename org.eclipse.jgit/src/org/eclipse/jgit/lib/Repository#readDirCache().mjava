@@ -5,8 +5,6 @@
 	 * failures are reported as exceptions and therefore prevent the method from
 	 * returning a partially populated index.
 	 *
-	 * @param db
-	 *            repository the caller wants to read the default index of.
 	 * @return a cache representing the contents of the specified index file (if
 	 *         it exists) or an empty cache if the file does not exist.
 	 * @throws NoWorkTreeException
@@ -17,8 +15,8 @@
 	 *             the index file is using a format or extension that this
 	 *             library does not support.
 	 */
-	public static DirCache read(final Repository db)
-			throws NoWorkTreeException, CorruptObjectException, IOException {
-		return read(db.getIndexFile());
+	public DirCache readDirCache() throws NoWorkTreeException,
+			CorruptObjectException, IOException {
+		return DirCache.read(getIndexFile());
 	}
 

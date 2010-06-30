@@ -5,7 +5,7 @@
 		final int length = 1342;
 		final DirCacheEntry entOrig;
 		{
-			final DirCache dc = DirCache.lock(db);
+			final DirCache dc = db.lockDirCache();
 			final DirCacheBuilder b = dc.builder();
 			assertNotNull(b);
 
@@ -32,7 +32,7 @@
 			assertTrue(dc.commit());
 		}
 		{
-			final DirCache dc = DirCache.read(db);
+			final DirCache dc = db.readDirCache();
 			assertEquals(1, dc.getEntryCount());
 
 			final DirCacheEntry entRead = dc.getEntry(0);
