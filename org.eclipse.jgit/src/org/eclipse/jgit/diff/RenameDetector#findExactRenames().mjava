@@ -1,0 +1,54 @@
+	@SuppressWarnings("unchecked")
+	private void findExactRenames() {
+		HashMap<AbbreviatedObjectId, Object> map = new HashMap<AbbreviatedObjectId, Object>();
+
+		for (DiffEntry del : deleted) {
+			Object old = map.put(del.oldId, del);
+			if (old != null) {
+				if (old instanceof DiffEntry) {
+					ArrayList<DiffEntry> tmp = new ArrayList<DiffEntry>(2);
+					tmp.add((DiffEntry) old);
+					tmp.add(del);
+					map.put(del.oldId, tmp);
+				} else {
+					// Must be a list of DiffEntrys
+					((List) old).add(del);
+					map.put(del.oldId, old);
+				}
+			}
+		}
+
+		ArrayList<DiffEntry> tempAdded = new ArrayList<DiffEntry>(added.size());
+
+		for (DiffEntry add : added) {
+			Object del = map.remove(add.newId);
+			if (del != null) {
+				if (del instanceof DiffEntry) {
+					entries.add(resolveRename(add, (DiffEntry) del,
+							EXACT_RENAME_SCORE));
+				} else {
+					// Must be a list of DiffEntrys
+					List<DiffEntry> tmp = (List<DiffEntry>) del;
+					entries.add(resolveRename(add, tmp.remove(0),
+							EXACT_RENAME_SCORE));
+					if (!tmp.isEmpty())
+						map.put(add.newId, del);
+				}
+			} else {
+				tempAdded.add(add);
+			}
+		}
+		added = tempAdded;
+
+		Collection<Object> values = map.values();
+		ArrayList<DiffEntry> tempDeleted = new ArrayList<DiffEntry>(values
+				.size());
+		for (Object o : values) {
+			if (o instanceof DiffEntry)
+				tempDeleted.add((DiffEntry) o);
+			else
+				tempDeleted.addAll((List<DiffEntry>) o);
+		}
+		deleted = tempDeleted;
+	}
+

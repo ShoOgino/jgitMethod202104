@@ -1,0 +1,55 @@
+	/**
+	 * Walk through a given tree walk with exactly two trees and add all
+	 * differing files to the list of object to run rename detection on.
+	 * <p>
+	 * The tree walk must have two trees attached to it, as well as a filter.
+	 * Calling this method after calling {@link #getEntries()} will result in an
+	 * {@link IllegalStateException}.
+	 *
+	 * @param walk
+	 *            the TreeWalk to walk through. Must have exactly two trees.
+	 * @throws IllegalStateException
+	 *             the {@link #getEntries()} method has already been called for
+	 *             this instance.
+	 * @throws MissingObjectException
+	 *             {@link TreeWalk#isRecursive()} was enabled on the tree, a
+	 *             subtree was found, but the subtree object does not exist in
+	 *             this repository. The repository may be missing objects.
+	 * @throws IncorrectObjectTypeException
+	 *             {@link TreeWalk#isRecursive()} was enabled on the tree, a
+	 *             subtree was found, and the subtree id does not denote a tree,
+	 *             but instead names some other non-tree type of object. The
+	 *             repository may have data corruption.
+	 * @throws CorruptObjectException
+	 *             the contents of a tree did not appear to be a tree. The
+	 *             repository may have data corruption.
+	 * @throws IOException
+	 *             a loose object or pack file could not be read.
+	 */
+	public void addTreeWalk(TreeWalk walk) throws MissingObjectException,
+			IncorrectObjectTypeException, CorruptObjectException, IOException {
+		if (done)
+			throw new IllegalStateException(JGitText.get().renamesAlreadyFound);
+		MutableObjectId idBuf = new MutableObjectId();
+		while (walk.next()) {
+			DiffEntry entry = new DiffEntry();
+			walk.getObjectId(idBuf, 0);
+			entry.oldId = AbbreviatedObjectId.fromObjectId(idBuf);
+			walk.getObjectId(idBuf, 1);
+			entry.newId = AbbreviatedObjectId.fromObjectId(idBuf);
+			entry.oldMode = walk.getFileMode(0);
+			entry.newMode = walk.getFileMode(1);
+			entry.newName = entry.oldName = walk.getPathString();
+			if (entry.oldMode == FileMode.MISSING) {
+				entry.changeType = ChangeType.ADD;
+				added.add(entry);
+			} else if (entry.newMode == FileMode.MISSING) {
+				entry.changeType = ChangeType.DELETE;
+				deleted.add(entry);
+			} else {
+				entry.changeType = ChangeType.MODIFY;
+				entries.add(entry);
+			}
+		}
+	}
+

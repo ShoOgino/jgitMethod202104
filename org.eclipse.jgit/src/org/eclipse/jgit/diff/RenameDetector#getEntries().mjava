@@ -1,0 +1,22 @@
+	/**
+	 * Determines which files, if any, are renames, and returns an unmodifiable
+	 * list of {@link DiffEntry}s representing all files that have been changed
+	 * in some way. The list will contain all modified files first
+	 *
+	 * @return an unmodifiable list of {@link DiffEntry}s representing all files
+	 *         that have been changed
+	 * @throws IOException
+	 */
+	public List<DiffEntry> getEntries() throws IOException {
+		if (!done) {
+			done = true;
+			findExactRenames();
+			entries.addAll(added);
+			entries.addAll(deleted);
+			added = null;
+			deleted = null;
+			Collections.sort(entries, DIFF_COMPARATOR);
+		}
+		return Collections.unmodifiableList(entries);
+	}
+
