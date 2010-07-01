@@ -1,5 +1,6 @@
 	private void writeWholeObjectDeflate(PackOutputStream out,
 			final ObjectToPack otp) throws IOException {
+		final Deflater deflater = deflater();
 		final ObjectLoader loader = reader.open(otp, otp.getType());
 		final byte[] data = loader.getCachedBytes();
 		out.writeHeader(otp, data.length);
