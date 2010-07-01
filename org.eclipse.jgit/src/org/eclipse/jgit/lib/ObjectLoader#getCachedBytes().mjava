@@ -7,6 +7,10 @@
 	 * Changes (if made) will affect the cache but not the repository itself.
 	 *
 	 * @return the cached bytes of this object. Do not modify it.
+	 * @throws LargeObjectException
+	 *             if the object won't fit into a byte array, because
+	 *             {@link #isLarge()} returns true. Callers should use
+	 *             {@link #openStream()} instead to access the contents.
 	 */
-	public abstract byte[] getCachedBytes();
+	public abstract byte[] getCachedBytes() throws LargeObjectException;
 
