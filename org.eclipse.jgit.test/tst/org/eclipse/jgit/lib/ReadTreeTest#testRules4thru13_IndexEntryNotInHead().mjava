@@ -1,4 +1,4 @@
-    // for these rules, they all have clean yes/no options
+	// for these rules, they all have clean yes/no options
 	// but it doesn't matter if the entry is clean or not
 	// so we can just ignore the state in the filesystem entirely
 	public void testRules4thru13_IndexEntryNotInHead() throws IOException {
@@ -8,17 +8,17 @@
 		idxMap = new HashMap<String, String>();
 		idxMap.put("foo", "foo");
 		setupCase(null, null, idxMap);
-		theReadTree = go();
+		go();
 
-		assertTrue(theReadTree.updated().isEmpty());
-		assertTrue(theReadTree.removed().isEmpty());
-		assertTrue(theReadTree.conflicts().isEmpty());
+		assertTrue(getUpdated().isEmpty());
+		assertTrue(getRemoved().isEmpty());
+		assertTrue(getConflicts().isEmpty());
 
 		// rules 6 and 7
 		idxMap = new HashMap<String, String>();
 		idxMap.put("foo", "foo");
 		setupCase(null, idxMap, idxMap);
-		theReadTree = go();
+		go();
 
 		assertAllEmpty();
 
@@ -30,9 +30,9 @@
 		setupCase(null, mergeMap, idxMap);
 		go();
 
-		assertTrue(theReadTree.updated().isEmpty());
-		assertTrue(theReadTree.removed().isEmpty());
-		assertTrue(theReadTree.conflicts().contains("foo"));
+		assertTrue(getUpdated().isEmpty());
+		assertTrue(getRemoved().isEmpty());
+		assertTrue(getConflicts().contains("foo"));
 
 		// rule 10
 
@@ -41,29 +41,29 @@
 		setupCase(headMap, null, idxMap);
 		go();
 
-		assertTrue(theReadTree.removed().contains("foo"));
-		assertTrue(theReadTree.updated().isEmpty());
-		assertTrue(theReadTree.conflicts().isEmpty());
+		assertTrue(getRemoved().contains("foo"));
+		assertTrue(getUpdated().isEmpty());
+		assertTrue(getConflicts().isEmpty());
 
 		// rule 11
 		setupCase(headMap, null, idxMap);
 		new File(trash, "foo").delete();
 		writeTrashFile("foo", "bar");
-		theIndex.getMembers()[0].forceRecheck();
+		db.getIndex().getMembers()[0].forceRecheck();
 		go();
 
-		assertTrue(theReadTree.removed().isEmpty());
-		assertTrue(theReadTree.updated().isEmpty());
-		assertTrue(theReadTree.conflicts().contains("foo"));
+		assertTrue(getRemoved().isEmpty());
+		assertTrue(getUpdated().isEmpty());
+		assertTrue(getConflicts().contains("foo"));
 
 		// rule 12 & 13
 		headMap.put("foo", "head");
 		setupCase(headMap, null, idxMap);
 		go();
 
-		assertTrue(theReadTree.removed().isEmpty());
-		assertTrue(theReadTree.updated().isEmpty());
-		assertTrue(theReadTree.conflicts().contains("foo"));
+		assertTrue(getRemoved().isEmpty());
+		assertTrue(getUpdated().isEmpty());
+		assertTrue(getConflicts().contains("foo"));
 
 		// rules 14 & 15
 		setupCase(headMap, headMap, idxMap);
@@ -73,7 +73,7 @@
 
 		// rules 16 & 17
 		setupCase(headMap, mergeMap, idxMap); go();
-		assertTrue(theReadTree.conflicts().contains("foo"));
+		assertTrue(getConflicts().contains("foo"));
 
 		// rules 18 & 19
 		setupCase(headMap, idxMap, idxMap); go();
@@ -81,14 +81,14 @@
 
 		// rule 20
 		setupCase(idxMap, mergeMap, idxMap); go();
-		assertTrue(theReadTree.updated().containsKey("foo"));
+		assertTrue(getUpdated().containsKey("foo"));
 
 		// rules 21
 		setupCase(idxMap, mergeMap, idxMap);
 		new File(trash, "foo").delete();
 		writeTrashFile("foo", "bar");
-		theIndex.getMembers()[0].forceRecheck();
+		db.getIndex().getMembers()[0].forceRecheck();
 		go();
-		assertTrue(theReadTree.conflicts().contains("foo"));
+		assertTrue(getConflicts().contains("foo"));
 	}
 
