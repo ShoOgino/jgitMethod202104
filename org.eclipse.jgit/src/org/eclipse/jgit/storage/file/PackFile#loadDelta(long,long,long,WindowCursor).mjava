@@ -1,4 +1,4 @@
-	private PackedObjectLoader loadDelta(final long posData, long sz,
+	private ObjectLoader loadDelta(final long posData, long sz,
 			final long posBase, final WindowCursor curs) throws IOException,
 			DataFormatException {
 		byte[] data;
@@ -9,13 +9,13 @@
 			data = e.data;
 			type = e.type;
 		} else {
-			PackedObjectLoader p = load(curs, posBase);
+			ObjectLoader p = load(curs, posBase);
 			data = p.getCachedBytes();
 			type = p.getType();
 			saveCache(posBase, data, type);
 		}
 
 		data = BinaryDelta.apply(data, decompress(posData, sz, curs));
-		return new PackedObjectLoader(type, data);
+		return new ObjectLoader.SmallObject(type, data);
 	}
 

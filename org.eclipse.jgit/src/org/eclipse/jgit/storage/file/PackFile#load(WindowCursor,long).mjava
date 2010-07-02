@@ -1,4 +1,4 @@
-	private PackedObjectLoader load(final WindowCursor curs, final long pos)
+	private ObjectLoader load(final WindowCursor curs, final long pos)
 			throws IOException {
 		final byte[] ib = curs.tempId;
 		readFully(pos, ib, 0, 20, curs);
@@ -20,7 +20,7 @@
 			case Constants.OBJ_BLOB:
 			case Constants.OBJ_TAG: {
 				byte[] data = decompress(pos + p, sz, curs);
-				return new PackedObjectLoader(type, data);
+				return new ObjectLoader.SmallObject(type, data);
 			}
 
 			case Constants.OBJ_OFS_DELTA: {
