@@ -1,0 +1,22 @@
+	/**
+	 * Parse an object from the unpacked object format.
+	 *
+	 * @param raw
+	 *            complete contents of the compressed object.
+	 * @param id
+	 *            expected ObjectId of the object, used only for error reporting
+	 *            in exceptions.
+	 * @return loader to read the inflated contents.
+	 * @throws IOException
+	 *             the object cannot be parsed.
+	 */
+	public static ObjectLoader parse(byte[] raw, AnyObjectId id)
+			throws IOException {
+		WindowCursor wc = new WindowCursor(null);
+		try {
+			return open(new ByteArrayInputStream(raw), null, id, wc);
+		} finally {
+			wc.release();
+		}
+	}
+

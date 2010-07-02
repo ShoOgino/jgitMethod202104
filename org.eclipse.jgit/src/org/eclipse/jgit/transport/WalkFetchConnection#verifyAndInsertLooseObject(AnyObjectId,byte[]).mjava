@@ -1,8 +1,8 @@
 	private void verifyAndInsertLooseObject(final AnyObjectId id,
 			final byte[] compressed) throws IOException {
-		final UnpackedObjectLoader uol;
+		final ObjectLoader uol;
 		try {
-			uol = new UnpackedObjectLoader(compressed);
+			uol = UnpackedObject.parse(compressed, id);
 		} catch (CorruptObjectException parsingError) {
 			// Some HTTP servers send back a "200 OK" status with an HTML
 			// page that explains the requested file could not be found.

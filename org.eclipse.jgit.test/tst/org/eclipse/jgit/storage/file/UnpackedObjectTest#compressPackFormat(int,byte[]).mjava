@@ -1,0 +1,22 @@
+	private byte[] compressPackFormat(int type, byte[] data) throws IOException {
+		byte[] hdr = new byte[64];
+		int rawLength = data.length;
+		int nextLength = rawLength >>> 4;
+		hdr[0] = (byte) ((nextLength > 0 ? 0x80 : 0x00) | (type << 4) | (rawLength & 0x0F));
+		rawLength = nextLength;
+		int n = 1;
+		while (rawLength > 0) {
+			nextLength >>>= 7;
+			hdr[n++] = (byte) ((nextLength > 0 ? 0x80 : 0x00) | (rawLength & 0x7F));
+			rawLength = nextLength;
+		}
+
+		final ByteArrayOutputStream out = new ByteArrayOutputStream();
+		out.write(hdr, 0, n);
+
+		DeflaterOutputStream d = new DeflaterOutputStream(out);
+		d.write(data);
+		d.finish();
+		return out.toByteArray();
+	}
+

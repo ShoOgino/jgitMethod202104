@@ -1,0 +1,37 @@
+	public void testStandardFormat_LargeObject_CorruptZLibStream()
+			throws Exception {
+		final int type = Constants.OBJ_BLOB;
+		byte[] data = rng.nextBytes(UnpackedObject.LARGE_OBJECT + 5);
+		ObjectId id = new ObjectInserter.Formatter().idFor(type, data);
+		byte[] gz = compressStandardFormat(type, data);
+		gz[gz.length - 1] = 0;
+		gz[gz.length - 2] = 0;
+
+		write(id, gz);
+
+		ObjectLoader ol;
+		{
+			FileInputStream fs = new FileInputStream(path(id));
+			try {
+				ol = UnpackedObject.open(fs, path(id), id, wc);
+			} finally {
+				fs.close();
+			}
+		}
+
+		try {
+			byte[] tmp = new byte[data.length];
+			InputStream in = ol.openStream();
+			try {
+				IO.readFully(in, tmp, 0, tmp.length);
+			} finally {
+				in.close();
+			}
+			fail("Did not throw CorruptObjectException");
+		} catch (CorruptObjectException coe) {
+			assertEquals(MessageFormat.format(JGitText.get().objectIsCorrupt,
+					id.name(), JGitText.get().corruptObjectBadStream), coe
+					.getMessage());
+		}
+	}
+

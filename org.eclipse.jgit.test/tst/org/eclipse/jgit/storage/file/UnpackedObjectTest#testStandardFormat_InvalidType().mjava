@@ -1,0 +1,15 @@
+	public void testStandardFormat_InvalidType() throws Exception {
+		ObjectId id = ObjectId.zeroId();
+		byte[] data = rng.nextBytes(300);
+
+		try {
+			byte[] gz = compressStandardFormat("not.a.type", "1", data);
+			UnpackedObject.open(new ByteArrayInputStream(gz), path(id), id, wc);
+			fail("Did not throw CorruptObjectException");
+		} catch (CorruptObjectException coe) {
+			assertEquals(MessageFormat.format(JGitText.get().objectIsCorrupt,
+					id.name(), JGitText.get().corruptObjectInvalidType), coe
+					.getMessage());
+		}
+	}
+

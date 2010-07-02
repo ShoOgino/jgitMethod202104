@@ -1,0 +1,45 @@
+	public void testPackFormat_DeltaNotAllowed() throws Exception {
+		ObjectId id = ObjectId.zeroId();
+		byte[] data = rng.nextBytes(300);
+
+		try {
+			byte[] gz = compressPackFormat(Constants.OBJ_OFS_DELTA, data);
+			UnpackedObject.open(new ByteArrayInputStream(gz), path(id), id, wc);
+			fail("Did not throw CorruptObjectException");
+		} catch (CorruptObjectException coe) {
+			assertEquals(MessageFormat.format(JGitText.get().objectIsCorrupt,
+					id.name(), JGitText.get().corruptObjectInvalidType), coe
+					.getMessage());
+		}
+
+		try {
+			byte[] gz = compressPackFormat(Constants.OBJ_REF_DELTA, data);
+			UnpackedObject.open(new ByteArrayInputStream(gz), path(id), id, wc);
+			fail("Did not throw CorruptObjectException");
+		} catch (CorruptObjectException coe) {
+			assertEquals(MessageFormat.format(JGitText.get().objectIsCorrupt,
+					id.name(), JGitText.get().corruptObjectInvalidType), coe
+					.getMessage());
+		}
+
+		try {
+			byte[] gz = compressPackFormat(Constants.OBJ_TYPE_5, data);
+			UnpackedObject.open(new ByteArrayInputStream(gz), path(id), id, wc);
+			fail("Did not throw CorruptObjectException");
+		} catch (CorruptObjectException coe) {
+			assertEquals(MessageFormat.format(JGitText.get().objectIsCorrupt,
+					id.name(), JGitText.get().corruptObjectInvalidType), coe
+					.getMessage());
+		}
+
+		try {
+			byte[] gz = compressPackFormat(Constants.OBJ_EXT, data);
+			UnpackedObject.open(new ByteArrayInputStream(gz), path(id), id, wc);
+			fail("Did not throw CorruptObjectException");
+		} catch (CorruptObjectException coe) {
+			assertEquals(MessageFormat.format(JGitText.get().objectIsCorrupt,
+					id.name(), JGitText.get().corruptObjectInvalidType), coe
+					.getMessage());
+		}
+	}
+

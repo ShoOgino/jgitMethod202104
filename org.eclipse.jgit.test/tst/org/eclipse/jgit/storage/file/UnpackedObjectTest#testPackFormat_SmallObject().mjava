@@ -1,0 +1,24 @@
+	public void testPackFormat_SmallObject() throws Exception {
+		final int type = Constants.OBJ_BLOB;
+		byte[] data = rng.nextBytes(300);
+		byte[] gz = compressPackFormat(type, data);
+		ObjectId id = ObjectId.zeroId();
+
+		ObjectLoader ol = UnpackedObject.open(new ByteArrayInputStream(gz),
+				path(id), id, wc);
+		assertNotNull("created loader", ol);
+		assertEquals(type, ol.getType());
+		assertEquals(data.length, ol.getSize());
+		assertFalse("is not large", ol.isLarge());
+		assertTrue("same content", Arrays.equals(data, ol.getCachedBytes()));
+
+		ObjectStream in = ol.openStream();
+		assertNotNull("have stream", in);
+		assertEquals(type, in.getType());
+		assertEquals(data.length, in.getSize());
+		byte[] data2 = new byte[data.length];
+		IO.readFully(in, data2, 0, data.length);
+		assertTrue("same content", Arrays.equals(data, ol.getCachedBytes()));
+		in.close();
+	}
+

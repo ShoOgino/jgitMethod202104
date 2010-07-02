@@ -2,7 +2,13 @@
 			final String objectName, final AnyObjectId objectId)
 			throws IOException {
 		try {
-			return new UnpackedObjectLoader(fileFor(objectName), objectId);
+			File path = fileFor(objectName);
+			FileInputStream in = new FileInputStream(path);
+			try {
+				return UnpackedObject.open(in, path, objectId, curs);
+			} finally {
+				in.close();
+			}
 		} catch (FileNotFoundException noFile) {
 			return null;
 		}

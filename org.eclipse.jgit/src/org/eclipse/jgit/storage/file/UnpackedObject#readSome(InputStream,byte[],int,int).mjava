@@ -1,0 +1,13 @@
+	private static int readSome(InputStream in, final byte[] hdr, int off,
+			int cnt) throws IOException {
+		int avail = 0;
+		while (0 < cnt) {
+			int n = in.read(hdr, off, cnt);
+			if (n < 0)
+				break;
+			avail += n;
+			cnt -= n;
+		}
+		return avail;
+	}
+
