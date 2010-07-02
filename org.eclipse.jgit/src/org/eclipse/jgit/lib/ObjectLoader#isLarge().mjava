@@ -4,6 +4,11 @@
 	 *         {@link #openStream()} to prevent overflowing the JVM heap.
 	 */
 	public boolean isLarge() {
-		return LARGE_OBJECT <= getSize();
+		try {
+			getCachedBytes();
+			return false;
+		} catch (LargeObjectException tooBig) {
+			return true;
+		}
 	}
 

@@ -25,7 +25,7 @@
 							JGitText.get().corruptObjectGarbageAfterSize);
 				if (path == null && Integer.MAX_VALUE < size)
 					throw new LargeObjectException(id.copy());
-				if (size < LARGE_OBJECT || path == null) {
+				if (size < wc.getStreamFileThreshold() || path == null) {
 					byte[] data = new byte[(int) size];
 					int n = avail - p.value;
 					if (n > 0)
@@ -62,7 +62,7 @@
 
 				if (path == null && Integer.MAX_VALUE < size)
 					throw new LargeObjectException(id.copy());
-				if (size < LARGE_OBJECT || path == null) {
+				if (size < wc.getStreamFileThreshold() || path == null) {
 					in.reset();
 					IO.skipFully(in, p);
 					in = inflate(in, wc);
