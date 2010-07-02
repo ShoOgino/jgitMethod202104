@@ -1,0 +1,31 @@
+	private InputStream open(final WindowCursor wc)
+			throws MissingObjectException, IOException,
+			IncorrectObjectTypeException {
+		InputStream delta;
+		try {
+			delta = new PackInputStream(pack, objectOffset + headerLength, wc);
+		} catch (IOException packGone) {
+			// If the pack file cannot be pinned into the cursor, it
+			// probably was repacked recently. Go find the object
+			// again and open the stream from that location instead.
+			//
+			return wc.open(getObjectId(), type).openStream();
+		}
+		delta = new InflaterInputStream(delta);
+
+		final ObjectLoader base = pack.load(wc, baseOffset);
+		return new DeltaStream(delta) {
+			@Override
+			protected InputStream openBase() throws IOException {
+				if (base instanceof LargePackedDeltaObject)
+					return ((LargePackedDeltaObject) base).open(wc);
+				return base.openStream();
+			}
+
+			@Override
+			protected long getBaseSize() throws IOException {
+				return base.getSize();
+			}
+		};
+	}
+

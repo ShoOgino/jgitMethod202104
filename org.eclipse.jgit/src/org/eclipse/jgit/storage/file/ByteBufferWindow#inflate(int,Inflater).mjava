@@ -1,0 +1,11 @@
+	@Override
+	protected int inflate(final int pos, final Inflater inf)
+			throws DataFormatException {
+		final ByteBuffer s = buffer.slice();
+		s.position(pos);
+		final byte[] tmp = new byte[Math.min(s.remaining(), 512)];
+		s.get(tmp, 0, tmp.length);
+		inf.setInput(tmp, 0, tmp.length);
+		return tmp.length;
+	}
+

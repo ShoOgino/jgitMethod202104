@@ -1,0 +1,30 @@
+	@Override
+	public long skip(long len) throws IOException {
+		long act = 0;
+		while (0 < len) {
+			long n = Math.min(len, copySize);
+			switch (curcmd) {
+			case CMD_COPY:
+				copyOffset += n;
+				break;
+
+			case CMD_INSERT:
+				cmdptr += n;
+				break;
+
+			case CMD_EOF:
+				return act;
+			default:
+				throw new CorruptObjectException(
+						JGitText.get().unsupportedCommand0);
+			}
+
+			act += n;
+			len -= n;
+			copySize -= n;
+			if (copySize == 0)
+				curcmd = next();
+		}
+		return act;
+	}
+

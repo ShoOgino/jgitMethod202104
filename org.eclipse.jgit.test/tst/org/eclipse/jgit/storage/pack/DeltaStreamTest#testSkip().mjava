@@ -1,0 +1,47 @@
+	public void testSkip() throws IOException {
+		init(32, 15);
+		copy(2, 2);
+		insert("ab");
+		insert("cd");
+		copy(4, 4);
+		copy(0, 2);
+		insert("efg");
+		assertValidState();
+
+		for (int p = 0; p < data.length; p++) {
+			byte[] act = new byte[data.length];
+			System.arraycopy(data, 0, act, 0, p);
+			DeltaStream in = open();
+			IO.skipFully(in, p);
+			assertEquals(data.length - p, in.read(act, p, data.length - p));
+			assertEquals(-1, in.read());
+			assertTrue("skipping " + p, Arrays.equals(data, act));
+		}
+
+		// Skip all the way to the end should still recognize EOF.
+		DeltaStream in = open();
+		IO.skipFully(in, data.length);
+		assertEquals(-1, in.read());
+		assertEquals(0, in.skip(1));
+
+		// Skip should not open the base as we move past it, but it
+		// will open when we need to start copying data from it.
+		final boolean[] opened = new boolean[1];
+		in = new DeltaStream(new ByteArrayInputStream(delta)) {
+			@Override
+			protected long getBaseSize() throws IOException {
+				return base.length;
+			}
+
+			@Override
+			protected InputStream openBase() throws IOException {
+				opened[0] = true;
+				return new ByteArrayInputStream(base);
+			}
+		};
+		IO.skipFully(in, 7);
+		assertFalse("not yet open", opened[0]);
+		assertEquals(data[7], in.read());
+		assertTrue("now open", opened[0]);
+	}
+

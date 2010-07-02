@@ -1,0 +1,23 @@
+	/**
+	 * Insert a literal binary sequence.
+	 *
+	 * @param text
+	 *            the binary to insert.
+	 * @param off
+	 *            offset within {@code text} to start copying from.
+	 * @param cnt
+	 *            number of bytes to insert.
+	 * @throws IOException
+	 *             the instruction buffer can't store the instructions.
+	 */
+	public void insert(byte[] text, int off, int cnt) throws IOException {
+		while (0 < cnt) {
+			int n = Math.min(127, cnt);
+			out.write((byte) n);
+			out.write(text, off, n);
+			off += n;
+			cnt -= n;
+			size += 1 + n;
+		}
+	}
+

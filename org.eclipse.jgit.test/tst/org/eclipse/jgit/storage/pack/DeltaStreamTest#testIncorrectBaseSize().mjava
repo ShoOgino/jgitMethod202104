@@ -1,0 +1,42 @@
+	public void testIncorrectBaseSize() throws IOException {
+		init(4, 4);
+		copy(0, 4);
+		assertValidState();
+
+		DeltaStream in = new DeltaStream(new ByteArrayInputStream(delta)) {
+			@Override
+			protected long getBaseSize() throws IOException {
+				return 128;
+			}
+
+			@Override
+			protected InputStream openBase() throws IOException {
+				return new ByteArrayInputStream(base);
+			}
+		};
+		try {
+			in.read(new byte[4]);
+			fail("did not throw an exception");
+		} catch (CorruptObjectException e) {
+			assertEquals(JGitText.get().baseLengthIncorrect, e.getMessage());
+		}
+
+		in = new DeltaStream(new ByteArrayInputStream(delta)) {
+			@Override
+			protected long getBaseSize() throws IOException {
+				return 4;
+			}
+
+			@Override
+			protected InputStream openBase() throws IOException {
+				return new ByteArrayInputStream(new byte[0]);
+			}
+		};
+		try {
+			in.read(new byte[4]);
+			fail("did not throw an exception");
+		} catch (CorruptObjectException e) {
+			assertEquals(JGitText.get().baseLengthIncorrect, e.getMessage());
+		}
+	}
+
