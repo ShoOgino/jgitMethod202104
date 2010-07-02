@@ -6,10 +6,8 @@
 			// that implies the resulting object is going to be massive.
 			// Use only the large delta format here.
 			//
-			byte[] hdr = getDeltaHeader(posSelf + hdrLen, curs);
-			return new LargePackedDeltaObject(getObjectType(curs, posBase), //
-					BinaryDelta.getResultSize(hdr), //
-					posSelf, posBase, hdrLen, this, curs.db);
+			return new LargePackedDeltaObject(posSelf, posBase, hdrLen, //
+					this, curs.db);
 		}
 
 		byte[] data;
@@ -25,10 +23,8 @@
 				// The base itself is large. We have to produce a large
 				// delta stream as we don't want to build the whole base.
 				//
-				byte[] hdr = getDeltaHeader(posSelf + hdrLen, curs);
-				return new LargePackedDeltaObject(getObjectType(curs, posBase),
-						BinaryDelta.getResultSize(hdr), //
-						posSelf, posBase, hdrLen, this, curs.db);
+				return new LargePackedDeltaObject(posSelf, posBase, hdrLen,
+						this, curs.db);
 			}
 			data = p.getCachedBytes();
 			type = p.getType();

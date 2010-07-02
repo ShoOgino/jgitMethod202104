@@ -1,5 +1,31 @@
 	@Override
 	public long getSize() {
+		if (size == SIZE_UNKNOWN) {
+			WindowCursor wc = new WindowCursor(db);
+			try {
+				byte[] b = pack.getDeltaHeader(wc, objectOffset + headerLength);
+				size = BinaryDelta.getResultSize(b);
+			} catch (DataFormatException objectCorrupt) {
+				// The zlib stream for the delta is corrupt. We probably
+				// cannot access the object. Keep the size negative and
+				// report that bogus result to the caller.
+			} catch (IOException packGone) {
+				// If the pack file cannot be pinned into the cursor, it
+				// probably was repacked recently. Go find the object
+				// again and get the size from that location instead.
+				//
+				try {
+					size = wc.open(getObjectId()).getSize();
+				} catch (IOException packGone2) {
+					// "He's dead, Jim." We just can't discover the size
+					// and the interface isn't supposed to be lazy here.
+					// Report an invalid type code instead, callers will
+					// wind up bailing out with an error at some point.
+				}
+			} finally {
+				wc.release();
+			}
+		}
 		return size;
 	}
 

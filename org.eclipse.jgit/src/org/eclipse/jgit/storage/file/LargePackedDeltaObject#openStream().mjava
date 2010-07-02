@@ -3,7 +3,7 @@
 		final WindowCursor wc = new WindowCursor(db);
 		InputStream in = open(wc);
 		in = new BufferedInputStream(in, 8192);
-		return new ObjectStream.Filter(type, size, in) {
+		return new ObjectStream.Filter(getType(), size, in) {
 			@Override
 			public void close() throws IOException {
 				wc.release();
