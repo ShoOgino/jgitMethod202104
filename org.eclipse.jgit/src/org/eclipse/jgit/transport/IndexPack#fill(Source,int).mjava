@@ -1,0 +1,34 @@
+	// Ensure at least need bytes are available in in {@link #buf}.
+	private int fill(final Source src, final int need) throws IOException {
+		while (bAvail < need) {
+			int next = bOffset + bAvail;
+			int free = buf.length - next;
+			if (free + bAvail < need) {
+				switch(src){
+				case INPUT:
+					sync();
+					break;
+				case FILE:
+					if (bAvail > 0)
+						System.arraycopy(buf, bOffset, buf, 0, bAvail);
+					bOffset = 0;
+					break;
+				}
+				next = bAvail;
+				free = buf.length - next;
+			}
+			switch(src){
+			case INPUT:
+				next = in.read(buf, next, free);
+				break;
+			case FILE:
+				next = packOut.read(buf, next, free);
+				break;
+			}
+			if (next <= 0)
+				throw new EOFException(JGitText.get().packfileIsTruncated);
+			bAvail += next;
+		}
+		return bOffset;
+	}
+

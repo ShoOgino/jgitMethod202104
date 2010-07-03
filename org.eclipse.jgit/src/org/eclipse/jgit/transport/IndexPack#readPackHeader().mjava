@@ -1,6 +1,6 @@
 	private void readPackHeader() throws IOException {
 		final int hdrln = Constants.PACK_SIGNATURE.length + 4 + 4;
-		final int p = fillFromInput(hdrln);
+		final int p = fill(Source.INPUT, hdrln);
 		for (int k = 0; k < Constants.PACK_SIGNATURE.length; k++)
 			if (buf[p + k] != Constants.PACK_SIGNATURE[k])
 				throw new IOException(JGitText.get().notAPACKFile);

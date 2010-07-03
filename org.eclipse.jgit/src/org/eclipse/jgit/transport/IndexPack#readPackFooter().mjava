@@ -1,7 +1,7 @@
 	private void readPackFooter() throws IOException {
 		sync();
 		final byte[] cmpcsum = packDigest.digest();
-		final int c = fillFromInput(20);
+		final int c = fill(Source.INPUT, 20);
 		packcsum = new byte[20];
 		System.arraycopy(buf, c, packcsum, 0, 20);
 		use(20);
