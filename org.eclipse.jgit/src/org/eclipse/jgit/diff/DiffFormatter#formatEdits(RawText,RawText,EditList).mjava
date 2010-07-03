@@ -1,13 +1,16 @@
 	/**
 	 * Formats a list of edits in unified diff format
-	 * @param out where the unified diff is written to
-	 * @param a the text A which was compared
-	 * @param b the text B which was compared
-	 * @param edits some differences which have been calculated between A and B
+	 *
+	 * @param a
+	 *            the text A which was compared
+	 * @param b
+	 *            the text B which was compared
+	 * @param edits
+	 *            some differences which have been calculated between A and B
 	 * @throws IOException
 	 */
-	public void formatEdits(final OutputStream out, final RawText a,
-			final RawText b, final EditList edits) throws IOException {
+	public void formatEdits(final RawText a, final RawText b,
+			final EditList edits) throws IOException {
 		for (int curIdx = 0; curIdx < edits.size();) {
 			Edit curEdit = edits.get(curIdx);
 			final int endIdx = findCombinedEnd(edits, curIdx);
@@ -18,18 +21,24 @@
 			final int aEnd = Math.min(a.size(), endEdit.getEndA() + context);
 			final int bEnd = Math.min(b.size(), endEdit.getEndB() + context);
 
-			writeHunkHeader(out, aCur, aEnd, bCur, bEnd);
+			writeHunkHeader(aCur, aEnd, bCur, bEnd);
 
 			while (aCur < aEnd || bCur < bEnd) {
 				if (aCur < curEdit.getBeginA() || endIdx + 1 < curIdx) {
-					writeContextLine(out, a, aCur, isEndOfLineMissing(a, aCur));
+					writeContextLine(a, aCur);
+					if (isEndOfLineMissing(a, aCur))
+						out.write(noNewLine);
 					aCur++;
 					bCur++;
 				} else if (aCur < curEdit.getEndA()) {
-					writeRemovedLine(out, a, aCur, isEndOfLineMissing(a, aCur));
+					writeRemovedLine(a, aCur);
+					if (isEndOfLineMissing(a, aCur))
+						out.write(noNewLine);
 					aCur++;
 				} else if (bCur < curEdit.getEndB()) {
-					writeAddedLine(out, b, bCur, isEndOfLineMissing(b, bCur));
+					writeAddedLine(b, bCur);
+					if (isEndOfLineMissing(b, bCur))
+						out.write(noNewLine);
 					bCur++;
 				}
 

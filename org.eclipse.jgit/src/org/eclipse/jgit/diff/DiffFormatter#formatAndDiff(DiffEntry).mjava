@@ -1,10 +1,9 @@
-	private void format(OutputStream out, Repository src, DiffEntry ent)
-			throws IOException {
+	private void formatAndDiff(DiffEntry ent) throws IOException {
 		String oldName = quotePath("a/" + ent.getOldName());
 		String newName = quotePath("b/" + ent.getNewName());
 		out.write(encode("diff --git " + oldName + " " + newName + "\n"));
 
-		switch(ent.getChangeType()) {
+		switch (ent.getChangeType()) {
 		case ADD:
 			out.write(encodeASCII("new file mode "));
 			ent.getNewMode().copyTo(out);
@@ -18,7 +17,7 @@
 			break;
 
 		case RENAME:
-			out.write(encode("similarity index " + ent.getScore() + "%"));
+			out.write(encodeASCII("similarity index " + ent.getScore() + "%"));
 			out.write('\n');
 
 			out.write(encode("rename from " + quotePath(ent.getOldName())));
@@ -29,7 +28,7 @@
 			break;
 
 		case COPY:
-			out.write(encode("similarity index " + ent.getScore() + "%"));
+			out.write(encodeASCII("similarity index " + ent.getScore() + "%"));
 			out.write('\n');
 
 			out.write(encode("copy from " + quotePath(ent.getOldName())));
@@ -61,9 +60,9 @@
 		}
 
 		out.write(encodeASCII("index " //
-				+ format(src, ent.getOldId()) //
+				+ format(ent.getOldId()) //
 				+ ".." //
-				+ format(src, ent.getNewId())));
+				+ format(ent.getNewId())));
 		if (ent.getOldMode().equals(ent.getNewMode())) {
 			out.write(' ');
 			ent.getNewMode().copyTo(out);
@@ -72,8 +71,8 @@
 		out.write(encode("--- " + oldName + '\n'));
 		out.write(encode("+++ " + newName + '\n'));
 
-		byte[] aRaw = open(src, ent.getOldMode(), ent.getOldId());
-		byte[] bRaw = open(src, ent.getNewMode(), ent.getNewId());
+		byte[] aRaw = open(ent.getOldMode(), ent.getOldId());
+		byte[] bRaw = open(ent.getNewMode(), ent.getNewId());
 
 		if (RawText.isBinary(aRaw) || RawText.isBinary(bRaw)) {
 			out.write(encodeASCII("Binary files differ\n"));
@@ -81,7 +80,7 @@
 		} else {
 			RawText a = newRawText(aRaw);
 			RawText b = newRawText(bRaw);
-			formatEdits(out, a, b, new MyersDiff(a, b).getEdits());
+			formatEdits(a, b, new MyersDiff(a, b).getEdits());
 		}
 	}
 

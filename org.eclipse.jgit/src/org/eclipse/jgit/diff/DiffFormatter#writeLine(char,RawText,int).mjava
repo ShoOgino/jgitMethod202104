@@ -1,0 +1,19 @@
+	/**
+	 * Write a standard patch script line.
+	 *
+	 * @param prefix
+	 *            prefix before the line, typically '-', '+', ' '.
+	 * @param text
+	 *            the text object to obtain the line from.
+	 * @param cur
+	 *            line number to output.
+	 * @throws IOException
+	 *             the stream threw an exception while writing to it.
+	 */
+	protected void writeLine(final char prefix, final RawText text,
+			final int cur) throws IOException {
+		out.write(prefix);
+		text.writeLine(out, cur);
+		out.write('\n');
+	}
+

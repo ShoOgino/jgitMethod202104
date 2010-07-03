@@ -1,0 +1,20 @@
+	/**
+	 * Format a patch script for one file entry.
+	 *
+	 * @param entry
+	 *            the entry to be formatted.
+	 * @throws IOException
+	 *             a file's content cannot be read, or the output stream cannot
+	 *             be written to.
+	 */
+	public void format(DiffEntry entry) throws IOException {
+		if (entry instanceof FileHeader) {
+			format(
+					(FileHeader) entry, //
+					newRawText(open(entry.getOldMode(), entry.getOldId())),
+					newRawText(open(entry.getNewMode(), entry.getNewId())));
+		} else {
+			formatAndDiff(entry);
+		}
+	}
+

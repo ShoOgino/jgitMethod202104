@@ -17,10 +17,9 @@
 			Diff.nameStatus(out, files);
 
 		} else {
-			out.flush();
-			BufferedOutputStream o = new BufferedOutputStream(System.out);
-			diffFmt.format(o, db, files);
-			o.flush();
+			diffFmt.setRepository(db);
+			diffFmt.format(files);
+			diffFmt.flush();
 		}
 	}
 
