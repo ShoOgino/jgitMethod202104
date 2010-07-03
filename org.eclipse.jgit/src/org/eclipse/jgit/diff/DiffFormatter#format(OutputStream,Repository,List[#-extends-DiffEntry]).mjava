@@ -1,0 +1,28 @@
+	/**
+	 * Format a patch script from a list of difference entries.
+	 *
+	 * @param out
+	 *            stream to write the patch script out to.
+	 * @param src
+	 *            repository the file contents can be read from.
+	 * @param entries
+	 *            entries describing the affected files.
+	 * @throws IOException
+	 *             a file's content cannot be read, or the output stream cannot
+	 *             be written to.
+	 */
+	public void format(final OutputStream out, Repository src,
+			List<? extends DiffEntry> entries) throws IOException {
+		for(DiffEntry ent : entries) {
+			if (ent instanceof FileHeader) {
+				format(
+						out,
+						(FileHeader) ent, //
+						newRawText(open(src, ent.getOldMode(), ent.getOldId())),
+						newRawText(open(src, ent.getNewMode(), ent.getNewId())));
+			} else {
+				format(out, src, ent);
+			}
+		}
+	}
+

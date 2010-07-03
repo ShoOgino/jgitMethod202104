@@ -1,0 +1,16 @@
+	private byte[] open(Repository src, FileMode mode, AbbreviatedObjectId id)
+			throws IOException {
+		if (mode == FileMode.MISSING)
+			return new byte[] {};
+
+		if (mode.getObjectType() != Constants.OBJ_BLOB)
+			return new byte[] {};
+
+		if (id.isComplete()) {
+			ObjectLoader ldr = src.openObject(id.toObjectId());
+			return ldr.getCachedBytes();
+		}
+
+		return new byte[] {};
+	}
+
