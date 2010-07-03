@@ -1,0 +1,10 @@
+	static boolean sameType(FileMode a, FileMode b) {
+		// Files have to be of the same type in order to rename them.
+		// We would never want to rename a file to a gitlink, or a
+		// symlink to a file.
+		//
+		int aType = a.getBits() & FileMode.TYPE_MASK;
+		int bType = b.getBits() & FileMode.TYPE_MASK;
+		return aType == bType;
+	}
+

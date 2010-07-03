@@ -1,0 +1,38 @@
+	private static int common(long[] srcHash, int srcIdx, //
+			long[] dstHash, int dstIdx) {
+		if (srcIdx == srcHash.length || dstIdx == dstHash.length)
+			return 0;
+
+		int common = 0;
+		int srcKey = keyOf(srcHash[srcIdx]);
+		int dstKey = keyOf(dstHash[dstIdx]);
+
+		for (;;) {
+			if (srcKey == dstKey) {
+				common += countOf(dstHash[dstIdx]);
+
+				if (++srcIdx == srcHash.length)
+					break;
+				srcKey = keyOf(srcHash[srcIdx]);
+
+				if (++dstIdx == dstHash.length)
+					break;
+				dstKey = keyOf(dstHash[dstIdx]);
+
+			} else if (srcKey < dstKey) {
+				// Regions of src which do not appear in dst.
+				if (++srcIdx == srcHash.length)
+					break;
+				srcKey = keyOf(srcHash[srcIdx]);
+
+			} else /* if (srcKey > dstKey) */{
+				// Regions of dst which do not appear in dst.
+				if (++dstIdx == dstHash.length)
+					break;
+				dstKey = keyOf(dstHash[dstIdx]);
+			}
+		}
+
+		return common;
+	}
+

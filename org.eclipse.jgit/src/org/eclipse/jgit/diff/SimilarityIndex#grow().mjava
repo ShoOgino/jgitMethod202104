@@ -1,0 +1,17 @@
+	private void grow() {
+		long[] oldHash = idHash;
+		int oldSize = idHash.length;
+
+		idHash = new long[2 * oldSize];
+		for (int i = 0; i < oldSize; i++) {
+			long v = oldHash[i];
+			if (v != 0) {
+				int j = slot(keyOf(v));
+				while (idHash[j] != 0)
+					if (++j >= idHash.length)
+						j = 0;
+				idHash[j] = v;
+			}
+		}
+	}
+

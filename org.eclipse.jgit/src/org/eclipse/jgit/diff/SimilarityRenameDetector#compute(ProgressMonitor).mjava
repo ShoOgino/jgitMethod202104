@@ -1,0 +1,47 @@
+	void compute(ProgressMonitor pm) throws IOException {
+		if (pm == null)
+			pm = NullProgressMonitor.INSTANCE;
+
+		pm.beginTask(JGitText.get().renamesFindingByContent, //
+				2 * srcs.size() * dsts.size());
+
+		int mNext = buildMatrix(pm);
+		out = new ArrayList<DiffEntry>(Math.min(mNext, dsts.size()));
+
+		// Match rename pairs on a first come, first serve basis until
+		// we have looked at everything that is above our minimum score.
+		//
+		for (--mNext; mNext >= 0; mNext--) {
+			long ent = matrix[mNext];
+			int sIdx = srcFile(ent);
+			int dIdx = dstFile(ent);
+			DiffEntry s = srcs.get(sIdx);
+			DiffEntry d = dsts.get(dIdx);
+
+			if (d == null) {
+				pm.update(1);
+				continue; // was already matched earlier
+			}
+
+			ChangeType type;
+			if (s.changeType == ChangeType.DELETE) {
+				// First use of this source file. Tag it as a rename so we
+				// later know it is already been used as a rename, other
+				// matches (if any) will claim themselves as copies instead.
+				//
+				s.changeType = ChangeType.RENAME;
+				type = ChangeType.RENAME;
+			} else {
+				type = ChangeType.COPY;
+			}
+
+			out.add(DiffEntry.pair(type, s, d, score(ent)));
+			dsts.set(dIdx, null); // Claim the destination was matched.
+			pm.update(1);
+		}
+
+		srcs = compactSrcList(srcs);
+		dsts = compactDstList(dsts);
+		pm.endTask();
+	}
+

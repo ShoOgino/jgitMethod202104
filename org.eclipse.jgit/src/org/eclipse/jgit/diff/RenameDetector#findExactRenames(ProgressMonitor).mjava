@@ -1,0 +1,83 @@
+	@SuppressWarnings("unchecked")
+	private void findExactRenames(ProgressMonitor pm) {
+		if (added.isEmpty() || deleted.isEmpty())
+			return;
+
+		pm.beginTask(JGitText.get().renamesFindingExact, //
+				added.size() + deleted.size());
+
+		HashMap<AbbreviatedObjectId, Object> map = new HashMap<AbbreviatedObjectId, Object>();
+		for (DiffEntry del : deleted) {
+			Object old = map.put(del.oldId, del);
+			if (old instanceof DiffEntry) {
+				ArrayList<DiffEntry> list = new ArrayList<DiffEntry>(2);
+				list.add((DiffEntry) old);
+				list.add(del);
+				map.put(del.oldId, list);
+
+			} else if (old != null) {
+				// Must be a list of DiffEntries
+				((List) old).add(del);
+				map.put(del.oldId, old);
+			}
+			pm.update(1);
+		}
+
+		ArrayList<DiffEntry> left = new ArrayList<DiffEntry>(added.size());
+		for (DiffEntry dst : added) {
+			Object del = map.get(dst.newId);
+			if (del instanceof DiffEntry) {
+				DiffEntry e = (DiffEntry) del;
+				if (sameType(e.oldMode, dst.newMode)) {
+					if (e.changeType == ChangeType.DELETE) {
+						e.changeType = ChangeType.RENAME;
+						entries.add(exactRename(e, dst));
+					} else {
+						entries.add(exactCopy(e, dst));
+					}
+				} else {
+					left.add(dst);
+				}
+
+			} else if (del != null) {
+				List<DiffEntry> list = (List<DiffEntry>) del;
+				DiffEntry best = null;
+				for (DiffEntry e : list) {
+					if (best == null && sameType(e.oldMode, dst.newMode))
+						best = e;
+				}
+				if (best != null) {
+					if (best.changeType == ChangeType.DELETE) {
+						best.changeType = ChangeType.RENAME;
+						entries.add(exactRename(best, dst));
+					} else {
+						entries.add(exactCopy(best, dst));
+					}
+				} else {
+					left.add(dst);
+				}
+
+			} else {
+				left.add(dst);
+			}
+			pm.update(1);
+		}
+		added = left;
+
+		deleted = new ArrayList<DiffEntry>(map.size());
+		for (Object o : map.values()) {
+			if (o instanceof DiffEntry) {
+				DiffEntry e = (DiffEntry) o;
+				if (e.changeType == ChangeType.DELETE)
+					deleted.add(e);
+			} else {
+				List<DiffEntry> list = (List<DiffEntry>) o;
+				for (DiffEntry e : list) {
+					if (e.changeType == ChangeType.DELETE)
+						deleted.add(e);
+				}
+			}
+		}
+		pm.endTask();
+	}
+

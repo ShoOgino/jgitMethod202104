@@ -1,0 +1,37 @@
+	/**
+	 * Add entries to be considered for rename detection.
+	 *
+	 * @param entriesToAdd
+	 *            one or more entries to add.
+	 * @throws IllegalStateException
+	 *             if {@code getEntries} was already invoked.
+	 */
+	public void addAll(Collection<DiffEntry> entriesToAdd) {
+		if (done)
+			throw new IllegalStateException(JGitText.get().renamesAlreadyFound);
+
+		for (DiffEntry entry : entriesToAdd) {
+			switch (entry.getChangeType()) {
+			case ADD:
+				added.add(entry);
+				break;
+
+			case DELETE:
+				deleted.add(entry);
+				break;
+
+			case MODIFY:
+				if (sameType(entry.getOldMode(), entry.getNewMode()))
+					entries.add(entry);
+				else
+					entries.addAll(DiffEntry.breakModify(entry));
+				break;
+
+			case COPY:
+			case RENAME:
+			default:
+				entriesToAdd.add(entry);
+			}
+		}
+	}
+

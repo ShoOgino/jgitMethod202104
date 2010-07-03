@@ -1,0 +1,14 @@
+	public void testExactRename_OneRename() throws Exception {
+		ObjectId foo = blob("foo");
+
+		DiffEntry a = DiffEntry.add(PATH_A, foo);
+		DiffEntry b = DiffEntry.delete(PATH_Q, foo);
+
+		rd.add(a);
+		rd.add(b);
+
+		List<DiffEntry> entries = rd.compute();
+		assertEquals(1, entries.size());
+		assertRename(b, a, 100, entries.get(0));
+	}
+

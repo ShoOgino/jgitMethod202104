@@ -1,0 +1,53 @@
+	private int buildMatrix(ProgressMonitor pm) throws IOException {
+		// Allocate for the worst-case scenario where every pair has a
+		// score that we need to consider. We might not need that many.
+		//
+		matrix = new long[srcs.size() * dsts.size()];
+
+		// Consider each pair of files, if the score is above the minimum
+		// threshold we need record that scoring in the matrix so we can
+		// later find the best matches.
+		//
+		int mNext = 0;
+		for (int srcIdx = 0; srcIdx < srcs.size(); srcIdx++) {
+			DiffEntry srcEnt = srcs.get(srcIdx);
+			if (!isFile(srcEnt.oldMode)) {
+				pm.update(dsts.size());
+				continue;
+			}
+
+			SimilarityIndex s = hash(srcEnt.oldId.toObjectId());
+			for (int dstIdx = 0; dstIdx < dsts.size(); dstIdx++) {
+				DiffEntry dstEnt = dsts.get(dstIdx);
+
+				if (!isFile(dstEnt.newMode)) {
+					pm.update(1);
+					continue;
+				}
+
+				if (!RenameDetector.sameType(srcEnt.oldMode, dstEnt.newMode)) {
+					pm.update(1);
+					continue;
+				}
+
+				SimilarityIndex d = hash(dstEnt.newId.toObjectId());
+				int score = s.score(d);
+
+				if (score < renameScore) {
+					pm.update(1);
+					continue;
+				}
+
+				matrix[mNext++] = encode(score, srcIdx, dstIdx);
+				pm.update(1);
+			}
+		}
+
+		// Sort everything in the range we populated, which might be the
+		// entire matrix, or just a smaller slice if we had some bad low
+		// scoring pairs.
+		//
+		Arrays.sort(matrix, 0, mNext);
+		return mNext;
+	}
+

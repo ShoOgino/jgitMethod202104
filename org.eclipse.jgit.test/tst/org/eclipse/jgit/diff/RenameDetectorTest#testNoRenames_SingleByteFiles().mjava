@@ -1,0 +1,16 @@
+	public void testNoRenames_SingleByteFiles() throws Exception {
+		ObjectId aId = blob("a");
+		ObjectId bId = blob("b");
+
+		DiffEntry a = DiffEntry.add(PATH_A, aId);
+		DiffEntry b = DiffEntry.delete(PATH_Q, bId);
+
+		rd.add(a);
+		rd.add(b);
+
+		List<DiffEntry> entries = rd.compute();
+		assertEquals(2, entries.size());
+		assertSame(a, entries.get(0));
+		assertSame(b, entries.get(1));
+	}
+

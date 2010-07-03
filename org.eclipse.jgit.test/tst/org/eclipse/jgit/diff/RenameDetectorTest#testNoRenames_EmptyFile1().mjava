@@ -1,0 +1,11 @@
+	public void testNoRenames_EmptyFile1() throws Exception {
+		ObjectId aId = blob("");
+		DiffEntry a = DiffEntry.add(PATH_A, aId);
+
+		rd.add(a);
+
+		List<DiffEntry> entries = rd.compute();
+		assertEquals(1, entries.size());
+		assertSame(a, entries.get(0));
+	}
+

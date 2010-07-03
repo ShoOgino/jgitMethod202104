@@ -1,0 +1,46 @@
+	/**
+	 * Convert the TreeWalk into DiffEntry headers.
+	 *
+	 * @param walk
+	 *            the TreeWalk to walk through. Must have exactly two trees.
+	 * @return headers describing the changed files.
+	 * @throws IOException
+	 *             the repository cannot be accessed.
+	 */
+	public static List<DiffEntry> scan(TreeWalk walk) throws IOException {
+		List<DiffEntry> r = new ArrayList<DiffEntry>();
+		MutableObjectId idBuf = new MutableObjectId();
+		while (walk.next()) {
+			DiffEntry entry = new DiffEntry();
+
+			walk.getObjectId(idBuf, 0);
+			entry.oldId = AbbreviatedObjectId.fromObjectId(idBuf);
+
+			walk.getObjectId(idBuf, 1);
+			entry.newId = AbbreviatedObjectId.fromObjectId(idBuf);
+
+			entry.oldMode = walk.getFileMode(0);
+			entry.newMode = walk.getFileMode(1);
+			entry.newName = entry.oldName = walk.getPathString();
+
+			if (entry.oldMode == FileMode.MISSING) {
+				entry.oldName = DiffEntry.DEV_NULL;
+				entry.changeType = ChangeType.ADD;
+				r.add(entry);
+
+			} else if (entry.newMode == FileMode.MISSING) {
+				entry.newName = DiffEntry.DEV_NULL;
+				entry.changeType = ChangeType.DELETE;
+				r.add(entry);
+
+			} else {
+				entry.changeType = ChangeType.MODIFY;
+				if (RenameDetector.sameType(entry.oldMode, entry.newMode))
+					r.add(entry);
+				else
+					r.addAll(breakModify(entry));
+			}
+		}
+		return r;
+	}
+
