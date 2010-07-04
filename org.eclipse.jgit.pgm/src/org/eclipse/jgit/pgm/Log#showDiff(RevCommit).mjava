@@ -1,19 +1,25 @@
 	private void showDiff(RevCommit c) throws IOException {
 		final TreeWalk tw = new TreeWalk(db);
-		tw.reset();
 		tw.setRecursive(true);
+		tw.reset();
 		tw.addTree(c.getParent(0).getTree());
 		tw.addTree(c.getTree());
-		tw.setFilter(AndTreeFilter.create(TreeFilter.ANY_DIFF, pathFilter));
+		tw.setFilter(AndTreeFilter.create(pathFilter, TreeFilter.ANY_DIFF));
 
 		List<DiffEntry> files = DiffEntry.scan(tw);
-		if (detectRenames) {
-			RenameDetector rd = new RenameDetector(db);
-			if (renameLimit != null)
-				rd.setRenameLimit(renameLimit.intValue());
-			rd.addAll(files);
-			files = rd.compute(new TextProgressMonitor());
-		}
+		if (pathFilter instanceof FollowFilter && isAdd(files)) {
+			// The file we are following was added here, find where it
+			// came from so we can properly show the rename or copy,
+			// then continue digging backwards.
+			//
+			tw.reset();
+			tw.addTree(c.getParent(0).getTree());
+			tw.addTree(c.getTree());
+			tw.setFilter(TreeFilter.ANY_DIFF);
+			files = updateFollowFilter(detectRenames(DiffEntry.scan(tw)));
+
+		} else if (detectRenames)
+			files = detectRenames(files);
 
 		if (showNameAndStatusOnly) {
 			Diff.nameStatus(out, files);
