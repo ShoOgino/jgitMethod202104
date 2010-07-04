@@ -7,7 +7,7 @@
 	public RenameDetector(Repository repo) {
 		this.repo = repo;
 
-		Config cfg = repo.getConfig();
-		renameLimit = cfg.getInt("diff", "renamelimit", 200);
+		DiffConfig cfg = repo.getConfig().get(DiffConfig.KEY);
+		renameLimit = cfg.getRenameLimit();
 	}
 
