@@ -12,7 +12,7 @@
 	 */
 	public void insert(byte[] text, int off, int cnt) throws IOException {
 		while (0 < cnt) {
-			int n = Math.min(127, cnt);
+			int n = Math.min(MAX_INSERT_DATA_SIZE, cnt);
 			out.write((byte) n);
 			out.write(text, off, n);
 			off += n;
