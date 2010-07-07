@@ -8,8 +8,9 @@
 
 			if (isStandardFormat(hdr)) {
 				in.reset();
-				in = inflate(in, wc);
-				int avail = readSome(in, hdr, 0, 64);
+				Inflater inf =  wc.inflater();
+				InputStream zIn = inflate(in, inf);
+				int avail = readSome(zIn, hdr, 0, 64);
 				if (avail < 5)
 					throw new CorruptObjectException(id,
 							JGitText.get().corruptObjectNoHeader);
@@ -30,7 +31,8 @@
 					int n = avail - p.value;
 					if (n > 0)
 						System.arraycopy(hdr, p.value, data, 0, n);
-					IO.readFully(in, data, n, data.length - n);
+					IO.readFully(zIn, data, n, data.length - n);
+					checkValidEndOfStream(in, inf, id, hdr);
 					return new ObjectLoader.SmallObject(type, data);
 				}
 				return new LargeObject(type, size, path, id, wc.db);
@@ -65,9 +67,11 @@
 				if (size < wc.getStreamFileThreshold() || path == null) {
 					in.reset();
 					IO.skipFully(in, p);
-					in = inflate(in, wc);
+					Inflater inf = wc.inflater();
+					InputStream zIn = inflate(in, inf);
 					byte[] data = new byte[(int) size];
-					IO.readFully(in, data, 0, data.length);
+					IO.readFully(zIn, data, 0, data.length);
+					checkValidEndOfStream(in, inf, id, hdr);
 					return new ObjectLoader.SmallObject(type, data);
 				}
 				return new LargeObject(type, size, path, id, wc.db);

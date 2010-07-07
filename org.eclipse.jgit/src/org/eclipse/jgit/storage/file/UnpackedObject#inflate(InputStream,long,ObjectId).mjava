@@ -1,0 +1,32 @@
+	private static InputStream inflate(final InputStream in, final long size,
+			final ObjectId id) {
+		final Inflater inf = InflaterCache.get();
+		return new InflaterInputStream(in, inf) {
+			private long remaining = size;
+
+			@Override
+			public int read(byte[] b, int off, int cnt) throws IOException {
+				try {
+					int r = super.read(b, off, cnt);
+					if (r > 0)
+						remaining -= r;
+					return r;
+				} catch (ZipException badStream) {
+					throw new CorruptObjectException(id,
+							JGitText.get().corruptObjectBadStream);
+				}
+			}
+
+			@Override
+			public void close() throws IOException {
+				try {
+					if (remaining <= 0)
+						checkValidEndOfStream(in, inf, id, new byte[64]);
+					super.close();
+				} finally {
+					InflaterCache.release(inf);
+				}
+			}
+		};
+	}
+

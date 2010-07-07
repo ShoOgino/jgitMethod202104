@@ -1,0 +1,18 @@
+	public void testStandardFormat_SmallObject_TruncatedZLibStream()
+			throws Exception {
+		ObjectId id = ObjectId.zeroId();
+		byte[] data = rng.nextBytes(300);
+
+		try {
+			byte[] gz = compressStandardFormat(Constants.OBJ_BLOB, data);
+			byte[] tr = new byte[gz.length - 1];
+			System.arraycopy(gz, 0, tr, 0, tr.length);
+			UnpackedObject.open(new ByteArrayInputStream(tr), path(id), id, wc);
+			fail("Did not throw CorruptObjectException");
+		} catch (CorruptObjectException coe) {
+			assertEquals(MessageFormat.format(JGitText.get().objectIsCorrupt,
+					id.name(), JGitText.get().corruptObjectBadStream), coe
+					.getMessage());
+		}
+	}
+

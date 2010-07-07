@@ -20,7 +20,7 @@
 
 				if (isStandardFormat(hdr)) {
 					in.reset();
-					in = buffer(inflate(in, id));
+					in = buffer(inflate(in, size, id));
 					while (0 < in.read())
 						continue;
 				} else {
@@ -32,7 +32,7 @@
 
 					in.reset();
 					IO.skipFully(in, p);
-					in = buffer(inflate(in, id));
+					in = buffer(inflate(in, size, id));
 				}
 
 				ok = true;
