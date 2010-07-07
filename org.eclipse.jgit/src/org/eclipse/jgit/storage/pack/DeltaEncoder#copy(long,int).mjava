@@ -10,48 +10,28 @@
 	 *             the instruction buffer cannot store the instructions.
 	 */
 	public void copy(long offset, int cnt) throws IOException {
-		if (cnt > MAX_COPY) {
-			copy(offset, MAX_COPY);
-			offset += MAX_COPY;
-			cnt -= MAX_COPY;
-		}
+		if (cnt == 0)
+			return;
 
-		int cmd = 0x80;
-		int p = 1;
+		int p = 0;
 
-		if ((offset & 0xff) != 0) {
-			cmd |= 0x01;
-			buf[p++] = (byte) (offset & 0xff);
-		}
-		if ((offset & (0xff << 8)) != 0) {
-			cmd |= 0x02;
-			buf[p++] = (byte) ((offset >>> 8) & 0xff);
-		}
-		if ((offset & (0xff << 16)) != 0) {
-			cmd |= 0x04;
-			buf[p++] = (byte) ((offset >>> 16) & 0xff);
-		}
-		if ((offset & (0xff << 24)) != 0) {
-			cmd |= 0x08;
-			buf[p++] = (byte) ((offset >>> 24) & 0xff);
-		}
+		// We cannot encode more than MAX_V2_COPY bytes in a single
+		// command, so encode that much and start a new command.
+		// This limit is imposed by the pack file format rules.
+		//
+		while (MAX_V2_COPY < cnt) {
+			p = encodeCopy(p, offset, MAX_V2_COPY);
+			offset += MAX_V2_COPY;
+			cnt -= MAX_V2_COPY;
 
-		if (cnt != 0x10000) {
-			if ((cnt & 0xff) != 0) {
-				cmd |= 0x10;
-				buf[p++] = (byte) (cnt & 0xff);
-			}
-			if ((cnt & (0xff << 8)) != 0) {
-				cmd |= 0x20;
-				buf[p++] = (byte) ((cnt >>> 8) & 0xff);
-			}
-			if ((cnt & (0xff << 16)) != 0) {
-				cmd |= 0x40;
-				buf[p++] = (byte) ((cnt >>> 16) & 0xff);
+			if (buf.length < p + MAX_COPY_CMD_SIZE) {
+				out.write(buf, 0, p);
+				size += p;
+				p = 0;
 			}
 		}
 
-		buf[0] = (byte) cmd;
+		p = encodeCopy(p, offset, cnt);
 		out.write(buf, 0, p);
 		size += p;
 	}
