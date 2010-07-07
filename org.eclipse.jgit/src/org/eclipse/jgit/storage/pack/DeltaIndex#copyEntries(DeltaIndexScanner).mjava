@@ -1,0 +1,19 @@
+	private void copyEntries(DeltaIndexScanner scan) {
+		// Rebuild the entries list from the scanner, positioning all
+		// blocks in the same hash chain next to each other. We can
+		// then later discard the next list, along with the scanner.
+		//
+		int next = 1;
+		for (int i = 0; i < table.length; i++) {
+			int h = table[i];
+			if (h == 0)
+				continue;
+
+			table[i] = next;
+			do {
+				entries[next++] = scan.entries[h];
+				h = scan.next[h];
+			} while (h != 0);
+		}
+	}
+

@@ -1,0 +1,13 @@
+	public void testLimitObjectSize_Length130CopyFails() throws IOException {
+		src = rng.nextBytes(130);
+		copy(0, 130);
+		dst = dstBuf.toByteArray();
+
+		// The header requires 4 bytes for these objects, so a target length
+		// of 5 is bigger than the copy instruction and should cause an abort.
+		//
+		DeltaIndex di = new DeltaIndex(src);
+		assertFalse(di.encode(actDeltaBuf, dst, 5));
+		assertEquals(4, actDeltaBuf.size());
+	}
+

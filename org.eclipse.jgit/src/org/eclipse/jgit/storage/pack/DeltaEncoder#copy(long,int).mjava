@@ -6,12 +6,14 @@
 	 *            from the beginning of the base.
 	 * @param cnt
 	 *            number of bytes to copy.
+	 * @return true if the copy fits within the limit; false if the copy
+	 *         would cause the instruction stream to exceed the limit.
 	 * @throws IOException
 	 *             the instruction buffer cannot store the instructions.
 	 */
-	public void copy(long offset, int cnt) throws IOException {
+	public boolean copy(long offset, int cnt) throws IOException {
 		if (cnt == 0)
-			return;
+			return true;
 
 		int p = 0;
 
@@ -25,6 +27,8 @@
 			cnt -= MAX_V2_COPY;
 
 			if (buf.length < p + MAX_COPY_CMD_SIZE) {
+				if (0 < limit && limit < size + p)
+					return false;
 				out.write(buf, 0, p);
 				size += p;
 				p = 0;
@@ -32,7 +36,10 @@
 		}
 
 		p = encodeCopy(p, offset, cnt);
+		if (0 < limit && limit < size + p)
+			return false;
 		out.write(buf, 0, p);
 		size += p;
+		return true;
 	}
 

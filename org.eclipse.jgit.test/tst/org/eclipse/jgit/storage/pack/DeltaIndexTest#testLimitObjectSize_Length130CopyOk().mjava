@@ -1,0 +1,15 @@
+	public void testLimitObjectSize_Length130CopyOk() throws IOException {
+		src = rng.nextBytes(130);
+		copy(0, 130);
+		dst = dstBuf.toByteArray();
+
+		DeltaIndex di = new DeltaIndex(src);
+		assertTrue(di.encode(actDeltaBuf, dst, dst.length));
+
+		byte[] actDelta = actDeltaBuf.toByteArray();
+		byte[] expDelta = expDeltaBuf.toByteArray();
+
+		assertEquals(BinaryDelta.format(expDelta, false), //
+				BinaryDelta.format(actDelta, false));
+	}
+

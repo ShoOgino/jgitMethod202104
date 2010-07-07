@@ -1,0 +1,30 @@
+	static int hashBlock(byte[] raw, int ptr) {
+		int hash;
+
+		// The first 4 steps collapse out into a 4 byte big-endian decode,
+		// with a larger right shift as we combined shift lefts together.
+		//
+		hash = ((raw[ptr] & 0xff) << 24) //
+				| ((raw[ptr + 1] & 0xff) << 16) //
+				| ((raw[ptr + 2] & 0xff) << 8) //
+				| (raw[ptr + 3] & 0xff);
+		hash ^= T[hash >>> 31];
+
+		hash = ((hash << 8) | (raw[ptr + 4] & 0xff)) ^ T[hash >>> 23];
+		hash = ((hash << 8) | (raw[ptr + 5] & 0xff)) ^ T[hash >>> 23];
+		hash = ((hash << 8) | (raw[ptr + 6] & 0xff)) ^ T[hash >>> 23];
+		hash = ((hash << 8) | (raw[ptr + 7] & 0xff)) ^ T[hash >>> 23];
+
+		hash = ((hash << 8) | (raw[ptr + 8] & 0xff)) ^ T[hash >>> 23];
+		hash = ((hash << 8) | (raw[ptr + 9] & 0xff)) ^ T[hash >>> 23];
+		hash = ((hash << 8) | (raw[ptr + 10] & 0xff)) ^ T[hash >>> 23];
+		hash = ((hash << 8) | (raw[ptr + 11] & 0xff)) ^ T[hash >>> 23];
+
+		hash = ((hash << 8) | (raw[ptr + 12] & 0xff)) ^ T[hash >>> 23];
+		hash = ((hash << 8) | (raw[ptr + 13] & 0xff)) ^ T[hash >>> 23];
+		hash = ((hash << 8) | (raw[ptr + 14] & 0xff)) ^ T[hash >>> 23];
+		hash = ((hash << 8) | (raw[ptr + 15] & 0xff)) ^ T[hash >>> 23];
+
+		return hash;
+	}
+

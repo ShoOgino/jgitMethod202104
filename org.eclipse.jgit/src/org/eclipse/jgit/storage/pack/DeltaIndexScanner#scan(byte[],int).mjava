@@ -1,0 +1,31 @@
+	private void scan(byte[] raw, final int end) {
+		// We scan the input backwards, and always insert onto the
+		// front of the chain. This ensures that chains will have lower
+		// offsets at the front of the chain, allowing us to prefer the
+		// earlier match rather than the later match.
+		//
+		int lastHash = 0;
+		int ptr = end - DeltaIndex.BLKSZ;
+		do {
+			final int key = DeltaIndex.hashBlock(raw, ptr);
+			final int tIdx = key & tableMask;
+
+			final int head = table[tIdx];
+			if (head != 0 && lastHash == key) {
+				// Two consecutive blocks have the same content hash,
+				// prefer the earlier block because we want to use the
+				// longest sequence we can during encoding.
+				//
+				entries[head] = (((long) key) << 32) | ptr;
+			} else {
+				final int eIdx = ++entryCnt;
+				entries[eIdx] = (((long) key) << 32) | ptr;
+				next[eIdx] = head;
+				table[tIdx] = eIdx;
+			}
+
+			lastHash = key;
+			ptr -= DeltaIndex.BLKSZ;
+		} while (0 <= ptr);
+	}
+

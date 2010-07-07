@@ -1,0 +1,25 @@
+	private int countEntries(DeltaIndexScanner scan) {
+		// Figure out exactly how many entries we need. As we do the
+		// enumeration truncate any delta chains longer than what we
+		// are willing to scan during encode. This keeps the encode
+		// logic linear in the size of the input rather than quadratic.
+		//
+		int cnt = 0;
+		for (int i = 0; i < table.length; i++) {
+			int h = table[i];
+			if (h == 0)
+				continue;
+
+			int len = 0;
+			do {
+				if (++len == MAX_CHAIN_LENGTH) {
+					scan.next[h] = 0;
+					break;
+				}
+				h = scan.next[h];
+			} while (h != 0);
+			cnt += len;
+		}
+		return cnt;
+	}
+

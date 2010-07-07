@@ -1,33 +1,26 @@
 	/**
-	 * Apply the changes defined by delta to the data in base, yielding a new
-	 * array of bytes.
+	 * Format this delta as a human readable string.
 	 *
-	 * @param base
-	 *            some byte representing an object of some kind.
 	 * @param delta
-	 *            a git pack delta defining the transform from one version to
-	 *            another.
-	 * @return patched base
+	 *            the delta instruction sequence to format.
+	 * @param includeHeader
+	 *            true if the header (base size and result size) should be
+	 *            included in the formatting.
+	 * @return the formatted delta.
 	 */
-	public static final byte[] apply(final byte[] base, final byte[] delta) {
+	public static String format(byte[] delta, boolean includeHeader) {
+		StringBuilder r = new StringBuilder();
 		int deltaPtr = 0;
 
-		// Length of the base object (a variable length int).
-		//
-		int baseLen = 0;
+		long baseLen = 0;
 		int c, shift = 0;
 		do {
 			c = delta[deltaPtr++] & 0xff;
 			baseLen |= (c & 0x7f) << shift;
 			shift += 7;
 		} while ((c & 0x80) != 0);
-		if (base.length != baseLen)
-			throw new IllegalArgumentException(
-					JGitText.get().baseLengthIncorrect);
 
-		// Length of the resulting object (a variable length int).
-		//
-		int resLen = 0;
+		long resLen = 0;
 		shift = 0;
 		do {
 			c = delta[deltaPtr++] & 0xff;
@@ -35,8 +28,9 @@
 			shift += 7;
 		} while ((c & 0x80) != 0);
 
-		final byte[] result = new byte[resLen];
-		int resultPtr = 0;
+		if (includeHeader)
+			r.append("DELTA( BASE=" + baseLen + " RESULT=" + resLen + " )\n");
+
 		while (deltaPtr < delta.length) {
 			final int cmd = delta[deltaPtr++] & 0xff;
 			if ((cmd & 0x80) != 0) {
@@ -64,15 +58,17 @@
 				if (copySize == 0)
 					copySize = 0x10000;
 
-				System.arraycopy(base, copyOffset, result, resultPtr, copySize);
-				resultPtr += copySize;
+				r.append("  COPY  (" + copyOffset + ", " + copySize + ")\n");
+
 			} else if (cmd != 0) {
 				// Anything else the data is literal within the delta
 				// itself.
 				//
-				System.arraycopy(delta, deltaPtr, result, resultPtr, cmd);
+				r.append("  INSERT(");
+				r.append(QuotedString.GIT_PATH.quote(RawParseUtils.decode(
+						delta, deltaPtr, deltaPtr + cmd)));
+				r.append(")\n");
 				deltaPtr += cmd;
-				resultPtr += cmd;
 			} else {
 				// cmd == 0 has been reserved for future encoding but
 				// for now its not acceptable.
@@ -82,6 +78,6 @@
 			}
 		}
 
-		return result;
+		return r.toString();
 	}
 

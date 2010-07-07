@@ -1,0 +1,18 @@
+	private void doTest() throws IOException {
+		dst = dstBuf.toByteArray();
+
+		DeltaIndex di = new DeltaIndex(src);
+		di.encode(actDeltaBuf, dst);
+
+		byte[] actDelta = actDeltaBuf.toByteArray();
+		byte[] expDelta = expDeltaBuf.toByteArray();
+
+		assertEquals(BinaryDelta.format(expDelta, false), //
+				BinaryDelta.format(actDelta, false));
+
+		assertTrue("delta is not empty", actDelta.length > 0);
+		assertEquals(src.length, BinaryDelta.getBaseSize(actDelta));
+		assertEquals(dst.length, BinaryDelta.getResultSize(actDelta));
+		assertTrue(Arrays.equals(dst, BinaryDelta.apply(src, actDelta)));
+	}
+

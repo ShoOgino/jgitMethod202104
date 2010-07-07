@@ -1,5 +1,5 @@
 	/**
-	 * Create an encoder.
+	 * Create an encoder with no upper bound on the instruction stream size.
 	 *
 	 * @param out
 	 *            buffer to store the instructions written.
@@ -14,8 +14,6 @@
 	 */
 	public DeltaEncoder(OutputStream out, long baseSize, long resultSize)
 			throws IOException {
-		this.out = out;
-		writeVarint(baseSize);
-		writeVarint(resultSize);
+		this(out, baseSize, resultSize, 0);
 	}
 
