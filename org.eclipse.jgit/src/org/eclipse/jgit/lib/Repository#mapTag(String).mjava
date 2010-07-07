@@ -4,7 +4,10 @@
 	 * @param revstr
 	 * @return a Tag or null
 	 * @throws IOException on I/O error or unexpected type
+	 * @deprecated Use {@link #resolve(String)} and feed its return value to
+	 * {@link org.eclipse.jgit.revwalk.RevWalk#parseTag(AnyObjectId)}.
 	 */
+	@Deprecated
 	public Tag mapTag(String revstr) throws IOException {
 		final ObjectId id = resolve(revstr);
 		return id != null ? mapTag(revstr, id) : null;

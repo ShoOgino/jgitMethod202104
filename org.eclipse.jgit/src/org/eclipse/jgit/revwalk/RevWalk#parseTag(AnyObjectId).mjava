@@ -1,0 +1,26 @@
+	/**
+	 * Locate a reference to an annotated tag and immediately parse its content.
+	 * <p>
+	 * Unlike {@link #lookupTag(AnyObjectId)} this method only returns
+	 * successfully if the tag object exists, is verified to be a tag, and was
+	 * parsed without error.
+	 *
+	 * @param id
+	 *            name of the tag object.
+	 * @return reference to the tag object. Never null.
+	 * @throws MissingObjectException
+	 *             the supplied tag does not exist.
+	 * @throws IncorrectObjectTypeException
+	 *             the supplied id is not a tag or an annotated tag.
+	 * @throws IOException
+	 *             a pack file or loose object could not be read.
+	 */
+	public RevTag parseTag(final AnyObjectId id) throws MissingObjectException,
+			IncorrectObjectTypeException, IOException {
+		RevObject c = parseAny(id);
+		if (!(c instanceof RevTag))
+			throw new IncorrectObjectTypeException(id.toObjectId(),
+					Constants.TYPE_TAG);
+		return (RevTag) c;
+	}
+

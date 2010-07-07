@@ -8,7 +8,10 @@
 	 * @throws IOException for I/O error or unexpected object type.
 	 *
 	 * @see #resolve(String)
+	 * @deprecated Use {@link #resolve(String)} and pass its return value to
+	 * {@link org.eclipse.jgit.revwalk.RevWalk#parseCommit(AnyObjectId)}.
 	 */
+	@Deprecated
 	public Commit mapCommit(final String revstr) throws IOException {
 		final ObjectId id = resolve(revstr);
 		return id != null ? mapCommit(id) : null;
