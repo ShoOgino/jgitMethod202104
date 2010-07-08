@@ -1,0 +1,34 @@
+	public void testCreateFileHeader_Modify() throws Exception {
+		ObjectId adId = blob("a\nd\n");
+		ObjectId abcdId = blob("a\nb\nc\nd\n");
+
+		String diffHeader = makeDiffHeader(PATH_A, PATH_A, adId, abcdId);
+
+		DiffEntry ad = DiffEntry.delete(PATH_A, adId);
+		DiffEntry abcd = DiffEntry.add(PATH_A, abcdId);
+
+		DiffEntry mod = DiffEntry.pair(ChangeType.MODIFY, ad, abcd, 0);
+
+		FileHeader fh = df.createFileHeader(mod);
+
+		assertEquals(diffHeader, RawParseUtils.decode(fh.getBuffer()));
+		assertEquals(0, fh.getStartOffset());
+		assertEquals(fh.getBuffer().length, fh.getEndOffset());
+		assertEquals(FileHeader.PatchType.UNIFIED, fh.getPatchType());
+
+		assertEquals(1, fh.getHunks().size());
+
+		HunkHeader hh = fh.getHunks().get(0);
+		assertEquals(1, hh.toEditList().size());
+
+		EditList el = hh.toEditList();
+		assertEquals(1, el.size());
+
+		Edit e = el.get(0);
+		assertEquals(1, e.getBeginA());
+		assertEquals(1, e.getEndA());
+		assertEquals(1, e.getBeginB());
+		assertEquals(3, e.getEndB());
+		assertEquals(Edit.Type.INSERT, e.getType());
+	}
+

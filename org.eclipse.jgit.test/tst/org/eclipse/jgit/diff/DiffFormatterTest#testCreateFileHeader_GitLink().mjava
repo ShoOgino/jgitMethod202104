@@ -1,0 +1,24 @@
+	public void testCreateFileHeader_GitLink() throws Exception {
+		ObjectId aId = blob("a\n");
+		ObjectId bId = blob("b\n");
+
+		String diffHeader = makeDiffHeaderModeChange(PATH_A, PATH_A, aId, bId,
+				GITLINK, REGULAR_FILE)
+				+ "-Subproject commit " + aId.name() + "\n";
+
+		DiffEntry ad = DiffEntry.delete(PATH_A, aId);
+		ad.oldMode = FileMode.GITLINK;
+		DiffEntry abcd = DiffEntry.add(PATH_A, bId);
+
+		DiffEntry mod = DiffEntry.pair(ChangeType.MODIFY, ad, abcd, 0);
+
+		FileHeader fh = df.createFileHeader(mod);
+
+		assertEquals(diffHeader, RawParseUtils.decode(fh.getBuffer()));
+
+		assertEquals(1, fh.getHunks().size());
+
+		HunkHeader hh = fh.getHunks().get(0);
+		assertEquals(0, hh.toEditList().size());
+	}
+

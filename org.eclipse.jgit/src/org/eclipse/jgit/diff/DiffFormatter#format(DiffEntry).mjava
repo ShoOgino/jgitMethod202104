@@ -8,87 +8,10 @@
 	 *             be written to.
 	 */
 	public void format(DiffEntry ent) throws IOException {
-		String oldName = quotePath("a/" + ent.getOldName());
-		String newName = quotePath("b/" + ent.getNewName());
-		out.write(encode("diff --git " + oldName + " " + newName + "\n"));
-
-		switch (ent.getChangeType()) {
-		case ADD:
-			out.write(encodeASCII("new file mode "));
-			ent.getNewMode().copyTo(out);
-			out.write('\n');
-			break;
-
-		case DELETE:
-			out.write(encodeASCII("deleted file mode "));
-			ent.getOldMode().copyTo(out);
-			out.write('\n');
-			break;
-
-		case RENAME:
-			out.write(encodeASCII("similarity index " + ent.getScore() + "%"));
-			out.write('\n');
-
-			out.write(encode("rename from " + quotePath(ent.getOldName())));
-			out.write('\n');
-
-			out.write(encode("rename to " + quotePath(ent.getNewName())));
-			out.write('\n');
-			break;
-
-		case COPY:
-			out.write(encodeASCII("similarity index " + ent.getScore() + "%"));
-			out.write('\n');
-
-			out.write(encode("copy from " + quotePath(ent.getOldName())));
-			out.write('\n');
-
-			out.write(encode("copy to " + quotePath(ent.getNewName())));
-			out.write('\n');
-
-			if (!ent.getOldMode().equals(ent.getNewMode())) {
-				out.write(encodeASCII("new file mode "));
-				ent.getNewMode().copyTo(out);
-				out.write('\n');
-			}
-			break;
-		}
-
-		switch (ent.getChangeType()) {
-		case RENAME:
-		case MODIFY:
-			if (!ent.getOldMode().equals(ent.getNewMode())) {
-				out.write(encodeASCII("old mode "));
-				ent.getOldMode().copyTo(out);
-				out.write('\n');
-
-				out.write(encodeASCII("new mode "));
-				ent.getNewMode().copyTo(out);
-				out.write('\n');
-			}
-		}
-
-		out.write(encodeASCII("index " //
-				+ format(ent.getOldId()) //
-				+ ".." //
-				+ format(ent.getNewId())));
-		if (ent.getOldMode().equals(ent.getNewMode())) {
-			out.write(' ');
-			ent.getNewMode().copyTo(out);
-		}
-		out.write('\n');
-		out.write(encode("--- " + oldName + '\n'));
-		out.write(encode("+++ " + newName + '\n'));
+		writeDiffHeader(out, ent);
 
 		if (ent.getOldMode() == GITLINK || ent.getNewMode() == GITLINK) {
-			if (ent.getOldMode() == GITLINK) {
-				out.write(encodeASCII("-Subproject commit "
-						+ ent.getOldId().name() + "\n"));
-			}
-			if (ent.getNewMode() == GITLINK) {
-				out.write(encodeASCII("+Subproject commit "
-						+ ent.getNewId().name() + "\n"));
-			}
+			writeGitLinkDiffText(out, ent);
 		} else {
 			byte[] aRaw = open(ent.getOldMode(), ent.getOldId());
 			byte[] bRaw = open(ent.getNewMode(), ent.getNewId());

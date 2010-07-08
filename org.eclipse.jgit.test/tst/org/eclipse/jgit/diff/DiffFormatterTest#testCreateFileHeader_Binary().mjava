@@ -1,0 +1,23 @@
+	public void testCreateFileHeader_Binary() throws Exception {
+		ObjectId adId = blob("a\nd\n");
+		ObjectId binId = blob("a\nb\nc\n\0\0\0\0d\n");
+
+		String diffHeader = makeDiffHeader(PATH_A, PATH_B, adId, binId)
+				+ "Binary files differ\n";
+
+		DiffEntry ad = DiffEntry.delete(PATH_A, adId);
+		DiffEntry abcd = DiffEntry.add(PATH_B, binId);
+
+		DiffEntry mod = DiffEntry.pair(ChangeType.MODIFY, ad, abcd, 0);
+
+		FileHeader fh = df.createFileHeader(mod);
+
+		assertEquals(diffHeader, RawParseUtils.decode(fh.getBuffer()));
+		assertEquals(FileHeader.PatchType.BINARY, fh.getPatchType());
+
+		assertEquals(1, fh.getHunks().size());
+
+		HunkHeader hh = fh.getHunks().get(0);
+		assertEquals(0, hh.toEditList().size());
+	}
+

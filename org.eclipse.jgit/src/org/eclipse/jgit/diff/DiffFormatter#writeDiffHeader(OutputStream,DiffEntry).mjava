@@ -1,0 +1,75 @@
+	private void writeDiffHeader(OutputStream o, DiffEntry ent)
+			throws IOException {
+		String oldName = quotePath("a/" + ent.getOldName());
+		String newName = quotePath("b/" + ent.getNewName());
+		o.write(encode("diff --git " + oldName + " " + newName + "\n"));
+
+		switch (ent.getChangeType()) {
+		case ADD:
+			o.write(encodeASCII("new file mode "));
+			ent.getNewMode().copyTo(o);
+			o.write('\n');
+			break;
+
+		case DELETE:
+			o.write(encodeASCII("deleted file mode "));
+			ent.getOldMode().copyTo(o);
+			o.write('\n');
+			break;
+
+		case RENAME:
+			o.write(encodeASCII("similarity index " + ent.getScore() + "%"));
+			o.write('\n');
+
+			o.write(encode("rename from " + quotePath(ent.getOldName())));
+			o.write('\n');
+
+			o.write(encode("rename to " + quotePath(ent.getNewName())));
+			o.write('\n');
+			break;
+
+		case COPY:
+			o.write(encodeASCII("similarity index " + ent.getScore() + "%"));
+			o.write('\n');
+
+			o.write(encode("copy from " + quotePath(ent.getOldName())));
+			o.write('\n');
+
+			o.write(encode("copy to " + quotePath(ent.getNewName())));
+			o.write('\n');
+
+			if (!ent.getOldMode().equals(ent.getNewMode())) {
+				o.write(encodeASCII("new file mode "));
+				ent.getNewMode().copyTo(o);
+				o.write('\n');
+			}
+			break;
+		}
+
+		switch (ent.getChangeType()) {
+		case RENAME:
+		case MODIFY:
+			if (!ent.getOldMode().equals(ent.getNewMode())) {
+				o.write(encodeASCII("old mode "));
+				ent.getOldMode().copyTo(o);
+				o.write('\n');
+
+				o.write(encodeASCII("new mode "));
+				ent.getNewMode().copyTo(o);
+				o.write('\n');
+			}
+		}
+
+		o.write(encodeASCII("index " //
+				+ format(ent.getOldId()) //
+				+ ".." //
+				+ format(ent.getNewId())));
+		if (ent.getOldMode().equals(ent.getNewMode())) {
+			o.write(' ');
+			ent.getNewMode().copyTo(o);
+		}
+		o.write('\n');
+		o.write(encode("--- " + oldName + '\n'));
+		o.write(encode("+++ " + newName + '\n'));
+	}
+
