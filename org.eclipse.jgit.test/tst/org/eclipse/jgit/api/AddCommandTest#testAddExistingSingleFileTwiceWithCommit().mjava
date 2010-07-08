@@ -1,0 +1,26 @@
+	public void testAddExistingSingleFileTwiceWithCommit() throws Exception {
+		File file = new File(db.getWorkDir(), "a.txt");
+		file.createNewFile();
+		PrintWriter writer = new PrintWriter(file);
+		writer.print("content");
+		writer.close();
+
+		Git git = new Git(db);
+		DirCache dc = git.add().addFilepattern("a.txt").call();
+
+		ObjectId id1 = dc.getEntry(0).getObjectId();
+
+		git.commit().setMessage("commit a.txt").call();
+
+		writer = new PrintWriter(file);
+		writer.print("other content");
+		writer.close();
+
+		dc = git.add().addFilepattern("a.txt").call();
+
+		assertEquals(1, dc.getEntryCount());
+		assertEquals("a.txt", dc.getEntry(0).getPathString());
+		assertNotSame(id1, dc.getEntry(0).getObjectId());
+		assertEquals(0, dc.getEntry(0).getStage());
+	}
+

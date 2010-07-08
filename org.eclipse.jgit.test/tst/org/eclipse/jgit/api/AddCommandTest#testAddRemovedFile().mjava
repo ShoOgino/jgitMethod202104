@@ -1,0 +1,22 @@
+	public void testAddRemovedFile() throws Exception {
+		File file = new File(db.getWorkDir(), "a.txt");
+		file.createNewFile();
+		PrintWriter writer = new PrintWriter(file);
+		writer.print("content");
+		writer.close();
+
+		Git git = new Git(db);
+		DirCache dc = git.add().addFilepattern("a.txt").call();
+
+		ObjectId id1 = dc.getEntry(0).getObjectId();
+		file.delete();
+
+		// is supposed to do nothing
+		dc = git.add().addFilepattern("a.txt").call();
+
+		assertEquals(1, dc.getEntryCount());
+		assertEquals("a.txt", dc.getEntry(0).getPathString());
+		assertEquals(id1, dc.getEntry(0).getObjectId());
+		assertEquals(0, dc.getEntry(0).getStage());
+	}
+

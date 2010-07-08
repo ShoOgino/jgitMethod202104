@@ -1,0 +1,69 @@
+	/**
+	 * Executes the {@code Add} command. Each instance of this class should only
+	 * be used for one invocation of the command. Don't call this method twice
+	 * on an instance.
+	 *
+	 * @return the DirCache after Add
+	 */
+	public DirCache call() throws NoFilepatternException {
+
+		if (filepatterns.isEmpty())
+			throw new NoFilepatternException(JGitText.get().atLeastOnePatternIsRequired);
+		checkCallable();
+		DirCache dc = null;
+
+		try {
+			dc = DirCache.lock(repo);
+			ObjectWriter ow = new ObjectWriter(repo);
+			DirCacheIterator c;
+
+			DirCacheBuilder builder = dc.builder();
+			final TreeWalk tw = new TreeWalk(repo);
+			tw.reset();
+			tw.addTree(new DirCacheBuildIterator(builder));
+			FileTreeIterator fileTreeIterator = new FileTreeIterator(
+					repo.getWorkDir(), repo.getFS());
+			tw.addTree(fileTreeIterator);
+			tw.setRecursive(true);
+			tw.setFilter(PathFilterGroup.createFromStrings(filepatterns));
+
+			String lastAddedFile = null;
+
+			while (tw.next()) {
+				String path = tw.getPathString();
+
+				final File file = new File(repo.getWorkDir(), path);
+				// In case of an existing merge conflict the
+				// DirCacheBuildIterator iterates over all stages of
+				// this path, we however want to add only one
+				// new DirCacheEntry per path.
+				if (!(path.equals(lastAddedFile))) {
+					 FileTreeIterator f = tw.getTree(1, FileTreeIterator.class);
+					 if (f != null) { // the file exists
+						DirCacheEntry entry = new DirCacheEntry(path);
+						entry.setLength((int)f.getEntryLength());
+						entry.setLastModified(f.getEntryLastModified());
+						entry.setFileMode(f.getEntryFileMode());
+						entry.setObjectId(ow.writeBlob(file));
+
+						builder.add(entry);
+						lastAddedFile = path;
+					} else {
+						c = tw.getTree(0, DirCacheIterator.class);
+						builder.add(c.getDirCacheEntry());
+					}
+				}
+			}
+			builder.commit();
+			setCallable(false);
+		} catch (IOException e) {
+			throw new JGitInternalException(
+					JGitText.get().exceptionCaughtDuringExecutionOfAddCommand, e);
+		} finally {
+			if (dc != null)
+				dc.unlock();
+		}
+
+		return dc;
+	}
+

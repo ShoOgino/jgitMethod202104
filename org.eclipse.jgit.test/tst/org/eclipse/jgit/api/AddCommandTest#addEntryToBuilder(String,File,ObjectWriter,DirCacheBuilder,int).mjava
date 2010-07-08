@@ -1,0 +1,14 @@
+	private DirCacheEntry addEntryToBuilder(String path, File file,
+			ObjectWriter ow, DirCacheBuilder builder, int stage)
+			throws IOException {
+		ObjectId id = ow.writeBlob(file);
+		DirCacheEntry entry = new DirCacheEntry(path, stage);
+		entry.setObjectId(id);
+		entry.setFileMode(FileMode.REGULAR_FILE);
+		entry.setLastModified(file.lastModified());
+		entry.setLength((int) file.length());
+
+		builder.add(entry);
+		return entry;
+	}
+

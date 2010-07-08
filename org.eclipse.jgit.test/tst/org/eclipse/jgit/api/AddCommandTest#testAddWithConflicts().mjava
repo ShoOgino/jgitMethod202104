@@ -1,0 +1,49 @@
+	public void testAddWithConflicts() throws Exception {
+		// prepare conflict
+
+		File file = new File(db.getWorkDir(), "a.txt");
+		file.createNewFile();
+		PrintWriter writer = new PrintWriter(file);
+		writer.print("content");
+		writer.close();
+
+		File file2 = new File(db.getWorkDir(), "b.txt");
+		file2.createNewFile();
+		writer = new PrintWriter(file2);
+		writer.print("content b");
+		writer.close();
+
+		ObjectWriter ow = new ObjectWriter(db);
+		DirCache dc = DirCache.lock(db);
+		DirCacheBuilder builder = dc.builder();
+
+		addEntryToBuilder("b.txt", file2, ow, builder, 0);
+		addEntryToBuilder("a.txt", file, ow, builder, 1);
+
+		writer = new PrintWriter(file);
+		writer.print("other content");
+		writer.close();
+		addEntryToBuilder("a.txt", file, ow, builder, 3);
+
+		writer = new PrintWriter(file);
+		writer.print("our content");
+		writer.close();
+		ObjectId id1 = addEntryToBuilder("a.txt", file, ow, builder, 2)
+				.getObjectId();
+
+		builder.commit();
+
+		assertEquals(4, dc.getEntryCount());
+
+		// now the test begins
+
+		Git git = new Git(db);
+		dc = git.add().addFilepattern("a.txt").call();
+
+		assertEquals(2, dc.getEntryCount());
+		assertEquals("a.txt", dc.getEntry("a.txt").getPathString());
+		assertEquals(id1, dc.getEntry("a.txt").getObjectId());
+		assertEquals(0, dc.getEntry("a.txt").getStage());
+		assertEquals(0, dc.getEntry("b.txt").getStage());
+	}
+
