@@ -1,0 +1,58 @@
+	private void searchForDeltas(ProgressMonitor monitor)
+			throws MissingObjectException, IncorrectObjectTypeException,
+			IOException {
+		// Commits and annotated tags tend to have too many differences to
+		// really benefit from delta compression. Consequently just don't
+		// bother examining those types here.
+		//
+		ObjectToPack[] list = new ObjectToPack[
+				  objectsLists[Constants.OBJ_TREE].size()
+				+ objectsLists[Constants.OBJ_BLOB].size()
+				+ edgeObjects.size()];
+		int cnt = 0;
+		cnt = findObjectsNeedingDelta(list, cnt, Constants.OBJ_TREE);
+		cnt = findObjectsNeedingDelta(list, cnt, Constants.OBJ_BLOB);
+		if (cnt == 0)
+			return;
+
+		// Queue up any edge objects that we might delta against.  We won't
+		// be sending these as we assume the other side has them, but we need
+		// them in the search phase below.
+		//
+		for (ObjectToPack eo : edgeObjects) {
+			try {
+				if (loadSize(eo))
+					list[cnt++] = eo;
+			} catch (IOException notAvailable) {
+				// Skip this object. Since we aren't going to write it out
+				// the only consequence of it being unavailable to us is we
+				// may produce a larger data stream than we could have.
+				//
+				if (!ignoreMissingUninteresting)
+					throw notAvailable;
+			}
+		}
+
+		monitor.beginTask(COMPRESSING_OBJECTS_PROGRESS, cnt);
+
+		// Sort the objects by path hash so like files are near each other,
+		// and then by size descending so that bigger files are first. This
+		// applies "Linus' Law" which states that newer files tend to be the
+		// bigger ones, because source files grow and hardly ever shrink.
+		//
+		Arrays.sort(list, 0, cnt, new Comparator<ObjectToPack>() {
+			public int compare(ObjectToPack a, ObjectToPack b) {
+				int cmp = a.getType() - b.getType();
+				if (cmp == 0)
+					cmp = (a.getPathHash() >>> 1) - (b.getPathHash() >>> 1);
+				if (cmp == 0)
+					cmp = (a.getPathHash() & 1) - (b.getPathHash() & 1);
+				if (cmp == 0)
+					cmp = b.getWeight() - a.getWeight();
+				return cmp;
+			}
+		});
+		searchForDeltas(monitor, list, cnt);
+		monitor.endTask();
+	}
+

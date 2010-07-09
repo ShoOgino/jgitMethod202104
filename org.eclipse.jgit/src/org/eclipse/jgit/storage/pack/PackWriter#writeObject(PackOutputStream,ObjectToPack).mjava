@@ -33,7 +33,10 @@
 
 		// If we reached here, reuse wasn't possible.
 		//
-		writeWholeObjectDeflate(out, otp);
+		if (otp.isDeltaRepresentation())
+			writeDeltaObjectDeflate(out, otp);
+		else
+			writeWholeObjectDeflate(out, otp);
 		out.endObject();
 		otp.setCRC(out.getCRC32());
 	}
