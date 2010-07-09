@@ -1,5 +1,5 @@
 	public void testDirectoryFileSimple() throws IOException {
-		theIndex = new GitIndex(db);
+		GitIndex theIndex = new GitIndex(db);
 		theIndex.add(trash, writeTrashFile("DF", "DF"));
 		Tree treeDF = db.mapTree(theIndex.writeTree());
 
@@ -12,19 +12,20 @@
 		recursiveDelete(new File(trash, "DF"));
 
 		theIndex.add(trash, writeTrashFile("DF", "DF"));
-		theReadTree = getCheckoutImpl(treeDF, theIndex, treeDFDF);
-		theReadTree.prescanTwoTrees();
+		theIndex.write();
 
-		assertTrue(theReadTree.removed().contains("DF"));
-		assertTrue(theReadTree.updated().containsKey("DF/DF"));
+		prescanTwoTrees(treeDF, treeDFDF);
+
+		assertTrue(getRemoved().contains("DF"));
+		assertTrue(getUpdated().containsKey("DF/DF"));
 
 		recursiveDelete(new File(trash, "DF"));
 		theIndex = new GitIndex(db);
 		theIndex.add(trash, writeTrashFile("DF/DF", "DF/DF"));
+		theIndex.write();
 
-		theReadTree = getCheckoutImpl(treeDFDF, theIndex, treeDF);
-		theReadTree.prescanTwoTrees();
-		assertTrue(theReadTree.removed().contains("DF/DF"));
-		assertTrue(theReadTree.updated().containsKey("DF"));
+		prescanTwoTrees(treeDFDF, treeDF);
+		assertTrue(getRemoved().contains("DF/DF"));
+		assertTrue(getUpdated().containsKey("DF"));
 	}
 
