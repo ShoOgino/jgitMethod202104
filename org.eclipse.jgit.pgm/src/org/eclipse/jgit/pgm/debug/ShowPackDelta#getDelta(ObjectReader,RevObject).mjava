@@ -1,0 +1,36 @@
+	private byte[] getDelta(ObjectReader reader, RevObject obj)
+			throws IOException, MissingObjectException,
+			StoredObjectRepresentationNotAvailableException {
+		ObjectReuseAsIs asis = (ObjectReuseAsIs) reader;
+		ObjectToPack target = asis.newObjectToPack(obj);
+
+		PackWriter pw = new PackWriter(reader) {
+			@Override
+			public void select(ObjectToPack otp, StoredObjectRepresentation next) {
+				otp.select(next);
+			}
+		};
+
+		ByteArrayOutputStream buf = new ByteArrayOutputStream();
+		asis.selectObjectRepresentation(pw, target);
+		asis.copyObjectAsIs(new PackOutputStream(NullProgressMonitor.INSTANCE,
+				buf, pw), target);
+
+		// At this point the object header has no delta information,
+		// because it was output as though it were a whole object.
+		// Skip over the header and inflate.
+		//
+		byte[] bufArray = buf.toByteArray();
+		int ptr = 0;
+		while ((bufArray[ptr] & 0x80) != 0)
+			ptr++;
+		ptr++;
+
+		TemporaryBuffer.Heap raw = new TemporaryBuffer.Heap(bufArray.length);
+		InflaterInputStream inf = new InflaterInputStream(
+				new ByteArrayInputStream(bufArray, ptr, bufArray.length));
+		raw.copy(inf);
+		inf.close();
+		return raw.toByteArray();
+	}
+

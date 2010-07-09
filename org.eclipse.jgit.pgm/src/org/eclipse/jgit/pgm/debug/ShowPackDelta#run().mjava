@@ -1,0 +1,20 @@
+	@Override
+	protected void run() throws Exception {
+		ObjectReader reader = db.newObjectReader();
+		RevObject obj = new RevWalk(reader).parseAny(objectId);
+		byte[] delta = getDelta(reader, obj);
+
+		// We're crossing our fingers that this will be a delta. Double
+		// check the size field in the header, it should match.
+		//
+		long size = reader.getObjectSize(obj, obj.getType());
+		try {
+			if (BinaryDelta.getResultSize(delta) != size)
+				throw die("Object " + obj.name() + " is not a delta");
+		} catch (ArrayIndexOutOfBoundsException bad) {
+			throw die("Object " + obj.name() + " is not a delta");
+		}
+
+		out.println(BinaryDelta.format(delta));
+	}
+
