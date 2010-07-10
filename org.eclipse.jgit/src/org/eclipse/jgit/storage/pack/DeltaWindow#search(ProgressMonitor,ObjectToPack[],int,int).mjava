@@ -1,24 +1,30 @@
 	void search(ProgressMonitor monitor, ObjectToPack[] toSearch, int off,
 			int cnt) throws IOException {
-		for (int end = off + cnt; off < end; off++) {
-			monitor.update(1);
+		try {
+			for (int end = off + cnt; off < end; off++) {
+				monitor.update(1);
 
-			res = window[resSlot];
-			res.set(toSearch[off]);
+				res = window[resSlot];
+				res.set(toSearch[off]);
 
-			if (res.object.isDoNotDelta()) {
-				// PackWriter marked edge objects with the do-not-delta flag.
-				// They are the only ones that appear in toSearch with it set,
-				// but we don't actually want to make a delta for them, just
-				// need to push them into the window so they can be read by
-				// other objects coming through.
-				//
-				keepInWindow();
-			} else {
-				// Search for a delta for the current window slot.
-				//
-				search();
+				if (res.object.isDoNotDelta()) {
+					// PackWriter marked edge objects with the
+					// do-not-delta flag. They are the only ones
+					// that appear in toSearch with it set, but
+					// we don't actually want to make a delta for
+					// them, just need to push them into the window
+					// so they can be read by other objects.
+					//
+					keepInWindow();
+				} else {
+					// Search for a delta for the current window slot.
+					//
+					search();
+				}
 			}
+		} finally {
+			if (deflater != null)
+				deflater.end();
 		}
 	}
 

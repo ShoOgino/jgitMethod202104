@@ -1,0 +1,26 @@
+	boolean canCache(int length, ObjectToPack src, ObjectToPack res) {
+		// If the cache would overflow, don't store.
+		//
+		if (0 < size && size < used + length) {
+			checkForGarbageCollectedObjects();
+			if (0 < size && size < used + length)
+				return false;
+		}
+
+		if (length < entryLimit) {
+			used += length;
+			return true;
+		}
+
+		// If the combined source files are multiple megabytes but the delta
+		// is on the order of a kilobyte or two, this was likely costly to
+		// construct. Cache it anyway, even though its over the limit.
+		//
+		if (length >> 10 < (src.getWeight() >> 20) + (res.getWeight() >> 21)) {
+			used += length;
+			return true;
+		}
+
+		return false;
+	}
+

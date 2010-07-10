@@ -1,0 +1,17 @@
+		@Override
+		public void write(byte[] b, int off, int len) throws IOException {
+			deflater.setInput(b, off, len);
+			for (;;) {
+				if (outPtr == zbuf.length)
+					throw new EOFException();
+
+				int n = deflater.deflate(zbuf, outPtr, zbuf.length - outPtr);
+				if (n == 0) {
+					if (deflater.needsInput())
+						break;
+					throw new IOException();
+				}
+				outPtr += n;
+			}
+		}
+

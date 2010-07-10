@@ -1,0 +1,16 @@
+		int finish() throws IOException {
+			deflater.finish();
+			for (;;) {
+				if (outPtr == zbuf.length)
+					throw new EOFException();
+
+				int n = deflater.deflate(zbuf, outPtr, zbuf.length - outPtr);
+				if (n == 0) {
+					if (deflater.finished())
+						return outPtr;
+					throw new IOException();
+				}
+				outPtr += n;
+			}
+		}
+
