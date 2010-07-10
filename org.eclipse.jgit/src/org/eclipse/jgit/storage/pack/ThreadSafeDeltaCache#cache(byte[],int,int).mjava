@@ -1,0 +1,11 @@
+	@Override
+	Ref cache(byte[] data, int actLen, int reservedSize) {
+		data = resize(data, actLen);
+		lock.lock();
+		try {
+			return super.cache(data, actLen, reservedSize);
+		} finally {
+			lock.unlock();
+		}
+	}
+
