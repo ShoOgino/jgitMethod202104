@@ -1,8 +1,12 @@
 	private byte[] buffer(DeltaWindowEntry ent) throws MissingObjectException,
 			IncorrectObjectTypeException, IOException, LargeObjectException {
 		byte[] buf = ent.buffer;
-		if (buf == null)
-			ent.buffer = buf = writer.buffer(reader, ent.object);
+		if (buf == null) {
+			buf = writer.buffer(reader, ent.object);
+			if (0 < maxMemory)
+				loaded += buf.length;
+			ent.buffer = buf;
+		}
 		return buf;
 	}
 
