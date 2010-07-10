@@ -15,10 +15,10 @@
 	public void writeIndex(final OutputStream indexStream) throws IOException {
 		final List<ObjectToPack> list = sortByName();
 		final PackIndexWriter iw;
-		if (outputVersion <= 0)
+		if (indexVersion <= 0)
 			iw = PackIndexWriter.createOldestPossible(indexStream, list);
 		else
-			iw = PackIndexWriter.createVersion(indexStream, outputVersion);
+			iw = PackIndexWriter.createVersion(indexStream, indexVersion);
 		iw.write(list, packcsum);
 	}
 

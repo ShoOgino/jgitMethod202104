@@ -16,8 +16,10 @@
 		else
 			reuseSupport = null;
 
-		final CoreConfig coreConfig = configOf(repo).get(CoreConfig.KEY);
-		compressionLevel = coreConfig.getCompression();
-		outputVersion = coreConfig.getPackIndexVersion();
+		final PackConfig pc = configOf(repo).get(PackConfig.KEY);
+		deltaSearchWindowSize = pc.deltaWindow;
+		maxDeltaDepth = pc.deltaDepth;
+		compressionLevel = pc.compression;
+		indexVersion = pc.indexVersion;
 	}
 
