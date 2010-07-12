@@ -1,0 +1,28 @@
+	/**
+	 *	Adds a node located at the FileTreeIterator's root directory.
+	 *	<br>
+	 *	Will check for the presence of a .gitignore using {@link FileTreeIterator#hasGitIgnore()}.
+	 *	If no .gitignore file exists, nothing will be done.
+	 *  <br>
+	 *  Will check the last time of modification using {@link FileTreeIterator#hasGitIgnore()}.
+	 *  If a node already exists and the time stamp has not changed, do nothing.
+	 *	<br>
+	 *  Note: This can be extended later if necessary to AbstractTreeIterator by using
+	 *  byte[] path instead of File directory.
+	 *
+	 * @param t
+	 * 			  AbstractTreeIterator to check for ignore info. The name of the node
+	 * 			  should be .gitignore
+	 */
+	protected void addNodeFromTree(FileTreeIterator t) {
+		IgnoreNode n = ignoreMap.get(relativize(t.getDirectory()));
+		long time = t.getGitIgnoreLastModified();
+		if (n != null) {
+			if (n.getLastModified() == time)
+				//TODO: Test and optimize
+				return;
+		}
+		n = addIgnoreNode(t.getDirectory());
+		n.setLastModified(time);
+	}
+

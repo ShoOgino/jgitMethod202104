@@ -1,0 +1,41 @@
+	/**
+	 * Returns the ignored status of the file based on the current state
+	 * of the ignore nodes. Ignore nodes will not be updated and new ignore
+	 * nodes will not be created.
+	 * <br><br>
+	 * Traverses from highest to lowest priority and quits as soon as a match
+	 * is made. If no match is made anywhere, the file is assumed
+	 * to be not ignored.
+	 *
+	 * @param file
+	 * 			  Path string relative to Repository.getWorkDir();
+	 * @return true
+	 * 			  True if file is ignored, false if the file matches a negation statement
+	 *            or if there are no rules pertaining to the file.
+	 * @throws IOException
+	 * 			  Failed to check ignore status
+	 */
+	public boolean isIgnored(String file) throws IOException{
+		String currentPriority = file;
+
+		boolean ignored = false;
+		String target = rootFileURI.getPath() + file;
+		while (currentPriority.length() > 1) {
+			currentPriority = getParent(currentPriority);
+			IgnoreNode n = ignoreMap.get(currentPriority);
+
+			if (n != null) {
+				ignored = n.isIgnored(target);
+
+				if (n.wasMatched()) {
+					if (ignored)
+						return ignored;
+					else
+						target = getParent(target);
+				}
+			}
+		}
+
+		return false;
+	}
+

@@ -1,0 +1,36 @@
+	/**
+	 * Remove leading/trailing characters as needed. Set up
+	 * rule variables for later matching.
+	 */
+	private void setup() {
+		int startIndex = 0;
+		int endIndex = pattern.length();
+		if (pattern.startsWith("!")) {
+			startIndex++;
+			negation = true;
+		}
+
+		if (pattern.endsWith("/")) {
+			endIndex --;
+			dirOnly = true;
+		}
+
+		pattern = pattern.substring(startIndex, endIndex);
+
+		if (!pattern.contains("/"))
+			nameOnly = true;
+		else if (!pattern.startsWith("/")) {
+			//Contains "/" but does not start with one
+			//Adding / to the start should not interfere with matching
+			pattern = "/" + pattern;
+		}
+
+		if (pattern.contains("*") || pattern.contains("?") || pattern.contains("[")) {
+			try {
+				matcher = new FileNameMatcher(pattern, new Character('/'));
+			} catch (InvalidPatternException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+

@@ -1,0 +1,11 @@
+	private void deleteIgnoreFiles() {
+		for (File f : toDelete)
+			f.delete();
+
+		//Systematically delete exclude parent dirs
+		File f = new File(ignoreTestDir.getAbsoluteFile(), ".git/info");
+		f.delete();
+		f = new File(ignoreTestDir.getAbsoluteFile(), ".git");
+		f.delete();
+	}
+

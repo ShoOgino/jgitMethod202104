@@ -1,0 +1,18 @@
+	/**
+	 * Creates a base implementation of an ignore cache. This default implementation
+	 * will search for all .gitignore files in all children of the base directory,
+	 * and grab the exclude file from baseDir/.git/info/exclude.
+	 * <br><br>
+	 * Call {@link #initialize()} to fetch the ignore information relevant
+	 * to a target file.
+	 * @param repository
+	 * 			  Repository to associate this cache with. The cache's base directory will
+	 * 			  be set to this repository's GIT_DIR
+	 *
+	 */
+	public SimpleIgnoreCache(Repository repository) {
+		ignoreMap = new HashMap<String, IgnoreNode>();
+		this.repository = repository;
+		this.rootFileURI = repository.getWorkDir().toURI();
+	}
+

@@ -1,0 +1,37 @@
+	public void testInitialization() {
+		File test = new File(db.getDirectory().getParentFile() + "/new/a/b1/test.stp");
+		assertTrue("Missing file " + test.getAbsolutePath(), test.exists());
+
+		/*
+		 * Every folder along the path has a .gitignore file. Therefore every
+		 * folder should have been added and initialized
+		 */
+		boolean result = isIgnored(getRelativePath(test));
+		assertFalse("Unexpected match for " + test.toString(), result);
+
+		/*
+		 * Check that every .gitignore along the path has been initialized
+		 */
+		File folder = test.getParentFile();
+		IgnoreNode rules = null;
+		String fp = folder.getAbsolutePath();
+		while (!folder.equals(db.getDirectory().getParentFile()) && fp.length() > 0) {
+			rules = cache.getRules(getRelativePath(folder));
+			assertNotNull("Ignore file not initialized for " + fp, rules);
+			if (getRelativePath(folder).endsWith("new/a"))
+				//The /new/a directory has an empty ignore file
+				assertEquals("Ignore file not initialized for " + fp, 0, rules.getRules().size());
+			else
+				assertEquals("Ignore file not initialized for " + fp, 1, rules.getRules().size());
+
+			folder = folder.getParentFile();
+			fp = folder.getAbsolutePath();
+		}
+		if (rules != null)
+			assertEquals(1, rules.getRules().size());
+		else
+			fail("Base directory not initialized");
+
+		test = new File("/tmp/not/part/of/repo/path");
+	}
+

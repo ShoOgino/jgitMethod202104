@@ -1,0 +1,53 @@
+	/**
+	 *
+	 * Returns whether or not a target is matched as being ignored by
+	 * any patterns in this directory.
+	 * <br>
+	 * Will return false if the file is not a descendant of this directory.
+	 * <br>
+	 *
+	 * @param target
+	 *			  Absolute path to the file. This makes stripping common path elements easier.
+	 * @return
+	 * 			  true if target is ignored, false if the target is explicitly not
+	 * 			  ignored or if no rules exist for the target.
+	 * @throws IOException
+	 * 			  Failed to parse rules
+	 *
+	 */
+	public boolean isIgnored(String target) throws IOException {
+		matched = false;
+		File targetFile = new File(target);
+		String tar = baseDir.toURI().relativize(targetFile.toURI()).getPath();
+
+		if (tar.length() == target.length())
+			//target is not a derivative of baseDir, this node has no jurisdiction
+			return false;
+
+		if (rules.isEmpty()) {
+			//Either we haven't parsed yet, or the file is empty.
+			//Empty file should be very fast to parse
+			parse();
+		}
+		if (rules.isEmpty())
+			return false;
+
+		/*
+		 * Boolean matched is necessary because we may have encountered
+		 * a negation ("!/test.c").
+		 */
+
+		int i;
+		//Parse rules in the reverse order that they were read
+		for (i = rules.size() -1; i > -1; i--) {
+			matched = rules.get(i).isMatch(tar, targetFile.isDirectory());
+			if (matched)
+				break;
+		}
+
+		if (i > -1 && rules.get(i) != null)
+			return rules.get(i).getResult();
+
+		return false;
+	}
+

@@ -1,0 +1,16 @@
+	/**
+	 * Returns the relative path versus the repository root.
+	 *
+	 * @param directory
+	 * 			  Directory to find relative path for.
+	 * @return
+	 * 			  Relative path versus the repository root. This function will
+	 * 			  strip the last trailing "/" from its return string
+	 */
+	private String relativize(File directory) {
+		String retVal = rootFileURI.relativize(directory.toURI()).getPath();
+		if (retVal.endsWith("/"))
+			retVal = retVal.substring(0, retVal.length() - 1);
+		return retVal;
+	}
+

@@ -1,0 +1,21 @@
+	/**
+	 * Creates rules for .git/info/exclude and .gitignore to the base node.
+	 * It will overwrite the existing base ignore node. There will always
+	 * be a base ignore node, even if there is no .gitignore file
+	 */
+	private void readRulesAtBase() {
+		//Add .gitignore rules
+		String path =  new File(repository.getWorkDir(), ".gitignore").getAbsolutePath();
+		File f = new File(path);
+		IgnoreNode n = new IgnoreNode(f.getParentFile());
+
+		//Add exclude rules
+		//TODO: Get /info directory without string concat
+		path = new File(repository.getWorkDir(), ".git/info/exclude").getAbsolutePath();
+		f = new File(path);
+		if (f.canRead())
+			n.addSecondarySource(f);
+
+		ignoreMap.put("", n);
+	}
+

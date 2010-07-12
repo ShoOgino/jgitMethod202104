@@ -1,0 +1,10 @@
+	protected void recursiveCopy(File src, File parent) throws IOException {
+		for (File file : src.listFiles()) {
+			String rel = file.getName();
+			File dst = new File(parent.toURI().resolve(rel));
+			copyFileOrDirectory(file, dst);
+			if (file.isDirectory())
+				recursiveCopy(file, dst);
+		}
+	}
+

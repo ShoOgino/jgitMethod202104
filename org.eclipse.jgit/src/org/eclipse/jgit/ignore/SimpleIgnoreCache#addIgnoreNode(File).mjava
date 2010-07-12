@@ -1,0 +1,23 @@
+	/**
+	 * Maps the directory to an IgnoreNode, but does not initialize
+	 * the IgnoreNode. If a node already exists it will be emptied. Empty nodes
+	 * will be initialized when needed, see {@link #isIgnored(String)}
+	 *
+	 * @param dir
+	 * 			  directory to load rules from
+	 * @return
+	 * 			  true if set successfully, false if directory does not exist
+	 * 			  or if directory does not contain a .gitignore file.
+	 */
+	protected IgnoreNode addIgnoreNode(File dir) {
+		String relativeDir = relativize(dir);
+		IgnoreNode n = ignoreMap.get(relativeDir);
+		if (n != null)
+			n.clear();
+		else {
+			n = new IgnoreNode(dir);
+			ignoreMap.put(relativeDir, n);
+		}
+		return n;
+	}
+

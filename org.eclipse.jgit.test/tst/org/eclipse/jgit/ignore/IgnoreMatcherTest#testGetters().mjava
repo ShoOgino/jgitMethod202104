@@ -1,0 +1,44 @@
+	public void testGetters() {
+		IgnoreRule r = new IgnoreRule("/pattern/");
+		assertFalse(r.getNameOnly());
+		assertTrue(r.dirOnly());
+		assertFalse(r.getNegation());
+		assertEquals(r.getPattern(), "/pattern");
+
+		r = new IgnoreRule("/patter?/");
+		assertFalse(r.getNameOnly());
+		assertTrue(r.dirOnly());
+		assertFalse(r.getNegation());
+		assertEquals(r.getPattern(), "/patter?");
+
+		r = new IgnoreRule("patt*");
+		assertTrue(r.getNameOnly());
+		assertFalse(r.dirOnly());
+		assertFalse(r.getNegation());
+		assertEquals(r.getPattern(), "patt*");
+
+		r = new IgnoreRule("pattern");
+		assertTrue(r.getNameOnly());
+		assertFalse(r.dirOnly());
+		assertFalse(r.getNegation());
+		assertEquals(r.getPattern(), "pattern");
+
+		r = new IgnoreRule("!pattern");
+		assertTrue(r.getNameOnly());
+		assertFalse(r.dirOnly());
+		assertTrue(r.getNegation());
+		assertEquals(r.getPattern(), "pattern");
+
+		r = new IgnoreRule("!/pattern");
+		assertFalse(r.getNameOnly());
+		assertFalse(r.dirOnly());
+		assertTrue(r.getNegation());
+		assertEquals(r.getPattern(), "/pattern");
+
+		r = new IgnoreRule("!/patter?");
+		assertFalse(r.getNameOnly());
+		assertFalse(r.dirOnly());
+		assertTrue(r.getNegation());
+		assertEquals(r.getPattern(), "/patter?");
+	}
+
