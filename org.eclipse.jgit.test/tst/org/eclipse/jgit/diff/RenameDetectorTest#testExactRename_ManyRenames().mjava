@@ -5,8 +5,8 @@
 		DiffEntry a = DiffEntry.add(PATH_A, foo);
 		DiffEntry b = DiffEntry.delete(PATH_Q, foo);
 
-		DiffEntry c = DiffEntry.add("README", bar);
-		DiffEntry d = DiffEntry.delete("REEDME", bar);
+		DiffEntry c = DiffEntry.add(PATH_H, bar);
+		DiffEntry d = DiffEntry.delete(PATH_B, bar);
 
 		rd.add(a);
 		rd.add(b);
@@ -15,7 +15,7 @@
 
 		List<DiffEntry> entries = rd.compute();
 		assertEquals(2, entries.size());
-		assertRename(d, c, 100, entries.get(0));
-		assertRename(b, a, 100, entries.get(1));
+		assertRename(b, a, 100, entries.get(0));
+		assertRename(d, c, 100, entries.get(1));
 	}
 

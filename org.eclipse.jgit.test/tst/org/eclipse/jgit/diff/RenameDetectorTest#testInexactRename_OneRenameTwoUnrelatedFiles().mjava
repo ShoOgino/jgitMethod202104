@@ -6,8 +6,8 @@
 
 		ObjectId cId = blob("some\nsort\nof\ntext\n");
 		ObjectId dId = blob("completely\nunrelated\ntext\n");
-		DiffEntry c = DiffEntry.add("c", cId);
-		DiffEntry d = DiffEntry.delete("d", dId);
+		DiffEntry c = DiffEntry.add(PATH_B, cId);
+		DiffEntry d = DiffEntry.delete(PATH_H, dId);
 
 		rd.add(a);
 		rd.add(b);
@@ -16,8 +16,8 @@
 
 		List<DiffEntry> entries = rd.compute();
 		assertEquals(3, entries.size());
-		assertSame(c, entries.get(0));
-		assertSame(d, entries.get(1));
-		assertRename(b, a, 66, entries.get(2));
+		assertRename(b, a, 66, entries.get(0));
+		assertSame(c, entries.get(1));
+		assertSame(d, entries.get(2));
 	}
 

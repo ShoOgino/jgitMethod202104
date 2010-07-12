@@ -1,0 +1,28 @@
+	public void testRenameLimit() throws Exception {
+		ObjectId aId = blob("foo\nbar\nbaz\nblarg\n");
+		ObjectId bId = blob("foo\nbar\nbaz\nblah\n");
+		DiffEntry a = DiffEntry.add(PATH_A, aId);
+		DiffEntry b = DiffEntry.delete(PATH_B, bId);
+
+		ObjectId cId = blob("a\nb\nc\nd\n");
+		ObjectId dId = blob("a\nb\nc\n");
+		DiffEntry c = DiffEntry.add(PATH_H, cId);
+		DiffEntry d = DiffEntry.delete(PATH_Q, dId);
+
+		rd.add(a);
+		rd.add(b);
+		rd.add(c);
+		rd.add(d);
+
+		rd.setRenameLimit(1);
+
+		assertTrue(rd.isOverRenameLimit());
+
+		List<DiffEntry> entries = rd.compute();
+		assertEquals(4, entries.size());
+		assertSame(a, entries.get(0));
+		assertSame(b, entries.get(1));
+		assertSame(c, entries.get(2));
+		assertSame(d, entries.get(3));
+	}
+

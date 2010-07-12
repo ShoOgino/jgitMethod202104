@@ -1,0 +1,22 @@
+	public void testExactRename_MultipleIdenticalDeletes() throws Exception {
+		ObjectId foo = blob("foo");
+
+		DiffEntry a = DiffEntry.delete(PATH_A, foo);
+		DiffEntry b = DiffEntry.delete(PATH_B, foo);
+
+		DiffEntry c = DiffEntry.delete(PATH_H, foo);
+		DiffEntry d = DiffEntry.add(PATH_Q, foo);
+
+		rd.add(a);
+		rd.add(b);
+		rd.add(c);
+		rd.add(d);
+
+		// Pairs the add with the first delete added
+		List<DiffEntry> entries = rd.compute();
+		assertEquals(3, entries.size());
+		assertEquals(b, entries.get(0));
+		assertEquals(c, entries.get(1));
+		assertRename(a, d, 100, entries.get(2));
+	}
+
