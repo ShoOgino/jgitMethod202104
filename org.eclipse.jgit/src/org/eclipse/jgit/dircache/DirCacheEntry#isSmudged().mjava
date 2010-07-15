@@ -1,0 +1,15 @@
+	/**
+	 * Check whether this entry has been smudged or not
+	 * <p>
+	 * If a blob has length 0 we know his id see {@link Constants#EMPTY_BLOB_ID}. If an entry
+	 * has length 0 and an ID different from the one for empty blob we know this
+	 * entry was smudged.
+	 *
+	 * @return <code>true</code> if the entry is smudged, <code>false</code>
+	 *         otherwise
+	 */
+	public final boolean isSmudged() {
+		final int base = infoOffset + P_OBJECTID;
+		return (getLength() == 0) && (Constants.EMPTY_BLOB_ID.compareTo(info, base) != 0);
+	}
+

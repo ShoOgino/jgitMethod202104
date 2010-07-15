@@ -14,7 +14,7 @@
 	 *            nanoseconds component of the index's last modified time.
 	 * @return true if extra careful checks should be used.
 	 */
-	final boolean mightBeRacilyClean(final int smudge_s, final int smudge_ns) {
+	public final boolean mightBeRacilyClean(final int smudge_s, final int smudge_ns) {
 		// If the index has a modification time then it came from disk
 		// and was not generated from scratch in memory. In such cases
 		// the entry is 'racily clean' if the entry's cached modification
@@ -24,8 +24,6 @@
 		//
 		final int base = infoOffset + P_MTIME;
 		final int mtime = NB.decodeInt32(info, base);
-		if (smudge_s < mtime)
-			return true;
 		if (smudge_s == mtime)
 			return smudge_ns <= NB.decodeInt32(info, base + 4);
 		return false;
