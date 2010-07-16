@@ -1,0 +1,27 @@
+	void add(int key, int cnt) {
+		key = hash(key);
+		int j = slot(key);
+		for (;;) {
+			long v = idHash[j];
+			if (v == 0) {
+				// Empty slot in the table, store here.
+				if (shouldGrow()) {
+					grow();
+					j = slot(key);
+					continue;
+				}
+				idHash[j] = (((long) key) << KEY_SHIFT) | cnt;
+				idSize++;
+				return;
+
+			} else if (keyOf(v) == key) {
+				// Same key, increment the counter.
+				idHash[j] = v + cnt;
+				return;
+
+			} else if (++j >= idHash.length) {
+				j = 0;
+			}
+		}
+	}
+

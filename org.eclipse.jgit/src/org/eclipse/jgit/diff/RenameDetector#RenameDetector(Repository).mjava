@@ -1,0 +1,13 @@
+	/**
+	 * Create a new rename detector for the given repository
+	 *
+	 * @param repo
+	 *            the repository to use for rename detection
+	 */
+	public RenameDetector(Repository repo) {
+		this.repo = repo;
+
+		DiffConfig cfg = repo.getConfig().get(DiffConfig.KEY);
+		renameLimit = cfg.getRenameLimit();
+	}
+

@@ -1,0 +1,23 @@
+	public void testInexactRename_OneRenameTwoUnrelatedFiles() throws Exception {
+		ObjectId aId = blob("foo\nbar\nbaz\nblarg\n");
+		ObjectId bId = blob("foo\nbar\nbaz\nblah\n");
+		DiffEntry a = DiffEntry.add(PATH_A, aId);
+		DiffEntry b = DiffEntry.delete(PATH_Q, bId);
+
+		ObjectId cId = blob("some\nsort\nof\ntext\n");
+		ObjectId dId = blob("completely\nunrelated\ntext\n");
+		DiffEntry c = DiffEntry.add(PATH_B, cId);
+		DiffEntry d = DiffEntry.delete(PATH_H, dId);
+
+		rd.add(a);
+		rd.add(b);
+		rd.add(c);
+		rd.add(d);
+
+		List<DiffEntry> entries = rd.compute();
+		assertEquals(3, entries.size());
+		assertRename(b, a, 66, entries.get(0));
+		assertSame(c, entries.get(1));
+		assertSame(d, entries.get(2));
+	}
+

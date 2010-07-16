@@ -1,0 +1,23 @@
+	private static SimilarityIndex hash(String text) {
+		SimilarityIndex src = new SimilarityIndex() {
+			@Override
+			void hash(byte[] raw, int ptr, final int end) {
+				while (ptr < end) {
+					int hash = raw[ptr] & 0xff;
+					int start = ptr;
+					do {
+						int c = raw[ptr++] & 0xff;
+						if (c == '\n')
+							break;
+					} while (ptr < end && ptr - start < 64);
+					add(hash, ptr - start);
+				}
+			}
+		};
+		byte[] raw = Constants.encode(text);
+		src.setFileSize(raw.length);
+		src.hash(raw, 0, raw.length);
+		src.sort();
+		return src;
+	}
+

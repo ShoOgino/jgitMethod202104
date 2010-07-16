@@ -1,0 +1,88 @@
+	private int buildMatrix(ProgressMonitor pm) throws IOException {
+		// Allocate for the worst-case scenario where every pair has a
+		// score that we need to consider. We might not need that many.
+		//
+		matrix = new long[srcs.size() * dsts.size()];
+
+		long[] srcSizes = new long[srcs.size()];
+		long[] dstSizes = new long[dsts.size()];
+
+		// Init the size arrays to some value that indicates that we haven't
+		// calculated the size yet. Since sizes cannot be negative, -1 will work
+		Arrays.fill(srcSizes, -1);
+		Arrays.fill(dstSizes, -1);
+
+		// Consider each pair of files, if the score is above the minimum
+		// threshold we need record that scoring in the matrix so we can
+		// later find the best matches.
+		//
+		int mNext = 0;
+		for (int srcIdx = 0; srcIdx < srcs.size(); srcIdx++) {
+			DiffEntry srcEnt = srcs.get(srcIdx);
+			if (!isFile(srcEnt.oldMode)) {
+				pm.update(dsts.size());
+				continue;
+			}
+
+			SimilarityIndex s = hash(srcEnt.oldId.toObjectId());
+			for (int dstIdx = 0; dstIdx < dsts.size(); dstIdx++) {
+				DiffEntry dstEnt = dsts.get(dstIdx);
+
+				if (!isFile(dstEnt.newMode)) {
+					pm.update(1);
+					continue;
+				}
+
+				if (!RenameDetector.sameType(srcEnt.oldMode, dstEnt.newMode)) {
+					pm.update(1);
+					continue;
+				}
+
+				long srcSize = srcSizes[srcIdx];
+				if (srcSize < 0) {
+					srcSize = size(srcEnt.oldId.toObjectId());
+					srcSizes[srcIdx] = srcSize;
+				}
+
+				long dstSize = dstSizes[dstIdx];
+				if (dstSize < 0) {
+					dstSize = size(dstEnt.newId.toObjectId());
+					dstSizes[dstIdx] = dstSize;
+				}
+
+				long max = Math.max(srcSize, dstSize);
+				long min = Math.min(srcSize, dstSize);
+				if (min * 100 / max < renameScore) {
+					// Cannot possibly match, as the file sizes are so different
+					pm.update(1);
+					continue;
+				}
+
+				SimilarityIndex d = hash(dstEnt.newId.toObjectId());
+				int contentScore = s.score(d, 10000);
+
+				// nameScore returns a value between 0 and 100, but we want it
+				// to be in the same range as the content score. This allows it
+				// to be dropped into the pretty formula for the final score.
+				int nameScore = nameScore(srcEnt.oldName, dstEnt.newName) * 100;
+
+				int score = (contentScore * 99 + nameScore * 1) / 10000;
+
+				if (score < renameScore) {
+					pm.update(1);
+					continue;
+				}
+
+				matrix[mNext++] = encode(score, srcIdx, dstIdx);
+				pm.update(1);
+			}
+		}
+
+		// Sort everything in the range we populated, which might be the
+		// entire matrix, or just a smaller slice if we had some bad low
+		// scoring pairs.
+		//
+		Arrays.sort(matrix, 0, mNext);
+		return mNext;
+	}
+

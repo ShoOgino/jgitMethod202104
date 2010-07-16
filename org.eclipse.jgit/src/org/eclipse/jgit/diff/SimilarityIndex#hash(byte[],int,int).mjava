@@ -1,0 +1,16 @@
+	void hash(byte[] raw, int ptr, final int end) {
+		while (ptr < end) {
+			int hash = 5381;
+			int start = ptr;
+
+			// Hash one line, or one block, whichever occurs first.
+			do {
+				int c = raw[ptr++] & 0xff;
+				if (c == '\n')
+					break;
+				hash = (hash << 5) ^ c;
+			} while (ptr < end && ptr - start < 64);
+			add(hash, ptr - start);
+		}
+	}
+

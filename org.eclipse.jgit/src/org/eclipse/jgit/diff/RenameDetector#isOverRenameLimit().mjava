@@ -1,0 +1,17 @@
+	/**
+	 * Check if the detector is over the rename limit.
+	 * <p>
+	 * This method can be invoked either before or after {@code getEntries} has
+	 * been used to perform rename detection.
+	 *
+	 * @return true if the detector has more file additions or removals than the
+	 *         rename limit is currently set to. In such configurations the
+	 *         detector will skip expensive computation.
+	 */
+	public boolean isOverRenameLimit() {
+		if (done)
+			return overRenameLimit;
+		int cnt = Math.max(added.size(), deleted.size());
+		return getRenameLimit() != 0 && getRenameLimit() < cnt;
+	}
+

@@ -1,0 +1,52 @@
+	/**
+	 * Creates a {@link FileHeader} representing the given {@link DiffEntry}
+	 * <p>
+	 * This method does not use the OutputStream associated with this
+	 * DiffFormatter instance. It is therefore safe to instantiate this
+	 * DiffFormatter instance with a {@link DisabledOutputStream} if this method
+	 * is the only one that will be used.
+	 *
+	 * @param ent
+	 *            the DiffEntry to create the FileHeader for
+	 * @return a FileHeader representing the DiffEntry. The FileHeader's buffer
+	 *         will contain only the header of the diff output. It will also
+	 *         contain one {@link HunkHeader}.
+	 * @throws IOException
+	 *             the stream threw an exception while writing to it, or one of
+	 *             the blobs referenced by the DiffEntry could not be read.
+	 * @throws CorruptObjectException
+	 *             one of the blobs referenced by the DiffEntry is corrupt.
+	 * @throws MissingObjectException
+	 *             one of the blobs referenced by the DiffEntry is missing.
+	 */
+	public FileHeader createFileHeader(DiffEntry ent) throws IOException,
+			CorruptObjectException, MissingObjectException {
+		ByteArrayOutputStream buf = new ByteArrayOutputStream();
+		final EditList editList;
+		final FileHeader.PatchType type;
+
+		writeDiffHeader(buf, ent);
+
+		if (ent.getOldMode() == GITLINK || ent.getNewMode() == GITLINK) {
+			writeGitLinkDiffText(buf, ent);
+			editList = new EditList();
+			type = PatchType.UNIFIED;
+		} else {
+			byte[] aRaw = open(ent.getOldMode(), ent.getOldId());
+			byte[] bRaw = open(ent.getNewMode(), ent.getNewId());
+
+			if (RawText.isBinary(aRaw) || RawText.isBinary(bRaw)) {
+				buf.write(encodeASCII("Binary files differ\n"));
+				editList = new EditList();
+				type = PatchType.BINARY;
+			} else {
+				RawText a = rawTextFactory.create(aRaw);
+				RawText b = rawTextFactory.create(bRaw);
+				editList = new MyersDiff(a, b).getEdits();
+				type = PatchType.UNIFIED;
+			}
+		}
+
+		return new FileHeader(buf.toByteArray(), editList, type);
+	}
+

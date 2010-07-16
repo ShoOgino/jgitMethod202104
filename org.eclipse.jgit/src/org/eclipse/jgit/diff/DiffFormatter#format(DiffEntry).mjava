@@ -1,0 +1,29 @@
+	/**
+	 * Format a patch script for one file entry.
+	 *
+	 * @param ent
+	 *            the entry to be formatted.
+	 * @throws IOException
+	 *             a file's content cannot be read, or the output stream cannot
+	 *             be written to.
+	 */
+	public void format(DiffEntry ent) throws IOException {
+		writeDiffHeader(out, ent);
+
+		if (ent.getOldMode() == GITLINK || ent.getNewMode() == GITLINK) {
+			writeGitLinkDiffText(out, ent);
+		} else {
+			byte[] aRaw = open(ent.getOldMode(), ent.getOldId());
+			byte[] bRaw = open(ent.getNewMode(), ent.getNewId());
+
+			if (RawText.isBinary(aRaw) || RawText.isBinary(bRaw)) {
+				out.write(encodeASCII("Binary files differ\n"));
+
+			} else {
+				RawText a = rawTextFactory.create(aRaw);
+				RawText b = rawTextFactory.create(bRaw);
+				formatEdits(a, b, new MyersDiff(a, b).getEdits());
+			}
+		}
+	}
+

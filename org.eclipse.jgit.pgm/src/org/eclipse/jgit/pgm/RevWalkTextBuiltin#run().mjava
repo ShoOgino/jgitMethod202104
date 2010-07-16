@@ -4,7 +4,9 @@
 		for (final RevSort s : sorting)
 			walk.sort(s, true);
 
-		if (pathFilter != TreeFilter.ALL)
+		if (pathFilter instanceof FollowFilter)
+			walk.setTreeFilter(pathFilter);
+		else if (pathFilter != TreeFilter.ALL)
 			walk.setTreeFilter(AndTreeFilter.create(pathFilter,
 					TreeFilter.ANY_DIFF));
 

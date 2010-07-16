@@ -1,0 +1,25 @@
+	/**
+	 * Output a hunk header
+	 *
+	 * @param aStartLine
+	 *            within first source
+	 * @param aEndLine
+	 *            within first source
+	 * @param bStartLine
+	 *            within second source
+	 * @param bEndLine
+	 *            within second source
+	 * @throws IOException
+	 */
+	protected void writeHunkHeader(int aStartLine, int aEndLine,
+			int bStartLine, int bEndLine) throws IOException {
+		out.write('@');
+		out.write('@');
+		writeRange('-', aStartLine + 1, aEndLine - aStartLine);
+		writeRange('+', bStartLine + 1, bEndLine - bStartLine);
+		out.write(' ');
+		out.write('@');
+		out.write('@');
+		out.write('\n');
+	}
+

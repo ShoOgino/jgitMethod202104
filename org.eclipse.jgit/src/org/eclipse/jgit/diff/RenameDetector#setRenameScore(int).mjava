@@ -1,0 +1,20 @@
+	/**
+	 * Set the minimum score required to pair an add/delete as a rename.
+	 * <p>
+	 * When comparing two files together their score must be greater than or
+	 * equal to the rename score for them to be considered a rename match. The
+	 * score is computed based on content similarity, so a score of 60 implies
+	 * that approximately 60% of the bytes in the files are identical.
+	 *
+	 * @param score
+	 *            new rename score, must be within [0, 100].
+	 * @throws IllegalArgumentException
+	 *             the score was not within [0, 100].
+	 */
+	public void setRenameScore(int score) {
+		if (score < 0 || score > 100)
+			throw new IllegalArgumentException(
+					JGitText.get().similarityScoreMustBeWithinBounds);
+		renameScore = score;
+	}
+

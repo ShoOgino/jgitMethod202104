@@ -1,0 +1,17 @@
+	public void testNoRenames_SymlinkAndFileSamePath() throws Exception {
+		ObjectId aId = blob("src/dest");
+
+		DiffEntry a = DiffEntry.delete(PATH_A, aId);
+		DiffEntry b = DiffEntry.add(PATH_A, aId);
+		a.oldMode = FileMode.SYMLINK;
+
+		rd.add(a);
+		rd.add(b);
+
+		// Deletes should be first
+		List<DiffEntry> entries = rd.compute();
+		assertEquals(2, entries.size());
+		assertSame(a, entries.get(0));
+		assertSame(b, entries.get(1));
+	}
+

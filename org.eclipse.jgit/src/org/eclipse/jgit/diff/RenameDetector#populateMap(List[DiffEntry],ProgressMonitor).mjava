@@ -1,0 +1,21 @@
+	@SuppressWarnings("unchecked")
+	private HashMap<AbbreviatedObjectId, Object> populateMap(
+			List<DiffEntry> diffEntries, ProgressMonitor pm) {
+		HashMap<AbbreviatedObjectId, Object> map = new HashMap<AbbreviatedObjectId, Object>();
+		for (DiffEntry de : diffEntries) {
+			Object old = map.put(id(de), de);
+			if (old instanceof DiffEntry) {
+				ArrayList<DiffEntry> list = new ArrayList<DiffEntry>(2);
+				list.add((DiffEntry) old);
+				list.add(de);
+				map.put(id(de), list);
+			} else if (old != null) {
+				// Must be a list of DiffEntries
+				((List<DiffEntry>) old).add(de);
+				map.put(id(de), old);
+			}
+			pm.update(1);
+		}
+		return map;
+	}
+

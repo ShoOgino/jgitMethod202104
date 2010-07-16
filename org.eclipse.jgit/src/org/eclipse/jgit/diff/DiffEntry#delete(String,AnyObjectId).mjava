@@ -1,0 +1,13 @@
+	static DiffEntry delete(String path, AnyObjectId id) {
+		DiffEntry e = new DiffEntry();
+		e.oldId = AbbreviatedObjectId.fromObjectId(id);
+		e.oldMode = FileMode.REGULAR_FILE;
+		e.oldName = path;
+
+		e.newId = A_ZERO;
+		e.newMode = FileMode.MISSING;
+		e.newName = DEV_NULL;
+		e.changeType = ChangeType.DELETE;
+		return e;
+	}
+
