@@ -14,19 +14,10 @@
 		TreeWalk tw = new TreeWalk(repository);
 		tw.reset();
 		tw.addTree(new FileTreeIterator(repository.getWorkDir(), FS.DETECTED));
+		tw.setFilter(PathSuffixFilter.create("/" + Constants.DOT_GIT_IGNORE));
 		tw.setRecursive(true);
-
-		//Don't waste time trying to add iterators that already exist
-		HashSet<FileTreeIterator> toAdd = new HashSet<FileTreeIterator>();
-		while (tw.next()) {
-			FileTreeIterator t = tw.getTree(0, FileTreeIterator.class);
-			if (t.hasGitIgnore()) {
-				toAdd.add(t);
-				//TODO: Account for and test the removal of .gitignore files
-			}
-		}
-		for (FileTreeIterator t : toAdd)
-			addNodeFromTree(t);
+		while (tw.next())
+			addNodeFromTree(tw.getTree(0, FileTreeIterator.class));
 
 		//The base is special
 		//TODO: Test alternate locations for GIT_DIR
