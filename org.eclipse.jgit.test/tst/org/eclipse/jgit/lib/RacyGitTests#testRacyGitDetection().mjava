@@ -1,0 +1,46 @@
+	public void testRacyGitDetection() throws IOException,
+			IllegalStateException, InterruptedException {
+		DirCache dc;
+		TreeSet<Long> modTimes = new TreeSet<Long>();
+		File lastFile;
+
+		// wait to ensure that modtimes of the file doesn't match last index
+		// file modtime
+		modTimes.add(fsTick(db.getIndexFile()));
+
+		// create two files
+		addToWorkDir("a", "a");
+		lastFile = addToWorkDir("b", "b");
+
+		// wait to ensure that file-modTimes and therefore index entry modTime
+		// doesn't match the modtime of index-file after next persistance
+		modTimes.add(fsTick(lastFile));
+
+		// now add both files to the index. No racy git expected
+		addToIndex(modTimes);
+
+		assertEquals("[[a, modTime(index/file): t0/t0], [b, modTime(index/file): t0/t0]]", indexState(modTimes));
+
+		// Remember the last modTime of index file. All modifications times of
+		// further modification are translated to this value so it looks that
+		// files have been modified in the same time slot as the index file
+		modTimes.add(Long.valueOf(db.getIndexFile().lastModified()));
+
+		// modify one file
+		addToWorkDir("a", "a2");
+		// now update the index the index. 'a' has to be racily clean -- because
+		// it's modification time is exactly the same as the previous index file
+		// mod time.
+		addToIndex(modTimes);
+
+		dc = db.readDirCache();
+		assertTrue(dc.getEntryCount() == 2);
+		assertTrue(dc.getEntry("a").isSmudged());
+		assertFalse(dc.getEntry("b").isSmudged());
+
+		// although racily clean a should not be reported as beeing dirty
+		assertEquals("[[a, modTime(index/file): t0/t0, unsmudged], [b, modTime(index/file): t1/t1]]", indexState(modTimes));
+		assertEquals("[[a, modTime(index/file): t0/t0, unsmudged], [b, modTime(index/file): t1/t1]]", indexState(modTimes));
+
+	}
+

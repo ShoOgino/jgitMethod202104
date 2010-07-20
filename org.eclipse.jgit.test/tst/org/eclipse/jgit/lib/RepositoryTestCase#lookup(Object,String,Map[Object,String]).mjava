@@ -1,0 +1,32 @@
+	/**
+	 * Helper method to map arbitrary objects to user-defined names. This can be
+	 * used create short names for objects to produce small and stable debug
+	 * output. It is guaranteed that when you lookup the same object multiple
+	 * times even with different nameTemplates this method will always return
+	 * the same name which was derived from the first nameTemplate.
+	 * nameTemplates can contain "%n" which will be replaced by a running number
+	 * before used as a name.
+	 *
+	 * @param l
+	 *            the object to lookup
+	 * @param nameTemplate
+	 *            the name for that object. Can contain "%n" which will be
+	 *            replaced by a running number before used as a name. If the
+	 *            lookup table already contains the object this parameter will
+	 *            be ignored
+	 * @param lookupTable
+	 *            a table storing object-name mappings.
+	 * @return a name of that object. Is not guaranteed to be unique. Use
+	 *         nameTemplates containing "%n" to always have uniqe names
+	 */
+	public static String lookup(Object l, String nameTemplate,
+			Map<Object, String> lookupTable) {
+		String name = lookupTable.get(l);
+		if (name == null) {
+			name = nameTemplate.replaceAll("%n",
+					Integer.toString(lookupTable.size()));
+			lookupTable.put(l, name);
+		}
+		return name;
+	}
+
