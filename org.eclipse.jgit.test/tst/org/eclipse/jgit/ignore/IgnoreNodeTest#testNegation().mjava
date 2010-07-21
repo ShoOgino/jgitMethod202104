@@ -1,0 +1,16 @@
+	public void testNegation() throws IOException {
+		writeIgnoreFile(".gitignore", "*.o");
+		writeIgnoreFile("src/a/b/.gitignore", "!keep.o");
+		writeTrashFile("src/a/b/keep.o", "");
+		writeTrashFile("src/a/b/nothere.o", "");
+
+		beginWalk();
+		assertEntry(F, tracked, ".gitignore");
+		assertEntry(D, tracked, "src");
+		assertEntry(D, tracked, "src/a");
+		assertEntry(D, tracked, "src/a/b");
+		assertEntry(F, tracked, "src/a/b/.gitignore");
+		assertEntry(F, tracked, "src/a/b/keep.o");
+		assertEntry(F, ignored, "src/a/b/nothere.o");
+	}
+

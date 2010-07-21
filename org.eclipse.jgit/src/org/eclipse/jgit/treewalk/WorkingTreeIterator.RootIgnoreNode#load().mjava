@@ -1,0 +1,24 @@
+		@Override
+		IgnoreNode load() throws IOException {
+			IgnoreNode r;
+			if (entry != null) {
+				r = super.load();
+				if (r == null)
+					r = new IgnoreNode();
+			} else {
+				r = new IgnoreNode();
+			}
+
+			File exclude = new File(repository.getDirectory(), "info/exclude");
+			if (exclude.exists()) {
+				FileInputStream in = new FileInputStream(exclude);
+				try {
+					r.parse(in);
+				} finally {
+					in.close();
+				}
+			}
+
+			return r.getRules().isEmpty() ? null : r;
+		}
+

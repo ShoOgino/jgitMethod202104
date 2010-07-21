@@ -1,0 +1,18 @@
+	public void testWithSlashDoesNotMatchInSubDirectory() throws IOException {
+		writeIgnoreFile(".gitignore", "a/b");
+		writeTrashFile("a/a", "");
+		writeTrashFile("a/b", "");
+		writeTrashFile("src/a/a", "");
+		writeTrashFile("src/a/b", "");
+
+		beginWalk();
+		assertEntry(F, tracked, ".gitignore");
+		assertEntry(D, tracked, "a");
+		assertEntry(F, tracked, "a/a");
+		assertEntry(F, ignored, "a/b");
+		assertEntry(D, tracked, "src");
+		assertEntry(D, tracked, "src/a");
+		assertEntry(F, tracked, "src/a/a");
+		assertEntry(F, tracked, "src/a/b");
+	}
+

@@ -1,0 +1,13 @@
+	private void assertEntry(FileMode type, boolean entryIgnored,
+			String pathName) throws IOException {
+		assertTrue("walk has entry", walk.next());
+		assertEquals(pathName, walk.getPathString());
+		assertEquals(type, walk.getFileMode(0));
+
+		WorkingTreeIterator itr = walk.getTree(0, WorkingTreeIterator.class);
+		assertNotNull("has tree", itr);
+		assertEquals("is ignored", entryIgnored, itr.isEntryIgnored());
+		if (D.equals(type))
+			walk.enterSubtree();
+	}
+

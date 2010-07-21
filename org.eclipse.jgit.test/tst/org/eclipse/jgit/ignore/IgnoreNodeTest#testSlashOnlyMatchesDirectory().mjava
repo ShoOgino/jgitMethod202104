@@ -1,0 +1,17 @@
+	public void testSlashOnlyMatchesDirectory() throws IOException {
+		writeIgnoreFile(".gitignore", "out/");
+		writeTrashFile("out", "");
+
+		beginWalk();
+		assertEntry(F, tracked, ".gitignore");
+		assertEntry(F, tracked, "out");
+
+		new File(trash, "out").delete();
+		writeTrashFile("out/foo", "");
+
+		beginWalk();
+		assertEntry(F, tracked, ".gitignore");
+		assertEntry(D, ignored, "out");
+		assertEntry(F, ignored, "out/foo");
+	}
+

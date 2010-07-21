@@ -1,0 +1,18 @@
+	/**
+	 * Initialize this iterator for the root level of a repository.
+	 * <p>
+	 * This method should only be invoked after calling {@link #init(Entry[])},
+	 * and only for the root iterator.
+	 *
+	 * @param repo
+	 *            the repository.
+	 */
+	protected void initRootIterator(Repository repo) {
+		Entry entry;
+		if (ignoreNode instanceof PerDirectoryIgnoreNode)
+			entry = ((PerDirectoryIgnoreNode) ignoreNode).entry;
+		else
+			entry = null;
+		ignoreNode = new RootIgnoreNode(entry, repo);
+	}
+
