@@ -20,11 +20,11 @@
 		try {
 			raw = IO.readFully(mergeHeadFile);
 		} catch (FileNotFoundException notFound) {
-			return new LinkedList<ObjectId>();
+			return null;
 		}
 
 		if (raw.length == 0)
-			throw new IOException("MERGE_HEAD file empty: " + mergeHeadFile);
+			return null;
 
 		LinkedList<ObjectId> heads = new LinkedList<ObjectId>();
 		for (int p = 0; p < raw.length;) {

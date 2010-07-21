@@ -1,0 +1,29 @@
+	/**
+	 * Write new merge-heads into $GIT_DIR/MERGE_HEAD. In this file operations
+	 * triggering a merge will store the IDs of all heads which should be merged
+	 * together with HEAD. If <code>null</code> is specified as list of commits
+	 * the file will be deleted
+	 *
+	 * @param heads
+	 *            a list of {@link Commit}s which IDs should be written to
+	 *            $GIT_DIR/MERGE_HEAD or <code>null</code> to delete the file
+	 * @throws IOException
+	 */
+	public void writeMergeHeads(List<ObjectId> heads) throws IOException {
+		File mergeHeadFile = new File(gitDir, Constants.MERGE_HEAD);
+		if (heads != null) {
+			BufferedOutputStream bos = new BufferedOutputStream(
+					new FileOutputStream(mergeHeadFile));
+			try {
+				for (ObjectId id : heads) {
+					id.copyTo(bos);
+					bos.write('\n');
+				}
+			} finally {
+				bos.close();
+			}
+		} else {
+			mergeHeadFile.delete();
+		}
+	}
+

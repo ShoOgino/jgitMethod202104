@@ -16,7 +16,7 @@
 
 		File mergeMsgFile = new File(getDirectory(), Constants.MERGE_MSG);
 		try {
-			return new String(IO.readFully(mergeMsgFile));
+			return RawParseUtils.decode(IO.readFully(mergeMsgFile));
 		} catch (FileNotFoundException e) {
 			// MERGE_MSG file has disappeared in the meantime
 			// ignore it
