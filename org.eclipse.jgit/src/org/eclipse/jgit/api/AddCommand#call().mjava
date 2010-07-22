@@ -24,8 +24,9 @@
 			final TreeWalk tw = new TreeWalk(repo);
 			tw.reset();
 			tw.addTree(new DirCacheBuildIterator(builder));
-			FileTreeIterator fileTreeIterator = new FileTreeIterator(repo);
-			tw.addTree(fileTreeIterator);
+			if (workingTreeIterator == null)
+				workingTreeIterator = new FileTreeIterator(repo);
+			tw.addTree(workingTreeIterator);
 			tw.setRecursive(true);
 			if (!addAll)
 				tw.setFilter(PathFilterGroup.createFromStrings(filepatterns));
@@ -36,7 +37,7 @@
 				String path = tw.getPathString();
 
 				final File file = new File(repo.getWorkDir(), path);
-				FileTreeIterator f = tw.getTree(1, FileTreeIterator.class);
+				WorkingTreeIterator f = tw.getTree(1, WorkingTreeIterator.class);
 				if (tw.getTree(0, DirCacheIterator.class) == null &&
 						f != null && f.isEntryIgnored()) {
 					// file is not in index but is ignored, do nothing
