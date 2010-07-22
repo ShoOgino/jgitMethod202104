@@ -8,6 +8,7 @@
 		if (minRef.eof())
 			return minRef;
 
+		boolean hasConflict = false;
 		minRef.matches = minRef;
 		while (++i < trees.length) {
 			final AbstractTreeIterator t = trees[i];
@@ -23,6 +24,7 @@
 					// tree anyway.
 					//
 					t.matches = minRef;
+					hasConflict = true;
 				} else {
 					fastMinHasMatch = false;
 					t.matches = t;
@@ -49,10 +51,13 @@
 				}
 				t.matches = t;
 				minRef = t;
+				hasConflict = true;
 			} else
 				fastMinHasMatch = false;
 		}
 
+		if (hasConflict && fastMinHasMatch && dfConflict == null)
+			dfConflict = minRef;
 		return minRef;
 	}
 
