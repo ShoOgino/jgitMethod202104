@@ -21,7 +21,8 @@
 		assertFalse(top.eof());
 		assertEquals(FileMode.TREE.getBits(), top.mode);
 
-		final AbstractTreeIterator sub = top.createSubtreeIterator(db);
+		final ObjectReader reader = db.newObjectReader();
+		final AbstractTreeIterator sub = top.createSubtreeIterator(reader);
 		assertTrue(sub instanceof FileTreeIterator);
 		final FileTreeIterator subfti = (FileTreeIterator) sub;
 		assertTrue(sub.first());

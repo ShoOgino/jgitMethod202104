@@ -1,0 +1,16 @@
+	/**
+	 * Set the number of objects considered when searching for a delta base.
+	 * <p>
+	 * Default setting: {@value #DEFAULT_DELTA_SEARCH_WINDOW_SIZE}
+	 * </p>
+	 *
+	 * @param objectCount
+	 *            number of objects to search at once.  Must be at least 2.
+	 */
+	public void setDeltaSearchWindowSize(int objectCount) {
+		if (objectCount <= 2)
+			setDeltaCompress(false);
+		else
+			deltaSearchWindowSize = objectCount;
+	}
+

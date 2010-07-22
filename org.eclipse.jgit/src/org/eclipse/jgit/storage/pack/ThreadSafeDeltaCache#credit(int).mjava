@@ -1,0 +1,10 @@
+	@Override
+	void credit(int reservedSize) {
+		lock.lock();
+		try {
+			super.credit(reservedSize);
+		} finally {
+			lock.unlock();
+		}
+	}
+

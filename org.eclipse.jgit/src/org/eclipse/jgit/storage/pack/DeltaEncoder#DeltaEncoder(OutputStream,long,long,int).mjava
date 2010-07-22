@@ -1,0 +1,26 @@
+	/**
+	 * Create an encoder with an upper limit on the instruction size.
+	 *
+	 * @param out
+	 *            buffer to store the instructions written.
+	 * @param baseSize
+	 *            size of the base object, in bytes.
+	 * @param resultSize
+	 *            size of the resulting object, after applying this instruction
+	 *            stream to the base object, in bytes.
+	 * @param limit
+	 *            maximum number of bytes to write to the out buffer declaring
+	 *            the stream is over limit and should be discarded. May be 0 to
+	 *            specify an infinite limit.
+	 * @throws IOException
+	 *             the output buffer cannot store the instruction stream's
+	 *             header with the size fields.
+	 */
+	public DeltaEncoder(OutputStream out, long baseSize, long resultSize,
+			int limit) throws IOException {
+		this.out = out;
+		this.limit = limit;
+		writeVarint(baseSize);
+		writeVarint(resultSize);
+	}
+

@@ -1,0 +1,34 @@
+	private File guessWorkTreeOrFail() throws IOException {
+		final Config cfg = getConfig();
+
+		// If set, core.worktree wins.
+		//
+		String path = cfg.getString(CONFIG_CORE_SECTION, null,
+				CONFIG_KEY_WORKTREE);
+		if (path != null)
+			return safeFS().resolve(getGitDir(), path);
+
+		// If core.bare is set, honor its value. Assume workTree is
+		// the parent directory of the repository.
+		//
+		if (cfg.getString(CONFIG_CORE_SECTION, null, CONFIG_KEY_BARE) != null) {
+			if (cfg.getBoolean(CONFIG_CORE_SECTION, CONFIG_KEY_BARE, true)) {
+				setBare();
+				return null;
+			}
+			return getGitDir().getParentFile();
+		}
+
+		if (getGitDir().getName().equals(DOT_GIT)) {
+			// No value for the "bare" flag, but gitDir is named ".git",
+			// use the parent of the directory
+			//
+			return getGitDir().getParentFile();
+		}
+
+		// We have to assume we are bare.
+		//
+		setBare();
+		return null;
+	}
+

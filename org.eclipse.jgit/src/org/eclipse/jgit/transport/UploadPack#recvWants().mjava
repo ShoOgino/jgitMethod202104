@@ -33,7 +33,11 @@
 			}
 			if (!o.has(ADVERTISED))
 				throw new PackProtocolException(MessageFormat.format(JGitText.get().notValid, id.name()));
-			want(o);
+			try {
+				want(o);
+			} catch (IOException e) {
+				throw new PackProtocolException(MessageFormat.format(JGitText.get().notValid, id.name()), e);
+			}
 		}
 	}
 

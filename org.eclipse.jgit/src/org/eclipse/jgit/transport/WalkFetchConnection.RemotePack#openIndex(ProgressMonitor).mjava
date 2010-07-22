@@ -1,7 +1,9 @@
 		void openIndex(final ProgressMonitor pm) throws IOException {
 			if (index != null)
 				return;
-			if (tmpIdx.isFile()) {
+			if (tmpIdx == null)
+				tmpIdx = File.createTempFile("jgit-walk-", ".idx");
+			else if (tmpIdx.isFile()) {
 				try {
 					index = PackIndex.open(tmpIdx);
 					return;

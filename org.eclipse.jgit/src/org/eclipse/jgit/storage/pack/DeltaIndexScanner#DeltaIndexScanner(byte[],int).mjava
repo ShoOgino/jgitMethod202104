@@ -1,0 +1,28 @@
+	DeltaIndexScanner(byte[] raw, int len) {
+		// Clip the length so it falls on a block boundary. We won't
+		// bother to scan the final partial block.
+		//
+		len -= (len % DeltaIndex.BLKSZ);
+
+		final int worstCaseBlockCnt = len / DeltaIndex.BLKSZ;
+		if (worstCaseBlockCnt < 1) {
+			table = new int[] {};
+			tableMask = 0;
+
+			entries = new long[] {};
+			next = new int[] {};
+
+		} else {
+			table = new int[tableSize(worstCaseBlockCnt)];
+			tableMask = table.length - 1;
+
+			// As we insert blocks we preincrement so that 0 is never a
+			// valid entry. Therefore we have to allocate one extra space.
+			//
+			entries = new long[1 + worstCaseBlockCnt];
+			next = new int[entries.length];
+
+			scan(raw, len);
+		}
+	}
+

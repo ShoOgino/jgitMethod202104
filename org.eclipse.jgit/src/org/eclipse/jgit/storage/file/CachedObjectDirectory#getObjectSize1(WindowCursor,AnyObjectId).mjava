@@ -1,0 +1,7 @@
+	@Override
+	long getObjectSize1(WindowCursor curs, AnyObjectId objectId) throws IOException {
+		if (unpackedObjects.contains(objectId))
+			return wrapped.getObjectSize2(curs, objectId.name(), objectId);
+		return wrapped.getObjectSize1(curs, objectId);
+	}
+

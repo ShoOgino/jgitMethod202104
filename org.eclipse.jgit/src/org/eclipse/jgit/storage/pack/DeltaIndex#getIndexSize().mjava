@@ -1,0 +1,17 @@
+	/**
+	 * Get an estimate of the memory required by this index.
+	 *
+	 * @return an approximation of the number of bytes used by this index in
+	 *         memory. The size includes the cached source buffer size from
+	 *         {@link #getSourceSize()}, as well as a rough approximation of JVM
+	 *         object overheads.
+	 */
+	public long getIndexSize() {
+		long sz = 8 /* object header */;
+		sz += 4 /* fields */* 4 /* guessed size per field */;
+		sz += sizeOf(src);
+		sz += sizeOf(table);
+		sz += sizeOf(entries);
+		return sz;
+	}
+

@@ -14,8 +14,10 @@
 				continue;
 			if (needBaseObjectIds)
 				baseObjectIds.add(baseId);
-			final ObjectLoader ldr = repo.openObject(readCurs, baseId);
-			if (ldr == null) {
+			final ObjectLoader ldr;
+			try {
+				ldr = readCurs.open(baseId);
+			} catch (MissingObjectException notFound) {
 				missing.add(baseId);
 				continue;
 			}

@@ -1,0 +1,56 @@
+	/**
+	 * Generate and write the bundle to the output stream.
+	 * <p>
+	 * This method can only be called once per BundleWriter instance.
+	 *
+	 * @param monitor
+	 *            progress monitor to report bundle writing status to.
+	 * @param os
+	 *            the stream the bundle is written to. The stream should be
+	 *            buffered by the caller. The caller is responsible for closing
+	 *            the stream.
+	 * @throws IOException
+	 *             an error occurred reading a local object's data to include in
+	 *             the bundle, or writing compressed object data to the output
+	 *             stream.
+	 */
+	public void writeBundle(ProgressMonitor monitor, OutputStream os)
+			throws IOException {
+		try {
+			final HashSet<ObjectId> inc = new HashSet<ObjectId>();
+			final HashSet<ObjectId> exc = new HashSet<ObjectId>();
+			inc.addAll(include.values());
+			for (final RevCommit r : assume)
+				exc.add(r.getId());
+			packWriter.setThin(exc.size() > 0);
+			packWriter.preparePack(monitor, inc, exc);
+
+			final Writer w = new OutputStreamWriter(os, Constants.CHARSET);
+			w.write(TransportBundle.V2_BUNDLE_SIGNATURE);
+			w.write('\n');
+
+			final char[] tmp = new char[Constants.OBJECT_ID_STRING_LENGTH];
+			for (final RevCommit a : assume) {
+				w.write('-');
+				a.copyTo(tmp, w);
+				if (a.getRawBuffer() != null) {
+					w.write(' ');
+					w.write(a.getShortMessage());
+				}
+				w.write('\n');
+			}
+			for (final Map.Entry<String, ObjectId> e : include.entrySet()) {
+				e.getValue().copyTo(tmp, w);
+				w.write(' ');
+				w.write(e.getKey());
+				w.write('\n');
+			}
+
+			w.write('\n');
+			w.flush();
+			packWriter.writePack(monitor, monitor, os);
+		} finally {
+			packWriter.release();
+		}
+	}
+

@@ -21,6 +21,13 @@
 		t.setTag(name);
 		t.setTagger(new PersonIdent(committer, new Date(now)));
 		t.setMessage("");
-		return (RevTag) pool.lookupAny(writer.writeTag(t), Constants.OBJ_TAG);
+		ObjectId id;
+		try {
+			id = inserter.insert(Constants.OBJ_TAG, inserter.format(t));
+			inserter.flush();
+		} finally {
+			inserter.release();
+		}
+		return (RevTag) pool.lookupAny(id, Constants.OBJ_TAG);
 	}
 

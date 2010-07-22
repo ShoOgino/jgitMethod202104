@@ -1,0 +1,45 @@
+		@Override
+		public ObjectStream openStream() throws MissingObjectException,
+				IOException {
+			InputStream in;
+			try {
+				in = buffer(new FileInputStream(path));
+			} catch (FileNotFoundException gone) {
+				// If the loose file no longer exists, it may have been
+				// moved into a pack file in the mean time. Try again
+				// to locate the object.
+				//
+				return source.open(id, type).openStream();
+			}
+
+			boolean ok = false;
+			try {
+				final byte[] hdr = new byte[64];
+				in.mark(20);
+				IO.readFully(in, hdr, 0, 2);
+
+				if (isStandardFormat(hdr)) {
+					in.reset();
+					in = buffer(inflate(in, size, id));
+					while (0 < in.read())
+						continue;
+				} else {
+					readSome(in, hdr, 2, 18);
+					int c = hdr[0] & 0xff;
+					int p = 1;
+					while ((c & 0x80) != 0)
+						c = hdr[p++] & 0xff;
+
+					in.reset();
+					IO.skipFully(in, p);
+					in = buffer(inflate(in, size, id));
+				}
+
+				ok = true;
+				return new ObjectStream.Filter(type, size, in);
+			} finally {
+				if (!ok)
+					in.close();
+			}
+		}
+

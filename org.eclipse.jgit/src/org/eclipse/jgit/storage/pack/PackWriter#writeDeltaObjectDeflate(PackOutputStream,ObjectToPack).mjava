@@ -1,0 +1,22 @@
+	private void writeDeltaObjectDeflate(PackOutputStream out,
+			final ObjectToPack otp) throws IOException {
+		DeltaCache.Ref ref = otp.popCachedDelta();
+		if (ref != null) {
+			byte[] zbuf = ref.get();
+			if (zbuf != null) {
+				out.writeHeader(otp, otp.getCachedSize());
+				out.write(zbuf);
+				return;
+			}
+		}
+
+		TemporaryBuffer.Heap delta = delta(otp);
+		out.writeHeader(otp, delta.length());
+
+		Deflater deflater = deflater();
+		deflater.reset();
+		DeflaterOutputStream dst = new DeflaterOutputStream(out, deflater);
+		delta.writeTo(dst, null);
+		dst.finish();
+	}
+

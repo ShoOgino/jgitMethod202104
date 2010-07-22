@@ -1,0 +1,45 @@
+	/**
+	 * Create a copy instruction to copy from the base object.
+	 *
+	 * @param offset
+	 *            position in the base object to copy from. This is absolute,
+	 *            from the beginning of the base.
+	 * @param cnt
+	 *            number of bytes to copy.
+	 * @return true if the copy fits within the limit; false if the copy
+	 *         would cause the instruction stream to exceed the limit.
+	 * @throws IOException
+	 *             the instruction buffer cannot store the instructions.
+	 */
+	public boolean copy(long offset, int cnt) throws IOException {
+		if (cnt == 0)
+			return true;
+
+		int p = 0;
+
+		// We cannot encode more than MAX_V2_COPY bytes in a single
+		// command, so encode that much and start a new command.
+		// This limit is imposed by the pack file format rules.
+		//
+		while (MAX_V2_COPY < cnt) {
+			p = encodeCopy(p, offset, MAX_V2_COPY);
+			offset += MAX_V2_COPY;
+			cnt -= MAX_V2_COPY;
+
+			if (buf.length < p + MAX_COPY_CMD_SIZE) {
+				if (0 < limit && limit < size + p)
+					return false;
+				out.write(buf, 0, p);
+				size += p;
+				p = 0;
+			}
+		}
+
+		p = encodeCopy(p, offset, cnt);
+		if (0 < limit && limit < size + p)
+			return false;
+		out.write(buf, 0, p);
+		size += p;
+		return true;
+	}
+

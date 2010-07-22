@@ -1,0 +1,26 @@
+	/**
+	 * Construct an index from the source file.
+	 *
+	 * @param sourceBuffer
+	 *            the source file's raw contents. The buffer will be held by the
+	 *            index instance to facilitate matching, and therefore must not
+	 *            be modified by the caller.
+	 */
+	public DeltaIndex(byte[] sourceBuffer) {
+		src = sourceBuffer;
+
+		DeltaIndexScanner scan = new DeltaIndexScanner(src, src.length);
+
+		// Reuse the same table the scanner made. We will replace the
+		// values at each position, but we want the same-length array.
+		//
+		table = scan.table;
+		tableMask = scan.tableMask;
+
+		// Because entry index 0 means there are no entries for the
+		// slot in the table, we have to allocate one extra position.
+		//
+		entries = new long[1 + countEntries(scan)];
+		copyEntries(scan);
+	}
+

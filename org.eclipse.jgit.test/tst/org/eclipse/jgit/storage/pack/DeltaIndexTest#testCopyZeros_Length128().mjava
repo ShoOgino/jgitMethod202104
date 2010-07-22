@@ -1,0 +1,12 @@
+	public void testCopyZeros_Length128() throws IOException {
+		src = new byte[2048];
+		copy(0, src.length);
+		doTest();
+
+		// The index should be smaller than expected due to the chain
+		// being truncated. Without truncation we would expect to have
+		// more than 3584 bytes used.
+		//
+		assertEquals(2636, new DeltaIndex(src).getIndexSize());
+	}
+

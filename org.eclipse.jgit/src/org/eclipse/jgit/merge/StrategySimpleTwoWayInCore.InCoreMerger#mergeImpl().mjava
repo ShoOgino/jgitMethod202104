@@ -47,7 +47,9 @@
 			if (hasConflict)
 				return false;
 			try {
-				resultTree = cache.writeTree(getObjectWriter());
+				ObjectInserter odi = getObjectInserter();
+				resultTree = cache.writeTree(odi);
+				odi.flush();
 				return true;
 			} catch (UnmergedPathException upe) {
 				resultTree = null;

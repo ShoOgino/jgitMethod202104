@@ -1,0 +1,13 @@
+	private ObjectId commit(final ObjectInserter odi, final DirCache treeB,
+			final ObjectId[] parentIds) throws Exception {
+		final Commit c = new Commit(db);
+		c.setTreeId(treeB.writeTree(odi));
+		c.setAuthor(new PersonIdent("A U Thor", "a.u.thor", 1L, 0));
+		c.setCommitter(c.getAuthor());
+		c.setParentIds(parentIds);
+		c.setMessage("Tree " + c.getTreeId().name());
+		ObjectId id = odi.insert(OBJ_COMMIT, odi.format(c));
+		odi.flush();
+		return id;
+	}
+

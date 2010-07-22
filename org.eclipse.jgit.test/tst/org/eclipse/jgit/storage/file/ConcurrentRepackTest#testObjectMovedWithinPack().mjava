@@ -1,0 +1,32 @@
+	public void testObjectMovedWithinPack()
+			throws IncorrectObjectTypeException, IOException {
+		// Create an object and pack it.
+		//
+		final Repository eden = createBareRepository();
+		final RevObject o1 = writeBlob(eden, "o1");
+		final File[] out1 = pack(eden, o1);
+		assertEquals(o1.name(), parse(o1).name());
+
+		// Force close the old pack.
+		//
+		whackCache();
+
+		// Now overwrite the old pack in place. This method of creating a
+		// different pack under the same file name is partially broken. We
+		// should also have a different file name because the list of objects
+		// within the pack has been modified.
+		//
+		final RevObject o2 = writeBlob(eden, "o2");
+		final PackWriter pw = new PackWriter(eden);
+		pw.addObject(o2);
+		pw.addObject(o1);
+		write(out1, pw);
+		pw.release();
+
+		// Try the old name, then the new name. The old name should cause the
+		// pack to reload when it opens and the index and pack mismatch.
+		//
+		assertEquals(o1.name(), parse(o1).name());
+		assertEquals(o2.name(), parse(o2).name());
+	}
+

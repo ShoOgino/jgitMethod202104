@@ -24,6 +24,13 @@
 		c.setAuthor(new PersonIdent(author, new Date(now)));
 		c.setCommitter(new PersonIdent(committer, new Date(now)));
 		c.setMessage("");
-		return pool.lookupCommit(writer.writeCommit(c));
+		ObjectId id;
+		try {
+			id = inserter.insert(Constants.OBJ_COMMIT, inserter.format(c));
+			inserter.flush();
+		} finally {
+			inserter.release();
+		}
+		return pool.lookupCommit(id);
 	}
 

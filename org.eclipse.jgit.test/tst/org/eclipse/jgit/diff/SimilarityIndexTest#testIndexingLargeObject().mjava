@@ -1,0 +1,11 @@
+	public void testIndexingLargeObject() throws IOException {
+		byte[] in = ("" //
+				+ "A\n" //
+				+ "B\n" //
+				+ "B\n" //
+				+ "B\n").getBytes("UTF-8");
+		SimilarityIndex si = new SimilarityIndex();
+		si.hash(new ByteArrayInputStream(in), in.length);
+		assertEquals(2, si.size());
+	}
+

@@ -1,0 +1,13 @@
+	private byte[] compressStandardFormat(String type, String length,
+			byte[] data) throws IOException {
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		DeflaterOutputStream d = new DeflaterOutputStream(out);
+		d.write(Constants.encodeASCII(type));
+		d.write(' ');
+		d.write(Constants.encodeASCII(length));
+		d.write(0);
+		d.write(data);
+		d.finish();
+		return out.toByteArray();
+	}
+

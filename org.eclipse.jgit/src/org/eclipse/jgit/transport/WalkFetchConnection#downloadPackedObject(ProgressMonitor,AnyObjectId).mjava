@@ -54,11 +54,12 @@
 				// it failed the index and pack are unusable and we
 				// shouldn't consult them again.
 				//
-				pack.tmpIdx.delete();
+				if (pack.tmpIdx != null)
+					pack.tmpIdx.delete();
 				packItr.remove();
 			}
 
-			if (!local.hasObject(id)) {
+			if (!alreadyHave(id)) {
 				// What the hell? This pack claimed to have
 				// the object, but after indexing we didn't
 				// actually find it in the pack.

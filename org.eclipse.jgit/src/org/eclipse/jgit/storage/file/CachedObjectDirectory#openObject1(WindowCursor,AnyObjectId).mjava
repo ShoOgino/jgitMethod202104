@@ -1,0 +1,8 @@
+	@Override
+	ObjectLoader openObject1(WindowCursor curs, AnyObjectId objectId)
+			throws IOException {
+		if (unpackedObjects.contains(objectId))
+			return wrapped.openObject2(curs, objectId.name(), objectId);
+		return wrapped.openObject1(curs, objectId);
+	}
+

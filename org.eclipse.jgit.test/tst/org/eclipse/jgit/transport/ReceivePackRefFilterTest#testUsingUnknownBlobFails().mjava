@@ -1,19 +1,19 @@
 	public void testUsingUnknownBlobFails() throws Exception {
 		// Try to use the 'n' blob that is not on the server.
 		//
-		TestRepository s = new TestRepository(src);
+		TestRepository<Repository> s = new TestRepository<Repository>(src);
 		RevBlob n = s.blob("n");
 		RevCommit N = s.commit().parent(B).add("q", n).create();
 
 		// But don't include it in the pack.
 		//
-		final TemporaryBuffer.Heap pack = new TemporaryBuffer.Heap(64);
+		final TemporaryBuffer.Heap pack = new TemporaryBuffer.Heap(1024);
 		packHeader(pack, 2);
-		copy(pack, src.openObject(N));
-		copy(pack,src.openObject(s.parseBody(N).getTree()));
+		copy(pack, src.open(N));
+		copy(pack,src.open(s.parseBody(N).getTree()));
 		digest(pack);
 
-		final TemporaryBuffer.Heap inBuf = new TemporaryBuffer.Heap(256);
+		final TemporaryBuffer.Heap inBuf = new TemporaryBuffer.Heap(1024);
 		final PacketLineOut inPckLine = new PacketLineOut(inBuf);
 		inPckLine.writeString(ObjectId.zeroId().name() + ' ' + N.name() + ' '
 				+ "refs/heads/s" + '\0'

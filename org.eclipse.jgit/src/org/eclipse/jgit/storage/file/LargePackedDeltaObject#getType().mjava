@@ -1,0 +1,26 @@
+	@Override
+	public int getType() {
+		if (type == Constants.OBJ_BAD) {
+			WindowCursor wc = new WindowCursor(db);
+			try {
+				type = pack.getObjectType(wc, objectOffset);
+			} catch (IOException packGone) {
+				// If the pack file cannot be pinned into the cursor, it
+				// probably was repacked recently. Go find the object
+				// again and get the type from that location instead.
+				//
+				try {
+					type = wc.open(getObjectId()).getType();
+				} catch (IOException packGone2) {
+					// "He's dead, Jim." We just can't discover the type
+					// and the interface isn't supposed to be lazy here.
+					// Report an invalid type code instead, callers will
+					// wind up bailing out with an error at some point.
+				}
+			} finally {
+				wc.release();
+			}
+		}
+		return type;
+	}
+

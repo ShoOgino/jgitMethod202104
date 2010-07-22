@@ -1,0 +1,17 @@
+	Ref cache(byte[] data, int actLen, int reservedSize) {
+		// The caller may have had to allocate more space than is
+		// required. If we are about to waste anything, shrink it.
+		//
+		data = resize(data, actLen);
+
+		// When we reserved space for this item we did it for the
+		// inflated size of the delta, but we were just given the
+		// compressed version. Adjust the cache cost to match.
+		//
+		if (reservedSize != data.length) {
+			used -= reservedSize;
+			used += data.length;
+		}
+		return new Ref(data, queue);
+	}
+

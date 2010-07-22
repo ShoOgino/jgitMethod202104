@@ -2,10 +2,13 @@
 	 * @return an important state
 	 */
 	public RepositoryState getRepositoryState() {
+		if (isBare() || getDirectory() == null)
+			return RepositoryState.BARE;
+
 		// Pre Git-1.6 logic
-		if (new File(getWorkDir(), ".dotest").exists())
+		if (new File(getWorkTree(), ".dotest").exists())
 			return RepositoryState.REBASING;
-		if (new File(gitDir,".dotest-merge").exists())
+		if (new File(getDirectory(), ".dotest-merge").exists())
 			return RepositoryState.REBASING_INTERACTIVE;
 
 		// From 1.6 onwards
@@ -22,10 +25,10 @@
 			return RepositoryState.REBASING_MERGE;
 
 		// Both versions
-		if (new File(gitDir, "MERGE_HEAD").exists()) {
+		if (new File(getDirectory(), "MERGE_HEAD").exists()) {
 			// we are merging - now check whether we have unmerged paths
 			try {
-				if (!DirCache.read(this).hasUnmergedPaths()) {
+				if (!readDirCache().hasUnmergedPaths()) {
 					// no unmerged paths -> return the MERGING_RESOLVED state
 					return RepositoryState.MERGING_RESOLVED;
 				}
@@ -38,7 +41,7 @@
 			return RepositoryState.MERGING;
 		}
 
-		if (new File(gitDir,"BISECT_LOG").exists())
+		if (new File(getDirectory(), "BISECT_LOG").exists())
 			return RepositoryState.BISECTING;
 
 		return RepositoryState.SAFE;

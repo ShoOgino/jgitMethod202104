@@ -1,0 +1,13 @@
+	private void writeWholeObjectDeflate(PackOutputStream out,
+			final ObjectToPack otp) throws IOException {
+		final Deflater deflater = deflater();
+		final ObjectLoader ldr = reader.open(otp, otp.getType());
+
+		out.writeHeader(otp, ldr.getSize());
+
+		deflater.reset();
+		DeflaterOutputStream dst = new DeflaterOutputStream(out, deflater);
+		ldr.copyTo(dst);
+		dst.finish();
+	}
+

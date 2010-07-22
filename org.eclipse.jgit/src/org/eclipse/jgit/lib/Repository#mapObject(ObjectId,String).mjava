@@ -9,23 +9,26 @@
 	 * @deprecated Use {@link org.eclipse.jgit.revwalk.RevWalk#parseCommit(AnyObjectId)},
 	 *  or {@link org.eclipse.jgit.revwalk.RevWalk#parseTag(AnyObjectId)}.
 	 *  To read a tree, use {@link org.eclipse.jgit.treewalk.TreeWalk#addTree(AnyObjectId)}.
-	 *  To read a blob, open it with {@link #openObject(AnyObjectId)}.
+	 *  To read a blob, open it with {@link #open(AnyObjectId)}.
 	 */
 	@Deprecated
 	public Object mapObject(final ObjectId id, final String refName) throws IOException {
-		final ObjectLoader or = openObject(id);
-		if (or == null)
+		final ObjectLoader or;
+		try {
+			or = open(id);
+		} catch (MissingObjectException notFound) {
 			return null;
-		final byte[] raw = or.getBytes();
+		}
+		final byte[] raw = or.getCachedBytes();
 		switch (or.getType()) {
 		case Constants.OBJ_TREE:
-			return makeTree(id, raw);
+			return new Tree(this, id, raw);
 
 		case Constants.OBJ_COMMIT:
-			return makeCommit(id, raw);
+			return new Commit(this, id, raw);
 
 		case Constants.OBJ_TAG:
-			return makeTag(id, refName, raw);
+			return new Tag(this, id, refName, raw);
 
 		case Constants.OBJ_BLOB:
 			return raw;

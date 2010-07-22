@@ -1,0 +1,14 @@
+	public String toString() {
+		String[] units = { "bytes", "KiB", "MiB", "GiB" };
+		long sz = getIndexSize();
+		int u = 0;
+		while (1024 <= sz && u < units.length - 1) {
+			int rem = (int) (sz % 1024);
+			sz /= 1024;
+			if (rem != 0)
+				sz++;
+			u++;
+		}
+		return "DeltaIndex[" + sz + " " + units[u] + "]";
+	}
+

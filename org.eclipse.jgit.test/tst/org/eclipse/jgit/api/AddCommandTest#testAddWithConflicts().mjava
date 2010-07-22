@@ -1,20 +1,20 @@
 	public void testAddWithConflicts() throws Exception {
 		// prepare conflict
 
-		File file = new File(db.getWorkDir(), "a.txt");
+		File file = new File(db.getWorkTree(), "a.txt");
 		file.createNewFile();
 		PrintWriter writer = new PrintWriter(file);
 		writer.print("content");
 		writer.close();
 
-		File file2 = new File(db.getWorkDir(), "b.txt");
+		File file2 = new File(db.getWorkTree(), "b.txt");
 		file2.createNewFile();
 		writer = new PrintWriter(file2);
 		writer.print("content b");
 		writer.close();
 
 		ObjectWriter ow = new ObjectWriter(db);
-		DirCache dc = DirCache.lock(db);
+		DirCache dc = db.lockDirCache();
 		DirCacheBuilder builder = dc.builder();
 
 		addEntryToBuilder("b.txt", file2, ow, builder, 0);

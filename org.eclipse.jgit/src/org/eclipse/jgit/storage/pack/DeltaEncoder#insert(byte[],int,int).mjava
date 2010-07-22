@@ -1,0 +1,36 @@
+	/**
+	 * Insert a literal binary sequence.
+	 *
+	 * @param text
+	 *            the binary to insert.
+	 * @param off
+	 *            offset within {@code text} to start copying from.
+	 * @param cnt
+	 *            number of bytes to insert.
+	 * @return true if the insert fits within the limit; false if the insert
+	 *         would cause the instruction stream to exceed the limit.
+	 * @throws IOException
+	 *             the instruction buffer can't store the instructions.
+	 */
+	public boolean insert(byte[] text, int off, int cnt)
+			throws IOException {
+		if (cnt <= 0)
+			return true;
+		if (0 < limit) {
+			int hdrs = cnt / MAX_INSERT_DATA_SIZE;
+			if (cnt % MAX_INSERT_DATA_SIZE != 0)
+				hdrs++;
+			if (limit < size + hdrs + cnt)
+				return false;
+		}
+		do {
+			int n = Math.min(MAX_INSERT_DATA_SIZE, cnt);
+			out.write((byte) n);
+			out.write(text, off, n);
+			off += n;
+			cnt -= n;
+			size += 1 + n;
+		} while (0 < cnt);
+		return true;
+	}
+

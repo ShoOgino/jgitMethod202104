@@ -5,8 +5,6 @@
 	 *            the repository the walker will obtain data from.
 	 */
 	public ObjectWalk(final Repository repo) {
-		super(repo);
-		pendingObjects = new BlockObjQueue();
-		treeWalk = new CanonicalTreeParser();
+		this(repo.newObjectReader());
 	}
 

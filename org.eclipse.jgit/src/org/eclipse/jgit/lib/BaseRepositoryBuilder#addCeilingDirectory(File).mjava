@@ -1,0 +1,19 @@
+	/**
+	 * Add a ceiling directory to the search limit list.
+	 * <p>
+	 * This setting handles one ceiling directory at a time, and is provided to
+	 * support {@code GIT_CEILING_DIRECTORIES}.
+	 *
+	 * @param root
+	 *            a path to stop searching at; its parent will not be searched.
+	 * @return {@code this} (for chaining calls).
+	 */
+	public B addCeilingDirectory(File root) {
+		if (root != null) {
+			if (ceilingDirectories == null)
+				ceilingDirectories = new LinkedList<File>();
+			ceilingDirectories.add(root);
+		}
+		return self();
+	}
+

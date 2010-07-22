@@ -1,0 +1,17 @@
+	private static int negmatch(byte[] res, int resPtr, byte[] src, int srcPtr,
+			int limit) {
+		if (srcPtr == 0)
+			return 0;
+
+		resPtr--;
+		srcPtr--;
+		int start = resPtr;
+		do {
+			if (res[resPtr] != src[srcPtr])
+				break;
+			resPtr--;
+			srcPtr--;
+		} while (0 <= srcPtr && 0 < --limit);
+		return start - resPtr;
+	}
+

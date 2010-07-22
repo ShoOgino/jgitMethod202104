@@ -1,0 +1,43 @@
+	private void writeObject(PackOutputStream out, final ObjectToPack otp)
+			throws IOException {
+		if (otp.isWritten())
+			return; // We shouldn't be here.
+
+		otp.markWantWrite();
+		if (otp.isDeltaRepresentation())
+			writeBaseFirst(out, otp);
+
+		out.resetCRC32();
+		otp.setOffset(out.length());
+
+		while (otp.isReuseAsIs()) {
+			try {
+				reuseSupport.copyObjectAsIs(out, otp);
+				out.endObject();
+				otp.setCRC(out.getCRC32());
+				return;
+			} catch (StoredObjectRepresentationNotAvailableException gone) {
+				if (otp.getOffset() == out.length()) {
+					redoSearchForReuse(otp);
+					continue;
+				} else {
+					// Object writing already started, we cannot recover.
+					//
+					CorruptObjectException coe;
+					coe = new CorruptObjectException(otp, "");
+					coe.initCause(gone);
+					throw coe;
+				}
+			}
+		}
+
+		// If we reached here, reuse wasn't possible.
+		//
+		if (otp.isDeltaRepresentation())
+			writeDeltaObjectDeflate(out, otp);
+		else
+			writeWholeObjectDeflate(out, otp);
+		out.endObject();
+		otp.setCRC(out.getCRC32());
+	}
+

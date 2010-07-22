@@ -7,10 +7,13 @@
 	 */
 	@Deprecated
 	public Tree mapTree(final ObjectId id) throws IOException {
-		final ObjectLoader or = openObject(id);
-		if (or == null)
+		final ObjectLoader or;
+		try {
+			or = open(id);
+		} catch (MissingObjectException notFound) {
 			return null;
-		final byte[] raw = or.getBytes();
+		}
+		final byte[] raw = or.getCachedBytes();
 		switch (or.getType()) {
 		case Constants.OBJ_TREE:
 			return new Tree(this, id, raw);

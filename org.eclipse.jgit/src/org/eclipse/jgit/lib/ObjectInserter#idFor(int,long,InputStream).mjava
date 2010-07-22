@@ -1,0 +1,32 @@
+	/**
+	 * Compute the name of an object, without inserting it.
+	 *
+	 * @param objectType
+	 *            type code of the object to store.
+	 * @param length
+	 *            number of bytes to scan from {@code in}.
+	 * @param in
+	 *            stream providing the object content. The caller is responsible
+	 *            for closing the stream.
+	 * @return the name of the object.
+	 * @throws IOException
+	 *             the source stream could not be read.
+	 */
+	public ObjectId idFor(int objectType, long length, InputStream in)
+			throws IOException {
+		MessageDigest md = digest();
+		md.update(Constants.encodedTypeString(objectType));
+		md.update((byte) ' ');
+		md.update(Constants.encodeASCII(length));
+		md.update((byte) 0);
+		byte[] buf = buffer();
+		while (length > 0) {
+			int n = in.read(buf, 0, (int) Math.min(length, buf.length));
+			if (n < 0)
+				throw new EOFException("Unexpected end of input");
+			md.update(buf, 0, n);
+			length -= n;
+		}
+		return ObjectId.fromRaw(md.digest());
+	}
+

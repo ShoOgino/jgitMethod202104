@@ -1,0 +1,14 @@
+	private void writeFile(final File p, final byte[] bin) throws IOException,
+			ObjectWritingException {
+		final LockFile lck = new LockFile(p);
+		if (!lck.lock())
+			throw new ObjectWritingException("Can't write " + p);
+		try {
+			lck.write(bin);
+		} catch (IOException ioe) {
+			throw new ObjectWritingException("Can't write " + p);
+		}
+		if (!lck.commit())
+			throw new ObjectWritingException("Can't write " + p);
+	}
+

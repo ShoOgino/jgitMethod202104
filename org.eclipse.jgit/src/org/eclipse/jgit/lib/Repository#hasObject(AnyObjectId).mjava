@@ -3,7 +3,12 @@
 	 * @return true if the specified object is stored in this repo or any of the
 	 *         known shared repositories.
 	 */
-	public boolean hasObject(final AnyObjectId objectId) {
-		return objectDatabase.hasObject(objectId);
+	public boolean hasObject(AnyObjectId objectId) {
+		try {
+			return getObjectDatabase().has(objectId);
+		} catch (IOException e) {
+			// Legacy API, assume error means "no"
+			return false;
+		}
 	}
 

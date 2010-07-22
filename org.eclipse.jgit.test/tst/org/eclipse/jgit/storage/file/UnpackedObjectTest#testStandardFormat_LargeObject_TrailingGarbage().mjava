@@ -1,0 +1,34 @@
+	public void testStandardFormat_LargeObject_TrailingGarbage()
+			throws Exception {
+		final int type = Constants.OBJ_BLOB;
+		byte[] data = rng.nextBytes(ObjectLoader.STREAM_THRESHOLD + 5);
+		ObjectId id = new ObjectInserter.Formatter().idFor(type, data);
+		byte[] gz = compressStandardFormat(type, data);
+		byte[] tr = new byte[gz.length + 1];
+		System.arraycopy(gz, 0, tr, 0, gz.length);
+
+		write(id, tr);
+
+		ObjectLoader ol;
+		{
+			FileInputStream fs = new FileInputStream(path(id));
+			try {
+				ol = UnpackedObject.open(fs, path(id), id, wc);
+			} finally {
+				fs.close();
+			}
+		}
+
+		byte[] tmp = new byte[data.length];
+		InputStream in = ol.openStream();
+		IO.readFully(in, tmp, 0, tmp.length);
+		try {
+			in.close();
+			fail("close did not throw CorruptObjectException");
+		} catch (CorruptObjectException coe) {
+			assertEquals(MessageFormat.format(JGitText.get().objectIsCorrupt,
+					id.name(), JGitText.get().corruptObjectBadStream), coe
+					.getMessage());
+		}
+	}
+

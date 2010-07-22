@@ -1,0 +1,62 @@
+	/**
+	 * Format a Commit in canonical format.
+	 *
+	 * @param commit
+	 *            the commit object to format
+	 * @return canonical encoding of the commit object.
+	 * @throws UnsupportedEncodingException
+	 *             the commit's chosen encoding isn't supported on this JVM.
+	 */
+	public final byte[] format(Commit commit)
+			throws UnsupportedEncodingException {
+		String encoding = commit.getEncoding();
+		if (encoding == null)
+			encoding = Constants.CHARACTER_ENCODING;
+
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		OutputStreamWriter w = new OutputStreamWriter(os, encoding);
+		try {
+			os.write(htree);
+			os.write(' ');
+			commit.getTreeId().copyTo(os);
+			os.write('\n');
+
+			ObjectId[] ps = commit.getParentIds();
+			for (int i = 0; i < ps.length; ++i) {
+				os.write(hparent);
+				os.write(' ');
+				ps[i].copyTo(os);
+				os.write('\n');
+			}
+
+			os.write(hauthor);
+			os.write(' ');
+			w.write(commit.getAuthor().toExternalString());
+			w.flush();
+			os.write('\n');
+
+			os.write(hcommitter);
+			os.write(' ');
+			w.write(commit.getCommitter().toExternalString());
+			w.flush();
+			os.write('\n');
+
+			if (!encoding.equals(Constants.CHARACTER_ENCODING)) {
+				os.write(hencoding);
+				os.write(' ');
+				os.write(Constants.encodeASCII(encoding));
+				os.write('\n');
+			}
+
+			os.write('\n');
+			w.write(commit.getMessage());
+			w.flush();
+		} catch (IOException err) {
+			// This should never occur, the only way to get it above is
+			// for the ByteArrayOutputStream to throw, but it doesn't.
+			//
+			throw new RuntimeException(err);
+		}
+		return os.toByteArray();
+	}
+

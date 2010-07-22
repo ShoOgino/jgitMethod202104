@@ -1,0 +1,13 @@
+	private void createVerifyOpenPack(final Collection<ObjectId> interestings,
+			final Collection<ObjectId> uninterestings, final boolean thin,
+			final boolean ignoreMissingUninteresting)
+			throws MissingObjectException, IOException {
+		NullProgressMonitor m = NullProgressMonitor.INSTANCE;
+		writer.setThin(thin);
+		writer.setIgnoreMissingUninteresting(ignoreMissingUninteresting);
+		writer.preparePack(m, interestings, uninterestings);
+		writer.writePack(m, m, os);
+		writer.release();
+		verifyOpenPack(thin);
+	}
+

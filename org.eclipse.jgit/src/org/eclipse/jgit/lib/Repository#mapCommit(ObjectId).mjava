@@ -7,12 +7,12 @@
 	 */
 	@Deprecated
 	public Commit mapCommit(final ObjectId id) throws IOException {
-		final ObjectLoader or = openObject(id);
-		if (or == null)
+		final ObjectLoader or;
+		try {
+			or = open(id, Constants.OBJ_COMMIT);
+		} catch (MissingObjectException notFound) {
 			return null;
-		final byte[] raw = or.getBytes();
-		if (Constants.OBJ_COMMIT == or.getType())
-			return new Commit(this, id, raw);
-		throw new IncorrectObjectTypeException(id, Constants.TYPE_COMMIT);
+		}
+		return new Commit(this, id, or.getCachedBytes());
 	}
 

@@ -1,0 +1,13 @@
+	private void add(ListenerHandle handle) {
+		List<ListenerHandle> list = lists.get(handle.type);
+		if (list == null) {
+			CopyOnWriteArrayList<ListenerHandle> newList;
+
+			newList = new CopyOnWriteArrayList<ListenerHandle>();
+			list = lists.putIfAbsent(handle.type, newList);
+			if (list == null)
+				list = newList;
+		}
+		list.add(handle);
+	}
+

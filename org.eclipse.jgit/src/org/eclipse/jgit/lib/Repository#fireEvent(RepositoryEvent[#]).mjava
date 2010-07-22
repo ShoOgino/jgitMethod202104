@@ -1,0 +1,15 @@
+	/**
+	 * Fire an event to all registered listeners.
+	 * <p>
+	 * The source repository of the event is automatically set to this
+	 * repository, before the event is delivered to any listeners.
+	 *
+	 * @param event
+	 *            the event to deliver.
+	 */
+	public void fireEvent(RepositoryEvent<?> event) {
+		event.setRepository(this);
+		myListeners.dispatch(event);
+		globalListeners.dispatch(event);
+	}
+

@@ -1,0 +1,12 @@
+	byte[] getDeltaHeader(WindowCursor wc, long pos)
+			throws IOException, DataFormatException {
+		// The delta stream starts as two variable length integers. If we
+		// assume they are 64 bits each, we need 16 bytes to encode them,
+		// plus 2 extra bytes for the variable length overhead. So 18 is
+		// the longest delta instruction header.
+		//
+		final byte[] hdr = new byte[18];
+		wc.inflate(this, pos, hdr, 0);
+		return hdr;
+	}
+

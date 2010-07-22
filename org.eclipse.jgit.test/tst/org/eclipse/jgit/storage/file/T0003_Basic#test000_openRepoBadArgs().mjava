@@ -1,0 +1,11 @@
+	public void test000_openRepoBadArgs() throws IOException {
+		try {
+			new FileRepositoryBuilder().build();
+			fail("Must pass either GIT_DIR or GIT_WORK_TREE");
+		} catch (IllegalArgumentException e) {
+			assertEquals(
+					JGitText.get().eitherGitDirOrWorkTreeRequired,
+					e.getMessage());
+		}
+	}
+

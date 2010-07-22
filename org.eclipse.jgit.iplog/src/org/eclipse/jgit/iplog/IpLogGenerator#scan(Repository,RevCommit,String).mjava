@@ -17,8 +17,9 @@
 			throws IOException, ConfigInvalidException {
 		try {
 			db = repo;
-			rw = new RevWalk(db);
-			tw = new NameConflictTreeWalk(db);
+			curs = db.newObjectReader();
+			rw = new RevWalk(curs);
+			tw = new NameConflictTreeWalk(curs);
 
 			RevCommit c = rw.parseCommit(startCommit);
 
@@ -27,7 +28,7 @@
 			scanProjectCommits(meta.getProjects().get(0), c);
 			commits.add(c);
 		} finally {
-			WindowCursor.release(curs);
+			curs.release();
 			db = null;
 			rw = null;
 			tw = null;

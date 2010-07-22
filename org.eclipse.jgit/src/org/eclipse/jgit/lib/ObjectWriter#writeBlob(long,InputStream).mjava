@@ -10,6 +10,12 @@
 	 */
 	public ObjectId writeBlob(final long len, final InputStream is)
 			throws IOException {
-		return writeObject(Constants.OBJ_BLOB, len, is, true);
+		try {
+			ObjectId id = inserter.insert(OBJ_BLOB, len, is);
+			inserter.flush();
+			return id;
+		} finally {
+			inserter.release();
+		}
 	}
 

@@ -1,0 +1,8 @@
+	long getObjectSize(WindowCursor curs, AnyObjectId objectId)
+			throws IOException {
+		long sz = getObjectSizeImpl1(curs, objectId);
+		if (0 <= sz)
+			return sz;
+		return getObjectSizeImpl2(curs, objectId.name(), objectId);
+	}
+

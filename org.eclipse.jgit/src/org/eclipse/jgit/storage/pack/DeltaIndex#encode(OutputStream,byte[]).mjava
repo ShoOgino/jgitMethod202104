@@ -1,0 +1,22 @@
+	/**
+	 * Generate a delta sequence to recreate the result buffer.
+	 * <p>
+	 * There is no limit on the size of the delta sequence created. This is the
+	 * same as {@code encode(out, res, 0)}.
+	 *
+	 * @param out
+	 *            stream to receive the delta instructions that can transform
+	 *            this index's source buffer into {@code res}. This stream
+	 *            should be buffered, as instructions are written directly to it
+	 *            in small bursts.
+	 * @param res
+	 *            the desired result buffer. The generated instructions will
+	 *            recreate this buffer when applied to the source buffer stored
+	 *            within this index.
+	 * @throws IOException
+	 *             the output stream refused to write the instructions.
+	 */
+	public void encode(OutputStream out, byte[] res) throws IOException {
+		encode(out, res, 0 /* no limit */);
+	}
+

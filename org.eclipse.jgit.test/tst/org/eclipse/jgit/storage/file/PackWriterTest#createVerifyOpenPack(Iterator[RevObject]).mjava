@@ -1,0 +1,9 @@
+	private void createVerifyOpenPack(final Iterator<RevObject> objectSource)
+			throws MissingObjectException, IOException {
+		NullProgressMonitor m = NullProgressMonitor.INSTANCE;
+		writer.preparePack(objectSource);
+		writer.writePack(m, m, os);
+		writer.release();
+		verifyOpenPack(false);
+	}
+

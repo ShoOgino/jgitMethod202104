@@ -6,9 +6,15 @@
 	 * @return a String containing the content of the MERGE_MSG file or
 	 *         {@code null} if this file doesn't exist
 	 * @throws IOException
+	 * @throws NoWorkTreeException
+	 *             if this is bare, which implies it has no working directory.
+	 *             See {@link #isBare()}.
 	 */
-	public String readMergeCommitMsg() throws IOException {
-		File mergeMsgFile = new File(gitDir, Constants.MERGE_MSG);
+	public String readMergeCommitMsg() throws IOException, NoWorkTreeException {
+		if (isBare() || getDirectory() == null)
+			throw new NoWorkTreeException();
+
+		File mergeMsgFile = new File(getDirectory(), Constants.MERGE_MSG);
 		try {
 			return new String(IO.readFully(mergeMsgFile));
 		} catch (FileNotFoundException e) {

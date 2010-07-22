@@ -1,0 +1,8 @@
+	private DeflaterOutputStream compress(final OutputStream out) {
+		if (deflate == null)
+			deflate = new Deflater(config.get(CoreConfig.KEY).getCompression());
+		else
+			deflate.reset();
+		return new DeflaterOutputStream(out, deflate);
+	}
+

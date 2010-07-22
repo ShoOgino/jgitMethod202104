@@ -1,0 +1,31 @@
+	/**
+	 * Perform standard work-tree initialization.
+	 * <p>
+	 * This is a method typically invoked inside of {@link #setup()}, near the
+	 * end after the repository has been identified and its configuration is
+	 * available for inspection.
+	 *
+	 * @throws IOException
+	 *             the repository configuration could not be read.
+	 */
+	protected void setupWorkTree() throws IOException {
+		if (getFS() == null)
+			setFS(FS.DETECTED);
+
+		// If we aren't bare, we should have a work tree.
+		//
+		if (!isBare() && getWorkTree() == null)
+			setWorkTree(guessWorkTreeOrFail());
+
+		if (!isBare()) {
+			// If after guessing we're still not bare, we must have
+			// a metadata directory to hold the repository. Assume
+			// its at the work tree.
+			//
+			if (getGitDir() == null)
+				setGitDir(getWorkTree().getParentFile());
+			if (getIndexFile() == null)
+				setIndexFile(new File(getGitDir(), "index"));
+		}
+	}
+

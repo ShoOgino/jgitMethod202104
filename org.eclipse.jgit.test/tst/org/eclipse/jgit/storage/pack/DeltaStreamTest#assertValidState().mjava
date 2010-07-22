@@ -1,0 +1,16 @@
+	private void assertValidState() throws IOException {
+		assertEquals("test filled example result", data.length, dataPtr);
+
+		delta = deltaBuf.toByteArray();
+		assertEquals(base.length, BinaryDelta.getBaseSize(delta));
+		assertEquals(data.length, BinaryDelta.getResultSize(delta));
+		assertTrue(Arrays.equals(data, BinaryDelta.apply(base, delta)));
+
+		byte[] act = new byte[data.length];
+		DeltaStream in = open();
+		assertEquals(data.length, in.getSize());
+		assertEquals(data.length, in.read(act));
+		assertEquals(-1, in.read());
+		assertTrue(Arrays.equals(data, act));
+	}
+

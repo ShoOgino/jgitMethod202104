@@ -1,0 +1,11 @@
+	private void write(ObjectId id, byte[] data) throws IOException {
+		File path = path(id);
+		path.getParentFile().mkdirs();
+		FileOutputStream out = new FileOutputStream(path);
+		try {
+			out.write(data);
+		} finally {
+			out.close();
+		}
+	}
+

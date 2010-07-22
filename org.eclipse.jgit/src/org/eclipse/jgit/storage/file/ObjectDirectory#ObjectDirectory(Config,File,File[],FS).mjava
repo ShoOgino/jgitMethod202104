@@ -1,0 +1,38 @@
+	/**
+	 * Initialize a reference to an on-disk object directory.
+	 *
+	 * @param cfg
+	 *            configuration this directory consults for write settings.
+	 * @param dir
+	 *            the location of the <code>objects</code> directory.
+	 * @param alternatePaths
+	 *            a list of alternate object directories
+	 * @param fs
+	 *            the file system abstraction which will be necessary to perform
+	 *            certain file system operations.
+	 * @throws IOException
+	 *             an alternate object cannot be opened.
+	 */
+	public ObjectDirectory(final Config cfg, final File dir,
+			File[] alternatePaths, FS fs) throws IOException {
+		config = cfg;
+		objects = dir;
+		infoDirectory = new File(objects, "info");
+		packDirectory = new File(objects, "pack");
+		alternatesFile = new File(infoDirectory, "alternates");
+		packList = new AtomicReference<PackList>(NO_PACKS);
+		this.fs = fs;
+
+		alternates = new AtomicReference<AlternateHandle[]>();
+		if (alternatePaths != null) {
+			AlternateHandle[] alt;
+
+			alt = new AlternateHandle[alternatePaths.length];
+			for (int i = 0; i < alternatePaths.length; i++)
+				alt[i] = openAlternate(alternatePaths[i]);
+			alternates.set(alt);
+		}
+
+		onConfigChanged(new ConfigChangedEvent());
+	}
+

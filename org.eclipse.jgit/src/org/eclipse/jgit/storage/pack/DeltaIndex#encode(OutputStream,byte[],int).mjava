@@ -1,0 +1,139 @@
+	/**
+	 * Generate a delta sequence to recreate the result buffer.
+	 *
+	 * @param out
+	 *            stream to receive the delta instructions that can transform
+	 *            this index's source buffer into {@code res}. This stream
+	 *            should be buffered, as instructions are written directly to it
+	 *            in small bursts. If the caller might need to discard the
+	 *            instructions (such as when deltaSizeLimit would be exceeded)
+	 *            the caller is responsible for discarding or rewinding the
+	 *            stream when this method returns false.
+	 * @param res
+	 *            the desired result buffer. The generated instructions will
+	 *            recreate this buffer when applied to the source buffer stored
+	 *            within this index.
+	 * @param deltaSizeLimit
+	 *            maximum number of bytes that the delta instructions can
+	 *            occupy. If the generated instructions would be longer than
+	 *            this amount, this method returns false. If 0, there is no
+	 *            limit on the length of delta created.
+	 * @return true if the delta is smaller than deltaSizeLimit; false if the
+	 *         encoder aborted because the encoded delta instructions would be
+	 *         longer than deltaSizeLimit bytes.
+	 * @throws IOException
+	 *             the output stream refused to write the instructions.
+	 */
+	public boolean encode(OutputStream out, byte[] res, int deltaSizeLimit)
+			throws IOException {
+		final int end = res.length;
+		final DeltaEncoder enc = newEncoder(out, end, deltaSizeLimit);
+
+		// If either input is smaller than one full block, we simply punt
+		// and construct a delta as a literal. This implies that any file
+		// smaller than our block size is never delta encoded as the delta
+		// will always be larger than the file itself would be.
+		//
+		if (end < BLKSZ || table.length == 0)
+			return enc.insert(res);
+
+		// Bootstrap the scan by constructing a hash for the first block
+		// in the input.
+		//
+		int blkPtr = 0;
+		int blkEnd = BLKSZ;
+		int hash = hashBlock(res, 0);
+
+		int resPtr = 0;
+		while (blkEnd < end) {
+			final int tableIdx = hash & tableMask;
+			int entryIdx = table[tableIdx];
+			if (entryIdx == 0) {
+				// No matching blocks, slide forward one byte.
+				//
+				hash = step(hash, res[blkPtr++], res[blkEnd++]);
+				continue;
+			}
+
+			// For every possible location of the current block, try to
+			// extend the match out to the longest common substring.
+			//
+			int bestLen = -1;
+			int bestPtr = -1;
+			int bestNeg = 0;
+			do {
+				long ent = entries[entryIdx++];
+				if (keyOf(ent) == hash) {
+					int neg = 0;
+					if (resPtr < blkPtr) {
+						// If we need to do an insertion, check to see if
+						// moving the starting point of the copy backwards
+						// will allow us to shorten the insert. Our hash
+						// may not have allowed us to identify this area.
+						// Since it is quite fast to perform a negative
+						// scan, try to stretch backwards too.
+						//
+						neg = blkPtr - resPtr;
+						neg = negmatch(res, blkPtr, src, valOf(ent), neg);
+					}
+
+					int len = neg + fwdmatch(res, blkPtr, src, valOf(ent));
+					if (bestLen < len) {
+						bestLen = len;
+						bestPtr = valOf(ent);
+						bestNeg = neg;
+					}
+				} else if ((keyOf(ent) & tableMask) != tableIdx)
+					break;
+			} while (bestLen < 4096 && entryIdx < entries.length);
+
+			if (bestLen < BLKSZ) {
+				// All of the locations were false positives, or the copy
+				// is shorter than a block. In the latter case this won't
+				// give us a very great copy instruction, so delay and try
+				// at the next byte.
+				//
+				hash = step(hash, res[blkPtr++], res[blkEnd++]);
+				continue;
+			}
+
+			blkPtr -= bestNeg;
+
+			if (resPtr < blkPtr) {
+				// There are bytes between the last instruction we made
+				// and the current block pointer. None of these matched
+				// during the earlier iteration so insert them directly
+				// into the instruction stream.
+				//
+				int cnt = blkPtr - resPtr;
+				if (!enc.insert(res, resPtr, cnt))
+					return false;
+			}
+
+			if (!enc.copy(bestPtr - bestNeg, bestLen))
+				return false;
+
+			blkPtr += bestLen;
+			resPtr = blkPtr;
+			blkEnd = blkPtr + BLKSZ;
+
+			// If we don't have a full block available to us, abort now.
+			//
+			if (end <= blkEnd)
+				break;
+
+			// Start a new hash of the block after the copy region.
+			//
+			hash = hashBlock(res, blkPtr);
+		}
+
+		if (resPtr < end) {
+			// There were bytes at the end which didn't match, or maybe
+			// didn't make a full block. Insert whatever is left over.
+			//
+			int cnt = end - resPtr;
+			return enc.insert(res, resPtr, cnt);
+		}
+		return true;
+	}
+

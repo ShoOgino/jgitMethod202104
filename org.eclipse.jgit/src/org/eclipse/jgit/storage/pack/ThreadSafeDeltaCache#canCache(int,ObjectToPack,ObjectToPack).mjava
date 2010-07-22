@@ -1,0 +1,10 @@
+	@Override
+	boolean canCache(int length, ObjectToPack src, ObjectToPack res) {
+		lock.lock();
+		try {
+			return super.canCache(length, src, res);
+		} finally {
+			lock.unlock();
+		}
+	}
+

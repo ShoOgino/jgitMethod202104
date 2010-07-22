@@ -1,5 +1,4 @@
 		RemotePack(final WalkRemoteObjectDatabase c, final String pn) {
-			final File objdir = local.getObjectsDirectory();
 			connection = c;
 			packName = pn;
 			idxName = packName.substring(0, packName.length() - 5) + ".idx";
@@ -9,6 +8,10 @@
 				tn = tn.substring(5);
 			if (tn.endsWith(".idx"))
 				tn = tn.substring(0, tn.length() - 4);
-			tmpIdx = new File(objdir, "walk-" + tn + ".walkidx");
+
+			if (local.getObjectDatabase() instanceof ObjectDirectory) {
+				tmpIdx = new File(((ObjectDirectory) local.getObjectDatabase())
+						.getDirectory(), "walk-" + tn + ".walkidx");
+			}
 		}
 

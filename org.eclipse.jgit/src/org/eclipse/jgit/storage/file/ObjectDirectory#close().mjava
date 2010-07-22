@@ -1,0 +1,16 @@
+	@Override
+	public void close() {
+		final PackList packs = packList.get();
+		packList.set(NO_PACKS);
+		for (final PackFile p : packs.packs)
+			p.close();
+
+		// Fully close all loaded alternates and clear the alternate list.
+		AlternateHandle[] alt = alternates.get();
+		if (alt != null) {
+			alternates.set(null);
+			for(final AlternateHandle od : alt)
+				od.close();
+		}
+	}
+

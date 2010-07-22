@@ -1,0 +1,30 @@
+	/**
+	 * Create writer for specified repository.
+	 * <p>
+	 * Objects for packing are specified in {@link #preparePack(Iterator)} or
+	 * {@link #preparePack(ProgressMonitor, Collection, Collection)}.
+	 *
+	 * @param repo
+	 *            repository where objects are stored.
+	 * @param reader
+	 *            reader to read from the repository with.
+	 */
+	public PackWriter(final Repository repo, final ObjectReader reader) {
+		this.reader = reader;
+		if (reader instanceof ObjectReuseAsIs)
+			reuseSupport = ((ObjectReuseAsIs) reader);
+		else
+			reuseSupport = null;
+
+		final PackConfig pc = configOf(repo).get(PackConfig.KEY);
+		deltaSearchWindowSize = pc.deltaWindow;
+		deltaSearchMemoryLimit = pc.deltaWindowMemory;
+		deltaCacheSize = pc.deltaCacheSize;
+		deltaCacheLimit = pc.deltaCacheLimit;
+		maxDeltaDepth = pc.deltaDepth;
+		compressionLevel = pc.compression;
+		indexVersion = pc.indexVersion;
+		bigFileThreshold = pc.bigFileThreshold;
+		threads = pc.threads;
+	}
+

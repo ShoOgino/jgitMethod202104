@@ -1,0 +1,14 @@
+	private TemporaryBuffer.Heap delta(final ObjectToPack otp)
+			throws IOException {
+		DeltaIndex index = new DeltaIndex(buffer(reader, otp.getDeltaBaseId()));
+		byte[] res = buffer(reader, otp);
+
+		// We never would have proposed this pair if the delta would be
+		// larger than the unpacked version of the object. So using it
+		// as our buffer limit is valid: we will never reach it.
+		//
+		TemporaryBuffer.Heap delta = new TemporaryBuffer.Heap(res.length);
+		index.encode(delta, res);
+		return delta;
+	}
+

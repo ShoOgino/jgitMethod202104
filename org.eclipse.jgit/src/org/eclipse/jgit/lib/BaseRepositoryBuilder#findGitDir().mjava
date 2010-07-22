@@ -1,0 +1,19 @@
+	/**
+	 * Configure {@code GIT_DIR} by searching up the file system.
+	 * <p>
+	 * Starts from the current working directory of the JVM and scans up through
+	 * the directory tree until a Git repository is found. Success can be
+	 * determined by checking for {@code getGitDir() != null}.
+	 * <p>
+	 * The search can be limited to specific spaces of the local filesystem by
+	 * {@link #addCeilingDirectory(File)}, or inheriting the list through a
+	 * prior call to {@link #readEnvironment()}.
+	 *
+	 * @return {@code this} (for chaining calls).
+	 */
+	public B findGitDir() {
+		if (getGitDir() == null)
+			findGitDir(new File("").getAbsoluteFile());
+		return self();
+	}
+

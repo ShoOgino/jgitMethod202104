@@ -1,0 +1,8 @@
+	public void testNotBare_CreateRepositoryFromWorkDirOnly() throws Exception {
+		File workdir = getFile("workdir", "repo");
+		FileRepository repo = new FileRepositoryBuilder().setWorkTree(workdir).build();
+		assertFalse(repo.isBare());
+		assertWorkdirPath(repo, "workdir", "repo");
+		assertGitdirPath(repo, "workdir", "repo", Constants.DOT_GIT);
+	}
+

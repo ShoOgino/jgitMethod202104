@@ -11,6 +11,11 @@
 	 * @throws IOException
 	 */
 	public Result delete() throws IOException {
-		return delete(new RevWalk(getRepository()));
+		RevWalk rw = new RevWalk(getRepository());
+		try {
+			return delete(rw);
+		} finally {
+			rw.release();
+		}
 	}
 

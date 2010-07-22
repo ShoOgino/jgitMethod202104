@@ -1,0 +1,11 @@
+	public void testNotBare_CreateRepositoryFromGitDirOnlyWithWorktreeConfig()
+			throws Exception {
+		File gitDir = getFile("workdir", "repoWithConfig");
+		File workTree = getFile("workdir", "treeRoot");
+		setWorkTree(gitDir, workTree);
+		FileRepository repo = new FileRepositoryBuilder().setGitDir(gitDir).build();
+		assertFalse(repo.isBare());
+		assertWorkdirPath(repo, "workdir", "treeRoot");
+		assertGitdirPath(repo, "workdir", "repoWithConfig");
+	}
+

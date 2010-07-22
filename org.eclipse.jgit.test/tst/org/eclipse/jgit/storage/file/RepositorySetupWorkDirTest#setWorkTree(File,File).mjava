@@ -1,0 +1,9 @@
+	private void setWorkTree(File gitDir, File workTree) throws IOException,
+			ConfigInvalidException {
+		String path = workTree.getAbsolutePath();
+		FileBasedConfig cfg = configFor(gitDir);
+		cfg.setString(ConfigConstants.CONFIG_CORE_SECTION, null,
+				ConfigConstants.CONFIG_KEY_WORKTREE, path);
+		cfg.save();
+	}
+

@@ -23,10 +23,7 @@
 		if (tree == null)
 			throw new FileNotFoundException(MessageFormat.format(JGitText.get().entryNotFoundByPath, path));
 		final ObjectId blobId = tree.getObjectId(0);
-		final ObjectLoader loader = tree.getRepository().openBlob(blobId);
-		if (loader == null)
-			throw new IOException(MessageFormat.format(JGitText.get().blobNotFoundForPath
-					, blobId, path));
-		fromText(RawParseUtils.decode(loader.getBytes()));
+		ObjectLoader loader = r.open(blobId,Constants.OBJ_BLOB);
+		fromText(RawParseUtils.decode(loader.getCachedBytes()));
 	}
 

@@ -1,0 +1,18 @@
+	private boolean loadSize(ObjectToPack e) throws MissingObjectException,
+			IncorrectObjectTypeException, IOException {
+		long sz = reader.getObjectSize(e, e.getType());
+
+		// If its too big for us to handle, skip over it.
+		//
+		if (bigFileThreshold <= sz || Integer.MAX_VALUE <= sz)
+			return false;
+
+		// If its too tiny for the delta compression to work, skip it.
+		//
+		if (sz <= DeltaIndex.BLKSZ)
+			return false;
+
+		e.setWeight((int) sz);
+		return true;
+	}
+

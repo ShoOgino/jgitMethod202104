@@ -1,0 +1,14 @@
+	public ObjectLoader open(AnyObjectId objectId, int typeHint)
+			throws MissingObjectException, IncorrectObjectTypeException,
+			IOException {
+		final ObjectLoader ldr = db.openObject(this, objectId);
+		if (ldr == null) {
+			if (typeHint == OBJ_ANY)
+				throw new MissingObjectException(objectId.copy(), "unknown");
+			throw new MissingObjectException(objectId.copy(), typeHint);
+		}
+		if (typeHint != OBJ_ANY && ldr.getType() != typeHint)
+			throw new IncorrectObjectTypeException(objectId.copy(), typeHint);
+		return ldr;
+	}
+

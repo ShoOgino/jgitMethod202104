@@ -1,0 +1,12 @@
+	private AlternateHandle openAlternate(File objdir) throws IOException {
+		final File parent = objdir.getParentFile();
+		if (FileKey.isGitRepository(parent, fs)) {
+			FileKey key = FileKey.exact(parent, fs);
+			FileRepository db = (FileRepository) RepositoryCache.open(key);
+			return new AlternateRepository(db);
+		}
+
+		ObjectDirectory db = new ObjectDirectory(config, objdir, null, fs);
+		return new AlternateHandle(db);
+	}
+

@@ -1,0 +1,19 @@
+	public void testIndexingSmallObject() {
+		SimilarityIndex si = hash("" //
+				+ "A\n" //
+				+ "B\n" //
+				+ "D\n" //
+				+ "B\n" //
+		);
+
+		int key_A = keyFor("A\n");
+		int key_B = keyFor("B\n");
+		int key_D = keyFor("D\n");
+		assertTrue(key_A != key_B && key_A != key_D && key_B != key_D);
+
+		assertEquals(3, si.size());
+		assertEquals(2, si.count(si.findIndex(key_A)));
+		assertEquals(4, si.count(si.findIndex(key_B)));
+		assertEquals(2, si.count(si.findIndex(key_D)));
+	}
+

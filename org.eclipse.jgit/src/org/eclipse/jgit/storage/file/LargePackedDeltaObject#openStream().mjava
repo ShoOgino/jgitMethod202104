@@ -1,0 +1,14 @@
+	@Override
+	public ObjectStream openStream() throws MissingObjectException, IOException {
+		final WindowCursor wc = new WindowCursor(db);
+		InputStream in = open(wc);
+		in = new BufferedInputStream(in, 8192);
+		return new ObjectStream.Filter(getType(), size, in) {
+			@Override
+			public void close() throws IOException {
+				wc.release();
+				super.close();
+			}
+		};
+	}
+

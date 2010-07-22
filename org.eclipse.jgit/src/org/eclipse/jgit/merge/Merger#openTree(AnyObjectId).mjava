@@ -11,11 +11,6 @@
 	 */
 	protected AbstractTreeIterator openTree(final AnyObjectId treeId)
 			throws IncorrectObjectTypeException, IOException {
-		final WindowCursor curs = new WindowCursor();
-		try {
-			return new CanonicalTreeParser(null, db, treeId, curs);
-		} finally {
-			curs.release();
-		}
+		return new CanonicalTreeParser(null, reader, treeId);
 	}
 

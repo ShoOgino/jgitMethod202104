@@ -1,6 +1,6 @@
 	public void testBuildEmpty() throws Exception {
 		{
-			final DirCache dc = DirCache.lock(db);
+			final DirCache dc = db.lockDirCache();
 			final DirCacheBuilder b = dc.builder();
 			assertNotNull(b);
 			b.finish();
@@ -8,7 +8,7 @@
 			assertTrue(dc.commit());
 		}
 		{
-			final DirCache dc = DirCache.read(db);
+			final DirCache dc = db.readDirCache();
 			assertEquals(0, dc.getEntryCount());
 		}
 	}

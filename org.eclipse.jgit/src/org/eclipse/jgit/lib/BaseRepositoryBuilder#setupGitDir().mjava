@@ -1,0 +1,13 @@
+	/**
+	 * Perform standard gitDir initialization.
+	 *
+	 * @throws IOException
+	 *             the repository could not be accessed
+	 */
+	protected void setupGitDir() throws IOException {
+		// No gitDir? Try to assume its under the workTree.
+		//
+		if (getGitDir() == null && getWorkTree() != null)
+			setGitDir(new File(getWorkTree(), DOT_GIT));
+	}
+

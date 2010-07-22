@@ -1,0 +1,10 @@
+	private static Properties loadPropertiesFile(File propsFile)
+			throws NotSupportedException {
+		try {
+			return AmazonS3.properties(propsFile);
+		} catch (IOException e) {
+			throw new NotSupportedException(MessageFormat.format(
+					JGitText.get().cannotReadFile, propsFile), e);
+		}
+	}
+

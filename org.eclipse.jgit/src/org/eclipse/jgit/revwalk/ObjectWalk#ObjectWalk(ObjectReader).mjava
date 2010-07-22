@@ -1,0 +1,14 @@
+	/**
+	 * Create a new revision and object walker for a given repository.
+	 *
+	 * @param or
+	 *            the reader the walker will obtain data from. The reader should
+	 *            be released by the caller when the walker is no longer
+	 *            required.
+	 */
+	public ObjectWalk(ObjectReader or) {
+		super(or);
+		pendingObjects = new BlockObjQueue();
+		treeWalk = new CanonicalTreeParser();
+	}
+

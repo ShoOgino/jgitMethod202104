@@ -1,0 +1,27 @@
+	@Override
+	public void setUp() throws Exception {
+		super.setUp();
+
+		toLoad = new ArrayList<TestObject>();
+		final BufferedReader br = new BufferedReader(new InputStreamReader(
+				new FileInputStream(JGitTestUtil
+						.getTestResourceFile("all_packed_objects.txt")),
+				Constants.CHARSET));
+		try {
+			String line;
+			while ((line = br.readLine()) != null) {
+				final String[] parts = line.split(" {1,}");
+				final TestObject o = new TestObject();
+				o.id = ObjectId.fromString(parts[0]);
+				o.setType(parts[1]);
+				// parts[2] is the inflate size
+				// parts[3] is the size-in-pack
+				// parts[4] is the offset in the pack
+				toLoad.add(o);
+			}
+		} finally {
+			br.close();
+		}
+		assertEquals(96, toLoad.size());
+	}
+
