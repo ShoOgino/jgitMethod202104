@@ -1,0 +1,21 @@
+	public void testBreakModify_BreakBelowScore() throws Exception {
+		ObjectId aId = blob("foo");
+		ObjectId bId = blob("bar");
+
+		DiffEntry m = DiffEntry.modify(PATH_A);
+		m.oldId = AbbreviatedObjectId.fromObjectId(aId);
+		m.newId = AbbreviatedObjectId.fromObjectId(bId);
+
+		DiffEntry a = DiffEntry.add(PATH_B, aId);
+
+		rd.add(a);
+		rd.add(m);
+
+		rd.setBreakScore(20); // Should break the modify
+
+		List<DiffEntry> entries = rd.compute();
+		assertEquals(2, entries.size());
+		assertAdd(PATH_A, bId, FileMode.REGULAR_FILE, entries.get(0));
+		assertRename(DiffEntry.breakModify(m).get(0), a, 100, entries.get(1));
+	}
+

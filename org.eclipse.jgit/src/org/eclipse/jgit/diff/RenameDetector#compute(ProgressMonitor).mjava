@@ -14,8 +14,15 @@
 
 			if (pm == null)
 				pm = NullProgressMonitor.INSTANCE;
-			findExactRenames(pm);
-			findContentRenames(pm);
+			ObjectReader reader = repo.newObjectReader();
+			try {
+				breakModifies(reader, pm);
+				findExactRenames(pm);
+				findContentRenames(reader, pm);
+				rejoinModifies(pm);
+			} finally {
+				reader.release();
+			}
 
 			entries.addAll(added);
 			added = null;

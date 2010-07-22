@@ -1,0 +1,31 @@
+	private void breakModifies(ObjectReader reader, ProgressMonitor pm)
+			throws IOException {
+		if (breakScore <= 0)
+			return;
+
+		ArrayList<DiffEntry> newEntries = new ArrayList<DiffEntry>(entries.size());
+
+		pm.beginTask(JGitText.get().renamesBreakingModifies, entries.size());
+
+		for (int i = 0; i < entries.size(); i++) {
+			DiffEntry e = entries.get(i);
+			if (e.getChangeType() == ChangeType.MODIFY) {
+				int score = calculateModifyScore(reader, e);
+				if (score < breakScore) {
+					List<DiffEntry> tmp = DiffEntry.breakModify(e);
+					DiffEntry del = tmp.get(0);
+					del.score = score;
+					deleted.add(del);
+					added.add(tmp.get(1));
+				} else {
+					newEntries.add(e);
+				}
+			} else {
+				newEntries.add(e);
+			}
+			pm.update(1);
+		}
+
+		entries = newEntries;
+	}
+

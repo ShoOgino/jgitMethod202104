@@ -21,10 +21,13 @@
 				break;
 
 			case MODIFY:
-				if (sameType(entry.getOldMode(), entry.getNewMode()))
+				if (sameType(entry.getOldMode(), entry.getNewMode())) {
 					entries.add(entry);
-				else
-					entries.addAll(DiffEntry.breakModify(entry));
+				} else {
+					List<DiffEntry> tmp = DiffEntry.breakModify(entry);
+					deleted.add(tmp.get(0));
+					added.add(tmp.get(1));
+				}
 				break;
 
 			case COPY:

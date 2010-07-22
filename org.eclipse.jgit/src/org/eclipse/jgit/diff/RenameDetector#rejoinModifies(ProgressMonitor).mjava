@@ -1,0 +1,32 @@
+	private void rejoinModifies(ProgressMonitor pm) {
+		HashMap<String, DiffEntry> nameMap = new HashMap<String, DiffEntry>();
+		ArrayList<DiffEntry> newAdded = new ArrayList<DiffEntry>(added.size());
+
+		pm.beginTask(JGitText.get().renamesRejoiningModifies, added.size()
+				+ deleted.size());
+
+		for (DiffEntry src : deleted) {
+			nameMap.put(src.oldName, src);
+			pm.update(1);
+		}
+
+		for (DiffEntry dst : added) {
+			DiffEntry src = nameMap.remove(dst.newName);
+			if (src != null) {
+				if (sameType(src.oldMode, dst.newMode)) {
+					entries.add(DiffEntry.pair(ChangeType.MODIFY, src, dst,
+							src.score));
+				} else {
+					nameMap.put(src.oldName, src);
+					newAdded.add(dst);
+				}
+			} else {
+				newAdded.add(dst);
+			}
+			pm.update(1);
+		}
+
+		added = newAdded;
+		deleted = new ArrayList<DiffEntry>(nameMap.values());
+	}
+
