@@ -1,6 +1,6 @@
 	public void testReadIndex_LsFiles() throws Exception {
 		final Map<String, CGitIndexRecord> ls = readLsFiles();
-		final DirCache dc = new DirCache(index);
+		final DirCache dc = new DirCache(index, FS.DETECTED);
 		assertEquals(0, dc.getEntryCount());
 		dc.read();
 		assertEquals(ls.size(), dc.getEntryCount());

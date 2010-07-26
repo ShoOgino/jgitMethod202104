@@ -1,7 +1,7 @@
 	public void testReadIndex_DirCacheTree() throws Exception {
 		final Map<String, CGitIndexRecord> cList = readLsFiles();
 		final Map<String, CGitLsTreeRecord> cTree = readLsTree();
-		final DirCache dc = new DirCache(index);
+		final DirCache dc = new DirCache(index, FS.DETECTED);
 		assertEquals(0, dc.getEntryCount());
 		dc.read();
 		assertEquals(cList.size(), dc.getEntryCount());

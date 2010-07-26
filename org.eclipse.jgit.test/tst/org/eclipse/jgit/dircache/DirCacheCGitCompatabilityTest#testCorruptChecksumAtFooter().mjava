@@ -1,5 +1,6 @@
 	public void testCorruptChecksumAtFooter() throws Exception {
-		final DirCache dc = new DirCache(pathOf("gitgit.index.badchecksum"));
+		final DirCache dc = new DirCache(pathOf("gitgit.index.badchecksum"),
+				FS.DETECTED);
 		try {
 			dc.read();
 			fail("Cache loaded despite corrupt checksum");

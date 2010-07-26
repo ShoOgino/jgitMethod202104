@@ -7,6 +7,9 @@
 	 *
 	 * @param indexLocation
 	 *            location of the index file on disk.
+	 * @param fs
+	 *            the file system abstraction which will be necessary to perform
+	 *            certain file system operations.
 	 * @return a cache representing the contents of the specified index file (if
 	 *         it exists) or an empty cache if the file does not exist.
 	 * @throws IOException
@@ -15,9 +18,9 @@
 	 *             the index file is using a format or extension that this
 	 *             library does not support.
 	 */
-	public static DirCache read(final File indexLocation)
+	public static DirCache read(final File indexLocation, final FS fs)
 			throws CorruptObjectException, IOException {
-		final DirCache c = new DirCache(indexLocation);
+		final DirCache c = new DirCache(indexLocation, fs);
 		c.read();
 		return c;
 	}

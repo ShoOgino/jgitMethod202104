@@ -1,6 +1,7 @@
 	private FileBasedConfig configFor(File gitDir) throws IOException,
 			ConfigInvalidException {
-		FileBasedConfig cfg = new FileBasedConfig(new File(gitDir, "config"));
+		File configPath = new File(gitDir, "config");
+		FileBasedConfig cfg = new FileBasedConfig(configPath, FS.DETECTED);
 		cfg.load();
 		return cfg;
 	}

@@ -3,11 +3,14 @@
 	 * <p>
 	 * The new index will be locked and then read before it is returned to the
 	 * caller. Read failures are reported as exceptions and therefore prevent
-	 * the method from returning a partially populated index.  On read failure,
+	 * the method from returning a partially populated index. On read failure,
 	 * the lock is released.
 	 *
 	 * @param indexLocation
 	 *            location of the index file on disk.
+	 * @param fs
+	 *            the file system abstraction which will be necessary to perform
+	 *            certain file system operations.
 	 * @return a cache representing the contents of the specified index file (if
 	 *         it exists) or an empty cache if the file does not exist.
 	 * @throws IOException
@@ -17,9 +20,9 @@
 	 *             the index file is using a format or extension that this
 	 *             library does not support.
 	 */
-	public static DirCache lock(final File indexLocation)
+	public static DirCache lock(final File indexLocation, final FS fs)
 			throws CorruptObjectException, IOException {
-		final DirCache c = new DirCache(indexLocation);
+		final DirCache c = new DirCache(indexLocation, fs);
 		if (!c.lock())
 			throw new IOException(MessageFormat.format(JGitText.get().cannotLock, indexLocation));
 

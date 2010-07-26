@@ -15,7 +15,8 @@
 				"logs/" + fromName).exists());
 
 		// "someone" has branch X locked
-		LockFile lockFile = new LockFile(new File(db.getDirectory(), toLock));
+		LockFile lockFile = new LockFile(new File(db.getDirectory(), toLock),
+				db.getFS());
 		try {
 			assertTrue(lockFile.lock());
 

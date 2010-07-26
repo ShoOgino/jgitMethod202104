@@ -1,7 +1,7 @@
 	public void testTreeWalk_LsFiles() throws Exception {
 		final Repository db = createBareRepository();
 		final Map<String, CGitIndexRecord> ls = readLsFiles();
-		final DirCache dc = new DirCache(index);
+		final DirCache dc = new DirCache(index, db.getFS());
 		assertEquals(0, dc.getEntryCount());
 		dc.read();
 		assertEquals(ls.size(), dc.getEntryCount());
