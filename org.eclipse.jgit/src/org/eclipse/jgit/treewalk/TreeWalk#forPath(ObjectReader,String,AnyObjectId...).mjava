@@ -5,8 +5,8 @@
 	 * the caller should not need to invoke {@link #next()} unless they are
 	 * looking for a possible directory/file name conflict.
 	 *
-	 * @param db
-	 *            repository to read tree object data from.
+	 * @param reader
+	 *            the reader the walker will obtain tree data from.
 	 * @param path
 	 *            single path to advance the tree walk instance into.
 	 * @param trees
@@ -23,14 +23,14 @@
 	 * @throws MissingObjectException
 	 *             a tree object was not found.
 	 */
-	public static TreeWalk forPath(final Repository db, final String path,
+	public static TreeWalk forPath(final ObjectReader reader, final String path,
 			final AnyObjectId... trees) throws MissingObjectException,
 			IncorrectObjectTypeException, CorruptObjectException, IOException {
-		ObjectReader reader = db.newObjectReader();
-		try {
-			return forPath(reader, path, trees);
-		} finally {
-			reader.release();
-		}
+		final TreeWalk r = new TreeWalk(reader);
+		r.setFilter(PathFilterGroup.createFromStrings(Collections
+				.singleton(path)));
+		r.setRecursive(r.getFilter().shouldBeRecursive());
+		r.reset(trees);
+		return r.next() ? r : null;
 	}
 
