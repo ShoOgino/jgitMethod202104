@@ -24,7 +24,11 @@
 	public void preparePack(ProgressMonitor countingMonitor,
 			Set<? extends ObjectId> want,
 			Set<? extends ObjectId> have) throws IOException {
-		ObjectWalk ow = new ObjectWalk(reader);
+		ObjectWalk ow;
+		if (shallowPack)
+			ow = new DepthWalk.ObjectWalk(reader, depth);
+		else
+			ow = new ObjectWalk(reader);
 		preparePack(countingMonitor, ow, want, have);
 	}
 

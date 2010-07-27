@@ -8,6 +8,13 @@
 			try {
 				line = pckIn.readString();
 			} catch (EOFException eof) {
+				// EOF on stateless RPC (aka smart HTTP) and non-shallow request
+				// means the client asked for the updated shallow/unshallow data,
+				// disconnected, and will try another request with actual want/have.
+				// Don't report the EOF here, its a bug in the protocol that the client
+				// just disconnects without sending an END.
+				if (!biDirectionalPipe && depth > 0)
+					return false;
 				throw eof;
 			}
 

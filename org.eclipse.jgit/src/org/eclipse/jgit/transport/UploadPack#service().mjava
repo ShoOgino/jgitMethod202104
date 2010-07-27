@@ -26,6 +26,8 @@
 			else
 				multiAck = MultiAck.OFF;
 
+			if (depth != 0)
+				processShallow();
 			sendPack = negotiate();
 		} catch (PackProtocolException err) {
 			reportErrorDuringNegotiate(err.getMessage());

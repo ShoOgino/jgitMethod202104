@@ -12,6 +12,17 @@
 
 			if (line == PacketLineIn.END)
 				break;
+
+			if (line.startsWith("deepen ")) {
+				depth = Integer.parseInt(line.substring(7));
+				continue;
+			}
+
+			if (line.startsWith("shallow ")) {
+				clientShallowCommits.add(ObjectId.fromString(line.substring(8)));
+				continue;
+			}
+
 			if (!line.startsWith("want ") || line.length() < 45)
 				throw new PackProtocolException(MessageFormat.format(JGitText.get().expectedGot, "want", line));
 

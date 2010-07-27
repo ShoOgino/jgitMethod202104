@@ -24,12 +24,14 @@
 	 *             when some I/O problem occur during reading objects.
 	 */
 	public void preparePack(ProgressMonitor countingMonitor,
-			final ObjectWalk walk,
+			ObjectWalk walk,
 			final Set<? extends ObjectId> interestingObjects,
 			final Set<? extends ObjectId> uninterestingObjects)
 			throws IOException {
 		if (countingMonitor == null)
 			countingMonitor = NullProgressMonitor.INSTANCE;
+		if (shallowPack && !(walk instanceof DepthWalk.ObjectWalk))
+			walk = new DepthWalk.ObjectWalk(reader, depth);
 		findObjectsToPack(countingMonitor, walk, interestingObjects,
 				uninterestingObjects);
 	}

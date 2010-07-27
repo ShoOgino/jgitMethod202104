@@ -1,0 +1,29 @@
+	/**
+	 * @param w
+	 * @param s Parent generator
+	 * @throws MissingObjectException
+	 * @throws IncorrectObjectTypeException
+	 * @throws IOException
+	 */
+	DepthGenerator(DepthWalk w, Generator s) throws MissingObjectException,
+			IncorrectObjectTypeException, IOException {
+		pending = new FIFORevQueue();
+		walk = (RevWalk)w;
+
+		this.depth = w.getDepth();
+		this.UNSHALLOW = w.getUnshallowFlag();
+		this.REINTERESTING = w.getReinterestingFlag();
+
+		s.shareFreeList(pending);
+
+		// Begin by sucking out all of the source's commits, and
+		// adding them to the pending queue
+		for (;;) {
+			RevCommit c = s.next();
+			if (c == null)
+				break;
+			if (((DepthWalk.Commit) c).getDepth() == 0)
+				pending.add(c);
+		}
+	}
+

@@ -1,0 +1,16 @@
+		/**
+		 * Mark a root commit (i.e., one whose depth should be considered 0.)
+		 *
+		 * @param c
+		 *            Commit to mark
+		 * @throws IOException
+		 * @throws IncorrectObjectTypeException
+		 * @throws MissingObjectException
+		 */
+		public void markRoot(RevCommit c) throws MissingObjectException,
+				IncorrectObjectTypeException, IOException {
+			if (c instanceof Commit)
+				((Commit) c).depth = 0;
+			super.markStart(c);
+		}
+

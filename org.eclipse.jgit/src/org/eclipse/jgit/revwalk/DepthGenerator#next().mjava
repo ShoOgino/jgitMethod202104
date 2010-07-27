@@ -1,0 +1,57 @@
+	@Override
+	RevCommit next() throws MissingObjectException,
+			IncorrectObjectTypeException, IOException {
+		// Perform a breadth-first descent into the commit graph,
+		// marking depths as we go.  This means that if a commit is
+		// reachable by more than one route, we are guaranteed to
+		// arrive by the shortest route first.
+		for (;;) {
+			final DepthWalk.Commit c = (DepthWalk.Commit) pending.next();
+			if (c == null)
+				return null;
+
+			if ((c.flags & RevWalk.PARSED) == 0)
+				c.parseHeaders(walk);
+
+			int newDepth = c.depth + 1;
+
+			for (final RevCommit p : c.parents) {
+				DepthWalk.Commit dp = (DepthWalk.Commit) p;
+
+				// If no depth has been assigned to this commit, assign
+				// it now.  Since we arrive by the shortest route first,
+				// this depth is guaranteed to be the smallest value that
+				// any path could produce.
+				if (dp.depth == -1) {
+					dp.depth = newDepth;
+
+					// If the parent is not too deep, add it to the queue
+					// so that we can produce it later
+					if (newDepth <= depth)
+						pending.add(p);
+				}
+
+				// If the current commit has become unshallowed, everything
+				// below us is new to the client.  Mark its parent as
+				// re-interesting, and carry that flag downward to all
+				// of its ancestors.
+				if(c.has(UNSHALLOW) || c.has(REINTERESTING)) {
+					p.add(REINTERESTING);
+					p.flags &= ~RevWalk.UNINTERESTING;
+				}
+			}
+
+			// Produce all commits less than the depth cutoff
+			boolean produce = c.depth <= depth;
+
+			// Unshallow commits are uninteresting, but still need to be sent
+			// up to the PackWriter so that it will exclude objects correctly.
+			// All other uninteresting commits should be omitted.
+			if ((c.flags & RevWalk.UNINTERESTING) != 0 && !c.has(UNSHALLOW))
+				produce = false;
+
+			if (produce)
+				return c;
+		}
+	}
+

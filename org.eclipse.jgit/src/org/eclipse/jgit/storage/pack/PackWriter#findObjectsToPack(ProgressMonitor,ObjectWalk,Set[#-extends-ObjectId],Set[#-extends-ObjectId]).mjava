@@ -79,9 +79,9 @@
 					if (tipToPack.containsKey(o))
 						o.add(inCachedPack);
 
-					if (have.contains(o)) {
+					if (have.contains(o))
 						haveObjs.add(o);
-					} else if (want.contains(o)) {
+					if (want.contains(o)) {
 						o.add(include);
 						wantObjs.add(o);
 						if (o instanceof RevTag)
@@ -112,8 +112,18 @@
 			}
 		}
 
-		for (RevObject obj : wantObjs)
-			walker.markStart(obj);
+		if (walker instanceof DepthWalk.ObjectWalk) {
+			DepthWalk.ObjectWalk depthWalk = (DepthWalk.ObjectWalk) walker;
+			for (RevObject obj : wantObjs)
+				depthWalk.markRoot(obj);
+			if (unshallowObjects != null) {
+				for (ObjectId id : unshallowObjects)
+					depthWalk.markUnshallow(walker.parseAny(id));
+			}
+		} else {
+			for (RevObject obj : wantObjs)
+				walker.markStart(obj);
+		}
 		for (RevObject obj : haveObjs)
 			walker.markUninteresting(obj);
 
@@ -148,36 +158,42 @@
 			countingMonitor.update(1);
 		}
 
-		int commitCnt = 0;
-		boolean putTagTargets = false;
-		for (RevCommit cmit : commits) {
-			if (!cmit.has(added)) {
-				cmit.add(added);
+		if (shallowPack) {
+			for (RevCommit cmit : commits) {
 				addObject(cmit, 0);
-				commitCnt++;
 			}
-
-			for (int i = 0; i < cmit.getParentCount(); i++) {
-				RevCommit p = cmit.getParent(i);
-				if (!p.has(added) && !p.has(RevFlag.UNINTERESTING)) {
-					p.add(added);
-					addObject(p, 0);
+		} else {
+			int commitCnt = 0;
+			boolean putTagTargets = false;
+			for (RevCommit cmit : commits) {
+				if (!cmit.has(added)) {
+					cmit.add(added);
+					addObject(cmit, 0);
 					commitCnt++;
 				}
-			}
 
-			if (!putTagTargets && 4096 < commitCnt) {
-				for (ObjectId id : tagTargets) {
-					RevObject obj = walker.lookupOrNull(id);
-					if (obj instanceof RevCommit
-							&& obj.has(include)
-							&& !obj.has(RevFlag.UNINTERESTING)
-							&& !obj.has(added)) {
-						obj.add(added);
-						addObject(obj, 0);
+				for (int i = 0; i < cmit.getParentCount(); i++) {
+					RevCommit p = cmit.getParent(i);
+					if (!p.has(added) && !p.has(RevFlag.UNINTERESTING)) {
+						p.add(added);
+						addObject(p, 0);
+						commitCnt++;
 					}
 				}
-				putTagTargets = true;
+
+				if (!putTagTargets && 4096 < commitCnt) {
+					for (ObjectId id : tagTargets) {
+						RevObject obj = walker.lookupOrNull(id);
+						if (obj instanceof RevCommit
+								&& obj.has(include)
+								&& !obj.has(RevFlag.UNINTERESTING)
+								&& !obj.has(added)) {
+							obj.add(added);
+							addObject(obj, 0);
+						}
+					}
+					putTagTargets = true;
+				}
 			}
 		}
 		commits = null;
