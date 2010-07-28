@@ -33,6 +33,18 @@
 		processOptions(state);
 
 		try {
+			if (all && !repo.isBare() && repo.getWorkTree() != null) {
+				Git git = new Git(repo);
+				try {
+					git.add()
+							.addFilepattern(".")
+							.setUpdate(true).call();
+				} catch (NoFilepatternException e) {
+					// should really not happen
+					throw new JGitInternalException(e.getMessage(), e);
+				}
+			}
+
 			Ref head = repo.getRef(Constants.HEAD);
 			if (head == null)
 				throw new NoHeadException(
