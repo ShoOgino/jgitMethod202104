@@ -26,27 +26,27 @@
 				parseNewFileMode(ptr, eol);
 
 			} else if (match(buf, ptr, COPY_FROM) >= 0) {
-				oldName = parseName(oldName, ptr + COPY_FROM.length, eol);
+				oldPath = parseName(oldPath, ptr + COPY_FROM.length, eol);
 				changeType = ChangeType.COPY;
 
 			} else if (match(buf, ptr, COPY_TO) >= 0) {
-				newName = parseName(newName, ptr + COPY_TO.length, eol);
+				newPath = parseName(newPath, ptr + COPY_TO.length, eol);
 				changeType = ChangeType.COPY;
 
 			} else if (match(buf, ptr, RENAME_OLD) >= 0) {
-				oldName = parseName(oldName, ptr + RENAME_OLD.length, eol);
+				oldPath = parseName(oldPath, ptr + RENAME_OLD.length, eol);
 				changeType = ChangeType.RENAME;
 
 			} else if (match(buf, ptr, RENAME_NEW) >= 0) {
-				newName = parseName(newName, ptr + RENAME_NEW.length, eol);
+				newPath = parseName(newPath, ptr + RENAME_NEW.length, eol);
 				changeType = ChangeType.RENAME;
 
 			} else if (match(buf, ptr, RENAME_FROM) >= 0) {
-				oldName = parseName(oldName, ptr + RENAME_FROM.length, eol);
+				oldPath = parseName(oldPath, ptr + RENAME_FROM.length, eol);
 				changeType = ChangeType.RENAME;
 
 			} else if (match(buf, ptr, RENAME_TO) >= 0) {
-				newName = parseName(newName, ptr + RENAME_TO.length, eol);
+				newPath = parseName(newPath, ptr + RENAME_TO.length, eol);
 				changeType = ChangeType.RENAME;
 
 			} else if (match(buf, ptr, SIMILARITY_INDEX) >= 0) {

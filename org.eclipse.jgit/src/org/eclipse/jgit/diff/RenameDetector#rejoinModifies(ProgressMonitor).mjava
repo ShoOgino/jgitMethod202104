@@ -6,18 +6,18 @@
 				+ deleted.size());
 
 		for (DiffEntry src : deleted) {
-			nameMap.put(src.oldName, src);
+			nameMap.put(src.oldPath, src);
 			pm.update(1);
 		}
 
 		for (DiffEntry dst : added) {
-			DiffEntry src = nameMap.remove(dst.newName);
+			DiffEntry src = nameMap.remove(dst.newPath);
 			if (src != null) {
 				if (sameType(src.oldMode, dst.newMode)) {
 					entries.add(DiffEntry.pair(ChangeType.MODIFY, src, dst,
 							src.score));
 				} else {
-					nameMap.put(src.oldName, src);
+					nameMap.put(src.oldPath, src);
 					newAdded.add(dst);
 				}
 			} else {

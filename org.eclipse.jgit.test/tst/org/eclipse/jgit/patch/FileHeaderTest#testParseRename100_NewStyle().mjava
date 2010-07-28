@@ -5,14 +5,14 @@
 				+ "rename to \" c/\\303\\205ngstr\\303\\266m\"\n");
 		int ptr = fh.parseGitFileName(0, fh.buf.length);
 		assertTrue(ptr > 0);
-		assertNull(fh.getOldName()); // can't parse names on a rename
-		assertNull(fh.getNewName());
+		assertNull(fh.getOldPath()); // can't parse names on a rename
+		assertNull(fh.getNewPath());
 
 		ptr = fh.parseGitHeaders(ptr, fh.buf.length);
 		assertTrue(ptr > 0);
 
-		assertEquals("a", fh.getOldName());
-		assertEquals(" c/\u00c5ngstr\u00f6m", fh.getNewName());
+		assertEquals("a", fh.getOldPath());
+		assertEquals(" c/\u00c5ngstr\u00f6m", fh.getNewPath());
 
 		assertSame(FileHeader.ChangeType.RENAME, fh.getChangeType());
 		assertSame(FileHeader.PatchType.UNIFIED, fh.getPatchType());

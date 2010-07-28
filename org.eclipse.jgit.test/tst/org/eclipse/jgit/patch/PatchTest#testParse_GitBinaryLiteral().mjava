@@ -11,7 +11,7 @@
 			assertNotNull(fh.getNewId());
 			assertEquals(ObjectId.zeroId().name(), fh.getOldId().name());
 			assertSame(FileMode.REGULAR_FILE, fh.getNewMode());
-			assertTrue(fh.getNewName().startsWith(
+			assertTrue(fh.getNewPath().startsWith(
 					"org.spearce.egit.ui/icons/toolbar/"));
 			assertSame(FileHeader.PatchType.GIT_BINARY, fh.getPatchType());
 			assertTrue(fh.getHunks().isEmpty());
@@ -32,7 +32,7 @@
 		}
 
 		final FileHeader fh = p.getFiles().get(4);
-		assertEquals("org.spearce.egit.ui/plugin.xml", fh.getNewName());
+		assertEquals("org.spearce.egit.ui/plugin.xml", fh.getNewPath());
 		assertSame(FileHeader.ChangeType.MODIFY, fh.getChangeType());
 		assertSame(FileHeader.PatchType.UNIFIED, fh.getPatchType());
 		assertFalse(fh.hasMetaDataChanges());

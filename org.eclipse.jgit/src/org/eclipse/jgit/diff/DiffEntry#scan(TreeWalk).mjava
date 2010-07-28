@@ -21,15 +21,15 @@
 
 			entry.oldMode = walk.getFileMode(0);
 			entry.newMode = walk.getFileMode(1);
-			entry.newName = entry.oldName = walk.getPathString();
+			entry.newPath = entry.oldPath = walk.getPathString();
 
 			if (entry.oldMode == FileMode.MISSING) {
-				entry.oldName = DiffEntry.DEV_NULL;
+				entry.oldPath = DiffEntry.DEV_NULL;
 				entry.changeType = ChangeType.ADD;
 				r.add(entry);
 
 			} else if (entry.newMode == FileMode.MISSING) {
-				entry.newName = DiffEntry.DEV_NULL;
+				entry.newPath = DiffEntry.DEV_NULL;
 				entry.changeType = ChangeType.DELETE;
 				r.add(entry);
 
