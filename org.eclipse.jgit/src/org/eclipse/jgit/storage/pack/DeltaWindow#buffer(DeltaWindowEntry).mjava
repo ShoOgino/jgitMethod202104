@@ -2,7 +2,7 @@
 			IncorrectObjectTypeException, IOException, LargeObjectException {
 		byte[] buf = ent.buffer;
 		if (buf == null) {
-			buf = writer.buffer(reader, ent.object);
+			buf = PackWriter.buffer(config, reader, ent.object);
 			if (0 < maxMemory)
 				loaded += buf.length;
 			ent.buffer = buf;

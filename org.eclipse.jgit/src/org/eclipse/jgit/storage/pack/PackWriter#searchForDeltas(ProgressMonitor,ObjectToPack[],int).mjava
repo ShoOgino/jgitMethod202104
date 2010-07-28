@@ -2,17 +2,18 @@
 			final ObjectToPack[] list, final int cnt)
 			throws MissingObjectException, IncorrectObjectTypeException,
 			LargeObjectException, IOException {
+		int threads = config.getThreads();
 		if (threads == 0)
 			threads = Runtime.getRuntime().availableProcessors();
 
-		if (threads <= 1 || cnt <= 2 * getDeltaSearchWindowSize()) {
-			DeltaCache dc = new DeltaCache(this);
-			DeltaWindow dw = new DeltaWindow(this, dc, reader);
+		if (threads <= 1 || cnt <= 2 * config.getDeltaSearchWindowSize()) {
+			DeltaCache dc = new DeltaCache(config);
+			DeltaWindow dw = new DeltaWindow(config, dc, reader);
 			dw.search(monitor, list, 0, cnt);
 			return;
 		}
 
-		final DeltaCache dc = new ThreadSafeDeltaCache(this);
+		final DeltaCache dc = new ThreadSafeDeltaCache(config);
 		final ProgressMonitor pm = new ThreadSafeProgressMonitor(monitor);
 
 		// Guess at the size of batch we want. Because we don't really
@@ -21,8 +22,8 @@
 		// are a bit smaller.
 		//
 		int estSize = cnt / (threads * 2);
-		if (estSize < 2 * getDeltaSearchWindowSize())
-			estSize = 2 * getDeltaSearchWindowSize();
+		if (estSize < 2 * config.getDeltaSearchWindowSize())
+			estSize = 2 * config.getDeltaSearchWindowSize();
 
 		final List<DeltaTask> myTasks = new ArrayList<DeltaTask>(threads * 2);
 		for (int i = 0; i < cnt;) {
@@ -49,9 +50,10 @@
 				batchSize = end - start;
 			}
 			i += batchSize;
-			myTasks.add(new DeltaTask(this, reader, dc, pm, batchSize, start, list));
+			myTasks.add(new DeltaTask(config, reader, dc, pm, batchSize, start, list));
 		}
 
+		final Executor executor = config.getExecutor();
 		final List<Throwable> errors = Collections
 				.synchronizedList(new ArrayList<Throwable>());
 		if (executor instanceof ExecutorService) {
