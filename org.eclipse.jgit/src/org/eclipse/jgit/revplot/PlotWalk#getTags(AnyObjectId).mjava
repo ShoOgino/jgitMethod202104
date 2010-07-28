@@ -9,7 +9,9 @@
 			tags = null;
 		else {
 			tags = list.toArray(new Ref[list.size()]);
-			Arrays.sort(tags, new PlotRefComparator());
+			// TODO hotfix, this results in a loop and consequently stack overflow
+			// when opening the history view in EGit
+			// Arrays.sort(tags, new PlotRefComparator());
 		}
 		return tags;
 	}
