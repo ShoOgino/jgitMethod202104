@@ -1,7 +1,7 @@
 	@Override
 	public long getEntryLastModified() {
-		Long cutOff = modTimes
-				.floor(Long.valueOf(super.getEntryLastModified()));
-		return (cutOff == null) ? 0 : cutOff;
+		Long cutOff = Long.valueOf(super.getEntryLastModified());
+		SortedSet<Long> head = modTimes.headSet(cutOff);
+		return head.isEmpty() ? 0 : head.last().longValue();
 	}
 
