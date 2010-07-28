@@ -3,7 +3,8 @@
 		String pathPack = null;
 		String pathIdx = null;
 
-		final PackWriter pw = new PackWriter(local);
+		final PackWriter writer = new PackWriter(transport.getPackConfig(),
+				local.newObjectReader());
 		try {
 			final List<ObjectId> need = new ArrayList<ObjectId>();
 			final List<ObjectId> have = new ArrayList<ObjectId>();
@@ -14,20 +15,20 @@
 				if (r.getPeeledObjectId() != null)
 					have.add(r.getPeeledObjectId());
 			}
-			pw.preparePack(monitor, need, have);
+			writer.preparePack(monitor, need, have);
 
 			// We don't have to continue further if the pack will
 			// be an empty pack, as the remote has all objects it
 			// needs to complete this change.
 			//
-			if (pw.getObjectsNumber() == 0)
+			if (writer.getObjectsNumber() == 0)
 				return;
 
 			packNames = new LinkedHashMap<String, String>();
 			for (final String n : dest.getPackNames())
 				packNames.put(n, n);
 
-			final String base = "pack-" + pw.computeName().name();
+			final String base = "pack-" + writer.computeName().name();
 			final String packName = base + ".pack";
 			pathPack = "pack/" + packName;
 			pathIdx = "pack/" + base + ".idx";
@@ -48,7 +49,7 @@
 			OutputStream os = dest.writeFile(pathPack, monitor, wt + "..pack");
 			try {
 				os = new BufferedOutputStream(os);
-				pw.writePack(monitor, monitor, os);
+				writer.writePack(monitor, monitor, os);
 			} finally {
 				os.close();
 			}
@@ -56,7 +57,7 @@
 			os = dest.writeFile(pathIdx, monitor, wt + "..idx");
 			try {
 				os = new BufferedOutputStream(os);
-				pw.writeIndex(os);
+				writer.writeIndex(os);
 			} finally {
 				os.close();
 			}
@@ -76,7 +77,7 @@
 
 			throw new TransportException(uri, JGitText.get().cannotStoreObjects, err);
 		} finally {
-			pw.release();
+			writer.release();
 		}
 	}
 

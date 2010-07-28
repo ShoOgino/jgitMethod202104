@@ -16,6 +16,10 @@
 	 */
 	public void writeBundle(ProgressMonitor monitor, OutputStream os)
 			throws IOException {
+		PackConfig pc = packConfig;
+		if (pc == null)
+			pc = new PackConfig(db);
+		PackWriter packWriter = new PackWriter(pc, db.newObjectReader());
 		try {
 			final HashSet<ObjectId> inc = new HashSet<ObjectId>();
 			final HashSet<ObjectId> exc = new HashSet<ObjectId>();
