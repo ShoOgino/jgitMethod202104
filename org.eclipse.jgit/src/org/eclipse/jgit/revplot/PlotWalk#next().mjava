@@ -1,0 +1,9 @@
+	@Override
+	public RevCommit next() throws MissingObjectException,
+			IncorrectObjectTypeException, IOException {
+		PlotCommit<?> pc = (PlotCommit) super.next();
+		if (pc != null)
+			pc.refs = getTags(pc);
+		return pc;
+	}
+
