@@ -3,9 +3,7 @@
 	 * <p>
 	 * At first, this method collects and sorts objects to pack, then deltas
 	 * search is performed if set up accordingly, finally pack stream is
-	 * written. {@link ProgressMonitor} tasks {@link #COMPRESSING_OBJECTS_PROGRESS}
-	 * (only if reuseDeltas or reuseObjects is enabled) and
-	 * {@link #WRITING_OBJECTS_PROGRESS} are updated during packing.
+	 * written.
 	 * </p>
 	 * <p>
 	 * All reused objects data checksum (Adler32/CRC32) is computed and
@@ -40,8 +38,9 @@
 		final PackOutputStream out = new PackOutputStream(writeMonitor,
 				packStream, this);
 
-		writeMonitor.beginTask(WRITING_OBJECTS_PROGRESS, getObjectsNumber());
-		out.writeFileHeader(PACK_VERSION_GENERATED, getObjectsNumber());
+		int objCnt = getObjectsNumber();
+		writeMonitor.beginTask(JGitText.get().writingObjects, objCnt);
+		out.writeFileHeader(PACK_VERSION_GENERATED, objCnt);
 		writeObjects(writeMonitor, out);
 		writeChecksum(out);
 
