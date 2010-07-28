@@ -1,17 +1,11 @@
-	/**
-	 * @param commitId
-	 * @return return the list of knows tags referring to this commit
-	 */
-	protected Ref[] getTags(final AnyObjectId commitId) {
+	private Ref[] getTags(final AnyObjectId commitId) {
 		Collection<Ref> list = reverseRefMap.get(commitId);
 		Ref[] tags;
 		if (list == null)
 			tags = null;
 		else {
 			tags = list.toArray(new Ref[list.size()]);
-			// TODO hotfix, this results in a loop and consequently stack overflow
-			// when opening the history view in EGit
-			// Arrays.sort(tags, new PlotRefComparator());
+			Arrays.sort(tags, new PlotRefComparator());
 		}
 		return tags;
 	}
