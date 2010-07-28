@@ -4,6 +4,10 @@
 	 * During delta compression, if there are enough objects to be considered
 	 * the writer will start up concurrent threads and allow them to compress
 	 * different sections of the repository concurrently.
+	 * <p>
+	 * An application thread pool can be set by {@link #setExecutor(Executor)}.
+	 * If not set a temporary pool will be created by the writer, and torn down
+	 * automatically when compression is over.
 	 *
 	 * @param threads
 	 *            number of threads to use. If <= 0 the number of available
