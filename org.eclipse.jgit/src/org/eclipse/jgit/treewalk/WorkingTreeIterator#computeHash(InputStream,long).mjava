@@ -1,0 +1,31 @@
+	private byte[] computeHash(InputStream in, long length) throws IOException {
+		contentDigest.reset();
+		contentDigest.update(hblob);
+		contentDigest.update((byte) ' ');
+
+		long sz = length;
+		if (sz == 0) {
+			contentDigest.update((byte) '0');
+		} else {
+			final int bufn = contentReadBuffer.length;
+			int p = bufn;
+			do {
+				contentReadBuffer[--p] = digits[(int) (sz % 10)];
+				sz /= 10;
+			} while (sz > 0);
+			contentDigest.update(contentReadBuffer, p, bufn - p);
+		}
+		contentDigest.update((byte) 0);
+
+		for (;;) {
+			final int r = in.read(contentReadBuffer);
+			if (r <= 0)
+				break;
+			contentDigest.update(contentReadBuffer, 0, r);
+			sz += r;
+		}
+		if (sz != length)
+			return zeroid;
+		return contentDigest.digest();
+	}
+

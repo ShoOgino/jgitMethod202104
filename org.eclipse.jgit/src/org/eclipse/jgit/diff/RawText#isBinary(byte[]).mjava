@@ -7,12 +7,6 @@
 	 * @return true if raw is likely to be a binary file, false otherwise
 	 */
 	public static boolean isBinary(byte[] raw) {
-		// Same heuristic as C Git
-		int size = raw.length > FIRST_FEW_BYTES ? FIRST_FEW_BYTES : raw.length;
-		for (int ptr = 0; ptr < size; ptr++)
-			if (raw[ptr] == '\0')
-				return true;
-
-		return false;
+		return isBinary(raw, raw.length);
 	}
 

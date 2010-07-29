@@ -4,49 +4,41 @@
 			if (is == null)
 				return zeroid;
 			try {
-				initializeDigest();
+				initializeDigestAndReadBuffer();
 
-				contentDigest.reset();
-				contentDigest.update(hblob);
-				contentDigest.update((byte) ' ');
+				final long len = e.getLength();
+				if (!mightNeedCleaning(e))
+					return computeHash(is, len);
 
-				final long blobLength = e.getLength();
-				long sz = blobLength;
-				if (sz == 0) {
-					contentDigest.update((byte) '0');
-				} else {
-					final int bufn = contentReadBuffer.length;
-					int p = bufn;
-					do {
-						contentReadBuffer[--p] = digits[(int) (sz % 10)];
-						sz /= 10;
-					} while (sz > 0);
-					contentDigest.update(contentReadBuffer, p, bufn - p);
+				if (len <= MAXIMUM_FILE_SIZE_TO_READ_FULLY) {
+					ByteBuffer rawbuf = IO.readWholeStream(is, (int) len);
+					byte[] raw = rawbuf.array();
+					int n = rawbuf.limit();
+					if (!isBinary(e, raw, n)) {
+						rawbuf = filterClean(e, raw, n);
+						raw = rawbuf.array();
+						n = rawbuf.limit();
+					}
+					return computeHash(new ByteArrayInputStream(raw, 0, n), n);
 				}
-				contentDigest.update((byte) 0);
 
-				for (;;) {
-					final int r = is.read(contentReadBuffer);
-					if (r <= 0)
-						break;
-					contentDigest.update(contentReadBuffer, 0, r);
-					sz += r;
-				}
-				if (sz != blobLength)
-					return zeroid;
-				return contentDigest.digest();
-			} finally {
+				if (isBinary(e))
+					return computeHash(is, len);
+
+				final long canonLen;
+				final InputStream lenIs = filterClean(e, e.openInputStream());
 				try {
-					is.close();
-				} catch (IOException err2) {
-					// Suppress any error related to closing an input
-					// stream. We don't care, we should not have any
-					// outstanding data to flush or anything like that.
+					canonLen = computeLength(lenIs);
+				} finally {
+					safeClose(lenIs);
 				}
+
+				return computeHash(filterClean(e, is), canonLen);
+			} finally {
+				safeClose(is);
 			}
 		} catch (IOException err) {
 			// Can't read the file? Don't report the failure either.
-			//
 			return zeroid;
 		}
 	}

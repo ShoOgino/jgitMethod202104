@@ -1,4 +1,4 @@
-	private void initializeDigest() {
+	private void initializeDigestAndReadBuffer() {
 		if (contentDigest != null)
 			return;
 
@@ -7,7 +7,7 @@
 			contentDigest = Constants.newMessageDigest();
 		} else {
 			final WorkingTreeIterator p = (WorkingTreeIterator) parent;
-			p.initializeDigest();
+			p.initializeDigestAndReadBuffer();
 			contentReadBuffer = p.contentReadBuffer;
 			contentDigest = p.contentDigest;
 		}

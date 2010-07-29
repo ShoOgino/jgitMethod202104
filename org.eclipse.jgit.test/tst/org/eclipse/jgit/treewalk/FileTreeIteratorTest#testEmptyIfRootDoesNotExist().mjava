@@ -1,7 +1,8 @@
 	public void testEmptyIfRootDoesNotExist() throws Exception {
 		final File r = new File(trash, "not-existing-file");
 		assertFalse(r.exists());
-		final FileTreeIterator fti = new FileTreeIterator(r, db.getFS());
+		final FileTreeIterator fti = new FileTreeIterator(r, db.getFS(),
+				WorkingTreeOptions.createConfigurationInstance(db.getConfig()));
 		assertTrue(fti.first());
 		assertTrue(fti.eof());
 	}

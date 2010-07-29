@@ -1,0 +1,14 @@
+	private long computeLength(InputStream in) throws IOException {
+		// Since we only care about the length, use skip. The stream
+		// may be able to more efficiently wade through its data.
+		//
+		long length = 0;
+		for (;;) {
+			long n = in.skip(1 << 20);
+			if (n <= 0)
+				break;
+			length += n;
+		}
+		return length;
+	}
+

@@ -1,0 +1,23 @@
+	/**
+	 * Determine heuristically whether a byte array represents binary (as
+	 * opposed to text) content.
+	 *
+	 * @param raw
+	 *            the raw file content.
+	 * @param length
+	 *            number of bytes in {@code raw} to evaluate. This should be
+	 *            {@code raw.length} unless {@code raw} was over-allocated by
+	 *            the caller.
+	 * @return true if raw is likely to be a binary file, false otherwise
+	 */
+	public static boolean isBinary(byte[] raw, int length) {
+		// Same heuristic as C Git
+		if (length > FIRST_FEW_BYTES)
+			length = FIRST_FEW_BYTES;
+		for (int ptr = 0; ptr < length; ptr++)
+			if (raw[ptr] == '\0')
+				return true;
+
+		return false;
+	}
+
