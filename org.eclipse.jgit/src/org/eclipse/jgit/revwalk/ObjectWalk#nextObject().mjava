@@ -53,11 +53,19 @@
 			treeWalk = treeWalk.next();
 		}
 
+		if (firstCommit != null) {
+			reader.walkAdviceBeginTrees(this, firstCommit, lastCommit);
+			firstCommit = null;
+			lastCommit = null;
+		}
+
 		last = null;
 		for (;;) {
 			final RevObject o = pendingObjects.next();
-			if (o == null)
+			if (o == null) {
+				reader.walkAdviceEnd();
 				return null;
+			}
 			if ((o.flags & SEEN) != 0)
 				continue;
 			o.flags |= SEEN;
