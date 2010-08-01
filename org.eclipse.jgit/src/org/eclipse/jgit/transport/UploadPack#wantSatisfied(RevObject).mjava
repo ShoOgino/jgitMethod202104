@@ -1,0 +1,24 @@
+	private boolean wantSatisfied(final RevObject want) throws IOException {
+		if (want.has(SATISFIED))
+			return true;
+
+		if (!(want instanceof RevCommit)) {
+			want.add(SATISFIED);
+			return true;
+		}
+
+		walk.resetRetain(SAVE);
+		walk.markStart((RevCommit) want);
+		for (;;) {
+			final RevCommit c = walk.next();
+			if (c == null)
+				break;
+			if (c.has(PEER_HAS)) {
+				addCommonBase(c);
+				want.add(SATISFIED);
+				return true;
+			}
+		}
+		return false;
+	}
+

@@ -20,20 +20,66 @@
 		// them in the search phase below.
 		//
 		for (ObjectToPack eo : edgeObjects) {
-			try {
-				if (loadSize(eo))
-					list[cnt++] = eo;
-			} catch (IOException notAvailable) {
-				// Skip this object. Since we aren't going to write it out
-				// the only consequence of it being unavailable to us is we
-				// may produce a larger data stream than we could have.
-				//
-				if (!ignoreMissingUninteresting)
-					throw notAvailable;
-			}
+			eo.setWeight(0);
+			list[cnt++] = eo;
 		}
 
+		// Compute the sizes of the objects so we can do a proper sort.
+		// We let the reader skip missing objects if it chooses. For
+		// some readers this can be a huge win. We detect missing objects
+		// by having set the weights above to 0 and allowing the delta
+		// search code to discover the missing object and skip over it, or
+		// abort with an exception if we actually had to have it.
+		//
 		monitor.beginTask(JGitText.get().compressingObjects, cnt);
+		AsyncObjectSizeQueue<ObjectToPack> sizeQueue = reader.getObjectSize(
+				Arrays.<ObjectToPack> asList(list).subList(0, cnt), false);
+		try {
+			final long limit = config.getBigFileThreshold();
+			for (;;) {
+				monitor.update(1);
+
+				try {
+					if (!sizeQueue.next())
+						break;
+				} catch (MissingObjectException notFound) {
+					if (ignoreMissingUninteresting) {
+						ObjectToPack otp = sizeQueue.getCurrent();
+						if (otp != null && otp.isEdge()) {
+							otp.setDoNotDelta(true);
+							continue;
+						}
+
+						otp = edgeObjects.get(notFound.getObjectId());
+						if (otp != null) {
+							otp.setDoNotDelta(true);
+							continue;
+						}
+					}
+					throw notFound;
+				}
+
+				ObjectToPack otp = sizeQueue.getCurrent();
+				if (otp == null) {
+					otp = objectsMap.get(sizeQueue.getObjectId());
+					if (otp == null)
+						otp = edgeObjects.get(sizeQueue.getObjectId());
+				}
+
+				long sz = sizeQueue.getSize();
+				if (limit <= sz || Integer.MAX_VALUE <= sz)
+					otp.setDoNotDelta(true); // too big, avoid costly files
+
+				else if (sz <= DeltaIndex.BLKSZ)
+					otp.setDoNotDelta(true); // too small, won't work
+
+				else
+					otp.setWeight((int) sz);
+			}
+		} finally {
+			sizeQueue.release();
+		}
+		monitor.endTask();
 
 		// Sort the objects by path hash so like files are near each other,
 		// and then by size descending so that bigger files are first. This
@@ -42,16 +88,35 @@
 		//
 		Arrays.sort(list, 0, cnt, new Comparator<ObjectToPack>() {
 			public int compare(ObjectToPack a, ObjectToPack b) {
-				int cmp = a.getType() - b.getType();
-				if (cmp == 0)
-					cmp = (a.getPathHash() >>> 1) - (b.getPathHash() >>> 1);
-				if (cmp == 0)
-					cmp = (a.getPathHash() & 1) - (b.getPathHash() & 1);
-				if (cmp == 0)
-					cmp = b.getWeight() - a.getWeight();
-				return cmp;
+				int cmp = (a.isDoNotDelta() ? 1 : 0)
+						- (b.isDoNotDelta() ? 1 : 0);
+				if (cmp != 0)
+					return cmp;
+
+				cmp = a.getType() - b.getType();
+				if (cmp != 0)
+					return cmp;
+
+				cmp = (a.getPathHash() >>> 1) - (b.getPathHash() >>> 1);
+				if (cmp != 0)
+					return cmp;
+
+				cmp = (a.getPathHash() & 1) - (b.getPathHash() & 1);
+				if (cmp != 0)
+					return cmp;
+
+				return b.getWeight() - a.getWeight();
 			}
 		});
+
+		// Above we stored the objects we cannot delta onto the end.
+		// Remove them from the list so we don't waste time on them.
+		while (0 < cnt && list[cnt - 1].isDoNotDelta())
+			cnt--;
+		if (cnt == 0)
+			return;
+
+		monitor.beginTask(JGitText.get().compressingObjects, cnt);
 		searchForDeltas(monitor, list, cnt);
 		monitor.endTask();
 	}

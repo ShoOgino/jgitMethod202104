@@ -1,13 +1,11 @@
-	private int findObjectsNeedingDelta(ObjectToPack[] list, int cnt, int type)
-			throws MissingObjectException, IncorrectObjectTypeException,
-			IOException {
+	private int findObjectsNeedingDelta(ObjectToPack[] list, int cnt, int type) {
 		for (ObjectToPack otp : objectsLists[type]) {
 			if (otp.isDoNotDelta()) // delta is disabled for this path
 				continue;
 			if (otp.isDeltaRepresentation()) // already reusing a delta
 				continue;
-			if (loadSize(otp))
-				list[cnt++] = otp;
+			otp.setWeight(0);
+			list[cnt++] = otp;
 		}
 		return cnt;
 	}

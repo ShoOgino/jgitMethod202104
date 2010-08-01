@@ -1,0 +1,80 @@
+	/**
+	 * Asynchronous object parsing.
+	 *
+	 * @param <T>
+	 *            any ObjectId type.
+	 * @param objectIds
+	 *            objects to open from the object store. The supplied collection
+	 *            must not be modified until the queue has finished.
+	 * @param reportMissing
+	 *            if true missing objects are reported by calling failure with a
+	 *            MissingObjectException. This may be more expensive for the
+	 *            implementation to guarantee. If false the implementation may
+	 *            choose to report MissingObjectException, or silently skip over
+	 *            the object with no warning.
+	 * @return queue to read the objects from.
+	 */
+	public <T extends ObjectId> AsyncRevObjectQueue parseAny(
+			Iterable<T> objectIds, boolean reportMissing) {
+		List<T> need = new ArrayList<T>();
+		List<RevObject> have = new ArrayList<RevObject>();
+		for (T id : objectIds) {
+			RevObject r = objects.get(id);
+			if (r != null && (r.flags & PARSED) != 0)
+				have.add(r);
+			else
+				need.add(id);
+		}
+
+		final Iterator<RevObject> objItr = have.iterator();
+		if (need.isEmpty()) {
+			return new AsyncRevObjectQueue() {
+				public RevObject next() {
+					return objItr.hasNext() ? objItr.next() : null;
+				}
+
+				public boolean cancel(boolean mayInterruptIfRunning) {
+					return true;
+				}
+
+				public void release() {
+					// In-memory only, no action required.
+				}
+			};
+		}
+
+		final AsyncObjectLoaderQueue<T> lItr = reader.open(need, reportMissing);
+		return new AsyncRevObjectQueue() {
+			public RevObject next() throws MissingObjectException,
+					IncorrectObjectTypeException, IOException {
+				if (objItr.hasNext())
+					return objItr.next();
+				if (!lItr.next())
+					return null;
+
+				ObjectId id = lItr.getObjectId();
+				ObjectLoader ldr = lItr.open();
+				RevObject r = objects.get(id);
+				if (r == null)
+					r = parseNew(id, ldr);
+				else if (r instanceof RevCommit) {
+					byte[] raw = ldr.getCachedBytes();
+					((RevCommit) r).parseCanonical(RevWalk.this, raw);
+				} else if (r instanceof RevTag) {
+					byte[] raw = ldr.getCachedBytes();
+					((RevTag) r).parseCanonical(RevWalk.this, raw);
+				} else
+					r.flags |= PARSED;
+				return r;
+			}
+
+			public boolean cancel(boolean mayInterruptIfRunning) {
+				return lItr.cancel(mayInterruptIfRunning);
+			}
+
+			public void release() {
+				lItr.release();
+			}
+		};
+	}
+

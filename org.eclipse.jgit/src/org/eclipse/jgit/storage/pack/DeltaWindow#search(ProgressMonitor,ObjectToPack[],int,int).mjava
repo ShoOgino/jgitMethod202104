@@ -16,11 +16,8 @@
 				}
 				res.set(toSearch[off]);
 
-				if (res.object.isDoNotDelta()) {
-					// PackWriter marked edge objects with the
-					// do-not-delta flag. They are the only ones
-					// that appear in toSearch with it set, but
-					// we don't actually want to make a delta for
+				if (res.object.isEdge()) {
+					// We don't actually want to make a delta for
 					// them, just need to push them into the window
 					// so they can be read by other objects.
 					//

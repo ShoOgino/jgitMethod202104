@@ -3,15 +3,13 @@
 			return false;
 
 		try {
-			for (final Iterator<RevCommit> i = wantCommits.iterator(); i
-					.hasNext();) {
-				final RevCommit want = i.next();
-				if (wantSatisfied(want))
-					i.remove();
+			for (RevObject obj : wantAll) {
+				if (wantSatisfied(obj))
+					return false;
 			}
+			return true;
 		} catch (IOException e) {
 			throw new PackProtocolException(JGitText.get().internalRevisionError, e);
 		}
-		return wantCommits.isEmpty();
 	}
 

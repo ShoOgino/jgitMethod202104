@@ -1,0 +1,54 @@
+	/**
+	 * Asynchronous object opening.
+	 *
+	 * @param <T>
+	 *            type of identifier being supplied.
+	 * @param objectIds
+	 *            objects to open from the object store. The supplied collection
+	 *            must not be modified until the queue has finished.
+	 * @param reportMissing
+	 *            if true missing objects are reported by calling failure with a
+	 *            MissingObjectException. This may be more expensive for the
+	 *            implementation to guarantee. If false the implementation may
+	 *            choose to report MissingObjectException, or silently skip over
+	 *            the object with no warning.
+	 * @return queue to read the objects from.
+	 */
+	public <T extends ObjectId> AsyncObjectLoaderQueue<T> open(
+			Iterable<T> objectIds, final boolean reportMissing) {
+		final Iterator<T> idItr = objectIds.iterator();
+		return new AsyncObjectLoaderQueue<T>() {
+			private T cur;
+
+			public boolean next() throws MissingObjectException, IOException {
+				if (idItr.hasNext()) {
+					cur = idItr.next();
+					return true;
+				} else {
+					return false;
+				}
+			}
+
+			public T getCurrent() {
+				return cur;
+			}
+
+			public ObjectId getObjectId() {
+				return cur;
+			}
+
+			public ObjectLoader open() throws IOException {
+				return ObjectReader.this.open(cur, OBJ_ANY);
+			}
+
+			public boolean cancel(boolean mayInterruptIfRunning) {
+				return true;
+			}
+
+			public void release() {
+				// Since we are sequential by default, we don't
+				// have any state to clean up if we terminate early.
+			}
+		};
+	}
+

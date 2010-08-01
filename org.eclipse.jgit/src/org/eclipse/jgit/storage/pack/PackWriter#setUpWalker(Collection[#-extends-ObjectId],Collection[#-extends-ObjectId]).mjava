@@ -3,28 +3,45 @@
 			final Collection<? extends ObjectId> uninterestingObjects)
 			throws MissingObjectException, IOException,
 			IncorrectObjectTypeException {
+		List<ObjectId> all = new ArrayList<ObjectId>(interestingObjects.size());
+		for (ObjectId id : interestingObjects)
+			all.add(id.copy());
+
+		final Set<ObjectId> not;
+		if (uninterestingObjects != null && !uninterestingObjects.isEmpty()) {
+			not = new HashSet<ObjectId>();
+			for (ObjectId id : uninterestingObjects)
+				not.add(id.copy());
+			all.addAll(not);
+		} else
+			not = Collections.emptySet();
+
 		final ObjectWalk walker = new ObjectWalk(reader);
 		walker.setRetainBody(false);
 		walker.sort(RevSort.COMMIT_TIME_DESC);
-		if (thin)
+		if (thin && !not.isEmpty())
 			walker.sort(RevSort.BOUNDARY, true);
 
-		for (ObjectId id : interestingObjects) {
-			RevObject o = walker.parseAny(id);
-			walker.markStart(o);
-		}
-		if (uninterestingObjects != null) {
-			for (ObjectId id : uninterestingObjects) {
-				final RevObject o;
+		AsyncRevObjectQueue q = walker.parseAny(all, true);
+		try {
+			for (;;) {
 				try {
-					o = walker.parseAny(id);
-				} catch (MissingObjectException x) {
-					if (ignoreMissingUninteresting)
+					RevObject o = q.next();
+					if (o == null)
+						break;
+					if (not.contains(o.copy()))
+						walker.markUninteresting(o);
+					else
+						walker.markStart(o);
+				} catch (MissingObjectException e) {
+					if (ignoreMissingUninteresting
+							&& not.contains(e.getObjectId()))
 						continue;
-					throw x;
+					throw e;
 				}
-				walker.markUninteresting(o);
 			}
+		} finally {
+			q.release();
 		}
 		return walker;
 	}

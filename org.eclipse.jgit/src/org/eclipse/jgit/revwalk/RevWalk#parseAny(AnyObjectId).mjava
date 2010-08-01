@@ -17,37 +17,9 @@
 	public RevObject parseAny(final AnyObjectId id)
 			throws MissingObjectException, IOException {
 		RevObject r = objects.get(id);
-		if (r == null) {
-			final ObjectLoader ldr = reader.open(id);
-			final int type = ldr.getType();
-			switch (type) {
-			case Constants.OBJ_COMMIT: {
-				final RevCommit c = createCommit(id);
-				c.parseCanonical(this, ldr.getCachedBytes());
-				r = c;
-				break;
-			}
-			case Constants.OBJ_TREE: {
-				r = new RevTree(id);
-				r.flags |= PARSED;
-				break;
-			}
-			case Constants.OBJ_BLOB: {
-				r = new RevBlob(id);
-				r.flags |= PARSED;
-				break;
-			}
-			case Constants.OBJ_TAG: {
-				final RevTag t = new RevTag(id);
-				t.parseCanonical(this, ldr.getCachedBytes());
-				r = t;
-				break;
-			}
-			default:
-				throw new IllegalArgumentException(MessageFormat.format(JGitText.get().badObjectType, type));
-			}
-			objects.add(r);
-		} else
+		if (r == null)
+			r = parseNew(id, reader.open(id));
+		else
 			parseHeaders(r);
 		return r;
 	}
