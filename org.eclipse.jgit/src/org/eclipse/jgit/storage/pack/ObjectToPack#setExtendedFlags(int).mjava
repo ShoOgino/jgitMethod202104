@@ -1,0 +1,14 @@
+	/**
+	 * Set the extended flags used by the subclass.
+	 *
+	 * Subclass implementations may store up to 4 bits of information inside of
+	 * the internal flags field already used by the base ObjectToPack instance.
+	 *
+	 * @param extFlags
+	 *            additional flag bits to store in the flags field. Due to space
+	 *            constraints only values [0x0, 0xf] are permitted.
+	 */
+	protected void setExtendedFlags(int extFlags) {
+		flags = ((extFlags & EXT_MASK) << EXT_SHIFT) | (flags & NON_EXT_MASK);
+	}
+
