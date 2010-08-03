@@ -1,0 +1,19 @@
+	/**
+	 * Write one object.
+	 *
+	 * If the object was already written, this method does nothing and returns
+	 * quickly. This case occurs whenever an object was written out of order in
+	 * order to ensure the delta base occurred before the object that needs it.
+	 *
+	 * @param otp
+	 *            the object to write.
+	 * @throws IOException
+	 *             the object cannot be read from the object reader, or the
+	 *             output stream is no longer accepting output. Caller must
+	 *             examine the type of exception and possibly its message to
+	 *             distinguish between these cases.
+	 */
+	public void writeObject(ObjectToPack otp) throws IOException {
+		packWriter.writeObject(this, otp);
+	}
+

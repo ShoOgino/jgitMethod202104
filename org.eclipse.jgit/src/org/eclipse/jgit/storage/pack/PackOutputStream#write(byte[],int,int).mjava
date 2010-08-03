@@ -1,9 +1,24 @@
 	@Override
-	public void write(final byte[] b, final int off, final int len)
+	public void write(final byte[] b, int off, int len)
 			throws IOException {
-		count += len;
-		out.write(b, off, len);
-		crc.update(b, off, len);
-		md.update(b, off, len);
+		while (0 < len) {
+			final int n = Math.min(len, BYTES_TO_WRITE_BEFORE_CANCEL_CHECK);
+			count += n;
+
+			if (checkCancelAt <= count) {
+				if (writeMonitor.isCancelled()) {
+					throw new IOException(
+							JGitText.get().packingCancelledDuringObjectsWriting);
+				}
+				checkCancelAt = count + BYTES_TO_WRITE_BEFORE_CANCEL_CHECK;
+			}
+
+			out.write(b, off, n);
+			crc.update(b, off, n);
+			md.update(b, off, n);
+
+			off += n;
+			len -= n;
+		}
 	}
 

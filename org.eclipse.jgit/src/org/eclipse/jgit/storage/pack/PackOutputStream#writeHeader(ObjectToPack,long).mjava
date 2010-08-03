@@ -17,7 +17,7 @@
 	public void writeHeader(ObjectToPack otp, long rawLength)
 			throws IOException {
 		if (otp.isDeltaRepresentation()) {
-			if (ofsDelta) {
+			if (packWriter.isDeltaBaseAsOffset()) {
 				ObjectToPack baseInPack = otp.getDeltaBase();
 				if (baseInPack != null && baseInPack.isWritten()) {
 					final long start = count;
