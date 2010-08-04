@@ -1,0 +1,54 @@
+	// the same three cases as in testAddWithParameterUpdate
+	// file a exists in workdir and in index -> added
+	// file b exists not in workdir but in index -> unchanged
+	// file c exists in workdir but not in index -> added
+	public void testAddWithoutParameterUpdate() throws Exception {
+		new File(db.getWorkTree(), "sub").mkdir();
+		File file = new File(db.getWorkTree(), "sub/a.txt");
+		file.createNewFile();
+		PrintWriter writer = new PrintWriter(file);
+		writer.print("content");
+		writer.close();
+
+		File file2 = new File(db.getWorkTree(), "sub/b.txt");
+		file2.createNewFile();
+		writer = new PrintWriter(file2);
+		writer.print("content b");
+		writer.close();
+
+		Git git = new Git(db);
+		git.add().addFilepattern("sub").call();
+
+		assertEquals(
+				"[sub/a.txt, mode:100644, sha1:6b584e8ece562ebffc15d38808cd6b98fc3d97ea]" +
+				"[sub/b.txt, mode:100644, sha1:50e9cdb03f9719261dd39d7f2920b906db3711a3]",
+				indexState(CONTENT_ID));
+
+		git.commit().setMessage("commit").call();
+
+		// new unstaged file sub/c.txt
+		File file3 = new File(db.getWorkTree(), "sub/c.txt");
+		file3.createNewFile();
+		writer = new PrintWriter(file3);
+		writer.print("content c");
+		writer.close();
+
+		// file sub/a.txt is modified
+		writer = new PrintWriter(file);
+		writer.print("modified content");
+		writer.close();
+
+		// file sub/b.txt is deleted
+		file2.delete();
+
+		git.add().addFilepattern("sub").call();
+		// change in sub/a.txt is staged
+		// deletion of sub/b.txt is not staged
+		// sub/c.txt is staged
+		assertEquals(
+				"[sub/a.txt, mode:100644, sha1:268af4e306cfcf6e79edd50fed9c553d211f68e3]" +
+				"[sub/b.txt, mode:100644, sha1:50e9cdb03f9719261dd39d7f2920b906db3711a3]" +
+				"[sub/c.txt, mode:100644, sha1:fa08654474ae2ddc4f61ee3a43d017ba65a439c3]",
+				indexState(CONTENT_ID));
+	}
+

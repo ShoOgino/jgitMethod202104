@@ -8,7 +8,7 @@
 		Git git = new Git(db);
 		DirCache dc = git.add().addFilepattern("a.txt").call();
 
-		ObjectId id1 = dc.getEntry(0).getObjectId();
+		dc.getEntry(0).getObjectId();
 
 		git.commit().setMessage("commit a.txt").call();
 
@@ -18,9 +18,8 @@
 
 		dc = git.add().addFilepattern("a.txt").call();
 
-		assertEquals(1, dc.getEntryCount());
-		assertEquals("a.txt", dc.getEntry(0).getPathString());
-		assertNotSame(id1, dc.getEntry(0).getObjectId());
-		assertEquals(0, dc.getEntry(0).getStage());
+		assertEquals(
+				"[a.txt, mode:100644, sha1:4f41554f6e0045ef53848fc0c3f33b6a9abc24a9]",
+				indexState(CONTENT_ID));
 	}
 

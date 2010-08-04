@@ -19,10 +19,10 @@
 		writer.close();
 
 		Git git = new Git(db);
-		DirCache dc = git.add().addFilepattern("sub").call();
-		assertEquals("sub/a.txt", dc.getEntry("sub/a.txt").getPathString());
-		assertNull(dc.getEntry("sub/b.txt"));
-		assertNotNull(dc.getEntry("sub/a.txt").getObjectId());
-		assertEquals(0, dc.getEntry("sub/a.txt").getStage());
+		git.add().addFilepattern("sub").call();
+
+		assertEquals(
+				"[sub/a.txt, mode:100644, sha1:6b584e8ece562ebffc15d38808cd6b98fc3d97ea]",
+				indexState(CONTENT_ID));
 	}
 

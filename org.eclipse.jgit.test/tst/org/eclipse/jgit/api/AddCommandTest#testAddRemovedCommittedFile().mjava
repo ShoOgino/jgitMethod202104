@@ -10,15 +10,14 @@
 
 		git.commit().setMessage("commit a.txt").call();
 
-		ObjectId id1 = dc.getEntry(0).getObjectId();
+		dc.getEntry(0).getObjectId();
 		file.delete();
 
 		// is supposed to do nothing
 		dc = git.add().addFilepattern("a.txt").call();
 
-		assertEquals(1, dc.getEntryCount());
-		assertEquals("a.txt", dc.getEntry(0).getPathString());
-		assertEquals(id1, dc.getEntry(0).getObjectId());
-		assertEquals(0, dc.getEntry(0).getStage());
+		assertEquals(
+				"[a.txt, mode:100644, sha1:6b584e8ece562ebffc15d38808cd6b98fc3d97ea]",
+				indexState(CONTENT_ID));
 	}
 
