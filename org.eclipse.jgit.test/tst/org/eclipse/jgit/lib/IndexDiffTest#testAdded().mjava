@@ -3,10 +3,13 @@
 		writeTrashFile("file1", "file1");
 		writeTrashFile("dir/subfile", "dir/subfile");
 		Tree tree = new Tree(db);
+		tree.setId(new ObjectWriter(db).writeTree(tree));
 
 		index.add(trash, new File(trash, "file1"));
 		index.add(trash, new File(trash, "dir/subfile"));
-		IndexDiff diff = new IndexDiff(tree, index);
+		index.write();
+		FileTreeIterator iterator = new FileTreeIterator(db);
+		IndexDiff diff = new IndexDiff(db, tree.getId(), iterator);
 		diff.diff();
 		assertEquals(2, diff.getAdded().size());
 		assertTrue(diff.getAdded().contains("file1"));

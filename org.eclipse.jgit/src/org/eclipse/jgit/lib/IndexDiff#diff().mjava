@@ -1,40 +1,73 @@
 	/**
 	 * Run the diff operation. Until this is called, all lists will be empty
+	 *
 	 * @return if anything is different between index, tree, and workdir
 	 * @throws IOException
 	 */
 	public boolean diff() throws IOException {
-		final File root = index.getRepository().getWorkTree();
-		new IndexTreeWalker(index, tree, root, new AbstractIndexTreeVisitor() {
-			public void visitEntry(TreeEntry treeEntry, Entry indexEntry, File file) {
-				if (treeEntry == null) {
-					added.add(indexEntry.getName());
-					anyChanges = true;
-				} else if (indexEntry == null) {
-					if (!(treeEntry instanceof Tree))
-						removed.add(treeEntry.getFullName());
-					anyChanges = true;
+		boolean changesExist = false;
+		DirCache dirCache = repository.readDirCache();
+		TreeWalk treeWalk = new TreeWalk(repository);
+		treeWalk.reset();
+		treeWalk.setRecursive(true);
+		// add the trees (tree, dirchache, workdir)
+		treeWalk.addTree(tree);
+		treeWalk.addTree(new DirCacheIterator(dirCache));
+		treeWalk.addTree(initialWorkingTreeIterator);
+		treeWalk.setFilter(TreeFilter.ANY_DIFF);
+		while (treeWalk.next()) {
+			AbstractTreeIterator treeIterator = treeWalk.getTree(TREE,
+					AbstractTreeIterator.class);
+			DirCacheIterator dirCacheIterator = treeWalk.getTree(INDEX,
+					DirCacheIterator.class);
+			WorkingTreeIterator workingTreeIterator = treeWalk.getTree(WORKDIR,
+					WorkingTreeIterator.class);
+			FileMode fileModeTree = treeWalk.getFileMode(TREE);
+
+			if (treeIterator != null) {
+				if (dirCacheIterator != null) {
+					if (!treeIterator.getEntryObjectId().equals(
+							dirCacheIterator.getEntryObjectId())) {
+						// in repo, in index, content diff => changed
+						changed.add(dirCacheIterator.getEntryPathString());
+						changesExist = true;
+					}
 				} else {
-					if (!treeEntry.getId().equals(indexEntry.getObjectId())) {
-						changed.add(indexEntry.getName());
-						anyChanges = true;
+					// in repo, not in index => removed
+					if (!fileModeTree.equals(FileMode.TYPE_TREE)) {
+						removed.add(treeIterator.getEntryPathString());
+						changesExist = true;
 					}
 				}
-
-				if (indexEntry != null) {
-					if (!file.exists()) {
-						missing.add(indexEntry.getName());
-						anyChanges = true;
-					} else {
-						if (indexEntry.isModified(root, true)) {
-							modified.add(indexEntry.getName());
-							anyChanges = true;
-						}
+			} else {
+				if (dirCacheIterator != null) {
+					// not in repo, in index => added
+					added.add(dirCacheIterator.getEntryPathString());
+					changesExist = true;
+				} else {
+					// not in repo, not in index => untracked
+					if (workingTreeIterator != null
+							&& !workingTreeIterator.isEntryIgnored()) {
+						untracked.add(workingTreeIterator.getEntryPathString());
+						changesExist = true;
 					}
 				}
 			}
-		}).walk();
 
-		return anyChanges;
+			if (dirCacheIterator != null) {
+				if (workingTreeIterator == null) {
+					// in index, not in workdir => missing
+					missing.add(dirCacheIterator.getEntryPathString());
+					changesExist = true;
+				} else {
+					if (!dirCacheIterator.idEqual(workingTreeIterator)) {
+						// in index, in workdir, content differs => modified
+						modified.add(dirCacheIterator.getEntryPathString());
+						changesExist = true;
+					}
+				}
+			}
+		}
+		return changesExist;
 	}
 

@@ -1,5 +1,4 @@
 	public void testRemoved() throws IOException {
-		GitIndex index = new GitIndex(db);
 		writeTrashFile("file2", "file2");
 		writeTrashFile("dir/file3", "dir/file3");
 
@@ -13,7 +12,8 @@
 		tree2.setId(new ObjectWriter(db).writeTree(tree2));
 		tree.setId(new ObjectWriter(db).writeTree(tree));
 
-		IndexDiff diff = new IndexDiff(tree, index);
+		FileTreeIterator iterator = new FileTreeIterator(db);
+		IndexDiff diff = new IndexDiff(db, tree.getId(), iterator);
 		diff.diff();
 		assertEquals(2, diff.getRemoved().size());
 		assertTrue(diff.getRemoved().contains("file2"));

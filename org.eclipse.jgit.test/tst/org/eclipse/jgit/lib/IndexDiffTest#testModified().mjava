@@ -4,6 +4,7 @@
 
 		index.add(trash, writeTrashFile("file2", "file2"));
 		index.add(trash, writeTrashFile("dir/file3", "dir/file3"));
+		index.write();
 
 		writeTrashFile("dir/file3", "changed");
 
@@ -15,7 +16,8 @@
 		Tree tree2 = (Tree) tree.findTreeMember("dir");
 		tree2.setId(new ObjectWriter(db).writeTree(tree2));
 		tree.setId(new ObjectWriter(db).writeTree(tree));
-		IndexDiff diff = new IndexDiff(tree, index);
+		FileTreeIterator iterator = new FileTreeIterator(db);
+		IndexDiff diff = new IndexDiff(db, tree.getId(), iterator);
 		diff.diff();
 		assertEquals(2, diff.getChanged().size());
 		assertTrue(diff.getChanged().contains("file2"));

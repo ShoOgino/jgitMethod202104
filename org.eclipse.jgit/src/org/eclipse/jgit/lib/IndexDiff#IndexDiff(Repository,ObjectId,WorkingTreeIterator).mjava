@@ -1,0 +1,17 @@
+	/**
+	 * Construct an Indexdiff
+	 *
+	 * @param repository
+	 * @param objectId
+	 *            tree id
+	 * @param workingTreeIterator
+	 *            iterator for working directory
+	 * @throws IOException
+	 */
+	public IndexDiff(Repository repository, ObjectId objectId,
+			WorkingTreeIterator workingTreeIterator) throws IOException {
+		this.repository = repository;
+		tree = new RevWalk(repository).parseTree(objectId);
+		this.initialWorkingTreeIterator = workingTreeIterator;
+	}
+

@@ -14,6 +14,7 @@
 		index.add(trash, writeTrashFile("a/c", "a/c"));
 		index.add(trash, writeTrashFile("a=c", "a=c"));
 		index.add(trash, writeTrashFile("a=d", "a=d"));
+		index.write();
 
 		Tree tree = new Tree(db);
 		// got the hash id'd from the data using echo -n a.b|git hash-object -t blob --stdin
@@ -31,7 +32,8 @@
 		tree2.setId(new ObjectWriter(db).writeTree(tree2));
 		tree.setId(new ObjectWriter(db).writeTree(tree));
 
-		IndexDiff diff = new IndexDiff(tree, index);
+		FileTreeIterator iterator = new FileTreeIterator(db);
+		IndexDiff diff = new IndexDiff(db, tree.getId(), iterator);
 		diff.diff();
 		assertEquals(0, diff.getChanged().size());
 		assertEquals(0, diff.getAdded().size());
