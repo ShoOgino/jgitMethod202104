@@ -9,50 +9,6 @@
 	 * @return a commit message with an inserted Change-Id line
 	 */
 	public static String insertId(String message, ObjectId changeId) {
-		if (message.indexOf("\nChange-Id:") > 0)
-			return message;
-
-		String[] lines = message.split("\n");
-		int footerFirstLine = lines.length;
-		for (int i = lines.length - 1; i > 1; --i) {
-			if (footerPattern.matcher(lines[i]).matches()) {
-				footerFirstLine = i;
-				continue;
-			}
-			if (footerFirstLine != lines.length && lines[i].length() == 0) {
-				break;
-			}
-			if (footerFirstLine != lines.length
-					&& includeInFooterPattern.matcher(lines[i]).matches()) {
-				footerFirstLine = i + 1;
-				continue;
-			}
-			footerFirstLine = lines.length;
-			break;
-		}
-		int insertAfter = footerFirstLine;
-		for (int i = footerFirstLine; i < lines.length; ++i) {
-			if (issuePattern.matcher(lines[i]).matches()) {
-				insertAfter = i + 1;
-				continue;
-			}
-			break;
-		}
-		StringBuilder ret = new StringBuilder();
-		int i = 0;
-		for (; i < insertAfter; ++i) {
-			ret.append(lines[i]);
-			ret.append("\n");
-		}
-		if (insertAfter == lines.length && insertAfter == footerFirstLine)
-			ret.append("\n");
-		ret.append("Change-Id: I");
-		ret.append(ObjectId.toString(changeId));
-		ret.append("\n");
-		for (; i < lines.length; ++i) {
-			ret.append(lines[i]);
-			ret.append("\n");
-		}
-		return ret.toString();
+		return insertId(message, changeId, false);
 	}
 

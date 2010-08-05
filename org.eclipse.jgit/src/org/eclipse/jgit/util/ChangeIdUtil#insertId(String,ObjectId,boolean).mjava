@@ -1,0 +1,76 @@
+	/**
+	 * Find the right place to insert a Change-Id and return it.
+	 * <p>
+	 * If no Change-Id is found the Change-Id is inserted before
+	 * the first footer line but after a Bug line.
+	 *
+	 * If Change-Id is found and replaceExisting is set to false,
+	 * the message is unchanged.
+	 *
+	 * If Change-Id is found and replaceExisting is set to true,
+	 * the Change-Id is replaced with {@code changeId}.
+	 *
+	 * @param message
+	 * @param changeId
+	 * @param replaceExisting
+	 * @return a commit message with an inserted Change-Id line
+	 */
+	public static String insertId(String message, ObjectId changeId,
+			boolean replaceExisting) {
+		if (message.indexOf(CHANGE_ID) > 0) {
+			if (replaceExisting) {
+				int i = message.indexOf(CHANGE_ID) + 10;
+				while (message.charAt(i) == ' ')
+					i++;
+				String oldId = message.length() == (i + 40) ?
+						message.substring(i) : message.substring(i, i + 41);
+				message = message.replace(oldId, "I" + changeId.getName());
+			}
+			return message;
+		}
+
+		String[] lines = message.split("\n");
+		int footerFirstLine = lines.length;
+		for (int i = lines.length - 1; i > 1; --i) {
+			if (footerPattern.matcher(lines[i]).matches()) {
+				footerFirstLine = i;
+				continue;
+			}
+			if (footerFirstLine != lines.length && lines[i].length() == 0) {
+				break;
+			}
+			if (footerFirstLine != lines.length
+					&& includeInFooterPattern.matcher(lines[i]).matches()) {
+				footerFirstLine = i + 1;
+				continue;
+			}
+			footerFirstLine = lines.length;
+			break;
+		}
+		int insertAfter = footerFirstLine;
+		for (int i = footerFirstLine; i < lines.length; ++i) {
+			if (issuePattern.matcher(lines[i]).matches()) {
+				insertAfter = i + 1;
+				continue;
+			}
+			break;
+		}
+		StringBuilder ret = new StringBuilder();
+		int i = 0;
+		for (; i < insertAfter; ++i) {
+			ret.append(lines[i]);
+			ret.append("\n");
+		}
+		if (insertAfter == lines.length && insertAfter == footerFirstLine)
+			ret.append("\n");
+		ret.append(CHANGE_ID);
+		ret.append(" I");
+		ret.append(ObjectId.toString(changeId));
+		ret.append("\n");
+		for (; i < lines.length; ++i) {
+			ret.append(lines[i]);
+			ret.append("\n");
+		}
+		return ret.toString();
+	}
+
