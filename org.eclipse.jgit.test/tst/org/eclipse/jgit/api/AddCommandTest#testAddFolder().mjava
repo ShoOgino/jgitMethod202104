@@ -13,12 +13,10 @@
 		writer.close();
 
 		Git git = new Git(db);
-		DirCache dc = git.add().addFilepattern("sub").call();
-		assertEquals("sub/a.txt", dc.getEntry("sub/a.txt").getPathString());
-		assertEquals("sub/b.txt", dc.getEntry("sub/b.txt").getPathString());
-		assertNotNull(dc.getEntry("sub/a.txt").getObjectId());
-		assertNotNull(dc.getEntry("sub/b.txt").getObjectId());
-		assertEquals(0, dc.getEntry("sub/a.txt").getStage());
-		assertEquals(0, dc.getEntry("sub/b.txt").getStage());
+		git.add().addFilepattern("sub").call();
+		assertEquals(
+				"[sub/a.txt, mode:100644, sha1:6b584e8ece562ebffc15d38808cd6b98fc3d97ea]" +
+				"[sub/b.txt, mode:100644, sha1:50e9cdb03f9719261dd39d7f2920b906db3711a3]",
+				indexState(CONTENT_ID));
 	}
 

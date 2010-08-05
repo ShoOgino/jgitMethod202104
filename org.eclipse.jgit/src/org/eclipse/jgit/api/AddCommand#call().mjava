@@ -47,18 +47,20 @@
 				// this path, we however want to add only one
 				// new DirCacheEntry per path.
 				else if (!(path.equals(lastAddedFile))) {
-					 if (f != null) { // the file exists
-						DirCacheEntry entry = new DirCacheEntry(path);
-						entry.setLength((int)f.getEntryLength());
-						entry.setLastModified(f.getEntryLastModified());
-						entry.setFileMode(f.getEntryFileMode());
-						entry.setObjectId(ow.writeBlob(file));
+					if (!(update && tw.getTree(0, DirCacheIterator.class) == null)) {
+						if (f != null) { // the file exists
+							DirCacheEntry entry = new DirCacheEntry(path);
+							entry.setLength((int)f.getEntryLength());
+							entry.setLastModified(f.getEntryLastModified());
+							entry.setFileMode(f.getEntryFileMode());
+							entry.setObjectId(ow.writeBlob(file));
 
-						builder.add(entry);
-						lastAddedFile = path;
-					} else {
-						c = tw.getTree(0, DirCacheIterator.class);
-						builder.add(c.getDirCacheEntry());
+							builder.add(entry);
+							lastAddedFile = path;
+						} else if (!update){
+							c = tw.getTree(0, DirCacheIterator.class);
+							builder.add(c.getDirCacheEntry());
+						}
 					}
 				}
 			}
