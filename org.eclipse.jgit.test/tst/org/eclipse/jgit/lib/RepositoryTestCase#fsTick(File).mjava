@@ -1,10 +1,14 @@
 	/**
-	 * Waits until it is guaranteed that the filesystem timer (used e.g. for
-	 * lastModified) has a value greater than the lastmodified time of the given
-	 * file. This is done by touch a file, reading the lastmodified and sleeping
-	 * attribute sleeping
+	 * Waits until it is guaranteed that a subsequent file modification has a
+	 * younger modification timestamp than the modification timestamp of the
+	 * given file. This is done by touching a temporary file, reading the
+	 * lastmodified attribute and, if needed, sleeping. After sleeping this loop
+	 * starts again until the filesystem timer has advanced enough.
 	 *
 	 * @param lastFile
+	 *            the file on which we want to wait until the filesystem timer
+	 *            has advanced more than the lastmodification timestamp of this
+	 *            file
 	 * @return return the last measured value of the filesystem timer which is
 	 *         greater than then the lastmodification time of lastfile.
 	 * @throws InterruptedException
