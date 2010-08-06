@@ -1,0 +1,23 @@
+	/**
+	 * Create writer with a specified configuration.
+	 * <p>
+	 * Objects for packing are specified in {@link #preparePack(Iterator)} or
+	 * {@link #preparePack(ProgressMonitor, Collection, Collection)}.
+	 *
+	 * @param config
+	 *            configuration for the pack writer.
+	 * @param reader
+	 *            reader to read from the repository with.
+	 */
+	public PackWriter(final PackConfig config, final ObjectReader reader) {
+		this.config = config;
+		this.reader = reader;
+		if (reader instanceof ObjectReuseAsIs)
+			reuseSupport = ((ObjectReuseAsIs) reader);
+		else
+			reuseSupport = null;
+
+		deltaBaseAsOffset = config.isDeltaBaseAsOffset();
+		reuseDeltas = config.isReuseDeltas();
+	}
+

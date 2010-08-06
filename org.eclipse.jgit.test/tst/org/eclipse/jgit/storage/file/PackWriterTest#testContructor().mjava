@@ -2,9 +2,10 @@
 	 * Test constructor for exceptions, default settings, initialization.
 	 */
 	public void testContructor() {
+		writer = new PackWriter(config, db.newObjectReader());
 		assertEquals(false, writer.isDeltaBaseAsOffset());
-		assertEquals(true, writer.isReuseDeltas());
-		assertEquals(true, writer.isReuseObjects());
+		assertEquals(true, config.isReuseDeltas());
+		assertEquals(true, config.isReuseObjects());
 		assertEquals(0, writer.getObjectsNumber());
 	}
 

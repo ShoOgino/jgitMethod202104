@@ -30,9 +30,9 @@
 		if (writeMonitor == null)
 			writeMonitor = NullProgressMonitor.INSTANCE;
 
-		if ((reuseDeltas || reuseObjects) && reuseSupport != null)
+		if ((reuseDeltas || config.isReuseObjects()) && reuseSupport != null)
 			searchForReuse();
-		if (deltaCompress)
+		if (config.isDeltaCompress())
 			searchForDeltas(compressMonitor);
 
 		final PackOutputStream out = new PackOutputStream(writeMonitor,

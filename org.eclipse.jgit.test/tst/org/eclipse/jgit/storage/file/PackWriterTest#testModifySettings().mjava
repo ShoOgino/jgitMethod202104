@@ -2,12 +2,16 @@
 	 * Change default settings and verify them.
 	 */
 	public void testModifySettings() {
-		writer.setDeltaBaseAsOffset(true);
-		writer.setReuseDeltas(false);
-		writer.setReuseObjects(false);
+		config.setReuseDeltas(false);
+		config.setReuseObjects(false);
+		config.setDeltaBaseAsOffset(false);
+		assertEquals(false, config.isReuseDeltas());
+		assertEquals(false, config.isReuseObjects());
+		assertEquals(false, config.isDeltaBaseAsOffset());
 
+		writer = new PackWriter(config, db.newObjectReader());
+		writer.setDeltaBaseAsOffset(true);
 		assertEquals(true, writer.isDeltaBaseAsOffset());
-		assertEquals(false, writer.isReuseDeltas());
-		assertEquals(false, writer.isReuseObjects());
+		assertEquals(false, config.isDeltaBaseAsOffset());
 	}
 

@@ -1,0 +1,12 @@
+	public Object call() throws Exception {
+		final ObjectReader or = templateReader.newReader();
+		try {
+			DeltaWindow dw;
+			dw = new DeltaWindow(config, dc, or);
+			dw.search(pm, list, start, batchSize);
+		} finally {
+			or.release();
+		}
+		return null;
+	}
+

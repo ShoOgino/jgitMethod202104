@@ -2,21 +2,19 @@
 			final ObjectToPack[] list, final int cnt)
 			throws MissingObjectException, IncorrectObjectTypeException,
 			LargeObjectException, IOException {
+		int threads = config.getThreads();
 		if (threads == 0)
 			threads = Runtime.getRuntime().availableProcessors();
 
-		if (threads <= 1 || cnt <= 2 * getDeltaSearchWindowSize()) {
-			DeltaCache dc = new DeltaCache(this);
-			DeltaWindow dw = new DeltaWindow(this, dc, reader);
+		if (threads <= 1 || cnt <= 2 * config.getDeltaSearchWindowSize()) {
+			DeltaCache dc = new DeltaCache(config);
+			DeltaWindow dw = new DeltaWindow(config, dc, reader);
 			dw.search(monitor, list, 0, cnt);
 			return;
 		}
 
-		final List<Throwable> errors = Collections
-				.synchronizedList(new ArrayList<Throwable>());
-		final DeltaCache dc = new ThreadSafeDeltaCache(this);
+		final DeltaCache dc = new ThreadSafeDeltaCache(config);
 		final ProgressMonitor pm = new ThreadSafeProgressMonitor(monitor);
-		final ExecutorService pool = Executors.newFixedThreadPool(threads);
 
 		// Guess at the size of batch we want. Because we don't really
 		// have a way for a thread to steal work from another thread if
@@ -24,9 +22,10 @@
 		// are a bit smaller.
 		//
 		int estSize = cnt / (threads * 2);
-		if (estSize < 2 * getDeltaSearchWindowSize())
-			estSize = 2 * getDeltaSearchWindowSize();
+		if (estSize < 2 * config.getDeltaSearchWindowSize())
+			estSize = 2 * config.getDeltaSearchWindowSize();
 
+		final List<DeltaTask> myTasks = new ArrayList<DeltaTask>(threads * 2);
 		for (int i = 0; i < cnt;) {
 			final int start = i;
 			final int batchSize;
@@ -51,39 +50,67 @@
 				batchSize = end - start;
 			}
 			i += batchSize;
-
-			pool.submit(new Runnable() {
-				public void run() {
-					try {
-						final ObjectReader or = reader.newReader();
-						try {
-							DeltaWindow dw;
-							dw = new DeltaWindow(PackWriter.this, dc, or);
-							dw.search(pm, list, start, batchSize);
-						} finally {
-							or.release();
-						}
-					} catch (Throwable err) {
-						errors.add(err);
-					}
-				}
-			});
+			myTasks.add(new DeltaTask(config, reader, dc, pm, batchSize, start, list));
 		}
 
-		// Tell the pool to stop.
-		//
-		pool.shutdown();
-		for (;;) {
+		final Executor executor = config.getExecutor();
+		final List<Throwable> errors = Collections
+				.synchronizedList(new ArrayList<Throwable>());
+		if (executor instanceof ExecutorService) {
+			// Caller supplied us a service, use it directly.
+			//
+			runTasks((ExecutorService) executor, myTasks, errors);
+
+		} else if (executor == null) {
+			// Caller didn't give us a way to run the tasks, spawn up a
+			// temporary thread pool and make sure it tears down cleanly.
+			//
+			ExecutorService pool = Executors.newFixedThreadPool(threads);
 			try {
-				if (pool.awaitTermination(60, TimeUnit.SECONDS))
-					break;
-			} catch (InterruptedException e) {
+				runTasks(pool, myTasks, errors);
+			} finally {
+				pool.shutdown();
+				for (;;) {
+					try {
+						if (pool.awaitTermination(60, TimeUnit.SECONDS))
+							break;
+					} catch (InterruptedException e) {
+						throw new IOException(
+								JGitText.get().packingCancelledDuringObjectsWriting);
+					}
+				}
+			}
+		} else {
+			// The caller gave us an executor, but it might not do
+			// asynchronous execution.  Wrap everything and hope it
+			// can schedule these for us.
+			//
+			final CountDownLatch done = new CountDownLatch(myTasks.size());
+			for (final DeltaTask task : myTasks) {
+				executor.execute(new Runnable() {
+					public void run() {
+						try {
+							task.call();
+						} catch (Throwable failure) {
+							errors.add(failure);
+						} finally {
+							done.countDown();
+						}
+					}
+				});
+			}
+			try {
+				done.await();
+			} catch (InterruptedException ie) {
+				// We can't abort the other tasks as we have no handle.
+				// Cross our fingers and just break out anyway.
+				//
 				throw new IOException(
 						JGitText.get().packingCancelledDuringObjectsWriting);
 			}
 		}
 
-		// If any thread threw an error, try to report it back as
+		// If any task threw an error, try to report it back as
 		// though we weren't using a threaded search algorithm.
 		//
 		if (!errors.isEmpty()) {

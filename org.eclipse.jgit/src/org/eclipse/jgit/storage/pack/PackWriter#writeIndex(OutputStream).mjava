@@ -15,6 +15,7 @@
 	public void writeIndex(final OutputStream indexStream) throws IOException {
 		final List<ObjectToPack> list = sortByName();
 		final PackIndexWriter iw;
+		int indexVersion = config.getIndexVersion();
 		if (indexVersion <= 0)
 			iw = PackIndexWriter.createOldestPossible(indexStream, list);
 		else
