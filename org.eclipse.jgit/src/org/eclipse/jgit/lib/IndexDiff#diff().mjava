@@ -11,7 +11,10 @@
 		treeWalk.reset();
 		treeWalk.setRecursive(true);
 		// add the trees (tree, dirchache, workdir)
-		treeWalk.addTree(tree);
+		if (tree != null)
+			treeWalk.addTree(tree);
+		else
+			treeWalk.addTree(new EmptyTreeIterator());
 		treeWalk.addTree(new DirCacheIterator(dirCache));
 		treeWalk.addTree(initialWorkingTreeIterator);
 		treeWalk.setFilter(TreeFilter.ANY_DIFF);

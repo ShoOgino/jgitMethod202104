@@ -3,7 +3,7 @@
 	 *
 	 * @param repository
 	 * @param objectId
-	 *            tree id
+	 *            tree id. If null, an EmptyTreeIterator is used.
 	 * @param workingTreeIterator
 	 *            iterator for working directory
 	 * @throws IOException
@@ -11,7 +11,10 @@
 	public IndexDiff(Repository repository, ObjectId objectId,
 			WorkingTreeIterator workingTreeIterator) throws IOException {
 		this.repository = repository;
-		tree = new RevWalk(repository).parseTree(objectId);
+		if (objectId != null)
+			tree = new RevWalk(repository).parseTree(objectId);
+		else
+			tree = null;
 		this.initialWorkingTreeIterator = workingTreeIterator;
 	}
 
