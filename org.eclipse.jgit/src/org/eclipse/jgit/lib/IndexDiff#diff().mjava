@@ -18,6 +18,8 @@
 		treeWalk.addTree(new DirCacheIterator(dirCache));
 		treeWalk.addTree(initialWorkingTreeIterator);
 		treeWalk.setFilter(TreeFilter.ANY_DIFF);
+		treeWalk.setFilter(AndTreeFilter.create(TreeFilter.ANY_DIFF,
+				new NotIgnoredFilter(WORKDIR)));
 		while (treeWalk.next()) {
 			AbstractTreeIterator treeIterator = treeWalk.getTree(TREE,
 					AbstractTreeIterator.class);

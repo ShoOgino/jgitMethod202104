@@ -1,0 +1,11 @@
+	@Override
+	public boolean include(TreeWalk walker) throws MissingObjectException,
+			IncorrectObjectTypeException, IOException {
+		WorkingTreeIterator workingTreeIterator = walker.getTree(
+				workdirTreeIndex, WorkingTreeIterator.class);
+		if (workingTreeIterator != null)
+			// do not include ignored entries
+			return !workingTreeIterator.isEntryIgnored();
+		return true;
+	}
+
