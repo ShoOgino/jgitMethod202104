@@ -1,13 +1,15 @@
 	public void testFastForwardWithFiles() throws Exception {
 		Git git = new Git(db);
 
-		addNewFileToIndex("file1");
+		writeTrashFile("file1", "file1");
+		git.add().addFilepattern("file1").call();
 		RevCommit first = git.commit().setMessage("initial commit").call();
 
 		assertTrue(new File(db.getWorkTree(), "file1").exists());
 		createBranch(first, "refs/heads/branch1");
 
-		addNewFileToIndex("file2");
+		writeTrashFile("file2", "file2");
+		git.add().addFilepattern("file2").call();
 		RevCommit second = git.commit().setMessage("second commit").call();
 		assertTrue(new File(db.getWorkTree(), "file2").exists());
 

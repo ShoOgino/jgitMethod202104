@@ -1,0 +1,13 @@
+	private void createDir(File f) throws IOException {
+		if (!f.isDirectory() && !f.mkdirs()) {
+			File p = f;
+			while (p != null && !p.exists())
+				p = p.getParentFile();
+			if (p == null || p.isDirectory())
+				throw new IOException(JGitText.get().cannotCreateDirectory);
+			p.delete();
+			if (!f.mkdirs())
+				throw new IOException(JGitText.get().cannotCreateDirectory);
+		}
+	}
+

@@ -1,0 +1,65 @@
+	@Override
+	protected boolean mergeImpl() throws IOException {
+		boolean implicitDirCache = false;
+
+		if (dircache == null) {
+			dircache = getRepository().lockDirCache();
+			implicitDirCache = true;
+		}
+
+		try {
+			builder = dircache.builder();
+			DirCacheBuildIterator buildIt = new DirCacheBuildIterator(builder);
+
+			tw = new NameConflictTreeWalk(db);
+			tw.reset();
+			tw.addTree(mergeBase());
+			tw.addTree(sourceTrees[0]);
+			tw.addTree(sourceTrees[1]);
+			tw.addTree(buildIt);
+			if (workingTreeIt != null)
+				tw.addTree(workingTreeIt);
+
+			while (tw.next()) {
+				if (!processEntry(
+						tw.getTree(T_BASE, CanonicalTreeParser.class),
+						tw.getTree(T_OURS, CanonicalTreeParser.class),
+						tw.getTree(T_THEIRS, CanonicalTreeParser.class),
+						tw.getTree(T_INDEX, DirCacheBuildIterator.class),
+						(workingTreeIt == null) ? null : tw.getTree(T_FILE, WorkingTreeIterator.class))) {
+					cleanUp();
+					return false;
+				}
+				if (tw.isSubtree() && enterSubtree)
+					tw.enterSubtree();
+			}
+
+			// All content-merges are successfully done. If we can now write the
+			// new
+			// index we are on quite safe ground. Even if the checkout of files
+			// coming from "theirs" fails the user can work around such failures
+			// by
+			// checking out the index again.
+			if (!builder.commit()) {
+				cleanUp();
+				throw new IndexWriteException();
+			}
+			builder = null;
+
+			// No problem found. The only thing left to be done is to checkout
+			// all files from "theirs" which have been selected to go into the
+			// new index.
+			checkout();
+			if (getUnmergedPathes().isEmpty()) {
+				resultTree = dircache.writeTree(oi);
+				return true;
+			} else {
+				resultTree = null;
+				return false;
+			}
+		} finally {
+			if (implicitDirCache)
+				dircache.unlock();
+		}
+	}
+
