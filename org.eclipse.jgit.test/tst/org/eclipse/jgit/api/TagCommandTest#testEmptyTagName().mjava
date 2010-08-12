@@ -1,0 +1,14 @@
+	public void testEmptyTagName() throws NoHeadException, NoMessageException,
+			UnmergedPathException, ConcurrentRefUpdateException,
+			JGitInternalException, WrongRepositoryStateException {
+		Git git = new Git(db);
+		git.commit().setMessage("initial commit").call();
+		try {
+			// forget to tag name
+			git.tag().setMessage("some message").call();
+			fail("We should have failed without a tag name");
+		} catch (InvalidTagNameException e) {
+			// should hit here
+		}
+	}
+

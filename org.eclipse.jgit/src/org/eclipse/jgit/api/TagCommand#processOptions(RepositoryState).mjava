@@ -1,0 +1,24 @@
+	/**
+	 * Sets default values for not explicitly specified options. Then validates
+	 * that all required data has been provided.
+	 *
+	 * @param state
+	 *            the state of the repository we are working on
+	 *
+	 * @throws InvalidTagNameException
+	 *             if the tag name is null or invalid
+	 * @throws UnsupportedOperationException
+	 *             if the tag is signed (not supported yet)
+	 */
+	private void processOptions(RepositoryState state)
+			throws InvalidTagNameException {
+		if (tagger == null)
+			tagger = new PersonIdent(repo);
+		if (name == null || !Repository.isValidRefName(Constants.R_TAGS + name))
+			throw new InvalidTagNameException(MessageFormat.format(JGitText
+					.get().tagNameInvalid, name == null ? "<null>" : name));
+		if (signed)
+			throw new UnsupportedOperationException(
+					JGitText.get().signingNotSupportedOnTag);
+	}
+

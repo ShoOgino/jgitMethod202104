@@ -1,0 +1,84 @@
+	/**
+	 * Executes the {@code tag} command with all the options and parameters
+	 * collected by the setter methods of this class. Each instance of this
+	 * class should only be used for one invocation of the command (means: one
+	 * call to {@link #call()})
+	 *
+	 * @return a {@link RevTag} object representing the successful tag
+	 * @throws NoHeadException
+	 *             when called on a git repo without a HEAD reference
+	 * @throws JGitInternalException
+	 *             a low-level exception of JGit has occurred. The original
+	 *             exception can be retrieved by calling
+	 *             {@link Exception#getCause()}. Expect only
+	 *             {@code IOException's} to be wrapped.
+	 */
+	public RevTag call() throws JGitInternalException,
+			ConcurrentRefUpdateException, InvalidTagNameException, NoHeadException {
+		checkCallable();
+
+		RepositoryState state = repo.getRepositoryState();
+		processOptions(state);
+
+		try {
+			// create the tag object
+			TagBuilder newTag = new TagBuilder();
+			newTag.setTag(name);
+			newTag.setMessage(message);
+			newTag.setTagger(tagger);
+
+			// if no id is set, we should attempt to use HEAD
+			if (id == null) {
+				ObjectId objectId = repo.resolve(Constants.HEAD + "^{commit}");
+				if (objectId == null)
+					throw new NoHeadException(
+							JGitText.get().tagOnRepoWithoutHEADCurrentlyNotSupported);
+
+				newTag.setObjectId(objectId, Constants.OBJ_COMMIT);
+			} else {
+				newTag.setObjectId(id);
+			}
+
+			// write the tag object
+			ObjectInserter inserter = repo.newObjectInserter();
+			try {
+				ObjectId tagId = inserter.insert(newTag);
+				inserter.flush();
+
+				RevWalk revWalk = new RevWalk(repo);
+				try {
+					RevTag revTag = revWalk.parseTag(newTag.getTagId());
+					String refName = Constants.R_TAGS + newTag.getTag();
+					RefUpdate tagRef = repo.updateRef(refName);
+					tagRef.setNewObjectId(tagId);
+					tagRef.setForceUpdate(forceUpdate);
+					Result updateResult = tagRef.update(revWalk);
+					switch (updateResult) {
+					case NEW:
+					case FORCED:
+						return revTag;
+					case LOCK_FAILURE:
+						throw new ConcurrentRefUpdateException(
+								JGitText.get().couldNotLockHEAD,
+								tagRef.getRef(), updateResult);
+					default:
+						throw new JGitInternalException(MessageFormat.format(
+								JGitText.get().updatingRefFailed, refName,
+								newTag.toString(), updateResult));
+					}
+
+				} finally {
+					revWalk.release();
+				}
+
+			} finally {
+				inserter.release();
+			}
+
+		} catch (IOException e) {
+			throw new JGitInternalException(
+					JGitText.get().exceptionCaughtDuringExecutionOfTagCommand,
+					e);
+		}
+	}
+
