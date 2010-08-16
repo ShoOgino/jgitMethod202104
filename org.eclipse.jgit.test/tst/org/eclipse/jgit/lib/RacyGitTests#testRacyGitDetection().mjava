@@ -16,7 +16,7 @@
 		modTimes.add(fsTick(lastFile));
 
 		// now add both files to the index. No racy git expected
-		addToIndex(modTimes);
+		resetIndex(new FileTreeIteratorWithTimeControl(db, modTimes));
 
 		assertEquals(
 				"[a, mode:100644, time:t0, length:1, sha1:2e65efe2a145dda7ee51d1741299f848e5bf752e]" +
@@ -33,7 +33,7 @@
 		// now update the index the index. 'a' has to be racily clean -- because
 		// it's modification time is exactly the same as the previous index file
 		// mod time.
-		addToIndex(modTimes);
+		resetIndex(new FileTreeIteratorWithTimeControl(db, modTimes));
 
 		db.readDirCache();
 		// although racily clean a should not be reported as being dirty
