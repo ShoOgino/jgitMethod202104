@@ -18,6 +18,12 @@
 		loadUserConfig();
 		loadRepoConfig();
 
+		getConfig().addChangeListener(new ConfigChangedListener() {
+			public void onConfigChanged(ConfigChangedEvent event) {
+				fireEvent(event);
+			}
+		});
+
 		refs = new RefDirectory(this);
 		objectDatabase = new ObjectDirectory(repoConfig, //
 				options.getObjectDirectory(), //

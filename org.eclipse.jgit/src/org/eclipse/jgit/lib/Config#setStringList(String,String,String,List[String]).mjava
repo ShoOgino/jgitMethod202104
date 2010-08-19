@@ -22,5 +22,7 @@
 			src = state.get();
 			res = replaceStringList(src, section, subsection, name, values);
 		} while (!state.compareAndSet(src, res));
+		if (notifyUponTransientChanges())
+			fireConfigChangedEvent();
 	}
 

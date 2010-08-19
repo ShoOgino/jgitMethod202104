@@ -1,0 +1,33 @@
+	public void testFileRepository_ChangeEventsOnlyOnSave() throws Exception {
+		final ConfigChangedEvent[] events = new ConfigChangedEvent[1];
+		db.getListenerList().addConfigChangedListener(
+				new ConfigChangedListener() {
+					public void onConfigChanged(ConfigChangedEvent event) {
+						events[0] = event;
+					}
+				});
+		FileBasedConfig config = db.getConfig();
+		assertNull(events[0]);
+
+		// set a value to some arbitrary key
+		config.setString("test", "section", "event", "value");
+		// no changes until we save
+		assertNull(events[0]);
+		config.save();
+		assertNotNull(events[0]);
+		// correct repository?
+		assertEquals(events[0].getRepository(), db);
+
+		// reset for the next test
+		events[0] = null;
+
+		// unset the value we have just set above
+		config.unset("test", "section", "event");
+		// no changes until we save
+		assertNull(events[0]);
+		config.save();
+		assertNotNull(events[0]);
+		// correct repository?
+		assertEquals(events[0].getRepository(), db);
+	}
+
