@@ -3,7 +3,7 @@
 			ConcurrentRefUpdateException, JGitInternalException, Exception {
 		CommitCommand commitCmd = new Git(db).commit();
 		if (author != null)
-			commitCmd.setAuthor(new PersonIdent(author));
+			commitCmd.setAuthor(RawParseUtils.parsePersonIdent(author));
 		if (message != null)
 			commitCmd.setMessage(message);
 		Ref head = db.getRef(Constants.HEAD);
