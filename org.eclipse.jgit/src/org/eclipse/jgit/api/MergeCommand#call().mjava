@@ -21,7 +21,8 @@
 		try {
 			Ref head = repo.getRef(Constants.HEAD);
 			if (head == null)
-				throw new NoHeadException(JGitText.get().commitOnRepoWithoutHEADCurrentlyNotSupported);
+				throw new NoHeadException(
+						JGitText.get().commitOnRepoWithoutHEADCurrentlyNotSupported);
 			StringBuilder refLogMessage = new StringBuilder("merge ");
 
 			// Check for FAST_FORWARD, ALREADY_UP_TO_DATE
@@ -41,7 +42,8 @@
 				RevCommit srcCommit = revWalk.lookupCommit(objectId);
 				if (revWalk.isMergedInto(srcCommit, headCommit)) {
 					setCallable(false);
-					return new MergeResult(headCommit,
+					return new MergeResult(headCommit, srcCommit,
+							new ObjectId[] { srcCommit, headCommit },
 							MergeStatus.ALREADY_UP_TO_DATE, mergeStrategy);
 				} else if (revWalk.isMergedInto(headCommit, srcCommit)) {
 					// FAST_FORWARD detected: skip doing a real merge but only
@@ -50,11 +52,14 @@
 					checkoutNewHead(revWalk, headCommit, srcCommit);
 					updateHead(refLogMessage, srcCommit, head.getObjectId());
 					setCallable(false);
-					return new MergeResult(srcCommit, MergeStatus.FAST_FORWARD,
-							mergeStrategy);
+					return new MergeResult(srcCommit, headCommit,
+							new ObjectId[] { srcCommit, headCommit },
+							MergeStatus.FAST_FORWARD, mergeStrategy);
 				} else {
 					return new MergeResult(
 							headCommit,
+							null,
+							new ObjectId[] { srcCommit, headCommit },
 							MergeResult.MergeStatus.NOT_SUPPORTED,
 							mergeStrategy,
 							JGitText.get().onlyAlreadyUpToDateAndFastForwardMergesAreAvailable);
