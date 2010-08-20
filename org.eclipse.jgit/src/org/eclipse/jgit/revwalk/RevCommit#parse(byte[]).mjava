@@ -1,0 +1,21 @@
+	/**
+	 * Parse a commit from its canonical format.
+	 *
+	 * This method constructs a temporary revision pool, parses the commit as
+	 * supplied, and returns it to the caller. Since the commit was built inside
+	 * of a private revision pool its parent pointers will be initialized, but
+	 * will not have their headers loaded.
+	 *
+	 * Applications are discouraged from using this API. Callers usually need
+	 * more than one commit. Use {@link RevWalk#parseCommit(AnyObjectId)} to
+	 * obtain a RevCommit from an existing repository.
+	 *
+	 * @param raw
+	 *            the canonical formatted commit to be parsed.
+	 * @return the parsed commit, in an isolated revision pool that is not
+	 *         available to the caller.
+	 */
+	public static RevCommit parse(byte[] raw) {
+		return parse(new RevWalk((ObjectReader) null), raw);
+	}
+

@@ -1,0 +1,18 @@
+	public void testParse_PublicParseMethod()
+			throws UnsupportedEncodingException {
+		ObjectInserter.Formatter fmt = new ObjectInserter.Formatter();
+		Commit src = new Commit();
+		src.setTreeId(fmt.idFor(Constants.OBJ_TREE, new byte[] {}));
+		src.setAuthor(author);
+		src.setCommitter(committer);
+		src.setMessage("Test commit\n\nThis is a test.\n");
+
+		RevCommit p = RevCommit.parse(fmt.format(src));
+		assertEquals(src.getTreeId(), p.getTree());
+		assertEquals(0, p.getParentCount());
+		assertEquals(author, p.getAuthorIdent());
+		assertEquals(committer, p.getCommitterIdent());
+		assertEquals("Test commit", p.getShortMessage());
+		assertEquals(src.getMessage(), p.getFullMessage());
+	}
+
