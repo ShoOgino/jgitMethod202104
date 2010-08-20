@@ -1,0 +1,11 @@
+	private static byte[] read(Repository db, AnyObjectId blobId)
+			throws MissingObjectException, IncorrectObjectTypeException,
+			IOException {
+		ObjectReader or = db.newObjectReader();
+		try {
+			return read(or, blobId);
+		} finally {
+			or.release();
+		}
+	}
+

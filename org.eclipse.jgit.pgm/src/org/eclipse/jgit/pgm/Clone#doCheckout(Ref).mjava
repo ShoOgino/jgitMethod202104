@@ -7,13 +7,13 @@
 			u.link(branch.getName());
 		}
 
-		final Commit commit = db.mapCommit(branch.getObjectId());
+		final RevCommit commit = parseCommit(branch);
 		final RefUpdate u = db.updateRef(Constants.HEAD);
-		u.setNewObjectId(commit.getCommitId());
+		u.setNewObjectId(commit);
 		u.forceUpdate();
 
 		final GitIndex index = new GitIndex(db);
-		final Tree tree = commit.getTree();
+		final Tree tree = db.mapTree(commit.getTree());
 		final WorkDirCheckout co;
 
 		co = new WorkDirCheckout(db, db.getWorkTree(), index, tree);

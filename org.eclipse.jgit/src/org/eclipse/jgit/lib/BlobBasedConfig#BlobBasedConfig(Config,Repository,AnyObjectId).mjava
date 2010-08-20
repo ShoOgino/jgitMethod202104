@@ -1,9 +1,9 @@
 	/**
-	 * The constructor from object identifier
+	 * Load a configuration file from a blob.
 	 *
 	 * @param base
 	 *            the base configuration file
-	 * @param r
+	 * @param db
 	 *            the repository
 	 * @param objectId
 	 *            the object identifier
@@ -12,10 +12,8 @@
 	 * @throws ConfigInvalidException
 	 *             the blob is not a valid configuration format.
 	 */
-	public BlobBasedConfig(Config base, final Repository r,
-			final ObjectId objectId) throws IOException, ConfigInvalidException {
-		super(base);
-		ObjectLoader loader = r.open(objectId, Constants.OBJ_BLOB);
-		fromText(RawParseUtils.decode(loader.getCachedBytes()));
+	public BlobBasedConfig(Config base, Repository db, AnyObjectId objectId)
+			throws IOException, ConfigInvalidException {
+		this(base, read(db, objectId));
 	}
 

@@ -1,0 +1,13 @@
+	private ObjectId insertCommit(final Commit commit) throws IOException,
+			UnsupportedEncodingException {
+		ObjectInserter oi = db.newObjectInserter();
+		try {
+			ObjectId id = oi.insert(Constants.OBJ_COMMIT, oi.format(commit));
+			oi.flush();
+			commit.setCommitId(id);
+			return id;
+		} finally {
+			oi.release();
+		}
+	}
+

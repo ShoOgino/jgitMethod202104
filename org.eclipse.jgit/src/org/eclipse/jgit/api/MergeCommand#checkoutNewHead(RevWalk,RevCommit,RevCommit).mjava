@@ -6,8 +6,8 @@
 		File workDir = repo.getWorkTree();
 		if (workDir != null) {
 			WorkDirCheckout workDirCheckout = new WorkDirCheckout(repo,
-					workDir, headCommit.asCommit(revWalk).getTree(), index,
-					newHeadCommit.asCommit(revWalk).getTree());
+					workDir, repo.mapTree(headCommit.getTree()), index,
+					repo.mapTree(newHeadCommit.getTree()));
 			workDirCheckout.setFailOnConflict(true);
 			try {
 				workDirCheckout.checkout();

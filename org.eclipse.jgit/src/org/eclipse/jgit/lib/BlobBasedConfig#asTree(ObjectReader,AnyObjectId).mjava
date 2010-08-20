@@ -1,0 +1,13 @@
+	private static AnyObjectId asTree(ObjectReader or, AnyObjectId treeish)
+			throws MissingObjectException, IncorrectObjectTypeException,
+			IOException {
+		if (treeish instanceof RevTree)
+			return treeish;
+
+		if (treeish instanceof RevCommit
+				&& ((RevCommit) treeish).getTree() != null)
+			return ((RevCommit) treeish).getTree();
+
+		return new RevWalk(or).parseTree(treeish).getId();
+	}
+

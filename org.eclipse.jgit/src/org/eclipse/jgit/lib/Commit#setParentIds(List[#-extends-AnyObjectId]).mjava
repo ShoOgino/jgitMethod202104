@@ -1,0 +1,13 @@
+	/**
+	 * Set the parents of this commit.
+	 *
+	 * @param newParents
+	 *            the entire list of parents for this commit.
+	 */
+	public void setParentIds(List<? extends AnyObjectId> newParents) {
+		parentIds = new ObjectId[newParents.size()];
+		for (int i = 0; i < newParents.size(); i++)
+			parentIds[i] = newParents.get(i).copy();
+		commitId = null;
+	}
+

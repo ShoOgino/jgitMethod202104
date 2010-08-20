@@ -1,0 +1,24 @@
+	/**
+	 * Load a configuration file from a blob stored in a specific commit.
+	 *
+	 * @param base
+	 *            the base configuration file
+	 * @param db
+	 *            the repository containing the objects.
+	 * @param treeish
+	 *            the tree (or commit) that contains the object
+	 * @param path
+	 *            the path within the tree
+	 * @throws FileNotFoundException
+	 *             the path does not exist in the commit's tree.
+	 * @throws IOException
+	 *             the tree and/or blob cannot be accessed.
+	 * @throws ConfigInvalidException
+	 *             the blob is not a valid configuration format.
+	 */
+	public BlobBasedConfig(Config base, Repository db, AnyObjectId treeish,
+			String path) throws FileNotFoundException, IOException,
+			ConfigInvalidException {
+		this(base, read(db, treeish, path));
+	}
+

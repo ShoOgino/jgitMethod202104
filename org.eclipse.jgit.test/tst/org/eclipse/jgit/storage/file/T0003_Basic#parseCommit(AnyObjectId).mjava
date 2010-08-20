@@ -1,0 +1,11 @@
+	private RevCommit parseCommit(AnyObjectId id)
+			throws MissingObjectException, IncorrectObjectTypeException,
+			IOException {
+		RevWalk rw = new RevWalk(db);
+		try {
+			return rw.parseCommit(id);
+		} finally {
+			rw.release();
+		}
+	}
+
