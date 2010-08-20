@@ -1,0 +1,10 @@
+	private RevTag parseTag(AnyObjectId id) throws MissingObjectException,
+			IncorrectObjectTypeException, IOException {
+		RevWalk rw = new RevWalk(db);
+		try {
+			return rw.parseTag(id);
+		} finally {
+			rw.release();
+		}
+	}
+

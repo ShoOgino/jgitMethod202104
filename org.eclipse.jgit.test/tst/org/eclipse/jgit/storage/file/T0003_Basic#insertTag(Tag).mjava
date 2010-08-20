@@ -1,0 +1,13 @@
+	private ObjectId insertTag(final Tag tag) throws IOException,
+			UnsupportedEncodingException {
+		ObjectInserter oi = db.newObjectInserter();
+		try {
+			ObjectId id = oi.insert(Constants.OBJ_TAG, oi.format(tag));
+			oi.flush();
+			tag.setTagId(id);
+			return id;
+		} finally {
+			oi.release();
+		}
+	}
+
