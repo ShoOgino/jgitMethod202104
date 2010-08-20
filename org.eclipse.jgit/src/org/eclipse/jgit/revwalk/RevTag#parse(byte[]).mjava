@@ -1,0 +1,23 @@
+	/**
+	 * Parse an annotated tag from its canonical format.
+	 *
+	 * This method constructs a temporary revision pool, parses the tag as
+	 * supplied, and returns it to the caller. Since the tag was built inside of
+	 * a private revision pool its object pointer will be initialized, but will
+	 * not have its headers loaded.
+	 *
+	 * Applications are discouraged from using this API. Callers usually need
+	 * more than one object. Use {@link RevWalk#parseTag(AnyObjectId)} to obtain
+	 * a RevTag from an existing repository.
+	 *
+	 * @param raw
+	 *            the canonical formatted tag to be parsed.
+	 * @return the parsed tag, in an isolated revision pool that is not
+	 *         available to the caller.
+	 * @throws CorruptObjectException
+	 *             the tag contains a malformed header that cannot be handled.
+	 */
+	public static RevTag parse(byte[] raw) throws CorruptObjectException {
+		return parse(new RevWalk((ObjectReader) null), raw);
+	}
+
