@@ -1,4 +1,7 @@
 	public int hashCode() {
-		return getEmailAddress().hashCode() ^ (int) when;
+		int hc = getEmailAddress().hashCode();
+		hc *= 31;
+		hc += (int) (when / 1000L);
+		return hc;
 	}
 
