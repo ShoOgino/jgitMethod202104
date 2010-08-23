@@ -1,4 +1,13 @@
 	public void visitFile(final FileTreeEntry f) throws IOException {
-		f.setId(ow.writeBlob(new File(getCurrentDirectory(), f.getName())));
+		File path = new File(getCurrentDirectory(), f.getName());
+		FileInputStream in = new FileInputStream(path);
+		try {
+			long sz = in.getChannel().size();
+			f.setId(inserter.insert(Constants.OBJ_BLOB, sz, in));
+			inserter.flush();
+		} finally {
+			inserter.release();
+			in.close();
+		}
 	}
 

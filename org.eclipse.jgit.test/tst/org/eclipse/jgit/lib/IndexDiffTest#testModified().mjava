@@ -14,8 +14,8 @@
 		assertEquals(2, tree.memberCount());
 
 		Tree tree2 = (Tree) tree.findTreeMember("dir");
-		tree2.setId(new ObjectWriter(db).writeTree(tree2));
-		tree.setId(new ObjectWriter(db).writeTree(tree));
+		tree2.setId(insertTree(tree2));
+		tree.setId(insertTree(tree));
 		FileTreeIterator iterator = new FileTreeIterator(db);
 		IndexDiff diff = new IndexDiff(db, tree.getId(), iterator);
 		diff.diff();

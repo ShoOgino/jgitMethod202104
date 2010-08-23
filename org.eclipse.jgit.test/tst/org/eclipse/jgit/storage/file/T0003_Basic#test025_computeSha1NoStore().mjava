@@ -1,9 +1,8 @@
 	public void test025_computeSha1NoStore() throws IOException {
 		byte[] data = "test025 some data, more than 16 bytes to get good coverage"
 				.getBytes("ISO-8859-1");
-		// TODO: but we do not test legacy header writing
-		final ObjectId id = new ObjectWriter(db).computeBlobSha1(data.length,
-				new ByteArrayInputStream(data));
+		final ObjectId id = new ObjectInserter.Formatter().idFor(
+				Constants.OBJ_BLOB, data);
 		assertEquals("4f561df5ecf0dfbd53a0dc0f37262fef075d9dde", id.name());
 	}
 

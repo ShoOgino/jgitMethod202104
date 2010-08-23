@@ -1,15 +1,13 @@
 	/**
-	 * Format a Tree in canonical format.
+	 * Format this Tree in canonical format.
 	 *
-	 * @param tree
-	 *            the tree object to format
 	 * @return canonical encoding of the tree object.
 	 * @throws IOException
 	 *             the tree cannot be loaded, or its not in a writable state.
 	 */
-	public final byte[] format(Tree tree) throws IOException {
+	public byte[] format() throws IOException {
 		ByteArrayOutputStream o = new ByteArrayOutputStream();
-		for (TreeEntry e : tree.members()) {
+		for (TreeEntry e : members()) {
 			ObjectId id = e.getId();
 			if (id == null)
 				throw new ObjectWritingException(MessageFormat.format(JGitText

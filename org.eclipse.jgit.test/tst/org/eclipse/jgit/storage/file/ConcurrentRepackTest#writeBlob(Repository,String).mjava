@@ -2,8 +2,14 @@
 			throws IOException {
 		final RevWalk revWalk = new RevWalk(repo);
 		final byte[] bytes = Constants.encode(data);
-		final ObjectWriter ow = new ObjectWriter(repo);
-		final ObjectId id = ow.writeBlob(bytes);
+		final ObjectInserter inserter = repo.newObjectInserter();
+		final ObjectId id;
+		try {
+			id = inserter.insert(Constants.OBJ_BLOB, bytes);
+			inserter.flush();
+		} finally {
+			inserter.release();
+		}
 		try {
 			parse(id);
 			fail("Object " + id.name() + " should not exist in test repository");

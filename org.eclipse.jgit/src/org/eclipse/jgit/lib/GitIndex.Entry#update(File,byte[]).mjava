@@ -12,11 +12,16 @@
 		public boolean update(File f, byte[] newContent) throws IOException {
 			boolean modified = false;
 			size = newContent.length;
-			ObjectWriter writer = new ObjectWriter(db);
-			ObjectId newsha1 = writer.writeBlob(newContent);
-			if (!newsha1.equals(sha1))
-				modified = true;
-			sha1 = newsha1;
+			ObjectInserter oi = db.newObjectInserter();
+			try {
+				ObjectId newsha1 = oi.insert(Constants.OBJ_BLOB, newContent);
+				oi.flush();
+				if (!newsha1.equals(sha1))
+					modified = true;
+				sha1 = newsha1;
+			} finally {
+				oi.release();
+			}
 			return modified;
 		}
 

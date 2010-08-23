@@ -1,0 +1,12 @@
+	private ObjectId insertEmptyBlob() throws IOException {
+		final ObjectId emptyId;
+		ObjectInserter oi = db.newObjectInserter();
+		try {
+			emptyId = oi.insert(Constants.OBJ_BLOB, new byte[] {});
+			oi.flush();
+		} finally {
+			oi.release();
+		}
+		return emptyId;
+	}
+

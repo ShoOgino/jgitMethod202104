@@ -74,11 +74,9 @@
 				try {
 					InputStream is = new FileInputStream(file);
 					try {
-						ObjectWriter objectWriter = new ObjectWriter(db);
-						ObjectId newId = objectWriter.computeBlobSha1(file
-								.length(), is);
-						boolean ret = !newId.equals(sha1);
-						return ret;
+						ObjectId newId = new ObjectInserter.Formatter().idFor(
+								Constants.OBJ_BLOB, file.length(), is);
+						return !newId.equals(sha1);
 					} catch (IOException e) {
 						e.printStackTrace();
 					} finally {

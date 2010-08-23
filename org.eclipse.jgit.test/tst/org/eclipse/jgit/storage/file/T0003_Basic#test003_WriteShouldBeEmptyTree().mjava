@@ -1,6 +1,6 @@
 	public void test003_WriteShouldBeEmptyTree() throws IOException {
 		final Tree t = new Tree(db);
-		final ObjectId emptyId = new ObjectWriter(db).writeBlob(new byte[0]);
+		final ObjectId emptyId = insertEmptyBlob();
 		t.addFile("should-be-empty").setId(emptyId);
 		t.accept(new WriteTree(trash, db), TreeEntry.MODIFIED_ONLY);
 		assertEquals("7bb943559a305bdd6bdee2cef6e5df2413c3d30a", t.getId()

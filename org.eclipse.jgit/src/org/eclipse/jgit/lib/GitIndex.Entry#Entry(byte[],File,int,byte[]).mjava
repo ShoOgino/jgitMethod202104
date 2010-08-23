@@ -11,8 +11,18 @@
 			uid = -1;
 			gid = -1;
 			size = newContent.length;
-			ObjectWriter writer = new ObjectWriter(db);
-			sha1 = writer.writeBlob(newContent);
+			ObjectInserter inserter = db.newObjectInserter();
+			try {
+				InputStream in = new FileInputStream(f);
+				try {
+					sha1 = inserter.insert(Constants.OBJ_BLOB, newContent);
+				} finally {
+					in.close();
+				}
+				inserter.flush();
+			} finally {
+				inserter.release();
+			}
 			name = key;
 			flags = (short) ((stage << 12) | name.length); // TODO: fix flags
 			stages = (1 >> getStage());

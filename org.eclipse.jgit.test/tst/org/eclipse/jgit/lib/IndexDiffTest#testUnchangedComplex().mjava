@@ -27,10 +27,10 @@
 		tree.addFile("a=d").setId(ObjectId.fromString("fa6414df3da87840700e9eeb7fc261dd77ccd5c2"));
 
 		Tree tree3 = (Tree) tree.findTreeMember("a/b.b");
-		tree3.setId(new ObjectWriter(db).writeTree(tree3));
+		tree3.setId(insertTree(tree3));
 		Tree tree2 = (Tree) tree.findTreeMember("a");
-		tree2.setId(new ObjectWriter(db).writeTree(tree2));
-		tree.setId(new ObjectWriter(db).writeTree(tree));
+		tree2.setId(insertTree(tree2));
+		tree.setId(insertTree(tree));
 
 		FileTreeIterator iterator = new FileTreeIterator(db);
 		IndexDiff diff = new IndexDiff(db, tree.getId(), iterator);

@@ -1,8 +1,8 @@
 	public void test022_createCommitTag() throws IOException {
-		final ObjectId emptyId = new ObjectWriter(db).writeBlob(new byte[0]);
+		final ObjectId emptyId = insertEmptyBlob();
 		final Tree almostEmptyTree = new Tree(db);
 		almostEmptyTree.addEntry(new FileTreeEntry(almostEmptyTree, emptyId, "empty".getBytes(), false));
-		final ObjectId almostEmptyTreeId = new ObjectWriter(db).writeTree(almostEmptyTree);
+		final ObjectId almostEmptyTreeId = insertTree(almostEmptyTree);
 		final CommitBuilder almostEmptyCommit = new CommitBuilder();
 		almostEmptyCommit.setAuthor(new PersonIdent(author, 1154236443000L, -2 * 60)); // not exactly the same
 		almostEmptyCommit.setCommitter(new PersonIdent(author, 1154236443000L, -2 * 60));
