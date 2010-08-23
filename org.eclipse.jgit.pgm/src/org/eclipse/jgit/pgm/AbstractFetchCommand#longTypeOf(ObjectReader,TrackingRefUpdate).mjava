@@ -1,4 +1,4 @@
-	private String longTypeOf(final TrackingRefUpdate u) {
+	private String longTypeOf(ObjectReader reader, final TrackingRefUpdate u) {
 		final RefUpdate.Result r = u.getResult();
 		if (r == RefUpdate.Result.LOCK_FAILURE)
 			return "[lock fail]";
@@ -18,14 +18,14 @@
 		}
 
 		if (r == RefUpdate.Result.FORCED) {
-			final String aOld = u.getOldObjectId().abbreviate(db).name();
-			final String aNew = u.getNewObjectId().abbreviate(db).name();
+			final String aOld = safeAbbreviate(reader, u.getOldObjectId());
+			final String aNew = safeAbbreviate(reader, u.getNewObjectId());
 			return aOld + "..." + aNew;
 		}
 
 		if (r == RefUpdate.Result.FAST_FORWARD) {
-			final String aOld = u.getOldObjectId().abbreviate(db).name();
-			final String aNew = u.getNewObjectId().abbreviate(db).name();
+			final String aOld = safeAbbreviate(reader, u.getOldObjectId());
+			final String aNew = safeAbbreviate(reader, u.getNewObjectId());
 			return aOld + ".." + aNew;
 		}
 

@@ -1,0 +1,20 @@
+	/**
+	 * Return an abbreviation (prefix) of this object SHA-1.
+	 *
+	 * This implementation does not guaranteeing uniqueness. Callers should
+	 * instead use {@link ObjectReader#abbreviate(AnyObjectId, int)} to obtain a
+	 * unique abbreviation within the scope of a particular object database.
+	 *
+	 * @param len
+	 *            length of the abbreviated string.
+	 * @return SHA-1 abbreviation.
+	 */
+	public AbbreviatedObjectId abbreviate(final int len) {
+		final int a = AbbreviatedObjectId.mask(len, 1, w1);
+		final int b = AbbreviatedObjectId.mask(len, 2, w2);
+		final int c = AbbreviatedObjectId.mask(len, 3, w3);
+		final int d = AbbreviatedObjectId.mask(len, 4, w4);
+		final int e = AbbreviatedObjectId.mask(len, 5, w5);
+		return new AbbreviatedObjectId(len, a, b, c, d, e);
+	}
+

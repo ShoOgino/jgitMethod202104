@@ -1,0 +1,21 @@
+	/**
+	 * Obtain a unique abbreviation (prefix) of an object SHA-1.
+	 *
+	 * This method uses a reasonable default for the minimum length. Callers who
+	 * don't care about the minimum length should prefer this method.
+	 *
+	 * The returned abbreviation would expand back to the argument ObjectId when
+	 * passed to {@link #resolve(AbbreviatedObjectId)}, assuming no new objects
+	 * are added to this repository between calls.
+	 *
+	 * @param objectId
+	 *            object identity that needs to be abbreviated.
+	 * @return SHA-1 abbreviation.
+	 * @throws IOException
+	 *             the object store cannot be read.
+	 */
+	public AbbreviatedObjectId abbreviate(AnyObjectId objectId)
+			throws IOException {
+		return abbreviate(objectId, 7);
+	}
+

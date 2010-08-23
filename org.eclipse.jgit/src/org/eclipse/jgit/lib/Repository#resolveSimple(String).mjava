@@ -1,7 +1,23 @@
 	private ObjectId resolveSimple(final String revstr) throws IOException {
 		if (ObjectId.isId(revstr))
 			return ObjectId.fromString(revstr);
-		final Ref r = getRefDatabase().getRef(revstr);
-		return r != null ? r.getObjectId() : null;
+
+		Ref r = getRefDatabase().getRef(revstr);
+		if (r != null)
+			return r.getObjectId();
+
+		if (AbbreviatedObjectId.isId(revstr)) {
+			AbbreviatedObjectId id = AbbreviatedObjectId.fromString(revstr);
+			ObjectReader reader = newObjectReader();
+			try {
+				Collection<ObjectId> matches = reader.resolve(id);
+				if (matches.size() == 1)
+					return matches.iterator().next();
+			} finally {
+				reader.release();
+			}
+		}
+
+		return null;
 	}
 

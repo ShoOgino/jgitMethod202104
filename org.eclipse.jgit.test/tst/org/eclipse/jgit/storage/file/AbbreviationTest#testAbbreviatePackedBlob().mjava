@@ -1,0 +1,19 @@
+	public void testAbbreviatePackedBlob() throws Exception {
+		RevBlob id = test.blob("test");
+		test.branch("master").commit().add("test", id).child();
+		test.packAndPrune();
+		assertTrue(reader.has(id));
+
+		assertEquals(id.abbreviate(7), reader.abbreviate(id, 7));
+		assertEquals(id.abbreviate(8), reader.abbreviate(id, 8));
+		assertEquals(id.abbreviate(10), reader.abbreviate(id, 10));
+		assertEquals(id.abbreviate(16), reader.abbreviate(id, 16));
+
+		Collection<ObjectId> matches = reader.resolve(reader.abbreviate(id, 8));
+		assertNotNull(matches);
+		assertEquals(1, matches.size());
+		assertEquals(id, matches.iterator().next());
+
+		assertEquals(id, db.resolve(reader.abbreviate(id, 8).name()));
+	}
+

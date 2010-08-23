@@ -8,9 +8,16 @@
 				addRef("(no branch)", head);
 			addRefs(refs, Constants.R_HEADS, !remote);
 			addRefs(refs, Constants.R_REMOTES, remote);
-			for (final Entry<String, Ref> e : printRefs.entrySet()) {
-				final Ref ref = e.getValue();
-				printHead(e.getKey(), current.equals(ref.getName()), ref);
+
+			ObjectReader reader = db.newObjectReader();
+			try {
+				for (final Entry<String, Ref> e : printRefs.entrySet()) {
+					final Ref ref = e.getValue();
+					printHead(reader, e.getKey(),
+							current.equals(ref.getName()), ref);
+				}
+			} finally {
+				reader.release();
 			}
 		}
 	}

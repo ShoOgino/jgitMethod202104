@@ -1,0 +1,33 @@
+	/**
+	 * Resolve an abbreviated ObjectId to its full form.
+	 *
+	 * This method searches for an ObjectId that begins with the abbreviation,
+	 * and returns at least some matching candidates.
+	 *
+	 * If the returned collection is empty, no objects start with this
+	 * abbreviation. The abbreviation doesn't belong to this repository, or the
+	 * repository lacks the necessary objects to complete it.
+	 *
+	 * If the collection contains exactly one member, the abbreviation is
+	 * (currently) unique within this database. There is a reasonably high
+	 * probability that the returned id is what was previously abbreviated.
+	 *
+	 * If the collection contains 2 or more members, the abbreviation is not
+	 * unique. In this case the implementation is only required to return at
+	 * least 2 candidates to signal the abbreviation has conflicts. User
+	 * friendly implementations should return as many candidates as reasonably
+	 * possible, as the caller may be able to disambiguate further based on
+	 * context. However since databases can be very large (e.g. 10 million
+	 * objects) returning 625,000 candidates for the abbreviation "0" is simply
+	 * unreasonable, so implementors should draw the line at around 256 matches.
+	 *
+	 * @param id
+	 *            abbreviated id to resolve to a complete identity. The
+	 *            abbreviation must have a length of at least 2.
+	 * @return candidates that begin with the abbreviated identity.
+	 * @throws IOException
+	 *             the object store cannot be read.
+	 */
+	public abstract Collection<ObjectId> resolve(AbbreviatedObjectId id)
+			throws IOException;
+

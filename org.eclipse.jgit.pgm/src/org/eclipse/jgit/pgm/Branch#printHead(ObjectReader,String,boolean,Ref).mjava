@@ -1,5 +1,5 @@
-	private void printHead(final String ref, final boolean isCurrent,
-			final Ref refObj) throws Exception {
+	private void printHead(final ObjectReader reader, final String ref,
+			final boolean isCurrent, final Ref refObj) throws Exception {
 		out.print(isCurrent ? '*' : ' ');
 		out.print(' ');
 		out.print(ref);
@@ -7,7 +7,7 @@
 			final int spaces = maxNameLength - ref.length() + 1;
 			out.format("%" + spaces + "s", "");
 			final ObjectId objectId = refObj.getObjectId();
-			out.print(objectId.abbreviate(db).name());
+			out.print(reader.abbreviate(objectId).name());
 			out.print(' ');
 			out.print(rw.parseCommit(objectId).getShortMessage());
 		}

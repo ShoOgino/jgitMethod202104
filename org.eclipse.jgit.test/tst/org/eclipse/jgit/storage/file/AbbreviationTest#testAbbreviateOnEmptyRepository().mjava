@@ -1,0 +1,24 @@
+	public void testAbbreviateOnEmptyRepository() throws IOException {
+		ObjectId id = id("9d5b926ed164e8ee88d3b8b1e525d699adda01ba");
+
+		assertEquals(id.abbreviate(2), reader.abbreviate(id, 2));
+		assertEquals(id.abbreviate(7), reader.abbreviate(id, 7));
+		assertEquals(id.abbreviate(8), reader.abbreviate(id, 8));
+		assertEquals(id.abbreviate(10), reader.abbreviate(id, 10));
+		assertEquals(id.abbreviate(16), reader.abbreviate(id, 16));
+
+		assertEquals(AbbreviatedObjectId.fromObjectId(id), //
+				reader.abbreviate(id, OBJECT_ID_STRING_LENGTH));
+
+		Collection<ObjectId> matches;
+
+		matches = reader.resolve(reader.abbreviate(id, 8));
+		assertNotNull(matches);
+		assertEquals(0, matches.size());
+
+		matches = reader.resolve(AbbreviatedObjectId.fromObjectId(id));
+		assertNotNull(matches);
+		assertEquals(1, matches.size());
+		assertEquals(id, matches.iterator().next());
+	}
+

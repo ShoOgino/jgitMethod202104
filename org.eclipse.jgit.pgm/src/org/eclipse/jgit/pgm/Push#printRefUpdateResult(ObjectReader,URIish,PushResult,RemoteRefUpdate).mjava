@@ -1,5 +1,5 @@
-	private void printRefUpdateResult(final URIish uri,
-			final PushResult result, final RemoteRefUpdate rru) {
+	private void printRefUpdateResult(final ObjectReader reader,
+			final URIish uri, final PushResult result, final RemoteRefUpdate rru) {
 		if (!shownURI) {
 			shownURI = true;
 			out.println(MessageFormat.format(CLIText.get().pushTo, uri));
@@ -24,10 +24,10 @@
 				} else {
 					boolean fastForward = rru.isFastForward();
 					final char flag = fastForward ? ' ' : '+';
-					final String summary = oldRef.getObjectId().abbreviate(db)
-							.name()
+					final String summary = safeAbbreviate(reader, oldRef
+							.getObjectId())
 							+ (fastForward ? ".." : "...")
-							+ rru.getNewObjectId().abbreviate(db).name();
+							+ safeAbbreviate(reader, rru.getNewObjectId());
 					final String message = fastForward ? null : CLIText.get().forcedUpdate;
 					printUpdateLine(flag, summary, srcRef, remoteName, message);
 				}
@@ -50,8 +50,8 @@
 
 		case REJECTED_REMOTE_CHANGED:
 			final String message = MessageFormat.format(
-					CLIText.get().remoteRefObjectChangedIsNotExpectedOne
-					, rru.getExpectedOldObjectId().abbreviate(db).name());
+					CLIText.get().remoteRefObjectChangedIsNotExpectedOne,
+					safeAbbreviate(reader, rru.getExpectedOldObjectId()));
 			printUpdateLine('!', "[rejected]", srcRef, remoteName, message);
 			break;
 

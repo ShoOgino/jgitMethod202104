@@ -1,4 +1,4 @@
-	private void printPushResult(final URIish uri,
+	private void printPushResult(final ObjectReader reader, final URIish uri,
 			final PushResult result) {
 		shownURI = false;
 		boolean everythingUpToDate = true;
@@ -7,7 +7,7 @@
 		for (final RemoteRefUpdate rru : result.getRemoteUpdates()) {
 			if (rru.getStatus() == Status.UP_TO_DATE) {
 				if (verbose)
-					printRefUpdateResult(uri, result, rru);
+					printRefUpdateResult(reader, uri, result, rru);
 			} else
 				everythingUpToDate = false;
 		}
@@ -15,14 +15,14 @@
 		for (final RemoteRefUpdate rru : result.getRemoteUpdates()) {
 			// ...then successful updates...
 			if (rru.getStatus() == Status.OK)
-				printRefUpdateResult(uri, result, rru);
+				printRefUpdateResult(reader, uri, result, rru);
 		}
 
 		for (final RemoteRefUpdate rru : result.getRemoteUpdates()) {
 			// ...finally, others (problematic)
 			if (rru.getStatus() != Status.OK
 					&& rru.getStatus() != Status.UP_TO_DATE)
-				printRefUpdateResult(uri, result, rru);
+				printRefUpdateResult(reader, uri, result, rru);
 		}
 
 		AbstractFetchCommand.showRemoteMessages(result.getMessages());

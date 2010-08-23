@@ -27,7 +27,13 @@
 			} finally {
 				transport.close();
 			}
-			printPushResult(uri, result);
+
+			ObjectReader reader = db.newObjectReader();
+			try {
+				printPushResult(reader, uri, result);
+			} finally {
+				reader.release();
+			}
 		}
 	}
 

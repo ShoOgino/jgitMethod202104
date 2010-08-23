@@ -1,24 +1,28 @@
 	protected void showFetchResult(final Transport tn, final FetchResult r) {
-		boolean shownURI = false;
-		for (final TrackingRefUpdate u : r.getTrackingRefUpdates()) {
-			if (!verbose && u.getResult() == RefUpdate.Result.NO_CHANGE)
-				continue;
+		ObjectReader reader = db.newObjectReader();
+		try {
+			boolean shownURI = false;
+			for (final TrackingRefUpdate u : r.getTrackingRefUpdates()) {
+				if (!verbose && u.getResult() == RefUpdate.Result.NO_CHANGE)
+					continue;
 
-			final char type = shortTypeOf(u.getResult());
-			final String longType = longTypeOf(u);
-			final String src = abbreviateRef(u.getRemoteName(), false);
-			final String dst = abbreviateRef(u.getLocalName(), true);
+				final char type = shortTypeOf(u.getResult());
+				final String longType = longTypeOf(reader, u);
+				final String src = abbreviateRef(u.getRemoteName(), false);
+				final String dst = abbreviateRef(u.getLocalName(), true);
 
-			if (!shownURI) {
-				out.format(CLIText.get().fromURI, tn.getURI());
+				if (!shownURI) {
+					out.format(CLIText.get().fromURI, tn.getURI());
+					out.println();
+					shownURI = true;
+				}
+
+				out.format(" %c %-17s %-10s -> %s", type, longType, src, dst);
 				out.println();
-				shownURI = true;
 			}
-
-			out.format(" %c %-17s %-10s -> %s", type, longType, src, dst);
-			out.println();
+		} finally {
+			reader.release();
 		}
-
 		showRemoteMessages(r.getMessages());
 	}
 
