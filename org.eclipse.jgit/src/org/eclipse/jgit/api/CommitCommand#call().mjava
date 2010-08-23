@@ -4,7 +4,7 @@
 	 * class should only be used for one invocation of the command (means: one
 	 * call to {@link #call()})
 	 *
-	 * @return a {@link Commit} object representing the successful commit
+	 * @return a {@link RevCommit} object representing the successful commit.
 	 * @throws NoHeadException
 	 *             when called on a git repo without a HEAD reference
 	 * @throws NoMessageException
@@ -66,7 +66,7 @@
 					ObjectId indexTreeId = index.writeTree(odi);
 
 					// Create a Commit object, populate it and write it
-					Commit commit = new Commit();
+					CommitBuilder commit = new CommitBuilder();
 					commit.setCommitter(committer);
 					commit.setAuthor(author);
 					commit.setMessage(message);

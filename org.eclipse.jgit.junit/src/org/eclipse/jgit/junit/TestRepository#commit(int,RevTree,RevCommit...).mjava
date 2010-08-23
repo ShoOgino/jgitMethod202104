@@ -18,7 +18,9 @@
 			final RevCommit... parents) throws Exception {
 		tick(secDelta);
 
-		final Commit c = new Commit();
+		final org.eclipse.jgit.lib.CommitBuilder c;
+
+		c = new org.eclipse.jgit.lib.CommitBuilder();
 		c.setTreeId(tree);
 		c.setParentIds(parents);
 		c.setAuthor(new PersonIdent(author, new Date(now)));

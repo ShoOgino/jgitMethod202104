@@ -3,7 +3,7 @@
 		final Tree almostEmptyTree = new Tree(db);
 		almostEmptyTree.addEntry(new FileTreeEntry(almostEmptyTree, emptyId, "empty".getBytes(), false));
 		final ObjectId almostEmptyTreeId = new ObjectWriter(db).writeTree(almostEmptyTree);
-		Commit commit = new Commit();
+		CommitBuilder commit = new CommitBuilder();
 		commit.setTreeId(almostEmptyTreeId);
 		commit.setAuthor(new PersonIdent("Joe H\u00e4cker","joe@example.com",4294967295000L,60));
 		commit.setCommitter(new PersonIdent("Joe Hacker","joe2@example.com",4294967295000L,60));
