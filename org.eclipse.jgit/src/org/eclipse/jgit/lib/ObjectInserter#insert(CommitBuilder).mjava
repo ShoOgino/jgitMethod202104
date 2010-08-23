@@ -1,0 +1,16 @@
+	/**
+	 * Insert a single commit into the store, returning its unique name.
+	 *
+	 * As a side effect, {@link CommitBuilder#getCommitId()} will also be
+	 * populated with the returned ObjectId.
+	 *
+	 * @param builder
+	 *            the builder containing the proposed commit's data.
+	 * @return the name of the commit object.
+	 * @throws IOException
+	 *             the object could not be stored.
+	 */
+	public final ObjectId insert(CommitBuilder builder) throws IOException {
+		return insert(Constants.OBJ_COMMIT, builder.format(this));
+	}
+

@@ -1,0 +1,16 @@
+	/**
+	 * Insert a single annotated tag into the store, returning its unique name.
+	 *
+	 * As a side effect, {@link TagBuilder#getTagId()} will also be populated
+	 * with the returned ObjectId.
+	 *
+	 * @param builder
+	 *            the builder containing the proposed tag's data.
+	 * @return the name of the tag object.
+	 * @throws IOException
+	 *             the object could not be stored.
+	 */
+	public final ObjectId insert(TagBuilder builder) throws IOException {
+		return insert(Constants.OBJ_TAG, builder.format(this));
+	}
+
