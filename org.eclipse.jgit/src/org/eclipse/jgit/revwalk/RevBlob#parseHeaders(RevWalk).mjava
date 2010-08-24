@@ -1,0 +1,9 @@
+	@Override
+	void parseHeaders(RevWalk walk) throws MissingObjectException,
+			IncorrectObjectTypeException, IOException {
+		if (walk.reader.has(this))
+			flags |= PARSED;
+		else
+			throw new MissingObjectException(this, getType());
+	}
+

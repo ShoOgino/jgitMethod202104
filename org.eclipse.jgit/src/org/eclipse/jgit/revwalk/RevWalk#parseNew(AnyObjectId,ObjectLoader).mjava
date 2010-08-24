@@ -1,11 +1,12 @@
 	private RevObject parseNew(AnyObjectId id, ObjectLoader ldr)
-			throws CorruptObjectException, LargeObjectException {
+			throws LargeObjectException, CorruptObjectException,
+			MissingObjectException, IOException {
 		RevObject r;
 		int type = ldr.getType();
 		switch (type) {
 		case Constants.OBJ_COMMIT: {
 			final RevCommit c = createCommit(id);
-			c.parseCanonical(this, ldr.getCachedBytes());
+			c.parseCanonical(this, getCachedBytes(c, ldr));
 			r = c;
 			break;
 		}
@@ -21,7 +22,7 @@
 		}
 		case Constants.OBJ_TAG: {
 			final RevTag t = new RevTag(id);
-			t.parseCanonical(this, ldr.getCachedBytes());
+			t.parseCanonical(this, getCachedBytes(t, ldr));
 			r = t;
 			break;
 		}
