@@ -23,10 +23,15 @@
 	 * @param revstr
 	 *            A git object references expression
 	 * @return an ObjectId or null if revstr can't be resolved to any ObjectId
+	 * @throws AmbiguousObjectException
+	 *             {@code revstr} contains an abbreviated ObjectId and this
+	 *             repository contains more than one object which match to the
+	 *             input abbreviation.
 	 * @throws IOException
 	 *             on serious errors
 	 */
-	public ObjectId resolve(final String revstr) throws IOException {
+	public ObjectId resolve(final String revstr)
+			throws AmbiguousObjectException, IOException {
 		RevWalk rw = new RevWalk(this);
 		try {
 			return resolve(rw, revstr);
