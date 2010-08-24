@@ -1,0 +1,62 @@
+	public void testLimitedGetCachedBytesExceedsJavaLimits()
+			throws LargeObjectException, MissingObjectException, IOException {
+		ObjectLoader ldr = new ObjectLoader() {
+			@Override
+			public boolean isLarge() {
+				return true;
+			}
+
+			@Override
+			public byte[] getCachedBytes() throws LargeObjectException {
+				throw new LargeObjectException();
+			}
+
+			@Override
+			public long getSize() {
+				return Long.MAX_VALUE;
+			}
+
+			@Override
+			public int getType() {
+				return OBJ_BLOB;
+			}
+
+			@Override
+			public ObjectStream openStream() throws MissingObjectException,
+					IOException {
+				return new ObjectStream() {
+					@Override
+					public long getSize() {
+						return Long.MAX_VALUE;
+					}
+
+					@Override
+					public int getType() {
+						return OBJ_BLOB;
+					}
+
+					@Override
+					public int read() throws IOException {
+						fail("never should have reached read");
+						return -1;
+					}
+				};
+			}
+		};
+		assertTrue("is large", ldr.isLarge());
+
+		try {
+			ldr.getCachedBytes(10);
+			fail("Did not throw LargeObjectException");
+		} catch (LargeObjectException tooBig) {
+			// Expected result.
+		}
+
+		try {
+			ldr.getCachedBytes(Integer.MAX_VALUE);
+			fail("Did not throw LargeObjectException");
+		} catch (LargeObjectException tooBig) {
+			// Expected result.
+		}
+	}
+

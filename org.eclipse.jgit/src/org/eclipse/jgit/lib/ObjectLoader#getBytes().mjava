@@ -11,9 +11,6 @@
 	 *             {@link #openStream()} instead to access the contents.
 	 */
 	public final byte[] getBytes() throws LargeObjectException {
-		final byte[] data = getCachedBytes();
-		final byte[] copy = new byte[data.length];
-		System.arraycopy(data, 0, copy, 0, data.length);
-		return copy;
+		return cloneArray(getCachedBytes());
 	}
 

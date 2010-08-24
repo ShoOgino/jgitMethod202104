@@ -1,0 +1,27 @@
+	public void testLimitedGetCachedBytes() throws LargeObjectException,
+			MissingObjectException, IOException {
+		byte[] act = rng.nextBytes(512);
+		ObjectLoader ldr = new ObjectLoader.SmallObject(OBJ_BLOB, act) {
+			@Override
+			public boolean isLarge() {
+				return true;
+			}
+		};
+		assertTrue("is large", ldr.isLarge());
+
+		try {
+			ldr.getCachedBytes(10);
+			fail("Did not throw LargeObjectException");
+		} catch (LargeObjectException tooBig) {
+			// Expected result.
+		}
+
+		byte[] copy = ldr.getCachedBytes(512);
+		assertNotSame(act, copy);
+		assertTrue("same content", Arrays.equals(act, copy));
+
+		copy = ldr.getCachedBytes(1024);
+		assertNotSame(act, copy);
+		assertTrue("same content", Arrays.equals(act, copy));
+	}
+
