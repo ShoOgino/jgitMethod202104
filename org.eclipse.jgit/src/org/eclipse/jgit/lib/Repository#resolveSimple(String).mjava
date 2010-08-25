@@ -6,19 +6,8 @@
 		if (r != null)
 			return r.getObjectId();
 
-		if (AbbreviatedObjectId.isId(revstr)) {
-			AbbreviatedObjectId id = AbbreviatedObjectId.fromString(revstr);
-			ObjectReader reader = newObjectReader();
-			try {
-				Collection<ObjectId> matches = reader.resolve(id);
-				if (matches.size() == 1)
-					return matches.iterator().next();
-				if (1 < matches.size())
-					throw new AmbiguousObjectException(id, matches);
-			} finally {
-				reader.release();
-			}
-		}
+		if (AbbreviatedObjectId.isId(revstr))
+			return resolveAbbreviation(revstr);
 
 		return null;
 	}
