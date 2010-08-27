@@ -1,0 +1,12 @@
+	public void close() throws IOException {
+		byte[] b = skipBuffer();
+		for (;;) {
+			int n = src.read(b);
+			if (n <= 0)
+				break;
+			dst.write(b, 0, n);
+		}
+		dst.close();
+		src.close();
+	}
+
