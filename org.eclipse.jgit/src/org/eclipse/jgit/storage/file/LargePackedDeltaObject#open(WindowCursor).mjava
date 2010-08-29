@@ -16,9 +16,13 @@
 		final ObjectLoader base = pack.load(wc, baseOffset);
 		DeltaStream ds = new DeltaStream(delta) {
 			private long baseSize = SIZE_UNKNOWN;
+			private TemporaryBuffer.LocalFile buffer;
 
 			@Override
 			protected InputStream openBase() throws IOException {
+				if (buffer != null)
+					return buffer.openInputStream();
+
 				InputStream in;
 				if (base instanceof LargePackedDeltaObject)
 					in = ((LargePackedDeltaObject) base).open(wc);
@@ -30,7 +34,9 @@
 					else if (in instanceof ObjectStream)
 						baseSize = ((ObjectStream) in).getSize();
 				}
-				return in;
+
+				buffer = new TemporaryBuffer.LocalFile(db.getDirectory());
+				return new TeeInputStream(in, buffer);
 			}
 
 			@Override
@@ -42,6 +48,13 @@
 					baseSize = base.getSize();
 				}
 				return baseSize;
+			}
+
+			@Override
+			public void close() throws IOException {
+				super.close();
+				if (buffer != null)
+					buffer.destroy();
 			}
 		};
 		if (size == SIZE_UNKNOWN)

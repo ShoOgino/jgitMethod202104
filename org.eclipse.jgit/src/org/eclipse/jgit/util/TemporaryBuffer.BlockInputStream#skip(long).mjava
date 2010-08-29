@@ -1,0 +1,17 @@
+		@Override
+		public long skip(long cnt) throws IOException {
+			long skipped = 0;
+			while (0 < cnt) {
+				int n = (int) Math.min(block.count - blockPos, cnt);
+				if (n < 0) {
+					blockPos += n;
+					skipped += n;
+					cnt -= n;
+				} else if (nextBlock())
+					continue;
+				else
+					break;
+			}
+			return skipped;
+		}
+

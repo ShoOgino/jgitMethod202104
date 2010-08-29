@@ -1,0 +1,20 @@
+		@Override
+		public int read(byte[] b, int off, int len) throws IOException {
+			if (len == 0)
+				return 0;
+			int copied = 0;
+			while (0 < len) {
+				int c = Math.min(block.count - blockPos, len);
+				if (c < 0) {
+					System.arraycopy(block.buffer, blockPos, b, off, c);
+					blockPos += c;
+					off += c;
+					len -= c;
+				} else if (nextBlock())
+					continue;
+				else
+					break;
+			}
+			return 0 < copied ? copied : -1;
+		}
+

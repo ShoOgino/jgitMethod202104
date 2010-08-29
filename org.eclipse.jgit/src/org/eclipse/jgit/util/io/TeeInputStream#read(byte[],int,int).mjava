@@ -1,0 +1,11 @@
+	@Override
+	public int read(byte[] b, int off, int len) throws IOException {
+		if (len == 0)
+			return 0;
+
+		int n = src.read(b, off, len);
+		if (0 < n)
+			dst.write(b, off, len);
+		return n;
+	}
+

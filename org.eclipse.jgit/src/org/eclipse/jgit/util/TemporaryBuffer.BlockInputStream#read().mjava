@@ -1,0 +1,8 @@
+		@Override
+		public int read() throws IOException {
+			if (singleByteBuffer == null)
+				singleByteBuffer = new byte[1];
+			int n = read(singleByteBuffer);
+			return n == 1 ? singleByteBuffer[0] & 0xff : -1;
+		}
+
