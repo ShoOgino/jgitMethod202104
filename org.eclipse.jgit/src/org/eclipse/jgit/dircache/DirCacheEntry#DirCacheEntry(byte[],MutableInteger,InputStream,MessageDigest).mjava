@@ -1,10 +1,23 @@
-	DirCacheEntry(final byte[] sharedInfo, final int infoAt,
+	DirCacheEntry(final byte[] sharedInfo, final MutableInteger infoAt,
 			final InputStream in, final MessageDigest md) throws IOException {
 		info = sharedInfo;
-		infoOffset = infoAt;
+		infoOffset = infoAt.value;
 
 		IO.readFully(in, info, infoOffset, INFO_LEN);
-		md.update(info, infoOffset, INFO_LEN);
+
+		final int len;
+		if (isExtended()) {
+			len = INFO_LEN_EXTENDED;
+			IO.readFully(in, info, infoOffset + INFO_LEN, INFO_LEN_EXTENDED - INFO_LEN);
+
+			if ((getExtendedFlags() & ~EXTENDED_FLAGS) != 0)
+				throw new IOException(MessageFormat.format(JGitText.get()
+						.DIRCUnrecognizedExtendedFlags, String.valueOf(getExtendedFlags())));
+		} else
+			len = INFO_LEN;
+
+		infoAt.value += len;
+		md.update(info, infoOffset, len);
 
 		int pathLen = NB.decodeUInt16(info, infoOffset + P_FLAGS) & NAME_MASK;
 		int skipped = 0;
@@ -37,7 +50,7 @@
 		// Index records are padded out to the next 8 byte alignment
 		// for historical reasons related to how C Git read the files.
 		//
-		final int actLen = INFO_LEN + pathLen;
+		final int actLen = len + pathLen;
 		final int expLen = (actLen + 8) & ~7;
 		final int padLen = expLen - actLen - skipped;
 		if (padLen > 0) {
