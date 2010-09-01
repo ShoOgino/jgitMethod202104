@@ -5,12 +5,14 @@
 		final EditList editList;
 		final FileHeader.PatchType type;
 
-		writeDiffHeader(buf, ent);
+		formatHeader(buf, ent);
 
 		if (ent.getOldMode() == GITLINK || ent.getNewMode() == GITLINK) {
+			formatOldNewPaths(buf, ent);
 			writeGitLinkDiffText(buf, ent);
 			editList = new EditList();
 			type = PatchType.UNIFIED;
+
 		} else {
 			if (db == null)
 				throw new IllegalStateException(
@@ -25,14 +27,28 @@
 			}
 
 			if (RawText.isBinary(aRaw) || RawText.isBinary(bRaw)) {
+				formatOldNewPaths(buf, ent);
 				buf.write(encodeASCII("Binary files differ\n"));
 				editList = new EditList();
 				type = PatchType.BINARY;
+
 			} else {
 				res.a = rawTextFactory.create(aRaw);
 				res.b = rawTextFactory.create(bRaw);
 				editList = new MyersDiff(res.a, res.b).getEdits();
 				type = PatchType.UNIFIED;
+
+				switch (ent.getChangeType()) {
+				case RENAME:
+				case COPY:
+					if (!editList.isEmpty())
+						formatOldNewPaths(buf, ent);
+					break;
+
+				default:
+					formatOldNewPaths(buf, ent);
+					break;
+				}
 			}
 		}
 
