@@ -27,7 +27,7 @@
 		if (!head.getHunks().isEmpty())
 			end = head.getHunks().get(0).getStartOffset();
 		out.write(head.getBuffer(), start, end - start);
-
-		formatEdits(a, b, head.toEditList());
+		if (head.getPatchType() == PatchType.UNIFIED)
+			formatEdits(a, b, head.toEditList());
 	}
 
