@@ -24,7 +24,7 @@
 				continue;
 			}
 
-			SimilarityIndex s = hash(srcEnt.oldId.toObjectId());
+			SimilarityIndex s = hash(OLD, srcEnt);
 			for (int dstIdx = 0; dstIdx < dsts.size(); dstIdx++) {
 				DiffEntry dstEnt = dsts.get(dstIdx);
 
@@ -40,13 +40,13 @@
 
 				long srcSize = srcSizes[srcIdx];
 				if (srcSize < 0) {
-					srcSize = size(srcEnt.oldId.toObjectId());
+					srcSize = size(OLD, srcEnt);
 					srcSizes[srcIdx] = srcSize;
 				}
 
 				long dstSize = dstSizes[dstIdx];
 				if (dstSize < 0) {
-					dstSize = size(dstEnt.newId.toObjectId());
+					dstSize = size(NEW, dstEnt);
 					dstSizes[dstIdx] = dstSize;
 				}
 
@@ -58,7 +58,7 @@
 					continue;
 				}
 
-				SimilarityIndex d = hash(dstEnt.newId.toObjectId());
+				SimilarityIndex d = hash(NEW, dstEnt);
 				int contentScore = s.score(d, 10000);
 
 				// nameScore returns a value between 0 and 100, but we want it

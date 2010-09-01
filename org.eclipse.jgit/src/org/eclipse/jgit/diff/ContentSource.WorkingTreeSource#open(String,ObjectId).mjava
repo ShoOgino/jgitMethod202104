@@ -1,0 +1,34 @@
+		@Override
+		public ObjectLoader open(String path, ObjectId id) throws IOException {
+			seek(path);
+			return new ObjectLoader() {
+				@Override
+				public long getSize() {
+					return ptr.getEntryLength();
+				}
+
+				@Override
+				public int getType() {
+					return ptr.getEntryFileMode().getObjectType();
+				}
+
+				@Override
+				public ObjectStream openStream() throws MissingObjectException,
+						IOException {
+					InputStream in = ptr.openEntryStream();
+					in = new BufferedInputStream(in);
+					return new ObjectStream.Filter(getType(), getSize(), in);
+				}
+
+				@Override
+				public boolean isLarge() {
+					return true;
+				}
+
+				@Override
+				public byte[] getCachedBytes() throws LargeObjectException {
+					throw new LargeObjectException();
+				}
+			};
+		}
+

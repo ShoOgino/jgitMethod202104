@@ -16,12 +16,8 @@
 		} else {
 			assertHaveRepository();
 
-			byte[] aRaw = open(ent.getOldPath(), //
-					ent.getOldMode(), //
-					ent.getOldId());
-			byte[] bRaw = open(ent.getNewPath(), //
-					ent.getNewMode(), //
-					ent.getNewId());
+			byte[] aRaw = open(OLD, ent);
+			byte[] bRaw = open(NEW, ent);
 
 			if (aRaw == BINARY || bRaw == BINARY //
 					|| RawText.isBinary(aRaw) || RawText.isBinary(bRaw)) {

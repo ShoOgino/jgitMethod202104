@@ -1,0 +1,25 @@
+		/**
+		 * Open the object.
+		 *
+		 * @param side
+		 *            which side of the entry to read (OLD or NEW).
+		 * @param ent
+		 *            the entry to examine.
+		 * @return a loader that can supply the content of the file. The loader
+		 *         must be used before another loader can be obtained from this
+		 *         same source.
+		 * @throws IOException
+		 *             the file cannot be accessed.
+		 */
+		public ObjectLoader open(DiffEntry.Side side, DiffEntry ent)
+				throws IOException {
+			switch (side) {
+			case OLD:
+				return oldSource.open(ent.oldPath, ent.oldId.toObjectId());
+			case NEW:
+				return newSource.open(ent.newPath, ent.newId.toObjectId());
+			default:
+				throw new IllegalArgumentException();
+			}
+		}
+

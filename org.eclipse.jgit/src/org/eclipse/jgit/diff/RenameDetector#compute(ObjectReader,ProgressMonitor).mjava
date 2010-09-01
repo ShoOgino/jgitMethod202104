@@ -12,24 +12,7 @@
 	 */
 	public List<DiffEntry> compute(ObjectReader reader, ProgressMonitor pm)
 			throws IOException {
-		if (!done) {
-			done = true;
-
-			if (pm == null)
-				pm = NullProgressMonitor.INSTANCE;
-				breakModifies(reader, pm);
-				findExactRenames(pm);
-				findContentRenames(reader, pm);
-				rejoinModifies(pm);
-
-			entries.addAll(added);
-			added = null;
-
-			entries.addAll(deleted);
-			deleted = null;
-
-			Collections.sort(entries, DIFF_COMPARATOR);
-		}
-		return Collections.unmodifiableList(entries);
+		final ContentSource cs = ContentSource.create(reader);
+		return compute(new ContentSource.Pair(cs, cs), pm);
 	}
 
