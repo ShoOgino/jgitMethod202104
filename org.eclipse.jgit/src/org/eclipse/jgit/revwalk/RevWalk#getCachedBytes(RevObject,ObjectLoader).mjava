@@ -1,7 +1,7 @@
 	byte[] getCachedBytes(RevObject obj, ObjectLoader ldr)
 			throws LargeObjectException, MissingObjectException, IOException {
 		try {
-			return ldr.getCachedBytes(bigFileThreshold);
+			return ldr.getCachedBytes(5 * MB);
 		} catch (LargeObjectException tooBig) {
 			tooBig.setObjectId(obj);
 			throw tooBig;
