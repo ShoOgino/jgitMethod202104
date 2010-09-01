@@ -1,0 +1,40 @@
+	private byte[] open(ObjectReader reader, String path, FileMode mode,
+			AbbreviatedObjectId id) throws IOException {
+		if (mode == FileMode.MISSING)
+			return EMPTY;
+
+		if (mode.getObjectType() != Constants.OBJ_BLOB)
+			return EMPTY;
+
+		if (isBinary(path))
+			return BINARY;
+
+		if (!id.isComplete()) {
+			Collection<ObjectId> ids = reader.resolve(id);
+			if (ids.size() == 1)
+				id = AbbreviatedObjectId.fromObjectId(ids.iterator().next());
+			else if (ids.size() == 0)
+				throw new MissingObjectException(id, Constants.OBJ_BLOB);
+			else
+				throw new AmbiguousObjectException(id, ids);
+		}
+
+		try {
+			ObjectLoader ldr = reader.open(id.toObjectId());
+			return ldr.getBytes(binaryFileThreshold);
+
+		} catch (LargeObjectException.ExceedsLimit overLimit) {
+			return BINARY;
+
+		} catch (LargeObjectException.ExceedsByteArrayLimit overLimit) {
+			return BINARY;
+
+		} catch (LargeObjectException.OutOfMemory tooBig) {
+			return BINARY;
+
+		} catch (LargeObjectException tooBig) {
+			tooBig.setObjectId(id.toObjectId());
+			throw tooBig;
+		}
+	}
+
