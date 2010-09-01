@@ -2,6 +2,27 @@
 	protected void run() throws Exception {
 		diffFmt.setRepository(db);
 		try {
+			if (cached) {
+				if (oldTree == null) {
+					ObjectId head = db.resolve(HEAD + "^{tree}");
+					if (head == null)
+						die(MessageFormat.format(CLIText.get().notATree, HEAD));
+					CanonicalTreeParser p = new CanonicalTreeParser();
+					ObjectReader reader = db.newObjectReader();
+					try {
+						p.reset(reader, head);
+					} finally {
+						reader.release();
+					}
+					oldTree = p;
+				}
+				newTree = new DirCacheIterator(db.readDirCache());
+			} else if (oldTree == null) {
+				oldTree = new DirCacheIterator(db.readDirCache());
+				newTree = new FileTreeIterator(db);
+			} else if (newTree == null)
+				newTree = new FileTreeIterator(db);
+
 			diffFmt.setProgressMonitor(new TextProgressMonitor());
 			diffFmt.setPathFilter(pathFilter);
 			if (detectRenames != null)
