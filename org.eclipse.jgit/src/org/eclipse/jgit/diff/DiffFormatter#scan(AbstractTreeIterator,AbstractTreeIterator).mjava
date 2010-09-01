@@ -1,0 +1,58 @@
+	/**
+	 * Determine the differences between two trees.
+	 *
+	 * No output is created, instead only the file paths that are different are
+	 * returned. Callers may choose to format these paths themselves, or convert
+	 * them into {@link FileHeader} instances with a complete edit list by
+	 * calling {@link #toFileHeader(DiffEntry)}.
+	 *
+	 * @param a
+	 *            the old (or previous) side.
+	 * @param b
+	 *            the new (or updated) side.
+	 * @return the paths that are different.
+	 * @throws IOException
+	 *             trees cannot be read or file contents cannot be read.
+	 */
+	public List<DiffEntry> scan(AbstractTreeIterator a, AbstractTreeIterator b)
+			throws IOException {
+		assertHaveRepository();
+
+		TreeWalk walk = new TreeWalk(reader);
+		walk.reset();
+		walk.addTree(a);
+		walk.addTree(b);
+		walk.setRecursive(true);
+
+		if (pathFilter == TreeFilter.ALL) {
+			walk.setFilter(TreeFilter.ANY_DIFF);
+		} else if (pathFilter instanceof FollowFilter) {
+			walk.setFilter(pathFilter);
+		} else {
+			walk.setFilter(AndTreeFilter
+					.create(pathFilter, TreeFilter.ANY_DIFF));
+		}
+
+		List<DiffEntry> files = DiffEntry.scan(walk);
+		if (pathFilter instanceof FollowFilter && isAdd(files)) {
+			// The file we are following was added here, find where it
+			// came from so we can properly show the rename or copy,
+			// then continue digging backwards.
+			//
+			a.reset();
+			b.reset();
+			walk.reset();
+			walk.addTree(a);
+			walk.addTree(b);
+			walk.setFilter(TreeFilter.ANY_DIFF);
+
+			if (renameDetector == null)
+				setDetectRenames(true);
+			files = updateFollowFilter(detectRenames(DiffEntry.scan(walk)));
+
+		} else if (renameDetector != null)
+			files = detectRenames(files);
+
+		return files;
+	}
+

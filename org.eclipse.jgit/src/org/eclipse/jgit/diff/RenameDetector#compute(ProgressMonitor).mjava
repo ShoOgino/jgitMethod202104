@@ -10,27 +10,12 @@
 	 */
 	public List<DiffEntry> compute(ProgressMonitor pm) throws IOException {
 		if (!done) {
-			done = true;
-
-			if (pm == null)
-				pm = NullProgressMonitor.INSTANCE;
 			ObjectReader reader = repo.newObjectReader();
 			try {
-				breakModifies(reader, pm);
-				findExactRenames(pm);
-				findContentRenames(reader, pm);
-				rejoinModifies(pm);
+				return compute(reader, pm);
 			} finally {
 				reader.release();
 			}
-
-			entries.addAll(added);
-			added = null;
-
-			entries.addAll(deleted);
-			deleted = null;
-
-			Collections.sort(entries, DIFF_COMPARATOR);
 		}
 		return Collections.unmodifiableList(entries);
 	}

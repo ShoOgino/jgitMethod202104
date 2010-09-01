@@ -1,0 +1,19 @@
+	/**
+	 * Enable or disable rename detection.
+	 *
+	 * Before enabling rename detection the repository must be set with
+	 * {@link #setRepository(Repository)}. Once enabled the detector can be
+	 * configured away from its defaults by obtaining the instance directly from
+	 * {@link #getRenameDetector()} and invoking configuration.
+	 *
+	 * @param on
+	 *            if rename detection should be enabled.
+	 */
+	public void setDetectRenames(boolean on) {
+		if (on && renameDetector == null) {
+			assertHaveRepository();
+			renameDetector = new RenameDetector(db);
+		} else if (!on)
+			renameDetector = null;
+	}
+

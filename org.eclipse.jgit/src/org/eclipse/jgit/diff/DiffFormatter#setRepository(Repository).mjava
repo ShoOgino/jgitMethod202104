@@ -1,10 +1,24 @@
 	/**
 	 * Set the repository the formatter can load object contents from.
 	 *
+	 * Once a repository has been set, the formatter must be released to ensure
+	 * the internal ObjectReader is able to release its resources.
+	 *
 	 * @param repository
 	 *            source repository holding referenced objects.
 	 */
 	public void setRepository(Repository repository) {
+		if (reader != null)
+			reader.release();
+
 		db = repository;
+		reader = db.newObjectReader();
+
+		DiffConfig dc = db.getConfig().get(DiffConfig.KEY);
+		if (dc.isNoPrefix()) {
+			setOldPrefix("");
+			setNewPrefix("");
+		}
+		setDetectRenames(dc.isRenameDetectionEnabled());
 	}
 

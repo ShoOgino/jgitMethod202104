@@ -1,0 +1,28 @@
+	/**
+	 * Determine the differences between two trees.
+	 *
+	 * No output is created, instead only the file paths that are different are
+	 * returned. Callers may choose to format these paths themselves, or convert
+	 * them into {@link FileHeader} instances with a complete edit list by
+	 * calling {@link #toFileHeader(DiffEntry)}.
+	 *
+	 * @param a
+	 *            the old (or previous) side.
+	 * @param b
+	 *            the new (or updated) side.
+	 * @return the paths that are different.
+	 * @throws IOException
+	 *             trees cannot be read or file contents cannot be read.
+	 */
+	public List<DiffEntry> scan(RevTree a, RevTree b) throws IOException {
+		assertHaveRepository();
+
+		CanonicalTreeParser aParser = new CanonicalTreeParser();
+		CanonicalTreeParser bParser = new CanonicalTreeParser();
+
+		aParser.reset(reader, a);
+		bParser.reset(reader, b);
+
+		return scan(aParser, bParser);
+	}
+

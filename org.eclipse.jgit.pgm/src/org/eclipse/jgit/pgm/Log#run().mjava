@@ -2,7 +2,6 @@
 	protected void run() throws Exception {
 		diffFmt.setRepository(db);
 		try {
-			diffFmt.setProgressMonitor(new TextProgressMonitor());
 			diffFmt.setPathFilter(pathFilter);
 			if (detectRenames != null)
 				diffFmt.setDetectRenames(detectRenames.booleanValue());
@@ -11,14 +10,7 @@
 				rd.setRenameLimit(renameLimit.intValue());
 			}
 
-			if (showNameAndStatusOnly) {
-				nameStatus(out, diffFmt.scan(oldTree, newTree));
-				out.flush();
-
-			} else {
-				diffFmt.format(oldTree, newTree);
-				diffFmt.flush();
-			}
+			super.run();
 		} finally {
 			diffFmt.release();
 		}

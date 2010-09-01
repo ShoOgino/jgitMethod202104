@@ -14,24 +14,14 @@
 			type = PatchType.UNIFIED;
 
 		} else {
-			if (db == null)
-				throw new IllegalStateException(
-						JGitText.get().repositoryIsRequired);
+			assertHaveRepository();
 
-			ObjectReader reader = db.newObjectReader();
-			byte[] aRaw, bRaw;
-			try {
-				aRaw = open(reader, //
-						ent.getOldPath(), //
-						ent.getOldMode(), //
-						ent.getOldId());
-				bRaw = open(reader, //
-						ent.getNewPath(), //
-						ent.getNewMode(), //
-						ent.getNewId());
-			} finally {
-				reader.release();
-			}
+			byte[] aRaw = open(ent.getOldPath(), //
+					ent.getOldMode(), //
+					ent.getOldId());
+			byte[] bRaw = open(ent.getNewPath(), //
+					ent.getNewMode(), //
+					ent.getNewId());
 
 			if (aRaw == BINARY || bRaw == BINARY //
 					|| RawText.isBinary(aRaw) || RawText.isBinary(bRaw)) {
