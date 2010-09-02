@@ -17,16 +17,24 @@
 			if (db == null)
 				throw new IllegalStateException(
 						JGitText.get().repositoryIsRequired);
+
 			ObjectReader reader = db.newObjectReader();
 			byte[] aRaw, bRaw;
 			try {
-				aRaw = open(reader, ent.getOldMode(), ent.getOldId());
-				bRaw = open(reader, ent.getNewMode(), ent.getNewId());
+				aRaw = open(reader, //
+						ent.getOldPath(), //
+						ent.getOldMode(), //
+						ent.getOldId());
+				bRaw = open(reader, //
+						ent.getNewPath(), //
+						ent.getNewMode(), //
+						ent.getNewId());
 			} finally {
 				reader.release();
 			}
 
-			if (RawText.isBinary(aRaw) || RawText.isBinary(bRaw)) {
+			if (aRaw == BINARY || bRaw == BINARY //
+					|| RawText.isBinary(aRaw) || RawText.isBinary(bRaw)) {
 				formatOldNewPaths(buf, ent);
 				buf.write(encodeASCII("Binary files differ\n"));
 				editList = new EditList();
