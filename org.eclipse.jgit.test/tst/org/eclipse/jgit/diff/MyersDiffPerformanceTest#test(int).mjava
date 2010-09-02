@@ -16,14 +16,15 @@
 		String b = DiffTestDataGenerator.generateSequence(characters, 1621, 5);
 		CharArray ac = new CharArray(a);
 		CharArray bc = new CharArray(b);
-		MyersDiff myersDiff = null;
+		CharCmp cmp = new CharCmp();
+		MyersDiff<CharArray> myersDiff = null;
 		int cpuTimeChanges = 0;
 		long lastReadout = 0;
 		long interimTime = 0;
 		int repetitions = 0;
 		stopwatch.start();
 		while (cpuTimeChanges < minCPUTimerTicks && interimTime < longTaskBoundary) {
-			myersDiff = new MyersDiff(ac, bc);
+			myersDiff = new MyersDiff<CharArray>(cmp, ac, bc);
 			repetitions++;
 			interimTime = stopwatch.readout();
 			if (interimTime != lastReadout) {
@@ -32,7 +33,7 @@
 			}
 		}
 		ret.runningTime = stopwatch.stop() / repetitions;
-		ret.N = (ac.size() + bc.size());
+		ret.N = ac.size() + bc.size();
 		ret.D = myersDiff.getEdits().size();
 
 		return ret;

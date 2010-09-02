@@ -13,22 +13,11 @@
 	 *            the used {@link MergeStrategy}
 	 * @param lowLevelResults
 	 *            merge results as returned by {@link ResolveMerger#getMergeResults()}
-	 * @param description
-	 *            a user friendly description of the merge result
 	 */
 	public MergeResult(ObjectId newHead, ObjectId base,
 			ObjectId[] mergedCommits, MergeStatus mergeStatus,
-			MergeStrategy mergeStrategy,
-			Map<String, org.eclipse.jgit.merge.MergeResult> lowLevelResults,
-			String description) {
-		this.newHead = newHead;
-		this.mergedCommits = mergedCommits;
-		this.base = base;
-		this.mergeStatus = mergeStatus;
-		this.mergeStrategy = mergeStrategy;
-		this.description = description;
-		if (lowLevelResults != null)
-			for (String path : lowLevelResults.keySet())
-				addConflict(path, lowLevelResults.get(path));
+			Map<String, org.eclipse.jgit.merge.MergeResult<?>> lowLevelResults,
+			MergeStrategy mergeStrategy) {
+		this(newHead, base, mergedCommits, mergeStatus, mergeStrategy, lowLevelResults, null);
 	}
 

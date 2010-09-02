@@ -1,5 +1,6 @@
 	public void assertDiff(String a, String b, String edits) {
-		MyersDiff diff = new MyersDiff(toCharArray(a), toCharArray(b));
+		MyersDiff diff = new MyersDiff<CharArray>(new CharCmp(),
+				toCharArray(a), toCharArray(b));
 		assertEquals(edits, toString(diff.getEdits()));
 	}
 

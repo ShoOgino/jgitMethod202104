@@ -27,9 +27,9 @@
 				type = PatchType.BINARY;
 
 			} else {
-				res.a = rawTextFactory.create(aRaw);
-				res.b = rawTextFactory.create(bRaw);
-				editList = new MyersDiff(res.a, res.b).getEdits();
+				res.a = new RawText(comparator, aRaw);
+				res.b = new RawText(comparator, bRaw);
+				editList = diff(res.a, res.b);
 				type = PatchType.UNIFIED;
 
 				switch (ent.getChangeType()) {
