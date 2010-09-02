@@ -1,0 +1,9 @@
+	public void testEdit_UniqueCommonLargerThanMatchPoint() {
+		// We are testing 3 unique common matches, but two of
+		// them are consumed as part of the 1st's LCS region.
+		EditList r = diff(t("AbdeZ"), t("PbdeQR"));
+		assertEquals(2, r.size());
+		assertEquals(new Edit(0, 1, 0, 1), r.get(0));
+		assertEquals(new Edit(4, 5, 4, 6), r.get(1));
+	}
+

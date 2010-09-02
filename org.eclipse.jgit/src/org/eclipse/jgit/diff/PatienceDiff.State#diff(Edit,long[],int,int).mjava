@@ -1,0 +1,46 @@
+		private void diff(Edit r, long[] pCommon, int pIdx, int pEnd) {
+			switch (r.getType()) {
+			case INSERT:
+			case DELETE:
+				edits.add(r);
+				return;
+
+			case REPLACE:
+				break;
+
+			case EMPTY:
+			default:
+				throw new IllegalStateException();
+			}
+
+			PatienceDiffIndex<S> p;
+
+			p = new PatienceDiffIndex<S>(cmp, a, b, r, pCommon, pIdx, pEnd);
+			Edit lcs = p.findLongestCommonSequence();
+
+			if (lcs != null) {
+				pCommon = p.nCommon;
+				pIdx = p.cIdx;
+				pEnd = p.nCnt;
+				p = null;
+
+				diff(r.before(lcs), pCommon, 0, pIdx);
+				diff(r.after(lcs), pCommon, pIdx + 1, pEnd);
+
+			} else if (fallback != null) {
+				p = null;
+				pCommon = null;
+
+				SubsequenceComparator<HashedSequence<S>> cs;
+				cs = new SubsequenceComparator<HashedSequence<S>>(cmp);
+
+				Subsequence<HashedSequence<S>> as = Subsequence.a(a, r);
+				Subsequence<HashedSequence<S>> bs = Subsequence.b(b, r);
+				EditList res = fallback.diff(cs, as, bs);
+				edits.addAll(Subsequence.toBase(res, as, bs));
+
+			} else {
+				edits.add(r);
+			}
+		}
+
