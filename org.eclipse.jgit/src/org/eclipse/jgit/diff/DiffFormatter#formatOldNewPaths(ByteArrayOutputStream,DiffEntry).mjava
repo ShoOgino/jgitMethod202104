@@ -1,0 +1,26 @@
+	private void formatOldNewPaths(ByteArrayOutputStream o, DiffEntry ent)
+			throws IOException {
+		final String oldp;
+		final String newp;
+
+		switch (ent.getChangeType()) {
+		case ADD:
+			oldp = DiffEntry.DEV_NULL;
+			newp = quotePath(newPrefix + ent.getNewPath());
+			break;
+
+		case DELETE:
+			oldp = quotePath(oldPrefix + ent.getOldPath());
+			newp = DiffEntry.DEV_NULL;
+			break;
+
+		default:
+			oldp = quotePath(oldPrefix + ent.getOldPath());
+			newp = quotePath(newPrefix + ent.getNewPath());
+			break;
+		}
+
+		o.write(encode("--- " + oldp + "\n"));
+		o.write(encode("+++ " + newp + "\n"));
+	}
+
