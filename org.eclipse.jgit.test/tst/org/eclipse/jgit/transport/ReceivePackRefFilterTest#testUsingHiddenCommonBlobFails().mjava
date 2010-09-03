@@ -25,7 +25,15 @@
 		rp.setCheckReceivedObjects(true);
 		rp.setCheckReferencedObjectsAreReachable(true);
 		rp.setRefFilter(new HidePrivateFilter());
-		rp.receive(new ByteArrayInputStream(inBuf.toByteArray()), outBuf, null);
+		try {
+			receive(rp, inBuf, outBuf);
+			fail("Expected UnpackException");
+		} catch (UnpackException failed) {
+			Throwable err = failed.getCause();
+			assertTrue(err instanceof MissingObjectException);
+			MissingObjectException moe = (MissingObjectException) err;
+			assertEquals(b, moe.getObjectId());
+		}
 
 		final PacketLineIn r = asPacketLineIn(outBuf);
 		String master = r.readString();
