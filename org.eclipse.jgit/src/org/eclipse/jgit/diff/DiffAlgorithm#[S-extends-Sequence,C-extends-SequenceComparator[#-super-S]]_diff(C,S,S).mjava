@@ -1,0 +1,24 @@
+	/**
+	 * Compare two sequences and identify a list of edits between them.
+	 * 
+	 * @param <S>
+	 *            type of sequence being compared.
+	 * @param <C>
+	 *            type of comparator to evaluate the sequence elements.
+	 * @param cmp
+	 *            the comparator supplying the element equivalence function.
+	 * @param a
+	 *            the first (also known as old or pre-image) sequence. Edits
+	 *            returned by this algorithm will reference indexes using the
+	 *            'A' side: {@link Edit#getBeginA()}, {@link Edit#getEndA()}.
+	 * @param b
+	 *            the second (also known as new or post-image) sequence. Edits
+	 *            returned by this algorithm will reference indexes using the
+	 *            'B' side: {@link Edit#getBeginB()}, {@link Edit#getEndB()}.
+	 * @return a modifiable edit list comparing the two sequences. If empty, the
+	 *         sequences are identical according to {@code cmp}'s rules. The
+	 *         result list is never null.
+	 */
+	public <S extends Sequence, C extends SequenceComparator<? super S>> EditList diff(
+			C cmp, S a, S b);
+
