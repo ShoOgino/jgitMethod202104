@@ -1,0 +1,12 @@
+	@SuppressWarnings("unchecked")
+	private static <T> T[] allValuesOf(final T value) {
+		try {
+			return (T[]) value.getClass().getMethod("values").invoke(null);
+		} catch (Exception err) {
+			String typeName = value.getClass().getName();
+			String msg = MessageFormat.format(
+					JGitText.get().enumValuesNotAvailable, typeName);
+			throw new IllegalArgumentException(msg, err);
+		}
+	}
+

@@ -1,0 +1,21 @@
+	/**
+	 * Parse an enumeration from the configuration.
+	 *
+	 * @param <T>
+	 *            type of the enumeration object.
+	 * @param section
+	 *            section the key is grouped within.
+	 * @param subsection
+	 *            subsection name, such a remote or branch name.
+	 * @param name
+	 *            name of the key to get.
+	 * @param defaultValue
+	 *            default value to return if no value was present.
+	 * @return the selected enumeration value, or {@code defaultValue}.
+	 */
+	public <T extends Enum<?>> T getEnum(final String section,
+			final String subsection, final String name, final T defaultValue) {
+		final T[] all = allValuesOf(defaultValue);
+		return getEnum(all, section, subsection, name, defaultValue);
+	}
+

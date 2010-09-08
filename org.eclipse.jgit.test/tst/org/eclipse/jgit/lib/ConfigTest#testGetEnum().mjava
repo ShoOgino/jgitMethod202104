@@ -1,0 +1,22 @@
+	public void testGetEnum() throws ConfigInvalidException {
+		Config c = parse("[s]\na = ON\nb = input\nc = true\nd = off\n");
+		assertSame(CoreConfig.AutoCRLF.TRUE, c.getEnum("s", null, "a",
+				CoreConfig.AutoCRLF.FALSE));
+
+		assertSame(CoreConfig.AutoCRLF.INPUT, c.getEnum("s", null, "b",
+				CoreConfig.AutoCRLF.FALSE));
+
+		assertSame(CoreConfig.AutoCRLF.TRUE, c.getEnum("s", null, "c",
+				CoreConfig.AutoCRLF.FALSE));
+
+		assertSame(CoreConfig.AutoCRLF.FALSE, c.getEnum("s", null, "d",
+				CoreConfig.AutoCRLF.TRUE));
+
+		c = new Config();
+		assertSame(CoreConfig.AutoCRLF.FALSE, c.getEnum("s", null, "d",
+				CoreConfig.AutoCRLF.FALSE));
+
+		c = parse("[s \"b\"]\n\tc = one two\n");
+		assertSame(TestEnum.ONE_TWO, c.getEnum("s", "b", "c", TestEnum.ONE_TWO));
+	}
+
