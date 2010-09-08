@@ -1,0 +1,59 @@
+	@SuppressWarnings("boxing")
+	@Override
+	protected void run() throws Exception {
+		diffFmt.setRepository(db);
+		try {
+			diffFmt.setPathFilter(pathFilter);
+			if (detectRenames != null)
+				diffFmt.setDetectRenames(detectRenames.booleanValue());
+			if (renameLimit != null && diffFmt.isDetectRenames()) {
+				RenameDetector rd = diffFmt.getRenameDetector();
+				rd.setRenameLimit(renameLimit.intValue());
+			}
+
+			ObjectId objectId;
+			if (objectName == null)
+				objectId = db.resolve(Constants.HEAD);
+			else
+				objectId = db.resolve(objectName);
+
+			RevWalk rw = new RevWalk(db);
+			try {
+				RevObject obj = rw.parseAny(objectId);
+				while (obj instanceof RevTag) {
+					show((RevTag) obj);
+					obj = ((RevTag) obj).getObject();
+					rw.parseBody(obj);
+				}
+
+				switch (obj.getType()) {
+				case Constants.OBJ_COMMIT:
+					show(rw, (RevCommit) obj);
+					break;
+
+				case Constants.OBJ_TREE:
+					out.print("tree ");
+					out.print(objectName);
+					out.println();
+					out.println();
+					show((RevTree) obj);
+					break;
+
+				case Constants.OBJ_BLOB:
+					db.open(obj, obj.getType()).copyTo(System.out);
+					System.out.flush();
+					break;
+
+				default:
+					throw die(MessageFormat.format(
+							CLIText.get().cannotReadBecause, obj.name(),
+							obj.getType()));
+				}
+			} finally {
+				rw.release();
+			}
+		} finally {
+			diffFmt.release();
+		}
+	}
+

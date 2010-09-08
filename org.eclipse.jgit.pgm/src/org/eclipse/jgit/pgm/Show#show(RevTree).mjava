@@ -1,0 +1,15 @@
+	private void show(RevTree obj) throws MissingObjectException,
+			IncorrectObjectTypeException, CorruptObjectException, IOException {
+		final TreeWalk walk = new TreeWalk(db);
+		walk.reset();
+		walk.addTree(obj);
+
+		while (walk.next()) {
+			out.print(walk.getPathString());
+			final FileMode mode = walk.getFileMode(0);
+			if (mode == FileMode.TREE)
+				out.print('/');
+			out.println();
+		}
+	}
+

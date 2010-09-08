@@ -1,0 +1,14 @@
+	private void showDiff(RevCommit c) throws IOException {
+		final RevTree a = c.getParent(0).getTree();
+		final RevTree b = c.getTree();
+
+		if (showNameAndStatusOnly)
+			Diff.nameStatus(out, diffFmt.scan(a, b));
+		else {
+			out.flush();
+			diffFmt.format(a, b);
+			diffFmt.flush();
+		}
+		out.println();
+	}
+
