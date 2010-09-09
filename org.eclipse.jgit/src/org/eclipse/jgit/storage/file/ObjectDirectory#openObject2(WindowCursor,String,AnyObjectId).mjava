@@ -5,11 +5,13 @@
 			File path = fileFor(objectName);
 			FileInputStream in = new FileInputStream(path);
 			try {
+				unpackedObjectCache.add(objectId);
 				return UnpackedObject.open(in, path, objectId, curs);
 			} finally {
 				in.close();
 			}
 		} catch (FileNotFoundException noFile) {
+			unpackedObjectCache.remove(objectId);
 			return null;
 		}
 	}

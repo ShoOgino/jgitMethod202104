@@ -2,15 +2,12 @@
 			final InputStream is) throws IOException, FileNotFoundException,
 			Error {
 		boolean delete = true;
-		File tmp = File.createTempFile("noz", null, db.getDirectory());
+		File tmp = newTempFile();
 		try {
 			DigestOutputStream dOut = new DigestOutputStream(
 					compress(new FileOutputStream(tmp)), md);
 			try {
-				dOut.write(Constants.encodedTypeString(type));
-				dOut.write((byte) ' ');
-				dOut.write(Constants.encodeASCII(len));
-				dOut.write((byte) 0);
+				writeHeader(dOut, type, len);
 
 				final byte[] buf = buffer();
 				while (len > 0) {
@@ -24,7 +21,6 @@
 				dOut.close();
 			}
 
-			tmp.setReadOnly();
 			delete = false;
 			return tmp;
 		} finally {

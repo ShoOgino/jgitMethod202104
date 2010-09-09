@@ -1,4 +1,6 @@
 	boolean hasObject1(final AnyObjectId objectId) {
+		if (unpackedObjectCache.isUnpacked(objectId))
+			return true;
 		for (final PackFile p : packList.get().packs) {
 			try {
 				if (p.hasObject(objectId)) {
