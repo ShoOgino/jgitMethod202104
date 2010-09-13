@@ -15,6 +15,18 @@
 		else if (revLimiter.size() > 1)
 			walk.setRevFilter(AndRevFilter.create(revLimiter));
 
+		if (all)
+			for (Ref a : db.getAllRefs().values()) {
+				ObjectId oid = a.getPeeledObjectId();
+				if (oid == null)
+					oid = a.getObjectId();
+				try {
+					commits.add(walk.parseCommit(oid));
+				} catch (IncorrectObjectTypeException e) {
+					// Ignore all refs which are not commits
+				}
+			}
+
 		if (commits.isEmpty()) {
 			final ObjectId head = db.resolve(Constants.HEAD);
 			if (head == null)
