@@ -1,0 +1,21 @@
+	@SuppressWarnings("boxing")
+	public void testSideBranch() throws Exception {
+		final RevCommit a = commit();
+		final RevCommit b = commit(a);
+		final RevCommit c = commit(a);
+
+		PlotWalk pw = new PlotWalk(db);
+		pw.markStart(pw.lookupCommit(b.getId()));
+		pw.markStart(pw.lookupCommit(c.getId()));
+
+		PlotCommitList<PlotLane> pcl = new PlotCommitList<PlotLane>();
+		pcl.source(pw);
+		pcl.fillTo(Integer.MAX_VALUE);
+
+		CommitListAssert test = new CommitListAssert(pcl);
+		test.commit(c).lanePos(0).parents(a);
+		test.commit(b).lanePos(1).parents(a);
+		test.commit(a).lanePos(0).parents();
+		test.noMoreCommits();
+	}
+
