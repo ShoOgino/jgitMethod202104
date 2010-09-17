@@ -1,0 +1,8 @@
+		public CommitListAssert commit(RevCommit id) {
+			assertTrue("Unexpected end of list at pos#"+nextIndex, pcl.size()>nextIndex);
+			current = pcl.get(nextIndex++);
+			assertEquals("Expected commit not found at pos#" + (nextIndex - 1),
+					id.getId(), current.getId());
+			return this;
+		}
+

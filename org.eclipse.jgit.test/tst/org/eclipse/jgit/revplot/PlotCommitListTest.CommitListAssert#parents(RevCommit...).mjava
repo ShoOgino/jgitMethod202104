@@ -1,0 +1,10 @@
+		public CommitListAssert parents(RevCommit... parents) {
+			assertEquals("Number of parents of commit #" + (nextIndex - 1)
+					+ " not as expected.", parents.length,
+					current.getParentCount());
+			for (int i = 0; i < parents.length; i++)
+				assertEquals("Unexpected parent of commit #" + (nextIndex - 1),
+						parents[i], current.getParent(i));
+			return this;
+		}
+
