@@ -20,10 +20,16 @@
 			case Constants.OBJ_BLOB:
 			case Constants.OBJ_TAG: {
 				if (sz < curs.getStreamFileThreshold()) {
-					byte[] data = decompress(pos + p, sz, curs);
+					byte[] data;
+					try {
+						data = new byte[(int) sz];
+					} catch (OutOfMemoryError tooBig) {
+						return largeWhole(curs, pos, type, sz, p);
+					}
+					decompress(pos + p, curs, data, 0, data.length);
 					return new ObjectLoader.SmallObject(type, data);
 				}
-				return new LargePackedWholeObject(type, sz, pos, p, this, curs.db);
+				return largeWhole(curs, pos, type, sz, p);
 			}
 
 			case Constants.OBJ_OFS_DELTA: {

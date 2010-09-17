@@ -1,7 +1,7 @@
 	public void testStandardFormat_LargeObject_TruncatedZLibStream()
 			throws Exception {
 		final int type = Constants.OBJ_BLOB;
-		byte[] data = rng.nextBytes(ObjectLoader.STREAM_THRESHOLD + 5);
+		byte[] data = rng.nextBytes(streamThreshold + 5);
 		ObjectId id = new ObjectInserter.Formatter().idFor(type, data);
 		byte[] gz = compressStandardFormat(type, data);
 		byte[] tr = new byte[gz.length - 1];
