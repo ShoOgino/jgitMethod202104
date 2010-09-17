@@ -1,7 +1,8 @@
 	@Override
 	ObjectLoader openObject2(WindowCursor curs, String objectName,
 			AnyObjectId objectId) throws IOException {
-		// This method should never be invoked.
-		throw new UnsupportedOperationException();
+		if (unpackedObjects.contains(objectId))
+			return wrapped.openObject2(curs, objectName, objectId);
+		return null;
 	}
 
