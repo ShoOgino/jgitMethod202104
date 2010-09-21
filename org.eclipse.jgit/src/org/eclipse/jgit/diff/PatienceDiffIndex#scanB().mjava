@@ -17,8 +17,7 @@
 		final int end = region.endB;
 		int pIdx = pBegin;
 		SCAN: while (ptr < end) {
-			final int key = cmp.hash(b, ptr);
-			final int tIdx = key & tableMask;
+			final int tIdx = cmp.hash(b, ptr) & tableMask;
 
 			if (pIdx < pEnd) {
 				final long priorRec = pCommon[pIdx];
@@ -26,7 +25,7 @@
 					// We know this region is unique from a prior pass.
 					// Insert the start point, and skip right to the end.
 					//
-					insertB(key, tIdx, ptr);
+					insertB(tIdx, ptr);
 					pIdx++;
 					ptr = aOfRaw(priorRec);
 					continue SCAN;
@@ -38,9 +37,6 @@
 			// was already a different entry present.
 			//
 			for (int eIdx = table[tIdx]; eIdx != 0; eIdx = next[eIdx]) {
-				if (hash[eIdx] != key)
-					continue;
-
 				final long rec = ptrs[eIdx];
 				if (cmp.equals(b, ptr, b, bOf(rec))) {
 					ptrs[eIdx] = rec | B_DUPLICATE;
@@ -49,7 +45,7 @@
 				}
 			}
 
-			insertB(key, tIdx, ptr);
+			insertB(tIdx, ptr);
 			ptr++;
 		}
 	}
