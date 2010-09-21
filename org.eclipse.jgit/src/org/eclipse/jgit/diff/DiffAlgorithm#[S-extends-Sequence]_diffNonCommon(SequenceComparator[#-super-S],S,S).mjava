@@ -1,10 +1,14 @@
 	/**
 	 * Compare two sequences and identify a list of edits between them.
-	 * 
+	 *
+	 * This method should be invoked only after the two sequences have been
+	 * proven to have no common starting or ending elements. The expected
+	 * elimination of common starting and ending elements is automatically
+	 * performed by the {@link #diff(SequenceComparator, Sequence, Sequence)}
+	 * method, which invokes this method using {@link Subsequence}s.
+	 *
 	 * @param <S>
 	 *            type of sequence being compared.
-	 * @param <C>
-	 *            type of comparator to evaluate the sequence elements.
 	 * @param cmp
 	 *            the comparator supplying the element equivalence function.
 	 * @param a
@@ -15,10 +19,8 @@
 	 *            the second (also known as new or post-image) sequence. Edits
 	 *            returned by this algorithm will reference indexes using the
 	 *            'B' side: {@link Edit#getBeginB()}, {@link Edit#getEndB()}.
-	 * @return a modifiable edit list comparing the two sequences. If empty, the
-	 *         sequences are identical according to {@code cmp}'s rules. The
-	 *         result list is never null.
+	 * @return a modifiable edit list comparing the two sequences.
 	 */
-	public <S extends Sequence, C extends SequenceComparator<? super S>> EditList diff(
-			C cmp, S a, S b);
+	public abstract <S extends Sequence> EditList diffNonCommon(
+			SequenceComparator<? super S> cmp, S a, S b);
 
