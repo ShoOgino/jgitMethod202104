@@ -1,0 +1,23 @@
+	/**
+	 * Adjust the Edit to reflect positions in the base sequence.
+	 * 
+	 * @param <S>
+	 *            the base sequence type.
+	 * @param e
+	 *            edit to adjust in-place. Prior to invocation the indexes are
+	 *            in terms of the two subsequences; after invocation the indexes
+	 *            are in terms of the base sequences.
+	 * @param a
+	 *            the A sequence.
+	 * @param b
+	 *            the B sequence.
+	 */
+	public static <S extends Sequence> void toBase(Edit e, Subsequence<S> a,
+			Subsequence<S> b) {
+		e.beginA += a.begin;
+		e.endA += a.begin;
+
+		e.beginB += b.begin;
+		e.endB += b.begin;
+	}
+

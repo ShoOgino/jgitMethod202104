@@ -1,0 +1,22 @@
+	/**
+	 * Adjust the Edits to reflect positions in the base sequence.
+	 *
+	 * @param <S>
+	 *            the base sequence type.
+	 * @param edits
+	 *            edits to adjust in-place. Prior to invocation the indexes are
+	 *            in terms of the two subsequences; after invocation the indexes
+	 *            are in terms of the base sequences.
+	 * @param a
+	 *            the A sequence.
+	 * @param b
+	 *            the B sequence.
+	 * @return always {@code edits} (as the list was updated in-place).
+	 */
+	public static <S extends Sequence> EditList toBase(EditList edits,
+			Subsequence<S> a, Subsequence<S> b) {
+		for (Edit e : edits)
+			toBase(e, a, b);
+		return edits;
+	}
+
