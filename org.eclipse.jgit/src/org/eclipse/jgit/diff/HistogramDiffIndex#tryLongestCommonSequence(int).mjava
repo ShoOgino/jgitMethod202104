@@ -1,0 +1,71 @@
+	private int tryLongestCommonSequence(final int bPtr) {
+		int bNext = bPtr + 1;
+		int rIdx = table[hash(b, bPtr)];
+		for (long rec; rIdx != 0; rIdx = recNext(rec)) {
+			rec = recs[rIdx];
+
+			// If there are more occurrences in A, don't use this chain.
+			if (recCnt(rec) > cnt) {
+				if (!hasCommon)
+					hasCommon = cmp.equals(a, recPtr(rec), b, bPtr);
+				continue;
+			}
+
+			int as = recPtr(rec);
+			if (!cmp.equals(a, as, b, bPtr))
+				continue;
+
+			hasCommon = true;
+			TRY_LOCATIONS: for (;;) {
+				int np = next[as - nextShift];
+				int bs = bPtr;
+				int ae = as + 1;
+				int be = bs + 1;
+
+				while (region.beginA < as && region.beginB < bs
+						&& cmp.equals(a, as - 1, b, bs - 1)) {
+					as--;
+					bs--;
+				}
+				while (ae < region.endA && be < region.endB
+						&& cmp.equals(a, ae, b, be)) {
+					ae++;
+					be++;
+				}
+
+				if (bNext < be)
+					bNext = be;
+				if (lcs.getLengthA() < ae - as || recCnt(rec) < cnt) {
+					// If this region is the longest, or there are less
+					// occurrences of it in A, its now our LCS.
+					//
+					lcs.beginA = as;
+					lcs.beginB = bs;
+					lcs.endA = ae;
+					lcs.endB = be;
+					cnt = recCnt(rec);
+				}
+
+				// Because we added elements in reverse order index 0
+				// cannot possibly be the next position. Its the first
+				// element of the sequence and thus would have been the
+				// value of as at the start of the TRY_LOCATIONS loop.
+				//
+				if (np == 0)
+					break TRY_LOCATIONS;
+
+				while (np < ae) {
+					// The next location to consider was actually within
+					// the LCS we examined above. Don't reconsider it.
+					//
+					np = next[np - nextShift];
+					if (np == 0)
+						break TRY_LOCATIONS;
+				}
+
+				as = np;
+			}
+		}
+		return bNext;
+	}
+

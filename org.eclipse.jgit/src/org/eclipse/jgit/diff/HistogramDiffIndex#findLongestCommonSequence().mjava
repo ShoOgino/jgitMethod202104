@@ -1,0 +1,13 @@
+	Edit findLongestCommonSequence() {
+		if (!scanA())
+			return null;
+
+		lcs = new Edit(0, 0);
+		cnt = maxChainLength + 1;
+
+		for (int bPtr = region.beginB; bPtr < region.endB;)
+			bPtr = tryLongestCommonSequence(bPtr);
+
+		return hasCommon && maxChainLength < cnt ? null : lcs;
+	}
+

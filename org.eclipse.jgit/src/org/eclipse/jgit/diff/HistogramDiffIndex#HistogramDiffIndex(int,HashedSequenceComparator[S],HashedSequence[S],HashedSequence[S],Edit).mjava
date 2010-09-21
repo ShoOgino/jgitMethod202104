@@ -1,0 +1,22 @@
+	HistogramDiffIndex(int maxChainLength, HashedSequenceComparator<S> cmp,
+			HashedSequence<S> a, HashedSequence<S> b, Edit r) {
+		this.maxChainLength = maxChainLength;
+		this.cmp = cmp;
+		this.a = a;
+		this.b = b;
+		this.region = r;
+
+		if (region.endA >= MAX_PTR)
+			throw new IllegalArgumentException(
+					JGitText.get().sequenceTooLargeForDiffAlgorithm);
+
+		final int sz = r.getLengthA();
+		final int tableBits = tableBits(sz);
+		table = new int[1 << tableBits];
+		keyShift = 32 - tableBits;
+		nextShift = r.beginA;
+
+		recs = new long[Math.max(4, sz >>> 3)];
+		next = new int[sz];
+	}
+

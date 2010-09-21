@@ -1,0 +1,10 @@
+	public void testExceedsChainLenght_DuringScanOfB() {
+		HistogramDiff hd = new HistogramDiff();
+		hd.setFallbackAlgorithm(null);
+		hd.setMaxChainLength(1);
+
+		EditList r = hd.diff(RawTextComparator.DEFAULT, t("RaaS"), t("QaaT"));
+		assertEquals(1, r.size());
+		assertEquals(new Edit(0, 4, 0, 4), r.get(0));
+	}
+

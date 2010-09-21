@@ -1,0 +1,48 @@
+	private boolean scanA() {
+		// Scan the elements backwards, inserting them into the hash table
+		// as we go. Going in reverse places the earliest occurrence of any
+		// element at the start of the chain, so we consider earlier matches
+		// before later matches.
+		//
+		SCAN: for (int ptr = region.endA - 1; region.beginA <= ptr; ptr--) {
+			final int tIdx = hash(a, ptr);
+
+			int chainLen = 0;
+			for (int rIdx = table[tIdx]; rIdx != 0;) {
+				final long rec = recs[rIdx];
+				if (cmp.equals(a, recPtr(rec), a, ptr)) {
+					// ptr is identical to another element. Insert it onto
+					// the front of the existing element chain.
+					//
+					int newCnt = recCnt(rec) + 1;
+					if (MAX_CNT < newCnt)
+						newCnt = MAX_CNT;
+					recs[rIdx] = recCreate(recNext(rec), ptr, newCnt);
+					next[ptr - nextShift] = recPtr(rec);
+					continue SCAN;
+				}
+
+				rIdx = recNext(rec);
+				chainLen++;
+			}
+
+			if (chainLen == maxChainLength)
+				return false;
+
+			// This is the first time we have ever seen this particular
+			// element in the sequence. Construct a new chain for it.
+			//
+			final int rIdx = ++recCnt;
+			if (rIdx == recs.length) {
+				int sz = Math.min(recs.length << 1, 1 + region.getLengthA());
+				long[] n = new long[sz];
+				System.arraycopy(recs, 0, n, 0, recs.length);
+				recs = n;
+			}
+
+			recs[rIdx] = recCreate(table[tIdx], ptr, 1);
+			table[tIdx] = rIdx;
+		}
+		return true;
+	}
+

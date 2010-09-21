@@ -1,0 +1,22 @@
+	public void testExceedsChainLenght_DuringScanOfA() {
+		HistogramDiff hd = new HistogramDiff();
+		hd.setFallbackAlgorithm(null);
+		hd.setMaxChainLength(3);
+
+		SequenceComparator<RawText> cmp = new SequenceComparator<RawText>() {
+			@Override
+			public boolean equals(RawText a, int ai, RawText b, int bi) {
+				return RawTextComparator.DEFAULT.equals(a, ai, b, bi);
+			}
+
+			@Override
+			public int hash(RawText a, int ai) {
+				return 1;
+			}
+		};
+
+		EditList r = hd.diff(cmp, t("RabS"), t("QabT"));
+		assertEquals(1, r.size());
+		assertEquals(new Edit(0, 4, 0, 4), r.get(0));
+	}
+
