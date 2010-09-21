@@ -1,0 +1,15 @@
+	/**
+	 * @param local
+	 * @param inCore
+	 */
+	protected ResolveMerger(Repository local, boolean inCore) {
+		super(local);
+		commitNames = new String[] { "BASE", "OURS", "THEIRS" };
+		oi = getObjectInserter();
+		this.inCore = inCore;
+
+		if (inCore) {
+			dircache = DirCache.newInCore();
+		}
+	}
+

@@ -1,13 +1,19 @@
 	/**
 	 * Reverts the worktree after an unsuccessful merge. We know that for all
 	 * modified files the old content was in the old index and the index
-	 * contained only stage 0
+	 * contained only stage 0. In case if inCore operation just clear
+	 * the history of modified files.
 	 *
 	 * @throws IOException
 	 * @throws CorruptObjectException
 	 * @throws NoWorkTreeException
 	 */
 	private void cleanUp() throws NoWorkTreeException, CorruptObjectException, IOException {
+		if (inCore) {
+			modifiedFiles.clear();
+			return;
+		}
+
 		DirCache dc = db.readDirCache();
 		ObjectReader or = db.getObjectDatabase().newReader();
 		Iterator<String> mpathsIt=modifiedFiles.iterator();
