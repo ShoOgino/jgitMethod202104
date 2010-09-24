@@ -1,0 +1,38 @@
+	private List<Function> init() {
+		List<Hash> hashes = new ArrayList<Hash>();
+		List<Fold> folds = new ArrayList<Fold>();
+
+		try {
+			for (Field f : TextHashFunctions.class.getDeclaredFields()) {
+				if (f.getType() == Hash.class) {
+					f.setAccessible(true);
+					Hash cmp = (Hash) f.get(this);
+					cmp.name = f.getName();
+					hashes.add(cmp);
+
+				} else if (f.getType() == Fold.class) {
+					f.setAccessible(true);
+					Fold fold = (Fold) f.get(this);
+					fold.name = f.getName();
+					folds.add(fold);
+				}
+			}
+		} catch (IllegalArgumentException e) {
+			throw new RuntimeException("Cannot determine names", e);
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException("Cannot determine names", e);
+		}
+
+		List<Function> all = new ArrayList<Function>();
+		for (Hash cmp : hashes) {
+			if (include(cmp.name, hashFunctions)) {
+				for (Fold f : folds) {
+					if (include(f.name, foldFunctions)) {
+						all.add(new Function(cmp, f));
+					}
+				}
+			}
+		}
+		return all;
+	}
+

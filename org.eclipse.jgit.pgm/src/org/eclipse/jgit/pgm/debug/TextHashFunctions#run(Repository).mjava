@@ -1,0 +1,76 @@
+	private void run(Repository db) throws Exception {
+		List<Function> all = init();
+
+		long fileCnt = 0;
+		long lineCnt = 0;
+		ObjectReader or = db.newObjectReader();
+		try {
+			final MutableObjectId id = new MutableObjectId();
+			RevWalk rw = new RevWalk(or);
+			TreeWalk tw = new TreeWalk(or);
+			tw.reset(rw.parseTree(db.resolve(Constants.HEAD)));
+			tw.setRecursive(true);
+
+			while (tw.next()) {
+				FileMode fm = tw.getFileMode(0);
+				if (!FileMode.REGULAR_FILE.equals(fm)
+						&& !FileMode.EXECUTABLE_FILE.equals(fm))
+					continue;
+
+				byte[] raw;
+				try {
+					tw.getObjectId(id, 0);
+					raw = or.open(id).getCachedBytes(textLimit * 1024);
+				} catch (LargeObjectException tooBig) {
+					continue;
+				}
+
+				if (RawText.isBinary(raw))
+					continue;
+
+				RawText txt = new RawText(raw);
+				int[] lines = new int[txt.size()];
+				int cnt = 0;
+				HashSet<Line> u = new HashSet<Line>();
+				for (int i = 0; i < txt.size(); i++) {
+					if (u.add(new Line(txt, i)))
+						lines[cnt++] = i;
+				}
+
+				fileCnt++;
+				lineCnt += cnt;
+
+				for (Function fun : all)
+					testOne(fun, txt, lines, cnt);
+			}
+		} finally {
+			or.release();
+		}
+
+		if (db.getDirectory() != null) {
+			String name = db.getDirectory().getName();
+			File parent = db.getDirectory().getParentFile();
+			if (name.equals(Constants.DOT_GIT_EXT) && parent != null)
+				name = parent.getName();
+			out.println(name + ":");
+		}
+		out.format("  %6d files; %5d avg. unique lines/file\n", //
+				fileCnt, //
+				lineCnt / fileCnt);
+		out.format("%-20s %-15s %9s\n", "Hash", "Fold", "Max Len");
+		out.println("-----------------------------------------------");
+		String lastHashName = null;
+		for (Function fun : all) {
+			String hashName = fun.hash.name;
+			if (hashName.equals(lastHashName))
+				hashName = "";
+			out.format("%-20s %-15s %9d\n", //
+					hashName, //
+					fun.fold.name, //
+					fun.maxChainLength);
+			lastHashName = fun.hash.name;
+		}
+		out.println();
+		out.flush();
+	}
+
