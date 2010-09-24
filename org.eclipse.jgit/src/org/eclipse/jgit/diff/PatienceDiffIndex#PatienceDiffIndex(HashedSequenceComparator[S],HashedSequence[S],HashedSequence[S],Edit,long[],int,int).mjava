@@ -12,8 +12,9 @@
 		this.pEnd = pCnt;
 
 		final int sz = region.getLengthB();
-		table = new int[tableSize(sz)];
-		tableMask = table.length - 1;
+		final int tableBits = tableBits(sz);
+		table = new int[1 << tableBits];
+		keyShift = 32 - tableBits;
 
 		// As we insert elements we preincrement so that 0 is never a
 		// valid entry. Therefore we have to allocate one extra space.

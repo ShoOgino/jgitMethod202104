@@ -20,7 +20,7 @@
 				int c = buf[ptr++] & 0xff;
 				if (c == '\n')
 					break;
-				hash = (hash << 5) ^ c;
+				hash = (hash << 5) + hash + c;
 			} while (n < 64 && n < remaining);
 			add(hash, n);
 			remaining -= n;

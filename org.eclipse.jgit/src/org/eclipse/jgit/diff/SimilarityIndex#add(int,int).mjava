@@ -1,5 +1,6 @@
 	void add(int key, int cnt) {
-		key = hash(key);
+		key = (key * 0x9e370001) >>> 1; // Mix bits and ensure not negative.
+
 		int j = slot(key);
 		for (;;) {
 			long v = idHash[j];

@@ -1,4 +1,8 @@
 	private int slot(int key) {
-		return key % idHash.length;
+		// We use 31 - idHashBits because the upper bit was already forced
+		// to be 0 and we want the remaining high bits to be used as the
+		// table slot.
+		//
+		return key >>> (31 - idHashBits);
 	}
 
