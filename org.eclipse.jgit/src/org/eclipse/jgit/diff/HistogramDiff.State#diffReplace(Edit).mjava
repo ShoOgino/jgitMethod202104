@@ -14,6 +14,10 @@
 					diff(r.after(lcs));
 				}
 
+			} else if (fallback instanceof LowLevelDiffAlgorithm) {
+				LowLevelDiffAlgorithm fb = (LowLevelDiffAlgorithm) fallback;
+				fb.diffNonCommon(edits, cmp, a, b, r);
+
 			} else if (fallback != null) {
 				SubsequenceComparator<HashedSequence<S>> cs = subcmp();
 				Subsequence<HashedSequence<S>> as = Subsequence.a(a, r);

@@ -1,11 +1,10 @@
 	/**
 	 * Entrypoint into the algorithm this class is all about. This method triggers that the
 	 * differences between A and B are calculated in form of a list of edits.
+	 * @param r portion of the sequences to examine.
 	 */
-	protected void calculateEdits() {
-		edits = new EditList();
-
-		middle.initialize(0, a.size(), 0, b.size());
+	private void calculateEdits(Edit r) {
+		middle.initialize(r.beginA, r.endA, r.beginB, r.endB);
 		if (middle.beginA >= middle.endA &&
 				middle.beginB >= middle.endB)
 			return;
