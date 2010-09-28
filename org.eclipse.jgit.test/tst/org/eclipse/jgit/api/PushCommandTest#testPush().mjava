@@ -1,0 +1,34 @@
+	public void testPush() throws JGitInternalException, IOException,
+			GitAPIException, URISyntaxException {
+
+		// create other repository
+		Repository db2 = createWorkRepository();
+
+		// setup the first repository
+		final Config config = db.getConfig();
+		RemoteConfig remoteConfig = new RemoteConfig(config, "test");
+		URIish uri = new URIish(db2.getDirectory().toURI().toURL());
+		remoteConfig.addURI(uri);
+		remoteConfig.update(config);
+
+		Git git1 = new Git(db);
+		// create some refs via commits and tag
+		RevCommit commit = git1.commit().setMessage("initial commit").call();
+		RevTag tag = git1.tag().setName("tag").call();
+
+		try {
+			db2.resolve(commit.getId().getName() + "^{commit}");
+			fail("id shouldn't exist yet");
+		} catch (MissingObjectException e) {
+			// we should get here
+		}
+
+		RefSpec spec = new RefSpec("refs/heads/master:refs/heads/x");
+		git1.push().setRemote("test").setRefSpecs(spec)
+				.call();
+
+		assertEquals(commit.getId(),
+				db2.resolve(commit.getId().getName() + "^{commit}"));
+		assertEquals(tag.getId(), db2.resolve(tag.getId().getName()));
+	}
+
