@@ -1,4 +1,4 @@
-	protected void showFetchResult(final Transport tn, final FetchResult r) {
+	protected void showFetchResult(final FetchResult r) {
 		ObjectReader reader = db.newObjectReader();
 		try {
 			boolean shownURI = false;
@@ -12,7 +12,7 @@
 				final String dst = abbreviateRef(u.getLocalName(), true);
 
 				if (!shownURI) {
-					out.format(CLIText.get().fromURI, tn.getURI());
+					out.format(CLIText.get().fromURI, r.getURI());
 					out.println();
 					shownURI = true;
 				}
