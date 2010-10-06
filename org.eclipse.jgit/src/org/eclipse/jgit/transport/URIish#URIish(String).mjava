@@ -14,24 +14,23 @@
 			host = matcher.group(4);
 			if (matcher.group(5) != null)
 				port = Integer.parseInt(matcher.group(5));
-			path = matcher.group(6);
-			if (path.length() >= 3
-			&& path.charAt(0) == '/'
-			&& path.charAt(2) == ':'
-			&& (path.charAt(1) >= 'A' && path.charAt(1) <= 'Z'
-			 || path.charAt(1) >= 'a' && path.charAt(1) <= 'z'))
-				path = path.substring(1);
-			else if (scheme != null && path.length() >= 2
-					&& path.charAt(0) == '/' && path.charAt(1) == '~')
-				path = path.substring(1);
+			path = cleanLeadingSlashes(
+					n2e(matcher.group(6)) + n2e(matcher.group(7)), scheme);
 		} else {
 			matcher = SCP_URI.matcher(s);
 			if (matcher.matches()) {
 				user = matcher.group(1);
-				host = matcher.group(2);
-				path = matcher.group(3);
-			} else
-				throw new URISyntaxException(s, JGitText.get().cannotParseGitURIish);
+				pass = matcher.group(2);
+				host = matcher.group(3);
+				path = matcher.group(4);
+			} else {
+				matcher = LOCAL_FILE.matcher(s);
+				if (matcher.matches()) {
+					path = matcher.group(1);
+				} else
+					throw new URISyntaxException(s,
+							JGitText.get().cannotParseGitURIish);
+			}
 		}
 	}
 
