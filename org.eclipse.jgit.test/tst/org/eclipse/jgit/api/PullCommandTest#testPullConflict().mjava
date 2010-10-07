@@ -1,0 +1,33 @@
+	public void testPullConflict() throws Exception {
+		PullResult res = target.pull().call();
+		// nothing to update since we don't have different data yet
+		assertTrue(res.getFetchResult().getTrackingRefUpdates().isEmpty());
+		assertTrue(res.getMergeResult().getMergeStatus().equals(
+				MergeStatus.ALREADY_UP_TO_DATE));
+
+		assertFileContentsEqual(targetFile, "Hello world");
+
+		// change the source file
+		writeToFile(sourceFile, "Source change");
+		source.add().addFilepattern("SomeFile.txt").call();
+		source.commit().setMessage("Source change in remote").call();
+
+		// change the target file
+		writeToFile(targetFile, "Target change");
+		target.add().addFilepattern("SomeFile.txt").call();
+		target.commit().setMessage("Target change in local").call();
+
+		res = target.pull().call();
+
+		String sourceChangeString = "Source change\n>>>>>>> branch 'refs/heads/master' of "
+				+ target.getRepository().getConfig().getString("remote",
+						"origin", "url");
+
+		assertFalse(res.getFetchResult().getTrackingRefUpdates().isEmpty());
+		assertEquals(res.getMergeResult().getMergeStatus(),
+				MergeStatus.CONFLICTING);
+		String result = "<<<<<<< HEAD\nTarget change\n=======\n"
+				+ sourceChangeString + "\n";
+		assertFileContentsEqual(targetFile, result);
+	}
+
