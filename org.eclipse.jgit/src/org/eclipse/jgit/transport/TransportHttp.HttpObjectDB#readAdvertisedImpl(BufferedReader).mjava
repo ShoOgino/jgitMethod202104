@@ -15,14 +15,14 @@
 
 				name = line.substring(tab + 1);
 				id = ObjectId.fromString(line.substring(0, tab));
-				if (name.endsWith("^{}")) {
+				if (name.endsWith("^{}")) { //$NON-NLS-1$
 					name = name.substring(0, name.length() - 3);
 					final Ref prior = avail.get(name);
 					if (prior == null)
 						throw outOfOrderAdvertisement(name);
 
 					if (prior.getPeeledObjectId() != null)
-						throw duplicateAdvertisement(name + "^{}");
+						throw duplicateAdvertisement(name + "^{}"); //$NON-NLS-1$
 
 					avail.put(name, new ObjectIdRef.PeeledTag(
 							Ref.Storage.NETWORK, name,
