@@ -1,0 +1,41 @@
+		@SuppressWarnings("boxing")
+		@Override
+		void configureRequest(final HttpURLConnection conn) throws IOException {
+			final Map<String, String> p = new HashMap<String, String>(params);
+			p.put("username", user);
+
+			final String realm = p.get("realm");
+			final String nonce = p.get("nonce");
+			final String uri = p.get("uri");
+			final String qop = p.get("qop");
+			final String method = conn.getRequestMethod();
+
+			final String A1 = user + ":" + realm + ":" + pass;
+			final String A2 = method + ":" + uri;
+
+			final String expect;
+			if ("auth".equals(qop)) {
+				final String c = p.get("cnonce");
+				final String nc = String.format("%8.8x", ++requestCount);
+				p.put("nc", nc);
+				expect = KD(H(A1), nonce + ":" + nc + ":" + c + ":" + qop + ":"
+						+ H(A2));
+			} else {
+				expect = KD(H(A1), nonce + ":" + H(A2));
+			}
+			p.put("response", expect);
+
+			StringBuilder v = new StringBuilder();
+			for (Map.Entry<String, String> e : p.entrySet()) {
+				if (v.length() > 0) {
+					v.append(", ");
+				}
+				v.append(e.getKey());
+				v.append('=');
+				v.append('"');
+				v.append(e.getValue());
+				v.append('"');
+			}
+			conn.setRequestProperty(HDR_AUTHORIZATION, NAME + " " + v);
+		}
+

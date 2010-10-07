@@ -1,0 +1,11 @@
+		Digest(String hdr) {
+			params = parse(hdr);
+
+			final String qop = params.get("qop");
+			if ("auth".equals(qop)) {
+				final byte[] bin = new byte[8];
+				PRNG.nextBytes(bin);
+				params.put("cnonce", Base64.encodeBytes(bin));
+			}
+		}
+

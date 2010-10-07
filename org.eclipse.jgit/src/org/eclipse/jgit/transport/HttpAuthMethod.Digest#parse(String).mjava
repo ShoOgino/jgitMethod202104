@@ -1,0 +1,44 @@
+		private static Map<String, String> parse(String auth) {
+			Map<String, String> p = new HashMap<String, String>();
+			int next = 0;
+			while (next < auth.length()) {
+				if (next < auth.length() && auth.charAt(next) == ',') {
+					next++;
+				}
+				while (next < auth.length()
+						&& Character.isWhitespace(auth.charAt(next))) {
+					next++;
+				}
+
+				int eq = auth.indexOf('=', next);
+				if (eq < 0 || eq + 1 == auth.length()) {
+					return Collections.emptyMap();
+				}
+
+				final String name = auth.substring(next, eq);
+				final String value;
+				if (auth.charAt(eq + 1) == '"') {
+					int dq = auth.indexOf('"', eq + 2);
+					if (dq < 0) {
+						return Collections.emptyMap();
+					}
+					value = auth.substring(eq + 2, dq);
+					next = dq + 1;
+
+				} else {
+					int space = auth.indexOf(' ', eq + 1);
+					int comma = auth.indexOf(',', eq + 1);
+					if (space < 0)
+						space = auth.length();
+					if (comma < 0)
+						comma = auth.length();
+
+					final int e = Math.min(space, comma);
+					value = auth.substring(eq + 1, e);
+					next = e + 1;
+				}
+				p.put(name, value);
+			}
+			return p;
+		}
+

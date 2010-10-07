@@ -1,0 +1,7 @@
+		@Override
+		void configureRequest(final HttpURLConnection conn) throws IOException {
+			String ident = user + ":" + pass;
+			String enc = Base64.encodeBytes(ident.getBytes("UTF-8"));
+			conn.setRequestProperty(HDR_AUTHORIZATION, NAME + " " + enc);
+		}
+
