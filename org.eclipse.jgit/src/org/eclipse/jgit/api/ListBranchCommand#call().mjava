@@ -1,0 +1,31 @@
+	/**
+	 * @throws JGitInternalException
+	 *             upon internal failure
+	 */
+	public List<Ref> call() throws JGitInternalException {
+		checkCallable();
+		Map<String, Ref> refList;
+		try {
+			if (listMode == null) {
+				refList = repo.getRefDatabase().getRefs(Constants.R_HEADS);
+			} else if (listMode == ListMode.REMOTE) {
+				refList = repo.getRefDatabase().getRefs(Constants.R_REMOTES);
+			} else {
+				refList = repo.getRefDatabase().getRefs(Constants.R_HEADS);
+				refList.putAll(repo.getRefDatabase().getRefs(
+						Constants.R_REMOTES));
+			}
+		} catch (IOException e) {
+			throw new JGitInternalException(e.getMessage(), e);
+		}
+		List<Ref> resultRefs = new ArrayList<Ref>();
+		resultRefs.addAll(refList.values());
+		Collections.sort(resultRefs, new Comparator<Ref>() {
+			public int compare(Ref o1, Ref o2) {
+				return o1.getName().compareTo(o2.getName());
+			}
+		});
+		setCallable(false);
+		return resultRefs;
+	}
+

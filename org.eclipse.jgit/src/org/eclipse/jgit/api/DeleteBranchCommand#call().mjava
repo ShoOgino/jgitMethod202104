@@ -1,0 +1,78 @@
+	/**
+	 * @throws NotMergedException
+	 *             when trying to delete a branch which has not been merged into
+	 *             the currently checked out branch without force
+	 * @return the list with the (full) names of the deleted branches
+	 */
+	public List<String> call() throws JGitInternalException,
+			NotMergedException, CannotDeleteCurrentBranchException {
+		checkCallable();
+		List<String> result = new ArrayList<String>();
+		if (branchNames.isEmpty())
+			return result;
+		try {
+			String currentBranch = repo.getFullBranch();
+			if (!force) {
+				// check if the branches to be deleted
+				// are all merged into the current branch
+				RevWalk walk = new RevWalk(repo);
+				RevCommit tip = walk.parseCommit(repo.resolve(Constants.HEAD));
+				for (String branchName : branchNames) {
+					if (branchName == null)
+						continue;
+					Ref currentRef = repo.getRef(branchName);
+					if (currentRef == null)
+						continue;
+
+					RevCommit base = walk.parseCommit(repo.resolve(branchName));
+					if (!walk.isMergedInto(base, tip)) {
+						throw new NotMergedException();
+					}
+				}
+			}
+			setCallable(false);
+			for (String branchName : branchNames) {
+				if (branchName == null)
+					continue;
+				Ref currentRef = repo.getRef(branchName);
+				if (currentRef == null)
+					continue;
+				if (currentRef.getName().equals(currentBranch))
+					throw new CannotDeleteCurrentBranchException(
+							MessageFormat
+									.format(
+											JGitText.get().cannotDeleteCheckedOutBranch,
+											branchName));
+				RefUpdate update = repo.updateRef(currentRef.getName());
+				update.setRefLogMessage("branch deleted", false);
+				update.setForceUpdate(true);
+				Result deleteResult = update.delete();
+
+				boolean ok = true;
+				switch (deleteResult) {
+				case IO_FAILURE:
+				case LOCK_FAILURE:
+				case REJECTED:
+					ok = false;
+					break;
+				default:
+					break;
+				}
+
+				if (ok) {
+					result.add(currentRef.getName());
+					// remove upstream configuration if any
+					repo.getConfig().unsetSection(
+							ConfigConstants.CONFIG_BRANCH_SECTION, branchName);
+					repo.getConfig().save();
+				} else
+					throw new JGitInternalException(MessageFormat.format(
+							JGitText.get().deleteBranchUnexpectedResult,
+							deleteResult.name()));
+			}
+			return result;
+		} catch (IOException ioe) {
+			throw new JGitInternalException(ioe.getMessage(), ioe);
+		}
+	}
+

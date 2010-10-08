@@ -1,0 +1,13 @@
+	public Ref createBranch(Git actGit, String name, boolean force,
+			String startPoint, SetupUpstreamMode mode)
+			throws JGitInternalException, RefAlreadyExistsException,
+			AmbiguousObjectException, RefNotFoundException,
+			InvalidRefNameException {
+		CreateBranchCommand cmd = actGit.branchCreate();
+		cmd.setName(name);
+		cmd.setForce(force);
+		cmd.setStartPoint(startPoint);
+		cmd.setUpstreamMode(mode);
+		return cmd.call();
+	}
+

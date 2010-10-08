@@ -1,0 +1,10 @@
+	public void testRenameRemoteTrackingBranch() throws Exception {
+		Git localGit = setUpRepoWithRemote();
+		Ref remoteBranch = localGit.branchList().setListMode(ListMode.REMOTE)
+				.call().get(0);
+		Ref renamed = localGit.branchRename()
+				.setOldName(remoteBranch.getName()).setNewName("newRemote")
+				.call();
+		assertEquals(Constants.R_REMOTES + "newRemote", renamed.getName());
+	}
+

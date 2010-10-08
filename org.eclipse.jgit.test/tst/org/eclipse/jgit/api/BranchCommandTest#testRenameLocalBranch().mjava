@@ -1,0 +1,54 @@
+	public void testRenameLocalBranch() throws Exception {
+		// null newName not allowed
+		try {
+			git.branchRename().call();
+		} catch (InvalidRefNameException e) {
+			// expected
+		}
+		// invalid newName not allowed
+		try {
+			git.branchRename().setNewName("In va lid").call();
+		} catch (InvalidRefNameException e) {
+			// expected
+		}
+		// not existing name not allowed
+		try {
+			git.branchRename().setOldName("notexistingbranch").setNewName(
+					"newname").call();
+		} catch (RefNotFoundException e) {
+			// expected
+		}
+		// create some branch
+		createBranch(git, "existing", false, "master", null);
+		// a local branch
+		Ref branch = createBranch(git, "fromMasterForRename", false, "master",
+				null);
+		assertEquals(Constants.R_HEADS + "fromMasterForRename", branch
+				.getName());
+		Ref renamed = git.branchRename().setOldName("fromMasterForRename")
+				.setNewName("newName").call();
+		assertEquals(Constants.R_HEADS + "newName", renamed.getName());
+		try {
+			git.branchRename().setOldName(renamed.getName()).setNewName(
+					"existing").call();
+			fail("Should have failed");
+		} catch (RefAlreadyExistsException e) {
+			// expected
+		}
+		try {
+			git.branchRename().setNewName("In va lid").call();
+			fail("Rename with invalid ref name should fail");
+		} catch (InvalidRefNameException e) {
+			// expected
+		}
+		// rename without old name and detached head not allowed
+		RefUpdate rup = git.getRepository().updateRef(Constants.HEAD, true);
+		rup.setNewObjectId(initialCommit);
+		rup.forceUpdate();
+		try {
+			git.branchRename().setNewName("detached").call();
+		} catch (DetachedHeadException e) {
+			// expected
+		}
+	}
+

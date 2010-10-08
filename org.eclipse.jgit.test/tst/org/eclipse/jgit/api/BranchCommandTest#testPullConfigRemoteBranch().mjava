@@ -1,0 +1,21 @@
+	public void testPullConfigRemoteBranch() throws Exception {
+		Git localGit = setUpRepoWithRemote();
+		Ref remote = localGit.branchList().setListMode(ListMode.REMOTE).call()
+				.get(0);
+		assertEquals("refs/remotes/origin/master", remote.getName());
+		// by default, we should create pull configuration
+		createBranch(localGit, "newFromRemote", false, remote.getName(), null);
+		assertEquals("origin", localGit.getRepository().getConfig().getString(
+				"branch", "newFromRemote", "remote"));
+		localGit.branchDelete().setBranchNames("newFromRemote").call();
+		// the pull configuration should be gone after deletion
+		assertNull(localGit.getRepository().getConfig().getString("branch",
+				"newFromRemote", "remote"));
+		// use --no-track
+		createBranch(localGit, "newFromRemote", false, remote.getName(),
+				SetupUpstreamMode.NOTRACK);
+		assertNull(localGit.getRepository().getConfig().getString("branch",
+				"newFromRemote", "remote"));
+		localGit.branchDelete().setBranchNames("newFromRemote").call();
+	}
+

@@ -1,0 +1,166 @@
+	/**
+	 * @throws RefAlreadyExistsException
+	 *             when trying to create (without force) a branch with a name
+	 *             that already exists
+	 * @throws RefNotFoundException
+	 *             if the start point can not be found
+	 * @throws AmbiguousObjectException
+	 *             if the start point is ambiguous
+	 * @throws InvalidRefNameException
+	 *             if the provided name is <code>null</code> or otherwise
+	 *             invalid
+	 * @return the newly created branch
+	 */
+	public Ref call() throws JGitInternalException, RefAlreadyExistsException,
+			RefNotFoundException, AmbiguousObjectException,
+			InvalidRefNameException {
+		checkCallable();
+		processOptions();
+		try {
+			boolean exists = repo.getRef(name) != null;
+			if (!force && exists)
+				throw new RefAlreadyExistsException(MessageFormat.format(
+						JGitText.get().refAlreadExists, name));
+
+			ObjectId startAt = getStartPoint();
+			String startPointFullName = null;
+			if (startPoint != null) {
+				Ref baseRef = repo.getRef(startPoint);
+				if (baseRef != null)
+					startPointFullName = baseRef.getName();
+			}
+
+			// determine whether we are based on a commit,
+			// a branch, or a tag and compose the reflog message
+			String refLogMessage;
+			String baseBranch = "";
+			if (startPointFullName == null) {
+				String baseCommit;
+				if (startCommit != null)
+					baseCommit = startCommit.getShortMessage();
+				else {
+					RevCommit commit = new RevWalk(repo).parseCommit(repo
+							.resolve(startPoint));
+					baseCommit = commit.getShortMessage();
+				}
+				if (exists)
+					refLogMessage = "branch: Reset start-point to commit "
+							+ baseCommit;
+				else
+					refLogMessage = "branch: Created from commit " + baseCommit;
+
+			} else if (startPointFullName.startsWith(Constants.R_HEADS)
+					|| startPointFullName.startsWith(Constants.R_REMOTES)) {
+				baseBranch = startPointFullName;
+				if (exists)
+					refLogMessage = "branch: Reset start-point to branch "
+							+ startPointFullName; // TODO
+				else
+					refLogMessage = "branch: Created from branch " + baseBranch;
+			} else {
+				if (exists)
+					refLogMessage = "branch: Reset start-point to tag "
+							+ startPointFullName;
+				else
+					refLogMessage = "branch: Created from tag "
+							+ startPointFullName;
+			}
+
+			RefUpdate updateRef = repo.updateRef(Constants.R_HEADS + name);
+			updateRef.setNewObjectId(startAt);
+			updateRef.setRefLogMessage(refLogMessage, false);
+			Result updateResult;
+			if (exists && force)
+				updateResult = updateRef.forceUpdate();
+			else
+				updateResult = updateRef.update();
+
+			setCallable(false);
+
+			boolean ok = false;
+			switch (updateResult) {
+			case NEW:
+				ok = !exists;
+				break;
+			case NO_CHANGE:
+			case FAST_FORWARD:
+			case FORCED:
+				ok = exists;
+				break;
+			default:
+				break;
+			}
+
+			if (!ok)
+				throw new JGitInternalException(MessageFormat.format(JGitText
+						.get().createBranchUnexpectedResult, updateResult
+						.name()));
+
+			Ref result = repo.getRef(name);
+			if (result == null)
+				throw new JGitInternalException(
+						JGitText.get().createBranchFailedUnknownReason);
+
+			if (baseBranch.length() == 0) {
+				return result;
+			}
+
+			// if we are based on another branch, see
+			// if we need to configure upstream configuration: first check
+			// whether the setting was done explicitly
+			boolean doConfigure;
+			if (upstreamMode == SetupUpstreamMode.SET_UPSTREAM
+					|| upstreamMode == SetupUpstreamMode.TRACK)
+				// explicitly set to configure
+				doConfigure = true;
+			else if (upstreamMode == SetupUpstreamMode.NOTRACK)
+				// explicitly set to not configure
+				doConfigure = false;
+			else {
+				// if there was no explicit setting, check the configuration
+				String autosetupflag = repo.getConfig().getString(
+						ConfigConstants.CONFIG_BRANCH_SECTION, null,
+						ConfigConstants.CONFIG_KEY_AUTOSETUPMERGE);
+				if ("false".equals(autosetupflag)) {
+					doConfigure = false;
+				} else if ("always".equals(autosetupflag)) {
+					doConfigure = true;
+				} else {
+					// in this case, the default is to configure
+					// only in case the base branch was a remote branch
+					doConfigure = baseBranch.startsWith(Constants.R_REMOTES);
+				}
+			}
+
+			if (doConfigure) {
+				StoredConfig config = repo.getConfig();
+				String[] tokens = baseBranch.split("/", 4);
+				boolean isRemote = tokens[1].equals("remotes");
+				if (isRemote) {
+					// refs/remotes/<remote name>/<branch>
+					String remoteName = tokens[2];
+					String branchName = tokens[3];
+					config
+							.setString(ConfigConstants.CONFIG_BRANCH_SECTION,
+									name, ConfigConstants.CONFIG_KEY_REMOTE,
+									remoteName);
+					config.setString(ConfigConstants.CONFIG_BRANCH_SECTION,
+							name, ConfigConstants.CONFIG_KEY_MERGE,
+							Constants.R_HEADS + branchName);
+				} else {
+					// set "." as remote
+					config.setString(ConfigConstants.CONFIG_BRANCH_SECTION,
+							name, ConfigConstants.CONFIG_KEY_REMOTE, ".");
+					config.setString(ConfigConstants.CONFIG_BRANCH_SECTION,
+							name, ConfigConstants.CONFIG_KEY_MERGE, baseBranch);
+				}
+				config.save();
+			}
+			return result;
+		} catch (AmbiguousObjectException e) {
+			throw e;
+		} catch (IOException ioe) {
+			throw new JGitInternalException(ioe.getMessage(), ioe);
+		}
+	}
+

@@ -1,0 +1,52 @@
+	public void testCreateAndList() throws Exception {
+		int localBefore;
+		int remoteBefore;
+		int allBefore;
+
+		// invalid name not allowed
+		try {
+			git.branchCreate().setName("In va lid").call();
+			fail("Create branch with invalid ref name should fail");
+		} catch (InvalidRefNameException e) {
+			// expected
+		}
+		// existing name not allowed w/o force
+		try {
+			git.branchCreate().setName("master").call();
+			fail("Create branch with existing ref name should fail");
+		} catch (RefAlreadyExistsException e) {
+			// expected
+		}
+
+		localBefore = git.branchList().call().size();
+		remoteBefore = git.branchList().setListMode(ListMode.REMOTE).call()
+				.size();
+		allBefore = git.branchList().setListMode(ListMode.ALL).call().size();
+
+		assertEquals(localBefore + remoteBefore, allBefore);
+		Ref newBranch = createBranch(git, "NewForTestList", false, "master",
+				null);
+		assertEquals("refs/heads/NewForTestList", newBranch.getName());
+
+		assertEquals(1, git.branchList().call().size() - localBefore);
+		assertEquals(0, git.branchList().setListMode(ListMode.REMOTE).call()
+				.size()
+				- remoteBefore);
+		assertEquals(1, git.branchList().setListMode(ListMode.ALL).call()
+				.size()
+				- allBefore);
+		// we can only create local branches
+		newBranch = createBranch(git,
+				"refs/remotes/origin/NewRemoteForTestList", false, "master",
+				null);
+		assertEquals("refs/heads/refs/remotes/origin/NewRemoteForTestList",
+				newBranch.getName());
+		assertEquals(2, git.branchList().call().size() - localBefore);
+		assertEquals(0, git.branchList().setListMode(ListMode.REMOTE).call()
+				.size()
+				- remoteBefore);
+		assertEquals(2, git.branchList().setListMode(ListMode.ALL).call()
+				.size()
+				- allBefore);
+	}
+

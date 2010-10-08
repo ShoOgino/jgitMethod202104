@@ -1,0 +1,103 @@
+	/**
+	 * @throws RefNotFoundException
+	 *             if the old branch can not be found (branch with provided old
+	 *             name does not exist or old name resolves to a tag)
+	 * @throws InvalidRefNameException
+	 *             if the provided new name is <code>null</code> or otherwise
+	 *             invalid
+	 * @throws RefAlreadyExistsException
+	 *             if a branch with the new name already exists
+	 * @throws DetachedHeadException
+	 *             if rename is tried without specifying the old name and HEAD
+	 *             is detached
+	 */
+	public Ref call() throws RefNotFoundException, InvalidRefNameException,
+			RefAlreadyExistsException, DetachedHeadException {
+		checkCallable();
+
+		if (newName == null)
+			throw new InvalidRefNameException(MessageFormat.format(JGitText
+					.get().branchNameInvalid, "<null>"));
+
+		try {
+			String fullOldName;
+			String fullNewName;
+			if (repo.getRef(newName) != null)
+				throw new RefAlreadyExistsException(MessageFormat.format(
+						JGitText.get().refAlreadExists, newName));
+			if (oldName != null) {
+				Ref ref = repo.getRef(oldName);
+				if (ref == null)
+					throw new RefNotFoundException(MessageFormat.format(
+							JGitText.get().refNotResolved, oldName));
+				if (ref.getName().startsWith(Constants.R_TAGS))
+					throw new RefNotFoundException(MessageFormat.format(
+							JGitText.get().renameBranchFailedBecauseTag,
+							oldName));
+				fullOldName = ref.getName();
+			} else {
+				fullOldName = repo.getFullBranch();
+				if (ObjectId.isId(fullOldName))
+					throw new DetachedHeadException();
+			}
+
+			if (fullOldName.startsWith(Constants.R_REMOTES))
+				fullNewName = Constants.R_REMOTES + newName;
+			else {
+				fullNewName = Constants.R_HEADS + newName;
+			}
+
+			if (!Repository.isValidRefName(fullNewName))
+				throw new InvalidRefNameException(MessageFormat.format(JGitText
+						.get().branchNameInvalid, fullNewName));
+
+			RefRename rename = repo.renameRef(fullOldName, fullNewName);
+			Result renameResult = rename.rename();
+
+			setCallable(false);
+
+			boolean ok = Result.RENAMED == renameResult;
+
+			if (ok) {
+				if (fullNewName.startsWith(Constants.R_HEADS)) {
+					// move the upstream configuration over to the new branch
+					String shortOldName = fullOldName
+							.substring(Constants.R_HEADS.length());
+					String oldRemote = repo.getConfig().getString(
+							ConfigConstants.CONFIG_BRANCH_SECTION,
+							shortOldName, ConfigConstants.CONFIG_KEY_REMOTE);
+					if (oldRemote != null) {
+						repo.getConfig().setString(
+								ConfigConstants.CONFIG_BRANCH_SECTION, newName,
+								ConfigConstants.CONFIG_KEY_REMOTE, oldRemote);
+					}
+					String oldMerge = repo.getConfig().getString(
+							ConfigConstants.CONFIG_BRANCH_SECTION,
+							shortOldName, ConfigConstants.CONFIG_KEY_MERGE);
+					if (oldMerge != null) {
+						repo.getConfig().setString(
+								ConfigConstants.CONFIG_BRANCH_SECTION, newName,
+								ConfigConstants.CONFIG_KEY_MERGE, oldMerge);
+					}
+					repo.getConfig()
+							.unsetSection(
+									ConfigConstants.CONFIG_BRANCH_SECTION,
+									shortOldName);
+					repo.getConfig().save();
+				}
+
+			} else
+				throw new JGitInternalException(MessageFormat.format(JGitText
+						.get().renameBranchUnexpectedResult, renameResult
+						.name()));
+
+			Ref resultRef = repo.getRef(newName);
+			if (resultRef == null)
+				throw new JGitInternalException(
+						JGitText.get().renameBranchFailedUnknownReason);
+			return resultRef;
+		} catch (IOException ioe) {
+			throw new JGitInternalException(ioe.getMessage(), ioe);
+		}
+	}
+

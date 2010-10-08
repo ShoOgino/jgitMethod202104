@@ -1,0 +1,44 @@
+	public void testDelete() throws Exception {
+		createBranch(git, "ForDelete", false, "master", null);
+		git.branchDelete().setBranchNames("ForDelete").call();
+		// now point the branch to a non-merged commit
+		createBranch(git, "ForDelete", false, secondCommit.getId().name(), null);
+		try {
+			git.branchDelete().setBranchNames("ForDelete").call();
+			fail("Deletion of a non-merged branch without force should have failed");
+		} catch (NotMergedException e) {
+			// expected
+		}
+		List<String> deleted = git.branchDelete().setBranchNames("ForDelete")
+				.setForce(true).call();
+		assertEquals(1, deleted.size());
+		assertEquals(Constants.R_HEADS + "ForDelete", deleted.get(0));
+		createBranch(git, "ForDelete", false, "master", null);
+		try {
+			createBranch(git, "ForDelete", false, "master", null);
+			fail("Repeated creation of same branch without force should fail");
+		} catch (RefAlreadyExistsException e) {
+			// expected
+		}
+		// change starting point
+		Ref newBranch = createBranch(git, "ForDelete", true, initialCommit
+				.name(), null);
+		assertEquals(newBranch.getTarget().getObjectId(), initialCommit.getId());
+		newBranch = createBranch(git, "ForDelete", true, secondCommit.name(),
+				null);
+		assertEquals(newBranch.getTarget().getObjectId(), secondCommit.getId());
+		git.branchDelete().setBranchNames("ForDelete").setForce(true);
+		try {
+			git.branchDelete().setBranchNames("master").call();
+			fail("Deletion of checked out branch without force should have failed");
+		} catch (CannotDeleteCurrentBranchException e) {
+			// expected
+		}
+		try {
+			git.branchDelete().setBranchNames("master").setForce(true).call();
+			fail("Deletion of checked out branch with force should have failed");
+		} catch (CannotDeleteCurrentBranchException e) {
+			// expected
+		}
+	}
+

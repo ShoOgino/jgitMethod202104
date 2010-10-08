@@ -1,0 +1,19 @@
+	private ObjectId getStartPoint() throws AmbiguousObjectException,
+			RefNotFoundException, IOException {
+		if (startCommit != null)
+			return startCommit.getId();
+		ObjectId result = null;
+		try {
+			if (startPoint == null)
+				result = repo.resolve(Constants.HEAD);
+			result = repo.resolve(startPoint);
+		} catch (AmbiguousObjectException e) {
+			throw e;
+		}
+		if (result == null)
+			throw new RefNotFoundException(MessageFormat.format(
+					JGitText.get().refNotResolved,
+					startPoint != null ? startPoint : Constants.HEAD));
+		return result;
+	}
+

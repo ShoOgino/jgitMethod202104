@@ -1,0 +1,32 @@
+	public void testCreateForce() throws Exception {
+		// using commits
+		Ref newBranch = createBranch(git, "NewForce", false, secondCommit
+				.getId().name(), null);
+		assertEquals(newBranch.getTarget().getObjectId(), secondCommit.getId());
+		try {
+			newBranch = createBranch(git, "NewForce", false, initialCommit
+					.getId().name(), null);
+			fail("Should have failed");
+		} catch (RefAlreadyExistsException e) {
+			// expected
+		}
+		newBranch = createBranch(git, "NewForce", true, initialCommit.getId()
+				.name(), null);
+		assertEquals(newBranch.getTarget().getObjectId(), initialCommit.getId());
+		git.branchDelete().setBranchNames("NewForce").call();
+		// using names
+
+		git.branchCreate().setName("NewForce").setStartPoint("master").call();
+		assertEquals(newBranch.getTarget().getObjectId(), initialCommit.getId());
+		try {
+			git.branchCreate().setName("NewForce").setStartPoint("master")
+					.call();
+			fail("Should have failed");
+		} catch (RefAlreadyExistsException e) {
+			// expected
+		}
+		git.branchCreate().setName("NewForce").setStartPoint("master")
+				.setForce(true).call();
+		assertEquals(newBranch.getTarget().getObjectId(), initialCommit.getId());
+	}
+

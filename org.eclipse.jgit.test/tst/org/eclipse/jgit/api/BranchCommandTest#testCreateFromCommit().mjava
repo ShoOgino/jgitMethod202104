@@ -1,0 +1,18 @@
+	public void testCreateFromCommit() throws Exception {
+		Ref branch = git.branchCreate().setName("FromInitial").setStartPoint(
+				initialCommit).call();
+		assertEquals(initialCommit.getId(), branch.getObjectId());
+		branch = git.branchCreate().setName("FromInitial2").setStartPoint(
+				initialCommit.getId().name()).call();
+		assertEquals(initialCommit.getId(), branch.getObjectId());
+		try {
+			git.branchCreate().setName("FromInitial").setStartPoint(
+					secondCommit).call();
+		} catch (RefAlreadyExistsException e) {
+			// expected
+		}
+		branch = git.branchCreate().setName("FromInitial").setStartPoint(
+				secondCommit).setForce(true).call();
+		assertEquals(secondCommit.getId(), branch.getObjectId());
+	}
+
