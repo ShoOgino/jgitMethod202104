@@ -1,0 +1,12 @@
+	/**
+	 * @param name
+	 *            a name given to the commit
+	 * @param commit
+	 *            the Id of a commit which is cherry-picked to the current head
+	 * @return {@code this}
+	 */
+	public CherryPickCommand include(String name, AnyObjectId commit) {
+		return include(new ObjectIdRef.Unpeeled(Storage.LOOSE, name,
+				commit.copy()));
+	}
+
