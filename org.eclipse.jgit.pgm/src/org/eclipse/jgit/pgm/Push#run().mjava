@@ -1,36 +1,20 @@
 	@Override
 	protected void run() throws Exception {
-		if (force) {
-			final List<RefSpec> orig = new ArrayList<RefSpec>(refSpecs);
-			refSpecs.clear();
-			for (final RefSpec spec : orig)
-				refSpecs.add(spec.setForceUpdate(true));
-		}
-
-		final List<Transport> transports;
-		transports = Transport.openAll(db, remote, Transport.Operation.PUSH);
-		for (final Transport transport : transports) {
-			if (0 <= timeout)
-				transport.setTimeout(timeout);
-			transport.setPushThin(thin);
-			if (receivePack != null)
-				transport.setOptionReceivePack(receivePack);
-			transport.setDryRun(dryRun);
-
-			final Collection<RemoteRefUpdate> toPush = transport
-					.findRemoteRefUpdatesFor(refSpecs);
-
-			final URIish uri = transport.getURI();
-			final PushResult result;
-			try {
-				result = transport.push(new TextProgressMonitor(), toPush);
-			} finally {
-				transport.close();
-			}
-
+		Git git = new Git(db);
+		PushCommand push = git.push();
+		push.setDryRun(dryRun);
+		push.setForce(force);
+		push.setProgressMonitor(new TextProgressMonitor());
+		push.setReceivePack(receivePack);
+		push.setRefSpecs(refSpecs);
+		push.setRemote(remote);
+		push.setThin(thin);
+		push.setTimeout(timeout);
+		Iterable<PushResult> results = push.call();
+		for (PushResult result : results) {
 			ObjectReader reader = db.newObjectReader();
 			try {
-				printPushResult(reader, uri, result);
+				printPushResult(reader, result.getURI(), result);
 			} finally {
 				reader.release();
 			}
