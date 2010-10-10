@@ -1,0 +1,111 @@
+	private void run(Repository db) throws Exception {
+		List<Test> all = init();
+
+		long files = 0;
+		int commits = 0;
+		int minN = Integer.MAX_VALUE;
+		int maxN = 0;
+
+		AbbreviatedObjectId startId;
+		ObjectReader or = db.newObjectReader();
+		try {
+			final MutableObjectId id = new MutableObjectId();
+			RevWalk rw = new RevWalk(or);
+			TreeWalk tw = new TreeWalk(or);
+			tw.setFilter(TreeFilter.ANY_DIFF);
+			tw.setRecursive(true);
+
+			ObjectId start = db.resolve(Constants.HEAD);
+			startId = or.abbreviate(start);
+			rw.markStart(rw.parseCommit(start));
+			for (;;) {
+				final RevCommit c = rw.next();
+				if (c == null)
+					break;
+				commits++;
+				if (c.getParentCount() != 1)
+					continue;
+
+				RevCommit p = c.getParent(0);
+				rw.parseHeaders(p);
+				tw.reset(new AnyObjectId[] { p.getTree(), c.getTree() });
+				while (tw.next()) {
+					if (!isFile(tw, 0) || !isFile(tw, 1))
+						continue;
+
+					byte[] raw0;
+					try {
+						tw.getObjectId(id, 0);
+						raw0 = or.open(id).getCachedBytes(textLimit * 1024);
+					} catch (LargeObjectException tooBig) {
+						continue;
+					}
+					if (RawText.isBinary(raw0))
+						continue;
+
+					byte[] raw1;
+					try {
+						tw.getObjectId(id, 1);
+						raw1 = or.open(id).getCachedBytes(textLimit * 1024);
+					} catch (LargeObjectException tooBig) {
+						continue;
+					}
+					if (RawText.isBinary(raw1))
+						continue;
+
+					RawText txt0 = new RawText(raw0);
+					RawText txt1 = new RawText(raw1);
+
+					minN = Math.min(minN, txt0.size() + txt1.size());
+					maxN = Math.max(maxN, txt0.size() + txt1.size());
+
+					for (Test test : all)
+						testOne(test, txt0, txt1);
+					files++;
+				}
+				if (count > 0 && files > count)
+					break;
+			}
+		} finally {
+			or.release();
+		}
+
+		Collections.sort(all, new Comparator<Test>() {
+			public int compare(Test a, Test b) {
+				int cmp = Long.signum(a.runningTimeNanos - b.runningTimeNanos);
+				if (cmp == 0)
+					cmp = a.algorithm.name.compareTo(b.algorithm.name);
+				return cmp;
+			}
+		});
+
+		if (db.getDirectory() != null) {
+			String name = db.getDirectory().getName();
+			File parent = db.getDirectory().getParentFile();
+			if (name.equals(Constants.DOT_GIT_EXT) && parent != null)
+				name = parent.getName();
+			out.println(name + ": start at " + startId.name());
+		}
+
+		out.format("  %12d files,     %8d commits\n", files, commits);
+		out.format("  N=%10d min lines, %8d max lines\n", minN, maxN);
+
+		out.format("%-25s %12s ( %12s  %12s )\n", //
+				"Algorithm", "Time(ns)", "Time(ns) on", "Time(ns) on");
+		out.format("%-25s %12s ( %12s  %12s )\n", //
+				"", "", "N=" + minN, "N=" + maxN);
+		out.println("-----------------------------------------------------"
+				+ "----------------");
+
+		for (Test test : all) {
+			out.format("%-25s %12d ( %12d  %12d )", //
+					test.algorithm.name, //
+					test.runningTimeNanos, //
+					test.minN.runningTimeNanos, //
+					test.maxN.runningTimeNanos);
+			out.println();
+		}
+		out.println();
+		out.flush();
+	}
+

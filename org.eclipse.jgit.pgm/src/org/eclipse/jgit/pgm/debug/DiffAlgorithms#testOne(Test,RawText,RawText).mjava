@@ -1,0 +1,35 @@
+	private void testOne(Test test, RawText a, RawText b) {
+		final DiffAlgorithm da = test.algorithm.create();
+		int cpuTimeChanges = 0;
+		int cnt = 0;
+
+		final long startTime = mxBean.getCurrentThreadCpuTime();
+		long lastTime = startTime;
+		while (cpuTimeChanges < minCPUTimerTicks) {
+			da.diff(cmp, a, b);
+			cnt++;
+
+			long interimTime = mxBean.getCurrentThreadCpuTime();
+			if (interimTime != lastTime) {
+				cpuTimeChanges++;
+				lastTime = interimTime;
+			}
+		}
+		final long stopTime = mxBean.getCurrentThreadCpuTime();
+		final long runTime = (stopTime - startTime) / cnt;
+
+		test.runningTimeNanos += runTime;
+
+		if (test.minN == null || a.size() + b.size() < test.minN.n) {
+			test.minN = new Run();
+			test.minN.n = a.size() + b.size();
+			test.minN.runningTimeNanos = runTime;
+		}
+
+		if (test.maxN == null || a.size() + b.size() > test.maxN.n) {
+			test.maxN = new Run();
+			test.maxN.n = a.size() + b.size();
+			test.maxN.runningTimeNanos = runTime;
+		}
+	}
+

@@ -1,0 +1,32 @@
+	@Override
+	protected void run() throws Exception {
+		mxBean = ManagementFactory.getThreadMXBean();
+		if (!mxBean.isCurrentThreadCpuTimeSupported())
+			throw die("Current thread CPU time not supported on this JRE");
+
+		if (gitDirs.isEmpty()) {
+			RepositoryBuilder rb = new RepositoryBuilder() //
+					.setGitDir(gitdir) //
+					.readEnvironment() //
+					.findGitDir();
+			if (rb.getGitDir() == null)
+				throw die(CLIText.get().cantFindGitDirectory);
+			gitDirs.add(rb.getGitDir());
+		}
+
+		for (File dir : gitDirs) {
+			RepositoryBuilder rb = new RepositoryBuilder();
+			if (RepositoryCache.FileKey.isGitRepository(dir, FS.DETECTED))
+				rb.setGitDir(dir);
+			else
+				rb.findGitDir(dir);
+
+			Repository db = rb.build();
+			try {
+				run(db);
+			} finally {
+				db.close();
+			}
+		}
+	}
+

@@ -1,0 +1,25 @@
+	private List<Test> init() {
+		List<Test> all = new ArrayList<Test>();
+
+		try {
+			for (Field f : DiffAlgorithms.class.getDeclaredFields()) {
+				if (f.getType() == Algorithm.class) {
+					f.setAccessible(true);
+					Algorithm alg = (Algorithm) f.get(this);
+					alg.name = f.getName();
+					if (included(alg.name, algorithms)) {
+						Test test = new Test();
+						test.algorithm = alg;
+						all.add(test);
+					}
+				}
+			}
+		} catch (IllegalArgumentException e) {
+			throw die("Cannot determine names", e);
+		} catch (IllegalAccessException e) {
+			throw die("Cannot determine names", e);
+		}
+
+		return all;
+	}
+
