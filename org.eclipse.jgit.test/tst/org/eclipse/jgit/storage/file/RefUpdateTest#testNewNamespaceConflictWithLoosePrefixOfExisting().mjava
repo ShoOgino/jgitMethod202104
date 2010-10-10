@@ -2,19 +2,11 @@
 			throws IOException {
 		final String newRef = "refs/heads/z/a";
 		final RefUpdate ru = updateRef(newRef);
-		final RevCommit newid = new RevCommit(ru.getNewObjectId()) {
-			// empty
-		};
-		ru.setNewObjectId(newid);
 		Result update = ru.update();
 		assertEquals(Result.NEW, update);
 		// end setup
 		final String newRef2 = "refs/heads/z";
 		final RefUpdate ru2 = updateRef(newRef2);
-		final RevCommit newid2 = new RevCommit(ru2.getNewObjectId()) {
-			// empty
-		};
-		ru.setNewObjectId(newid2);
 		Result update2 = ru2.update();
 		assertEquals(Result.LOCK_FAILURE, update2);
 		assertEquals(1, db.getReflogReader("refs/heads/z/a").getReverseEntries().size());

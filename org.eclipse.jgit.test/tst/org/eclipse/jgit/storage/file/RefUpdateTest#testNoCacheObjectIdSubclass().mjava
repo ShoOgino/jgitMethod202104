@@ -1,9 +1,7 @@
 	public void testNoCacheObjectIdSubclass() throws IOException {
 		final String newRef = "refs/heads/abc";
 		final RefUpdate ru = updateRef(newRef);
-		final RevCommit newid = new RevCommit(ru.getNewObjectId()) {
-			// empty
-		};
+		final SubclassedId newid = new SubclassedId(ru.getNewObjectId());
 		ru.setNewObjectId(newid);
 		Result update = ru.update();
 		assertEquals(Result.NEW, update);
