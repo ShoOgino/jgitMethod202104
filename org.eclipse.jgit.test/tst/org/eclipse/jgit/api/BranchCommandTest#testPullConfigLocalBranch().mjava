@@ -10,7 +10,8 @@
 				SetupUpstreamMode.TRACK);
 		assertEquals(".", localGit.getRepository().getConfig().getString(
 				"branch", "newFromMaster", "remote"));
-		localGit.branchDelete().setBranchNames("newFromMaster").call();
+		localGit.branchDelete().setBranchNames("refs/heads/newFromMaster")
+				.call();
 		// the pull configuration should be gone after deletion
 		assertNull(localGit.getRepository().getConfig().getString("branch",
 				"newFromRemote", "remote"));
