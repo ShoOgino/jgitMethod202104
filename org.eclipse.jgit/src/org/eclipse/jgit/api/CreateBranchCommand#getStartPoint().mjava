@@ -4,9 +4,8 @@
 			return startCommit.getId();
 		ObjectId result = null;
 		try {
-			if (startPoint == null)
-				result = repo.resolve(Constants.HEAD);
-			result = repo.resolve(startPoint);
+			result = repo.resolve((startPoint == null) ? Constants.HEAD
+					: startPoint);
 		} catch (AmbiguousObjectException e) {
 			throw e;
 		}
