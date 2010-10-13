@@ -17,8 +17,8 @@
 			tw.addTree(sourceTrees[0]);
 			tw.addTree(sourceTrees[1]);
 			tw.addTree(buildIt);
-			if (workingTreeIt != null)
-				tw.addTree(workingTreeIt);
+			if (workingTreeIterator != null)
+				tw.addTree(workingTreeIterator);
 
 			while (tw.next()) {
 				if (!processEntry(
@@ -26,7 +26,7 @@
 						tw.getTree(T_OURS, CanonicalTreeParser.class),
 						tw.getTree(T_THEIRS, CanonicalTreeParser.class),
 						tw.getTree(T_INDEX, DirCacheBuildIterator.class),
-						(workingTreeIt == null) ? null : tw.getTree(T_FILE, WorkingTreeIterator.class))) {
+						(workingTreeIterator == null) ? null : tw.getTree(T_FILE, WorkingTreeIterator.class))) {
 					cleanUp();
 					return false;
 				}
