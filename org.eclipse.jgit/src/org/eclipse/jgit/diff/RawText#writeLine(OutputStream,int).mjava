@@ -18,8 +18,8 @@
 	 */
 	public void writeLine(final OutputStream out, final int i)
 			throws IOException {
-		final int start = lines.get(i + 1);
-		int end = lines.get(i + 2);
+		int start = getStart(i);
+		int end = getEnd(i);
 		if (content[end - 1] == '\n')
 			end--;
 		out.write(content, start, end - start);

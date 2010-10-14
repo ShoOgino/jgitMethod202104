@@ -1,0 +1,24 @@
+	/**
+	 * Get the text for a region of lines.
+	 *
+	 * @param begin
+	 *            index of the first line to extract. Note this is 0-based, so
+	 *            line number 1 is actually index 0.
+	 * @param end
+	 *            index of one past the last line to extract.
+	 * @param dropLF
+	 *            if true the trailing LF ('\n') of the last returned line is
+	 *            dropped, if present.
+	 * @return the text for lines {@code [begin, end)}.
+	 */
+	public String getString(int begin, int end, boolean dropLF) {
+		if (begin == end)
+			return "";
+
+		int s = getStart(begin);
+		int e = getEnd(end - 1);
+		if (dropLF && content[e - 1] == '\n')
+			e--;
+		return decode(s, e);
+	}
+
