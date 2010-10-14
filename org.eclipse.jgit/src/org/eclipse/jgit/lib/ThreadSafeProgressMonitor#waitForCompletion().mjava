@@ -1,0 +1,19 @@
+	/**
+	 * Process pending updates and wait for workers to finish.
+	 *
+	 * This method can only be invoked by the same thread that allocated this
+	 * ThreadSafeProgressMonior.
+	 *
+	 * @throws InterruptedException
+	 *             if the main thread is interrupted while waiting for
+	 *             completion of workers.
+	 */
+	public void waitForCompletion() throws InterruptedException {
+		assert isMainThread();
+		while (0 < workers.get()) {
+			doUpdates();
+			process.acquire();
+		}
+		doUpdates();
+	}
+

@@ -14,7 +14,7 @@
 		}
 
 		final DeltaCache dc = new ThreadSafeDeltaCache(config);
-		final ProgressMonitor pm = new ThreadSafeProgressMonitor(monitor);
+		final ThreadSafeProgressMonitor pm = new ThreadSafeProgressMonitor(monitor);
 
 		// Guess at the size of batch we want. Because we don't really
 		// have a way for a thread to steal work from another thread if
@@ -52,6 +52,7 @@
 			i += batchSize;
 			myTasks.add(new DeltaTask(config, reader, dc, pm, batchSize, start, list));
 		}
+		pm.startWorkers(myTasks.size());
 
 		final Executor executor = config.getExecutor();
 		final List<Throwable> errors = Collections
@@ -59,7 +60,7 @@
 		if (executor instanceof ExecutorService) {
 			// Caller supplied us a service, use it directly.
 			//
-			runTasks((ExecutorService) executor, myTasks, errors);
+			runTasks((ExecutorService) executor, pm, myTasks, errors);
 
 		} else if (executor == null) {
 			// Caller didn't give us a way to run the tasks, spawn up a
@@ -67,7 +68,7 @@
 			//
 			ExecutorService pool = Executors.newFixedThreadPool(threads);
 			try {
-				runTasks(pool, myTasks, errors);
+				runTasks(pool, pm, myTasks, errors);
 			} finally {
 				pool.shutdown();
 				for (;;) {
@@ -85,7 +86,6 @@
 			// asynchronous execution.  Wrap everything and hope it
 			// can schedule these for us.
 			//
-			final CountDownLatch done = new CountDownLatch(myTasks.size());
 			for (final DeltaTask task : myTasks) {
 				executor.execute(new Runnable() {
 					public void run() {
@@ -93,14 +93,12 @@
 							task.call();
 						} catch (Throwable failure) {
 							errors.add(failure);
-						} finally {
-							done.countDown();
 						}
 					}
 				});
 			}
 			try {
-				done.await();
+				pm.waitForCompletion();
 			} catch (InterruptedException ie) {
 				// We can't abort the other tasks as we have no handle.
 				// Cross our fingers and just break out anyway.

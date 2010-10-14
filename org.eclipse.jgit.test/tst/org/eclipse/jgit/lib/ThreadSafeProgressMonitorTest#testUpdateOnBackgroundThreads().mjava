@@ -1,0 +1,38 @@
+	public void testUpdateOnBackgroundThreads() throws InterruptedException {
+		final MockProgressMonitor mock = new MockProgressMonitor();
+		final ThreadSafeProgressMonitor pm = new ThreadSafeProgressMonitor(mock);
+
+		pm.startWorker();
+
+		final CountDownLatch doUpdate = new CountDownLatch(1);
+		final CountDownLatch didUpdate = new CountDownLatch(1);
+		final CountDownLatch doEndWorker = new CountDownLatch(1);
+
+		final Thread bg = new Thread() {
+			public void run() {
+				assertFalse(pm.isCancelled());
+
+				await(doUpdate);
+				pm.update(2);
+				didUpdate.countDown();
+
+				await(doEndWorker);
+				pm.update(1);
+				pm.endWorker();
+			}
+		};
+		bg.start();
+
+		pm.pollForUpdates();
+		assertEquals(0, mock.value);
+		doUpdate.countDown();
+
+		await(didUpdate);
+		pm.pollForUpdates();
+		assertEquals(2, mock.value);
+
+		doEndWorker.countDown();
+		pm.waitForCompletion();
+		assertEquals(3, mock.value);
+	}
+

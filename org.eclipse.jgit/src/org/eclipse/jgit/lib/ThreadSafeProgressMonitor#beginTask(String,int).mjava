@@ -1,9 +1,6 @@
 	public void beginTask(String title, int totalWork) {
-		lock.lock();
-		try {
-			pm.beginTask(title, totalWork);
-		} finally {
-			lock.unlock();
-		}
+		if (!isMainThread())
+			throw new IllegalStateException();
+		pm.beginTask(title, totalWork);
 	}
 
