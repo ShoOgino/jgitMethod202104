@@ -42,21 +42,10 @@
 		}
 
 		final TextBuiltin cmd = subcommand;
-		if (cmd.requiresRepository()) {
-			RepositoryBuilder rb = new RepositoryBuilder() //
-					.setGitDir(gitdir) //
-					.readEnvironment() //
-					.findGitDir();
-			if (rb.getGitDir() == null) {
-				writer.println(CLIText.get().cantFindGitDirectory);
-				writer.flush();
-				System.exit(1);
-			}
-
-			cmd.init(rb.build(), null);
-		} else {
-			cmd.init(null, gitdir);
-		}
+		if (cmd.requiresRepository())
+			cmd.init(openGitDir(gitdir), null);
+		else
+			cmd.init(null, gitdir != null ? new File(gitdir) : null);
 		try {
 			cmd.execute(arguments.toArray(new String[arguments.size()]));
 		} finally {

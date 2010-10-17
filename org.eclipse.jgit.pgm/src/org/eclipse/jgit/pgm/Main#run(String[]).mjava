@@ -1,0 +1,45 @@
+	/**
+	 * Parse the command line and execute the requested action.
+	 *
+	 * Subclasses should allocate themselves and then invoke this method:
+	 *
+	 * <pre>
+	 * class ExtMain {
+	 * 	public static void main(String[] argv) {
+	 * 		new ExtMain().run(argv);
+	 * 	}
+	 * }
+	 * </pre>
+	 *
+	 * @param argv
+	 *            arguments.
+	 */
+	protected void run(final String[] argv) {
+		try {
+			if (!installConsole()) {
+				AwtAuthenticator.install();
+				AwtSshSessionFactory.install();
+			}
+			configureHttpProxy();
+			execute(argv);
+		} catch (Die err) {
+			System.err.println(MessageFormat.format(CLIText.get().fatalError, err.getMessage()));
+			if (showStackTrace)
+				err.printStackTrace();
+			System.exit(128);
+		} catch (Exception err) {
+			if (!showStackTrace && err.getCause() != null
+					&& err instanceof TransportException)
+				System.err.println(MessageFormat.format(CLIText.get().fatalError, err.getCause().getMessage()));
+
+			if (err.getClass().getName().startsWith("org.eclipse.jgit.errors.")) {
+				System.err.println(MessageFormat.format(CLIText.get().fatalError, err.getMessage()));
+				if (showStackTrace)
+					err.printStackTrace();
+				System.exit(128);
+			}
+			err.printStackTrace();
+			System.exit(1);
+		}
+	}
+
