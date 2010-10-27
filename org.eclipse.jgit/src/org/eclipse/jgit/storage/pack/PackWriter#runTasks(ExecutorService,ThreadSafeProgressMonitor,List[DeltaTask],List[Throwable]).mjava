@@ -1,10 +1,11 @@
-	private void runTasks(ExecutorService pool, List<DeltaTask> tasks,
-			List<Throwable> errors) throws IOException {
+	private void runTasks(ExecutorService pool, ThreadSafeProgressMonitor pm,
+			List<DeltaTask> tasks, List<Throwable> errors) throws IOException {
 		List<Future<?>> futures = new ArrayList<Future<?>>(tasks.size());
 		for (DeltaTask task : tasks)
 			futures.add(pool.submit(task));
 
 		try {
+			pm.waitForCompletion();
 			for (Future<?> f : futures) {
 				try {
 					f.get();

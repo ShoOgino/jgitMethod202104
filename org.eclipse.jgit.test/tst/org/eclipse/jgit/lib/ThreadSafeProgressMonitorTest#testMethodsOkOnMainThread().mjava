@@ -1,0 +1,22 @@
+	public void testMethodsOkOnMainThread() {
+		final MockProgressMonitor mock = new MockProgressMonitor();
+		final ThreadSafeProgressMonitor pm = new ThreadSafeProgressMonitor(mock);
+
+		pm.start(1);
+		assertEquals(1, mock.value);
+
+		pm.beginTask("title", 42);
+		assertEquals("title", mock.taskTitle);
+		assertEquals(42, mock.value);
+
+		pm.update(1);
+		assertEquals(43, mock.value);
+
+		pm.update(2);
+		assertEquals(45, mock.value);
+
+		pm.endTask();
+		assertNull(mock.taskTitle);
+		assertEquals(0, mock.value);
+	}
+

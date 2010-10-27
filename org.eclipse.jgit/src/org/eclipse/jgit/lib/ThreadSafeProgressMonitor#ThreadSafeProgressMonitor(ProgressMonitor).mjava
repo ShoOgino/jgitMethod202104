@@ -7,5 +7,9 @@
 	public ThreadSafeProgressMonitor(ProgressMonitor pm) {
 		this.pm = pm;
 		this.lock = new ReentrantLock();
+		this.mainThread = Thread.currentThread();
+		this.workers = new AtomicInteger(0);
+		this.pendingUpdates = new AtomicInteger(0);
+		this.process = new Semaphore(0);
 	}
 
