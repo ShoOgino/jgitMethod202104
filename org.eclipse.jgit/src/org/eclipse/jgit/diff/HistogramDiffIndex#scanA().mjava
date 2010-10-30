@@ -18,7 +18,8 @@
 					if (MAX_CNT < newCnt)
 						newCnt = MAX_CNT;
 					recs[rIdx] = recCreate(recNext(rec), ptr, newCnt);
-					next[ptr - nextShift] = recPtr(rec);
+					next[ptr - ptrShift] = recPtr(rec);
+					recIdx[ptr - ptrShift] = rIdx;
 					continue SCAN;
 				}
 
@@ -41,6 +42,7 @@
 			}
 
 			recs[rIdx] = recCreate(table[tIdx], ptr, 1);
+			recIdx[ptr - ptrShift] = rIdx;
 			table[tIdx] = rIdx;
 		}
 		return true;

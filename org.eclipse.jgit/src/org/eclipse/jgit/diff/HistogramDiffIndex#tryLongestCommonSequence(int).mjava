@@ -17,25 +17,30 @@
 
 			hasCommon = true;
 			TRY_LOCATIONS: for (;;) {
-				int np = next[as - nextShift];
+				int np = next[as - ptrShift];
 				int bs = bPtr;
 				int ae = as + 1;
 				int be = bs + 1;
+				int rc = recCnt(rec);
 
 				while (region.beginA < as && region.beginB < bs
 						&& cmp.equals(a, as - 1, b, bs - 1)) {
 					as--;
 					bs--;
+					if (1 < rc)
+						rc = Math.min(rc, recCnt(recs[recIdx[as - ptrShift]]));
 				}
 				while (ae < region.endA && be < region.endB
 						&& cmp.equals(a, ae, b, be)) {
+					if (1 < rc)
+						rc = Math.min(rc, recCnt(recs[recIdx[ae - ptrShift]]));
 					ae++;
 					be++;
 				}
 
 				if (bNext < be)
 					bNext = be;
-				if (lcs.getLengthA() < ae - as || recCnt(rec) < cnt) {
+				if (lcs.getLengthA() < ae - as || rc < cnt) {
 					// If this region is the longest, or there are less
 					// occurrences of it in A, its now our LCS.
 					//
@@ -43,7 +48,7 @@
 					lcs.beginB = bs;
 					lcs.endA = ae;
 					lcs.endB = be;
-					cnt = recCnt(rec);
+					cnt = rc;
 				}
 
 				// Because we added elements in reverse order index 0
@@ -58,7 +63,7 @@
 					// The next location to consider was actually within
 					// the LCS we examined above. Don't reconsider it.
 					//
-					np = next[np - nextShift];
+					np = next[np - ptrShift];
 					if (np == 0)
 						break TRY_LOCATIONS;
 				}
