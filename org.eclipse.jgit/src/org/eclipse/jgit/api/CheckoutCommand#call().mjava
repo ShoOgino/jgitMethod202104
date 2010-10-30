@@ -1,0 +1,81 @@
+	/**
+	 * @throws RefAlreadyExistsException
+	 *             when trying to create (without force) a branch with a name
+	 *             that already exists
+	 * @throws RefNotFoundException
+	 *             if the start point or branch can not be found
+	 * @throws InvalidRefNameException
+	 *             if the provided name is <code>null</code> or otherwise
+	 *             invalid
+	 * @return the newly created branch
+	 */
+	public Ref call() throws JGitInternalException, RefAlreadyExistsException,
+			RefNotFoundException, InvalidRefNameException {
+		checkCallable();
+		processOptions();
+		try {
+
+			if(createBranch) {
+				Git git = new Git(repo);
+				CreateBranchCommand command = git.branchCreate();
+				command.setName(name);
+				command.setStartPoint(getStartPoint().name());
+				if (upstreamMode != null)
+					command.setUpstreamMode(upstreamMode);
+				command.call();
+			}
+
+			RevWalk revWalk = new RevWalk(repo);
+			Ref headRef = repo.getRef(Constants.HEAD);
+			RevCommit headCommit = revWalk.parseCommit(headRef.getObjectId());
+			String refLogMessage = "checkout: moving from "
+					+ headRef.getTarget().getName();
+			ObjectId branch = repo.resolve(name);
+			Ref ref = repo.getRef(name);
+			if (branch == null)
+				throw new RefNotFoundException(MessageFormat.format(
+						JGitText.get().refNotResolved, name));
+
+			RevCommit newCommit = revWalk.parseCommit(branch);
+
+			DirCacheCheckout dco = new DirCacheCheckout(repo,
+					headCommit.getTree(), repo.lockDirCache(),
+					newCommit.getTree());
+			dco.setFailOnConflict(true);
+			dco.checkout();
+			RefUpdate refUpdate = repo.updateRef(Constants.HEAD);
+			refUpdate.setForceUpdate(force);
+			refUpdate.setRefLogMessage(
+					refLogMessage + "to " + newCommit.getName(), false);
+			Result updateResult = refUpdate.link(ref.getName());
+
+			setCallable(false);
+
+			boolean ok = false;
+			switch (updateResult) {
+			case NEW:
+				ok = true;
+				break;
+			case NO_CHANGE:
+			case FAST_FORWARD:
+			case FORCED:
+				ok = true;
+				break;
+			default:
+				break;
+			}
+
+			if (!ok)
+				throw new JGitInternalException(MessageFormat.format(
+						JGitText.get().checkoutUnexpectedResult,
+						updateResult
+						.name()));
+
+			Ref result = repo.getRef(name);
+
+			return result;
+		} catch (IOException ioe) {
+			throw new JGitInternalException(ioe.getMessage(), ioe);
+		}
+	}
+

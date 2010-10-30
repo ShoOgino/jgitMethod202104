@@ -1,0 +1,13 @@
+	public void testCheckout() {
+		try {
+			git.checkout().setName("test").call();
+			assertEquals("[Test.txt, mode:100644, content:Some change]",
+					indexState(CONTENT));
+			git.checkout().setName("master").call();
+			assertEquals("[Test.txt, mode:100644, content:Hello world]",
+					indexState(CONTENT));
+		} catch (Exception e) {
+			fail(e.getMessage());
+		}
+	}
+

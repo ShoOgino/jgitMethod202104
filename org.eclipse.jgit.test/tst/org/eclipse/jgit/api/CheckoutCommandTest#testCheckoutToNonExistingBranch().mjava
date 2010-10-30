@@ -1,0 +1,10 @@
+	public void testCheckoutToNonExistingBranch() throws JGitInternalException,
+			RefAlreadyExistsException, InvalidRefNameException {
+		try {
+			git.checkout().setName("badbranch").call();
+			fail("Should have failed");
+		} catch (RefNotFoundException e) {
+			// except to hit here
+		}
+	}
+
