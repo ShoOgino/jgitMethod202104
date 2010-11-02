@@ -1,0 +1,17 @@
+	/**
+	 * Compute the size of a tree entry record.
+	 *
+	 * This method can be used to estimate the correct size of a tree prior to
+	 * allocating a formatter. Getting the size correct at allocation time
+	 * ensures the internal buffer is sized correctly, reducing copying.
+	 *
+	 * @param mode
+	 *            the mode the entry will have.
+	 * @param nameLen
+	 *            the length of the name, in bytes.
+	 * @return the length of the record.
+	 */
+	public static int entrySize(FileMode mode, int nameLen) {
+		return mode.copyToLength() + nameLen + OBJECT_ID_LENGTH + 2;
+	}
+

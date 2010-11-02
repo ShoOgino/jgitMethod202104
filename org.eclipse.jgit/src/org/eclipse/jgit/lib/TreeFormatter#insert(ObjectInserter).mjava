@@ -1,0 +1,17 @@
+	/**
+	 * Insert this tree and obtain its ObjectId.
+	 *
+	 * @param ins
+	 *            the inserter to store the tree.
+	 * @return computed ObjectId of the tree
+	 * @throws IOException
+	 *             the tree could not be stored.
+	 */
+	public ObjectId insert(ObjectInserter ins) throws IOException {
+		if (buf != null)
+			return ins.insert(OBJ_TREE, buf, 0, ptr);
+
+		final long len = overflowBuffer.length();
+		return ins.insert(OBJ_TREE, len, overflowBuffer.openInputStream());
+	}
+

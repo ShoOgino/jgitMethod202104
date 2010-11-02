@@ -1,0 +1,14 @@
+	private void fmtOverflowBuffer(byte[] nameBuf, int namePos, int nameLen,
+			FileMode mode) throws IOException {
+		if (buf != null) {
+			overflowBuffer = new TemporaryBuffer.Heap(Integer.MAX_VALUE);
+			overflowBuffer.write(buf, 0, ptr);
+			buf = null;
+		}
+
+		mode.copyTo(overflowBuffer);
+		overflowBuffer.write((byte) ' ');
+		overflowBuffer.write(nameBuf, namePos, nameLen);
+		overflowBuffer.write((byte) 0);
+	}
+

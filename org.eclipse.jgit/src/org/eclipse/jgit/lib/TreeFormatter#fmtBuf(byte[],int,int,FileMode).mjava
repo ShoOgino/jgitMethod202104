@@ -1,0 +1,15 @@
+	private boolean fmtBuf(byte[] nameBuf, int namePos, int nameLen,
+			FileMode mode) {
+		if (buf == null || buf.length < ptr + entrySize(mode, nameLen))
+			return false;
+
+		mode.copyTo(buf, ptr);
+		ptr += mode.copyToLength();
+		buf[ptr++] = ' ';
+
+		System.arraycopy(nameBuf, namePos, buf, ptr, nameLen);
+		ptr += nameLen;
+		buf[ptr++] = 0;
+		return true;
+	}
+

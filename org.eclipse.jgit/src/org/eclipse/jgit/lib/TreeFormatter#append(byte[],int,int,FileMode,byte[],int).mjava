@@ -1,0 +1,35 @@
+	/**
+	 * Append any entry to the tree.
+	 *
+	 * @param nameBuf
+	 *            buffer holding the name of the entry. The name should be UTF-8
+	 *            encoded, but file name encoding is not a well defined concept
+	 *            in Git.
+	 * @param namePos
+	 *            first position within {@code nameBuf} of the name data.
+	 * @param nameLen
+	 *            number of bytes from {@code nameBuf} to use as the name.
+	 * @param mode
+	 *            mode describing the treatment of {@code id}.
+	 * @param idBuf
+	 *            buffer holding the raw ObjectId of the entry.
+	 * @param idPos
+	 *            first position within {@code idBuf} to copy the id from.
+	 */
+	public void append(byte[] nameBuf, int namePos, int nameLen, FileMode mode,
+			byte[] idBuf, int idPos) {
+		if (fmtBuf(nameBuf, namePos, nameLen, mode)) {
+			System.arraycopy(idBuf, idPos, buf, ptr, OBJECT_ID_LENGTH);
+			ptr += OBJECT_ID_LENGTH;
+
+		} else {
+			try {
+				fmtOverflowBuffer(nameBuf, namePos, nameLen, mode);
+				overflowBuffer.write(idBuf, idPos, OBJECT_ID_LENGTH);
+			} catch (IOException badBuffer) {
+				// This should never occur.
+				throw new RuntimeException(badBuffer);
+			}
+		}
+	}
+
