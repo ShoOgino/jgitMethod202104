@@ -70,13 +70,21 @@
 			return true;
 		}
 
-		if (nonTree(modeT) && modeB == modeO && tw.idEqual(T_BASE, T_OURS)) {
+		if (modeB == modeO && tw.idEqual(T_BASE, T_OURS)) {
 			// OURS was not changed compared to base. All changes must be in
 			// THEIRS. Choose THEIRS.
-			DirCacheEntry e=add(tw.getRawPath(), theirs, DirCacheEntry.STAGE_0);
-			if (e!=null)
-				toBeCheckedOut.put(tw.getPathString(), e);
-			return true;
+			if (nonTree(modeT)) {
+				DirCacheEntry e = add(tw.getRawPath(), theirs,
+						DirCacheEntry.STAGE_0);
+				if (e != null)
+					toBeCheckedOut.put(tw.getPathString(), e);
+				return true;
+			} else if (modeT == 0) {
+				// we want THEIRS ... but THEIRS contains the deletion of the
+				// file
+				toBeCheckedOut.put(tw.getPathString(), null);
+				return true;
+			}
 		}
 
 		if (tw.isSubtree()) {

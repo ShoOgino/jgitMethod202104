@@ -1,10 +1,16 @@
 	private void checkout() throws NoWorkTreeException, IOException {
 		for (Map.Entry<String, DirCacheEntry> entry : toBeCheckedOut.entrySet()) {
 			File f = new File(db.getWorkTree(), entry.getKey());
-			createDir(f.getParentFile());
-			DirCacheCheckout.checkoutEntry(db,
-					f,
-					entry.getValue(), true);
+			if (entry.getValue() != null) {
+				createDir(f.getParentFile());
+				DirCacheCheckout.checkoutEntry(db,
+						f,
+						entry.getValue(), true);
+			} else {
+				if (!f.delete())
+					failingPathes.put(entry.getKey(),
+							MergeFailureReason.COULD_NOT_DELETE);
+			}
 			modifiedFiles.add(entry.getKey());
 		}
 	}
