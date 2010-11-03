@@ -1,0 +1,7 @@
+	public void testRemoteBranch() throws Exception {
+		Ref remoteA = db.getRef("refs/remotes/origin/remote-a");
+		Ref master = db.getRef("refs/heads/master");
+		String message = formatter.format(Arrays.asList(remoteA), master);
+		assertEquals("Merge remote branch 'origin/remote-a'", message);
+	}
+
