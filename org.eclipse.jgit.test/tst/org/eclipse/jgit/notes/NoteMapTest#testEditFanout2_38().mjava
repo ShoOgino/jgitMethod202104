@@ -7,6 +7,8 @@
 		RevCommit r = tr.commit() //
 				.add(fanout(2, a.name()), data1) //
 				.add(fanout(2, b.name()), data2) //
+				.add(".gitignore", "") //
+				.add("zoo-animals.txt", b) //
 				.create();
 		tr.parseBody(r);
 
@@ -20,10 +22,19 @@
 		assertEquals(b, map.get(data1));
 		assertFalse("no b", map.contains(b));
 		assertFalse("no data2", map.contains(data2));
+		RevCommit n = commitNoteMap(map);
 
 		map.set(a, null);
 		map.set(data1, null);
 		assertFalse("no a", map.contains(a));
 		assertFalse("no data1", map.contains(data1));
+
+		map = NoteMap.read(reader, n);
+		assertEquals(data2, map.get(a));
+		assertEquals(b, map.get(data1));
+		assertFalse("no b", map.contains(b));
+		assertFalse("no data2", map.contains(data2));
+		assertEquals(b, TreeWalk
+				.forPath(reader, "zoo-animals.txt", n.getTree()).getObjectId(0));
 	}
 

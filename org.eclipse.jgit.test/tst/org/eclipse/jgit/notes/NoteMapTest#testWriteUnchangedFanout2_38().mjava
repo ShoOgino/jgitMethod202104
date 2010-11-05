@@ -1,0 +1,30 @@
+	public void testWriteUnchangedFanout2_38() throws Exception {
+		RevBlob a = tr.blob("a");
+		RevBlob b = tr.blob("b");
+		RevBlob data1 = tr.blob("data1");
+		RevBlob data2 = tr.blob("data2");
+
+		RevCommit r = tr.commit() //
+				.add(fanout(2, a.name()), data1) //
+				.add(fanout(2, b.name()), data2) //
+				.add(".gitignore", "") //
+				.add("zoo-animals.txt", "") //
+				.create();
+		tr.parseBody(r);
+
+		NoteMap map = NoteMap.read(reader, r);
+		assertTrue("has note for a", map.contains(a));
+		assertTrue("has note for b", map.contains(b));
+
+		// This is a non-lazy map, so we'll be looking at the leaf buckets.
+		RevCommit n = commitNoteMap(map);
+		assertNotSame("is new commit", r, n);
+		assertSame("same tree", r.getTree(), n.getTree());
+
+		// Use a lazy-map for the next round of the same test.
+		map = NoteMap.read(reader, r);
+		n = commitNoteMap(map);
+		assertNotSame("is new commit", r, n);
+		assertSame("same tree", r.getTree(), n.getTree());
+	}
+
