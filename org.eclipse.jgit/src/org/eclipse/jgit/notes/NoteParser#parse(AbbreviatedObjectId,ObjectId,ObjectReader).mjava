@@ -1,0 +1,31 @@
+	/**
+	 * Parse a tree object into a {@link NoteBucket} instance.
+	 *
+	 * The type of note tree is automatically detected by examining the items
+	 * within the tree, and allocating the proper storage type based on the
+	 * first note-like entry encountered. Since the method parses by guessing
+	 * the type on the first element, malformed note trees can be read as the
+	 * wrong type of tree.
+	 *
+	 * This method is not recursive, it parses the one tree given to it and
+	 * returns the bucket. If there are subtrees for note storage, they are
+	 * setup as lazy pointers that will be resolved at a later time.
+	 *
+	 * @param prefix
+	 *            common hex digits that all notes within this tree share. The
+	 *            root tree has {@code prefix.length() == 0}, the first-level
+	 *            subtrees should be {@code prefix.length()==2}, etc.
+	 * @param treeId
+	 *            the tree to read from the repository.
+	 * @param reader
+	 *            reader to access the tree object.
+	 * @return bucket to holding the notes of the specified tree.
+	 * @throws IOException
+	 *             {@code treeId} cannot be accessed.
+	 */
+	static InMemoryNoteBucket parse(AbbreviatedObjectId prefix,
+			final ObjectId treeId, final ObjectReader reader)
+			throws IOException {
+		return new NoteParser(prefix, reader, treeId).parseTree();
+	}
+

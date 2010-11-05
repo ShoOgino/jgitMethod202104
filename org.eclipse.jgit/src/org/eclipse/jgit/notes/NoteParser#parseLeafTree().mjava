@@ -1,0 +1,12 @@
+	private LeafBucket parseLeafTree() {
+		final LeafBucket leaf = new LeafBucket(prefix.length());
+		final MutableObjectId idBuf = new MutableObjectId();
+
+		for (; !eof(); next(1)) {
+			if (parseObjectId(idBuf))
+				leaf.parseOneEntry(idBuf, getEntryObjectId());
+		}
+
+		return leaf;
+	}
+

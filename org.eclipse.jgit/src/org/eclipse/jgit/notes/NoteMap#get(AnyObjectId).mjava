@@ -4,9 +4,10 @@
 	 * @param id
 	 *            the object to look for.
 	 * @return the note's blob ObjectId, or null if no note exists.
+	 * @throws IOException
+	 *             a portion of the note space is not accessible.
 	 */
-	public ObjectId get(AnyObjectId id) {
-		Note note = notes.get(id);
-		return note != null ? note.getData() : null;
+	public ObjectId get(AnyObjectId id) throws IOException {
+		return root.get(id, reader);
 	}
 

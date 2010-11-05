@@ -1,0 +1,13 @@
+	private InMemoryNoteBucket parseTree() {
+		for (; !eof(); next(1)) {
+			if (pathLen == pathPadding + OBJECT_ID_STRING_LENGTH && isHex())
+				return parseLeafTree();
+
+			else if (getNameLength() == 2 && isHex() && isTree())
+				return parseFanoutTree();
+		}
+
+		// If we cannot determine the style used, assume its a leaf.
+		return new LeafBucket(prefix.length());
+	}
+

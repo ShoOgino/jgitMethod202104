@@ -1,0 +1,12 @@
+	private NoteParser(AbbreviatedObjectId p, ObjectReader r, ObjectId t)
+			throws IncorrectObjectTypeException, IOException {
+		super(encodeASCII(p.name()), r, t);
+		prefix = p;
+
+		// Our path buffer has a '/' that we don't want after the prefix.
+		// Drop it by shifting the path down one position.
+		pathPadding = 0 < prefix.length() ? 1 : 0;
+		if (0 < pathPadding)
+			System.arraycopy(path, 0, path, pathPadding, prefix.length());
+	}
+

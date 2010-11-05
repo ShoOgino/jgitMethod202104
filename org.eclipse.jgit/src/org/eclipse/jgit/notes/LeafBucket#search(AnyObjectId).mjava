@@ -1,0 +1,16 @@
+	private int search(AnyObjectId objId) {
+		int low = 0;
+		int high = cnt;
+		while (low < high) {
+			int mid = (low + high) >>> 1;
+			int cmp = objId.compareTo(notes[mid]);
+			if (cmp < 0)
+				high = mid;
+			else if (cmp == 0)
+				return mid;
+			else
+				low = mid + 1;
+		}
+		return -(low + 1);
+	}
+

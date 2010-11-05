@@ -1,0 +1,12 @@
+	private boolean parseObjectId(MutableObjectId id) {
+		if (pathLen == pathPadding + OBJECT_ID_STRING_LENGTH) {
+			try {
+				id.fromString(path, pathPadding);
+				return true;
+			} catch (ArrayIndexOutOfBoundsException notHex) {
+				return false;
+			}
+		}
+		return false;
+	}
+

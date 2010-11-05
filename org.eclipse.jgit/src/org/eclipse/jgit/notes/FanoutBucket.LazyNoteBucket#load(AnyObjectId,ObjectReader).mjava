@@ -1,0 +1,8 @@
+		private NoteBucket load(AnyObjectId objId, ObjectReader or)
+				throws IOException {
+			AbbreviatedObjectId p = objId.abbreviate(prefixLen + 2);
+			NoteBucket self = NoteParser.parse(p, treeId, or);
+			table[cell(objId)] = self;
+			return self;
+		}
+

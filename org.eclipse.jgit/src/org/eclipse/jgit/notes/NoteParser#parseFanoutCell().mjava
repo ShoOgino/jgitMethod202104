@@ -1,0 +1,13 @@
+	private int parseFanoutCell() {
+		if (getNameLength() == 2 && isTree()) {
+			try {
+				return (parseHexInt4(path[pathOffset + 0]) << 4)
+						| parseHexInt4(path[pathOffset + 1]);
+			} catch (ArrayIndexOutOfBoundsException notHex) {
+				return -1;
+			}
+		} else {
+			return -1;
+		}
+	}
+
