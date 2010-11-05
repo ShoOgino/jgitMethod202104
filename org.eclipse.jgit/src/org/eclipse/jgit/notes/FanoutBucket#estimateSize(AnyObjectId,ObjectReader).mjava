@@ -1,0 +1,27 @@
+	@Override
+	int estimateSize(AnyObjectId noteOn, ObjectReader or) throws IOException {
+		// If most of this fan-out is full, estimate it should still be split.
+		if (LeafBucket.MAX_SIZE * 3 / 4 <= cnt)
+			return 1 + LeafBucket.MAX_SIZE;
+
+		// Due to the uniform distribution of ObjectIds, having less nodes full
+		// indicates a good chance the total number of children below here
+		// is less than the MAX_SIZE split point. Get a more accurate count.
+
+		MutableObjectId id = new MutableObjectId();
+		id.fromObjectId(noteOn);
+
+		int sz = 0;
+		for (int cell = 0; cell < 256; cell++) {
+			NoteBucket b = table[cell];
+			if (b == null)
+				continue;
+
+			id.setByte(prefixLen >> 1, cell);
+			sz += b.estimateSize(id, or);
+			if (LeafBucket.MAX_SIZE < sz)
+				break;
+		}
+		return sz;
+	}
+
