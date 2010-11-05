@@ -1,0 +1,35 @@
+	/**
+	 * Open and return the content of an object's note.
+	 *
+	 * This method assumes the note is fairly small and can be accessed
+	 * efficiently. Larger notes should be accessed by streaming:
+	 *
+	 * <pre>
+	 * ObjectId dataId = thisMap.get(id);
+	 * if (dataId != null)
+	 * 	reader.open(dataId).openStream();
+	 * </pre>
+	 *
+	 * @param id
+	 *            object to lookup the note of.
+	 * @param sizeLimit
+	 *            maximum number of bytes to return. If the note data size is
+	 *            larger than this limit, LargeObjectException will be thrown.
+	 * @return if a note is defined for {@code id}, the note content. If no note
+	 *         is defined, null.
+	 * @throws LargeObjectException
+	 *             the note data is larger than {@code sizeLimit}.
+	 * @throws MissingObjectException
+	 *             the note's blob does not exist in the repository.
+	 * @throws IOException
+	 *             the note's blob cannot be read from the repository
+	 */
+	public byte[] getCachedBytes(AnyObjectId id, int sizeLimit)
+			throws LargeObjectException, MissingObjectException, IOException {
+		ObjectId dataId = get(id);
+		if (dataId != null)
+			return reader.open(dataId).getCachedBytes(sizeLimit);
+		else
+			return null;
+	}
+

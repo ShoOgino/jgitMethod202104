@@ -1,0 +1,24 @@
+	public void testReadFullyFannedOut() throws Exception {
+		RevBlob a = tr.blob("a");
+		RevBlob b = tr.blob("b");
+		RevBlob data1 = tr.blob("data1");
+		RevBlob data2 = tr.blob("data2");
+
+		RevCommit r = tr.commit() //
+				.add(fanout(38, a.name()), data1) //
+				.add(fanout(38, b.name()), data2) //
+				.create();
+		tr.parseBody(r);
+
+		NoteMap map = NoteMap.read(reader, r);
+		assertNotNull("have map", map);
+
+		assertTrue("has note for a", map.contains(a));
+		assertTrue("has note for b", map.contains(b));
+		assertEquals(data1, map.get(a));
+		assertEquals(data2, map.get(b));
+
+		assertFalse("no note for data1", map.contains(data1));
+		assertNull("no note for data1", map.get(data1));
+	}
+

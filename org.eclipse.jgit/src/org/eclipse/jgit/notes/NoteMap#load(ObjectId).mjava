@@ -1,0 +1,21 @@
+	private void load(ObjectId treeId) throws MissingObjectException,
+			IncorrectObjectTypeException, CorruptObjectException, IOException {
+		try {
+			byte[] idBuf = new byte[Constants.OBJECT_ID_LENGTH];
+			TreeWalk tw = new TreeWalk(reader);
+			tw.reset();
+			tw.setRecursive(true);
+			tw.addTree(treeId);
+
+			notes.clear();
+
+			while (tw.next()) {
+				ObjectId pathId = pathToId(idBuf, tw.getRawPath());
+				if (pathId != null)
+					notes.add(new Note(pathId, tw.getObjectId(0)));
+			}
+		} finally {
+			reader.release();
+		}
+	}
+

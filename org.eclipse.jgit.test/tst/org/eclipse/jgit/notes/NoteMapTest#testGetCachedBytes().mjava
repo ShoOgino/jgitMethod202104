@@ -1,0 +1,16 @@
+	public void testGetCachedBytes() throws Exception {
+		final String exp = "this is test data";
+		RevBlob a = tr.blob("a");
+		RevBlob data = tr.blob(exp);
+
+		RevCommit r = tr.commit() //
+				.add(a.name(), data) //
+				.create();
+		tr.parseBody(r);
+
+		NoteMap map = NoteMap.read(reader, r);
+		byte[] act = map.getCachedBytes(a, exp.length() * 4);
+		assertNotNull("has data for a", act);
+		assertEquals(exp, RawParseUtils.decode(act));
+	}
+

@@ -1,0 +1,17 @@
+	private static String fanout(int prefix, String name) {
+		StringBuilder r = new StringBuilder();
+		int i = 0;
+		for (; i < prefix && i < name.length(); i += 2) {
+			if (i != 0)
+				r.append('/');
+			r.append(name.charAt(i + 0));
+			r.append(name.charAt(i + 1));
+		}
+		if (i < name.length()) {
+			if (i != 0)
+				r.append('/');
+			r.append(name.substring(i));
+		}
+		return r.toString();
+	}
+

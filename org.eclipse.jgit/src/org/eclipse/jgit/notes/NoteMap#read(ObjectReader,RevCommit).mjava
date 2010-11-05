@@ -1,0 +1,25 @@
+	/**
+	 * Load a collection of notes from a branch.
+	 *
+	 * @param reader
+	 *            reader to scan the note branch with. This reader may be
+	 *            retained by the NoteMap for the life of the map in order to
+	 *            support lazy loading of entries.
+	 * @param commit
+	 *            the revision of the note branch to read.
+	 * @return the note map read from the commit.
+	 * @throws IOException
+	 *             the repository cannot be accessed through the reader.
+	 * @throws CorruptObjectException
+	 *             a tree object is corrupt and cannot be read.
+	 * @throws IncorrectObjectTypeException
+	 *             a tree object wasn't actually a tree.
+	 * @throws MissingObjectException
+	 *             a reference tree object doesn't exist.
+	 */
+	public static NoteMap read(ObjectReader reader, RevCommit commit)
+			throws MissingObjectException, IncorrectObjectTypeException,
+			CorruptObjectException, IOException {
+		return read(reader, commit.getTree());
+	}
+
