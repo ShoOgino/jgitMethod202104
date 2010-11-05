@@ -1,0 +1,35 @@
+	public void testEditFlat() throws Exception {
+		RevBlob a = tr.blob("a");
+		RevBlob b = tr.blob("b");
+		RevBlob data1 = tr.blob("data1");
+		RevBlob data2 = tr.blob("data2");
+
+		RevCommit r = tr.commit() //
+				.add(a.name(), data1) //
+				.add(b.name(), data2) //
+				.create();
+		tr.parseBody(r);
+
+		NoteMap map = NoteMap.read(reader, r);
+		map.set(a, data2);
+		map.set(b, null);
+		map.set(data1, b);
+		map.set(data2, null);
+
+		assertEquals(data2, map.get(a));
+		assertEquals(b, map.get(data1));
+		assertFalse("no b", map.contains(b));
+		assertFalse("no data2", map.contains(data2));
+
+		MutableObjectId id = new MutableObjectId();
+		for (int p = 42; p > 0; p--) {
+			id.setByte(1, p);
+			map.set(id, data1);
+		}
+
+		for (int p = 42; p > 0; p--) {
+			id.setByte(1, p);
+			assertTrue("contains " + id, map.contains(id));
+		}
+	}
+

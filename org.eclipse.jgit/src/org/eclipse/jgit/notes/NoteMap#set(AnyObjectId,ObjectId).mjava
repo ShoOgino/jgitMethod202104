@@ -1,0 +1,33 @@
+	/**
+	 * Attach (or remove) a note on an object.
+	 *
+	 * If no note exists, a new note is stored. If a note already exists for the
+	 * given object, it is replaced (or removed).
+	 *
+	 * This method only updates the map in memory.
+	 *
+	 * If the caller wants to attach a UTF-8 encoded string message to an
+	 * object, {@link #set(AnyObjectId, String, ObjectInserter)} is a convenient
+	 * way to encode and update a note in one step.
+	 *
+	 * @param noteOn
+	 *            the object to attach the note to. This same ObjectId can later
+	 *            be used as an argument to {@link #get(AnyObjectId)} or
+	 *            {@link #getCachedBytes(AnyObjectId, int)} to read back the
+	 *            {@code noteData}.
+	 * @param noteData
+	 *            data to associate with the note. This must be the ObjectId of
+	 *            a blob that already exists in the repository. If null the note
+	 *            will be deleted, if present.
+	 * @throws IOException
+	 *             a portion of the note space is not accessible.
+	 */
+	public void set(AnyObjectId noteOn, ObjectId noteData) throws IOException {
+		InMemoryNoteBucket newRoot = root.set(noteOn, noteData, reader);
+		if (newRoot == null) {
+			newRoot = new LeafBucket(0);
+			newRoot.nonNotes = root.nonNotes;
+		}
+		root = newRoot;
+	}
+

@@ -1,0 +1,29 @@
+	public void testCreateFromEmpty() throws Exception {
+		RevBlob a = tr.blob("a");
+		RevBlob b = tr.blob("b");
+		RevBlob data1 = tr.blob("data1");
+		RevBlob data2 = tr.blob("data2");
+
+		NoteMap map = NoteMap.newEmptyMap();
+		assertFalse("no a", map.contains(a));
+		assertFalse("no b", map.contains(b));
+
+		map.set(a, data1);
+		map.set(b, data2);
+
+		assertEquals(data1, map.get(a));
+		assertEquals(data2, map.get(b));
+
+		map.remove(a);
+		map.remove(b);
+
+		assertFalse("no a", map.contains(a));
+		assertFalse("no b", map.contains(b));
+
+		map.set(a, "data1", inserter);
+		assertEquals(data1, map.get(a));
+
+		map.set(a, null, inserter);
+		assertFalse("no a", map.contains(a));
+	}
+
