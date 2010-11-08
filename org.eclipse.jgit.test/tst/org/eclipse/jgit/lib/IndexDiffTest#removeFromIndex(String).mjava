@@ -1,0 +1,8 @@
+	private void removeFromIndex(String path) throws IOException {
+		final DirCache dirc = db.lockDirCache();
+		final DirCacheEditor edit = dirc.editor();
+		edit.add(new DirCacheEditor.DeletePath(path));
+		if (!edit.commit())
+			throw new IOException("could not commit");
+	}
+
