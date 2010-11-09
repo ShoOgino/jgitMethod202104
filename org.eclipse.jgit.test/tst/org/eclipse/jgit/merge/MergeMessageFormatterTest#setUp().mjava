@@ -1,0 +1,17 @@
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
+
+		RefUpdate createRemoteRefA = db
+				.updateRef("refs/remotes/origin/remote-a");
+		createRemoteRefA.setNewObjectId(db.resolve("refs/heads/a"));
+		createRemoteRefA.update();
+
+		RefUpdate createRemoteRefB = db
+				.updateRef("refs/remotes/origin/remote-b");
+		createRemoteRefB.setNewObjectId(db.resolve("refs/heads/b"));
+		createRemoteRefB.update();
+
+		formatter = new MergeMessageFormatter();
+	}
+

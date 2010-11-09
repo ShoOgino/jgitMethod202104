@@ -1,0 +1,11 @@
+	public void testCommit() throws IOException {
+		ObjectId objectId = ObjectId
+				.fromString("6db9c2ebf75590eef973081736730a9ea169a0c4");
+		Ref commit = new ObjectIdRef.Unpeeled(Storage.LOOSE,
+				objectId.getName(), objectId);
+		Ref master = db.getRef("refs/heads/master");
+		String message = formatter.format(Arrays.asList(commit), master);
+		assertEquals("Merge commit '6db9c2ebf75590eef973081736730a9ea169a0c4'",
+				message);
+	}
+

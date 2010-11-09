@@ -1,0 +1,7 @@
+	public void testIntoOtherThanMaster() throws IOException {
+		Ref a = db.getRef("refs/heads/a");
+		Ref b = db.getRef("refs/heads/b");
+		String message = formatter.format(Arrays.asList(a), b);
+		assertEquals("Merge branch 'a' into b", message);
+	}
+
