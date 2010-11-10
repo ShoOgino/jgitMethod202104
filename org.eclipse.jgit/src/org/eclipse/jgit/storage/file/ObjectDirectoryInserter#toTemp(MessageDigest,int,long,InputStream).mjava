@@ -4,9 +4,13 @@
 		boolean delete = true;
 		File tmp = newTempFile();
 		try {
-			DigestOutputStream dOut = new DigestOutputStream(
-					compress(new FileOutputStream(tmp)), md);
+			FileOutputStream fOut = new FileOutputStream(tmp);
 			try {
+				OutputStream out = fOut;
+				if (config.getFSyncObjectFiles())
+					out = Channels.newOutputStream(fOut.getChannel());
+				DeflaterOutputStream cOut = compress(out);
+				DigestOutputStream dOut = new DigestOutputStream(cOut, md);
 				writeHeader(dOut, type, len);
 
 				final byte[] buf = buffer();
@@ -17,8 +21,12 @@
 					dOut.write(buf, 0, n);
 					len -= n;
 				}
+				dOut.flush();
+				cOut.finish();
 			} finally {
-				dOut.close();
+				if (config.getFSyncObjectFiles())
+					fOut.getChannel().force(true);
+				fOut.close();
 			}
 
 			delete = false;
