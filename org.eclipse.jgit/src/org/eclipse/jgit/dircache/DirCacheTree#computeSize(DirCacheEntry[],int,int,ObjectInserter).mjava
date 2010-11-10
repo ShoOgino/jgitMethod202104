@@ -18,9 +18,7 @@
 					final int stOffset = pathOffset + st.nameLength() + 1;
 					st.writeTree(cache, entryIdx, stOffset, ow);
 
-					size += FileMode.TREE.copyToLength();
-					size += st.nameLength();
-					size += OBJECT_ID_LENGTH + 2;
+					size += entrySize(TREE, st.nameLength());
 
 					entryIdx += st.entrySpan;
 					childIdx++;
@@ -28,10 +26,7 @@
 				}
 			}
 
-			final FileMode mode = e.getFileMode();
-			size += mode.copyToLength();
-			size += ep.length - pathOffset;
-			size += OBJECT_ID_LENGTH + 2;
+			size += entrySize(e.getFileMode(), ep.length - pathOffset);
 			entryIdx++;
 		}
 

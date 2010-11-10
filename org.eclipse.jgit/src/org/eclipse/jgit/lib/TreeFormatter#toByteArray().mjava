@@ -1,0 +1,25 @@
+	/**
+	 * Copy this formatter's buffer into a byte array.
+	 *
+	 * This method is not efficient, as it needs to create a copy of the
+	 * internal buffer in order to supply an array of the correct size to the
+	 * caller. If the buffer is just to pass to an ObjectInserter, consider
+	 * using {@link #insert(ObjectInserter)} instead.
+	 *
+	 * @return a copy of this formatter's buffer.
+	 */
+	public byte[] toByteArray() {
+		if (buf != null) {
+			byte[] r = new byte[ptr];
+			System.arraycopy(buf, 0, r, 0, ptr);
+			return r;
+		}
+
+		try {
+			return overflowBuffer.toByteArray();
+		} catch (IOException err) {
+			// This should never happen, its read failure on a byte array.
+			throw new RuntimeException(err);
+		}
+	}
+
