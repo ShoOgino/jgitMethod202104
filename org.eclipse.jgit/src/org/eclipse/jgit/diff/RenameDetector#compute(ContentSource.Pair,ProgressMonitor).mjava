@@ -17,9 +17,17 @@
 
 			if (pm == null)
 				pm = NullProgressMonitor.INSTANCE;
+
+			if (0 < breakScore)
 				breakModifies(reader, pm);
+
+			if (!added.isEmpty() && !deleted.isEmpty())
 				findExactRenames(pm);
+
+			if (!added.isEmpty() && !deleted.isEmpty())
 				findContentRenames(reader, pm);
+
+			if (0 < breakScore && !added.isEmpty() && !deleted.isEmpty())
 				rejoinModifies(pm);
 
 			entries.addAll(added);
