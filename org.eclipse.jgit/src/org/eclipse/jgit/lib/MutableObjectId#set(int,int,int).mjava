@@ -1,0 +1,17 @@
+	private static int set(int w, int index, int value) {
+		value &= 0xff;
+
+		switch (index) {
+		case 0:
+			return (w & 0x00ffffff) | (value << 24);
+		case 1:
+			return (w & 0xff00ffff) | (value << 16);
+		case 2:
+			return (w & 0xffff00ff) | (value << 8);
+		case 3:
+			return (w & 0xffffff00) | value;
+		default:
+			throw new ArrayIndexOutOfBoundsException();
+		}
+	}
+
