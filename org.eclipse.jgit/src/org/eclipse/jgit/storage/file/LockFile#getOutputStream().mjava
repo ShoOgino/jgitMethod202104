@@ -9,34 +9,43 @@
 	 */
 	public OutputStream getOutputStream() {
 		requireLock();
+
+		final OutputStream out;
+		if (fsync)
+			out = Channels.newOutputStream(os.getChannel());
+		else
+			out = os;
+
 		return new OutputStream() {
 			@Override
 			public void write(final byte[] b, final int o, final int n)
 					throws IOException {
-				os.write(b, o, n);
+				out.write(b, o, n);
 			}
 
 			@Override
 			public void write(final byte[] b) throws IOException {
-				os.write(b);
+				out.write(b);
 			}
 
 			@Override
 			public void write(final int b) throws IOException {
-				os.write(b);
+				out.write(b);
 			}
 
 			@Override
 			public void flush() throws IOException {
-				os.flush();
+				out.flush();
 			}
 
 			@Override
 			public void close() throws IOException {
 				try {
-					os.flush();
+					out.flush();
+					if (fsync)
+						os.getChannel().force(true);
 					fLck.release();
-					os.close();
+					out.close();
 					os = null;
 				} catch (IOException ioe) {
 					unlock();
