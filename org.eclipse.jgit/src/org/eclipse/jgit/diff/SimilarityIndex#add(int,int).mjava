@@ -1,4 +1,4 @@
-	void add(int key, int cnt) {
+	void add(int key, int cnt) throws TableFullException {
 		key = (key * 0x9e370001) >>> 1; // Mix bits and ensure not negative.
 
 		int j = slot(key);
@@ -6,7 +6,7 @@
 			long v = idHash[j];
 			if (v == 0) {
 				// Empty slot in the table, store here.
-				if (shouldGrow()) {
+				if (idGrowAt <= idSize) {
 					grow();
 					j = slot(key);
 					continue;

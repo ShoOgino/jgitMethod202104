@@ -1,7 +1,8 @@
-	private static SimilarityIndex hash(String text) {
+	private static SimilarityIndex hash(String text) throws TableFullException {
 		SimilarityIndex src = new SimilarityIndex() {
 			@Override
-			void hash(byte[] raw, int ptr, final int end) {
+			void hash(byte[] raw, int ptr, final int end)
+					throws TableFullException {
 				while (ptr < end) {
 					int hash = raw[ptr] & 0xff;
 					int start = ptr;

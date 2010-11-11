@@ -24,7 +24,14 @@
 				continue;
 			}
 
-			SimilarityIndex s = hash(OLD, srcEnt);
+			SimilarityIndex s;
+			try {
+				s = hash(OLD, srcEnt);
+			} catch (TableFullException tableFull) {
+				tableOverflow = true;
+				continue;
+			}
+
 			for (int dstIdx = 0; dstIdx < dsts.size(); dstIdx++) {
 				DiffEntry dstEnt = dsts.get(dstIdx);
 
@@ -58,7 +65,15 @@
 					continue;
 				}
 
-				SimilarityIndex d = hash(NEW, dstEnt);
+				SimilarityIndex d;
+				try {
+					d = hash(NEW, dstEnt);
+				} catch (TableFullException tableFull) {
+					tableOverflow = true;
+					pm.update(1);
+					continue;
+				}
+
 				int contentScore = s.score(d, 10000);
 
 				// nameScore returns a value between 0 and 100, but we want it

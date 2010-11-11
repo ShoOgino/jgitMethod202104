@@ -1,9 +1,19 @@
-	private void grow() {
+	private void grow() throws TableFullException {
+		if (idHashBits == 30)
+			throw new TableFullException();
+
 		long[] oldHash = idHash;
 		int oldSize = idHash.length;
 
 		idHashBits++;
-		idHash = new long[1 << idHashBits];
+		idGrowAt = growAt(idHashBits);
+
+		try {
+			idHash = new long[1 << idHashBits];
+		} catch (OutOfMemoryError noMemory) {
+			throw TABLE_FULL_OUT_OF_MEMORY;
+		}
+
 		for (int i = 0; i < oldSize; i++) {
 			long v = oldHash[i];
 			if (v != 0) {

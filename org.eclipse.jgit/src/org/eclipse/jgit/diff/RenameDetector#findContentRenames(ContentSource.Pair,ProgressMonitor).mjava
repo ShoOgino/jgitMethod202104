@@ -11,6 +11,7 @@
 			d = new SimilarityRenameDetector(reader, deleted, added);
 			d.setRenameScore(getRenameScore());
 			d.compute(pm);
+			overRenameLimit |= d.isTableOverflow();
 			deleted = d.getLeftOverSources();
 			added = d.getLeftOverDestinations();
 			entries.addAll(d.getMatches());
