@@ -6,6 +6,7 @@
 
 		long[] srcSizes = new long[srcs.size()];
 		long[] dstSizes = new long[dsts.size()];
+		BitSet dstTooLarge = null;
 
 		// Init the size arrays to some value that indicates that we haven't
 		// calculated the size yet. Since sizes cannot be negative, -1 will work
@@ -45,6 +46,11 @@
 					continue;
 				}
 
+				if (dstTooLarge != null && dstTooLarge.get(dstIdx)) {
+					pm.update(1);
+					continue;
+				}
+
 				long srcSize = srcSizes[srcIdx];
 				if (srcSize < 0) {
 					srcSize = size(OLD, srcEnt);
@@ -69,6 +75,9 @@
 				try {
 					d = hash(NEW, dstEnt);
 				} catch (TableFullException tableFull) {
+					if (dstTooLarge == null)
+						dstTooLarge = new BitSet(dsts.size());
+					dstTooLarge.set(dstIdx);
 					tableOverflow = true;
 					pm.update(1);
 					continue;
