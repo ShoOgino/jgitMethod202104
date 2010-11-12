@@ -11,13 +11,15 @@
 					j = slot(key);
 					continue;
 				}
-				idHash[j] = (((long) key) << KEY_SHIFT) | cnt;
+				idHash[j] = pair(key, cnt);
 				idSize++;
 				return;
 
 			} else if (keyOf(v) == key) {
-				// Same key, increment the counter.
-				idHash[j] = v + cnt;
+				// Same key, increment the counter. If it overflows, fail
+				// indexing to prevent the key from being impacted.
+				//
+				idHash[j] = pair(key, countOf(v) + cnt);
 				return;
 
 			} else if (++j >= idHash.length) {
