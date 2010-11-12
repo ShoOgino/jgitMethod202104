@@ -1,0 +1,11 @@
+	private DirCacheCheckout resetHard(RevCommit commit)
+			throws NoWorkTreeException,
+			CorruptObjectException, IOException {
+		DirCacheCheckout dc;
+		dc = new DirCacheCheckout(db, null, db.lockDirCache(),
+				commit.getTree());
+		dc.setFailOnConflict(true);
+		assertTrue(dc.checkout());
+		return dc;
+	}
+

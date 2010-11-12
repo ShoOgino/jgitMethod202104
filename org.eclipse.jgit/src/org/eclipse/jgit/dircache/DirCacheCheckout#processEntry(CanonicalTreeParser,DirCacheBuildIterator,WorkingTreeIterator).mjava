@@ -10,9 +10,9 @@
 			WorkingTreeIterator f) {
 		if (m != null) {
 			if (i == null || f == null || !m.idEqual(i)
-					|| (i.getDirCacheEntry() != null && f.isModified(i
-							.getDirCacheEntry(), true, config_filemode(), repo
-							.getFS()))) {
+					|| (i.getDirCacheEntry() != null && (f.isModified(
+							i.getDirCacheEntry(), true, config_filemode(),
+							repo.getFS()) || i.getDirCacheEntry().getStage() != 0))) {
 				update(m.getEntryPathString(), m.getEntryObjectId(),
 						m.getEntryFileMode());
 			} else
@@ -30,7 +30,7 @@
 						conflicts.remove(i.getEntryPathString());
 					}
 				}
-			} else
+			} else if (i.getDirCacheEntry().getStage() == 0)
 				keep(i.getDirCacheEntry());
 		}
 	}
