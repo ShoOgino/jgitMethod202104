@@ -1,0 +1,20 @@
+	/**
+	 * Constructs a DirCacheCeckout for checking out one tree, merging with the
+	 * index. As iterator over the working tree this constructor creates a
+	 * standard {@link FileTreeIterator}
+	 *
+	 * @param repo
+	 *            the repository in which we do the checkout
+	 * @param dc
+	 *            the (already locked) Dircache for this repo
+	 * @param mergeCommitTree
+	 *            the id of the tree of the
+	 * @throws IOException
+	 */
+	public DirCacheCheckout(Repository repo, DirCache dc,
+			ObjectId mergeCommitTree) throws IOException {
+		this(repo, null, dc, mergeCommitTree, new FileTreeIterator(
+				repo.getWorkTree(), repo.getFS(),
+				WorkingTreeOptions.createDefaultInstance()));
+	}
+

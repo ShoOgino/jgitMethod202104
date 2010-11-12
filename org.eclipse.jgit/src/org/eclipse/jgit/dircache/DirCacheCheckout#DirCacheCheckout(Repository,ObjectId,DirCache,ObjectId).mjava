@@ -1,7 +1,7 @@
 	/**
-	 * Constructs a DirCacheCeckout for checking out one tree, merging with the
-	 * index. As iterator over the working tree this constructor creates a
-	 * standard {@link FileTreeIterator}
+	 * Constructs a DirCacheCeckout for merging and checking out two trees (HEAD
+	 * and mergeCommitTree) and the index. As iterator over the working tree
+	 * this constructor creates a standard {@link FileTreeIterator}
 	 *
 	 * @param repo
 	 *            the repository in which we do the checkout
@@ -13,8 +13,8 @@
 	 *            the id of the tree of the
 	 * @throws IOException
 	 */
-	public DirCacheCheckout(Repository repo, ObjectId headCommitTree, DirCache dc,
-			ObjectId mergeCommitTree) throws IOException {
+	public DirCacheCheckout(Repository repo, ObjectId headCommitTree,
+			DirCache dc, ObjectId mergeCommitTree) throws IOException {
 		this(repo, headCommitTree, dc, mergeCommitTree, new FileTreeIterator(
 				repo.getWorkTree(), repo.getFS(),
 				WorkingTreeOptions.createDefaultInstance()));
