@@ -1,0 +1,17 @@
+	public void testRemoveDeletesTreeFanout2_38() throws Exception {
+		RevBlob a = tr.blob("a");
+		RevBlob data1 = tr.blob("data1");
+		RevTree empty = tr.tree();
+
+		RevCommit r = tr.commit() //
+				.add(fanout(2, a.name()), data1) //
+				.create();
+		tr.parseBody(r);
+
+		NoteMap map = NoteMap.read(reader, r);
+		map.set(a, null);
+
+		RevCommit n = commitNoteMap(map);
+		assertEquals("empty tree", empty, n.getTree());
+	}
+
