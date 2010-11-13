@@ -1,4 +1,4 @@
-	void add(int key, int cnt) {
+	void add(int key, int cnt) throws TableFullException {
 		key = (key * 0x9e370001) >>> 1; // Mix bits and ensure not negative.
 
 		int j = slot(key);
@@ -6,18 +6,20 @@
 			long v = idHash[j];
 			if (v == 0) {
 				// Empty slot in the table, store here.
-				if (shouldGrow()) {
+				if (idGrowAt <= idSize) {
 					grow();
 					j = slot(key);
 					continue;
 				}
-				idHash[j] = (((long) key) << KEY_SHIFT) | cnt;
+				idHash[j] = pair(key, cnt);
 				idSize++;
 				return;
 
 			} else if (keyOf(v) == key) {
-				// Same key, increment the counter.
-				idHash[j] = v + cnt;
+				// Same key, increment the counter. If it overflows, fail
+				// indexing to prevent the key from being impacted.
+				//
+				idHash[j] = pair(key, countOf(v) + cnt);
 				return;
 
 			} else if (++j >= idHash.length) {
