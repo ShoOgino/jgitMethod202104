@@ -1,0 +1,29 @@
+	public void testEditFanout2_38() throws Exception {
+		RevBlob a = tr.blob("a");
+		RevBlob b = tr.blob("b");
+		RevBlob data1 = tr.blob("data1");
+		RevBlob data2 = tr.blob("data2");
+
+		RevCommit r = tr.commit() //
+				.add(fanout(2, a.name()), data1) //
+				.add(fanout(2, b.name()), data2) //
+				.create();
+		tr.parseBody(r);
+
+		NoteMap map = NoteMap.read(reader, r);
+		map.set(a, data2);
+		map.set(b, null);
+		map.set(data1, b);
+		map.set(data2, null);
+
+		assertEquals(data2, map.get(a));
+		assertEquals(b, map.get(data1));
+		assertFalse("no b", map.contains(b));
+		assertFalse("no data2", map.contains(data2));
+
+		map.set(a, null);
+		map.set(data1, null);
+		assertFalse("no a", map.contains(a));
+		assertFalse("no data1", map.contains(data1));
+	}
+

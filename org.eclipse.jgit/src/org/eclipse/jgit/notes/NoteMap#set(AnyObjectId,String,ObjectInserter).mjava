@@ -1,0 +1,34 @@
+	/**
+	 * Attach a note to an object.
+	 *
+	 * If no note exists, a new note is stored. If a note already exists for the
+	 * given object, it is replaced (or removed).
+	 *
+	 * @param noteOn
+	 *            the object to attach the note to. This same ObjectId can later
+	 *            be used as an argument to {@link #get(AnyObjectId)} or
+	 *            {@link #getCachedBytes(AnyObjectId, int)} to read back the
+	 *            {@code noteData}.
+	 * @param noteData
+	 *            text to store in the note. The text will be UTF-8 encoded when
+	 *            stored in the repository. If null the note will be deleted, if
+	 *            the empty string a note with the empty string will be stored.
+	 * @param ins
+	 *            inserter to write the encoded {@code noteData} out as a blob.
+	 *            The caller must ensure the inserter is flushed before the
+	 *            updated note map is made available for reading.
+	 * @throws IOException
+	 *             the note data could not be stored in the repository.
+	 */
+	public void set(AnyObjectId noteOn, String noteData, ObjectInserter ins)
+			throws IOException {
+		ObjectId dataId;
+		if (noteData != null) {
+			byte[] dataUTF8 = Constants.encode(noteData);
+			dataId = ins.insert(Constants.OBJ_BLOB, dataUTF8);
+		} else {
+			dataId = null;
+		}
+		set(noteOn, dataId);
+	}
+
