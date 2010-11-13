@@ -13,23 +13,6 @@
 			haveLck = true;
 			try {
 				os = new FileOutputStream(lck);
-				try {
-					fLck = os.getChannel().tryLock();
-					if (fLck == null)
-						throw new OverlappingFileLockException();
-				} catch (OverlappingFileLockException ofle) {
-					// We cannot use unlock() here as this file is not
-					// held by us, but we thought we created it. We must
-					// not delete it, as it belongs to some other process.
-					//
-					haveLck = false;
-					try {
-						os.close();
-					} catch (IOException ioe) {
-						// Fail by returning haveLck = false.
-					}
-					os = null;
-				}
 			} catch (IOException ioe) {
 				unlock();
 				throw ioe;

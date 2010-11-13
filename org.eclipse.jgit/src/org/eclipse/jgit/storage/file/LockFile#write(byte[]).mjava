@@ -15,9 +15,15 @@
 	public void write(final byte[] content) throws IOException {
 		requireLock();
 		try {
-			os.write(content);
-			os.flush();
-			fLck.release();
+			if (fsync) {
+				FileChannel fc = os.getChannel();
+				ByteBuffer buf = ByteBuffer.wrap(content);
+				while (0 < buf.remaining())
+					fc.write(buf);
+				fc.force(true);
+			} else {
+				os.write(content);
+			}
 			os.close();
 			os = null;
 		} catch (IOException ioe) {
