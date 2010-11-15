@@ -1,0 +1,10 @@
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
+		git = new Git(db);
+		// commit something
+		writeTrashFile(FILE, "Hello world");
+		git.add().addFilepattern(FILE).call();
+		git.commit().setMessage("Initial commit").call();
+	}
+

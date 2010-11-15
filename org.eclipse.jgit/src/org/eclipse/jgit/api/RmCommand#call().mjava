@@ -1,0 +1,46 @@
+	/**
+	 * Executes the {@code Rm} command. Each instance of this class should only
+	 * be used for one invocation of the command. Don't call this method twice
+	 * on an instance.
+	 *
+	 * @return the DirCache after Rm
+	 */
+	public DirCache call() throws NoFilepatternException {
+
+		if (filepatterns.isEmpty())
+			throw new NoFilepatternException(JGitText.get().atLeastOnePatternIsRequired);
+		checkCallable();
+		DirCache dc = null;
+
+		try {
+			dc = repo.lockDirCache();
+			DirCacheBuilder builder = dc.builder();
+			final TreeWalk tw = new TreeWalk(repo);
+			tw.reset(); // drop the first empty tree, which we do not need here
+			tw.setRecursive(true);
+			tw.setFilter(PathFilterGroup.createFromStrings(filepatterns));
+			tw.addTree(new DirCacheBuildIterator(builder));
+
+			while (tw.next()) {
+				final File path = new File(repo.getWorkTree(),
+						tw.getPathString());
+				final FileMode mode = tw.getFileMode(0);
+				if (mode.getObjectType() == Constants.OBJ_BLOB) {
+					// Deleting a blob is simply a matter of removing
+					// the file or symlink named by the tree entry.
+					delete(path);
+				}
+			}
+			builder.commit();
+			setCallable(false);
+		} catch (IOException e) {
+			throw new JGitInternalException(
+					JGitText.get().exceptionCaughtDuringExecutionOfRmCommand, e);
+		} finally {
+			if (dc != null)
+				dc.unlock();
+		}
+
+		return dc;
+	}
+

@@ -1,0 +1,10 @@
+	public void testRemove() throws JGitInternalException,
+			NoFilepatternException, IllegalStateException, IOException {
+		assertEquals("[test.txt, mode:100644, content:Hello world]",
+				indexState(CONTENT));
+		RmCommand command = git.rm();
+		command.addFilepattern(FILE);
+		command.call();
+		assertEquals("", indexState(CONTENT));
+	}
+
