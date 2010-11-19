@@ -2,6 +2,21 @@
 	public byte[] idBuffer() {
 		if (contentIdFromPtr == ptr)
 			return contentId;
+
+		if (state.walk != null) {
+			// If there is a matching DirCacheIterator, we can reuse
+			// its idBuffer, but only if we appear to be clean against
+			// the cached index information for the path.
+			//
+			DirCacheIterator i = state.walk.getTree(state.dirCacheTree,
+					DirCacheIterator.class);
+			if (i != null) {
+				DirCacheEntry ent = i.getDirCacheEntry();
+				if (ent != null && compareMetadata(ent) == MetadataDiff.EQUAL)
+					return i.idBuffer();
+			}
+		}
+
 		switch (mode & FileMode.TYPE_MASK) {
 		case FileMode.TYPE_FILE:
 			contentIdFromPtr = ptr;
