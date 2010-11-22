@@ -1,0 +1,20 @@
+	/**
+	 * @param upstream
+	 *            the upstream branch
+	 * @return {@code this}
+	 * @throws RefNotFoundException
+	 */
+	public RebaseCommand setUpstream(String upstream)
+			throws RefNotFoundException {
+		try {
+			ObjectId upstreamId = repo.resolve(upstream);
+			if (upstreamId == null)
+				throw new RefNotFoundException(MessageFormat.format(JGitText
+						.get().refNotResolved, upstream));
+			upstreamCommit = walk.parseCommit(repo.resolve(upstream));
+			return this;
+		} catch (IOException ioe) {
+			throw new JGitInternalException(ioe.getMessage(), ioe);
+		}
+	}
+

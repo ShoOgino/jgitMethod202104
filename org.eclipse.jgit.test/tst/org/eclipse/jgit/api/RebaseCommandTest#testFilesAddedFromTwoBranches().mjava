@@ -1,0 +1,46 @@
+	public void testFilesAddedFromTwoBranches() throws Exception {
+		Git git = new Git(db);
+
+		// create file1 on master
+		writeTrashFile("file1", "file1");
+		git.add().addFilepattern("file1").call();
+		RevCommit masterCommit = git.commit().setMessage("Add file1 to master")
+				.call();
+
+		// create a branch named file2 and add file2
+		createBranch(masterCommit, "refs/heads/file2");
+		checkoutBranch("refs/heads/file2");
+		writeTrashFile("file2", "file2");
+		git.add().addFilepattern("file2").call();
+		RevCommit addFile2 = git.commit().setMessage(
+				"Add file2 to branch file2").call();
+
+		// create a branch named file3 and add file3
+		createBranch(masterCommit, "refs/heads/file3");
+		checkoutBranch("refs/heads/file3");
+		writeTrashFile("file3", "file3");
+		git.add().addFilepattern("file3").call();
+		git.commit().setMessage("Add file3 to branch file3").call();
+
+		assertTrue(new File(db.getWorkTree(), "file1").exists());
+		assertFalse(new File(db.getWorkTree(), "file2").exists());
+		assertTrue(new File(db.getWorkTree(), "file3").exists());
+
+		RebaseResult res = git.rebase().setUpstream("refs/heads/file2").call();
+		assertEquals(Status.OK, res.getStatus());
+
+		assertTrue(new File(db.getWorkTree(), "file1").exists());
+		assertTrue(new File(db.getWorkTree(), "file2").exists());
+		assertTrue(new File(db.getWorkTree(), "file3").exists());
+
+		// our old branch should be checked out again
+		assertEquals("refs/heads/file3", db.getFullBranch());
+		assertEquals(addFile2, new RevWalk(db).parseCommit(
+				db.resolve(Constants.HEAD)).getParent(0));
+
+		checkoutBranch("refs/heads/file2");
+		assertTrue(new File(db.getWorkTree(), "file1").exists());
+		assertTrue(new File(db.getWorkTree(), "file2").exists());
+		assertFalse(new File(db.getWorkTree(), "file3").exists());
+	}
+

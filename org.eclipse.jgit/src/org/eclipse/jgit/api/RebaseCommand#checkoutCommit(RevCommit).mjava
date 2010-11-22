@@ -1,0 +1,26 @@
+	private void checkoutCommit(RevCommit commit) throws IOException {
+		try {
+			RevCommit head = walk.parseCommit(repo.resolve(Constants.HEAD));
+			DirCacheCheckout dco = new DirCacheCheckout(repo, head.getTree(),
+					repo.lockDirCache(), commit.getTree());
+			dco.setFailOnConflict(true);
+			dco.checkout();
+			// update the HEAD
+			RefUpdate refUpdate = repo.updateRef(Constants.HEAD, true);
+			refUpdate.setExpectedOldObjectId(head);
+			refUpdate.setNewObjectId(commit);
+			Result res = refUpdate.forceUpdate();
+			switch (res) {
+			case FAST_FORWARD:
+			case NO_CHANGE:
+			case FORCED:
+				break;
+			default:
+				throw new IOException("Could not rewind to upstream commit");
+			}
+		} finally {
+			walk.release();
+			monitor.endTask();
+		}
+	}
+

@@ -1,0 +1,76 @@
+	private RebaseResult initFilesAndRewind() throws RefNotFoundException,
+			IOException, NoHeadException, JGitInternalException {
+		// we need to store everything into files so that we can implement
+		// --skip, --continue, and --abort
+
+		// first of all, we determine the commits to be applied
+		List<RevCommit> cherryPickList = new ArrayList<RevCommit>();
+
+		Ref head = repo.getRef(Constants.HEAD);
+		if (head == null || head.getObjectId() == null)
+			throw new RefNotFoundException(MessageFormat.format(
+					JGitText.get().refNotResolved, Constants.HEAD));
+
+		String headName;
+		if (head.isSymbolic())
+			headName = head.getTarget().getName();
+		else
+			headName = "detached HEAD";
+		ObjectId headId = head.getObjectId();
+		if (headId == null)
+			throw new RefNotFoundException(MessageFormat.format(
+					JGitText.get().refNotResolved, Constants.HEAD));
+		RevCommit headCommit = walk.lookupCommit(headId);
+		monitor.beginTask(JGitText.get().obtainingCommitsForCherryPick,
+				ProgressMonitor.UNKNOWN);
+		LogCommand cmd = new Git(repo).log().addRange(upstreamCommit,
+				headCommit);
+		Iterable<RevCommit> commitsToUse = cmd.call();
+		for (RevCommit commit : commitsToUse) {
+			cherryPickList.add(commit);
+		}
+
+		// nothing to do: return with UP_TO_DATE_RESULT
+		if (cherryPickList.isEmpty())
+			return RebaseResult.UP_TO_DATE_RESULT;
+
+		Collections.reverse(cherryPickList);
+		// create the folder for the meta information
+		rebaseDir.mkdir();
+
+		createFile(repo.getDirectory(), "ORIG_HEAD", headId.name());
+		createFile(rebaseDir, "head", headId.name());
+		createFile(rebaseDir, "head-name", headName);
+		createFile(rebaseDir, "onto", upstreamCommit.name());
+		BufferedWriter fw = new BufferedWriter(new OutputStreamWriter(
+				new FileOutputStream(new File(rebaseDir, "git-rebase-todo")),
+				"UTF-8"));
+		fw.write("# Created by EGit: rebasing " + upstreamCommit.name()
+				+ " onto " + headId.name());
+		fw.newLine();
+		try {
+			StringBuilder sb = new StringBuilder();
+			ObjectReader reader = walk.getObjectReader();
+			for (RevCommit commit : cherryPickList) {
+				sb.setLength(0);
+				sb.append(Action.PICK.toToken());
+				sb.append(" ");
+				sb.append(reader.abbreviate(commit).name());
+				sb.append(" ");
+				sb.append(commit.getShortMessage());
+				fw.write(sb.toString());
+				fw.newLine();
+			}
+		} finally {
+			fw.close();
+		}
+
+		monitor.endTask();
+		// we rewind to the upstream commit
+		monitor.beginTask(MessageFormat.format(JGitText.get().rewinding,
+				upstreamCommit.getShortMessage()), ProgressMonitor.UNKNOWN);
+		checkoutCommit(upstreamCommit);
+		monitor.endTask();
+		return null;
+	}
+

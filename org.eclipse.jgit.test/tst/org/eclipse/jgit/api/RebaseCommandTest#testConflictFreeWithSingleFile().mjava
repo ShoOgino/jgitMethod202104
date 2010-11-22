@@ -1,0 +1,36 @@
+	public void testConflictFreeWithSingleFile() throws Exception {
+		Git git = new Git(db);
+
+		// create file1 on master
+		File theFile = writeTrashFile("file1", "1\n2\n3\n");
+		git.add().addFilepattern("file1").call();
+		RevCommit second = git.commit().setMessage("Add file1").call();
+		assertTrue(new File(db.getWorkTree(), "file1").exists());
+		// change first line in master and commit
+		writeTrashFile("file1", "1master\n2\n3\n");
+		checkFile(theFile, "1master\n2\n3\n");
+		git.add().addFilepattern("file1").call();
+		RevCommit lastMasterChange = git.commit().setMessage(
+				"change file1 in master").call();
+
+		// create a topic branch based on second commit
+		createBranch(second, "refs/heads/topic");
+		checkoutBranch("refs/heads/topic");
+		// we have the old content again
+		checkFile(theFile, "1\n2\n3\n");
+
+		assertTrue(new File(db.getWorkTree(), "file1").exists());
+		// change third line in topic branch
+		writeTrashFile("file1", "1\n2\n3\ntopic\n");
+		git.add().addFilepattern("file1").call();
+		git.commit().setMessage("change file1 in topic").call();
+
+		RebaseResult res = git.rebase().setUpstream("refs/heads/master").call();
+		assertEquals(Status.OK, res.getStatus());
+		checkFile(theFile, "1master\n2\n3\ntopic\n");
+		// our old branch should be checked out again
+		assertEquals("refs/heads/topic", db.getFullBranch());
+		assertEquals(lastMasterChange, new RevWalk(db).parseCommit(
+				db.resolve(Constants.HEAD)).getParent(0));
+	}
+

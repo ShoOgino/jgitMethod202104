@@ -1,0 +1,95 @@
+	/**
+	 * Executes the {@code Rebase} command with all the options and parameters
+	 * collected by the setter methods of this class. Each instance of this
+	 * class should only be used for one invocation of the command. Don't call
+	 * this method twice on an instance.
+	 *
+	 * @return an object describing the result of this command
+	 */
+	public RebaseResult call() throws NoHeadException, RefNotFoundException,
+			JGitInternalException, GitAPIException {
+		checkCallable();
+		checkParameters();
+		try {
+			switch (operation) {
+			case ABORT:
+				try {
+					return abort();
+				} catch (IOException ioe) {
+					throw new JGitInternalException(ioe.getMessage(), ioe);
+				}
+			case SKIP:
+				// fall through
+			case CONTINUE:
+				String upstreamCommitName = readFile(rebaseDir, "onto");
+				this.upstreamCommit = walk.parseCommit(repo
+						.resolve(upstreamCommitName));
+				break;
+			case BEGIN:
+				RebaseResult res = initFilesAndRewind();
+				if (res != null)
+					return res;
+			}
+
+			if (monitor.isCancelled())
+				return abort();
+
+			if (this.operation == Operation.CONTINUE)
+				throw new UnsupportedOperationException(
+						"--continue Not yet implemented");
+
+			if (this.operation == Operation.SKIP)
+				throw new UnsupportedOperationException(
+						"--skip Not yet implemented");
+
+			RevCommit newHead = null;
+
+			List<Step> steps = loadSteps();
+			ObjectReader or = repo.newObjectReader();
+			int stepsToPop = 0;
+
+			for (Step step : steps) {
+				if (step.action != Action.PICK)
+					continue;
+				Collection<ObjectId> ids = or.resolve(step.commit);
+				if (ids.size() != 1)
+					throw new JGitInternalException(
+							"Could not resolve uniquely the abbreviated object ID");
+				RevCommit commitToPick = walk
+						.parseCommit(ids.iterator().next());
+				if (monitor.isCancelled())
+					return new RebaseResult(commitToPick);
+				monitor.beginTask(MessageFormat.format(
+						JGitText.get().applyingCommit, commitToPick
+								.getShortMessage()), ProgressMonitor.UNKNOWN);
+				// TODO if the first parent of commitToPick is the current HEAD,
+				// we should fast-forward instead of cherry-pick to avoid
+				// unnecessary object rewriting
+				newHead = new Git(repo).cherryPick().include(commitToPick)
+						.call();
+				monitor.endTask();
+				if (newHead == null) {
+					popSteps(stepsToPop);
+					return new RebaseResult(commitToPick);
+				}
+				stepsToPop++;
+			}
+			if (newHead != null) {
+				// point the previous head (if any) to the new commit
+				String headName = readFile(rebaseDir, "head-name");
+				if (headName.startsWith(Constants.R_REFS)) {
+					RefUpdate rup = repo.updateRef(headName);
+					rup.setNewObjectId(newHead);
+					rup.forceUpdate();
+					rup = repo.updateRef(Constants.HEAD);
+					rup.link(headName);
+				}
+				deleteRecursive(rebaseDir);
+				return new RebaseResult(Status.OK);
+			}
+			return new RebaseResult(Status.UP_TO_DATE);
+		} catch (IOException ioe) {
+			throw new JGitInternalException(ioe.getMessage(), ioe);
+		}
+	}
+

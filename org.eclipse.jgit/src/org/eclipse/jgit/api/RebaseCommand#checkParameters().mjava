@@ -1,0 +1,33 @@
+	private void checkParameters() throws WrongRepositoryStateException {
+		if (this.operation != Operation.BEGIN) {
+			// these operations are only possible while in a rebasing state
+			switch (repo.getRepositoryState()) {
+			case REBASING:
+				// fall through
+			case REBASING_INTERACTIVE:
+				// fall through
+			case REBASING_MERGE:
+				// fall through
+			case REBASING_REBASING:
+				break;
+			default:
+				throw new WrongRepositoryStateException(MessageFormat.format(
+						JGitText.get().wrongRepositoryState, repo
+								.getRepositoryState().name()));
+			}
+		} else
+			switch (repo.getRepositoryState()) {
+			case SAFE:
+				if (this.upstreamCommit == null)
+					throw new JGitInternalException(MessageFormat
+							.format(JGitText.get().missingRequiredParameter,
+									"upstream"));
+				return;
+			default:
+				throw new WrongRepositoryStateException(MessageFormat.format(
+						JGitText.get().wrongRepositoryState, repo
+								.getRepositoryState().name()));
+
+			}
+	}
+

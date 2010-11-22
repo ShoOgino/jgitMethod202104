@@ -1,0 +1,24 @@
+	public void testFastForwardWithNewFile() throws Exception {
+		Git git = new Git(db);
+
+		// create file1 on master
+		writeTrashFile("file1", "file1");
+		git.add().addFilepattern("file1").call();
+		RevCommit first = git.commit().setMessage("Add file1").call();
+
+		assertTrue(new File(db.getWorkTree(), "file1").exists());
+		// create a topic branch
+		createBranch(first, "refs/heads/topic");
+		// create file2 on master
+		writeTrashFile("file2", "file2");
+		git.add().addFilepattern("file2").call();
+		git.commit().setMessage("Add file2").call();
+		assertTrue(new File(db.getWorkTree(), "file2").exists());
+
+		checkoutBranch("refs/heads/topic");
+		assertFalse(new File(db.getWorkTree(), "file2").exists());
+
+		RebaseResult res = git.rebase().setUpstream("refs/heads/master").call();
+		assertEquals(Status.UP_TO_DATE, res.getStatus());
+	}
+

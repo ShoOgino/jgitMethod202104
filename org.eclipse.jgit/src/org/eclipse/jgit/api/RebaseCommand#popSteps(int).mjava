@@ -1,0 +1,54 @@
+	/**
+	 * Removes the number of lines given in the parameter from the
+	 * <code>git-rebase-todo</code> file but preserves comments and other lines
+	 * that can not be parsed as steps
+	 *
+	 * @param numSteps
+	 * @throws IOException
+	 */
+	private void popSteps(int numSteps) throws IOException {
+		if (numSteps == 0)
+			return;
+		List<String> lines = new ArrayList<String>();
+		File file = new File(rebaseDir, "git-rebase-todo");
+		BufferedReader br = new BufferedReader(new InputStreamReader(
+				new FileInputStream(file), "UTF-8"));
+		int popped = 0;
+		try {
+			// check if the line starts with a action tag (pick, skip...)
+			while (popped < numSteps) {
+				String popCandidate = br.readLine();
+				if (popCandidate == null)
+					break;
+				int spaceIndex = popCandidate.indexOf(' ');
+				boolean pop = false;
+				if (spaceIndex >= 0) {
+					String actionToken = popCandidate.substring(0, spaceIndex);
+					pop = Action.parse(actionToken) != null;
+				}
+				if (pop)
+					popped++;
+				else
+					lines.add(popCandidate);
+			}
+			String readLine = br.readLine();
+			while (readLine != null) {
+				lines.add(readLine);
+				readLine = br.readLine();
+			}
+		} finally {
+			br.close();
+		}
+
+		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
+				new FileOutputStream(file), "UTF-8"));
+		try {
+			for (String writeLine : lines) {
+				bw.write(writeLine);
+				bw.newLine();
+			}
+		} finally {
+			bw.close();
+		}
+	}
+
