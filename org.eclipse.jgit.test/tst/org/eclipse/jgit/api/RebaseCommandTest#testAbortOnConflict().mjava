@@ -44,6 +44,15 @@
 		// the first one should be included, so we should have left two picks in
 		// the file
 		assertEquals(countPicks(), 2);
+
+		// rebase should not succeed in this state
+		try {
+			git.rebase().setUpstream("refs/heads/master").call();
+			fail("Expected exception was not thrown");
+		} catch (WrongRepositoryStateException e) {
+			// expected
+		}
+
 		// abort should reset to topic branch
 		res = git.rebase().setOperation(Operation.ABORT).call();
 		assertEquals(res.getStatus(), Status.ABORTED);

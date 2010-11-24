@@ -1,0 +1,19 @@
+	public void testUnknownUpstream() throws Exception {
+		Git git = new Git(db);
+
+		// create file1 on master
+		writeTrashFile("file1", "file1");
+		git.add().addFilepattern("file1").call();
+		git.commit().setMessage("Add file1").call();
+
+		assertTrue(new File(db.getWorkTree(), "file1").exists());
+
+		try {
+			git.rebase().setUpstream("refs/heads/xyz")
+					.call();
+			fail("expected exception was not thrown");
+		} catch (RefNotFoundException e) {
+			// expected exception
+		}
+	}
+
