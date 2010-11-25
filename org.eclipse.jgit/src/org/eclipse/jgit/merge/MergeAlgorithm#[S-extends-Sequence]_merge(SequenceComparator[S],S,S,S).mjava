@@ -9,16 +9,16 @@
 	 * @param theirs the second sequence to be merged
 	 * @return the resulting content
 	 */
-	public static <S extends Sequence> MergeResult<S> merge(
+	public <S extends Sequence> MergeResult<S> merge(
 			SequenceComparator<S> cmp, S base, S ours, S theirs) {
 		List<S> sequences = new ArrayList<S>(3);
 		sequences.add(base);
 		sequences.add(ours);
 		sequences.add(theirs);
-		MergeResult result = new MergeResult<S>(sequences);
-		EditList oursEdits = MyersDiff.INSTANCE.diff(cmp, base, ours);
+		MergeResult<S> result = new MergeResult<S>(sequences);
+		EditList oursEdits = diffAlg.diff(cmp, base, ours);
 		Iterator<Edit> baseToOurs = oursEdits.iterator();
-		EditList theirsEdits = MyersDiff.INSTANCE.diff(cmp, base, theirs);
+		EditList theirsEdits = diffAlg.diff(cmp, base, theirs);
 		Iterator<Edit> baseToTheirs = theirsEdits.iterator();
 		int current = 0; // points to the next line (first line is 0) of base
 		                 // which was not handled yet
