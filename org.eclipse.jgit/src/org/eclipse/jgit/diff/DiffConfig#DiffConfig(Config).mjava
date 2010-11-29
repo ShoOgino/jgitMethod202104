@@ -1,6 +1,7 @@
 	private DiffConfig(final Config rc) {
 		noPrefix = rc.getBoolean("diff", "noprefix", false);
-		renames = rc.getBoolean("diff", "renames", false);
+		renameDetectionType = parseRenameDetectionType(rc.getString("diff",
+				null, "renames"));
 		renameLimit = rc.getInt("diff", "renamelimit", 200);
 	}
 
