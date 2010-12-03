@@ -1,9 +1,6 @@
 	/**
 	 * Format this builder's state as a commit object.
 	 *
-	 * As a side effect, {@link #getCommitId()} will be populated with the
-	 * proper ObjectId for the formatted content.
-	 *
 	 * @return this object in the canonical commit format, suitable for storage
 	 *         in a repository.
 	 * @throws UnsupportedEncodingException
@@ -11,6 +8,52 @@
 	 *             supported by this Java runtime.
 	 */
 	public byte[] build() throws UnsupportedEncodingException {
-		return build(new ObjectInserter.Formatter());
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		OutputStreamWriter w = new OutputStreamWriter(os, getEncoding());
+		try {
+			os.write(htree);
+			os.write(' ');
+			getTreeId().copyTo(os);
+			os.write('\n');
+
+			for (ObjectId p : getParentIds()) {
+				os.write(hparent);
+				os.write(' ');
+				p.copyTo(os);
+				os.write('\n');
+			}
+
+			os.write(hauthor);
+			os.write(' ');
+			w.write(getAuthor().toExternalString());
+			w.flush();
+			os.write('\n');
+
+			os.write(hcommitter);
+			os.write(' ');
+			w.write(getCommitter().toExternalString());
+			w.flush();
+			os.write('\n');
+
+			if (getEncoding() != Constants.CHARSET) {
+				os.write(hencoding);
+				os.write(' ');
+				os.write(Constants.encodeASCII(getEncoding().name()));
+				os.write('\n');
+			}
+
+			os.write('\n');
+
+			if (getMessage() != null) {
+				w.write(getMessage());
+				w.flush();
+			}
+		} catch (IOException err) {
+			// This should never occur, the only way to get it above is
+			// for the ByteArrayOutputStream to throw, but it doesn't.
+			//
+			throw new RuntimeException(err);
+		}
+		return os.toByteArray();
 	}
 

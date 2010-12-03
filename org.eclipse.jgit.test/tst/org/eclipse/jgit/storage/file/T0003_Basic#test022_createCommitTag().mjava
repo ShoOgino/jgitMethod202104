@@ -14,10 +14,10 @@
 		t.setTag("test022");
 		t.setTagger(new PersonIdent(author, 1154236443000L, -4 * 60));
 		t.setMessage("test022 tagged\n");
-		insertTag(t);
-		assertEquals("0ce2ebdb36076ef0b38adbe077a07d43b43e3807", t.getTagId().name());
+		ObjectId actid = insertTag(t);
+		assertEquals("0ce2ebdb36076ef0b38adbe077a07d43b43e3807", actid.name());
 
-		RevTag mapTag = parseTag(t.getTagId());
+		RevTag mapTag = parseTag(actid);
 		assertEquals(Constants.OBJ_COMMIT, mapTag.getObject().getType());
 		assertEquals("test022 tagged\n", mapTag.getFullMessage());
 		assertEquals(new PersonIdent(author, 1154236443000L, -4 * 60), mapTag.getTaggerIdent());
