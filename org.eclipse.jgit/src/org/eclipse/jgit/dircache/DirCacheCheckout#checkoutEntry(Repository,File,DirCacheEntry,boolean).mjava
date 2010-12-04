@@ -20,21 +20,11 @@
 	public static void checkoutEntry(final Repository repo, File f, DirCacheEntry entry,
 			boolean config_filemode) throws IOException {
 		ObjectLoader ol = repo.open(entry.getObjectId());
-		if (ol == null)
-			throw new MissingObjectException(entry.getObjectId(),
-					Constants.TYPE_BLOB);
-
-		byte[] bytes = ol.getCachedBytes();
-
 		File parentDir = f.getParentFile();
 		File tmpFile = File.createTempFile("._" + f.getName(), null, parentDir);
-		FileChannel channel = new FileOutputStream(tmpFile).getChannel();
-		ByteBuffer buffer = ByteBuffer.wrap(bytes);
+		FileOutputStream channel = new FileOutputStream(tmpFile);
 		try {
-			int j = channel.write(buffer);
-			if (j != bytes.length)
-				throw new IOException(MessageFormat.format(
-						JGitText.get().couldNotWriteFile, tmpFile));
+			ol.copyTo(channel);
 		} finally {
 			channel.close();
 		}
