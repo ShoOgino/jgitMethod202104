@@ -1,0 +1,11 @@
+		@Override
+		void exec(String commandName) throws TransportException {
+			initSession();
+			try {
+				channel = (ChannelExec) sock.openChannel("exec");
+				channel.setCommand(commandFor(commandName));
+			} catch (JSchException je) {
+				throw new TransportException(uri, je.getMessage(), je);
+			}
+		}
+

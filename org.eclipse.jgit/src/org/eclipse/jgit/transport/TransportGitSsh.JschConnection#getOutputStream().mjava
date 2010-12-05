@@ -1,0 +1,34 @@
+		@Override
+		OutputStream getOutputStream() throws IOException {
+			// JSch won't let us interrupt writes when we use our InterruptTimer
+			// to break out of a long-running write operation. To work around
+			// that we spawn a background thread to shuttle data through a pipe,
+			// as we can issue an interrupted write out of that. Its slower, so
+			// we only use this route if there is a timeout.
+			//
+			final OutputStream out = channel.getOutputStream();
+			if (getTimeout() <= 0)
+				return out;
+			final PipedInputStream pipeIn = new PipedInputStream();
+			final StreamCopyThread copier = new StreamCopyThread(pipeIn, out);
+			final PipedOutputStream pipeOut = new PipedOutputStream(pipeIn) {
+				@Override
+				public void flush() throws IOException {
+					super.flush();
+					copier.flush();
+				}
+
+				@Override
+				public void close() throws IOException {
+					super.close();
+					try {
+						copier.join(getTimeout() * 1000);
+					} catch (InterruptedException e) {
+						// Just wake early, the thread will terminate anyway.
+					}
+				}
+			};
+			copier.start();
+			return pipeOut;
+		}
+
