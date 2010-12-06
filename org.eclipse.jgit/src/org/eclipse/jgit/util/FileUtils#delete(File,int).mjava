@@ -1,0 +1,41 @@
+	/**
+	 * Delete file or folder
+	 *
+	 * @param f
+	 *            {@code File} to be deleted
+	 * @param options
+	 *            deletion options, {@code RECURSIVE} for recursive deletion of
+	 *            a subtree, {@code RETRY} to retry when deletion failed.
+	 *            Retrying may help if the underlying file system doesn't allow
+	 *            deletion of files being read by another thread.
+	 * @throws IOException
+	 *             if deletion of {@code f} fails. This may occur if {@code f}
+	 *             didn't exist when the method was called. This can therefore
+	 *             cause IOExceptions during race conditions when multiple
+	 *             concurrent threads all try to delete the same file.
+	 */
+	public static void delete(final File f, int options) throws IOException {
+		if ((options & RECURSIVE) != 0 && f.isDirectory()) {
+			final File[] items = f.listFiles();
+			if (items != null) {
+				for (File c : items)
+					delete(c, options);
+			}
+		}
+		if (!f.delete()) {
+			if ((options & RETRY) != 0 && f.exists()) {
+				for (int i = 1; i < 10; i++) {
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {
+						// ignore
+					}
+					if (f.delete())
+						return;
+				}
+			}
+			throw new IOException(MessageFormat.format(
+					JGitText.get().deleteFileFailed, f.getAbsolutePath()));
+		}
+	}
+
