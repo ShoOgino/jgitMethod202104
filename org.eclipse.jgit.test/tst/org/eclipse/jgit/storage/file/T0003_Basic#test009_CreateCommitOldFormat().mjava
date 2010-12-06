@@ -13,11 +13,11 @@
 		c.setTreeId(t.getTreeId());
 		assertEquals(t.getTreeId(), c.getTreeId());
 
-		insertCommit(c);
+		ObjectId actid = insertCommit(c);
 
 		final ObjectId cmtid = ObjectId.fromString(
 				"803aec4aba175e8ab1d666873c984c0308179099");
-		assertEquals(cmtid, c.getCommitId());
+		assertEquals(cmtid, actid);
 
 		// Verify the commit we just wrote is in the correct format.
 		ObjectDatabase odb = db.getObjectDatabase();
@@ -33,7 +33,7 @@
 		}
 
 		// Verify we can read it.
-		RevCommit c2 = parseCommit(c.getCommitId());
+		RevCommit c2 = parseCommit(actid);
 		assertNotNull(c2);
 		assertEquals(c.getMessage(), c2.getFullMessage());
 		assertEquals(c.getTreeId(), c2.getTree());
