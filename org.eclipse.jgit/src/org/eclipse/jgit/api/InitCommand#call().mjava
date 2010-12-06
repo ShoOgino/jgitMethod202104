@@ -1,0 +1,32 @@
+	/**
+	 * Executes the {@code Init} command.
+	 *
+	 * @throws JGitInternalException
+	 *             if the repository can't be created
+	 * @return the newly created {@code Git} object with associated repository
+	 */
+	public Git call() throws JGitInternalException {
+		try {
+			RepositoryBuilder builder = new RepositoryBuilder();
+			if (bare)
+				builder.setBare();
+			builder.readEnvironment();
+			if (directory != null) {
+				File d = directory;
+				if (!bare)
+					d = new File(d, Constants.DOT_GIT);
+				builder.setGitDir(d);
+			} else if (builder.getGitDir() == null) {
+				File d = new File(".");
+				if (!bare)
+					d = new File(d, Constants.DOT_GIT);
+				builder.setGitDir(d);
+			}
+			Repository repository = builder.build();
+			repository.create(bare);
+			return new Git(repository);
+		} catch (IOException e) {
+			throw new JGitInternalException(e.getMessage(), e);
+		}
+	}
+
