@@ -30,7 +30,7 @@
 					fos.close();
 				}
 			} catch (IOException err) {
-				tmpIdx.delete();
+				FileUtils.delete(tmpIdx);
 				throw err;
 			} finally {
 				s.in.close();
@@ -38,14 +38,14 @@
 			pm.endTask();
 
 			if (pm.isCancelled()) {
-				tmpIdx.delete();
+				FileUtils.delete(tmpIdx);
 				return;
 			}
 
 			try {
 				index = PackIndex.open(tmpIdx);
 			} catch (IOException e) {
-				tmpIdx.delete();
+				FileUtils.delete(tmpIdx);
 				throw e;
 			}
 		}

@@ -1,7 +1,7 @@
-	private void prunePacked(ObjectDirectory odb) {
+	private void prunePacked(ObjectDirectory odb) throws IOException {
 		for (PackFile p : odb.getPacks()) {
 			for (MutableEntry e : p)
-				odb.fileFor(e.toObjectId()).delete();
+				FileUtils.delete(odb.fileFor(e.toObjectId()));
 		}
 	}
 

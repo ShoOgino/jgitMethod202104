@@ -54,8 +54,12 @@
 				// it failed the index and pack are unusable and we
 				// shouldn't consult them again.
 				//
-				if (pack.tmpIdx != null)
-					pack.tmpIdx.delete();
+				try {
+					if (pack.tmpIdx != null)
+						FileUtils.delete(pack.tmpIdx);
+				} catch (IOException e) {
+					throw new TransportException(e.getMessage(), e);
+				}
 				packItr.remove();
 			}
 
