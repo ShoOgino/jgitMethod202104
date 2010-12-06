@@ -7,15 +7,15 @@
 				state.initializeDigestAndReadBuffer();
 
 				final long len = e.getLength();
-				if (!mightNeedCleaning(e))
+				if (!mightNeedCleaning())
 					return computeHash(is, len);
 
 				if (len <= MAXIMUM_FILE_SIZE_TO_READ_FULLY) {
 					ByteBuffer rawbuf = IO.readWholeStream(is, (int) len);
 					byte[] raw = rawbuf.array();
 					int n = rawbuf.limit();
-					if (!isBinary(e, raw, n)) {
-						rawbuf = filterClean(e, raw, n);
+					if (!isBinary(raw, n)) {
+						rawbuf = filterClean(raw, n);
 						raw = rawbuf.array();
 						n = rawbuf.limit();
 					}
@@ -26,14 +26,14 @@
 					return computeHash(is, len);
 
 				final long canonLen;
-				final InputStream lenIs = filterClean(e, e.openInputStream());
+				final InputStream lenIs = filterClean(e.openInputStream());
 				try {
 					canonLen = computeLength(lenIs);
 				} finally {
 					safeClose(lenIs);
 				}
 
-				return computeHash(filterClean(e, is), canonLen);
+				return computeHash(filterClean(is), canonLen);
 			} finally {
 				safeClose(is);
 			}
