@@ -1,0 +1,26 @@
+	private void checkout(Repository repo, FetchResult result)
+			throws JGitInternalException,
+			MissingObjectException, IncorrectObjectTypeException, IOException {
+
+		if (branch.startsWith(Constants.R_HEADS)) {
+			final RefUpdate head = repo.updateRef(Constants.HEAD);
+			head.disableRefLog();
+			head.link(branch);
+		}
+
+		final Ref head = result.getAdvertisedRef(branch);
+		if (head == null || head.getObjectId() == null)
+			return; // throw exception?
+
+		final RevCommit commit = parseCommit(repo, head);
+
+		boolean detached = !head.getName().startsWith(Constants.R_HEADS);
+		RefUpdate u = repo.updateRef(Constants.HEAD, detached);
+		u.setNewObjectId(commit.getId());
+		u.forceUpdate();
+
+		DirCache dc = repo.lockDirCache();
+		DirCacheCheckout co = new DirCacheCheckout(repo, dc, commit.getTree());
+		co.checkout();
+	}
+

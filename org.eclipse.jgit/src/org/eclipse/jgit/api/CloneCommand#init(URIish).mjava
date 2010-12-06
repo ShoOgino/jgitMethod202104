@@ -1,0 +1,9 @@
+	private Repository init(URIish u) {
+		InitCommand command = Git.init();
+		command.setBare(bare);
+		if (directory == null)
+			directory = new File(u.getHumanishName(), Constants.DOT_GIT);
+		command.setDirectory(directory);
+		return command.call().getRepository();
+	}
+

@@ -1,0 +1,23 @@
+	/**
+	 * Executes the {@code Clone} command.
+	 *
+	 * @throws JGitInternalException
+	 *             if the repository can't be created
+	 * @return the newly created {@code Git} object with associated repository
+	 */
+	public Git call() throws JGitInternalException {
+		try {
+			URIish u = new URIish(uri);
+			Repository repository = init(u);
+			FetchResult result = fetch(repository, u);
+			checkout(repository, result);
+			return new Git(repository);
+		} catch (IOException ioe) {
+			throw new JGitInternalException(ioe.getMessage(), ioe);
+		} catch (InvalidRemoteException e) {
+			throw new JGitInternalException(e.getMessage(), e);
+		} catch (URISyntaxException e) {
+			throw new JGitInternalException(e.getMessage(), e);
+		}
+	}
+

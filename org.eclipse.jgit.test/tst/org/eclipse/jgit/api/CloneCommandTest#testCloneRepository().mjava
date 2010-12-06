@@ -1,0 +1,15 @@
+	@Test
+	public void testCloneRepository() {
+		try {
+			File directory = createTempDirectory("testCloneRepository");
+			CloneCommand command = Git.cloneRepository();
+			command.setDirectory(directory);
+			command.setURI("file://"
+					+ git.getRepository().getWorkTree().getPath());
+			Git git2 = command.call();
+			assertNotNull(git2);
+		} catch (Exception e) {
+			fail(e.getMessage());
+		}
+	}
+

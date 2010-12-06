@@ -1,0 +1,26 @@
+	private FetchResult fetch(Repository repo, URIish u)
+			throws URISyntaxException,
+			JGitInternalException,
+			InvalidRemoteException, IOException {
+		// create the remote config and save it
+		RemoteConfig config = new RemoteConfig(repo.getConfig(), remote);
+		config.addURI(u);
+
+		final String dst = Constants.R_REMOTES + config.getName();
+		RefSpec refSpec = new RefSpec();
+		refSpec = refSpec.setForceUpdate(true);
+		refSpec = refSpec.setSourceDestination(Constants.R_HEADS + "*", dst + "/*"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		config.addFetchRefSpec(refSpec);
+		config.update(repo.getConfig());
+		repo.getConfig().save();
+
+		// run the fetch command
+		FetchCommand command = new FetchCommand(repo);
+		command.setRemote(remote);
+		command.setProgressMonitor(monitor);
+		if (credentialsProvider != null)
+			command.setCredentialsProvider(credentialsProvider);
+		return command.call();
+	}
+
