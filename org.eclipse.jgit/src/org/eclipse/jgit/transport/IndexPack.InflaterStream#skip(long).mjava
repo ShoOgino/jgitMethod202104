@@ -1,0 +1,13 @@
+		@Override
+		public long skip(long toSkip) throws IOException {
+			long n = 0;
+			while (n < toSkip) {
+				final int cnt = (int) Math.min(skipBuffer.length, toSkip - n);
+				final int r = read(skipBuffer, 0, cnt);
+				if (r <= 0)
+					break;
+				n += r;
+			}
+			return n;
+		}
+

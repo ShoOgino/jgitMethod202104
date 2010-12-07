@@ -1,7 +1,9 @@
 	private byte[] inflateAndReturn(final Source src, final long inflatedSize)
 			throws IOException {
 		final byte[] dst = new byte[(int) inflatedSize];
-		inflate(src, inflatedSize, dst, true /* keep result in dst */);
+		final InputStream inf = inflate(src, inflatedSize);
+		IO.readFully(inf, dst, 0, dst.length);
+		inf.close();
 		return dst;
 	}
 
