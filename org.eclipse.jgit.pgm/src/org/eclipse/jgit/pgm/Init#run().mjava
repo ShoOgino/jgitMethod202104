@@ -3,7 +3,9 @@
 		InitCommand command = Git.init();
 		command.setBare(bare);
 		command.setDirectory(gitdir);
-		command.call();
-		out.println(MessageFormat.format(CLIText.get().initializedEmptyGitRepositoryIn, gitdir.getAbsolutePath()));
+		Repository repository = command.call().getRepository();
+		out.println(MessageFormat.format(
+				CLIText.get().initializedEmptyGitRepositoryIn, repository
+						.getDirectory().getAbsolutePath()));
 	}
 
