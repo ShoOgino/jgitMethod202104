@@ -51,6 +51,7 @@
 			for (Step step : steps) {
 				if (step.action != Action.PICK)
 					continue;
+				popSteps(1);
 				Collection<ObjectId> ids = or.resolve(step.commit);
 				if (ids.size() != 1)
 					throw new JGitInternalException(
@@ -69,7 +70,6 @@
 						.call();
 				monitor.endTask();
 				if (newHead == null) {
-					popSteps(stepsToPop);
 					return new RebaseResult(commitToPick);
 				}
 				stepsToPop++;
