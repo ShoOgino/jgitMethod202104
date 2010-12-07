@@ -12,11 +12,13 @@
 	public IndexPack(final Repository db, final InputStream src,
 			final File dstBase) throws IOException {
 		repo = db;
+		streamFileThreshold = 5 * (1 << 20); // A reasonable default for now.
 		objectDatabase = db.getObjectDatabase().newCachedDatabase();
 		in = src;
 		inflater = new InflaterStream();
 		readCurs = objectDatabase.newReader();
 		buf = new byte[BUFFER_SIZE];
+		readBuffer = new byte[BUFFER_SIZE];
 		objectDigest = Constants.newMessageDigest();
 		tempObjectId = new MutableObjectId();
 		packDigest = Constants.newMessageDigest();
