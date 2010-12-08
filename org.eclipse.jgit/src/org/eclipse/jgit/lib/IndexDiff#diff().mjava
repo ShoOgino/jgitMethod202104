@@ -6,7 +6,8 @@
 	 */
 	public boolean diff() throws IOException {
 		boolean changesExist = false;
-		DirCache dirCache = repository.readDirCache();
+		dirCache = repository.readDirCache();
+
 		TreeWalk treeWalk = new TreeWalk(repository);
 		treeWalk.setRecursive(true);
 		// add the trees (tree, dirchache, workdir)
@@ -30,11 +31,6 @@
 					DirCacheIterator.class);
 			WorkingTreeIterator workingTreeIterator = treeWalk.getTree(WORKDIR,
 					WorkingTreeIterator.class);
-
-			if (dirCacheIterator != null) {
-				if (dirCacheIterator.getDirCacheEntry().isAssumeValid())
-					assumeUnchanged.add(treeWalk.getPathString());
-			}
 
 			if (treeIterator != null) {
 				if (dirCacheIterator != null) {
