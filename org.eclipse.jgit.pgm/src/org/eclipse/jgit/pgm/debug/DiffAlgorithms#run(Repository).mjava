@@ -28,7 +28,7 @@
 
 				RevCommit p = c.getParent(0);
 				rw.parseHeaders(p);
-				tw.reset(new AnyObjectId[] { p.getTree(), c.getTree() });
+				tw.reset(p.getTree(), c.getTree());
 				while (tw.next()) {
 					if (!isFile(tw, 0) || !isFile(tw, 1))
 						continue;
