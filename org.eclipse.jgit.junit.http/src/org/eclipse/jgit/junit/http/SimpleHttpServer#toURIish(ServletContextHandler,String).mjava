@@ -1,0 +1,9 @@
+	private URIish toURIish(ServletContextHandler app, String name)
+			throws URISyntaxException {
+		String p = app.getContextPath();
+		if (!p.endsWith("/") && !name.startsWith("/"))
+			p += "/";
+		p += name;
+		return toURIish(p);
+	}
+
