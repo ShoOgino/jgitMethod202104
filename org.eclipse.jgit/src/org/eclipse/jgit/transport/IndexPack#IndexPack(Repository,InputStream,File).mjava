@@ -14,10 +14,9 @@
 		repo = db;
 		objectDatabase = db.getObjectDatabase().newCachedDatabase();
 		in = src;
-		inflater = InflaterCache.get();
+		inflater = new InflaterStream();
 		readCurs = objectDatabase.newReader();
 		buf = new byte[BUFFER_SIZE];
-		skipBuffer = new byte[512];
 		objectDigest = Constants.newMessageDigest();
 		tempObjectId = new MutableObjectId();
 		packDigest = Constants.newMessageDigest();
