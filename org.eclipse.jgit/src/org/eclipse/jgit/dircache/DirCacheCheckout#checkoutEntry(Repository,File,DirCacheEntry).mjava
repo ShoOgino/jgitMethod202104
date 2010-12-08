@@ -13,12 +13,10 @@
 	 *            has to exist already
 	 * @param entry
 	 *            the entry containing new mode and content
-	 * @param config_filemode
-	 *            whether the mode bits should be handled at all.
 	 * @throws IOException
 	 */
-	public static void checkoutEntry(final Repository repo, File f, DirCacheEntry entry,
-			boolean config_filemode) throws IOException {
+	public static void checkoutEntry(final Repository repo, File f,
+			DirCacheEntry entry) throws IOException {
 		ObjectLoader ol = repo.open(entry.getObjectId());
 		File parentDir = f.getParentFile();
 		File tmpFile = File.createTempFile("._" + f.getName(), null, parentDir);
@@ -29,7 +27,8 @@
 			channel.close();
 		}
 		FS fs = repo.getFS();
-		if (config_filemode && fs.supportsExecute()) {
+		WorkingTreeOptions opt = repo.getConfig().get(WorkingTreeOptions.KEY);
+		if (opt.isFileMode() && fs.supportsExecute()) {
 			if (FileMode.EXECUTABLE_FILE.equals(entry.getRawMode())) {
 				if (!fs.canExecute(tmpFile))
 					fs.setExecute(tmpFile, true);

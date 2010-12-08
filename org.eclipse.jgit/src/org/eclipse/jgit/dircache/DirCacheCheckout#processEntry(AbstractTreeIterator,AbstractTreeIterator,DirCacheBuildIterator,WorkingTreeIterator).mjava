@@ -153,7 +153,7 @@
 			case 0xFFD: // 12 13 14
 				if (hId.equals(iId)) {
 					dce = i.getDirCacheEntry();
-					if (f == null || f.isModified(dce, true, config_filemode()))
+					if (f == null || f.isModified(dce, true))
 						conflict(name, i.getDirCacheEntry(), h, m);
 					else
 						remove(name);
@@ -219,8 +219,7 @@
 				if (m == null || mId.equals(iId)) {
 					if (m==null && walk.isDirectoryFileConflict()) {
 						if (dce != null
-								&& (f == null || f.isModified(dce, true,
-										config_filemode())))
+								&& (f == null || f.isModified(dce, true)))
 							conflict(name, i.getDirCacheEntry(), h, m);
 						else
 							remove(name);
@@ -242,7 +241,7 @@
 				 */
 
 				if (hId.equals(iId)) {
-					if (f == null || f.isModified(dce, true, config_filemode()))
+					if (f == null || f.isModified(dce, true))
 						conflict(name, i.getDirCacheEntry(), h, m);
 					else
 						remove(name);
@@ -252,9 +251,7 @@
 				if (!hId.equals(mId) && !hId.equals(iId) && !mId.equals(iId))
 					conflict(name, i.getDirCacheEntry(), h, m);
 				else if (hId.equals(iId) && !mId.equals(iId)) {
-					if (dce != null
-							&& (f == null || f.isModified(dce, true,
-									config_filemode())))
+					if (dce != null && (f == null || f.isModified(dce, true)))
 						conflict(name, i.getDirCacheEntry(), h, m);
 					else
 						update(name, mId, m.getEntryFileMode());
