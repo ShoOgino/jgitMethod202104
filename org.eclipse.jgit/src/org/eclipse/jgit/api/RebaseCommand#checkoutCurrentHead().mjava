@@ -1,5 +1,5 @@
-	private void checkoutCurrentHead() throws IOException, NoHeadException,
-			JGitInternalException {
+	private RevCommit checkoutCurrentHead() throws IOException,
+			NoHeadException, JGitInternalException {
 		ObjectId headTree = repo.resolve(Constants.HEAD + "^{tree}");
 		if (headTree == null)
 			throw new NoHeadException(
@@ -21,5 +21,9 @@
 		} finally {
 			dc.unlock();
 		}
+		RevWalk rw = new RevWalk(repo);
+		RevCommit commit = rw.parseCommit(repo.resolve(Constants.HEAD));
+		rw.release();
+		return commit;
 	}
 
