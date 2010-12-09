@@ -1,0 +1,7 @@
+	public void testFileInFolderCommittedDeleted() throws Exception {
+		RevCommit commit = writeFileInFolderAndCommit();
+		deleteFileInFolder();
+		TreeWalk treeWalk = createTreeWalk(commit);
+		assertPaths(treeWalk, FILE_IN_FOLDER);
+	}
+
