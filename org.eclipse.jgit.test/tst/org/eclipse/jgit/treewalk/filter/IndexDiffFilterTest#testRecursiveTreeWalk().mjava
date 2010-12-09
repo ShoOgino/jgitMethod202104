@@ -1,0 +1,14 @@
+	public void testRecursiveTreeWalk() throws Exception {
+		TreeWalk treeWalk = new TreeWalk(db);
+		treeWalk.setRecursive(true);
+		treeWalk.addTree(commit.getTree());
+		treeWalk.addTree(new DirCacheIterator(db.readDirCache()));
+		treeWalk.addTree(new FileTreeIterator(db));
+		treeWalk.setFilter(new IndexDiffFilter(1, 2));
+		assertTrue(treeWalk.next());
+		assertEquals("folder", treeWalk.getPathString());
+		assertTrue(treeWalk.next());
+		assertEquals("folder/file", treeWalk.getPathString());
+		assertFalse(treeWalk.next());
+	}
+

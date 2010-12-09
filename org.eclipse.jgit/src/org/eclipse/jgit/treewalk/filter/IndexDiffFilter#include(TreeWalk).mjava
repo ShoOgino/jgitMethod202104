@@ -1,0 +1,56 @@
+	@Override
+	public boolean include(TreeWalk tw) throws MissingObjectException,
+			IncorrectObjectTypeException, IOException {
+		// If the working tree file doesn't exist, it does exist for at least
+		// one other so include this difference.
+		final int wm = tw.getRawMode(workingTree);
+		if (wm == 0)
+			return true;
+
+		// If the path does not appear in the DirCache and its ignored
+		// we can avoid returning a result here, but only if its not in any
+		// other tree.
+		final int cnt = tw.getTreeCount();
+		final int dm = tw.getRawMode(dirCache);
+		if (dm == 0) {
+			if (honorIgnores && workingTree(tw).isEntryIgnored()) {
+				int i = 0;
+				for (; i < cnt; i++) {
+					if (i == dirCache || i == workingTree)
+						continue;
+					if (tw.getRawMode(i) != 0)
+						break;
+				}
+
+				// If i is cnt then the path does not appear in any other tree,
+				// and this working tree entry can be safely ignored.
+				return i == cnt ? false : true;
+			} else {
+				// In working tree and not ignored, and not in DirCache.
+				return true;
+			}
+		}
+
+		// Always include subtrees as WorkingTreeIterator cannot provide
+		// efficient elimination of unmodified subtrees.
+		if (tw.isSubtree())
+			return true;
+
+		// Try the inexpensive comparisons between index and all real trees
+		// first. Only if we don't find a diff here we have to bother with
+		// the working tree
+		for (int i = 0; i < cnt; i++) {
+			if (i == dirCache || i == workingTree)
+				continue;
+			if (tw.getRawMode(i) != dm || !tw.idEqual(i, dirCache))
+				return true;
+		}
+
+		// Only one chance left to detect a diff: between index and working
+		// tree. Make use of the WorkingTreeIterator#isModified() method to
+		// avoid computing SHA1 on filesystem content if not really needed.
+		WorkingTreeIterator wi = workingTree(tw);
+		DirCacheIterator di = tw.getTree(dirCache, DirCacheIterator.class);
+		return wi.isModified(di.getDirCacheEntry(), true);
+	}
+

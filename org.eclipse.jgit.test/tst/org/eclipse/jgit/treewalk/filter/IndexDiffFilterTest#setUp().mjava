@@ -1,0 +1,13 @@
+	public void setUp() throws Exception {
+		super.setUp();
+
+		Git git = new Git(db);
+		writeTrashFile("folder/file", "content");
+		git.add().addFilepattern("folder/file").call();
+		commit = git.commit().setMessage("commit").call();
+
+		deleteTrashFile("folder/file");
+		deleteTrashFile("folder");
+		writeTrashFile("folder", "content");
+	}
+
