@@ -1,0 +1,24 @@
+	public void testDeleteRecursive() throws IOException {
+		File f1 = new File("test/test/a");
+		f1.mkdirs();
+		f1.createNewFile();
+		File f2 = new File("test/test/b");
+		f2.createNewFile();
+		File d = new File("test");
+		FileUtils.delete(d, FileUtils.RECURSIVE);
+		assertFalse(d.exists());
+
+		try {
+			FileUtils.delete(d, FileUtils.RECURSIVE);
+			fail("recursive deletion of non-existing directory must fail");
+		} catch (IOException e) {
+			// expected
+		}
+
+		try {
+			FileUtils.delete(d, FileUtils.RECURSIVE | FileUtils.SKIP_MISSING);
+		} catch (IOException e) {
+			fail("recursive deletion of non-existing directory must not fail with option SKIP_MISSING");
+		}
+	}
+

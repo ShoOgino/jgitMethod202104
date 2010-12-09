@@ -1,0 +1,20 @@
+	public void testDeleteFile() throws IOException {
+		File f = new File("test");
+		assertTrue(f.createNewFile());
+		FileUtils.delete(f);
+		assertFalse(f.exists());
+
+		try {
+			FileUtils.delete(f);
+			fail("deletion of non-existing file must fail");
+		} catch (IOException e) {
+			// expected
+		}
+
+		try {
+			FileUtils.delete(f, FileUtils.SKIP_MISSING);
+		} catch (IOException e) {
+			fail("deletion of non-existing file must not fail with option SKIP_MISSING");
+		}
+	}
+

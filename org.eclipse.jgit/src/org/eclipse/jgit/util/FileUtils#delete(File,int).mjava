@@ -15,6 +15,9 @@
 	 *             concurrent threads all try to delete the same file.
 	 */
 	public static void delete(final File f, int options) throws IOException {
+		if ((options & SKIP_MISSING) != 0 && !f.exists())
+			return;
+
 		if ((options & RECURSIVE) != 0 && f.isDirectory()) {
 			final File[] items = f.listFiles();
 			if (items != null) {
