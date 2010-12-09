@@ -1,0 +1,9 @@
+	public void testFileCommittedDeletedCommittedIgnoredComparedWithInitialCommit()
+			throws Exception {
+		RevCommit commit = writeFileAndCommit();
+		deleteFileAndCommit();
+		rewriteFileIgnored();
+		TreeWalk treeWalk = createTreeWalk(commit);
+		assertPaths(treeWalk, FILE);
+	}
+

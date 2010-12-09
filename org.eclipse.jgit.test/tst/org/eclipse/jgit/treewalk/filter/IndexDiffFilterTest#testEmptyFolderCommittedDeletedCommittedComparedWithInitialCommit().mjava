@@ -1,0 +1,8 @@
+	public void testEmptyFolderCommittedDeletedCommittedComparedWithInitialCommit()
+			throws Exception {
+		RevCommit commit = createEmptyFolderAndCommit();
+		deleteFolderAndCommit();
+		TreeWalk treeWalk = createTreeWalk(commit);
+		assertFalse(treeWalk.next());
+	}
+

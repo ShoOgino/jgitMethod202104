@@ -1,0 +1,8 @@
+	public void testFileInFolderCommittedAllDeletedCommittedComparedWithInitialCommit()
+			throws Exception {
+		RevCommit commit = writeFileInFolderAndCommit();
+		deleteAllAndCommit();
+		TreeWalk treeWalk = createTreeWalk(commit);
+		assertPaths(treeWalk, FILE_IN_FOLDER);
+	}
+

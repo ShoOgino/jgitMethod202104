@@ -1,0 +1,14 @@
+	private TreeWalk createTreeWalk(RevCommit commit, boolean isRecursive,
+			boolean honorIgnores) throws Exception {
+		TreeWalk treeWalk = new TreeWalk(db);
+		treeWalk.setRecursive(isRecursive);
+		treeWalk.addTree(commit.getTree());
+		treeWalk.addTree(new DirCacheIterator(db.readDirCache()));
+		treeWalk.addTree(new FileTreeIterator(db));
+		if (!honorIgnores)
+			treeWalk.setFilter(new IndexDiffFilter(1, 2, honorIgnores));
+		else
+			treeWalk.setFilter(new IndexDiffFilter(1, 2));
+		return treeWalk;
+	}
+

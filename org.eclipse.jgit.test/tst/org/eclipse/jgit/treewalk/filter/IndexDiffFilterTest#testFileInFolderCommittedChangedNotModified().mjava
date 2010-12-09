@@ -1,0 +1,7 @@
+	public void testFileInFolderCommittedChangedNotModified() throws Exception {
+		RevCommit commit = writeFileInFolderAndCommit();
+		writeFileInFolder();
+		TreeWalk treeWalk = createTreeWalk(commit);
+		assertFalse(treeWalk.next());
+	}
+

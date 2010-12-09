@@ -1,0 +1,8 @@
+	public void testFileCommittedModifiedCommittedComparedWithInitialCommit()
+			throws Exception {
+		RevCommit commit = writeFileAndCommit();
+		writeFileModifiedAndCommit();
+		TreeWalk treeWalk = createTreeWalk(commit);
+		assertPaths(treeWalk, FILE);
+	}
+
