@@ -1,6 +1,6 @@
 	private RebaseResult abort() throws IOException {
 		try {
-			String commitId = readFile(repo.getDirectory(), "ORIG_HEAD");
+			String commitId = readFile(repo.getDirectory(), Constants.ORIG_HEAD);
 			monitor.beginTask(MessageFormat.format(
 					JGitText.get().abortingRebase, commitId),
 					ProgressMonitor.UNKNOWN);
@@ -16,7 +16,7 @@
 			monitor.endTask();
 		}
 		try {
-			String headName = readFile(rebaseDir, "head-name");
+			String headName = readFile(rebaseDir, HEAD_NAME);
 			if (headName.startsWith(Constants.R_REFS)) {
 				monitor.beginTask(MessageFormat.format(
 						JGitText.get().resettingHead, headName),

@@ -1,0 +1,38 @@
+	/**
+	 * @return the commit if we had to do a commit, otherwise null
+	 * @throws GitAPIException
+	 * @throws IOException
+	 */
+	private RevCommit continueRebase() throws GitAPIException, IOException {
+		// if there are still conflicts, we throw a specific Exception
+		DirCache dc = repo.readDirCache();
+		boolean hasUnmergedPaths = dc.hasUnmergedPaths();
+		if (hasUnmergedPaths)
+			throw new UnmergedPathsException();
+
+		// determine whether we need to commit
+		TreeWalk treeWalk = new TreeWalk(repo);
+		treeWalk.reset();
+		treeWalk.setRecursive(true);
+		treeWalk.addTree(new DirCacheIterator(dc));
+		ObjectId id = repo.resolve(Constants.HEAD + "^{tree}");
+		if (id == null)
+			throw new NoHeadException(
+					JGitText.get().cannotRebaseWithoutCurrentHead);
+
+		treeWalk.addTree(id);
+
+		treeWalk.setFilter(TreeFilter.ANY_DIFF);
+
+		boolean needsCommit = treeWalk.next();
+		treeWalk.release();
+
+		if (needsCommit) {
+			CommitCommand commit = new Git(repo).commit();
+			commit.setMessage(readFile(rebaseDir, MESSAGE));
+			commit.setAuthor(parseAuthor());
+			return commit.call();
+		}
+		return null;
+	}
+

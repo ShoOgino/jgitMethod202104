@@ -1,0 +1,38 @@
+	public void testStopOnConflictAndSkipWithConflict() throws Exception {
+		// create file1 on master
+		RevCommit firstInMaster = writeFileAndCommit(FILE1, "Add file1", "1",
+				"2", "3", "4");
+		// change in master
+		writeFileAndCommit(FILE1, "change file1 in master", "1master", "2",
+				"3master", "4");
+
+		checkFile(FILE1, "1master", "2", "3master", "4");
+		// create a topic branch based on the first commit
+		createBranch(firstInMaster, "refs/heads/topic");
+		checkoutBranch("refs/heads/topic");
+		// we have the old content again
+		checkFile(FILE1, "1", "2", "3", "4");
+
+		// add a line (non-conflicting)
+		writeFileAndCommit(FILE1, "add a line to file1 in topic", "1", "2",
+				"3", "4", "5topic");
+
+		// change first line (conflicting)
+		writeFileAndCommit(FILE1,
+				"change file1 in topic\n\nThis is conflicting", "1topic", "2",
+				"3", "4", "5topic");
+
+		// change third line (conflicting)
+		writeFileAndCommit(FILE1, "change file1 in topic again", "1topic", "2",
+				"3topic", "4", "5topic");
+
+		RebaseResult res = git.rebase().setUpstream("refs/heads/master").call();
+		assertEquals(Status.STOPPED, res.getStatus());
+
+		res = git.rebase().setOperation(Operation.SKIP).call();
+		// TODO is this correct? It is what the command line returns
+		checkFile(FILE1,
+				"1master\n2\n<<<<<<< OURS\n3master\n=======\n3topic\n>>>>>>> THEIRS\n4\n5topic");
+		assertEquals(Status.STOPPED, res.getStatus());
+	}
+

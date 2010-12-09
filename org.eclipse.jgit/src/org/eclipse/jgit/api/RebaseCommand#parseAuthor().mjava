@@ -1,0 +1,11 @@
+	private PersonIdent parseAuthor() throws IOException {
+		File authorScriptFile = new File(rebaseDir, AUTHOR_SCRIPT);
+		byte[] raw;
+		try {
+			raw = IO.readFully(authorScriptFile);
+		} catch (FileNotFoundException notFound) {
+			return null;
+		}
+		return parseAuthor(raw);
+	}
+

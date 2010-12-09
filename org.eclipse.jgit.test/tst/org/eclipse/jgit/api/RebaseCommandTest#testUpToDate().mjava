@@ -1,12 +1,10 @@
 	public void testUpToDate() throws Exception {
-		Git git = new Git(db);
-
 		// create file1 on master
-		writeTrashFile("file1", "file1");
-		git.add().addFilepattern("file1").call();
+		writeTrashFile(FILE1, FILE1);
+		git.add().addFilepattern(FILE1).call();
 		RevCommit first = git.commit().setMessage("Add file1").call();
 
-		assertTrue(new File(db.getWorkTree(), "file1").exists());
+		assertTrue(new File(db.getWorkTree(), FILE1).exists());
 
 		RebaseResult res = git.rebase().setUpstream(first).call();
 		assertEquals(Status.UP_TO_DATE, res.getStatus());

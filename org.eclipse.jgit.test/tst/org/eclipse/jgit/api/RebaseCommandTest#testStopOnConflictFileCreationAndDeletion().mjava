@@ -1,9 +1,7 @@
-	public void testAbortOnConflictFileCreationAndDeletion() throws Exception {
-		Git git = new Git(db);
-
+	public void testStopOnConflictFileCreationAndDeletion() throws Exception {
 		// create file1 on master
-		writeTrashFile("file1", "Hello World");
-		git.add().addFilepattern("file1").call();
+		writeTrashFile(FILE1, "Hello World");
+		git.add().addFilepattern(FILE1).call();
 		// create file2 on master
 		File file2 = writeTrashFile("file2", "Hello World 2");
 		git.add().addFilepattern("file2").call();
@@ -25,10 +23,8 @@
 		writeTrashFile("folder6/file1", "Hello World folder6");
 		git.add().addFilepattern("folder6/file1").call();
 
-		git.commit()
-				.setMessage(
-						"Add file 4 and folder folder6, delete file2 on master")
-				.call();
+		git.commit().setMessage(
+				"Add file 4 and folder folder6, delete file2 on master").call();
 
 		// create a topic branch based on second commit
 		createBranch(firstInMaster, "refs/heads/topic");
@@ -50,9 +46,8 @@
 
 		deleteTrashFile("file5");
 		git.add().setUpdate(true).addFilepattern("file5").call();
-		RevCommit conflicting = git.commit()
-				.setMessage("Delete file5, add file folder6 and file7 in topic")
-				.call();
+		RevCommit conflicting = git.commit().setMessage(
+				"Delete file5, add file folder6 and file7 in topic").call();
 
 		RebaseResult res = git.rebase().setUpstream("refs/heads/master").call();
 		assertEquals(Status.STOPPED, res.getStatus());
@@ -76,8 +71,7 @@
 		assertEquals(res.getStatus(), Status.ABORTED);
 		assertEquals("refs/heads/topic", db.getFullBranch());
 		RevWalk rw = new RevWalk(db);
-		assertEquals(conflicting,
-				rw.parseCommit(db.resolve(Constants.HEAD)));
+		assertEquals(conflicting, rw.parseCommit(db.resolve(Constants.HEAD)));
 		assertEquals(RepositoryState.SAFE, db.getRepositoryState());
 
 		// rebase- dir in .git must be deleted

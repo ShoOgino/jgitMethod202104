@@ -8,6 +8,7 @@
 	 */
 	public RebaseResult call() throws NoHeadException, RefNotFoundException,
 			JGitInternalException, GitAPIException {
+		RevCommit newHead = null;
 		checkCallable();
 		checkParameters();
 		try {
@@ -21,7 +22,7 @@
 			case SKIP:
 				// fall through
 			case CONTINUE:
-				String upstreamCommitName = readFile(rebaseDir, "onto");
+				String upstreamCommitName = readFile(rebaseDir, ONTO);
 				this.upstreamCommit = walk.parseCommit(repo
 						.resolve(upstreamCommitName));
 				break;
@@ -35,16 +36,13 @@
 				return abort();
 
 			if (this.operation == Operation.CONTINUE)
-				throw new UnsupportedOperationException(
-						"--continue Not yet implemented");
-
-			if (this.operation == Operation.SKIP)
-				throw new UnsupportedOperationException(
-						"--skip Not yet implemented");
-
-			RevCommit newHead = null;
+				newHead = continueRebase();
 
 			List<Step> steps = loadSteps();
+
+			if (this.operation == Operation.SKIP && !steps.isEmpty())
+				checkoutCurrentHead();
+
 			ObjectReader or = repo.newObjectReader();
 			int stepsToPop = 0;
 
@@ -74,15 +72,20 @@
 				}
 				stepsToPop++;
 			}
-			if (newHead != null) {
+			if (newHead != null || steps.isEmpty()) {
 				// point the previous head (if any) to the new commit
-				String headName = readFile(rebaseDir, "head-name");
+				String headName = readFile(rebaseDir, HEAD_NAME);
 				if (headName.startsWith(Constants.R_REFS)) {
 					RefUpdate rup = repo.updateRef(headName);
-					rup.setNewObjectId(newHead);
-					rup.forceUpdate();
+					if (newHead != null) {
+						rup.setNewObjectId(newHead);
+						rup.forceUpdate();
+					}
 					rup = repo.updateRef(Constants.HEAD);
 					rup.link(headName);
+				}
+				if (this.operation == Operation.SKIP && steps.isEmpty()) {
+					checkoutCurrentHead();
 				}
 				FileUtils.delete(rebaseDir, FileUtils.RECURSIVE);
 				return new RebaseResult(Status.OK);

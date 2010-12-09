@@ -1,0 +1,12 @@
+	private RevCommit writeFileAndCommit(String fileName, String commitMessage,
+			String... lines) throws Exception {
+		StringBuilder sb = new StringBuilder();
+		for (String line : lines) {
+			sb.append(line);
+			sb.append('\n');
+		}
+		writeTrashFile(fileName, sb.toString());
+		git.add().addFilepattern(fileName).call();
+		return git.commit().setMessage(commitMessage).call();
+	}
+

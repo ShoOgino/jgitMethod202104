@@ -1,22 +1,15 @@
 	private RebaseResult stop(RevCommit commitToPick) throws IOException {
-		StringBuilder sb = new StringBuilder(100);
-		sb.append("GIT_AUTHOR_NAME='");
-		sb.append(commitToPick.getAuthorIdent().getName());
-		sb.append("'\n");
-		sb.append("GIT_AUTHOR_EMAIL='");
-		sb.append(commitToPick.getAuthorIdent().getEmailAddress());
-		sb.append("'\n");
-		sb.append("GIT_AUTHOR_DATE='");
-		sb.append(commitToPick.getAuthorIdent().getWhen());
-		sb.append("'\n");
-		createFile(rebaseDir, "author-script", sb.toString());
-		createFile(rebaseDir, "message", commitToPick.getShortMessage());
+		PersonIdent author = commitToPick.getAuthorIdent();
+		String authorScript = toAuthorScript(author);
+		createFile(rebaseDir, AUTHOR_SCRIPT, authorScript);
+		createFile(rebaseDir, MESSAGE, commitToPick.getFullMessage());
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		DiffFormatter df = new DiffFormatter(bos);
 		df.setRepository(repo);
 		df.format(commitToPick.getParent(0), commitToPick);
-		createFile(rebaseDir, "patch", new String(bos.toByteArray(), "UTF-8"));
-		createFile(rebaseDir, "stopped-sha", repo.newObjectReader().abbreviate(
+		createFile(rebaseDir, PATCH, new String(bos.toByteArray(),
+				Constants.CHARACTER_ENCODING));
+		createFile(rebaseDir, STOPPED_SHA, repo.newObjectReader().abbreviate(
 				commitToPick).name());
 		return new RebaseResult(commitToPick);
 	}

@@ -1,0 +1,21 @@
+	public void testRepositoryStateChecks() throws Exception {
+		try {
+			git.rebase().setOperation(Operation.ABORT).call();
+			fail("Expected Exception not thrown");
+		} catch (WrongRepositoryStateException e) {
+			// expected
+		}
+		try {
+			git.rebase().setOperation(Operation.SKIP).call();
+			fail("Expected Exception not thrown");
+		} catch (WrongRepositoryStateException e) {
+			// expected
+		}
+		try {
+			git.rebase().setOperation(Operation.CONTINUE).call();
+			fail("Expected Exception not thrown");
+		} catch (WrongRepositoryStateException e) {
+			// expected
+		}
+	}
+

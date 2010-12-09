@@ -1,0 +1,25 @@
+	private void checkoutCurrentHead() throws IOException, NoHeadException,
+			JGitInternalException {
+		ObjectId headTree = repo.resolve(Constants.HEAD + "^{tree}");
+		if (headTree == null)
+			throw new NoHeadException(
+					JGitText.get().cannotRebaseWithoutCurrentHead);
+		DirCache dc = repo.lockDirCache();
+		try {
+			DirCacheCheckout dco = new DirCacheCheckout(repo, dc, headTree);
+			dco.setFailOnConflict(false);
+			boolean needsDeleteFiles = dco.checkout();
+			if (needsDeleteFiles) {
+				List<String> fileList = dco.getToBeDeleted();
+				for (String filePath : fileList) {
+					File fileToDelete = new File(repo.getWorkTree(), filePath);
+					if (fileToDelete.exists())
+						FileUtils.delete(fileToDelete, FileUtils.RECURSIVE
+								| FileUtils.RETRY);
+				}
+			}
+		} finally {
+			dc.unlock();
+		}
+	}
+
