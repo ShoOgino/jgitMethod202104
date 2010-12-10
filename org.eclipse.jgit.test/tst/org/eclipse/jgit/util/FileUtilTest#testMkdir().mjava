@@ -1,0 +1,28 @@
+	public void testMkdir() throws IOException {
+		File d = new File(trash, "test");
+		FileUtils.mkdir(d);
+		assertTrue(d.exists() && d.isDirectory());
+
+		try {
+			FileUtils.mkdir(d);
+			fail("creation of existing directory must fail");
+		} catch (IOException e) {
+			// expected
+		}
+
+		FileUtils.mkdir(d, true);
+		assertTrue(d.exists() && d.isDirectory());
+
+		assertTrue(d.delete());
+		File f = new File(trash, "test");
+		assertTrue(f.createNewFile());
+		try {
+			FileUtils.mkdir(d);
+			fail("creation of directory having same path as existing file must"
+					+ " fail");
+		} catch (IOException e) {
+			// expected
+		}
+		assertTrue(f.delete());
+	}
+

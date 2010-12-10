@@ -1,0 +1,31 @@
+	public void testMkdirs() throws IOException {
+		File root = new File(trash, "test");
+		assertTrue(root.mkdir());
+
+		File d = new File(root, "test/test");
+		FileUtils.mkdirs(d);
+		assertTrue(d.exists() && d.isDirectory());
+
+		try {
+			FileUtils.mkdirs(d);
+			fail("creation of existing directory hierarchy must fail");
+		} catch (IOException e) {
+			// expected
+		}
+
+		FileUtils.mkdirs(d, true);
+		assertTrue(d.exists() && d.isDirectory());
+
+		FileUtils.delete(root, FileUtils.RECURSIVE);
+		File f = new File(trash, "test");
+		assertTrue(f.createNewFile());
+		try {
+			FileUtils.mkdirs(d);
+			fail("creation of directory having path conflicting with existing"
+					+ " file must fail");
+		} catch (IOException e) {
+			// expected
+		}
+		assertTrue(f.delete());
+	}
+
