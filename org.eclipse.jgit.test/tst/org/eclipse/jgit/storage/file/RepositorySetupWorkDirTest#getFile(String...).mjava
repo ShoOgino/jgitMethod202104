@@ -1,9 +1,9 @@
-	private File getFile(String... pathComponents) {
+	private File getFile(String... pathComponents) throws IOException {
 		String rootPath = new File(new File("target"), "trash").getPath();
 		for (String pathComponent : pathComponents)
 			rootPath = rootPath + File.separatorChar + pathComponent;
 		File result = new File(rootPath);
-		result.mkdir();
+		FileUtils.mkdirs(result, true);
 		return result;
 	}
 

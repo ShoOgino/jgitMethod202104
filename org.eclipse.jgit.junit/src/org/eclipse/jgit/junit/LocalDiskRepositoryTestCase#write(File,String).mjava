@@ -13,7 +13,7 @@
 	 *             the file could not be written.
 	 */
 	protected void write(final File f, final String body) throws IOException {
-		f.getParentFile().mkdirs();
+		FileUtils.mkdirs(f.getParentFile(), true);
 		Writer w = new OutputStreamWriter(new FileOutputStream(f), "UTF-8");
 		try {
 			w.write(body);

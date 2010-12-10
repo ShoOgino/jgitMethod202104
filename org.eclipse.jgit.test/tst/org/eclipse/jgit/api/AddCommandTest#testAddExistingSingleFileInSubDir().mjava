@@ -1,8 +1,8 @@
 	@Test
 	public void testAddExistingSingleFileInSubDir() throws IOException, NoFilepatternException {
-		new File(db.getWorkTree(), "sub").mkdir();
+		FileUtils.mkdir(new File(db.getWorkTree(), "sub"));
 		File file = new File(db.getWorkTree(), "sub/a.txt");
-		file.createNewFile();
+		FileUtils.createNewFile(file);
 		PrintWriter writer = new PrintWriter(file);
 		writer.print("content");
 		writer.close();

@@ -9,7 +9,7 @@
 		ObjectLoader ol = db.open(e.sha1, Constants.OBJ_BLOB);
 		File file = new File(wd, e.getName());
 		file.delete();
-		file.getParentFile().mkdirs();
+		FileUtils.mkdirs(file.getParentFile(), true);
 		FileOutputStream dst = new FileOutputStream(file);
 		try {
 			ol.copyTo(dst);

@@ -26,8 +26,7 @@
 	 */
 	public void syncCQs(File file, FS fs, URL base, String username,
 			String password) throws IOException, ConfigInvalidException {
-		if (!file.getParentFile().exists())
-			file.getParentFile().mkdirs();
+		FileUtils.mkdirs(file.getParentFile(), true);
 
 		LockFile lf = new LockFile(file, fs);
 		if (!lf.lock())

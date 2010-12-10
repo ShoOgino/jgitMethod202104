@@ -4,15 +4,15 @@
 	// file c exists in workdir but not in index -> added
 	@Test
 	public void testAddWithoutParameterUpdate() throws Exception {
-		new File(db.getWorkTree(), "sub").mkdir();
+		FileUtils.mkdir(new File(db.getWorkTree(), "sub"));
 		File file = new File(db.getWorkTree(), "sub/a.txt");
-		file.createNewFile();
+		FileUtils.createNewFile(file);
 		PrintWriter writer = new PrintWriter(file);
 		writer.print("content");
 		writer.close();
 
 		File file2 = new File(db.getWorkTree(), "sub/b.txt");
-		file2.createNewFile();
+		FileUtils.createNewFile(file2);
 		writer = new PrintWriter(file2);
 		writer.print("content b");
 		writer.close();
@@ -29,7 +29,7 @@
 
 		// new unstaged file sub/c.txt
 		File file3 = new File(db.getWorkTree(), "sub/c.txt");
-		file3.createNewFile();
+		FileUtils.createNewFile(file3);
 		writer = new PrintWriter(file3);
 		writer.print("content c");
 		writer.close();

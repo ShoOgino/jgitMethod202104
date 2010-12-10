@@ -8,7 +8,7 @@
 	 *             does not hold the lock.
 	 */
 	public boolean lock() throws IOException {
-		lck.getParentFile().mkdirs();
+		FileUtils.mkdirs(lck.getParentFile(), true);
 		if (lck.createNewFile()) {
 			haveLck = true;
 			try {
