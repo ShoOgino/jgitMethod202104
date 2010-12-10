@@ -7,7 +7,14 @@
 		try {
 			String line = br.readLine();
 			while (line != null) {
-				if (line.startsWith("pick "))
+				String actionToken = line.substring(0, line.indexOf(' '));
+				Action action = null;
+				try {
+					action = Action.parse(actionToken);
+				} catch (Exception e) {
+					// ignore
+				}
+				if (action != null)
 					count++;
 				line = br.readLine();
 			}

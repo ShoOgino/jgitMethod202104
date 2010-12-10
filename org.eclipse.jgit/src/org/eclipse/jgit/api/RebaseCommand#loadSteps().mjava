@@ -16,6 +16,10 @@
 					String actionToken = new String(buf, tokenBegin, nextSpace
 							- tokenBegin - 1);
 					tokenBegin = nextSpace;
+					if (actionToken.charAt(0) == '#') {
+						tokenCount = 3;
+						break;
+					}
 					Action action = Action.parse(actionToken);
 					if (action != null)
 						current = new Step(Action.parse(actionToken));

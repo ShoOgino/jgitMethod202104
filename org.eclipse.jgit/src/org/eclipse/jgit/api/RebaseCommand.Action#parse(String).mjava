@@ -1,6 +1,10 @@
 		static Action parse(String token) {
 			if (token.equals("pick") || token.equals("p"))
 				return PICK;
-			return null;
+			throw new JGitInternalException(
+					MessageFormat
+							.format(
+									"Unknown or unsupported command \"{0}\", only  \"pick\" is allowed",
+									token));
 		}
 
