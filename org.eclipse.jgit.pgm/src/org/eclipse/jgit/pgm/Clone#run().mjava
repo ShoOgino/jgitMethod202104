@@ -16,8 +16,9 @@
 
 		dst = new FileRepository(gitdir);
 		dst.create();
-		dst.getConfig().setBoolean("core", null, "bare", false);
-		dst.getConfig().save();
+		final FileBasedConfig dstcfg = dst.getConfig();
+		dstcfg.setBoolean("core", null, "bare", false);
+		dstcfg.save();
 		db = dst;
 
 		out.print(MessageFormat.format(

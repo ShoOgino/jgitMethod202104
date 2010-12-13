@@ -66,10 +66,11 @@
 						String shortenedName = fullName
 								.substring(Constants.R_HEADS.length());
 						// remove upstream configuration if any
-						repo.getConfig().unsetSection(
+						final StoredConfig cfg = repo.getConfig();
+						cfg.unsetSection(
 								ConfigConstants.CONFIG_BRANCH_SECTION,
 								shortenedName);
-						repo.getConfig().save();
+						cfg.save();
 					}
 				} else
 					throw new JGitInternalException(MessageFormat.format(
