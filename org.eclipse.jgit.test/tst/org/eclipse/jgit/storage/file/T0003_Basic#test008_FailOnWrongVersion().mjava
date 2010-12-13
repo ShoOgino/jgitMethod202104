@@ -1,11 +1,9 @@
 	public void test008_FailOnWrongVersion() throws IOException {
 		final File cfg = new File(db.getDirectory(), "config");
-		final FileWriter pw = new FileWriter(cfg);
 		final String badvers = "ihopethisisneveraversion";
 		final String configStr = "[core]\n" + "\trepositoryFormatVersion="
 				+ badvers + "\n";
-		pw.write(configStr);
-		pw.close();
+		write(cfg, configStr);
 
 		try {
 			new FileRepository(db.getDirectory());

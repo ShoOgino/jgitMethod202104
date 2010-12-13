@@ -2,15 +2,13 @@
 			ConfigInvalidException {
 		final File cfg = new File(db.getDirectory(), "config");
 		final FileBasedConfig c = new FileBasedConfig(cfg, db.getFS());
-		final FileWriter pw = new FileWriter(cfg);
 		final String configStr = "  [core];comment\n\tfilemode = yes\n"
 				+ "[user]\n"
 				+ "  email = A U Thor <thor@example.com> # Just an example...\n"
 				+ " name = \"A  Thor \\\\ \\\"\\t \"\n"
 				+ "    defaultCheckInComment = a many line\\n\\\ncomment\\n\\\n"
 				+ " to test\n";
-		pw.write(configStr);
-		pw.close();
+		write(cfg, configStr);
 		c.load();
 		assertEquals("yes", c.getString("core", null, "filemode"));
 		assertEquals("A U Thor <thor@example.com>", c
