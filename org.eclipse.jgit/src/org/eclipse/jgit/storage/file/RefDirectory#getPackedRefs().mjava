@@ -1,12 +1,9 @@
 	private PackedRefList getPackedRefs() throws IOException {
-		long size = packedRefsFile.length();
-		long mtime = size != 0 ? packedRefsFile.lastModified() : 0;
-
 		final PackedRefList curList = packedRefs.get();
-		if (size == curList.lastSize && mtime == curList.lastModified)
+		if (!curList.snapshot.isModified(packedRefsFile))
 			return curList;
 
-		final PackedRefList newList = readPackedRefs(size, mtime);
+		final PackedRefList newList = readPackedRefs();
 		if (packedRefs.compareAndSet(curList, newList))
 			modCnt.incrementAndGet();
 		return newList;

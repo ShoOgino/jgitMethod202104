@@ -1,5 +1,6 @@
-	private PackedRefList readPackedRefs(long size, long mtime)
+	private PackedRefList readPackedRefs()
 			throws IOException {
+		final FileSnapshot snapshot = FileSnapshot.save(packedRefsFile);
 		final BufferedReader br;
 		try {
 			br = new BufferedReader(new InputStreamReader(new FileInputStream(
@@ -9,7 +10,7 @@
 			return PackedRefList.NO_PACKED_REFS;
 		}
 		try {
-			return new PackedRefList(parsePackedRefs(br), size, mtime);
+			return new PackedRefList(parsePackedRefs(br), snapshot);
 		} finally {
 			br.close();
 		}
