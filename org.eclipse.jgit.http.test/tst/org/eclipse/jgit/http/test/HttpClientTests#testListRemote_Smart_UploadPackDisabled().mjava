@@ -1,7 +1,8 @@
 	public void testListRemote_Smart_UploadPackDisabled() throws Exception {
 		FileRepository src = remoteRepository.getRepository();
-		src.getConfig().setBoolean("http", null, "uploadpack", false);
-		src.getConfig().save();
+		final FileBasedConfig cfg = src.getConfig();
+		cfg.setBoolean("http", null, "uploadpack", false);
+		cfg.save();
 
 		Repository dst = createBareRepository();
 		Transport t = Transport.open(dst, smartAuthNoneURI);

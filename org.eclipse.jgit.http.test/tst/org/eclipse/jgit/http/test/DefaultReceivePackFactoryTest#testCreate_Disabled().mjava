@@ -1,5 +1,8 @@
-	public void testCreate_Disabled() throws ServiceNotAuthorizedException {
-		db.getConfig().setBoolean("http", null, "receivepack", false);
+	public void testCreate_Disabled() throws ServiceNotAuthorizedException,
+			IOException {
+		final StoredConfig cfg = db.getConfig();
+		cfg.setBoolean("http", null, "receivepack", false);
+		cfg.save();
 
 		try {
 			factory.create(new R(null, "localhost"), db);

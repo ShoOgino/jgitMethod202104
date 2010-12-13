@@ -1,6 +1,9 @@
 	public void testCreate_Enabled() throws ServiceNotEnabledException,
-			ServiceNotAuthorizedException {
-		db.getConfig().setBoolean("http", null, "receivepack", true);
+			ServiceNotAuthorizedException, IOException {
+		final StoredConfig cfg = db.getConfig();
+		cfg.setBoolean("http", null, "receivepack", true);
+		cfg.save();
+
 		ReceivePack rp;
 
 		rp = factory.create(new R(null, "1.2.3.4"), db);

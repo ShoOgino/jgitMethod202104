@@ -1,5 +1,8 @@
-	public void testCreate_Disabled() throws ServiceNotAuthorizedException {
-		db.getConfig().setBoolean("http", null, "uploadpack", false);
+	public void testCreate_Disabled() throws ServiceNotAuthorizedException,
+			IOException {
+		final StoredConfig cfg = db.getConfig();
+		cfg.setBoolean("http", null, "uploadpack", false);
+		cfg.save();
 
 		try {
 			factory.create(new R(null, "localhost"), db);

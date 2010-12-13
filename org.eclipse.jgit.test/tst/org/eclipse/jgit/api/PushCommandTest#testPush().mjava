@@ -5,11 +5,12 @@
 		Repository db2 = createWorkRepository();
 
 		// setup the first repository
-		final Config config = db.getConfig();
+		final StoredConfig config = db.getConfig();
 		RemoteConfig remoteConfig = new RemoteConfig(config, "test");
 		URIish uri = new URIish(db2.getDirectory().toURI().toURL());
 		remoteConfig.addURI(uri);
 		remoteConfig.update(config);
+		config.save();
 
 		Git git1 = new Git(db);
 		// create some refs via commits and tag
