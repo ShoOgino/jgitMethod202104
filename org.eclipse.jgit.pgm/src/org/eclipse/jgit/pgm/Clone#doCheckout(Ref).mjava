@@ -12,12 +12,8 @@
 		u.setNewObjectId(commit);
 		u.forceUpdate();
 
-		final GitIndex index = new GitIndex(db);
-		final Tree tree = db.mapTree(commit.getTree());
-		final WorkDirCheckout co;
-
-		co = new WorkDirCheckout(db, db.getWorkTree(), index, tree);
+		DirCache dc = db.lockDirCache();
+		DirCacheCheckout co = new DirCacheCheckout(db, dc, commit.getTree());
 		co.checkout();
-		index.write();
 	}
 
