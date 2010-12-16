@@ -1,7 +1,8 @@
 	public void test021_createTreeTag() throws IOException {
 		final ObjectId emptyId = insertEmptyBlob();
 		final Tree almostEmptyTree = new Tree(db);
-		almostEmptyTree.addEntry(new FileTreeEntry(almostEmptyTree, emptyId, "empty".getBytes(), false));
+		almostEmptyTree.addEntry(new FileTreeEntry(almostEmptyTree, emptyId,
+				"empty".getBytes(), false));
 		final ObjectId almostEmptyTreeId = insertTree(almostEmptyTree);
 		final TagBuilder t = new TagBuilder();
 		t.setObjectId(almostEmptyTreeId, Constants.OBJ_TREE);
@@ -14,7 +15,9 @@
 		RevTag mapTag = parseTag(actid);
 		assertEquals(Constants.OBJ_TREE, mapTag.getObject().getType());
 		assertEquals("test021 tagged\n", mapTag.getFullMessage());
-		assertEquals(new PersonIdent(author, 1154236443000L, -4 * 60), mapTag.getTaggerIdent());
-		assertEquals("417c01c8795a35b8e835113a85a5c0c1c77f67fb", mapTag.getObject().getId().name());
+		assertEquals(new PersonIdent(author, 1154236443000L, -4 * 60), mapTag
+				.getTaggerIdent());
+		assertEquals("417c01c8795a35b8e835113a85a5c0c1c77f67fb", mapTag
+				.getObject().getId().name());
 	}
 

@@ -11,11 +11,9 @@
 
 		// do one commit and check that reflog size is 0: no reflogs should be
 		// written
-		final Tree t = new Tree(db);
-		addFileToTree(t, "i-am-a-file", "and this is the data in me\n");
-		commit(t, "A Commit\n", new PersonIdent(author, commitTime, tz),
+		commit("A Commit\n", new PersonIdent(author, commitTime, tz),
 				new PersonIdent(committer, commitTime, tz));
-		commitTime += 100;
+		commitTime += 60 * 1000;
 		assertTrue(
 				"Reflog for HEAD still contain no entry",
 				db.getReflogReader(Constants.HEAD).getReverseEntries().size() == 0);
@@ -26,10 +24,9 @@
 		assertTrue(cfg.get(CoreConfig.KEY).isLogAllRefUpdates());
 
 		// do one commit and check that reflog size is increased to 1
-		addFileToTree(t, "i-am-another-file", "and this is other data in me\n");
-		commit(t, "A Commit\n", new PersonIdent(author, commitTime, tz),
+		commit("A Commit\n", new PersonIdent(author, commitTime, tz),
 				new PersonIdent(committer, commitTime, tz));
-		commitTime += 100;
+		commitTime += 60 * 1000;
 		assertTrue(
 				"Reflog for HEAD should contain one entry",
 				db.getReflogReader(Constants.HEAD).getReverseEntries().size() == 1);
@@ -40,9 +37,7 @@
 		assertFalse(cfg.get(CoreConfig.KEY).isLogAllRefUpdates());
 
 		// do one commit and check that reflog size is 2
-		addFileToTree(t, "i-am-anotheranother-file",
-				"and this is other other data in me\n");
-		commit(t, "A Commit\n", new PersonIdent(author, commitTime, tz),
+		commit("A Commit\n", new PersonIdent(author, commitTime, tz),
 				new PersonIdent(committer, commitTime, tz));
 		assertTrue(
 				"Reflog for HEAD should contain two entries",
