@@ -19,7 +19,7 @@
 			final PackFile[] newList = new PackFile[1 + oldList.length];
 			newList[0] = pf;
 			System.arraycopy(oldList, 0, newList, 1, oldList.length);
-			n = new PackList(o.lastRead, o.lastModified, newList);
+			n = new PackList(o.snapshot, newList);
 		} while (!packList.compareAndSet(o, n));
 	}
 

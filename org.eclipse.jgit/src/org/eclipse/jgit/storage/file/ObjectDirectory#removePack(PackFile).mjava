@@ -11,7 +11,7 @@
 			final PackFile[] newList = new PackFile[oldList.length - 1];
 			System.arraycopy(oldList, 0, newList, 0, j);
 			System.arraycopy(oldList, j + 1, newList, j, newList.length - j);
-			n = new PackList(o.lastRead, o.lastModified, newList);
+			n = new PackList(o.snapshot, newList);
 		} while (!packList.compareAndSet(o, n));
 		deadPack.close();
 	}

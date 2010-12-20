@@ -1,0 +1,29 @@
+	/**
+	 * Update this snapshot when the content hasn't changed.
+	 * <p>
+	 * If the caller gets true from {@link #isModified(File)}, re-reads the
+	 * content, discovers the content is identical, and
+	 * {@link #equals(FileSnapshot)} is true, it can use
+	 * {@link #setClean(FileSnapshot)} to make a future
+	 * {@link #isModified(File)} return false. The logic goes something like
+	 * this:
+	 *
+	 * <pre>
+	 * if (snapshot.isModified(path)) {
+	 *  FileSnapshot other = FileSnapshot.save(path);
+	 *  Content newContent = ...;
+	 *  if (oldContent.equals(newContent) &amp;&amp; snapshot.equals(other))
+	 *      snapshot.setClean(other);
+	 * }
+	 * </pre>
+	 *
+	 * @param other
+	 *            the other snapshot.
+	 */
+	public void setClean(FileSnapshot other) {
+		final long now = other.lastRead;
+		if (notRacyClean(now))
+			cannotBeRacilyClean = true;
+		lastRead = now;
+	}
+

@@ -1,7 +1,6 @@
 	private PackList scanPacksImpl(final PackList old) {
 		final Map<String, PackFile> forReuse = reuseMap(old);
-		final long lastRead = System.currentTimeMillis();
-		final long lastModified = packDirectory.lastModified();
+		final FileSnapshot snapshot = FileSnapshot.save(packDirectory);
 		final Set<String> names = listPackDirectory();
 		final List<PackFile> list = new ArrayList<PackFile>(names.size() >> 2);
 		boolean foundNew = false;
@@ -38,18 +37,20 @@
 		// the same as the set we were given. Instead of building a new object
 		// return the same collection.
 		//
-		if (!foundNew && lastModified == old.lastModified && forReuse.isEmpty())
-			return old.updateLastRead(lastRead);
+		if (!foundNew && forReuse.isEmpty() && snapshot.equals(old.snapshot)) {
+			old.snapshot.setClean(snapshot);
+			return old;
+		}
 
 		for (final PackFile p : forReuse.values()) {
 			p.close();
 		}
 
 		if (list.isEmpty())
-			return new PackList(lastRead, lastModified, NO_PACKS.packs);
+			return new PackList(snapshot, NO_PACKS.packs);
 
 		final PackFile[] r = list.toArray(new PackFile[list.size()]);
 		Arrays.sort(r, PackFile.SORT);
-		return new PackList(lastRead, lastModified, r);
+		return new PackList(snapshot, r);
 	}
 

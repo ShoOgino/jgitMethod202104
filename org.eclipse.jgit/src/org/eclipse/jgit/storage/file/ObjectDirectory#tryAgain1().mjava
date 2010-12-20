@@ -1,6 +1,6 @@
 	boolean tryAgain1() {
 		final PackList old = packList.get();
-		if (old.tryAgain(packDirectory.lastModified()))
+		if (old.snapshot.isModified(packDirectory))
 			return old != scanPacks(old);
 		return false;
 	}
