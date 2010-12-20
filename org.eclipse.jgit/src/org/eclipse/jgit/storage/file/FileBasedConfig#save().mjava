@@ -16,14 +16,15 @@
 		if (!lf.lock())
 			throw new IOException(MessageFormat.format(JGitText.get().cannotLockFile, getFile()));
 		try {
-			lf.setNeedStatInformation(true);
+			lf.setNeedSnapshot(true);
 			lf.write(out);
 			if (!lf.commit())
 				throw new IOException(MessageFormat.format(JGitText.get().cannotCommitWriteTo, getFile()));
 		} finally {
 			lf.unlock();
 		}
-		lastModified = lf.getCommitLastModified();
+		snapshot = lf.getCommitSnapshot();
+		hash = hash(out);
 		// notify the listeners
 		fireConfigChangedEvent();
 	}
