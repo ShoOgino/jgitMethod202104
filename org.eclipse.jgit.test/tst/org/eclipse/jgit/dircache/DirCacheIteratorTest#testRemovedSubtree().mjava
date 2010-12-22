@@ -1,0 +1,22 @@
+	public void testRemovedSubtree() throws Exception {
+		final File path = JGitTestUtil
+				.getTestResourceFile("dircache.testRemovedSubtree");
+
+		final DirCache dc = DirCache.read(path, FS.DETECTED);
+		assertEquals(2, dc.getEntryCount());
+
+		final TreeWalk tw = new TreeWalk(db);
+		tw.setRecursive(true);
+		tw.addTree(new DirCacheIterator(dc));
+
+		assertTrue(tw.next());
+		assertEquals("a/a", tw.getPathString());
+		assertSame(FileMode.REGULAR_FILE, tw.getFileMode(0));
+
+		assertTrue(tw.next());
+		assertEquals("q", tw.getPathString());
+		assertSame(FileMode.REGULAR_FILE, tw.getFileMode(0));
+
+		assertFalse(tw.next());
+	}
+
