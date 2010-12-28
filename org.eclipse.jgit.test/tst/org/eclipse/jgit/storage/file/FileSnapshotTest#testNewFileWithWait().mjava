@@ -1,0 +1,17 @@
+	/**
+	 * Create a file, but don't wait long enough for the difference between file
+	 * system clock and system clock to be significant. Assume the file may have
+	 * been modified. It may have been, but the clock alone cannot determine
+	 * this
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void testNewFileWithWait() throws Exception {
+		File f1 = createFile("newfile");
+		waitNextSec(f1);
+		FileSnapshot save = FileSnapshot.save(f1);
+		Thread.sleep(1500);
+		assertTrue(save.isModified(f1));
+	}
+
