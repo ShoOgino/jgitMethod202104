@@ -44,11 +44,8 @@
 			try {
 				dco.checkout();
 			} catch (CheckoutConflictException e) {
-				List<File> fileList = new ArrayList<File>();
-				for (String filePath : dco.getConflicts()) {
-					fileList.add(new File(repo.getWorkTree(), filePath));
-				}
-				status = new CheckoutResult(Status.CONFLICTS, fileList);
+				status = new CheckoutResult(Status.CONFLICTS, dco
+						.getConflicts());
 				throw e;
 			}
 			Ref ref = repo.getRef(name);
@@ -86,12 +83,9 @@
 				throw new JGitInternalException(MessageFormat.format(JGitText
 						.get().checkoutUnexpectedResult, updateResult.name()));
 
-			if (!repo.isBare() && !dco.getToBeDeleted().isEmpty()) {
-				List<File> fileList = new ArrayList<File>();
-				for (String filePath : dco.getToBeDeleted()) {
-					fileList.add(new File(repo.getWorkTree(), filePath));
-				}
-				status = new CheckoutResult(Status.NONDELETED, fileList);
+			if (!dco.getToBeDeleted().isEmpty()) {
+				status = new CheckoutResult(Status.NONDELETED, dco
+						.getToBeDeleted());
 			}
 			else
 				status = CheckoutResult.OK_RESULT;
