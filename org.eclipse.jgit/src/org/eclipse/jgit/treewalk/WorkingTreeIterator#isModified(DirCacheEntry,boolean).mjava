@@ -14,62 +14,27 @@
 	 * @return true if content is most likely different.
 	 */
 	public boolean isModified(DirCacheEntry entry, boolean forceContentCheck) {
-		if (entry.isAssumeValid())
-			return false;
-
-		if (entry.isUpdateNeeded())
-			return true;
-
-		if (!entry.isSmudged() && (getEntryLength() != entry.getLength()))
-			return true;
-
-		// Determine difference in mode-bits of file and index-entry. In the
-		// bitwise presentation of modeDiff we'll have a '1' when the two modes
-		// differ at this position.
-		int modeDiff = getEntryRawMode() ^ entry.getRawMode();
-
-		// Do not rely on filemode differences in case of symbolic links
-		if (modeDiff != 0 && !FileMode.SYMLINK.equals(entry.getRawMode())) {
-			// Ignore the executable file bits if WorkingTreeOptions tell me to
-			// do so. Ignoring is done by setting the bits representing a
-			// EXECUTABLE_FILE to '0' in modeDiff
-			if (!state.options.isFileMode())
-				modeDiff &= ~FileMode.EXECUTABLE_FILE.getBits();
-			if (modeDiff != 0)
-				// Report a modification if the modes still (after potentially
-				// ignoring EXECUTABLE_FILE bits) differ
-				return true;
-		}
-
-		// Git under windows only stores seconds so we round the timestamp
-		// Java gives us if it looks like the timestamp in index is seconds
-		// only. Otherwise we compare the timestamp at millisecond precision.
-		long cacheLastModified = entry.getLastModified();
-		long fileLastModified = getEntryLastModified();
-		if (cacheLastModified % 1000 == 0)
-			fileLastModified = fileLastModified - fileLastModified % 1000;
-
-		if (fileLastModified != cacheLastModified) {
-			// The file is dirty by timestamps
-			if (forceContentCheck) {
+		MetadataDiff diff = compareMetadata(entry);
+		switch (diff) {
+		case DIFFER_BY_TIMESTAMP:
+			if (forceContentCheck)
 				// But we are told to look at content even though timestamps
 				// tell us about modification
 				return contentCheck(entry);
-			} else {
+			else
 				// We are told to assume a modification if timestamps differs
 				return true;
-			}
-		} else {
-			// The file is clean when you look at timestamps.
-			if (entry.isSmudged()) {
-				// The file is clean by timestamps but the entry was smudged.
-				// Lets do a content check
-				return contentCheck(entry);
-			} else {
-				// The file is clean by timestamps and the entry is not
-				// smudged: Can't get any cleaner!
-				return false;
-			}
+		case SMUDGED:
+			// The file is clean by timestamps but the entry was smudged.
+			// Lets do a content check
+			return contentCheck(entry);
+		case EQUAL:
+			return false;
+		case DIFFER_BY_METADATA:
+			return true;
+		default:
+			throw new IllegalStateException(MessageFormat.format(
+					JGitText.get().unexpectedCompareResult, diff.name()));
 		}
 	}
 
