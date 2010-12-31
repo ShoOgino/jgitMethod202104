@@ -1,0 +1,30 @@
+	private UnresolvedDelta firstChildOf(PackedObjectInfo oe) {
+		UnresolvedDelta a = reverse(removeBaseById(oe));
+		UnresolvedDelta b = reverse(baseByPos.remove(oe.getOffset()));
+
+		if (a == null)
+			return b;
+		if (b == null)
+			return a;
+
+		UnresolvedDelta first = null;
+		UnresolvedDelta last = null;
+		while (a != null || b != null) {
+			UnresolvedDelta curr;
+			if (b == null || (a != null && a.position < b.position)) {
+				curr = a;
+				a = a.next;
+			} else {
+				curr = b;
+				b = b.next;
+			}
+			if (last != null)
+				last.next = curr;
+			else
+				first = curr;
+			last = curr;
+			curr.next = null;
+		}
+		return first;
+	}
+

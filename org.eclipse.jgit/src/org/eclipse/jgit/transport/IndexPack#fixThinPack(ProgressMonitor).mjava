@@ -21,18 +21,22 @@
 				missing.add(baseId);
 				continue;
 			}
-			final byte[] data = ldr.getCachedBytes(Integer.MAX_VALUE);
+
+			final DeltaVisit visit = new DeltaVisit();
+			visit.data = ldr.getCachedBytes(Integer.MAX_VALUE);
 			final int typeCode = ldr.getType();
 			final PackedObjectInfo oe;
 
 			crc.reset();
 			packOut.seek(end);
-			writeWhole(def, typeCode, data);
+			writeWhole(def, typeCode, visit.data);
 			oe = new PackedObjectInfo(end, (int) crc.getValue(), baseId);
 			entries[entryCount++] = oe;
 			end = packOut.getFilePointer();
 
-			resolveChildDeltas(oe.getOffset(), typeCode, data, oe);
+			visit.nextChild = firstChildOf(oe);
+			resolveDeltas(visit.next(), typeCode);
+
 			if (progress.isCancelled())
 				throw new IOException(JGitText.get().downloadCancelledDuringIndexing);
 		}

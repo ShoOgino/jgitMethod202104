@@ -1,0 +1,17 @@
+		DeltaVisit next() {
+			// If our parent has no more children, discard it.
+			if (parent != null && parent.nextChild == null) {
+				parent.data = null;
+				parent = parent.parent;
+			}
+
+			if (nextChild != null)
+				return new DeltaVisit(this);
+
+			// If we have no child ourselves, our parent must (if it exists),
+			// due to the discard rule above. With no parent, we are done.
+			if (parent != null)
+				return new DeltaVisit(parent);
+			return null;
+		}
+
