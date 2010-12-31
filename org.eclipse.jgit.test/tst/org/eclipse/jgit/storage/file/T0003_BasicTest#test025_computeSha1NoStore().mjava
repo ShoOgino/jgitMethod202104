@@ -1,0 +1,9 @@
+	@Test
+	public void test025_computeSha1NoStore() throws IOException {
+		byte[] data = "test025 some data, more than 16 bytes to get good coverage"
+				.getBytes("ISO-8859-1");
+		final ObjectId id = new ObjectInserter.Formatter().idFor(
+				Constants.OBJ_BLOB, data);
+		assertEquals("4f561df5ecf0dfbd53a0dc0f37262fef075d9dde", id.name());
+	}
+

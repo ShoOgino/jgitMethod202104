@@ -1,3 +1,4 @@
+	@Test
 	public void testUploadPack() throws Exception {
 		readConfig("[remote \"example\"]\n"
 				+ "url = user@example.com:egit.git\n"
@@ -15,7 +16,7 @@
 		assertNotNull(rc.getPushRefSpecs());
 
 		assertEquals(1, allURIs.size());
-		assertEquals("user@example.com:egit.git", allURIs.get(0));
+		assertEquals("user@example.com:egit.git", allURIs.get(0).toString());
 
 		assertEquals(1, rc.getFetchRefSpecs().size());
 		spec = rc.getFetchRefSpecs().get(0);

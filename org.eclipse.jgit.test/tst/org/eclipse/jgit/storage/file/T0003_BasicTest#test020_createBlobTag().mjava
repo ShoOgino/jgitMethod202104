@@ -1,0 +1,20 @@
+	@Test
+	public void test020_createBlobTag() throws IOException {
+		final ObjectId emptyId = insertEmptyBlob();
+		final TagBuilder t = new TagBuilder();
+		t.setObjectId(emptyId, Constants.OBJ_BLOB);
+		t.setTag("test020");
+		t.setTagger(new PersonIdent(author, 1154236443000L, -4 * 60));
+		t.setMessage("test020 tagged\n");
+		ObjectId actid = insertTag(t);
+		assertEquals("6759556b09fbb4fd8ae5e315134481cc25d46954", actid.name());
+
+		RevTag mapTag = parseTag(actid);
+		assertEquals(Constants.OBJ_BLOB, mapTag.getObject().getType());
+		assertEquals("test020 tagged\n", mapTag.getFullMessage());
+		assertEquals(new PersonIdent(author, 1154236443000L, -4 * 60), mapTag
+				.getTaggerIdent());
+		assertEquals("e69de29bb2d1d6434b8b29ae775ad8c2e48c5391", mapTag
+				.getObject().getId().name());
+	}
+

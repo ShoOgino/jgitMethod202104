@@ -1,3 +1,4 @@
+	@Test
 	public void testSimple() throws Exception {
 		readConfig("[remote \"spearce\"]\n"
 				+ "url = http://www.spearce.org/egit.git\n"
@@ -16,7 +17,8 @@
 		assertSame(TagOpt.AUTO_FOLLOW, rc.getTagOpt());
 
 		assertEquals(1, allURIs.size());
-		assertEquals("http://www.spearce.org/egit.git", allURIs.get(0));
+		assertEquals("http://www.spearce.org/egit.git", allURIs.get(0)
+				.toString());
 
 		assertEquals(1, rc.getFetchRefSpecs().size());
 		spec = rc.getFetchRefSpecs().get(0);

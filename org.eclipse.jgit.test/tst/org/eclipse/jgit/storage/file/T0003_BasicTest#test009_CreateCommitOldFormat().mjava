@@ -1,0 +1,38 @@
+	@Test
+	public void test009_CreateCommitOldFormat() throws IOException {
+		final ObjectId treeId = insertTree(new TreeFormatter());
+		final CommitBuilder c = new CommitBuilder();
+		c.setAuthor(new PersonIdent(author, 1154236443000L, -4 * 60));
+		c.setCommitter(new PersonIdent(committer, 1154236443000L, -4 * 60));
+		c.setMessage("A Commit\n");
+		c.setTreeId(treeId);
+		assertEquals(treeId, c.getTreeId());
+
+		ObjectId actid = insertCommit(c);
+
+		final ObjectId cmtid = ObjectId
+				.fromString("9208b2459ea6609a5af68627cc031796d0d9329b");
+		assertEquals(cmtid, actid);
+
+		// Verify the commit we just wrote is in the correct format.
+		ObjectDatabase odb = db.getObjectDatabase();
+		assertTrue("is ObjectDirectory", odb instanceof ObjectDirectory);
+		final XInputStream xis = new XInputStream(new FileInputStream(
+				((ObjectDirectory) odb).fileFor(cmtid)));
+		try {
+			assertEquals(0x78, xis.readUInt8());
+			assertEquals(0x9c, xis.readUInt8());
+			assertTrue(0x789c % 31 == 0);
+		} finally {
+			xis.close();
+		}
+
+		// Verify we can read it.
+		RevCommit c2 = parseCommit(actid);
+		assertNotNull(c2);
+		assertEquals(c.getMessage(), c2.getFullMessage());
+		assertEquals(c.getTreeId(), c2.getTree());
+		assertEquals(c.getAuthor(), c2.getAuthorIdent());
+		assertEquals(c.getCommitter(), c2.getCommitterIdent());
+	}
+

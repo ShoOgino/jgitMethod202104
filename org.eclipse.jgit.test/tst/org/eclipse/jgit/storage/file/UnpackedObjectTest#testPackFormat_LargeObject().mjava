@@ -1,6 +1,7 @@
+	@Test
 	public void testPackFormat_LargeObject() throws Exception {
 		final int type = Constants.OBJ_BLOB;
-		byte[] data = rng.nextBytes(streamThreshold + 5);
+		byte[] data = getRng().nextBytes(streamThreshold + 5);
 		ObjectId id = new ObjectInserter.Formatter().idFor(type, data);
 		write(id, compressPackFormat(type, data));
 

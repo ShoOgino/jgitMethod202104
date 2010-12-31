@@ -1,11 +1,11 @@
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 		super.setUp();
 
 		WindowCacheConfig cfg = new WindowCacheConfig();
 		cfg.setStreamFileThreshold(streamThreshold);
 		WindowCache.reconfigure(cfg);
 
-		rng = new TestRng(getName());
 		repo = createBareRepository();
 		tr = new TestRepository<FileRepository>(repo);
 		wc = (WindowCursor) repo.newObjectReader();

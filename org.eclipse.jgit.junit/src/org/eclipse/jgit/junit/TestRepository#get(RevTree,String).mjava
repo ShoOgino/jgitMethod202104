@@ -6,12 +6,10 @@
 	 * @param path
 	 *            the path to find the entry of.
 	 * @return the parsed object entry at this path, never null.
-	 * @throws AssertionFailedError
-	 *             if the path does not exist in the given tree.
 	 * @throws Exception
 	 */
 	public RevObject get(final RevTree tree, final String path)
-			throws AssertionFailedError, Exception {
+			throws Exception {
 		final TreeWalk tw = new TreeWalk(pool.getObjectReader());
 		tw.setFilter(PathFilterGroup.createFromStrings(Collections
 				.singleton(path)));
@@ -25,7 +23,7 @@
 			final FileMode entmode = tw.getFileMode(0);
 			return pool.lookupAny(entid, entmode.getObjectType());
 		}
-		Assert.fail("Can't find " + path + " in tree " + tree.name());
+		fail("Can't find " + path + " in tree " + tree.name());
 		return null; // never reached.
 	}
 

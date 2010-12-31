@@ -1,6 +1,7 @@
+	@Test
 	public void testWhole_SmallObject() throws Exception {
 		final int type = Constants.OBJ_BLOB;
-		byte[] data = rng.nextBytes(300);
+		byte[] data = getRng().nextBytes(300);
 		RevBlob id = tr.blob(data);
 		tr.branch("master").commit().add("A", id).create();
 		tr.packAndPrune();

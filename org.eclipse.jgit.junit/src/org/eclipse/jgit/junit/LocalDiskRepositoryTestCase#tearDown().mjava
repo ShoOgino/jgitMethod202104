@@ -1,5 +1,5 @@
-	@Override
-	protected void tearDown() throws Exception {
+	@After
+	public void tearDown() throws Exception {
 		RepositoryCache.clear();
 		for (Repository r : toClose)
 			r.close();
@@ -12,7 +12,6 @@
 		if (useMMAP)
 			System.gc();
 
-		recursiveDelete(testName(), trash, false, true);
-		super.tearDown();
+		recursiveDelete(testId(), trash, false, true);
 	}
 

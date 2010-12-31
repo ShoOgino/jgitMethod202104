@@ -1,6 +1,5 @@
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
+	@Before
+	public void setUp() throws Exception {
 
 		synchronized(this) {
 			if (shutdownHook == null) {
@@ -19,7 +18,7 @@
 				Runtime.getRuntime().addShutdownHook(shutdownHook);
 			}
 		}
-		recursiveDelete(testName(), trash, true, false);
+		recursiveDelete(testId(), trash, true, false);
 
 		mockSystemReader = new MockSystemReader();
 		mockSystemReader.userGitConfig = new FileBasedConfig(new File(trash,

@@ -1,3 +1,4 @@
+	@Test
 	public void testMirror() throws Exception {
 		readConfig("[remote \"spearce\"]\n"
 				+ "url = http://www.spearce.org/egit.git\n"
@@ -14,7 +15,8 @@
 		assertNotNull(rc.getPushRefSpecs());
 
 		assertEquals(1, allURIs.size());
-		assertEquals("http://www.spearce.org/egit.git", allURIs.get(0));
+		assertEquals("http://www.spearce.org/egit.git", allURIs.get(0)
+				.toString());
 
 		assertEquals(2, rc.getFetchRefSpecs().size());
 
