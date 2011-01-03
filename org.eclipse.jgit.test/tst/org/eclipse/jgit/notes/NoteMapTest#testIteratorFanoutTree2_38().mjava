@@ -1,0 +1,18 @@
+	public void testIteratorFanoutTree2_38() throws Exception {
+		RevBlob a = tr.blob("a");
+		RevBlob b = tr.blob("b");
+		RevBlob data1 = tr.blob("data1");
+		RevBlob data2 = tr.blob("data2");
+		RevBlob nonNote = tr.blob("non note");
+
+		RevCommit r = tr.commit() //
+				.add(fanout(2, a.name()), data1) //
+				.add(fanout(2, b.name()), data2) //
+				.add("nonNote", nonNote) //
+				.create();
+		tr.parseBody(r);
+
+		Iterator it = NoteMap.read(reader, r).iterator();
+		assertEquals(2, count(it));
+	}
+
