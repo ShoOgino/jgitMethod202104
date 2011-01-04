@@ -1,0 +1,33 @@
+	private TreeFormatter build(boolean insert, ObjectInserter inserter)
+			throws IOException {
+		byte[] nameBuf = new byte[2];
+		TreeFormatter fmt = new TreeFormatter(treeSize());
+		NonNoteEntry e = nonNotes;
+
+		for (int cell = 0; cell < 256; cell++) {
+			NoteBucket b = table[cell];
+			if (b == null)
+				continue;
+
+			nameBuf[0] = hexchar[cell >>> 4];
+			nameBuf[1] = hexchar[cell & 0x0f];
+
+			while (e != null && e.pathCompare(nameBuf, 0, 2, TREE) < 0) {
+				e.format(fmt);
+				e = e.next;
+			}
+
+			ObjectId id;
+			if (insert) {
+				id = b.writeTree(inserter);
+			} else {
+				id = b.getTreeId();
+			}
+			fmt.append(nameBuf, 0, 2, TREE, id);
+		}
+
+		for (; e != null; e = e.next)
+			e.format(fmt);
+		return fmt;
+	}
+

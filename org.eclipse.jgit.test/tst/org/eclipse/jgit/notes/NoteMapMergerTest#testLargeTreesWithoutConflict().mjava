@@ -1,0 +1,14 @@
+	@Test
+	public void testLargeTreesWithoutConflict() throws Exception {
+		NoteMapMerger merger = new NoteMapMerger(db, null, null);
+		NoteMap map1 = createLargeNoteMap("note_1_", "content_1_", 300, 0);
+		NoteMap map2 = createLargeNoteMap("note_2_", "content_2_", 300, 0);
+
+		NoteMap result = merger.merge(empty, map1, map2);
+		assertEquals(600, countNotes(result));
+		// check a few random notes
+		assertEquals(tr.blob("content_1_59"), result.get(tr.blob("note_1_59")));
+		assertEquals(tr.blob("content_2_10"), result.get(tr.blob("note_2_10")));
+		assertEquals(tr.blob("content_2_99"), result.get(tr.blob("note_2_99")));
+	}
+

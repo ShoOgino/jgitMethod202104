@@ -1,0 +1,16 @@
+	@Test
+	public void testFanoutAndLeafWitConflict() throws Exception {
+		NoteMapMerger merger = new NoteMapMerger(db, new DefaultNoteMerger(),
+				null);
+
+		NoteMap largeTree_b1 = createLargeNoteMap("note_1_", "content_1_", 300,
+				0);
+		String noteBContent1 = noteBContent + "change";
+		largeTree_b1.set(noteBId, tr.blob(noteBContent1));
+		largeTree_b1.writeTree(inserter);
+
+		NoteMap result = merger.merge(map_a, map_a_b, largeTree_b1);
+		assertEquals(301, countNotes(result));
+		assertEquals(tr.blob(noteBContent + noteBContent1), result.get(noteBId));
+	}
+

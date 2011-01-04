@@ -1,0 +1,14 @@
+	@Test
+	public void testAddAdd() throws Exception {
+		Note add1 = newNote("add1");
+		Note add2 = newNote("add2");
+
+		Note result = merger.merge(null, add1, add2, reader, inserter);
+		assertEquals(result, noteOn); // same note
+		assertEquals(result.getData(), tr.blob("add1add2"));
+
+		result = merger.merge(null, add2, add1, reader, inserter);
+		assertEquals(result, noteOn); // same note
+		assertEquals(result.getData(), tr.blob("add2add1"));
+	}
+

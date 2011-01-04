@@ -1,0 +1,31 @@
+	@Override
+	@Before
+	public void setUp() throws Exception {
+		super.setUp();
+		tr = new TestRepository<Repository>(db);
+		reader = db.newObjectReader();
+		inserter = db.newObjectInserter();
+
+		noRoot = NoteMap.newMap(null, reader);
+		empty = NoteMap.newEmptyMap();
+
+		noteAId = tr.blob("a");
+		noteAContent = "noteAContent";
+		noteABlob = tr.blob(noteAContent);
+		sampleTree_a = tr.commit()
+				.add(noteAId.name(), noteABlob)
+				.create();
+		tr.parseBody(sampleTree_a);
+		map_a = NoteMap.read(reader, sampleTree_a);
+
+		noteBId = tr.blob("b");
+		noteBContent = "noteBContent";
+		noteBBlob = tr.blob(noteBContent);
+		sampleTree_a_b = tr.commit()
+				.add(noteAId.name(), noteABlob)
+				.add(noteBId.name(), noteBBlob)
+				.create();
+		tr.parseBody(sampleTree_a_b);
+		map_a_b = NoteMap.read(reader, sampleTree_a_b);
+	}
+

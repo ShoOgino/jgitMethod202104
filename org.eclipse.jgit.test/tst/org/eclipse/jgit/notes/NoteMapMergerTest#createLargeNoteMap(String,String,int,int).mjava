@@ -1,0 +1,12 @@
+	private NoteMap createLargeNoteMap(String noteNamePrefix,
+			String noteContentPrefix, int notesCount, int firstIndex)
+			throws Exception {
+		NoteMap result = NoteMap.newEmptyMap();
+		for (int i = 0; i < notesCount; i++) {
+			result.set(tr.blob(noteNamePrefix + (firstIndex + i)),
+					tr.blob(noteContentPrefix + (firstIndex + i)));
+		}
+		result.writeTree(inserter);
+		return result;
+	}
+

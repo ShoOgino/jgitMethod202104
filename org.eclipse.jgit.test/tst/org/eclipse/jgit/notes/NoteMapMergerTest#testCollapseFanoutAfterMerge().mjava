@@ -1,0 +1,16 @@
+	@Test
+	public void testCollapseFanoutAfterMerge() throws Exception {
+		NoteMapMerger merger = new NoteMapMerger(db, null, null);
+
+		NoteMap largeTree = createLargeNoteMap("note_", "content_", 257, 0);
+		assertTrue(largeTree.getRoot() instanceof FanoutBucket);
+		NoteMap deleteFirstHundredNotes = createLargeNoteMap("note_", "content_", 157,
+				100);
+		NoteMap deleteLastHundredNotes = createLargeNoteMap("note_",
+				"content_", 157, 0);
+		NoteMap result = merger.merge(largeTree, deleteFirstHundredNotes,
+				deleteLastHundredNotes);
+		assertEquals(57, countNotes(result));
+		assertTrue(result.getRoot() instanceof LeafBucket);
+	}
+

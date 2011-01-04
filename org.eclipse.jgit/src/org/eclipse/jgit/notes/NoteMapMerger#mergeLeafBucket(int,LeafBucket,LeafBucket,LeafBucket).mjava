@@ -1,0 +1,40 @@
+	private InMemoryNoteBucket mergeLeafBucket(int treeDepth, LeafBucket bb,
+			LeafBucket ob, LeafBucket tb) throws MissingObjectException,
+			IOException {
+		bb = notNullOrEmpty(bb);
+		ob = notNullOrEmpty(ob);
+		tb = notNullOrEmpty(tb);
+
+		InMemoryNoteBucket result = new LeafBucket(treeDepth * 2);
+		int bi = 0, oi = 0, ti = 0;
+		while (bi < bb.size() || oi < ob.size() || ti < tb.size()) {
+			Note b = get(bb, bi), o = get(ob, oi), t = get(tb, ti);
+			Note min = min(b, o, t);
+
+			b = sameNoteOrNull(min, b);
+			o = sameNoteOrNull(min, o);
+			t = sameNoteOrNull(min, t);
+
+			if (sameContent(o, t))
+				result = addIfNotNull(result, o);
+
+			else if (sameContent(b, o))
+				result = addIfNotNull(result, t);
+
+			else if (sameContent(b, t))
+				result = addIfNotNull(result, o);
+
+			else
+				result = addIfNotNull(result,
+						noteMerger.merge(b, o, t, reader, inserter));
+
+			if (b != null)
+				bi++;
+			if (o != null)
+				oi++;
+			if (t != null)
+				ti++;
+		}
+		return result;
+	}
+

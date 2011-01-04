@@ -1,0 +1,8 @@
+	private FanoutBucket asFanout(InMemoryNoteBucket bucket) {
+		if (bucket == null)
+			return EMPTY_FANOUT;
+		if (bucket instanceof FanoutBucket)
+			return (FanoutBucket) bucket;
+		return ((LeafBucket) bucket).split();
+	}
+

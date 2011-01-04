@@ -1,0 +1,18 @@
+	@Test
+	public void testEditDeleteConflict() throws Exception {
+		NoteMapMerger merger = new NoteMapMerger(db, new DefaultNoteMerger(),
+				null);
+		NoteMap result;
+
+		NoteMap map_a_b1 = NoteMap.read(reader, sampleTree_a_b);
+		String noteBContent1 = noteBContent + "change";
+		RevBlob noteBBlob1 = tr.blob(noteBContent1);
+		map_a_b1.set(noteBId, noteBBlob1);
+		map_a_b1.writeTree(inserter);
+
+		result = merger.merge(map_a_b, map_a_b1, map_a);
+		assertEquals(2, countNotes(result));
+		assertEquals(noteABlob, result.get(noteAId));
+		assertEquals(noteBBlob1, result.get(noteBId));
+	}
+

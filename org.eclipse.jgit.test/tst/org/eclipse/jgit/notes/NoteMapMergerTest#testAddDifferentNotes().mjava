@@ -1,0 +1,18 @@
+	@Test
+	public void testAddDifferentNotes() throws Exception {
+		NoteMapMerger merger = new NoteMapMerger(db, null, null);
+		NoteMap result;
+
+		NoteMap map_a_c = NoteMap.read(reader, sampleTree_a);
+		RevBlob noteCId = tr.blob("c");
+		RevBlob noteCBlob = tr.blob("noteCContent");
+		map_a_c.set(noteCId, noteCBlob);
+		map_a_c.writeTree(inserter);
+
+		result = merger.merge(map_a, map_a_b, map_a_c);
+		assertEquals(3, countNotes(result));
+		assertEquals(noteABlob, result.get(noteAId));
+		assertEquals(noteBBlob, result.get(noteBId));
+		assertEquals(noteCBlob, result.get(noteCId));
+	}
+

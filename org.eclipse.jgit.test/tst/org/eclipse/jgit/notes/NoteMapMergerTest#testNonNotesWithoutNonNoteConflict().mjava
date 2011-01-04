@@ -1,0 +1,34 @@
+	@Test
+	public void testNonNotesWithoutNonNoteConflict() throws Exception {
+		NoteMapMerger merger = new NoteMapMerger(db, null,
+				MergeStrategy.RESOLVE);
+		RevCommit treeWithNonNotes =
+			tr.commit()
+				.add(noteAId.name(), noteABlob) // this is a note
+				.add("a.txt", tr.blob("content of a.txt")) // this is a non-note
+				.create();
+		tr.parseBody(treeWithNonNotes);
+		NoteMap base = NoteMap.read(reader, treeWithNonNotes);
+
+		treeWithNonNotes =
+			tr.commit()
+				.add(noteAId.name(), noteABlob)
+				.add("a.txt", tr.blob("content of a.txt"))
+				.add("b.txt", tr.blob("content of b.txt"))
+				.create();
+		tr.parseBody(treeWithNonNotes);
+		NoteMap ours = NoteMap.read(reader, treeWithNonNotes);
+
+		treeWithNonNotes =
+			tr.commit()
+				.add(noteAId.name(), noteABlob)
+				.add("a.txt", tr.blob("content of a.txt"))
+				.add("c.txt", tr.blob("content of c.txt"))
+				.create();
+		tr.parseBody(treeWithNonNotes);
+		NoteMap theirs = NoteMap.read(reader, treeWithNonNotes);
+
+		NoteMap result = merger.merge(base, ours, theirs);
+		assertEquals(3, countNonNotes(result));
+	}
+

@@ -1,0 +1,31 @@
+	private NonNoteEntry mergeNonNotes(NonNoteEntry baseList,
+			NonNoteEntry oursList, NonNoteEntry theirsList) throws IOException {
+		if (baseList == null && oursList == null && theirsList == null)
+			return null;
+
+		ObjectId baseId = write(baseList);
+		ObjectId oursId = write(oursList);
+		ObjectId theirsId = write(theirsList);
+		inserter.flush();
+
+		ObjectId resultTreeId;
+		if (nonNotesMergeStrategy instanceof ThreeWayMergeStrategy) {
+			ThreeWayMerger m = ((ThreeWayMergeStrategy) nonNotesMergeStrategy)
+					.newMerger(db, true);
+			m.setBase(baseId);
+			if (!m.merge(oursId, theirsId))
+				throw new NotesMergeConflictException(baseList, oursList,
+						theirsList);
+
+			resultTreeId = m.getResultTreeId();
+		} else {
+			Merger m = nonNotesMergeStrategy.newMerger(db, true);
+			if (!m.merge(new AnyObjectId[] { oursId, theirsId }))
+				throw new NotesMergeConflictException(baseList, oursList,
+						theirsList);
+			resultTreeId = m.getResultTreeId();
+		}
+		AbbreviatedObjectId none = AbbreviatedObjectId.fromString("");
+		return NoteParser.parse(none, resultTreeId, reader).nonNotes;
+	}
+

@@ -1,0 +1,13 @@
+	@Test
+	public void testNoChange() throws IOException {
+		NoteMapMerger merger = new NoteMapMerger(db, null, null);
+		NoteMap result;
+
+		assertEquals(0, countNotes(merger.merge(noRoot, noRoot, noRoot)));
+		assertEquals(0, countNotes(merger.merge(empty, empty, empty)));
+
+		result = merger.merge(map_a, map_a, map_a);
+		assertEquals(1, countNotes(result));
+		assertEquals(noteABlob, result.get(noteAId));
+	}
+

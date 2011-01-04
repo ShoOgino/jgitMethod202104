@@ -1,0 +1,31 @@
+	private InMemoryNoteBucket mergeFanoutBucket(int treeDepth,
+			FanoutBucket base,
+			FanoutBucket ours, FanoutBucket theirs) throws IOException {
+		FanoutBucket result = new FanoutBucket(treeDepth * 2);
+		// walking through entries of base, ours, theirs
+		for (int i = 0; i < 256; i++) {
+			NoteBucket b = base.getBucket(i);
+			NoteBucket o = ours.getBucket(i);
+			NoteBucket t = theirs.getBucket(i);
+
+			if (equals(o, t))
+				addIfNotNull(result, i, o);
+
+			else if (equals(b, o))
+				addIfNotNull(result, i, t);
+
+			else if (equals(b, t))
+				addIfNotNull(result, i, o);
+
+			else {
+				objectIdPrefix.setByte(treeDepth, i);
+				InMemoryNoteBucket mergedBucket = merge(treeDepth + 1,
+						FanoutBucket.loadIfLazy(b, objectIdPrefix, reader),
+						FanoutBucket.loadIfLazy(o, objectIdPrefix, reader),
+						FanoutBucket.loadIfLazy(t, objectIdPrefix, reader));
+				result.setBucket(i, mergedBucket);
+			}
+		}
+		return result.contractIfTooSmall(objectIdPrefix, reader);
+	}
+

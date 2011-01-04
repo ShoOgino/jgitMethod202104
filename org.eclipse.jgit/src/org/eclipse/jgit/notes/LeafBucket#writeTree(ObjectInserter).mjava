@@ -1,26 +1,5 @@
 	@Override
 	ObjectId writeTree(ObjectInserter inserter) throws IOException {
-		byte[] nameBuf = new byte[OBJECT_ID_STRING_LENGTH];
-		int nameLen = OBJECT_ID_STRING_LENGTH - prefixLen;
-		TreeFormatter fmt = new TreeFormatter(treeSize(nameLen));
-		NonNoteEntry e = nonNotes;
-
-		for (int i = 0; i < cnt; i++) {
-			Note n = notes[i];
-
-			n.copyTo(nameBuf, 0);
-
-			while (e != null
-					&& e.pathCompare(nameBuf, prefixLen, nameLen, REGULAR_FILE) < 0) {
-				e.format(fmt);
-				e = e.next;
-			}
-
-			fmt.append(nameBuf, prefixLen, nameLen, REGULAR_FILE, n.getData());
-		}
-
-		for (; e != null; e = e.next)
-			e.format(fmt);
-		return inserter.insert(fmt);
+		return inserter.insert(build());
 	}
 

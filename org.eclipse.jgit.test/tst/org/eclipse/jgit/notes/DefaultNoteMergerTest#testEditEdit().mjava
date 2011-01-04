@@ -1,0 +1,14 @@
+	@Test
+	public void testEditEdit() throws Exception {
+		Note edit1 = newNote("edit1");
+		Note edit2 = newNote("edit2");
+
+		Note result = merger.merge(baseNote, edit1, edit2, reader, inserter);
+		assertEquals(result, noteOn); // same note
+		assertEquals(result.getData(), tr.blob("edit1edit2"));
+
+		result = merger.merge(baseNote, edit2, edit1, reader, inserter);
+		assertEquals(result, noteOn); // same note
+		assertEquals(result.getData(), tr.blob("edit2edit1"));
+	}
+

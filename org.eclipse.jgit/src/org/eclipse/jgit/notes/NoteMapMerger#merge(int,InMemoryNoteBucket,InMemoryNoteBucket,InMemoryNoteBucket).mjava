@@ -1,0 +1,31 @@
+	/**
+	 * This method is called only when it is known that there is some difference
+	 * between base, ours and theirs.
+	 *
+	 * @param treeDepth
+	 * @param base
+	 * @param ours
+	 * @param theirs
+	 * @return merge result as an InMemoryBucket
+	 * @throws IOException
+	 */
+	private InMemoryNoteBucket merge(int treeDepth, InMemoryNoteBucket base,
+			InMemoryNoteBucket ours, InMemoryNoteBucket theirs)
+			throws IOException {
+		InMemoryNoteBucket result;
+
+		if (base instanceof FanoutBucket || ours instanceof FanoutBucket
+				|| theirs instanceof FanoutBucket) {
+			result = mergeFanoutBucket(treeDepth, asFanout(base),
+					asFanout(ours), asFanout(theirs));
+
+		} else {
+			result = mergeLeafBucket(treeDepth, (LeafBucket) base,
+					(LeafBucket) ours, (LeafBucket) theirs);
+		}
+
+		result.nonNotes = mergeNonNotes(nonNotes(base), nonNotes(ours),
+				nonNotes(theirs));
+		return result;
+	}
+

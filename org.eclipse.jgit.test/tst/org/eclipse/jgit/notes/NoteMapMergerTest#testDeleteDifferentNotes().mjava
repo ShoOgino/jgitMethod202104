@@ -1,0 +1,11 @@
+	@Test
+	public void testDeleteDifferentNotes() throws Exception {
+		NoteMapMerger merger = new NoteMapMerger(db, null, null);
+
+		NoteMap map_b = NoteMap.read(reader, sampleTree_a_b);
+		map_b.set(noteAId, null); // delete note a
+		map_b.writeTree(inserter);
+
+		assertEquals(0, countNotes(merger.merge(map_a_b, map_a, map_b)));
+	}
+

@@ -1,0 +1,9 @@
+	@Test
+	public void testFanoutAndLeafWithoutConflict() throws Exception {
+		NoteMapMerger merger = new NoteMapMerger(db, null, null);
+
+		NoteMap largeTree = createLargeNoteMap("note_1_", "content_1_", 300, 0);
+		NoteMap result = merger.merge(map_a, map_a_b, largeTree);
+		assertEquals(301, countNotes(result));
+	}
+

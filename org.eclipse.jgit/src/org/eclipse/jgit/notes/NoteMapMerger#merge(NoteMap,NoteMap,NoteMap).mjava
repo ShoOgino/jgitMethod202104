@@ -1,0 +1,25 @@
+	/**
+	 * Performs the merge.
+	 *
+	 * @param base
+	 *            base version of the note tree
+	 * @param ours
+	 *            ours version of the note tree
+	 * @param theirs
+	 *            theirs version of the note tree
+	 * @return merge result as a new NoteMap
+	 * @throws IOException
+	 */
+	public NoteMap merge(NoteMap base, NoteMap ours, NoteMap theirs)
+			throws IOException {
+		try {
+			InMemoryNoteBucket mergedBucket = merge(0, base.getRoot(),
+					ours.getRoot(), theirs.getRoot());
+			inserter.flush();
+			return NoteMap.newMap(mergedBucket, reader);
+		} finally {
+			reader.release();
+			inserter.release();
+		}
+	}
+

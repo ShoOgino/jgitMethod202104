@@ -1,0 +1,21 @@
+	/**
+	 * Constructs a NoteMapMerger with custom {@link NoteMerger} and custom
+	 * {@link MergeStrategy}.
+	 *
+	 * @param db
+	 *            Git repository
+	 * @param noteMerger
+	 *            note merger for merging conflicting changes on a note
+	 * @param nonNotesMergeStrategy
+	 *            merge strategy for merging non-note entries
+	 */
+	public NoteMapMerger(Repository db, NoteMerger noteMerger,
+			MergeStrategy nonNotesMergeStrategy) {
+		this.db = db;
+		this.reader = db.newObjectReader();
+		this.inserter = db.newObjectInserter();
+		this.noteMerger = noteMerger;
+		this.nonNotesMergeStrategy = nonNotesMergeStrategy;
+		this.objectIdPrefix = new MutableObjectId();
+	}
+

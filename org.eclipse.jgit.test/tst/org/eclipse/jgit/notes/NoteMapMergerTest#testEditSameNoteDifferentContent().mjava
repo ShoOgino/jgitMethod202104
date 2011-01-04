@@ -1,0 +1,24 @@
+	@Test
+	public void testEditSameNoteDifferentContent() throws Exception {
+		NoteMapMerger merger = new NoteMapMerger(db, new DefaultNoteMerger(),
+				null);
+		NoteMap result;
+
+		NoteMap map_a1 = NoteMap.read(reader, sampleTree_a);
+		String noteAContent1 = noteAContent + "change1";
+		RevBlob noteABlob1 = tr.blob(noteAContent1);
+		map_a1.set(noteAId, noteABlob1);
+		map_a1.writeTree(inserter);
+
+		NoteMap map_a2 = NoteMap.read(reader, sampleTree_a);
+		String noteAContent2 = noteAContent + "change2";
+		RevBlob noteABlob2 = tr.blob(noteAContent2);
+		map_a2.set(noteAId, noteABlob2);
+		map_a2.writeTree(inserter);
+
+		result = merger.merge(map_a, map_a1, map_a2);
+		assertEquals(1, countNotes(result));
+		assertEquals(tr.blob(noteAContent1 + noteAContent2),
+				result.get(noteAId));
+	}
+

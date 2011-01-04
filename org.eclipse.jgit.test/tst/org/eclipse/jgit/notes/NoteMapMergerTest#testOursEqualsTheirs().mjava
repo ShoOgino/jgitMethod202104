@@ -1,0 +1,29 @@
+	@Test
+	public void testOursEqualsTheirs() throws Exception {
+		NoteMapMerger merger = new NoteMapMerger(db, null, null);
+		NoteMap result;
+
+		assertEquals(0, countNotes(merger.merge(empty, noRoot, noRoot)));
+		assertEquals(0, countNotes(merger.merge(map_a, noRoot, noRoot)));
+
+		assertEquals(0, countNotes(merger.merge(noRoot, empty, empty)));
+		assertEquals(0, countNotes(merger.merge(map_a, empty, empty)));
+
+		result = merger.merge(noRoot, map_a, map_a);
+		assertEquals(1, countNotes(result));
+		assertEquals(noteABlob, result.get(noteAId));
+
+		result = merger.merge(empty, map_a, map_a);
+		assertEquals(1, countNotes(result));
+		assertEquals(noteABlob, result.get(noteAId));
+
+		result = merger.merge(map_a_b, map_a, map_a);
+		assertEquals(1, countNotes(result));
+		assertEquals(noteABlob, result.get(noteAId));
+
+		result = merger.merge(map_a, map_a_b, map_a_b);
+		assertEquals(2, countNotes(result));
+		assertEquals(noteABlob, result.get(noteAId));
+		assertEquals(noteBBlob, result.get(noteBId));
+	}
+

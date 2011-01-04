@@ -1,0 +1,14 @@
+	InMemoryNoteBucket contractIfTooSmall(AnyObjectId noteOn, ObjectReader or)
+			throws IOException {
+		if (estimateSize(noteOn, or) < LeafBucket.MAX_SIZE) {
+			// We are small enough to just contract to a single leaf.
+			InMemoryNoteBucket r = new LeafBucket(prefixLen);
+			for (Iterator<Note> i = iterator(noteOn, or); i.hasNext();)
+				r = r.append(i.next());
+			r.nonNotes = nonNotes;
+			return r;
+		}
+
+		return this;
+	}
+
