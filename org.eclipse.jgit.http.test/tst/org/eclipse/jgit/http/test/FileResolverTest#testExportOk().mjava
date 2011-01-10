@@ -22,8 +22,7 @@
 			fail("did not honor export-all flag");
 		}
 
-		export.createNewFile();
-		assertTrue("has git-daemon-export-ok", export.exists());
+		FileUtils.createNewFile(export);
 		resolver = new FileResolver(base, false /* require flag */);
 		try {
 			resolver.open(null, name).close();
