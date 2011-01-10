@@ -1,12 +1,15 @@
 		public Set<String> parse(Config cfg) {
-			final Set<String> result = new HashSet<String>();
+			final Map<String, String> m = new LinkedHashMap<String, String>();
 			while (cfg != null) {
 				for (final Entry e : cfg.state.get().entryList) {
-					if (e.section != null)
-						result.add(StringUtils.toLowerCase(e.section));
+					if (e.section != null) {
+						String lc = StringUtils.toLowerCase(e.section);
+						if (!m.containsKey(lc))
+							m.put(lc, e.section);
+					}
 				}
 				cfg = cfg.baseConfig;
 			}
-			return Collections.unmodifiableSet(result);
+			return new CaseFoldingSet(m);
 		}
 
