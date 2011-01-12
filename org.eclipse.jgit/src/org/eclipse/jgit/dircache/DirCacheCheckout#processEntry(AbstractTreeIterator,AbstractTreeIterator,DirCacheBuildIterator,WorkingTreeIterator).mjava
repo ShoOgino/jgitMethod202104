@@ -182,6 +182,16 @@
 		}
 
 		if (i == null) {
+			// make sure not to overwrite untracked files
+			if (f != null) {
+				// a dirty worktree: the index is empty but we have a
+				// workingtree-file
+				if (mId == null || !mId.equals(f.getEntryObjectId())) {
+					conflict(name, null, h, m);
+					return;
+				}
+			}
+
 			/**
 			 * <pre>
 			 * 		    I (index)                H        M        Result

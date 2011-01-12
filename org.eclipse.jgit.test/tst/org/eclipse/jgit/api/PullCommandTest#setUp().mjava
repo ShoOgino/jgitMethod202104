@@ -11,13 +11,7 @@
 		writeToFile(sourceFile, "Hello world");
 		// and commit it
 		source.add().addFilepattern("SomeFile.txt").call();
-		RevCommit commit = source.commit().setMessage(
-				"Initial commit for source").call();
-
-		// point the master branch to the new commit
-		RefUpdate upd = dbTarget.updateRef("refs/heads/master");
-		upd.setNewObjectId(commit.getId());
-		upd.update();
+		source.commit().setMessage("Initial commit for source").call();
 
 		// configure the target repo to connect to the source via "origin"
 		StoredConfig targetConfig = dbTarget.getConfig();
@@ -35,8 +29,8 @@
 		targetConfig.save();
 
 		targetFile = new File(dbTarget.getWorkTree(), "SomeFile.txt");
-		writeToFile(targetFile, "Hello world");
 		// make sure we have the same content
 		target.pull().call();
+		assertFileContentsEqual(targetFile, "Hello world");
 	}
 
