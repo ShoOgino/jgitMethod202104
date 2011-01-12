@@ -11,7 +11,8 @@
 			} else if (listMode == ListMode.REMOTE) {
 				refList = repo.getRefDatabase().getRefs(Constants.R_REMOTES);
 			} else {
-				refList = repo.getRefDatabase().getRefs(Constants.R_HEADS);
+				refList = new HashMap<String,Ref>(repo.getRefDatabase().getRefs(
+						Constants.R_HEADS));
 				refList.putAll(repo.getRefDatabase().getRefs(
 						Constants.R_REMOTES));
 			}
