@@ -1,0 +1,23 @@
+	/**
+	 * Store (and/or checksum) a portion of an object's data.
+	 * <p>
+	 * This method may be invoked multiple times per object, depending on the
+	 * size of the object, the size of the parser's internal read buffer, and
+	 * the alignment of the object relative to the read buffer.
+	 * <p>
+	 * Invoked after {@link #onObjectHeader(Source, byte[], int, int)}.
+	 *
+	 * @param src
+	 *            where the data came from
+	 * @param raw
+	 *            buffer to read data from.
+	 * @param pos
+	 *            first offset within buffer that is valid.
+	 * @param len
+	 *            number of bytes in buffer that are valid.
+	 * @throws IOException
+	 *             the stream cannot be archived.
+	 */
+	protected abstract void onObjectData(Source src, byte[] raw, int pos,
+			int len) throws IOException;
+

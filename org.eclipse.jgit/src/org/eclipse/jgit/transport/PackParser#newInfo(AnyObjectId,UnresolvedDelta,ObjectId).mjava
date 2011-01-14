@@ -1,0 +1,22 @@
+	/**
+	 * Construct a PackedObjectInfo instance for this parser.
+	 *
+	 * @param id
+	 *            identity of the object to be tracked.
+	 * @param delta
+	 *            if the object was previously an unresolved delta, this is the
+	 *            delta object that was tracking it. Otherwise null.
+	 * @param deltaBase
+	 *            if the object was previously an unresolved delta, this is the
+	 *            ObjectId of the base of the delta. The base may be outside of
+	 *            the pack stream if the stream was a thin-pack.
+	 * @return info object containing this object's data.
+	 */
+	protected PackedObjectInfo newInfo(AnyObjectId id, UnresolvedDelta delta,
+			ObjectId deltaBase) {
+		PackedObjectInfo oe = new PackedObjectInfo(id);
+		if (delta != null)
+			oe.setCRC(delta.crc);
+		return oe;
+	}
+

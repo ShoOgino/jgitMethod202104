@@ -1,0 +1,23 @@
+	/**
+	 * Get all of the objects, sorted by their name.
+	 * <p>
+	 * The object information is only available after
+	 * {@link #parse(ProgressMonitor)} has returned.
+	 * <p>
+	 * To maintain lower memory usage and good runtime performance, this method
+	 * sorts the objects in-place and therefore impacts the ordering presented
+	 * by {@link #getObject(int)}.
+	 *
+	 * @param cmp
+	 *            comparison function, if null objects are stored by ObjectId.
+	 * @return sorted list of objects in this pack stream.
+	 */
+	public List<PackedObjectInfo> getSortedObjectList(
+			Comparator<PackedObjectInfo> cmp) {
+		Arrays.sort(entries, 0, entryCount, cmp);
+		List<PackedObjectInfo> list = Arrays.asList(entries);
+		if (entryCount < entries.length)
+			list = list.subList(0, entryCount);
+		return list;
+	}
+

@@ -6,17 +6,23 @@
 		if (timeoutIn != null)
 			timeoutIn.setTimeout(10 * timeout * 1000);
 
-		ip = IndexPack.create(db, rawIn);
-		ip.setFixThin(true);
-		ip.setNeedNewObjectIds(checkReferencedIsReachable);
-		ip.setNeedBaseObjectIds(checkReferencedIsReachable);
-		ip.setObjectChecking(isCheckReceivedObjects());
-		ip.index(NullProgressMonitor.INSTANCE);
+		ObjectInserter ins = db.newObjectInserter();
+		try {
+			String lockMsg = "jgit receive-pack";
+			if (getRefLogIdent() != null)
+				lockMsg += " from " + getRefLogIdent().toExternalString();
 
-		String lockMsg = "jgit receive-pack";
-		if (getRefLogIdent() != null)
-			lockMsg += " from " + getRefLogIdent().toExternalString();
-		packLock = ip.renameAndOpenPack(lockMsg);
+			parser = ins.newPackParser(rawIn);
+			parser.setAllowThin(true);
+			parser.setNeedNewObjectIds(checkReferencedIsReachable);
+			parser.setNeedBaseObjectIds(checkReferencedIsReachable);
+			parser.setObjectChecking(isCheckReceivedObjects());
+			parser.setLockMessage(lockMsg);
+			packLock = parser.parse(NullProgressMonitor.INSTANCE);
+			ins.flush();
+		} finally {
+			ins.release();
+		}
 
 		if (timeoutIn != null)
 			timeoutIn.setTimeout(timeout * 1000);

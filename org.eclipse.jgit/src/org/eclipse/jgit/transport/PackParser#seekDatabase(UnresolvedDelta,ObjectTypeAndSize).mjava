@@ -1,0 +1,18 @@
+	/**
+	 * Reposition the database to re-read a previously stored object.
+	 * <p>
+	 * If the database is computing CRC-32 checksums for object data, it should
+	 * reset its internal CRC instance during this method call.
+	 *
+	 * @param delta
+	 *            the object position to begin reading from. This is an instance
+	 *            previously returned by {@link #onEndDelta()}.
+	 * @param info
+	 *            object to populate with type and size.
+	 * @return the {@code info} object.
+	 * @throws IOException
+	 *             the database cannot reposition to this location.
+	 */
+	protected abstract ObjectTypeAndSize seekDatabase(UnresolvedDelta delta,
+			ObjectTypeAndSize info) throws IOException;
+

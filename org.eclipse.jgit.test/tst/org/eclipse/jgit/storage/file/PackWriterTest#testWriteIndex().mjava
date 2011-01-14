@@ -3,6 +3,11 @@
 		config.setIndexVersion(2);
 		writeVerifyPack4(false);
 
+		File packFile = pack.getPackFile();
+		String name = packFile.getName();
+		String base = name.substring(0, name.lastIndexOf('.'));
+		File indexFile = new File(packFile.getParentFile(), base + ".idx");
+
 		// Validate that IndexPack came up with the right CRC32 value.
 		final PackIndex idx1 = PackIndex.open(indexFile);
 		assertTrue(idx1 instanceof PackIndexV2);

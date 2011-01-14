@@ -1,0 +1,16 @@
+	private void readPackFooter() throws IOException {
+		sync();
+		final byte[] actHash = packDigest.digest();
+
+		final int c = fill(Source.INPUT, 20);
+		final byte[] srcHash = new byte[20];
+		System.arraycopy(buf, c, srcHash, 0, 20);
+		use(20);
+
+		if (!Arrays.equals(actHash, srcHash))
+			throw new CorruptObjectException(
+					JGitText.get().corruptObjectPackfileChecksumIncorrect);
+
+		onPackFooter(srcHash);
+	}
+

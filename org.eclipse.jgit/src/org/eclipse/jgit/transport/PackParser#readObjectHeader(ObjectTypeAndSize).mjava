@@ -1,0 +1,65 @@
+	/**
+	 * Read the header of the current object.
+	 * <p>
+	 * After the header has been parsed, this method automatically invokes
+	 * {@link #onObjectHeader(Source, byte[], int, int)} to allow the
+	 * implementation to update its internal checksums for the bytes read.
+	 * <p>
+	 * When this method returns the database will be positioned on the first
+	 * byte of the deflated data stream.
+	 *
+	 * @param info
+	 *            the info object to populate.
+	 * @return {@code info}, after populating.
+	 * @throws IOException
+	 *             the size cannot be read.
+	 */
+	protected ObjectTypeAndSize readObjectHeader(ObjectTypeAndSize info)
+			throws IOException {
+		int hdrPtr = 0;
+		int c = readFrom(Source.DATABASE);
+		hdrBuf[hdrPtr++] = (byte) c;
+
+		info.type = (c >> 4) & 7;
+		long sz = c & 15;
+		int shift = 4;
+		while ((c & 0x80) != 0) {
+			c = readFrom(Source.DATABASE);
+			hdrBuf[hdrPtr++] = (byte) c;
+			sz += (c & 0x7f) << shift;
+			shift += 7;
+		}
+		info.size = sz;
+
+		switch (info.type) {
+		case Constants.OBJ_COMMIT:
+		case Constants.OBJ_TREE:
+		case Constants.OBJ_BLOB:
+		case Constants.OBJ_TAG:
+			onObjectHeader(Source.DATABASE, hdrBuf, 0, hdrPtr);
+			break;
+
+		case Constants.OBJ_OFS_DELTA:
+			c = readFrom(Source.DATABASE);
+			hdrBuf[hdrPtr++] = (byte) c;
+			while ((c & 128) != 0) {
+				c = readFrom(Source.DATABASE);
+				hdrBuf[hdrPtr++] = (byte) c;
+			}
+			onObjectHeader(Source.DATABASE, hdrBuf, 0, hdrPtr);
+			break;
+
+		case Constants.OBJ_REF_DELTA:
+			System.arraycopy(buf, fill(Source.DATABASE, 20), hdrBuf, hdrPtr, 20);
+			hdrPtr += 20;
+			use(20);
+			onObjectHeader(Source.DATABASE, hdrBuf, 0, hdrPtr);
+			break;
+
+		default:
+			throw new IOException(MessageFormat.format(
+					JGitText.get().unknownObjectType, info.type));
+		}
+		return info;
+	}
+

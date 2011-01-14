@@ -1,0 +1,22 @@
+	/**
+	 * Initialize a pack parser.
+	 *
+	 * @param odb
+	 *            database the parser will write its objects into.
+	 * @param src
+	 *            the stream the parser will read.
+	 */
+	protected PackParser(final ObjectDatabase odb, final InputStream src) {
+		objectDatabase = odb.newCachedDatabase();
+		in = src;
+
+		inflater = new InflaterStream();
+		readCurs = objectDatabase.newReader();
+		buf = new byte[BUFFER_SIZE];
+		tempBuffer = new byte[BUFFER_SIZE];
+		hdrBuf = new byte[64];
+		objectDigest = Constants.newMessageDigest();
+		tempObjectId = new MutableObjectId();
+		packDigest = Constants.newMessageDigest();
+	}
+

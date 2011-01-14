@@ -1,0 +1,19 @@
+	/**
+	 * Event notifying start of a delta referencing its base by offset.
+	 *
+	 * @param deltaStreamPosition
+	 *            position of this object in the incoming stream.
+	 * @param baseStreamPosition
+	 *            position of the base object in the incoming stream. The base
+	 *            must be before the delta, therefore {@code baseStreamPosition
+	 *            &lt; deltaStreamPosition}. This is <b>not</b> the position
+	 *            returned by a prior end object event.
+	 * @param inflatedSize
+	 *            size of the delta when fully inflated. The size stored within
+	 *            the pack may be larger or smaller, and is not yet known.
+	 * @throws IOException
+	 *             the object cannot be recorded.
+	 */
+	protected abstract void onBeginOfsDelta(long deltaStreamPosition,
+			long baseStreamPosition, long inflatedSize) throws IOException;
+

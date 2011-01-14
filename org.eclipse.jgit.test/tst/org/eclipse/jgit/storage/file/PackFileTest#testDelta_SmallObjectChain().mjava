@@ -32,11 +32,9 @@
 		deflate(pack, delta3);
 
 		digest(pack);
-		final byte[] raw = pack.toByteArray();
-		IndexPack ip = IndexPack.create(repo, new ByteArrayInputStream(raw));
-		ip.setFixThin(true);
-		ip.index(NullProgressMonitor.INSTANCE);
-		ip.renameAndOpenPack();
+		PackParser ip = index(pack.toByteArray());
+		ip.setAllowThin(true);
+		ip.parse(NullProgressMonitor.INSTANCE);
 
 		assertTrue("has blob", wc.has(id3));
 

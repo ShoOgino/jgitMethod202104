@@ -1,0 +1,42 @@
+	private void resolveDeltas(DeltaVisit visit, final int type,
+			ObjectTypeAndSize info) throws IOException {
+		do {
+			info = openDatabase(visit.delta, info);
+			switch (info.type) {
+			case Constants.OBJ_OFS_DELTA:
+			case Constants.OBJ_REF_DELTA:
+				break;
+
+			default:
+				throw new IOException(MessageFormat.format(
+						JGitText.get().unknownObjectType, info.type));
+			}
+
+			visit.data = BinaryDelta.apply(visit.parent.data, //
+					inflateAndReturn(Source.DATABASE, info.size));
+
+			if (!checkCRC(visit.delta.crc))
+				throw new IOException(MessageFormat.format(
+						JGitText.get().corruptionDetectedReReadingAt,
+						visit.delta.position));
+
+			objectDigest.update(Constants.encodedTypeString(type));
+			objectDigest.update((byte) ' ');
+			objectDigest.update(Constants.encodeASCII(visit.data.length));
+			objectDigest.update((byte) 0);
+			objectDigest.update(visit.data);
+			tempObjectId.fromRaw(objectDigest.digest(), 0);
+
+			verifySafeObject(tempObjectId, type, visit.data);
+
+			PackedObjectInfo oe;
+			oe = newInfo(tempObjectId, visit.delta, visit.parent.id);
+			oe.setOffset(visit.delta.position);
+			addObjectAndTrack(oe);
+			visit.id = oe;
+
+			visit.nextChild = firstChildOf(oe);
+			visit = visit.next();
+		} while (visit != null);
+	}
+

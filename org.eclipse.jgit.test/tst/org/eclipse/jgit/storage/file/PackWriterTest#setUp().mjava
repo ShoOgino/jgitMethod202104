@@ -2,9 +2,11 @@
 	public void setUp() throws Exception {
 		super.setUp();
 		os = new ByteArrayOutputStream();
-		packBase = new File(trash, "tmp_pack");
-		packFile = new File(trash, "tmp_pack.pack");
-		indexFile = new File(trash, "tmp_pack.idx");
 		config = new PackConfig(db);
+
+		dst = createBareRepository();
+		File alt = new File(dst.getObjectDatabase().getDirectory(), "info/alternates");
+		alt.getParentFile().mkdirs();
+		write(alt, db.getObjectDatabase().getDirectory().getAbsolutePath() + "\n");
 	}
 

@@ -1,7 +1,13 @@
 	@After
 	public void tearDown() throws Exception {
-		if (writer != null)
+		if (writer != null) {
 			writer.release();
+			writer = null;
+		}
+		if (inserter != null) {
+			inserter.release();
+			inserter = null;
+		}
 		super.tearDown();
 	}
 

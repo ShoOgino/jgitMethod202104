@@ -4,9 +4,17 @@
 			throws TransportException {
 		verifyPrerequisites();
 		try {
-			final IndexPack ip = newIndexPack();
-			ip.index(monitor);
-			packLock = ip.renameAndOpenPack(lockMessage);
+			ObjectInserter ins = transport.local.newObjectInserter();
+			try {
+				PackParser parser = ins.newPackParser(bin);
+				parser.setAllowThin(true);
+				parser.setObjectChecking(transport.isCheckFetchedObjects());
+				parser.setLockMessage(lockMessage);
+				packLock = parser.parse(NullProgressMonitor.INSTANCE);
+				ins.flush();
+			} finally {
+				ins.release();
+			}
 		} catch (IOException err) {
 			close();
 			throw new TransportException(transport.uri, err.getMessage(), err);

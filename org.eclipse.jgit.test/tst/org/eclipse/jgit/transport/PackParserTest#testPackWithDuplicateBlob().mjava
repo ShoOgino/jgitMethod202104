@@ -1,0 +1,18 @@
+	@Test
+	public void testPackWithDuplicateBlob() throws Exception {
+		final byte[] data = Constants.encode("0123456789abcdefg");
+		TestRepository<Repository> d = new TestRepository<Repository>(db);
+		assertTrue(db.hasObject(d.blob(data)));
+
+		TemporaryBuffer.Heap pack = new TemporaryBuffer.Heap(1024);
+		packHeader(pack, 1);
+		pack.write((Constants.OBJ_BLOB) << 4 | 0x80 | 1);
+		pack.write(1);
+		deflate(pack, data);
+		digest(pack);
+
+		PackParser p = index(new ByteArrayInputStream(pack.toByteArray()));
+		p.setAllowThin(false);
+		p.parse(NullProgressMonitor.INSTANCE);
+	}
+

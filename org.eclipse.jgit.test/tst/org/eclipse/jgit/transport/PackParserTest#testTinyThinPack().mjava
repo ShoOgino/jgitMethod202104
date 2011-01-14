@@ -1,0 +1,20 @@
+	@Test
+	public void testTinyThinPack() throws Exception {
+		TestRepository d = new TestRepository(db);
+		RevBlob a = d.blob("a");
+
+		TemporaryBuffer.Heap pack = new TemporaryBuffer.Heap(1024);
+
+		packHeader(pack, 1);
+
+		pack.write((Constants.OBJ_REF_DELTA) << 4 | 4);
+		a.copyRawTo(pack);
+		deflate(pack, new byte[] { 0x1, 0x1, 0x1, 'b' });
+
+		digest(pack);
+
+		PackParser p = index(new ByteArrayInputStream(pack.toByteArray()));
+		p.setAllowThin(true);
+		p.parse(NullProgressMonitor.INSTANCE);
+	}
+

@@ -1,0 +1,44 @@
+	@Override
+	protected void onEndThinPack() throws IOException {
+		final byte[] tailHash = this.tailDigest.digest();
+		final byte[] buf = buffer();
+
+		final MessageDigest origDigest = Constants.newMessageDigest();
+		final MessageDigest tailDigest = Constants.newMessageDigest();
+		final MessageDigest packDigest = Constants.newMessageDigest();
+
+		long origRemaining = origEnd;
+		out.seek(0);
+		out.readFully(buf, 0, 12);
+		origDigest.update(buf, 0, 12);
+		origRemaining -= 12;
+
+		NB.encodeInt32(buf, 8, getObjectCount());
+		out.seek(0);
+		out.write(buf, 0, 12);
+		packDigest.update(buf, 0, 12);
+
+		for (;;) {
+			final int n = out.read(buf);
+			if (n < 0)
+				break;
+			if (origRemaining != 0) {
+				final int origCnt = (int) Math.min(n, origRemaining);
+				origDigest.update(buf, 0, origCnt);
+				origRemaining -= origCnt;
+				if (origRemaining == 0)
+					tailDigest.update(buf, origCnt, n - origCnt);
+			} else
+				tailDigest.update(buf, 0, n);
+
+			packDigest.update(buf, 0, n);
+		}
+
+		if (!Arrays.equals(origDigest.digest(), origHash)
+				|| !Arrays.equals(tailDigest.digest(), tailHash))
+			throw new IOException(
+					JGitText.get().packCorruptedWhileWritingToFilesystem);
+
+		packHash = packDigest.digest();
+	}
+

@@ -1,0 +1,18 @@
+	/**
+	 * Check the current CRC matches the expected value.
+	 * <p>
+	 * This method is invoked when an object is read back in from the database
+	 * and its data is used during delta resolution. The CRC is validated after
+	 * the object has been fully read, allowing the parser to verify there was
+	 * no silent data corruption.
+	 * <p>
+	 * Implementations are free to ignore this check by always returning true if
+	 * they are performing other data integrity validations at a lower level.
+	 *
+	 * @param oldCRC
+	 *            the prior CRC that was recorded during the first scan of the
+	 *            object from the pack stream.
+	 * @return true if the CRC matches; false if it does not.
+	 */
+	protected abstract boolean checkCRC(int oldCRC);
+

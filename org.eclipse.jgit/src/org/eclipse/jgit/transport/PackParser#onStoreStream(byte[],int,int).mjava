@@ -1,0 +1,24 @@
+	/**
+	 * Store bytes received from the raw stream.
+	 * <p>
+	 * This method is invoked during {@link #parse(ProgressMonitor)} as data is
+	 * consumed from the incoming stream. Implementors may use this event to
+	 * archive the raw incoming stream to the destination repository in large
+	 * chunks, without paying attention to object boundaries.
+	 * <p>
+	 * The only component of the pack not supplied to this method is the last 20
+	 * bytes of the pack that comprise the trailing SHA-1 checksum. Those are
+	 * passed to {@link #onPackFooter(byte[])}.
+	 *
+	 * @param raw
+	 *            buffer to copy data out of.
+	 * @param pos
+	 *            first offset within the buffer that is valid.
+	 * @param len
+	 *            number of bytes in the buffer that are valid.
+	 * @throws IOException
+	 *             the stream cannot be archived.
+	 */
+	protected abstract void onStoreStream(byte[] raw, int pos, int len)
+			throws IOException;
+

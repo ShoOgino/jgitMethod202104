@@ -1,0 +1,24 @@
+	/**
+	 * Provide the implementation with a base that was outside of the pack.
+	 * <p>
+	 * This event only occurs on a thin pack for base objects that were outside
+	 * of the pack and came from the local repository. Usually an implementation
+	 * uses this event to compress the base and append it onto the end of the
+	 * pack, so the pack stays self-contained.
+	 *
+	 * @param typeCode
+	 *            type of the base object.
+	 * @param data
+	 *            complete content of the base object.
+	 * @param info
+	 *            packed object information for this base. Implementors must
+	 *            populate the CRC and offset members if returning true.
+	 * @return true if the {@code info} should be included in the object list
+	 *         returned by {@link #getSortedObjectList(Comparator)}, false if it
+	 *         should not be included.
+	 * @throws IOException
+	 *             the base could not be included into the pack.
+	 */
+	protected abstract boolean onAppendBase(int typeCode, byte[] data,
+			PackedObjectInfo info) throws IOException;
+

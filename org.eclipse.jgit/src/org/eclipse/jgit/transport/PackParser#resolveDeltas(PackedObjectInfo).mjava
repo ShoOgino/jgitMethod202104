@@ -1,0 +1,31 @@
+	private void resolveDeltas(final PackedObjectInfo oe) throws IOException {
+		UnresolvedDelta children = firstChildOf(oe);
+		if (children == null)
+			return;
+
+		DeltaVisit visit = new DeltaVisit();
+		visit.nextChild = children;
+
+		ObjectTypeAndSize info = openDatabase(oe, new ObjectTypeAndSize());
+		switch (info.type) {
+		case Constants.OBJ_COMMIT:
+		case Constants.OBJ_TREE:
+		case Constants.OBJ_BLOB:
+		case Constants.OBJ_TAG:
+			visit.data = inflateAndReturn(Source.DATABASE, info.size);
+			visit.id = oe;
+			break;
+		default:
+			throw new IOException(MessageFormat.format(
+					JGitText.get().unknownObjectType, info.type));
+		}
+
+		if (!checkCRC(oe.getCRC())) {
+			throw new IOException(MessageFormat.format(
+					JGitText.get().corruptionDetectedReReadingAt, oe
+							.getOffset()));
+		}
+
+		resolveDeltas(visit.next(), info.type, info);
+	}
+

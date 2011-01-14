@@ -1,0 +1,21 @@
+		@Override
+		public void close() throws IOException {
+			// We need to read here to enter the loop above and pump the
+			// trailing checksum into the Inflater. It should return -1 as the
+			// caller was supposed to consume all content.
+			//
+			if (read(skipBuffer) != -1 || actualSize != expectedSize) {
+				throw new CorruptObjectException(MessageFormat.format(JGitText
+						.get().packfileCorruptionDetected,
+						JGitText.get().wrongDecompressedLength));
+			}
+
+			int used = bAvail - inf.getRemaining();
+			if (0 < used) {
+				onObjectData(src, buf, p, used);
+				use(used);
+			}
+
+			inf.reset();
+		}
+

@@ -1,0 +1,33 @@
+	@Override
+	public PackLock parse(ProgressMonitor progress) throws IOException {
+		tmpPack = File.createTempFile("incoming_", ".pack", db.getDirectory());
+		tmpIdx = new File(db.getDirectory(), baseName(tmpPack) + ".idx");
+		try {
+			out = new RandomAccessFile(tmpPack, "rw");
+
+			super.parse(progress);
+
+			out.seek(packEnd);
+			out.write(packHash);
+			out.getChannel().force(true);
+			out.close();
+
+			writeIdx();
+
+			tmpPack.setReadOnly();
+			tmpIdx.setReadOnly();
+
+			return renameAndOpenPack(getLockMessage());
+		} finally {
+			if (def != null)
+				def.end();
+			try {
+				if (out != null && out.getChannel().isOpen())
+					out.close();
+			} catch (IOException closeError) {
+				// Ignored. We want to delete the file.
+			}
+			cleanupTemporaryFiles();
+		}
+	}
+

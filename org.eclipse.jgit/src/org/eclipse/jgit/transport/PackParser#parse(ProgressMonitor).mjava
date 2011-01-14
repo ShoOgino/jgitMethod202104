@@ -1,0 +1,72 @@
+	/**
+	 * Parse the pack stream.
+	 *
+	 * @param progress
+	 *            callback to provide progress feedback during parsing. If null,
+	 *            {@link NullProgressMonitor} will be used.
+	 * @return the pack lock, if one was requested by setting
+	 *         {@link #setLockMessage(String)}.
+	 * @throws IOException
+	 *             the stream is malformed, or contains corrupt objects.
+	 */
+	public PackLock parse(ProgressMonitor progress) throws IOException {
+		if (progress == null)
+			progress = NullProgressMonitor.INSTANCE;
+		progress.start(2 /* tasks */);
+		try {
+			readPackHeader();
+
+			entries = new PackedObjectInfo[(int) objectCount];
+			baseById = new ObjectIdSubclassMap<DeltaChain>();
+			baseByPos = new LongMap<UnresolvedDelta>();
+			deferredCheckBlobs = new ArrayList<PackedObjectInfo>();
+
+			progress.beginTask(JGitText.get().receivingObjects,
+					(int) objectCount);
+			for (int done = 0; done < objectCount; done++) {
+				indexOneObject();
+				progress.update(1);
+				if (progress.isCancelled())
+					throw new IOException(JGitText.get().downloadCancelled);
+			}
+			readPackFooter();
+			endInput();
+			if (!deferredCheckBlobs.isEmpty())
+				doDeferredCheckBlobs();
+			progress.endTask();
+			if (deltaCount > 0) {
+				resolveDeltas(progress);
+				if (entryCount < objectCount) {
+					if (!isAllowThin()) {
+						throw new IOException(MessageFormat.format(JGitText
+								.get().packHasUnresolvedDeltas,
+								(objectCount - entryCount)));
+					}
+
+					resolveDeltasWithExternalBases(progress);
+				}
+			}
+
+			packDigest = null;
+			baseById = null;
+			baseByPos = null;
+		} finally {
+			try {
+				if (readCurs != null)
+					readCurs.release();
+			} finally {
+				readCurs = null;
+			}
+
+			try {
+				inflater.release();
+			} finally {
+				inflater = null;
+				objectDatabase.close();
+			}
+
+			progress.endTask();
+		}
+		return null; // By default there is no locking.
+	}
+

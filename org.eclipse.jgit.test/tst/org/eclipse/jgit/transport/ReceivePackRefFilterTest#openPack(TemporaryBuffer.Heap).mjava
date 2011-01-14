@@ -1,8 +1,10 @@
 	private void openPack(TemporaryBuffer.Heap buf) throws IOException {
+		if (inserter == null)
+			inserter = src.newObjectInserter();
+
 		final byte[] raw = buf.toByteArray();
-		IndexPack ip = IndexPack.create(src, new ByteArrayInputStream(raw));
-		ip.setFixThin(true);
-		ip.index(PM);
-		ip.renameAndOpenPack();
+		PackParser p = inserter.newPackParser(new ByteArrayInputStream(raw));
+		p.setAllowThin(true);
+		p.parse(PM);
 	}
 

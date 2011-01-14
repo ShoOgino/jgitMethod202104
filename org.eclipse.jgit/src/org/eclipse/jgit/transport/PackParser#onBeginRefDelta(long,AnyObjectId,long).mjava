@@ -1,0 +1,18 @@
+	/**
+	 * Event notifying start of a delta referencing its base by ObjectId.
+	 *
+	 * @param deltaStreamPosition
+	 *            position of this object in the incoming stream.
+	 * @param baseId
+	 *            name of the base object. This object may be later in the
+	 *            stream, or might not appear at all in the stream (in the case
+	 *            of a thin-pack).
+	 * @param inflatedSize
+	 *            size of the delta when fully inflated. The size stored within
+	 *            the pack may be larger or smaller, and is not yet known.
+	 * @throws IOException
+	 *             the object cannot be recorded.
+	 */
+	protected abstract void onBeginRefDelta(long deltaStreamPosition,
+			AnyObjectId baseId, long inflatedSize) throws IOException;
+

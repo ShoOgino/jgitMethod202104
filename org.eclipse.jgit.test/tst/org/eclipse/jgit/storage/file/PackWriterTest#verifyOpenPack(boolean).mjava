@@ -1,20 +1,22 @@
 	private void verifyOpenPack(final boolean thin) throws IOException {
+		final byte[] packData = os.toByteArray();
+
 		if (thin) {
-			final InputStream is = new ByteArrayInputStream(os.toByteArray());
-			final IndexPack indexer = new IndexPack(db, is, packBase);
+			PackParser p = index(packData);
 			try {
-				indexer.index(new TextProgressMonitor());
+				p.parse(NullProgressMonitor.INSTANCE);
 				fail("indexer should grumble about missing object");
 			} catch (IOException x) {
 				// expected
 			}
 		}
-		final InputStream is = new ByteArrayInputStream(os.toByteArray());
-		final IndexPack indexer = new IndexPack(db, is, packBase);
-		indexer.setKeepEmpty(true);
-		indexer.setFixThin(thin);
-		indexer.setIndexVersion(2);
-		indexer.index(new TextProgressMonitor());
-		pack = new PackFile(indexFile, packFile);
+
+		ObjectDirectoryPackParser p = (ObjectDirectoryPackParser) index(packData);
+		p.setKeepEmpty(true);
+		p.setAllowThin(thin);
+		p.setIndexVersion(2);
+		p.parse(NullProgressMonitor.INSTANCE);
+		pack = p.getPackFile();
+		assertNotNull("have PackFile after parsing", pack);
 	}
 

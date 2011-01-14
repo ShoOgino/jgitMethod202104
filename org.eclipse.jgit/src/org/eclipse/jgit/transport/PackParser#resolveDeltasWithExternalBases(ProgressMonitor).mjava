@@ -1,0 +1,48 @@
+	private void resolveDeltasWithExternalBases(final ProgressMonitor progress)
+			throws IOException {
+		growEntries(baseById.size());
+
+		if (needBaseObjectIds)
+			baseObjectIds = new ObjectIdSubclassMap<ObjectId>();
+
+		final List<DeltaChain> missing = new ArrayList<DeltaChain>(64);
+		for (final DeltaChain baseId : baseById) {
+			if (baseId.head == null)
+				continue;
+
+			if (needBaseObjectIds)
+				baseObjectIds.add(baseId);
+
+			final ObjectLoader ldr;
+			try {
+				ldr = readCurs.open(baseId);
+			} catch (MissingObjectException notFound) {
+				missing.add(baseId);
+				continue;
+			}
+
+			final DeltaVisit visit = new DeltaVisit();
+			visit.data = ldr.getCachedBytes(Integer.MAX_VALUE);
+			visit.id = baseId;
+			final int typeCode = ldr.getType();
+			final PackedObjectInfo oe = newInfo(baseId, null, null);
+
+			if (onAppendBase(typeCode, visit.data, oe))
+				entries[entryCount++] = oe;
+
+			visit.nextChild = firstChildOf(oe);
+			resolveDeltas(visit.next(), typeCode, new ObjectTypeAndSize());
+
+			if (progress.isCancelled())
+				throw new IOException(
+						JGitText.get().downloadCancelledDuringIndexing);
+		}
+
+		for (final DeltaChain base : missing) {
+			if (base.head != null)
+				throw new MissingObjectException(base, "delta base");
+		}
+
+		onEndThinPack();
+	}
+

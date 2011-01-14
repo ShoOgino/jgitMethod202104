@@ -1,0 +1,10 @@
+	// Store consumed bytes in {@link #buf} up to {@link #bOffset}.
+	private void sync() throws IOException {
+		packDigest.update(buf, 0, bOffset);
+		onStoreStream(buf, 0, bOffset);
+		if (bAvail > 0)
+			System.arraycopy(buf, bOffset, buf, 0, bAvail);
+		bBase += bOffset;
+		bOffset = 0;
+	}
+
