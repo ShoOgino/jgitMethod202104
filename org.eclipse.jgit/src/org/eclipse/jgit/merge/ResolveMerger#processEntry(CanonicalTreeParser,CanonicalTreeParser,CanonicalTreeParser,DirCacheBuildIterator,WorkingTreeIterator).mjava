@@ -49,7 +49,7 @@
 		// Each index entry has to match ours, means: it has to be clean
 		if (nonTree(modeI)
 				&& !(tw.idEqual(T_INDEX, T_OURS) && modeO == modeI)) {
-			failingPathes.put(tw.getPathString(), MergeFailureReason.DIRTY_INDEX);
+			failingPaths.put(tw.getPathString(), MergeFailureReason.DIRTY_INDEX);
 			return false;
 		}
 
@@ -96,7 +96,7 @@
 				if (nonTree(modeB))
 					add(tw.getRawPath(), base, DirCacheEntry.STAGE_1);
 				add(tw.getRawPath(), ours, DirCacheEntry.STAGE_2);
-				unmergedPathes.add(tw.getPathString());
+				unmergedPaths.add(tw.getPathString());
 				enterSubtree = false;
 				return true;
 			}
@@ -104,7 +104,7 @@
 				if (nonTree(modeB))
 					add(tw.getRawPath(), base, DirCacheEntry.STAGE_1);
 				add(tw.getRawPath(), theirs, DirCacheEntry.STAGE_3);
-				unmergedPathes.add(tw.getPathString());
+				unmergedPaths.add(tw.getPathString());
 				enterSubtree = false;
 				return true;
 			}
@@ -127,14 +127,14 @@
 				if (work != null
 						&& (!nonTree(work.getEntryRawMode()) || work
 								.isModified(index.getDirCacheEntry(), true))) {
-					failingPathes.put(tw.getPathString(),
+					failingPaths.put(tw.getPathString(),
 							MergeFailureReason.DIRTY_WORKTREE);
 					return false;
 				}
 			}
 
 			if (!contentMerge(base, ours, theirs)) {
-				unmergedPathes.add(tw.getPathString());
+				unmergedPaths.add(tw.getPathString());
 			}
 			modifiedFiles.add(tw.getPathString());
 		}
