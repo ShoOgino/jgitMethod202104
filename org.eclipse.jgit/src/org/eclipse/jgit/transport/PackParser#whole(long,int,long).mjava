@@ -19,7 +19,8 @@
 			}
 			inf.close();
 			tempObjectId.fromRaw(objectDigest.digest(), 0);
-			checkContentLater = readCurs.has(tempObjectId);
+			checkContentLater = isCheckObjectCollisions()
+					&& readCurs.has(tempObjectId);
 
 		} else {
 			final byte[] data = inflateAndReturn(Source.INPUT, sz);
