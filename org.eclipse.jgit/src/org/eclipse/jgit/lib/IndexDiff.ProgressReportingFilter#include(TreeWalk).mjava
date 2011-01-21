@@ -1,0 +1,14 @@
+		@Override
+		public boolean include(TreeWalk walker)
+				throws MissingObjectException,
+				IncorrectObjectTypeException, IOException {
+			count++;
+			if (count % stepSize == 0) {
+				if (count <= total)
+					monitor.update(stepSize);
+				if (monitor.isCancelled())
+					throw StopWalkException.INSTANCE;
+			}
+			return true;
+		}
+

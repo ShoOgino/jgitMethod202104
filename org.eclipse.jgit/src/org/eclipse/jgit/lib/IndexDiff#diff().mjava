@@ -1,81 +1,12 @@
 	/**
-	 * Run the diff operation. Until this is called, all lists will be empty
+	 * Run the diff operation. Until this is called, all lists will be empty.
+	 * Use {@link #diff(ProgressMonitor, int, int, String)} if a progress
+	 * monitor is required.
 	 *
 	 * @return if anything is different between index, tree, and workdir
 	 * @throws IOException
 	 */
 	public boolean diff() throws IOException {
-		dirCache = repository.readDirCache();
-
-		TreeWalk treeWalk = new TreeWalk(repository);
-		treeWalk.setRecursive(true);
-		// add the trees (tree, dirchache, workdir)
-		if (tree != null)
-			treeWalk.addTree(tree);
-		else
-			treeWalk.addTree(new EmptyTreeIterator());
-		treeWalk.addTree(new DirCacheIterator(dirCache));
-		treeWalk.addTree(initialWorkingTreeIterator);
-		Collection<TreeFilter> filters = new ArrayList<TreeFilter>(4);
-		if (filter != null)
-			filters.add(filter);
-		filters.add(new SkipWorkTreeFilter(INDEX));
-		filters.add(new IndexDiffFilter(INDEX, WORKDIR));
-		treeWalk.setFilter(AndTreeFilter.create(filters));
-		while (treeWalk.next()) {
-			AbstractTreeIterator treeIterator = treeWalk.getTree(TREE,
-					AbstractTreeIterator.class);
-			DirCacheIterator dirCacheIterator = treeWalk.getTree(INDEX,
-					DirCacheIterator.class);
-			WorkingTreeIterator workingTreeIterator = treeWalk.getTree(WORKDIR,
-					WorkingTreeIterator.class);
-
-			if (treeIterator != null) {
-				if (dirCacheIterator != null) {
-					if (!treeIterator.idEqual(dirCacheIterator)
-							|| treeIterator.getEntryRawMode()
-							!= dirCacheIterator.getEntryRawMode()) {
-						// in repo, in index, content diff => changed
-						changed.add(treeWalk.getPathString());
-					}
-				} else {
-					// in repo, not in index => removed
-					removed.add(treeWalk.getPathString());
-					if (workingTreeIterator != null)
-						untracked.add(treeWalk.getPathString());
-				}
-			} else {
-				if (dirCacheIterator != null) {
-					// not in repo, in index => added
-					added.add(treeWalk.getPathString());
-				} else {
-					// not in repo, not in index => untracked
-					if (workingTreeIterator != null
-							&& !workingTreeIterator.isEntryIgnored()) {
-						untracked.add(treeWalk.getPathString());
-					}
-				}
-			}
-
-			if (dirCacheIterator != null) {
-				if (workingTreeIterator == null) {
-					// in index, not in workdir => missing
-					missing.add(treeWalk.getPathString());
-				} else {
-					if (workingTreeIterator.isModified(
-							dirCacheIterator.getDirCacheEntry(), true)) {
-						// in index, in workdir, content differs => modified
-						modified.add(treeWalk.getPathString());
-					}
-				}
-			}
-		}
-
-		if (added.isEmpty() && changed.isEmpty() && removed.isEmpty()
-				&& missing.isEmpty() && modified.isEmpty()
-				&& untracked.isEmpty())
-			return false;
-		else
-			return true;
+		return diff(null, 0, 0, "");
 	}
 
