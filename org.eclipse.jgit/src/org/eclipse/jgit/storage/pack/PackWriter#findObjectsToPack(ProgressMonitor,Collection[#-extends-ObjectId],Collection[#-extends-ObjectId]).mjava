@@ -1,8 +1,11 @@
-	private ObjectWalk setUpWalker(
+	private void findObjectsToPack(final ProgressMonitor countingMonitor,
 			final Collection<? extends ObjectId> interestingObjects,
 			final Collection<? extends ObjectId> uninterestingObjects)
 			throws MissingObjectException, IOException,
 			IncorrectObjectTypeException {
+		countingMonitor.beginTask(JGitText.get().countingObjects,
+				ProgressMonitor.UNKNOWN);
+
 		List<ObjectId> all = new ArrayList<ObjectId>(interestingObjects.size());
 		for (ObjectId id : interestingObjects)
 			all.add(id.copy());
@@ -17,13 +20,18 @@
 			not = Collections.emptySet();
 
 		final ObjectWalk walker = new ObjectWalk(reader);
+		final RevFlag hasObjectList = walker.newFlag("hasObjectList");
+
 		walker.setRetainBody(false);
-		if (not.isEmpty())
+		if (not.isEmpty()) {
 			walker.sort(RevSort.COMMIT_TIME_DESC);
-		else
+			for (ObjectId listName : reader.getAvailableObjectLists())
+				walker.lookupCommit(listName).add(hasObjectList);
+		} else {
 			walker.sort(RevSort.TOPO);
-		if (thin && !not.isEmpty())
-			walker.sort(RevSort.BOUNDARY, true);
+			if (thin)
+				walker.sort(RevSort.BOUNDARY, true);
+		}
 
 		AsyncRevObjectQueue q = walker.parseAny(all, true);
 		try {
@@ -46,6 +54,27 @@
 		} finally {
 			q.release();
 		}
-		return walker;
+
+		RevObject listName = null;
+		RevObject o;
+
+		while ((o = walker.next()) != null) {
+			if (o.has(hasObjectList)) {
+				listName = o;
+				break;
+			}
+			addResultOrBase(o, 0);
+			countingMonitor.update(1);
+		}
+		if (listName != null) {
+			addByObjectList(listName, countingMonitor, walker,
+					interestingObjects);
+		} else {
+			while ((o = walker.nextObject()) != null) {
+				addResultOrBase(o, walker.getPathHashCode());
+				countingMonitor.update(1);
+			}
+		}
+		countingMonitor.endTask();
 	}
 
