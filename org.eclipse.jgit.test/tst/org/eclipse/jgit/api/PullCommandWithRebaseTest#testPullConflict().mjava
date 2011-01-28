@@ -3,8 +3,7 @@
 		PullResult res = target.pull().call();
 		// nothing to update since we don't have different data yet
 		assertTrue(res.getFetchResult().getTrackingRefUpdates().isEmpty());
-		assertTrue(res.getMergeResult().getMergeStatus().equals(
-				MergeStatus.ALREADY_UP_TO_DATE));
+		assertTrue(res.getRebaseResult().getStatus().equals(Status.UP_TO_DATE));
 
 		assertFileContentsEqual(targetFile, "Hello world");
 
@@ -20,17 +19,11 @@
 
 		res = target.pull().call();
 
-		String sourceChangeString = "Source change\n>>>>>>> branch 'refs/heads/master' of "
-				+ target.getRepository().getConfig().getString("remote",
-						"origin", "url");
-
 		assertFalse(res.getFetchResult().getTrackingRefUpdates().isEmpty());
-		assertEquals(res.getMergeResult().getMergeStatus(),
-				MergeStatus.CONFLICTING);
-		String result = "<<<<<<< HEAD\nTarget change\n=======\n"
-				+ sourceChangeString + "\n";
+		assertTrue(res.getRebaseResult().getStatus().equals(Status.STOPPED));
+		String result = "<<<<<<< OURS\nSource change\n=======\nTarget change\n>>>>>>> THEIRS\n";
 		assertFileContentsEqual(targetFile, result);
-		assertEquals(RepositoryState.MERGING, target.getRepository()
-				.getRepositoryState());
+		assertEquals(RepositoryState.REBASING_INTERACTIVE, target
+				.getRepository().getRepositoryState());
 	}
 

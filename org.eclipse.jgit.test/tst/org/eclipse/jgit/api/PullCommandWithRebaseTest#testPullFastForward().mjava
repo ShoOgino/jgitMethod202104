@@ -3,8 +3,7 @@
 		PullResult res = target.pull().call();
 		// nothing to update since we don't have different data yet
 		assertTrue(res.getFetchResult().getTrackingRefUpdates().isEmpty());
-		assertTrue(res.getMergeResult().getMergeStatus().equals(
-				MergeStatus.ALREADY_UP_TO_DATE));
+		assertEquals(Status.UP_TO_DATE, res.getRebaseResult().getStatus());
 
 		assertFileContentsEqual(targetFile, "Hello world");
 
@@ -16,14 +15,12 @@
 		res = target.pull().call();
 
 		assertFalse(res.getFetchResult().getTrackingRefUpdates().isEmpty());
-		assertEquals(res.getMergeResult().getMergeStatus(),
-				MergeStatus.FAST_FORWARD);
+		assertEquals(Status.FAST_FORWARD, res.getRebaseResult().getStatus());
 		assertFileContentsEqual(targetFile, "Another change");
 		assertEquals(RepositoryState.SAFE, target.getRepository()
 				.getRepositoryState());
 
 		res = target.pull().call();
-		assertEquals(res.getMergeResult().getMergeStatus(),
-				MergeStatus.ALREADY_UP_TO_DATE);
+		assertEquals(Status.UP_TO_DATE, res.getRebaseResult().getStatus());
 	}
 

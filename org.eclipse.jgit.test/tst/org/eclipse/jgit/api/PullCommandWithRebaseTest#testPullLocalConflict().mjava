@@ -1,15 +1,19 @@
 	@Test
 	public void testPullLocalConflict() throws Exception {
 		target.branchCreate().setName("basedOnMaster").setStartPoint(
-				"refs/heads/master").setUpstreamMode(SetupUpstreamMode.TRACK)
+				"refs/heads/master").setUpstreamMode(SetupUpstreamMode.NOTRACK)
 				.call();
+		StoredConfig config = target.getRepository().getConfig();
+		config.setString("branch", "basedOnMaster", "remote", ".");
+		config.setString("branch", "basedOnMaster", "rebase",
+				"refs/heads/master");
+		config.save();
 		target.getRepository().updateRef(Constants.HEAD).link(
 				"refs/heads/basedOnMaster");
 		PullResult res = target.pull().call();
 		// nothing to update since we don't have different data yet
 		assertNull(res.getFetchResult());
-		assertTrue(res.getMergeResult().getMergeStatus().equals(
-				MergeStatus.ALREADY_UP_TO_DATE));
+		assertEquals(Status.UP_TO_DATE, res.getRebaseResult().getStatus());
 
 		assertFileContentsEqual(targetFile, "Hello world");
 
@@ -29,15 +33,11 @@
 
 		res = target.pull().call();
 
-		String sourceChangeString = "Master change\n>>>>>>> branch 'refs/heads/master' of local repository";
-
 		assertNull(res.getFetchResult());
-		assertEquals(res.getMergeResult().getMergeStatus(),
-				MergeStatus.CONFLICTING);
-		String result = "<<<<<<< HEAD\nSlave change\n=======\n"
-				+ sourceChangeString + "\n";
+		assertEquals(Status.STOPPED, res.getRebaseResult().getStatus());
+		String result = "<<<<<<< OURS\nMaster change\n=======\nSlave change\n>>>>>>> THEIRS\n";
 		assertFileContentsEqual(targetFile, result);
-		assertEquals(RepositoryState.MERGING, target.getRepository()
-				.getRepositoryState());
+		assertEquals(RepositoryState.REBASING_INTERACTIVE, target
+				.getRepository().getRepositoryState());
 	}
 
