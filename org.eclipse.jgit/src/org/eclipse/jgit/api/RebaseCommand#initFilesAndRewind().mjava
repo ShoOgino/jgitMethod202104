@@ -23,11 +23,28 @@
 		RevCommit headCommit = walk.lookupCommit(headId);
 		monitor.beginTask(JGitText.get().obtainingCommitsForCherryPick,
 				ProgressMonitor.UNKNOWN);
+
 		LogCommand cmd = new Git(repo).log().addRange(upstreamCommit,
 				headCommit);
 		Iterable<RevCommit> commitsToUse = cmd.call();
 		for (RevCommit commit : commitsToUse) {
 			cherryPickList.add(commit);
+		}
+
+		// if the upstream commit is in a direct line to the current head,
+		// the log command will not report any commits; in this case,
+		// we create the cherry-pick list ourselves
+		if (cherryPickList.isEmpty()) {
+			Iterable<RevCommit> parents = new Git(repo).log().add(
+					upstreamCommit).call();
+			for (RevCommit parent : parents) {
+				if (parent.equals(headCommit))
+					break;
+				if (parent.getParentCount() != 1)
+					throw new JGitInternalException(
+							JGitText.get().canOnlyCherryPickCommitsWithOneParent);
+				cherryPickList.add(parent);
+			}
 		}
 
 		// nothing to do: return with UP_TO_DATE_RESULT
