@@ -1,5 +1,19 @@
-	private void addResult(final RevObject object, final int pathHashCode)
+	private void addObject(final RevObject object, final int pathHashCode)
 			throws IncorrectObjectTypeException {
+		if (object.has(RevFlag.UNINTERESTING)) {
+			switch (object.getType()) {
+			case Constants.OBJ_TREE:
+			case Constants.OBJ_BLOB:
+				ObjectToPack otp = new ObjectToPack(object);
+				otp.setPathHash(pathHashCode);
+				otp.setEdge();
+				edgeObjects.add(otp);
+				thin = true;
+				break;
+			}
+			return;
+		}
+
 		final ObjectToPack otp;
 		if (reuseSupport != null)
 			otp = reuseSupport.newObjectToPack(object);

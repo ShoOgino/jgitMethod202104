@@ -27,7 +27,8 @@
 			throws IOException {
 		if (countingMonitor == null)
 			countingMonitor = NullProgressMonitor.INSTANCE;
-		findObjectsToPack(countingMonitor, interestingObjects,
+		ObjectWalk walker = setUpWalker(interestingObjects,
 				uninterestingObjects);
+		findObjectsToPack(countingMonitor, walker);
 	}
 
