@@ -1,0 +1,13 @@
+	@Test
+	public void testAddIfAbsentGrowsWithObjects() {
+		ObjectIdSubclassMap<SubId> m = new ObjectIdSubclassMap<SubId>();
+		m.add(id_1);
+		for (int i = 32; i < 8000; i++)
+			m.addIfAbsent(new SubId(id(i)));
+		assertEquals(8000 - 32 + 1, m.size());
+
+		assertSame(id_1, m.get(id_1.copy()));
+		for (int i = 32; i < 8000; i++)
+			assertTrue(m.contains(id(i)));
+	}
+
