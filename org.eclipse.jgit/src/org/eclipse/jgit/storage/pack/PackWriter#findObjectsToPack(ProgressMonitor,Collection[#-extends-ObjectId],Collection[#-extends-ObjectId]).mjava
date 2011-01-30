@@ -1,0 +1,60 @@
+	private void findObjectsToPack(final ProgressMonitor countingMonitor,
+			final Collection<? extends ObjectId> want,
+			Collection<? extends ObjectId> have)
+			throws MissingObjectException, IOException,
+			IncorrectObjectTypeException {
+		countingMonitor.beginTask(JGitText.get().countingObjects,
+				ProgressMonitor.UNKNOWN);
+
+		if (have == null)
+			have = Collections.emptySet();
+
+		List<ObjectId> all = new ArrayList<ObjectId>(want.size() + have.size());
+		all.addAll(want);
+		all.addAll(have);
+
+		final ObjectWalk walker = new ObjectWalk(reader);
+		walker.setRetainBody(false);
+		if (have.isEmpty())
+			walker.sort(RevSort.COMMIT_TIME_DESC);
+		else {
+			walker.sort(RevSort.TOPO);
+			if (thin)
+				walker.sort(RevSort.BOUNDARY, true);
+		}
+
+		AsyncRevObjectQueue q = walker.parseAny(all, true);
+		try {
+			for (;;) {
+				try {
+					RevObject o = q.next();
+					if (o == null)
+						break;
+					if (have.contains(o))
+						walker.markUninteresting(o);
+					else
+						walker.markStart(o);
+				} catch (MissingObjectException e) {
+					if (ignoreMissingUninteresting
+							&& have.contains(e.getObjectId()))
+						continue;
+					throw e;
+				}
+			}
+		} finally {
+			q.release();
+		}
+
+		RevObject o;
+
+		while ((o = walker.next()) != null) {
+			addObject(o, 0);
+			countingMonitor.update(1);
+		}
+		while ((o = walker.nextObject()) != null) {
+			addObject(o, walker.getPathHashCode());
+			countingMonitor.update(1);
+		}
+		countingMonitor.endTask();
+	}
+
