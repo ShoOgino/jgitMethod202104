@@ -1,6 +1,11 @@
 	@Override
 	protected void reset(final int retainFlags) {
 		super.reset(retainFlags);
+
+		for (RevObject obj : rootObjects)
+			obj.flags &= ~IN_PENDING;
+
+		rootObjects = new ArrayList<RevObject>();
 		pendingObjects = new BlockObjQueue();
 		treeWalk = new CanonicalTreeParser();
 		currentTree = null;
