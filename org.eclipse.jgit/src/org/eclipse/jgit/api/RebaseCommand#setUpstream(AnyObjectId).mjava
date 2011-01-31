@@ -1,0 +1,16 @@
+	/**
+	 * @param upstream
+	 *            id of the upstream commit
+	 * @return {@code this}
+	 */
+	public RebaseCommand setUpstream(AnyObjectId upstream) {
+		try {
+			this.upstreamCommit = walk.parseCommit(upstream);
+		} catch (IOException e) {
+			throw new JGitInternalException(MessageFormat.format(
+					JGitText.get().couldNotReadObjectWhileParsingCommit,
+					upstream.name()), e);
+		}
+		return this;
+	}
+
