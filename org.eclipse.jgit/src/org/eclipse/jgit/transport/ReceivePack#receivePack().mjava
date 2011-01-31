@@ -6,6 +6,11 @@
 		if (timeoutIn != null)
 			timeoutIn.setTimeout(10 * timeout * 1000);
 
+		ProgressMonitor receiving = NullProgressMonitor.INSTANCE;
+		ProgressMonitor resolving = NullProgressMonitor.INSTANCE;
+		if (sideBand)
+			resolving = new SideBandProgressMonitor(msgOut);
+
 		ObjectInserter ins = db.newObjectInserter();
 		try {
 			String lockMsg = "jgit receive-pack";
@@ -18,7 +23,7 @@
 			parser.setNeedBaseObjectIds(checkReferencedIsReachable);
 			parser.setObjectChecking(isCheckReceivedObjects());
 			parser.setLockMessage(lockMsg);
-			packLock = parser.parse(NullProgressMonitor.INSTANCE);
+			packLock = parser.parse(receiving, resolving);
 			ins.flush();
 		} finally {
 			ins.release();
