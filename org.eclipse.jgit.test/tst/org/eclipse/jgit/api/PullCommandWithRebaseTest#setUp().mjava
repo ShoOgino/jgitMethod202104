@@ -34,9 +34,9 @@
 		target.checkout().setStartPoint("refs/remotes/origin/master").setName(
 				"master").call();
 
-		targetConfig.setString("branch", "master", "rebase",
-				"refs/remotes/origin/master");
-		targetConfig.unset("branch", "master", "merge");
+		targetConfig
+				.setString("branch", "master", "merge", "refs/heads/master");
+		targetConfig.setBoolean("branch", "master", "rebase", true);
 		targetConfig.save();
 
 		assertFileContentsEqual(targetFile, "Hello world");
