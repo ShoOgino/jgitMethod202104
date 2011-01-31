@@ -6,6 +6,7 @@
 	 * @return the object we are packing, or null.
 	 */
 	public ObjectToPack get(AnyObjectId id) {
-		return objectsMap.get(id);
+		ObjectToPack obj = objectsMap.get(id);
+		return obj != null && !obj.isEdge() ? obj : null;
 	}
 

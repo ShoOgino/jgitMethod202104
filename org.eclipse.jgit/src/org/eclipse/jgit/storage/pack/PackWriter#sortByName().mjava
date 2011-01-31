@@ -1,6 +1,9 @@
 	private List<ObjectToPack> sortByName() {
 		if (sortedByName == null) {
-			sortedByName = new ArrayList<ObjectToPack>(objectsMap.size());
+			int cnt = 0;
+			for (List<ObjectToPack> list : objectsLists)
+				cnt += list.size();
+			sortedByName = new ArrayList<ObjectToPack>(cnt);
 			for (List<ObjectToPack> list : objectsLists) {
 				for (ObjectToPack otp : list)
 					sortedByName.add(otp);

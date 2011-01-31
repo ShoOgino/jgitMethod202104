@@ -1,0 +1,8 @@
+	private PackFile getPackFile(String packName) throws FileNotFoundException {
+		for (PackFile pack : odb.getPacks()) {
+			if (packName.equals(pack.getPackName()))
+				return pack;
+		}
+		throw new FileNotFoundException(getPackFilePath(packName));
+	}
+

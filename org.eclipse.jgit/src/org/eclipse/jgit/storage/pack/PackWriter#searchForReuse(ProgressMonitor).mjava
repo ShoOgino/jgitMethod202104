@@ -1,5 +1,8 @@
 	private void searchForReuse(ProgressMonitor monitor) throws IOException {
-		monitor.beginTask(JGitText.get().searchForReuse, getObjectsNumber());
+		int cnt = 0;
+		for (List<ObjectToPack> list : objectsLists)
+			cnt += list.size();
+		monitor.beginTask(JGitText.get().searchForReuse, cnt);
 		for (List<ObjectToPack> list : objectsLists)
 			reuseSupport.selectObjectRepresentation(this, monitor, list);
 		monitor.endTask();

@@ -1,0 +1,28 @@
+	@Override
+	Collection<? extends CachedPack> getCachedPacks() throws IOException {
+		CachedPackList list = cachedPacks.get();
+		if (list == null || list.snapshot.isModified(cachedPacksFile))
+			list = scanCachedPacks(list);
+
+		Collection<CachedPack> result = list.getCachedPacks();
+		boolean resultIsCopy = false;
+
+		for (AlternateHandle h : myAlternates()) {
+			Collection<CachedPack> altPacks = h.getCachedPacks();
+			if (altPacks.isEmpty())
+				continue;
+
+			if (result.isEmpty()) {
+				result = altPacks;
+				continue;
+			}
+
+			if (!resultIsCopy) {
+				result = new ArrayList<CachedPack>(result);
+				resultIsCopy = true;
+			}
+			result.addAll(altPacks);
+		}
+		return result;
+	}
+

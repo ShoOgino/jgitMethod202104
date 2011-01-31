@@ -1,0 +1,22 @@
+	private void pruneObjectList(int typesToPrune, int typeCode) {
+		if ((typesToPrune & (1 << typeCode)) == 0)
+			return;
+
+		final List<ObjectToPack> list = objectsLists[typeCode];
+		final int size = list.size();
+		int src = 0;
+		int dst = 0;
+
+		for (; src < size; src++) {
+			ObjectToPack obj = list.get(src);
+			if (obj.isEdge())
+				continue;
+			if (dst != src)
+				list.set(dst, obj);
+			dst++;
+		}
+
+		while (dst < list.size())
+			list.remove(dst);
+	}
+

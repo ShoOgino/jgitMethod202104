@@ -13,15 +13,37 @@
 		all.addAll(want);
 		all.addAll(have);
 
+		final Map<ObjectId, CachedPack> tipToPack = new HashMap<ObjectId, CachedPack>();
 		final ObjectWalk walker = new ObjectWalk(reader);
+		final RevFlag inCachedPack = walker.newFlag("inCachedPack");
+		final RevFlag include = walker.newFlag("include");
+
+		final RevFlagSet keepOnRestart = new RevFlagSet();
+		keepOnRestart.add(inCachedPack);
+
 		walker.setRetainBody(false);
-		if (have.isEmpty())
+		walker.carry(include);
+
+		int haveEst = have.size();
+		if (have.isEmpty()) {
 			walker.sort(RevSort.COMMIT_TIME_DESC);
-		else {
+			if (useCachedPacks && reuseSupport != null) {
+				for (CachedPack pack : reuseSupport.getCachedPacks()) {
+					for (ObjectId id : pack.getTips()) {
+						tipToPack.put(id, pack);
+						all.add(id);
+					}
+				}
+				haveEst += tipToPack.size();
+			}
+		} else {
 			walker.sort(RevSort.TOPO);
 			if (thin)
 				walker.sort(RevSort.BOUNDARY, true);
 		}
+
+		List<RevObject> wantObjs = new ArrayList<RevObject>(want.size());
+		List<RevObject> haveObjs = new ArrayList<RevObject>(haveEst);
 
 		AsyncRevObjectQueue q = walker.parseAny(all, true);
 		try {
@@ -30,10 +52,18 @@
 					RevObject o = q.next();
 					if (o == null)
 						break;
-					if (have.contains(o))
+
+					if (tipToPack.containsKey(o))
+						o.add(inCachedPack);
+
+					if (have.contains(o)) {
+						haveObjs.add(o);
 						walker.markUninteresting(o);
-					else
+					} else if (want.contains(o)) {
+						o.add(include);
+						wantObjs.add(o);
 						walker.markStart(o);
+					}
 				} catch (MissingObjectException e) {
 					if (ignoreMissingUninteresting
 							&& have.contains(e.getObjectId()))
@@ -45,21 +75,45 @@
 			q.release();
 		}
 
+		int typesToPrune = 0;
 		final int maxBases = config.getDeltaSearchWindowSize();
 		Set<RevTree> baseTrees = new HashSet<RevTree>();
 		RevObject o;
 		while ((o = walker.next()) != null) {
+			if (o.has(inCachedPack)) {
+				CachedPack pack = tipToPack.get(o);
+				if (includesAllTips(pack, include, walker)) {
+					useCachedPack(walker, keepOnRestart, //
+							wantObjs, haveObjs, pack);
+
+					countingMonitor.endTask();
+					countingMonitor.beginTask(JGitText.get().countingObjects,
+							ProgressMonitor.UNKNOWN);
+					continue;
+				}
+			}
+
 			if (o.has(RevFlag.UNINTERESTING)) {
 				if (baseTrees.size() <= maxBases)
 					baseTrees.add(((RevCommit) o).getTree());
 				continue;
 			}
+
 			addObject(o, 0);
 			countingMonitor.update(1);
 		}
 
+		for (CachedPack p : cachedPacks) {
+			for (ObjectId d : p.hasObject(objectsLists[Constants.OBJ_COMMIT])) {
+				if (baseTrees.size() <= maxBases)
+					baseTrees.add(walker.lookupCommit(d).getTree());
+				objectsMap.get(d).setEdge();
+				typesToPrune |= 1 << Constants.OBJ_COMMIT;
+			}
+		}
+
 		BaseSearch bases = new BaseSearch(countingMonitor, baseTrees, //
-				edgeObjects, reader);
+				objectsMap, edgeObjects, reader);
 		while ((o = walker.nextObject()) != null) {
 			if (o.has(RevFlag.UNINTERESTING))
 				continue;
@@ -72,6 +126,31 @@
 			addObject(o, pathHash);
 			countingMonitor.update(1);
 		}
+
+		for (CachedPack p : cachedPacks) {
+			for (ObjectId d : p.hasObject(objectsLists[Constants.OBJ_TREE])) {
+				objectsMap.get(d).setEdge();
+				typesToPrune |= 1 << Constants.OBJ_TREE;
+			}
+			for (ObjectId d : p.hasObject(objectsLists[Constants.OBJ_BLOB])) {
+				objectsMap.get(d).setEdge();
+				typesToPrune |= 1 << Constants.OBJ_BLOB;
+			}
+			for (ObjectId d : p.hasObject(objectsLists[Constants.OBJ_TAG])) {
+				objectsMap.get(d).setEdge();
+				typesToPrune |= 1 << Constants.OBJ_TAG;
+			}
+		}
+
+		if (typesToPrune != 0) {
+			pruneObjectList(typesToPrune, Constants.OBJ_COMMIT);
+			pruneObjectList(typesToPrune, Constants.OBJ_TREE);
+			pruneObjectList(typesToPrune, Constants.OBJ_BLOB);
+			pruneObjectList(typesToPrune, Constants.OBJ_TAG);
+		}
+
+		for (CachedPack pack : cachedPacks)
+			countingMonitor.update((int) pack.getObjectCount());
 		countingMonitor.endTask();
 	}
 

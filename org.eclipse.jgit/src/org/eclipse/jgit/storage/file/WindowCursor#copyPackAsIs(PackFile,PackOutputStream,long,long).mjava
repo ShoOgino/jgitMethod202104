@@ -1,0 +1,13 @@
+	void copyPackAsIs(final PackFile pack, final PackOutputStream out,
+			long position, long cnt) throws IOException {
+		while (0 < cnt) {
+			pin(pack, position);
+
+			int ptr = (int) (position - window.start);
+			int n = (int) Math.min(window.size() - ptr, cnt);
+			window.write(out, position, n);
+			position += n;
+			cnt -= n;
+		}
+	}
+

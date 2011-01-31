@@ -31,11 +31,11 @@
 		if (nFmt == PACK_DELTA && reuseDeltas) {
 			ObjectId baseId = next.getDeltaBase();
 			ObjectToPack ptr = objectsMap.get(baseId);
-			if (ptr != null) {
+			if (ptr != null && !ptr.isEdge()) {
 				otp.setDeltaBase(ptr);
 				otp.setReuseAsIs();
 				otp.setWeight(nWeight);
-			} else if (thin && edgeObjects.contains(baseId)) {
+			} else if (thin && ptr != null && ptr.isEdge()) {
 				otp.setDeltaBase(baseId);
 				otp.setReuseAsIs();
 				otp.setWeight(nWeight);

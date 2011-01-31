@@ -4,8 +4,20 @@
 	 * @param id
 	 *            the object to test the existence of.
 	 * @return true if the object will appear in the output pack file.
+	 * @throws IOException
+	 *             a cached pack cannot be examined.
 	 */
-	public boolean willInclude(final AnyObjectId id) {
-		return get(id) != null;
+	public boolean willInclude(final AnyObjectId id) throws IOException {
+		ObjectToPack obj = objectsMap.get(id);
+		if (obj != null && !obj.isEdge())
+			return true;
+
+		Set<ObjectId> toFind = Collections.singleton(id.toObjectId());
+		for (CachedPack pack : cachedPacks) {
+			if (pack.hasObject(toFind).contains(id))
+				return true;
+		}
+
+		return false;
 	}
 

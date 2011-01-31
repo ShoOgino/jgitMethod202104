@@ -38,12 +38,21 @@
 		final PackOutputStream out = new PackOutputStream(writeMonitor,
 				packStream, this);
 
-		int objCnt = getObjectsNumber();
+		long objCnt = 0;
+		for (List<ObjectToPack> list : objectsLists)
+			objCnt += list.size();
+		for (CachedPack pack : cachedPacks)
+			objCnt += pack.getObjectCount();
 		stats.totalObjects = objCnt;
-		writeMonitor.beginTask(JGitText.get().writingObjects, objCnt);
+
+		writeMonitor.beginTask(JGitText.get().writingObjects, (int) objCnt);
 		out.writeFileHeader(PACK_VERSION_GENERATED, objCnt);
 		out.flush();
 		writeObjects(out);
+		for (CachedPack pack : cachedPacks) {
+			stats.reusedObjects += pack.getObjectCount();
+			reuseSupport.copyPackAsIs(out, pack);
+		}
 		writeChecksum(out);
 
 		reader.release();

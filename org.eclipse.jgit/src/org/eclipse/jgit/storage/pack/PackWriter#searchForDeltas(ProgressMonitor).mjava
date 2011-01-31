@@ -51,8 +51,8 @@
 							continue;
 						}
 
-						otp = edgeObjects.get(notFound.getObjectId());
-						if (otp != null) {
+						otp = objectsMap.get(notFound.getObjectId());
+						if (otp != null && otp.isEdge()) {
 							otp.setDoNotDelta(true);
 							continue;
 						}
@@ -61,11 +61,8 @@
 				}
 
 				ObjectToPack otp = sizeQueue.getCurrent();
-				if (otp == null) {
+				if (otp == null)
 					otp = objectsMap.get(sizeQueue.getObjectId());
-					if (otp == null)
-						otp = edgeObjects.get(sizeQueue.getObjectId());
-				}
 
 				long sz = sizeQueue.getSize();
 				if (limit <= sz || Integer.MAX_VALUE <= sz)

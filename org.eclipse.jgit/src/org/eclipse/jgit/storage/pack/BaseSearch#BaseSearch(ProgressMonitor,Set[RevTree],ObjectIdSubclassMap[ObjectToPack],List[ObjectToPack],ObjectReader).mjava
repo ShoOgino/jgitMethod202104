@@ -1,8 +1,10 @@
 	BaseSearch(ProgressMonitor countingMonitor, Set<RevTree> bases,
-			ObjectIdSubclassMap<ObjectToPack> edges, ObjectReader or) {
+			ObjectIdSubclassMap<ObjectToPack> objects,
+			List<ObjectToPack> edges, ObjectReader or) {
 		progress = countingMonitor;
 		reader = or;
 		baseTrees = bases.toArray(new ObjectId[bases.size()]);
+		objectsMap = objects;
 		edgeObjects = edges;
 
 		alreadyProcessed = new IntSet();

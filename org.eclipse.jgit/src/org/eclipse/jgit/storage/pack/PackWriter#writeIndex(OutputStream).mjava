@@ -13,6 +13,9 @@
 	 *             the index data could not be written to the supplied stream.
 	 */
 	public void writeIndex(final OutputStream indexStream) throws IOException {
+		if (!cachedPacks.isEmpty())
+			throw new IOException(JGitText.get().cachedPacksPreventsIndexCreation);
+
 		final List<ObjectToPack> list = sortByName();
 		final PackIndexWriter iw;
 		int indexVersion = config.getIndexVersion();
