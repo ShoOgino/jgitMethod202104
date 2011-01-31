@@ -1,0 +1,55 @@
+	void addBase(int objectType, byte[] pathBuf, int pathLen, int pathHash)
+			throws IOException {
+		final int tailMode = modeForType(objectType);
+		if (tailMode == 0)
+			return;
+
+		if (!alreadyProcessed.add(pathHash))
+			return;
+
+		if (pathLen == 0) {
+			for (ObjectId root : baseTrees)
+				add(root, OBJ_TREE, pathHash);
+			return;
+		}
+
+		final int firstSlash = nextSlash(pathBuf, 0, pathLen);
+
+		CHECK_BASE: for (ObjectId root : baseTrees) {
+			int ptr = 0;
+			int end = firstSlash;
+			int mode = end != pathLen ? M_TREE : tailMode;
+
+			parser.reset(readTree(root));
+			while (!parser.eof()) {
+				int cmp = parser.pathCompare(pathBuf, ptr, end, mode);
+
+				if (cmp < 0) {
+					parser.next();
+					continue;
+				}
+
+				if (cmp > 0)
+					continue CHECK_BASE;
+
+				if (end == pathLen) {
+					if (parser.getEntryFileMode().getObjectType() == objectType) {
+						idBuf.fromRaw(parser.idBuffer(), parser.idOffset());
+						add(idBuf, objectType, pathHash);
+					}
+					continue CHECK_BASE;
+				}
+
+				if (!FileMode.TREE.equals(parser.getEntryRawMode()))
+					continue CHECK_BASE;
+
+				ptr = end + 1;
+				end = nextSlash(pathBuf, ptr, pathLen);
+				mode = end != pathLen ? M_TREE : tailMode;
+
+				idBuf.fromRaw(parser.idBuffer(), parser.idOffset());
+				parser.reset(readTree(idBuf));
+			}
+		}
+	}
+

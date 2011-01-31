@@ -1,26 +1,9 @@
 	int pathCompare(final AbstractTreeIterator p, final int pMode) {
-		final byte[] a = path;
-		final byte[] b = p.path;
-		final int aLen = pathLen;
-		final int bLen = p.pathLen;
-		int cPos;
-
 		// Its common when we are a subtree for both parents to match;
 		// when this happens everything in path[0..cPos] is known to
 		// be equal and does not require evaluation again.
 		//
-		cPos = alreadyMatch(this, p);
-
-		for (; cPos < aLen && cPos < bLen; cPos++) {
-			final int cmp = (a[cPos] & 0xff) - (b[cPos] & 0xff);
-			if (cmp != 0)
-				return cmp;
-		}
-
-		if (cPos < aLen)
-			return (a[cPos] & 0xff) - lastPathChar(pMode);
-		if (cPos < bLen)
-			return lastPathChar(mode) - (b[cPos] & 0xff);
-		return lastPathChar(mode) - lastPathChar(pMode);
+		int cPos = alreadyMatch(this, p);
+		return pathCompare(p.path, cPos, p.pathLen, pMode, cPos);
 	}
 

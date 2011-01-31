@@ -1,0 +1,12 @@
+	private byte[] readTree(AnyObjectId id) throws MissingObjectException,
+			IncorrectObjectTypeException, IOException {
+		TreeWithData tree = treeCache.get(id);
+		if (tree != null)
+			return tree.buf;
+
+		ObjectLoader ldr = reader.open(id, OBJ_TREE);
+		byte[] buf = ldr.getCachedBytes(Integer.MAX_VALUE);
+		treeCache.add(new TreeWithData(id, buf));
+		return buf;
+	}
+

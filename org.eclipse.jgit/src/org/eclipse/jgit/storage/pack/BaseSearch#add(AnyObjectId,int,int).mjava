@@ -1,0 +1,9 @@
+	private void add(AnyObjectId id, int objectType, int pathHash) {
+		ObjectToPack obj = new ObjectToPack(id, objectType);
+		obj.setEdge();
+		obj.setPathHash(pathHash);
+
+		if (edgeObjects.addIfAbsent(obj) == obj)
+			progress.update(1);
+	}
+

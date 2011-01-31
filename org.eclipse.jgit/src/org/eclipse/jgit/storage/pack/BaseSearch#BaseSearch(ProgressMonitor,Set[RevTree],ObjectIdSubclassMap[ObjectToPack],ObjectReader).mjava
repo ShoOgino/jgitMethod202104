@@ -1,0 +1,13 @@
+	BaseSearch(ProgressMonitor countingMonitor, Set<RevTree> bases,
+			ObjectIdSubclassMap<ObjectToPack> edges, ObjectReader or) {
+		progress = countingMonitor;
+		reader = or;
+		baseTrees = bases.toArray(new ObjectId[bases.size()]);
+		edgeObjects = edges;
+
+		alreadyProcessed = new IntSet();
+		treeCache = new ObjectIdSubclassMap<TreeWithData>();
+		parser = new CanonicalTreeParser();
+		idBuf = new MutableObjectId();
+	}
+

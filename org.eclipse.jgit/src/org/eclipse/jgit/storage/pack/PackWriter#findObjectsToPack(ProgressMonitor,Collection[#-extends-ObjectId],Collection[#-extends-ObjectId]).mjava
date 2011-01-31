@@ -45,14 +45,31 @@
 			q.release();
 		}
 
+		final int maxBases = config.getDeltaSearchWindowSize();
+		Set<RevTree> baseTrees = new HashSet<RevTree>();
 		RevObject o;
-
 		while ((o = walker.next()) != null) {
+			if (o.has(RevFlag.UNINTERESTING)) {
+				if (baseTrees.size() <= maxBases)
+					baseTrees.add(((RevCommit) o).getTree());
+				continue;
+			}
 			addObject(o, 0);
 			countingMonitor.update(1);
 		}
+
+		BaseSearch bases = new BaseSearch(countingMonitor, baseTrees, //
+				edgeObjects, reader);
 		while ((o = walker.nextObject()) != null) {
-			addObject(o, walker.getPathHashCode());
+			if (o.has(RevFlag.UNINTERESTING))
+				continue;
+
+			int pathHash = walker.getPathHashCode();
+			byte[] pathBuf = walker.getPathBuffer();
+			int pathLen = walker.getPathLength();
+
+			bases.addBase(o.getType(), pathBuf, pathLen, pathHash);
+			addObject(o, pathHash);
 			countingMonitor.update(1);
 		}
 		countingMonitor.endTask();
