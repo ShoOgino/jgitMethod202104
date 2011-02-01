@@ -1,0 +1,82 @@
+	/**
+	 * Executes the {@code Reset} command. Each instance of this class should
+	 * only be used for one invocation of the command. Don't call this method
+	 * twice on an instance.
+	 *
+	 * @return the Ref after reset
+	 */
+	public Ref call() throws IOException {
+		checkCallable();
+
+		Ref r;
+		RevCommit commit;
+
+		try {
+			boolean merging = false;
+			if (repo.getRepositoryState().equals(RepositoryState.MERGING)
+					|| repo.getRepositoryState().equals(
+							RepositoryState.MERGING_RESOLVED))
+				merging = true;
+
+			// resolve the ref to a commit
+			final ObjectId commitId;
+			try {
+				commitId = repo.resolve(ref);
+			} catch (IOException e) {
+				throw new JGitInternalException(
+						MessageFormat.format(JGitText.get().cannotRead, ref),
+						e);
+			}
+			RevWalk rw = new RevWalk(repo);
+			try {
+				commit = rw.parseCommit(commitId);
+			} catch (IOException e) {
+				throw new JGitInternalException(
+						MessageFormat.format(
+						JGitText.get().cannotReadCommit, commitId.toString()),
+						e);
+			} finally {
+				rw.release();
+			}
+
+			// write the ref
+			final RefUpdate ru = repo.updateRef(Constants.HEAD);
+			ru.setNewObjectId(commitId);
+
+			String refName = Repository.shortenRefName(ref);
+			String message = "reset --" //$NON-NLS-1$
+					+ mode.toString().toLowerCase() + " " + refName; //$NON-NLS-1$
+			ru.setRefLogMessage(message, false);
+			if (ru.forceUpdate() == RefUpdate.Result.LOCK_FAILURE)
+				throw new JGitInternalException(MessageFormat.format(
+						JGitText.get().cannotLock, ru.getName()));
+
+			switch (mode) {
+				case HARD:
+					checkoutIndex(commit);
+					break;
+				case MIXED:
+					resetIndex(commit);
+					break;
+				case SOFT: // do nothing, only the ref was changed
+					break;
+				case KEEP: // TODO
+				case MERGE: // TODO
+					throw new UnsupportedOperationException();
+
+			}
+
+			if (mode != ResetType.SOFT && merging)
+				resetMerge();
+
+			setCallable(false);
+			r = ru.getRef();
+		} catch (IOException e) {
+			throw new JGitInternalException(
+					JGitText.get().exceptionCaughtDuringExecutionOfResetCommand,
+					e);
+		}
+
+		return r;
+	}
+

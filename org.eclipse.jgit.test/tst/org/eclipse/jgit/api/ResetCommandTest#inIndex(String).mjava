@@ -1,0 +1,12 @@
+	/**
+	 * Checks if a file with the given path exists in the index
+	 *
+	 * @param path
+	 * @return true if the file exists
+	 * @throws IOException
+	 */
+	private boolean inIndex(String path) throws IOException {
+		DirCache dc = DirCache.read(db.getIndexFile(), db.getFS());
+		return dc.getEntry(path) != null;
+	}
+

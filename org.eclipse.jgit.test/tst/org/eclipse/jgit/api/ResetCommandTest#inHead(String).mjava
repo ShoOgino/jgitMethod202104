@@ -1,0 +1,22 @@
+	/**
+	 * Checks if a file with the given path exists in the HEAD tree
+	 *
+	 * @param path
+	 * @return true if the file exists
+	 * @throws IOException
+	 */
+	private boolean inHead(String path) throws IOException {
+		ObjectId headId = db.resolve(Constants.HEAD);
+		RevWalk rw = new RevWalk(db);
+		TreeWalk tw = null;
+		try {
+			tw = TreeWalk.forPath(db, path, rw.parseTree(headId));
+			return tw != null;
+		} finally {
+			rw.release();
+			rw.dispose();
+			if (tw != null)
+				tw.release();
+		}
+	}
+

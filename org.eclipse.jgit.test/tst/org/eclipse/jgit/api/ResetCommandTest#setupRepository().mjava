@@ -1,0 +1,33 @@
+	public void setupRepository() throws IOException, NoFilepatternException,
+			NoHeadException, NoMessageException, ConcurrentRefUpdateException,
+			JGitInternalException, WrongRepositoryStateException {
+
+		// create initial commit
+		git = new Git(db);
+		initialCommit = git.commit().setMessage("initial commit").call();
+
+		// create file
+		indexFile = new File(db.getWorkTree(), "a.txt");
+		FileUtils.createNewFile(indexFile);
+		PrintWriter writer = new PrintWriter(indexFile);
+		writer.print("content");
+		writer.flush();
+
+		// add file and commit it
+		git.add().addFilepattern("a.txt").call();
+		git.commit().setMessage("adding a.txt").call();
+
+		// modify file and add to index
+		writer.print("new content");
+		writer.close();
+		git.add().addFilepattern("a.txt").call();
+
+		// create a file not added to the index
+		untrackedFile = new File(db.getWorkTree(),
+				"notAddedToIndex.txt");
+		FileUtils.createNewFile(untrackedFile);
+		PrintWriter writer2 = new PrintWriter(untrackedFile);
+		writer2.print("content");
+		writer2.close();
+	}
+

@@ -1,0 +1,20 @@
+	@Test
+	public void testMixedReset() throws JGitInternalException,
+			AmbiguousObjectException, IOException, NoFilepatternException,
+			NoHeadException, NoMessageException, ConcurrentRefUpdateException,
+			WrongRepositoryStateException {
+		setupRepository();
+		git.reset().setMode(ResetType.MIXED).setRef(initialCommit.getName())
+				.call();
+		// check if HEAD points to initial commit now
+		ObjectId head = db.resolve(Constants.HEAD);
+		assertTrue(head.equals(initialCommit));
+		// check if files still exist
+		assertTrue(untrackedFile.exists());
+		assertTrue(indexFile.exists());
+		// fileInIndex must no longer be in HEAD and in the index
+		String fileInIndexPath = indexFile.getAbsolutePath();
+		assertFalse(inHead(fileInIndexPath));
+		assertFalse(inIndex(indexFile.getName()));
+	}
+
