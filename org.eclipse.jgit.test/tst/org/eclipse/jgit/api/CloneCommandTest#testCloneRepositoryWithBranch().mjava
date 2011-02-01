@@ -1,0 +1,18 @@
+	@Test
+	public void testCloneRepositoryWithBranch() {
+		try {
+			File directory = createTempDirectory("testCloneRepositoryWithBranch");
+			CloneCommand command = Git.cloneRepository();
+			command.setBranch("refs/heads/test");
+			command.setDirectory(directory);
+			command.setURI("file://"
+					+ git.getRepository().getWorkTree().getPath());
+			Git git2 = command.call();
+			assertNotNull(git2);
+			assertEquals(git2.getRepository().getFullBranch(),
+					"refs/heads/test");
+		} catch (Exception e) {
+			fail(e.getMessage());
+		}
+	}
+

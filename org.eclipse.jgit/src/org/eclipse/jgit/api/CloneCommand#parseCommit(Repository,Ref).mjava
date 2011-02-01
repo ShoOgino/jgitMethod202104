@@ -1,0 +1,13 @@
+	private RevCommit parseCommit(final Repository repo, final Ref ref)
+			throws MissingObjectException, IncorrectObjectTypeException,
+			IOException {
+		final RevWalk rw = new RevWalk(repo);
+		final RevCommit commit;
+		try {
+			commit = rw.parseCommit(ref.getObjectId());
+		} finally {
+			rw.release();
+		}
+		return commit;
+	}
+
