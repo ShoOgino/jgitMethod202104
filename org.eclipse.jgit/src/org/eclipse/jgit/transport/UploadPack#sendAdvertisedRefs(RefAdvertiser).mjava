@@ -7,7 +7,7 @@
 	 *             the formatter failed to write an advertisement.
 	 */
 	public void sendAdvertisedRefs(final RefAdvertiser adv) throws IOException {
-		adv.init(walk, ADVERTISED);
+		adv.init(db);
 		adv.advertiseCapability(OPTION_INCLUDE_TAG);
 		adv.advertiseCapability(OPTION_MULTI_ACK_DETAILED);
 		adv.advertiseCapability(OPTION_MULTI_ACK);
@@ -18,7 +18,7 @@
 		adv.advertiseCapability(OPTION_NO_PROGRESS);
 		adv.setDerefTags(true);
 		refs = refFilter.filter(db.getAllRefs());
-		adv.send(refs);
+		advertised = adv.send(refs);
 		adv.end();
 	}
 
