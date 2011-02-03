@@ -3,19 +3,64 @@
 		if (peerHas.isEmpty())
 			return last;
 
-		// If both sides have the same object; let the client know.
-		//
-		AsyncRevObjectQueue q = walk.parseAny(peerHas, false);
+		List<ObjectId> toParse = peerHas;
+		HashSet<ObjectId> peerHasSet = null;
+		boolean needMissing = false;
+
+		if (wantAll.isEmpty() && !wantIds.isEmpty()) {
+			// We have not yet parsed the want list. Parse it now.
+			peerHasSet = new HashSet<ObjectId>(peerHas);
+			int cnt = wantIds.size() + peerHasSet.size();
+			toParse = new ArrayList<ObjectId>(cnt);
+			toParse.addAll(wantIds);
+			toParse.addAll(peerHasSet);
+			needMissing = true;
+		}
+
+		AsyncRevObjectQueue q = walk.parseAny(toParse, needMissing);
 		try {
 			for (;;) {
 				RevObject obj;
 				try {
 					obj = q.next();
 				} catch (MissingObjectException notFound) {
+					if (wantIds.contains(notFound.getObjectId())) {
+						throw new PackProtocolException(
+								MessageFormat.format(JGitText.get().notValid,
+										notFound.getMessage()), notFound);
+					}
 					continue;
 				}
 				if (obj == null)
 					break;
+
+				// If the object is still found in wantIds, the want
+				// list wasn't parsed earlier, and was done in this batch.
+				//
+				if (wantIds.remove(obj)) {
+					if (!advertised.contains(obj)) {
+						throw new PackProtocolException(MessageFormat.format(
+								JGitText.get().notValid, obj.name()));
+					}
+
+					if (!obj.has(WANT)) {
+						obj.add(WANT);
+						wantAll.add(obj);
+					}
+
+					if (obj instanceof RevTag) {
+						RevObject target = walk.peel(obj);
+						if (target instanceof RevCommit) {
+							if (!target.has(WANT)) {
+								target.add(WANT);
+								wantAll.add(target);
+							}
+						}
+					}
+
+					if (!peerHasSet.contains(obj))
+						continue;
+				}
 
 				last = obj;
 				if (obj.has(PEER_HAS))
@@ -26,6 +71,8 @@
 					((RevCommit) obj).carry(PEER_HAS);
 				addCommonBase(obj);
 
+				// If both sides have the same object; let the client know.
+				//
 				switch (multiAck) {
 				case OFF:
 					if (commonBase.size() == 1)
