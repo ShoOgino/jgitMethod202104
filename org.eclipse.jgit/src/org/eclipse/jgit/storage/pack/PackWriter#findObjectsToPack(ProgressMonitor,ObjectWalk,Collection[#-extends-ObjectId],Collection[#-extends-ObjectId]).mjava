@@ -1,5 +1,5 @@
 	private void findObjectsToPack(final ProgressMonitor countingMonitor,
-			final Collection<? extends ObjectId> want,
+			final ObjectWalk walker, final Collection<? extends ObjectId> want,
 			Collection<? extends ObjectId> have)
 			throws MissingObjectException, IOException,
 			IncorrectObjectTypeException {
@@ -14,7 +14,6 @@
 		all.addAll(have);
 
 		final Map<ObjectId, CachedPack> tipToPack = new HashMap<ObjectId, CachedPack>();
-		final ObjectWalk walker = new ObjectWalk(reader);
 		final RevFlag inCachedPack = walker.newFlag("inCachedPack");
 		final RevFlag include = walker.newFlag("include");
 
