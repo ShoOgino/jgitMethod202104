@@ -2,11 +2,11 @@
 	 * Create a new filter to select commits after or equal a given date/time <code>since</code>
 	 * and before or equal a given date/time <code>until</code>.
 	 *
-	 * @param since the point in time to cut on.
-	 * @param until the point in time to cut off.
+	 * @param since the point in time to cut on, in milliseconds.
+	 * @param until the point in time to cut off, in millisconds.
 	 * @return a new filter to select commits between the given date/times.
 	 */
-	public static final RevFilter between(final Date since, final Date until) {
-		return between(since.getTime(), until.getTime());
+	public static final RevFilter between(final long since, final long until) {
+		return new Between(since, until);
 	}
 
