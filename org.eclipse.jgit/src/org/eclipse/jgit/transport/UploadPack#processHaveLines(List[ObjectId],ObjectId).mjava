@@ -48,6 +48,9 @@
 						wantAll.add(obj);
 					}
 
+					if (!(obj instanceof RevCommit))
+						obj.add(SATISFIED);
+
 					if (obj instanceof RevTag) {
 						RevObject target = walk.peel(obj);
 						if (target instanceof RevCommit) {
