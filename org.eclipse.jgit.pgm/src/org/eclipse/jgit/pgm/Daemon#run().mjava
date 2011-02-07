@@ -25,13 +25,19 @@
 		if (1 < threads)
 			packConfig.setExecutor(Executors.newFixedThreadPool(threads));
 
-		final org.eclipse.jgit.transport.Daemon d;
+		final FileResolver<DaemonClient> resolver = new FileResolver<DaemonClient>();
+		for (final File f : directory) {
+			out.println(MessageFormat.format(CLIText.get().exporting, f.getAbsolutePath()));
+			resolver.exportDirectory(f);
+		}
+		resolver.setExportAll(exportAll);
 
+		final org.eclipse.jgit.transport.Daemon d;
 		d = new org.eclipse.jgit.transport.Daemon(
 				host != null ? new InetSocketAddress(host, port)
 						: new InetSocketAddress(port));
-		d.setExportAll(exportAll);
 		d.setPackConfig(packConfig);
+		d.setRepositoryResolver(resolver);
 		if (0 <= timeout)
 			d.setTimeout(timeout);
 
@@ -45,10 +51,6 @@
 		for (final String n : forbidOverride)
 			service(d, n).setOverridable(false);
 
-		for (final File f : directory) {
-			out.println(MessageFormat.format(CLIText.get().exporting, f.getAbsolutePath()));
-			d.exportDirectory(f);
-		}
 		d.start();
 		out.println(MessageFormat.format(CLIText.get().listeningOn, d.getAddress()));
 	}

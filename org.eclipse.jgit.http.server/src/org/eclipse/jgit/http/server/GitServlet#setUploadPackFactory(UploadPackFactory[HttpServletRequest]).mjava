@@ -1,0 +1,11 @@
+	/**
+	 * @param f
+	 *            the factory to construct and configure an {@link UploadPack}
+	 *            session when a fetch or clone is requested by a client.
+	 */
+	@SuppressWarnings("unchecked")
+	public void setUploadPackFactory(UploadPackFactory<HttpServletRequest> f) {
+		assertNotInitialized();
+		this.uploadPackFactory = f != null ? f : (UploadPackFactory<HttpServletRequest>)UploadPackFactory.DISABLED;
+	}
+
