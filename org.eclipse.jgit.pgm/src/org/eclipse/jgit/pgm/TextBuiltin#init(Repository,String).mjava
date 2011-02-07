@@ -1,0 +1,33 @@
+	/**
+	 * Initialize the command to work with a repository.
+	 *
+	 * @param repository
+	 *            the opened repository that the command should work on.
+	 * @param gitDir
+	 *            value of the {@code --git-dir} command line option, if
+	 *            {@code repository} is null.
+	 */
+	protected void init(final Repository repository, final String gitDir) {
+		try {
+			final String outputEncoding = repository != null ? repository
+					.getConfig()
+					.getString("i18n", null, "logOutputEncoding") : null;
+			if (outputEncoding != null)
+				out = new PrintWriter(new BufferedWriter(
+						new OutputStreamWriter(System.out, outputEncoding)));
+			else
+				out = new PrintWriter(new BufferedWriter(
+						new OutputStreamWriter(System.out)));
+		} catch (IOException e) {
+			throw die(CLIText.get().cannotCreateOutputStream);
+		}
+
+		if (repository != null && repository.getDirectory() != null) {
+			db = repository;
+			gitdir = repository.getDirectory().getAbsolutePath();
+		} else {
+			db = repository;
+			gitdir = gitDir;
+		}
+	}
+
