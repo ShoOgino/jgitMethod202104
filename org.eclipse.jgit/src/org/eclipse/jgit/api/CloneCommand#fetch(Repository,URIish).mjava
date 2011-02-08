@@ -13,6 +13,12 @@
 
 		config.addFetchRefSpec(refSpec);
 		config.update(repo.getConfig());
+
+		repo.getConfig().setString(ConfigConstants.CONFIG_BRANCH_SECTION,
+				branch, ConfigConstants.CONFIG_REMOTE_SECTION, remote);
+		repo.getConfig().setString(ConfigConstants.CONFIG_BRANCH_SECTION,
+				branch, ConfigConstants.CONFIG_KEY_MERGE, branch); //$NON-NLS-1$ //$NON-NLS-2$
+
 		repo.getConfig().save();
 
 		// run the fetch command
