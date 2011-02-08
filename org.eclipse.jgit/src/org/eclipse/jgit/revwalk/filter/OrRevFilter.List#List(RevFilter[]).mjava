@@ -1,4 +1,9 @@
 		List(final RevFilter[] list) {
 			subfilters = list;
+
+			boolean rcb = false;
+			for (RevFilter filter : subfilters)
+				rcb |= filter.requiresCommitBody();
+			requiresCommitBody = rcb;
 		}
 
