@@ -3,11 +3,15 @@
 			Collection<? extends ObjectId> have)
 			throws MissingObjectException, IOException,
 			IncorrectObjectTypeException {
+		final long countingStart = System.currentTimeMillis();
 		countingMonitor.beginTask(JGitText.get().countingObjects,
 				ProgressMonitor.UNKNOWN);
 
 		if (have == null)
 			have = Collections.emptySet();
+
+		stats.interestingObjects = Collections.unmodifiableSet(new HashSet(want));
+		stats.uninterestingObjects = Collections.unmodifiableSet(new HashSet(have));
 
 		List<ObjectId> all = new ArrayList<ObjectId>(want.size() + have.size());
 		all.addAll(want);
@@ -151,5 +155,6 @@
 		for (CachedPack pack : cachedPacks)
 			countingMonitor.update((int) pack.getObjectCount());
 		countingMonitor.endTask();
+		stats.timeCounting = System.currentTimeMillis() - countingStart;
 	}
 

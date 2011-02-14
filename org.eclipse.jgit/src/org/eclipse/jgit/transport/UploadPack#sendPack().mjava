@@ -68,7 +68,7 @@
 			}
 
 			pw.writePack(pm, NullProgressMonitor.INSTANCE, packOut);
-			packOut.flush();
+			statistics = pw.getStatistics();
 
 			if (msgOut != null) {
 				String msg = pw.getStatistics().getMessage() + '\n';
@@ -82,5 +82,8 @@
 
 		if (sideband)
 			pckOut.end();
+
+		if (logger != null && statistics != null)
+			logger.onPackStatistics(statistics);
 	}
 
