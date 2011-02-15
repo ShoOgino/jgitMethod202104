@@ -1,0 +1,13 @@
+	@Test
+	public void testAcceptGzip() {
+		assertFalse(ServletUtils.acceptsGzipEncoding((String) null));
+		assertFalse(ServletUtils.acceptsGzipEncoding(""));
+
+		assertTrue(ServletUtils.acceptsGzipEncoding("gzip"));
+		assertTrue(ServletUtils.acceptsGzipEncoding("deflate,gzip"));
+		assertTrue(ServletUtils.acceptsGzipEncoding("gzip,deflate"));
+
+		assertFalse(ServletUtils.acceptsGzipEncoding("gzip(proxy)"));
+		assertFalse(ServletUtils.acceptsGzipEncoding("proxy-gzip"));
+	}
+
