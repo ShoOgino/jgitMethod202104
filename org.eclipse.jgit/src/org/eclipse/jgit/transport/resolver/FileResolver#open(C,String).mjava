@@ -1,0 +1,55 @@
+	public Repository open(final C req, final String name)
+			throws RepositoryNotFoundException, ServiceNotEnabledException {
+		if (isUnreasonableName(name))
+			throw new RepositoryNotFoundException(name);
+
+		Repository db = exports.get(nameWithDotGit(name));
+		if (db != null) {
+			db.incrementOpen();
+			return db;
+		}
+
+		for (File base : exportBase) {
+			File dir = FileKey.resolve(new File(base, name), FS.DETECTED);
+			if (dir == null)
+				continue;
+
+			try {
+				FileKey key = FileKey.exact(dir, FS.DETECTED);
+				db = RepositoryCache.open(key, true);
+			} catch (IOException e) {
+				throw new RepositoryNotFoundException(name, e);
+			}
+
+			try {
+				if (isExportOk(req, name, db)) {
+					// We have to leak the open count to the caller, they
+					// are responsible for closing the repository if we
+					// complete successfully.
+					return db;
+				} else
+					throw new ServiceNotEnabledException();
+
+			} catch (RuntimeException e) {
+				db.close();
+				throw new RepositoryNotFoundException(name, e);
+
+			} catch (IOException e) {
+				db.close();
+				throw new RepositoryNotFoundException(name, e);
+
+			} catch (ServiceNotEnabledException e) {
+				db.close();
+				throw e;
+			}
+		}
+
+		if (exportBase.size() == 1) {
+			File dir = new File(exportBase.iterator().next(), name);
+			throw new RepositoryNotFoundException(name,
+					new RepositoryNotFoundException(dir));
+		}
+
+		throw new RepositoryNotFoundException(name);
+	}
+

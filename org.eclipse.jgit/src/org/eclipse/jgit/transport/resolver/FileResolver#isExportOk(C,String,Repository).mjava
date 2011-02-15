@@ -1,5 +1,5 @@
 	/**
-	 * Check if this repository can be served over HTTP.
+	 * Check if this repository can be served.
 	 * <p>
 	 * The default implementation of this method returns true only if either
 	 * {@link #isExportAll()} is true, or the {@code git-daemon-export-ok} file
@@ -16,8 +16,8 @@
 	 *             the repository could not be accessed, the caller will claim
 	 *             the repository does not exist.
 	 */
-	protected boolean isExportOk(HttpServletRequest req, String repositoryName,
-			Repository db) throws IOException {
+	protected boolean isExportOk(C req, String repositoryName, Repository db)
+			throws IOException {
 		if (isExportAll())
 			return true;
 		else if (db.getDirectory() != null)

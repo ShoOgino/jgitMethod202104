@@ -1,0 +1,14 @@
+	/**
+	 * Set the factory to construct and configure per-request UploadPack.
+	 *
+	 * @param factory
+	 *            the factory. If null upload-pack is disabled.
+	 */
+	@SuppressWarnings("unchecked")
+	public void setUploadPackFactory(UploadPackFactory<DaemonClient> factory) {
+		if (factory != null)
+			uploadPackFactory = factory;
+		else
+			uploadPackFactory = (UploadPackFactory<DaemonClient>) UploadPackFactory.DISABLED;
+	}
+
