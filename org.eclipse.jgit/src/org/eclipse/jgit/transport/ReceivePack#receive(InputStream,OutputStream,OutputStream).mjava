@@ -21,6 +21,7 @@
 		try {
 			rawIn = input;
 			rawOut = output;
+			msgOut = messages;
 
 			if (timeout > 0) {
 				final Thread caller = Thread.currentThread();
@@ -35,8 +36,7 @@
 
 			pckIn = new PacketLineIn(rawIn);
 			pckOut = new PacketLineOut(rawOut);
-			if (messages != null)
-				msgs = new OutputStreamWriter(messages, Constants.CHARSET);
+			pckOut.setFlushOnEnd(false);
 
 			enabledCapablities = new HashSet<String>();
 			commands = new ArrayList<ReceiveCommand>();
@@ -45,11 +45,6 @@
 		} finally {
 			walk.release();
 			try {
-				if (pckOut != null)
-					pckOut.flush();
-				if (msgs != null)
-					msgs.flush();
-
 				if (sideBand) {
 					// If we are using side band, we need to send a final
 					// flush-pkt to tell the remote peer the side band is
@@ -57,16 +52,31 @@
 					// use the original output stream as rawOut is now the
 					// side band data channel.
 					//
-					new PacketLineOut(output).end();
+					((SideBandOutputStream) msgOut).flushBuffer();
+					((SideBandOutputStream) rawOut).flushBuffer();
+
+					PacketLineOut plo = new PacketLineOut(output);
+					plo.setFlushOnEnd(false);
+					plo.end();
+				}
+
+				if (biDirectionalPipe) {
+					// If this was a native git connection, flush the pipe for
+					// the caller. For smart HTTP we don't do this flush and
+					// instead let the higher level HTTP servlet code do it.
+					//
+					if (!sideBand && msgOut != null)
+						msgOut.flush();
+					rawOut.flush();
 				}
 			} finally {
 				unlockPack();
 				timeoutIn = null;
 				rawIn = null;
 				rawOut = null;
+				msgOut = null;
 				pckIn = null;
 				pckOut = null;
-				msgs = null;
 				refs = null;
 				enabledCapablities = null;
 				commands = null;

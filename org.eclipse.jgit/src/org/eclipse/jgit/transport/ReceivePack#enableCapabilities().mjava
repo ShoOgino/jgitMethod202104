@@ -7,8 +7,9 @@
 
 			rawOut = new SideBandOutputStream(CH_DATA, MAX_BUF, out);
 			msgOut = new SideBandOutputStream(CH_PROGRESS, MAX_BUF, out);
+
 			pckOut = new PacketLineOut(rawOut);
-			msgs = new OutputStreamWriter(msgOut, Constants.CHARSET);
+			pckOut.setFlushOnEnd(false);
 		}
 	}
 

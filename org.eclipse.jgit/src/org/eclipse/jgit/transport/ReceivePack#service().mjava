@@ -1,7 +1,8 @@
 	private void service() throws IOException {
-		if (biDirectionalPipe)
+		if (biDirectionalPipe) {
 			sendAdvertisedRefs(new PacketLineOutRefAdvertiser(pckOut));
-		else
+			pckOut.flush();
+		} else
 			refs = refFilter.filter(db.getAllRefs());
 		if (advertiseError != null)
 			return;
@@ -38,10 +39,10 @@
 					}
 				});
 				pckOut.end();
-			} else if (msgs != null) {
+			} else if (msgOut != null) {
 				sendStatusReport(false, new Reporter() {
 					void sendString(final String s) throws IOException {
-						msgs.write(s + "\n");
+						msgOut.write(Constants.encode(s + "\n"));
 					}
 				});
 			}
