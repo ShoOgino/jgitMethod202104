@@ -26,11 +26,19 @@
 	public static TreeWalk forPath(final ObjectReader reader, final String path,
 			final AnyObjectId... trees) throws MissingObjectException,
 			IncorrectObjectTypeException, CorruptObjectException, IOException {
-		final TreeWalk r = new TreeWalk(reader);
-		r.setFilter(PathFilterGroup.createFromStrings(Collections
-				.singleton(path)));
-		r.setRecursive(r.getFilter().shouldBeRecursive());
-		r.reset(trees);
-		return r.next() ? r : null;
+		TreeWalk tw = new TreeWalk(reader);
+		PathFilter f = PathFilter.create(path);
+		tw.setFilter(f);
+		tw.reset(trees);
+		tw.setRecursive(false);
+
+		while (tw.next()) {
+			if (f.isDone(tw)) {
+				return tw;
+			} else if (tw.isSubtree()) {
+				tw.enterSubtree();
+			}
+		}
+		return null;
 	}
 
