@@ -28,6 +28,8 @@
 				exc.add(r.getId());
 			packWriter.setDeltaBaseAsOffset(true);
 			packWriter.setThin(exc.size() > 0);
+			if (exc.size() == 0)
+				packWriter.setTagTargets(tagTargets);
 			packWriter.preparePack(monitor, inc, exc);
 
 			final Writer w = new OutputStreamWriter(os, Constants.CHARSET);
