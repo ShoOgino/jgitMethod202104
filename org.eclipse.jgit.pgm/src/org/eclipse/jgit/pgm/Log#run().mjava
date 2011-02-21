@@ -10,9 +10,31 @@
 				rd.setRenameLimit(renameLimit.intValue());
 			}
 
+			if (!noStandardNotes || additionalNoteRefs != null) {
+				reader = db.newObjectReader();
+				revWalk = new RevWalk(db);
+				noteMaps = new LinkedHashMap<String, NoteMap>();
+				if (!noStandardNotes) {
+					noteMaps.put(Constants.R_NOTES_COMMITS,
+							getNoteMap(Constants.R_NOTES_COMMITS));
+				}
+				if (additionalNoteRefs != null) {
+					for (String notesRef : additionalNoteRefs) {
+						if (!notesRef.startsWith(Constants.R_NOTES)) {
+							notesRef = Constants.R_NOTES + notesRef;
+						}
+						noteMaps.put(notesRef, getNoteMap(notesRef));
+					}
+				}
+			}
+
 			super.run();
 		} finally {
 			diffFmt.release();
+			if (reader != null)
+				reader.release();
+			if (revWalk != null)
+				revWalk.release();
 		}
 	}
 
