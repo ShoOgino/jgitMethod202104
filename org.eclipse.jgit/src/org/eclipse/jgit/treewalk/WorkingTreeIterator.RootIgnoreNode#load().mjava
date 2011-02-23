@@ -9,15 +9,21 @@
 				r = new IgnoreNode();
 			}
 
-			File exclude = new File(repository.getDirectory(), "info/exclude");
-			if (exclude.exists()) {
-				FileInputStream in = new FileInputStream(exclude);
-				try {
-					r.parse(in);
-				} finally {
-					in.close();
-				}
+			FS fs = repository.getFS();
+			String path = repository.getConfig().get(CoreConfig.KEY)
+					.getExcludesFile();
+			if (path != null) {
+				File excludesfile;
+				if (path.startsWith("~/"))
+					excludesfile = fs.resolve(fs.userHome(), path.substring(2));
+				else
+					excludesfile = fs.resolve(null, path);
+				loadRulesFromFile(r, excludesfile);
 			}
+
+			File exclude = fs
+					.resolve(repository.getDirectory(), "info/exclude");
+			loadRulesFromFile(r, exclude);
 
 			return r.getRules().isEmpty() ? null : r;
 		}
