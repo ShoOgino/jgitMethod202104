@@ -32,6 +32,7 @@
 		// search code to discover the missing object and skip over it, or
 		// abort with an exception if we actually had to have it.
 		//
+		final long sizingStart = System.currentTimeMillis();
 		monitor.beginTask(JGitText.get().searchForSizes, cnt);
 		AsyncObjectSizeQueue<ObjectToPack> sizeQueue = reader.getObjectSize(
 				Arrays.<ObjectToPack> asList(list).subList(0, cnt), false);
@@ -78,6 +79,7 @@
 			sizeQueue.release();
 		}
 		monitor.endTask();
+		stats.timeSearchingForSizes = System.currentTimeMillis() - sizingStart;
 
 		// Sort the objects by path hash so like files are near each other,
 		// and then by size descending so that bigger files are first. This

@@ -2,9 +2,11 @@
 		int cnt = 0;
 		for (List<ObjectToPack> list : objectsLists)
 			cnt += list.size();
+		long start = System.currentTimeMillis();
 		monitor.beginTask(JGitText.get().searchForReuse, cnt);
 		for (List<ObjectToPack> list : objectsLists)
 			reuseSupport.selectObjectRepresentation(this, monitor, list);
 		monitor.endTask();
+		stats.timeSearchingForReuse = System.currentTimeMillis() - start;
 	}
 
