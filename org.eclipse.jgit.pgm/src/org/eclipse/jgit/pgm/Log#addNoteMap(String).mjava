@@ -1,0 +1,9 @@
+	private void addNoteMap(String notesRef) throws IOException {
+		Ref notes = db.getRef(notesRef);
+		if (notes == null)
+			return;
+		RevCommit notesCommit = argWalk.parseCommit(notes.getObjectId());
+		noteMaps.put(notesRef,
+				NoteMap.read(argWalk.getObjectReader(), notesCommit));
+	}
+
