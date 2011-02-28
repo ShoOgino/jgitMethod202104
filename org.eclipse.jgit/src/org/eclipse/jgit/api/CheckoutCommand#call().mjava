@@ -25,21 +25,22 @@
 				command.call();
 			}
 
-			RevWalk revWalk = new RevWalk(repo);
 			Ref headRef = repo.getRef(Constants.HEAD);
-			RevCommit headCommit = revWalk.parseCommit(headRef.getObjectId());
 			String refLogMessage = "checkout: moving from "
 					+ headRef.getTarget().getName();
 			ObjectId branch = repo.resolve(name);
-
 			if (branch == null)
 				throw new RefNotFoundException(MessageFormat.format(JGitText
 						.get().refNotResolved, name));
 
+			RevWalk revWalk = new RevWalk(repo);
+			AnyObjectId headId = headRef.getObjectId();
+			RevCommit headCommit = headId == null ? null : revWalk
+					.parseCommit(headId);
 			RevCommit newCommit = revWalk.parseCommit(branch);
-
-			DirCacheCheckout dco = new DirCacheCheckout(repo, headCommit
-					.getTree(), repo.lockDirCache(), newCommit.getTree());
+			RevTree headTree = headCommit == null ? null : headCommit.getTree();
+			DirCacheCheckout dco = new DirCacheCheckout(repo, headTree,
+					repo.lockDirCache(), newCommit.getTree());
 			dco.setFailOnConflict(true);
 			try {
 				dco.checkout();

@@ -21,59 +21,20 @@
 	 * 'stage' is only presented when the stage is different from 0. All
 	 * reported time stamps are mapped to strings like "t0", "t1", ... "tn". The
 	 * smallest reported time-stamp will be called "t0". This allows to write
-	 * assertions against the string although the concrete value of the
-	 * time stamps is unknown.
+	 * assertions against the string although the concrete value of the time
+	 * stamps is unknown.
 	 *
 	 * @param includedOptions
 	 *            a bitmask constructed out of the constants {@link #MOD_TIME},
-	 *            {@link #SMUDGE}, {@link #LENGTH}, {@link #CONTENT_ID} and {@link #CONTENT}
-	 *            controlling which info is present in the resulting string.
+	 *            {@link #SMUDGE}, {@link #LENGTH}, {@link #CONTENT_ID} and
+	 *            {@link #CONTENT} controlling which info is present in the
+	 *            resulting string.
 	 * @return a string encoding the index state
 	 * @throws IllegalStateException
 	 * @throws IOException
 	 */
 	public String indexState(int includedOptions)
 			throws IllegalStateException, IOException {
-		DirCache dc = db.readDirCache();
-		StringBuilder sb = new StringBuilder();
-		TreeSet<Long> timeStamps = null;
-
-		// iterate once over the dircache just to collect all time stamps
-		if (0 != (includedOptions & MOD_TIME)) {
-			timeStamps = new TreeSet<Long>();
-			for (int i=0; i<dc.getEntryCount(); ++i)
-				timeStamps.add(Long.valueOf(dc.getEntry(i).getLastModified()));
-		}
-
-		// iterate again, now produce the result string
-		for (int i=0; i<dc.getEntryCount(); ++i) {
-			DirCacheEntry entry = dc.getEntry(i);
-			sb.append("["+entry.getPathString()+", mode:" + entry.getFileMode());
-			int stage = entry.getStage();
-			if (stage != 0)
-				sb.append(", stage:" + stage);
-			if (0 != (includedOptions & MOD_TIME)) {
-				sb.append(", time:t"+
-					timeStamps.headSet(Long.valueOf(entry.getLastModified())).size());
-			}
-			if (0 != (includedOptions & SMUDGE))
-				if (entry.isSmudged())
-					sb.append(", smudged");
-			if (0 != (includedOptions & LENGTH))
-				sb.append(", length:"
-						+ Integer.toString(entry.getLength()));
-			if (0 != (includedOptions & CONTENT_ID))
-				sb.append(", sha1:" + ObjectId.toString(entry.getObjectId()));
-			if (0 != (includedOptions & CONTENT)) {
-				sb.append(", content:"
-						+ new String(db.open(entry.getObjectId(),
-								Constants.OBJ_BLOB).getCachedBytes(), "UTF-8"));
-			}
-			if (0 != (includedOptions & ASSUME_UNCHANGED))
-				sb.append(", assume-unchanged:"
-						+ Boolean.toString(entry.isAssumeValid()));
-			sb.append("]");
-		}
-		return sb.toString();
+		return indexState(db, includedOptions);
 	}
 
