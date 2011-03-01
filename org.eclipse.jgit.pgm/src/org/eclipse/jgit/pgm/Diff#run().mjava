@@ -23,7 +23,9 @@
 			} else if (newTree == null)
 				newTree = new FileTreeIterator(db);
 
-			diffFmt.setProgressMonitor(new TextProgressMonitor());
+			TextProgressMonitor pm = new TextProgressMonitor();
+			pm.setDelayStart(2, TimeUnit.SECONDS);
+			diffFmt.setProgressMonitor(pm);
 			diffFmt.setPathFilter(pathFilter);
 			if (detectRenames != null)
 				diffFmt.setDetectRenames(detectRenames.booleanValue());
