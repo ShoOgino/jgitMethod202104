@@ -1,0 +1,13 @@
+		void end(BatchingProgressMonitor pm) {
+			if (output) {
+				if (totalWork == UNKNOWN) {
+					pm.onEndTask(taskName, lastWork);
+				} else {
+					int pDone = lastWork * 100 / totalWork;
+					pm.onEndTask(taskName, lastWork, totalWork, pDone);
+				}
+			}
+			if (timerFuture != null)
+				timerFuture.cancel(false /* no interrupt */);
+		}
+

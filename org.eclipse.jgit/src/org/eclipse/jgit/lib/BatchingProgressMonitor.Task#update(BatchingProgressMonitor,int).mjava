@@ -1,0 +1,26 @@
+		void update(BatchingProgressMonitor pm, int completed) {
+			lastWork += completed;
+
+			if (totalWork == UNKNOWN) {
+				// Only display once per second, as the alarm fires.
+				if (display) {
+					pm.onUpdate(taskName, lastWork);
+					output = true;
+					restartTimer();
+				}
+			} else {
+				// Display once per second or when 1% is done.
+				int currPercent = lastWork * 100 / totalWork;
+				if (display) {
+					pm.onUpdate(taskName, lastWork, totalWork, currPercent);
+					output = true;
+					restartTimer();
+					lastPercent = currPercent;
+				} else if (currPercent != lastPercent) {
+					pm.onUpdate(taskName, lastWork, totalWork, currPercent);
+					output = true;
+					lastPercent = currPercent;
+				}
+			}
+		}
+
