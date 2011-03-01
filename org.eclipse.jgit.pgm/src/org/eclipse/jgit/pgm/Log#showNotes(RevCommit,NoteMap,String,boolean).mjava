@@ -22,12 +22,16 @@
 			out.print(")");
 		}
 		out.println(":");
-		RawText rawText = new RawText(reader.open(blobId).getBytes());
-		String s = rawText.getString(0, rawText.size(), false);
-		final String[] lines = s.split("\n");
-		for (final String l : lines) {
-			out.print("    ");
-			out.println(l);
+		try {
+			RawText rawText = new RawText(argWalk.getObjectReader()
+					.open(blobId).getCachedBytes(Integer.MAX_VALUE));
+			for (int i = 0; i < rawText.size(); i++) {
+				out.print("    ");
+				out.println(rawText.getString(i));
+			}
+		} catch (LargeObjectException e) {
+			out.println(MessageFormat.format(
+					CLIText.get().noteObjectTooLargeToPrint, blobId.name()));
 		}
 		return true;
 	}
