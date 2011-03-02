@@ -1,0 +1,24 @@
+	private static ObjectInfo decodeItem(TinyProtobuf.Decoder m) {
+		ChunkKey key = null;
+		TinyProtobuf.Decoder data = null;
+		long time = -1;
+
+		for (;;) {
+			switch (m.next()) {
+			case 0:
+				return ObjectInfo.fromBytes(key, data, time);
+			case 1:
+				key = ChunkKey.fromBytes(m);
+				continue;
+			case 2:
+				data = m.message();
+				continue;
+			case 3:
+				time = m.fixed64();
+				continue;
+			default:
+				m.skip();
+			}
+		}
+	}
+

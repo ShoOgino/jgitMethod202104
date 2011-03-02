@@ -1,0 +1,20 @@
+		public void onPartialResult(Map<CacheKey, byte[]> result) {
+			for (Map.Entry<CacheKey, byte[]> ent : result.entrySet()) {
+				ChunkKey key = ChunkKey.fromBytes(ent.getKey().getBytes());
+				ChunkMeta meta = ChunkMeta.fromBytes(key, ent.getValue());
+
+				if (streamingCallback != null) {
+					streamingCallback.onPartialResult(singleton(meta));
+
+					synchronized (lock) {
+						remaining.remove(key);
+					}
+				} else {
+					synchronized (lock) {
+						all.add(meta);
+						remaining.remove(key);
+					}
+				}
+			}
+		}
+

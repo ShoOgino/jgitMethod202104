@@ -1,0 +1,14 @@
+	private static int selectOffsetFormat(List<? extends PackedObjectInfo> list) {
+		int fmt = 1;
+		int max = 1 << (8 * fmt);
+
+		for (PackedObjectInfo oe : list) {
+			while (max <= oe.getOffset() && fmt < 4) {
+				if (++fmt == 4)
+					return fmt;
+				max = 1 << (8 * fmt);
+			}
+		}
+		return fmt;
+	}
+

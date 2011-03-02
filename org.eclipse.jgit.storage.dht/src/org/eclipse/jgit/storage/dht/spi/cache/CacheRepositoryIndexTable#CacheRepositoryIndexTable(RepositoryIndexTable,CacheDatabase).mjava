@@ -1,0 +1,17 @@
+	/**
+	 * Initialize a new wrapper.
+	 *
+	 * @param dbTable
+	 *            the underlying database's corresponding table.
+	 * @param cacheDatabase
+	 *            the cache database.
+	 */
+	public CacheRepositoryIndexTable(RepositoryIndexTable dbTable,
+			CacheDatabase cacheDatabase) {
+		this.db = dbTable;
+		this.client = cacheDatabase.getClient();
+		this.options = cacheDatabase.getOptions();
+		this.ns = Namespace.REPOSITORY_INDEX;
+		this.none = Sync.none();
+	}
+

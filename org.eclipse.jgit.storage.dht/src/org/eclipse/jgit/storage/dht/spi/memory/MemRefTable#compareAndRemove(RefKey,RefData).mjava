@@ -1,0 +1,10 @@
+	public boolean compareAndRemove(RefKey refKey, RefData oldData)
+			throws DhtException, TimeoutException {
+		RepositoryKey repo = refKey.getRepositoryKey();
+		return table.compareAndSet( //
+				repo.asBytes(), //
+				colRef.append(refKey.asBytes()), //
+				oldData != RefData.NONE ? oldData.asBytes() : null, //
+				null);
+	}
+

@@ -1,0 +1,21 @@
+	/**
+	 * Asynchronously load one or more chunks
+	 * <p>
+	 * Callers are responsible for breaking up very large collections of chunk
+	 * keys into smaller units, based on the reader's batch size option. Since
+	 * chunks typically 1 MB each, 10-20 keys is a reasonable batch size, but
+	 * depends on available JVM memory and performance of this method obtaining
+	 * chunks from the database.
+	 *
+	 * @param options
+	 *            options to control reading.
+	 * @param keys
+	 *            the chunk keys to obtain.
+	 * @param callback
+	 *            receives the results when ready. If this is an instance of
+	 *            {@link StreamingCallback}, implementors should try to deliver
+	 *            results early.
+	 */
+	public void get(Context options, Set<ChunkKey> keys,
+			AsyncCallback<Collection<PackChunk.Members>> callback);
+

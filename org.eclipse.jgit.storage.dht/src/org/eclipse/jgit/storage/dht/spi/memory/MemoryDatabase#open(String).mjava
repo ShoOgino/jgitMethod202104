@@ -1,0 +1,17 @@
+	/**
+	 * Open a repository by name on this database.
+	 *
+	 * @param name
+	 *            the name of the repository.
+	 * @return the repository instance. If the repository does not yet exist,
+	 *         the caller can use {@link Repository#create(boolean)} to create.
+	 * @throws IOException
+	 */
+	public DhtRepository open(String name) throws IOException {
+		return (DhtRepository) new DhtRepositoryBuilder<DhtRepositoryBuilder, DhtRepository, MemoryDatabase>()
+				.setDatabase(this) //
+				.setRepositoryName(name) //
+				.setMustExist(false) //
+				.build();
+	}
+

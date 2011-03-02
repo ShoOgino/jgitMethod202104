@@ -1,0 +1,16 @@
+	@Override
+	protected Result doDelete(Result desiredResult) throws IOException {
+		try {
+			boolean r = db.ref().compareAndRemove(refKey, oldData);
+			if (r) {
+				getRefDatabase().removed(dstRef.getName());
+				return desiredResult;
+			} else {
+				getRefDatabase().clearCache();
+				return Result.LOCK_FAILURE;
+			}
+		} catch (TimeoutException e) {
+			return Result.IO_FAILURE;
+		}
+	}
+

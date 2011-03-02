@@ -1,0 +1,8 @@
+	private static Ref recreate(final Ref old, final Ref leaf) {
+		if (old.isSymbolic()) {
+			Ref dst = recreate(old.getTarget(), leaf);
+			return new SymbolicRef(old.getName(), dst);
+		}
+		return leaf;
+	}
+

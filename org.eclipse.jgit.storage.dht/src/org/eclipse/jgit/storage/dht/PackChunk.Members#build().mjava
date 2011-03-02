@@ -1,0 +1,16 @@
+		/**
+		 * @return the PackChunk instance.
+		 * @throws DhtException
+		 *             if early validation indicates the chunk data is corrupt
+		 *             or not recognized by this version of the library.
+		 */
+		public PackChunk build() throws DhtException {
+			ChunkIndex i;
+			if (indexBuf != null)
+				i = ChunkIndex.fromBytes(chunkKey, indexBuf, indexPtr, indexLen);
+			else
+				i = null;
+
+			return new PackChunk(chunkKey, dataBuf, dataPtr, dataLen, i, meta);
+		}
+

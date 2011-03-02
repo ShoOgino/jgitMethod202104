@@ -1,0 +1,12 @@
+		private long varint64() {
+			int c = buf[ptr++];
+			long r = c & 0x7f;
+			int shift = 7;
+			while ((c & 0x80) != 0) {
+				c = buf[ptr++];
+				r |= ((long) (c & 0x7f)) << shift;
+				shift += 7;
+			}
+			return r;
+		}
+

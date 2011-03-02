@@ -1,0 +1,15 @@
+	public void add(ObjectIndexKey objId, ObjectInfo info, WriteBuffer buffer)
+			throws DhtException {
+		// During addition, the cache is not populated. This prevents a
+		// race condition when the cache is cold. Readers need to scan
+		// the database and ensure the oldest ObjectInfo is loaded into
+		// the cache in order to allow PackChunk to break delta cycles.
+		//
+		// This does have a small performance penalty, as recently added
+		// objects are often read not long after they were written. But
+		// without good multi-system transaction support between the
+		// cache and the underlying storage we cannot do better.
+		//
+		db.add(objId, info, ((CacheBuffer) buffer).getWriteBuffer());
+	}
+

@@ -1,0 +1,22 @@
+	/**
+	 * Compare a reference, and put if it matches.
+	 *
+	 * @param refKey
+	 *            reference to create or replace.
+	 * @param oldData
+	 *            the old data for the reference. The put only occurs if the
+	 *            value is still equal to {@code oldData}. Use
+	 *            {@link RefData#NONE} if the reference should not exist and is
+	 *            being created.
+	 * @param newData
+	 *            new value to store.
+	 * @return true if the put was successful; false if the current value does
+	 *         not match {@code prior}.
+	 * @throws DhtException
+	 *             the database cannot be updated.
+	 * @throws TimeoutException
+	 *             the operation to modify the database timed out.
+	 */
+	public boolean compareAndPut(RefKey refKey, RefData oldData, RefData newData)
+			throws DhtException, TimeoutException;
+

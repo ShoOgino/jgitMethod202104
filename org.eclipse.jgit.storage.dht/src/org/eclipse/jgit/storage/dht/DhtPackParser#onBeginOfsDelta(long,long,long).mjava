@@ -1,0 +1,33 @@
+	@Override
+	protected void onBeginOfsDelta(long deltaPos, long basePos,
+			long inflatedSize) throws IOException {
+		long basePtr = objChunkPtrs.get(findStreamIndex(basePos));
+		int type = typeOf(basePtr);
+
+		currType = type;
+		currPackedSize = 0;
+		currInflatedSize = inflatedSize;
+		currBasePtr = basePtr;
+		objStreamPos.add(deltaPos);
+
+		ChunkFormatter w = begin(type);
+		if (isInCurrentChunk(basePtr)) {
+			if (w.ofsDelta(inflatedSize, w.position() - offsetOf(basePtr))) {
+				currDataPos = w.position();
+				return;
+			}
+
+			endChunk(type);
+			w = begin(type);
+		}
+
+		if (!longOfsDelta(w, inflatedSize, basePtr)) {
+			endChunk(type);
+			w = begin(type);
+			if (!longOfsDelta(w, inflatedSize, basePtr))
+				throw panicCannotInsert();
+		}
+
+		currDataPos = w.position();
+	}
+

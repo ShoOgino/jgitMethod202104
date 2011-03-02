@@ -1,0 +1,47 @@
+	void plan(List<DhtObjectToPack> list) throws DhtException {
+		try {
+			for (DhtObjectToPack obj : list)
+				visit(obj);
+
+			if (!metaToRead.isEmpty())
+				startBatch(Context.FAST_MISSING_OK);
+			awaitPendingBatches();
+
+			synchronized (metaMissing) {
+				if (!metaMissing.isEmpty()) {
+					metaBatches.release(batchSize);
+					resolveMissing();
+					awaitPendingBatches();
+				}
+			}
+		} catch (InterruptedException err) {
+			throw new DhtTimeoutException(err);
+		}
+
+		Iterable<ChunkKey> order;
+		synchronized (allMeta) {
+			if (allMeta.isEmpty()) {
+				order = allVisits.keySet();
+			} else {
+				BlockList<ChunkKey> keys = new BlockList<ChunkKey>();
+				for (ChunkKey key : allVisits.keySet()) {
+					keys.add(key);
+
+					ChunkMeta meta = allMeta.remove(key);
+					if (meta != null) {
+						for (int i = 1; i < meta.getFragmentCount(); i++)
+							keys.add(meta.getFragmentKey(i));
+					}
+				}
+				order = keys;
+			}
+		}
+		prefetch.push(order);
+
+		Collections.sort(list, new Comparator<DhtObjectToPack>() {
+			public int compare(DhtObjectToPack a, DhtObjectToPack b) {
+				return a.visitOrder - b.visitOrder;
+			}
+		});
+	}
+

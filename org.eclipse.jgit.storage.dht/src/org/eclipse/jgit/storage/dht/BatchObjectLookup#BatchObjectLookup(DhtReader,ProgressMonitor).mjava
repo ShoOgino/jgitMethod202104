@@ -1,0 +1,20 @@
+	BatchObjectLookup(DhtReader reader, ProgressMonitor monitor) {
+		this.repo = reader.getRepositoryKey();
+		this.db = reader.getDatabase();
+		this.reader = reader;
+
+		if (monitor != null && monitor != NullProgressMonitor.INSTANCE)
+			this.progress = new ThreadSafeProgressMonitor(monitor);
+		else
+			this.progress = null;
+
+		this.concurrentBatches = reader.getOptions()
+				.getObjectIndexConcurrentBatches();
+
+		this.batches = new Semaphore(concurrentBatches);
+		this.resultLock = new ReentrantLock();
+		this.error = new AtomicReference<DhtException>();
+		this.retry = new ArrayList<T>();
+		this.tmp = new ArrayList<ObjectInfo>(4);
+	}
+

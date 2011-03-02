@@ -1,0 +1,30 @@
+		/**
+		 * Wait for the asynchronous operation to complete.
+		 * <p>
+		 * To prevent application deadlock, waiting can only be performed with
+		 * the supplied timeout.
+		 *
+		 * @param timeout
+		 *            amount of time to wait before failing.
+		 * @param unit
+		 *            units of {@code timeout}. For example
+		 *            {@link TimeUnit#MILLISECONDS}.
+		 * @return the returned value.
+		 * @throws DhtException
+		 *             the asynchronous operation failed.
+		 * @throws InterruptedException
+		 *             the current thread was interrupted before the operation
+		 *             completed.
+		 * @throws TimeoutException
+		 *             the timeout elapsed before the operation completed.
+		 */
+		public T get(long timeout, TimeUnit unit) throws DhtException,
+				InterruptedException, TimeoutException {
+			if (wait.await(timeout, unit)) {
+				if (error != null)
+					throw error;
+				return data;
+			}
+			throw new TimeoutException();
+		}
+

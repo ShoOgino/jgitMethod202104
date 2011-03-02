@@ -1,0 +1,14 @@
+		/** @return decode a string from 8 hex digits. */
+		public int stringHex32() {
+			checkFieldType(WIRE_LEN_DELIM);
+			int len = varint32();
+			if (len != 8)
+				throw new IllegalStateException(MessageFormat.format(DhtText
+						.get().protobufWrongFieldLength,
+						Integer.valueOf(field), Integer.valueOf(8), Integer
+								.valueOf(len)));
+			int val = KeyUtils.parse32(buf, ptr);
+			ptr += 8;
+			return val;
+		}
+

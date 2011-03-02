@@ -1,0 +1,49 @@
+	/**
+	 * Compare and put or delete a cell.
+	 * <p>
+	 * This method performs an atomic compare-and-swap operation on the named
+	 * cell. If the cell does not yet exist, it will be created. If the cell
+	 * exists, it will be replaced, and if {@code newVal} is null, the cell will
+	 * be deleted.
+	 *
+	 * @param row
+	 * @param col
+	 * @param oldVal
+	 *            if null, the cell must not exist, otherwise the cell's current
+	 *            value must exactly equal this value for the update to occur.
+	 * @param newVal
+	 *            if null, the cell will be removed, otherwise the cell will be
+	 *            created or updated to this value.
+	 * @return true if successful, false if {@code oldVal} does not match.
+	 */
+	public boolean compareAndSet(byte[] row, byte[] col, byte[] oldVal,
+			byte[] newVal) {
+		synchronized (lock) {
+			Key rowKey = new Key(row);
+			Key colKey = new Key(col);
+
+			Map<Key, Cell> r = map.get(rowKey);
+			if (r == null) {
+				r = new HashMap<Key, Cell>(4);
+				map.put(rowKey, r);
+			}
+
+			Cell oldCell = r.get(colKey);
+			if (!same(oldCell, oldVal)) {
+				if (r.isEmpty())
+					map.remove(rowKey);
+				return false;
+			}
+
+			if (newVal != null) {
+				r.put(colKey, new Cell(row, col, newVal));
+				return true;
+			}
+
+			r.remove(colKey);
+			if (r.isEmpty())
+				map.remove(rowKey);
+			return true;
+		}
+	}
+

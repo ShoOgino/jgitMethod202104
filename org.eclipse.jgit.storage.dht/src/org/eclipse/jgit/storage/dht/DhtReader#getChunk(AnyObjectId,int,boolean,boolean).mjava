@@ -1,0 +1,76 @@
+	private ChunkAndOffset getChunk(AnyObjectId objId, int typeHint,
+			boolean loadIfRequired, boolean checkRecent) throws DhtException,
+			MissingObjectException {
+		if (checkRecent) {
+			ChunkAndOffset r = recentChunks.find(repo, objId);
+			if (r != null)
+				return r;
+		}
+
+		ChunkKey key;
+		if (objId instanceof RefData.IdWithChunk)
+			key = ((RefData.IdWithChunk) objId).getChunkKey();
+		else
+			key = repository.getRefDatabase().findChunk(objId);
+		if (key != null) {
+			PackChunk chunk = ChunkCache.get().get(key);
+			if (chunk != null) {
+				int pos = chunk.findOffset(repo, objId);
+				if (0 <= pos)
+					return new ChunkAndOffset(chunk, pos);
+			}
+
+			if (loadIfRequired) {
+				chunk = load(key);
+				if (chunk != null && chunk.hasIndex()) {
+					int pos = chunk.findOffset(repo, objId);
+					if (0 <= pos) {
+						chunk = ChunkCache.get().put(chunk);
+						return new ChunkAndOffset(chunk, pos);
+					}
+				}
+			}
+
+			// The hint above is stale. Fall through and do a
+			// more exhaustive lookup to find the object.
+		}
+
+		ChunkAndOffset r = ChunkCache.get().find(repo, objId);
+		if (r != null)
+			return r;
+
+		if (!loadIfRequired)
+			return null;
+
+		if (prefetcher != null) {
+			r = prefetcher.find(repo, objId);
+			if (r != null)
+				return r;
+		}
+
+		for (ObjectInfo link : find(objId)) {
+			PackChunk chunk;
+
+			if (prefetcher != null) {
+				chunk = prefetcher.get(link.getChunkKey());
+				if (chunk == null) {
+					chunk = load(link.getChunkKey());
+					if (chunk == null)
+						continue;
+					if (prefetcher.isType(typeHint))
+						prefetcher.push(chunk.getMeta());
+				}
+			} else {
+				chunk = load(link.getChunkKey());
+				if (chunk == null)
+					continue;
+			}
+
+			if (chunk.hasIndex())
+				chunk = ChunkCache.get().put(chunk);
+			return new ChunkAndOffset(chunk, link.getOffset());
+		}
+
+		throw missing(objId, typeHint);
+	}
+

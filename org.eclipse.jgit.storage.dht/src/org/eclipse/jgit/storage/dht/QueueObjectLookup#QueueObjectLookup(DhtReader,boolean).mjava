@@ -1,0 +1,13 @@
+	QueueObjectLookup(DhtReader reader, boolean reportMissing) {
+		this.repo = reader.getRepositoryKey();
+		this.db = reader.getDatabase();
+		this.reader = reader;
+		this.options = reader.getOptions();
+		this.reportMissing = reportMissing;
+		this.tmp = new ArrayList<ObjectInfo>(4);
+		this.context = Context.FAST_MISSING_OK;
+		this.toRetry = new ArrayList<T>();
+
+		this.concurrentBatches = options.getObjectIndexConcurrentBatches();
+	}
+

@@ -1,0 +1,21 @@
+	private void computeEdges(List<DhtInfo> objs, ChunkKey key, int type)
+			throws DhtException {
+		Edges edges = chunkEdges.get(key);
+		if (edges == null)
+			return;
+
+		for (DhtInfo obj : objs)
+			edges.remove(obj);
+
+		switch (type) {
+		case OBJ_COMMIT:
+			edges.commitEdges = toChunkList(edges.commitIds);
+			break;
+		case OBJ_TREE:
+			// TODO prefetch tree edges
+			break;
+		}
+
+		edges.commitIds = null;
+	}
+

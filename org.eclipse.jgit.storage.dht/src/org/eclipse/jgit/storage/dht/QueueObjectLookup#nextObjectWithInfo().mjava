@@ -1,0 +1,44 @@
+	synchronized ObjectWithInfo<T> nextObjectWithInfo()
+			throws MissingObjectException, IOException {
+		for (;;) {
+			if (error != null)
+				throw error;
+
+			// Consider starting another batch before popping a result.
+			// This ensures lookup is running while results are being
+			// consumed by the calling application.
+			//
+			while (runningBatches < concurrentBatches) {
+				if (!toFind.hasNext() // reached end of original input
+						&& runningBatches == 0 // all batches finished
+						&& toRetry != null // haven't yet retried
+						&& !toRetry.isEmpty()) {
+					toFind = toRetry.iterator();
+					toRetry = null;
+					context = Context.READ_REPAIR;
+				}
+
+				if (toFind.hasNext())
+					startBatch(context);
+				else
+					break;
+			}
+
+			ObjectWithInfo<T> c = pop();
+			if (c != null) {
+				if (c.chunkKey != null)
+					return c;
+				else
+					throw missing(c.object);
+
+			} else if (!toFind.hasNext() && runningBatches == 0)
+				return null;
+
+			try {
+				wait();
+			} catch (InterruptedException e) {
+				throw new DhtTimeoutException(e);
+			}
+		}
+	}
+

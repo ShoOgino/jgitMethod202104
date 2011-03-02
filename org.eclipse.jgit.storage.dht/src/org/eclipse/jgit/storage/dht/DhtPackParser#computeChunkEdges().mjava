@@ -1,0 +1,23 @@
+	private void computeChunkEdges() throws DhtException {
+		List<DhtInfo> objs = objectListByChunk;
+		int beginIdx = 0;
+		ChunkKey key = chunkOf(objs.get(0).chunkPtr);
+		int type = typeOf(objs.get(0).chunkPtr);
+
+		int objIdx = 1;
+		for (; objIdx < objs.size(); objIdx++) {
+			DhtInfo oe = objs.get(objIdx);
+			ChunkKey oeKey = chunkOf(oe.chunkPtr);
+			if (!key.equals(oeKey)) {
+				computeEdges(objs.subList(beginIdx, objIdx), key, type);
+				beginIdx = objIdx;
+
+				key = oeKey;
+				type = typeOf(oe.chunkPtr);
+			}
+			if (type != OBJ_MIXED && type != typeOf(oe.chunkPtr))
+				type = OBJ_MIXED;
+		}
+		computeEdges(objs.subList(beginIdx, objs.size()), key, type);
+	}
+

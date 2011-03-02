@@ -1,0 +1,31 @@
+	@Override
+	public B setup() throws IllegalArgumentException, DhtException,
+			RepositoryNotFoundException {
+		if (getDatabase() == null)
+			throw new IllegalArgumentException(DhtText.get().databaseRequired);
+
+		if (getReaderOptions() == null)
+			setReaderOptions(new DhtReaderOptions());
+		if (getInserterOptions() == null)
+			setInserterOptions(new DhtInserterOptions());
+
+		if (getRepositoryKey() == null) {
+			if (getRepositoryName() == null)
+				throw new IllegalArgumentException(DhtText.get().nameRequired);
+
+			RepositoryKey r;
+			try {
+				r = getDatabase().repositoryIndex().get(
+						RepositoryName.create(name));
+			} catch (TimeoutException e) {
+				throw new DhtTimeoutException(MessageFormat.format(
+						DhtText.get().timeoutLocatingRepository, name), e);
+			}
+			if (isMustExist() && r == null)
+				throw new RepositoryNotFoundException(getRepositoryName());
+			if (r != null)
+				setRepositoryKey(r);
+		}
+		return self();
+	}
+

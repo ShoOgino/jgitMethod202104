@@ -1,0 +1,26 @@
+	@Override
+	protected int readDatabase(byte[] dst, int pos, int cnt) throws IOException {
+		int n = dbChunk.read(dbPtr, dst, pos, cnt);
+		if (0 < n) {
+			dbPtr += n;
+			return n;
+		}
+
+		// ChunkMeta for fragments is delayed writing, so it isn't available
+		// on the chunk if the chunk was read-back from the database. Use
+		// our copy of ChunkMeta instead of the PackChunk's copy.
+
+		ChunkMeta meta = chunkMeta.get(dbChunk.getChunkKey());
+		if (meta == null)
+			return 0;
+
+		ChunkKey next = meta.getNextFragment(dbChunk.getChunkKey());
+		if (next == null)
+			return 0;
+
+		seekChunk(next, false);
+		n = dbChunk.read(0, dst, pos, cnt);
+		dbPtr = n;
+		return n;
+	}
+

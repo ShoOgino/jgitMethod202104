@@ -1,0 +1,27 @@
+	private Iterable<T> lookInCache(Iterable<T> objects) {
+		RecentInfoCache infoCache = reader.getRecentInfoCache();
+		List<T> missing = null;
+		for (T obj : objects) {
+			if (needChunkOnly && obj instanceof IdWithChunk) {
+				push(obj, ((IdWithChunk) obj).getChunkKey());
+				continue;
+			}
+
+			List<ObjectInfo> info = infoCache.get(obj);
+			if (info != null && !info.isEmpty()) {
+				push(obj, info.get(0));
+			} else {
+				if (missing == null) {
+					if (objects instanceof List<?>)
+						missing = new ArrayList<T>(((List<?>) objects).size());
+					else
+						missing = new ArrayList<T>();
+				}
+				missing.add(obj);
+			}
+		}
+		if (missing != null)
+			return missing;
+		return Collections.emptyList();
+	}
+

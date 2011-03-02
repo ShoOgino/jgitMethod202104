@@ -1,0 +1,9 @@
+		/** @return decode the current field as a string. */
+		public String string() {
+			checkFieldType(WIRE_LEN_DELIM);
+			int len = varint32();
+			String s = RawParseUtils.decode(buf, ptr, ptr + len);
+			ptr += len;
+			return s;
+		}
+

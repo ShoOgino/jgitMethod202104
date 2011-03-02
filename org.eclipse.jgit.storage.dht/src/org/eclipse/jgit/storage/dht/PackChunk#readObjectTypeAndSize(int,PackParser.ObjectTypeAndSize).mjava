@@ -1,0 +1,30 @@
+	int readObjectTypeAndSize(int ptr, PackParser.ObjectTypeAndSize info) {
+		ptr += dataPtr;
+
+		int c = dataBuf[ptr++] & 0xff;
+		int typeCode = (c >> 4) & 7;
+		long sz = c & 15;
+		int shift = 4;
+		while ((c & 0x80) != 0) {
+			c = dataBuf[ptr++] & 0xff;
+			sz += (c & 0x7f) << shift;
+			shift += 7;
+		}
+
+		switch (typeCode) {
+		case OBJ_OFS_DELTA:
+			c = dataBuf[ptr++] & 0xff;
+			while ((c & 128) != 0)
+				c = dataBuf[ptr++] & 0xff;
+			break;
+
+		case OBJ_REF_DELTA:
+			ptr += 20;
+			break;
+		}
+
+		info.type = typeCode;
+		info.size = sz;
+		return ptr - dataPtr;
+	}
+

@@ -1,0 +1,24 @@
+	private Iterable<T> lookInCache(Iterable<T> objects) {
+		RecentInfoCache infoCache = reader.getRecentInfoCache();
+		List<T> missing = null;
+		for (T obj : objects) {
+			List<ObjectInfo> info = infoCache.get(obj);
+			if (info != null) {
+				onResult(obj, info);
+				if (progress != null)
+					progress.update(1);
+			} else {
+				if (missing == null) {
+					if (objects instanceof List<?>)
+						missing = new ArrayList<T>(((List<?>) objects).size());
+					else
+						missing = new ArrayList<T>();
+				}
+				missing.add(obj);
+			}
+		}
+		if (missing != null)
+			return missing;
+		return Collections.emptyList();
+	}
+

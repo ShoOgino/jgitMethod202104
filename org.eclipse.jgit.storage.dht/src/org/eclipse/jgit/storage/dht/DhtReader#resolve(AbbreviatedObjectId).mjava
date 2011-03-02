@@ -1,0 +1,12 @@
+	@Override
+	public Collection<ObjectId> resolve(AbbreviatedObjectId id)
+			throws IOException {
+		// Because ObjectIndexKey requires at least 4 leading digits
+		// don't resolve anything that is shorter than 4 digits.
+		//
+		if (id.length() < 4)
+			return Collections.emptySet();
+
+		throw new DhtException.TODO("resolve abbreviations");
+	}
+

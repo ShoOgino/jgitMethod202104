@@ -1,0 +1,10 @@
+	@Override
+	public DhtRefUpdate newUpdate(String refName, boolean detach)
+			throws IOException {
+		Ref ref = getRefs(ALL).get(refName);
+		if (ref == null)
+			ref = new Unpeeled(NEW, refName, null);
+		RepositoryKey repo = repository.getRepositoryKey();
+		return new DhtRefUpdate(this, repo, db, ref);
+	}
+

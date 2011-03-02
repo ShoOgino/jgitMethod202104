@@ -1,0 +1,10 @@
+	private static void waitFor(Callable<?> task) throws DhtException {
+		try {
+			task.call();
+		} catch (DhtException err) {
+			throw err;
+		} catch (Exception err) {
+			throw new DhtException(err);
+		}
+	}
+

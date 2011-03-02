@@ -5,6 +5,7 @@
 		objectDigest.update(Constants.encodeASCII(sz));
 		objectDigest.update((byte) 0);
 
+		final byte[] data;
 		boolean checkContentLater = false;
 		if (type == Constants.OBJ_BLOB) {
 			byte[] readBuffer = buffer();
@@ -21,9 +22,10 @@
 			tempObjectId.fromRaw(objectDigest.digest(), 0);
 			checkContentLater = isCheckObjectCollisions()
 					&& readCurs.has(tempObjectId);
+			data = null;
 
 		} else {
-			final byte[] data = inflateAndReturn(Source.INPUT, sz);
+			data = inflateAndReturn(Source.INPUT, sz);
 			objectDigest.update(data);
 			tempObjectId.fromRaw(objectDigest.digest(), 0);
 			verifySafeObject(tempObjectId, type, data);
@@ -32,6 +34,8 @@
 		PackedObjectInfo obj = newInfo(tempObjectId, null, null);
 		obj.setOffset(pos);
 		onEndWholeObject(obj);
+		if (data != null)
+			onInflatedObjectData(obj, type, data);
 		addObjectAndTrack(obj);
 		if (checkContentLater)
 			deferredCheckBlobs.add(obj);

@@ -1,0 +1,23 @@
+	public void get(Context options, Set<ObjectIndexKey> objects,
+			AsyncCallback<Map<ObjectIndexKey, Collection<ObjectInfo>>> callback) {
+		Map<ObjectIndexKey, Collection<ObjectInfo>> out = new HashMap<ObjectIndexKey, Collection<ObjectInfo>>();
+
+		for (ObjectIndexKey objId : objects) {
+			for (MemTable.Cell cell : table.scanFamily(objId.asBytes(), colInfo)) {
+				Collection<ObjectInfo> info = out.get(objId);
+				if (info == null) {
+					info = new ArrayList<ObjectInfo>(4);
+					out.put(objId, info);
+				}
+
+				ChunkKey chunk = ChunkKey.fromBytes(
+						colInfo.suffix(cell.getName()));
+				byte[] value = cell.getValue();
+				long time = cell.getTimestamp();
+				info.add(ObjectInfo.fromBytes(chunk, value, time));
+			}
+		}
+
+		callback.onSuccess(out);
+	}
+

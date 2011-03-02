@@ -1,0 +1,65 @@
+	@Override
+	protected void onObjectData(Source src, byte[] raw, int pos, int len)
+			throws IOException {
+		if (src != Source.INPUT)
+			return;
+
+		if (currChunk.append(raw, pos, len)) {
+			currPackedSize += len;
+			return;
+		}
+
+		if (currFragments == null && currChunk.getObjectCount() == 1)
+			currFragments = new LinkedList<ChunkKey>();
+		if (currFragments != null) {
+			appendToFragment(raw, pos, len);
+			return;
+		}
+
+		// Everything between dataPos and dataEnd must be saved.
+		//
+		final int dataPos = currDataPos;
+		final int dataEnd = currChunk.position();
+		final int hdrPos = offsetOf(currChunkPtr);
+		final int hdrLen = dataPos - hdrPos;
+		final int type = typeOf(currChunkPtr);
+		byte[] dataOld = currChunk.getRawChunkDataArray();
+		final int typeOld = currChunk.getCurrentObjectType();
+
+		currChunk.rollback();
+		endChunk(type);
+
+		final ChunkFormatter w = begin(type);
+		switch (typeOld) {
+		case OBJ_COMMIT:
+		case OBJ_BLOB:
+		case OBJ_TREE:
+		case OBJ_TAG:
+		case OBJ_REF_DELTA:
+			w.adjustObjectCount(1, typeOld);
+			if (!w.append(dataOld, hdrPos, hdrLen))
+				throw panicCannotInsert();
+			break;
+
+		case OBJ_OFS_DELTA:
+			if (!longOfsDelta(w, currInflatedSize, currBasePtr))
+				throw panicCannotInsert();
+			break;
+
+		default:
+			throw new DhtException("Internal programming error: " + typeOld);
+		}
+
+		currDataPos = w.position();
+		if (dataPos < dataEnd && !w.append(dataOld, dataPos, dataEnd - dataPos))
+			throw panicCannotInsert();
+		dataOld = null;
+
+		if (w.append(raw, pos, len)) {
+			currPackedSize += len;
+		} else {
+			currFragments = new LinkedList<ChunkKey>();
+			appendToFragment(raw, pos, len);
+		}
+	}
+

@@ -1,0 +1,17 @@
+	/**
+	 * Schedule a removal only after the underlying database flushes.
+	 * <p>
+	 * Unlike {@link #remove(CacheKey)}, these removals are buffered until the
+	 * application calls {@link #flush()} and aren't sent to the cache service
+	 * until after the underlying database flush() operation is completed
+	 * successfully.
+	 *
+	 * @param key
+	 *            key to remove.
+	 */
+	public void removeAfterFlush(CacheKey key) {
+		if (afterFlush == null)
+			afterFlush = newList();
+		afterFlush.add(CacheService.Change.remove(key));
+	}
+

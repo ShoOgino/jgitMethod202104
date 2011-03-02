@@ -1,0 +1,20 @@
+	void push(Iterable<ChunkKey> list) {
+		synchronized (this) {
+			for (ChunkKey key : list) {
+				if (status.containsKey(key))
+					continue;
+
+				status.put(key, Status.ON_QUEUE);
+				queue.add(key);
+
+				if (key.equals(stopAt)) {
+					automaticallyPushHints = false;
+					break;
+				}
+			}
+
+			if (!first)
+				maybeStartGet();
+		}
+	}
+

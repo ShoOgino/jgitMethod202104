@@ -1,0 +1,13 @@
+	@Override
+	public int hashCode() {
+		if (hashCode == 0) {
+			int h = 5381;
+			for (int ptr = 0; ptr < key.length; ptr++)
+				h = ((h << 5) + h) + (key[ptr] & 0xff);
+			if (h == 0)
+				h = 1;
+			hashCode = h;
+		}
+		return hashCode;
+	}
+

@@ -1,0 +1,17 @@
+		LoaderFromCache(
+				Context options,
+				Set<ObjectIndexKey> objects,
+				AsyncCallback<Map<ObjectIndexKey, Collection<ObjectInfo>>> callback) {
+			this.options = options;
+			this.remaining = new HashSet<ObjectIndexKey>(objects);
+			this.normalCallback = callback;
+
+			if (callback instanceof StreamingCallback<?>) {
+				streamingCallback = (StreamingCallback<Map<ObjectIndexKey, Collection<ObjectInfo>>>) callback;
+				all = null;
+			} else {
+				streamingCallback = null;
+				all = new HashMap<ObjectIndexKey, Collection<ObjectInfo>>();
+			}
+		}
+

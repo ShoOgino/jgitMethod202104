@@ -1,0 +1,22 @@
+	@Override
+	protected void onInflatedObjectData(PackedObjectInfo obj, int typeCode,
+			byte[] data) throws IOException {
+		DhtInfo info = (DhtInfo) obj;
+		info.inflatedSize = data.length;
+		info.setType(typeCode);
+
+		switch (typeCode) {
+		case OBJ_COMMIT:
+			onCommit(info, data);
+			break;
+
+		case OBJ_TREE:
+			onTree(info, data);
+			break;
+
+		case OBJ_TAG:
+			onTag(info, data);
+			break;
+		}
+	}
+

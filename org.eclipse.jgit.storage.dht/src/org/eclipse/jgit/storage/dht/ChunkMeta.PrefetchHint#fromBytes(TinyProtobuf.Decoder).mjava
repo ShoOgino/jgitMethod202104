@@ -1,0 +1,33 @@
+		static PrefetchHint fromBytes(TinyProtobuf.Decoder d) {
+			ArrayList<ChunkKey> edge = null;
+			ArrayList<ChunkKey> sequential = null;
+
+			PARSE: for (;;) {
+				switch (d.next()) {
+				case 0:
+					break PARSE;
+				case 1:
+					if (edge == null)
+						edge = new ArrayList<ChunkKey>(16);
+					edge.add(ChunkKey.fromBytes(d));
+					continue;
+				case 2:
+					if (sequential == null)
+						sequential = new ArrayList<ChunkKey>(16);
+					sequential.add(ChunkKey.fromBytes(d));
+					continue;
+				default:
+					d.skip();
+					continue;
+				}
+			}
+
+			if (edge != null)
+				edge.trimToSize();
+
+			if (sequential != null)
+				sequential.trimToSize();
+
+			return new PrefetchHint(edge, sequential);
+		}
+

@@ -1,0 +1,20 @@
+	private static void waitFor(Future<?> task) throws DhtException {
+		try {
+			task.get();
+
+		} catch (InterruptedException e) {
+			throw new DhtTimeoutException(e);
+
+		} catch (ExecutionException err) {
+
+			Throwable t = err;
+			while (t != null) {
+				if (t instanceof DhtException)
+					throw (DhtException) t;
+				t = t.getCause();
+			}
+
+			throw new DhtException(err);
+		}
+	}
+

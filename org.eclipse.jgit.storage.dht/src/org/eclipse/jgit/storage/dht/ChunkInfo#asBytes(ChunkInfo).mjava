@@ -1,0 +1,19 @@
+	private static byte[] asBytes(ChunkInfo info) {
+		TinyProtobuf.Encoder objects = TinyProtobuf.encode(48);
+		objects.int32IfNotZero(1, info.objectsTotal);
+		objects.int32IfNotZero(2, info.objectsWhole);
+		objects.int32IfNotZero(3, info.objectsOfsDelta);
+		objects.int32IfNotZero(4, info.objectsRefDelta);
+
+		TinyProtobuf.Encoder e = TinyProtobuf.encode(128);
+		e.intEnum(1, info.source);
+		e.int32IfNotNegative(2, info.objectType);
+		e.boolIfTrue(3, info.fragment);
+		e.string(4, info.cachedPack);
+		e.message(5, objects);
+		e.int32IfNotZero(6, info.chunkSize);
+		e.int32IfNotZero(7, info.indexSize);
+		e.int32IfNotZero(8, info.metaSize);
+		return e.asByteArray();
+	}
+

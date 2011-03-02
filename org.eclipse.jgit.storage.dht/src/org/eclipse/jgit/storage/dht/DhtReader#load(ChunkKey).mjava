@@ -1,0 +1,22 @@
+	private PackChunk load(ChunkKey chunkKey) throws DhtException {
+		if (0 == stats.access(chunkKey).cntReader_Load++
+				&& readerOptions.isTrackFirstChunkLoad())
+			stats.access(chunkKey).locReader_Load = new Throwable("first");
+		Context opt = Context.READ_REPAIR;
+		Sync<Collection<PackChunk.Members>> sync = Sync.create();
+		db.chunk().get(opt, Collections.singleton(chunkKey), sync);
+		try {
+			Collection<PackChunk.Members> c = sync.get(getOptions()
+					.getTimeout());
+			if (c.isEmpty())
+				return null;
+			if (c instanceof List)
+				return ((List<PackChunk.Members>) c).get(0).build();
+			return c.iterator().next().build();
+		} catch (InterruptedException e) {
+			throw new DhtTimeoutException(e);
+		} catch (TimeoutException e) {
+			throw new DhtTimeoutException(e);
+		}
+	}
+

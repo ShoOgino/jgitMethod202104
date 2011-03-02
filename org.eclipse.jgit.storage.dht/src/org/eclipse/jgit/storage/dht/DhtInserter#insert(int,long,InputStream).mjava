@@ -1,0 +1,16 @@
+	@Override
+	public ObjectId insert(int type, long len, InputStream in)
+			throws IOException {
+		if (Integer.MAX_VALUE < len || mustFragmentSize() < len)
+			return insertStream(type, len, in);
+
+		byte[] tmp;
+		try {
+			tmp = new byte[(int) len];
+		} catch (OutOfMemoryError tooLarge) {
+			return insertStream(type, len, in);
+		}
+		IO.readFully(in, tmp, 0, tmp.length);
+		return insert(type, tmp, 0, tmp.length);
+	}
+

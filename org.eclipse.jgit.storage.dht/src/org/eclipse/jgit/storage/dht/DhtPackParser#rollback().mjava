@@ -1,0 +1,39 @@
+	private void rollback() throws DhtException {
+		try {
+			dbWriteBuffer.abort();
+			dbWriteBuffer = db.newWriteBuffer();
+
+			if (cachedPackKey != null)
+				db.repository().remove(repo, cachedPackKey, dbWriteBuffer);
+
+			if (linkIterators != null) {
+				boolean removed = true;
+				while (removed) {
+					removed = false;
+					for (ListIterator<DhtInfo> itr : linkIterators) {
+						int cnt = 0;
+						while (itr.hasPrevious() && cnt < linkBatchSize) {
+							DhtInfo oe = itr.previous();
+							db.objectIndex().remove( //
+									ObjectIndexKey.create(repo, oe), //
+									chunkOf(oe.chunkPtr), //
+									dbWriteBuffer);
+							cnt++;
+						}
+						if (0 < cnt)
+							removed = true;
+					}
+				}
+			}
+
+			deleteChunks(infoByOrder[OBJ_COMMIT]);
+			deleteChunks(infoByOrder[OBJ_TREE]);
+			deleteChunks(infoByOrder[OBJ_BLOB]);
+			deleteChunks(infoByOrder[OBJ_TAG]);
+
+			dbWriteBuffer.flush();
+		} catch (Throwable err) {
+			throw new DhtException(DhtText.get().packParserRollbackFailed, err);
+		}
+	}
+

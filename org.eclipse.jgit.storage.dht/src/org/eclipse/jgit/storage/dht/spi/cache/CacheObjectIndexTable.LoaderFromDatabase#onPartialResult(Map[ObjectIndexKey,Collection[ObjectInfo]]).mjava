@@ -1,0 +1,31 @@
+		public void onPartialResult(
+				Map<ObjectIndexKey, Collection<ObjectInfo>> result) {
+			final Map<ObjectIndexKey, Collection<ObjectInfo>> toPut = copy(result);
+
+			if (streamingCallback != null)
+				streamingCallback.onPartialResult(result);
+			else {
+				synchronized (lock) {
+					all.putAll(result);
+				}
+			}
+
+			// Encoding is rather expensive, so move the cache population
+			// into it a different background thread to prevent the current
+			// database task from being starved of time.
+			//
+			executor.submit(new Runnable() {
+				public void run() {
+					List<Change> ops = new ArrayList<Change>(toPut.size());
+
+					for (Map.Entry<ObjectIndexKey, Collection<ObjectInfo>> e : all(toPut)) {
+						List<ObjectInfo> items = copy(e.getValue());
+						ObjectInfo.sort(items);
+						ops.add(Change.put(ns.key(e.getKey()), encode(items)));
+					}
+
+					client.modify(ops, Sync.<Void> none());
+				}
+			});
+		}
+

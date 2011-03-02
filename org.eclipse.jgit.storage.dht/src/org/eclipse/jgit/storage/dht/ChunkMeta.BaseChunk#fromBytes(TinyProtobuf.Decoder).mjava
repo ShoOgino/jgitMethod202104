@@ -1,0 +1,23 @@
+		static BaseChunk fromBytes(TinyProtobuf.Decoder d) {
+			long relativeStart = -1;
+			ChunkKey chunk = null;
+
+			PARSE: for (;;) {
+				switch (d.next()) {
+				case 0:
+					break PARSE;
+				case 1:
+					relativeStart = d.int64();
+					continue;
+				case 2:
+					chunk = ChunkKey.fromBytes(d);
+					continue;
+				default:
+					d.skip();
+					continue;
+				}
+			}
+
+			return new BaseChunk(relativeStart, chunk);
+		}
+

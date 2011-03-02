@@ -1,0 +1,16 @@
+	/**
+	 * Parse an ObjectInfo from the storage system.
+	 *
+	 * @param chunkKey
+	 *            the chunk the object points to.
+	 * @param data
+	 *            the data of the ObjectInfo.
+	 * @param time
+	 *            timestamp of the ObjectInfo. If the implementation does not
+	 *            store timestamp data, supply a negative value.
+	 * @return the object's information.
+	 */
+	public static ObjectInfo fromBytes(ChunkKey chunkKey, byte[] data, long time) {
+		return fromBytes(chunkKey, TinyProtobuf.decode(data), time);
+	}
+

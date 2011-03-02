@@ -1,0 +1,12 @@
+	public void remove(ObjectIndexKey objId, ChunkKey chunk, WriteBuffer buffer)
+			throws DhtException {
+		CacheBuffer buf = (CacheBuffer) buffer;
+		db.remove(objId, chunk, buf.getWriteBuffer());
+
+		// TODO This suffers from a race condition. The removal from the
+		// cache can occur before the database update takes place, and a
+		// concurrent reader might re-populate the cache with the stale data.
+		//
+		buf.remove(ns.key(objId));
+	}
+

@@ -1,0 +1,7 @@
+	private ObjectTypeAndSize seekDatabase(long chunkPtr, ObjectTypeAndSize info)
+			throws DhtException {
+		seekChunk(chunkOf(chunkPtr), true);
+		dbPtr = dbChunk.readObjectTypeAndSize(offsetOf(chunkPtr), info);
+		return info;
+	}
+

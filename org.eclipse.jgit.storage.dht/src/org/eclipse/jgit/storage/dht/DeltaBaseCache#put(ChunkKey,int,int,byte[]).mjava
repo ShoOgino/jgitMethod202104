@@ -1,0 +1,15 @@
+	void put(ChunkKey key, int offset, int objectType, byte[] data) {
+		if (data.length > maxByteCount)
+			return; // Too large to cache.
+
+		curByteCount += data.length;
+		releaseMemory();
+
+		int tableIdx = hash(key, offset);
+		Slot e = new Slot(key, offset, data.length);
+		e.data = new SoftReference<Entry>(new Entry(data, objectType));
+		e.tableNext = table[tableIdx];
+		table[tableIdx] = e;
+		moveToHead(e);
+	}
+

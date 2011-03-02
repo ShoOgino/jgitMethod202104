@@ -1,0 +1,12 @@
+	RecentInfoCache(DhtReaderOptions options) {
+		final int sz = options.getRecentInfoCacheSize();
+		infoCache = new LinkedHashMap<ObjectId, List<ObjectInfo>>(sz, 0.75f, true) {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			protected boolean removeEldestEntry(Entry<ObjectId, List<ObjectInfo>> e) {
+				return sz < size();
+			}
+		};
+	}
+

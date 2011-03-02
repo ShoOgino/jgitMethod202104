@@ -1,0 +1,26 @@
+	public void copyObjectAsIs(PackOutputStream out, ObjectToPack otp,
+			boolean validate) throws IOException,
+			StoredObjectRepresentationNotAvailableException {
+		DhtObjectToPack obj = (DhtObjectToPack) otp;
+		try {
+			PackChunk chunk = recentChunks.get(obj.chunk);
+			if (chunk == null) {
+				chunk = prefetcher.get(obj.chunk);
+				if (chunk == null) {
+					// This should never happen during packing, it implies
+					// the fetch plan was incorrect. Unfortunately that can
+					// occur if objects need to be recompressed on the fly.
+					//
+					stats.access(obj.chunk).cntCopyObjectAsIs_PrefetchMiss++;
+					chunk = getChunk(obj.chunk);
+				}
+				if (!chunk.isFragment())
+					recentChunk(chunk);
+			}
+			chunk.copyObjectAsIs(out, obj, validate, this);
+		} catch (DhtMissingChunkException missingChunk) {
+			stats.access(missingChunk.getChunkKey()).cntCopyObjectAsIs_InvalidChunk++;
+			throw new StoredObjectRepresentationNotAvailableException(otp);
+		}
+	}
+

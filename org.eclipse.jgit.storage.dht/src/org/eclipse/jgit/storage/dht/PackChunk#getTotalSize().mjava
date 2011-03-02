@@ -1,0 +1,12 @@
+	/** @return the complete size of this chunk, in memory. */
+	int getTotalSize() {
+		// Assume the index is part of the buffer, and report its total size..
+		if (dataPtr != 0 || dataLen != dataBuf.length)
+			return dataBuf.length;
+
+		int sz = dataLen;
+		if (index != null)
+			sz += index.getIndexSize();
+		return sz;
+	}
+

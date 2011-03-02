@@ -1,0 +1,19 @@
+	@Override
+	protected Result doLink(String target) throws IOException {
+		try {
+			newData = RefData.symbolic(target);
+			boolean r = db.ref().compareAndPut(refKey, oldData, newData);
+			if (r) {
+				getRefDatabase().stored(dstRef.getName(), newData);
+				if (getRef().getStorage() == Ref.Storage.NEW)
+					return Result.NEW;
+				return Result.FORCED;
+			} else {
+				getRefDatabase().clearCache();
+				return Result.LOCK_FAILURE;
+			}
+		} catch (TimeoutException e) {
+			return Result.IO_FAILURE;
+		}
+	}
+

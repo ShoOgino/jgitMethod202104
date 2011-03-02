@@ -1,0 +1,22 @@
+	/**
+	 * Record the fact that {@code objId} can be found by {@code info}.
+	 * <p>
+	 * If there is already data for {@code objId} in the table, this method
+	 * should add the new chunk onto the existing data list.
+	 * <p>
+	 * This method should use batched asynchronous puts as much as possible.
+	 * Initial imports of an existing repository may require millions of add
+	 * operations to this table, one for each object being imported.
+	 *
+	 * @param objId
+	 *            the unique ObjectId.
+	 * @param info
+	 *            a chunk that is known to store {@code objId}.
+	 * @param buffer
+	 *            buffer to enqueue the put onto.
+	 * @throws DhtException
+	 *             if the buffer flushed and an enqueued operation failed.
+	 */
+	public void add(ObjectIndexKey objId, ObjectInfo info, WriteBuffer buffer)
+			throws DhtException;
+

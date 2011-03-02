@@ -1,0 +1,15 @@
+	private void remove(Node node) {
+		Node p = node.prev;
+		Node n = node.next;
+
+		if (p != null)
+			p.next = n;
+		if (n != null)
+			n.prev = p;
+
+		if (lruHead == node)
+			lruHead = n;
+		if (lruTail == node)
+			lruTail = p;
+	}
+

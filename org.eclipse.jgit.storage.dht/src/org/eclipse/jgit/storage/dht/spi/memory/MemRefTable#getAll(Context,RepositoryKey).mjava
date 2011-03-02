@@ -1,0 +1,11 @@
+	public Map<RefKey, RefData> getAll(Context options, RepositoryKey repository)
+			throws DhtException, TimeoutException {
+		Map<RefKey, RefData> out = new HashMap<RefKey, RefData>();
+		for (MemTable.Cell cell : table.scanFamily(repository.asBytes(), colRef)) {
+			RefKey ref = RefKey.fromBytes(colRef.suffix(cell.getName()));
+			RefData val = RefData.fromBytes(cell.getValue());
+			out.put(ref, val);
+		}
+		return out;
+	}
+

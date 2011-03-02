@@ -1,0 +1,8 @@
+	public void get(Context options, Set<ObjectIndexKey> objects,
+			AsyncCallback<Map<ObjectIndexKey, Collection<ObjectInfo>>> callback) {
+		List<CacheKey> toFind = new ArrayList<CacheKey>(objects.size());
+		for (ObjectIndexKey k : objects)
+			toFind.add(ns.key(k));
+		client.get(toFind, new LoaderFromCache(options, objects, callback));
+	}
+

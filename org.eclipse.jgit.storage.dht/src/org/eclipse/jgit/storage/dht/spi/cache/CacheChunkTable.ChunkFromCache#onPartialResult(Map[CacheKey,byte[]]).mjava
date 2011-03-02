@@ -1,0 +1,20 @@
+		public void onPartialResult(Map<CacheKey, byte[]> result) {
+			for (Map.Entry<CacheKey, byte[]> ent : result.entrySet()) {
+				ChunkKey key = ChunkKey.fromBytes(ent.getKey().getBytes());
+				PackChunk.Members members = decode(key, ent.getValue());
+
+				if (streamingCallback != null) {
+					streamingCallback.onPartialResult(singleton(members));
+
+					synchronized (lock) {
+						remaining.remove(key);
+					}
+				} else {
+					synchronized (lock) {
+						all.add(members);
+						remaining.remove(key);
+					}
+				}
+			}
+		}
+

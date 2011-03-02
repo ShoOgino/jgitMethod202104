@@ -1,0 +1,166 @@
+	@SuppressWarnings("null")
+	private static ObjectLoader read1(PackChunk pc, int pos,
+			final DhtReader ctx, final int typeHint, final boolean recent)
+			throws IOException, DeltaChainCycleException {
+		try {
+			Delta delta = null;
+			byte[] data = null;
+			int type = OBJ_BAD;
+			boolean cached = false;
+
+			SEARCH: for (;;) {
+				final byte[] dataBuf = pc.dataBuf;
+				final int dataPtr = pc.dataPtr;
+				final int posPtr = dataPtr + pos;
+				int c = dataBuf[posPtr] & 0xff;
+				int typeCode = (c >> 4) & 7;
+				long sz = c & 15;
+				int shift = 4;
+				int p = 1;
+				while ((c & 0x80) != 0) {
+					c = dataBuf[posPtr + p++] & 0xff;
+					sz += (c & 0x7f) << shift;
+					shift += 7;
+				}
+
+				switch (typeCode) {
+				case OBJ_COMMIT:
+				case OBJ_TREE:
+				case OBJ_BLOB:
+				case OBJ_TAG: {
+					if (delta != null) {
+						data = inflate(sz, pc, pos + p, ctx);
+						type = typeCode;
+						break SEARCH;
+					}
+
+					if (sz < Integer.MAX_VALUE && !pc.isFragment()) {
+						try {
+							data = pc.inflateOne(sz, pos + p, ctx);
+							return new ObjectLoader.SmallObject(typeCode, data);
+						} catch (LargeObjectException tooBig) {
+							// Fall through and stream.
+						}
+					}
+
+					return new LargeNonDeltaObject(typeCode, sz, pc, pos + p, ctx);
+				}
+
+				case OBJ_OFS_DELTA: {
+					c = dataBuf[posPtr + p++] & 0xff;
+					long base = c & 127;
+					while ((c & 128) != 0) {
+						base += 1;
+						c = dataBuf[posPtr + p++] & 0xff;
+						base <<= 7;
+						base += (c & 127);
+					}
+
+					ChunkKey baseChunkKey;
+					int basePosInChunk;
+
+					if (base <= pos) {
+						// Base occurs in the same chunk, just earlier.
+						baseChunkKey = pc.getChunkKey();
+						basePosInChunk = pos - (int) base;
+					} else {
+						// Long offset delta, base occurs in another chunk.
+						// Adjust distance to be from our chunk start.
+						base = base - pos;
+
+						ChunkMeta.BaseChunk baseChunk;
+						baseChunk = pc.meta.getBaseChunk(base);
+						baseChunkKey = baseChunk.getChunkKey();
+						basePosInChunk = (int) (baseChunk.relativeStart - base);
+					}
+
+					delta = new Delta(delta, //
+							pc.key, pos, (int) sz, p, //
+							baseChunkKey, basePosInChunk);
+					if (sz != delta.deltaSize)
+						break SEARCH;
+
+					DeltaBaseCache.Entry e = delta.getBase(ctx);
+					if (e != null) {
+						type = e.type;
+						data = e.data;
+						cached = true;
+						break SEARCH;
+					}
+					if (baseChunkKey != pc.getChunkKey())
+						pc = ctx.getChunk(baseChunkKey);
+					pos = basePosInChunk;
+					continue SEARCH;
+				}
+
+				case OBJ_REF_DELTA: {
+					ObjectId id = ObjectId.fromRaw(dataBuf, posPtr + p);
+					PackChunk nc = pc;
+					int base = pc.index.findOffset(id);
+					if (base < 0) {
+						DhtReader.ChunkAndOffset n;
+						n = ctx.getChunk(id, typeHint, recent);
+						nc = n.chunk;
+						base = n.offset;
+					}
+					checkCycle(delta, pc.key, pos);
+					delta = new Delta(delta, //
+							pc.key, pos, (int) sz, p + 20, //
+							nc.getChunkKey(), base);
+					if (sz != delta.deltaSize)
+						break SEARCH;
+
+					DeltaBaseCache.Entry e = delta.getBase(ctx);
+					if (e != null) {
+						type = e.type;
+						data = e.data;
+						cached = true;
+						break SEARCH;
+					}
+					pc = nc;
+					pos = base;
+					continue SEARCH;
+				}
+
+				default:
+					throw new DhtException(MessageFormat.format(
+							DhtText.get().unsupportedObjectTypeInChunk, //
+							Integer.valueOf(typeCode), //
+							pc.getChunkKey(), //
+							Integer.valueOf(pos)));
+				}
+			}
+
+			// At this point there is at least one delta to apply to data.
+			// (Whole objects with no deltas to apply return early above.)
+
+			do {
+				if (!delta.deltaChunk.equals(pc.getChunkKey()))
+					pc = ctx.getChunk(delta.deltaChunk);
+				pos = delta.deltaPos;
+
+				// Cache only the base immediately before desired object.
+				if (cached)
+					cached = false;
+				else if (delta.next == null)
+					delta.putBase(ctx, type, data);
+
+				final byte[] cmds = delta.decompress(pc, ctx);
+				final long sz = BinaryDelta.getResultSize(cmds);
+				final byte[] result = newResult(sz);
+				BinaryDelta.apply(data, cmds, result);
+				data = result;
+				delta = delta.next;
+			} while (delta != null);
+
+			return new ObjectLoader.SmallObject(type, data);
+
+		} catch (DataFormatException dfe) {
+			CorruptObjectException coe = new CorruptObjectException(
+					MessageFormat.format(DhtText.get().corruptCompressedObject,
+							pc.getChunkKey(), Integer.valueOf(pos)));
+			coe.initCause(dfe);
+			throw coe;
+		}
+	}
+

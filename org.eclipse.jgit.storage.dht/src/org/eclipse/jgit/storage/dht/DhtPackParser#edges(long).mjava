@@ -1,0 +1,20 @@
+	private Edges edges(long chunkPtr) throws DhtException {
+		if (isInCurrentChunk(chunkPtr)) {
+			int type = typeOf(chunkPtr);
+			Edges s = openEdges[type];
+			if (s == null) {
+				s = new Edges();
+				openEdges[type] = s;
+			}
+			return s;
+		} else {
+			ChunkKey key = chunkOf(chunkPtr);
+			Edges s = chunkEdges.get(key);
+			if (s == null) {
+				s = new Edges();
+				chunkEdges.put(key, s);
+			}
+			return s;
+		}
+	}
+

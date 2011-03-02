@@ -1,0 +1,30 @@
+	@Override
+	protected void onBeginRefDelta(long deltaPos, AnyObjectId baseId,
+			long inflatedSize) throws IOException {
+		// Try to get the base type, but only if it was seen before in this
+		// pack stream. If not assume worst-case of BLOB type.
+		//
+		int typeCode;
+		DhtInfo baseInfo = objectMap.get(baseId);
+		if (baseInfo != null && baseInfo.isInPack()) {
+			typeCode = baseInfo.getType();
+			currType = typeCode;
+		} else {
+			typeCode = OBJ_BLOB;
+			currType = -1;
+		}
+
+		ChunkFormatter w = begin(typeCode);
+		if (!w.refDelta(inflatedSize, baseId)) {
+			endChunk(typeCode);
+			w = begin(typeCode);
+			if (!w.refDelta(inflatedSize, baseId))
+				throw panicCannotInsert();
+		}
+
+		currDataPos = w.position();
+		currPackedSize = 0;
+		currInflatedSize = inflatedSize;
+		objStreamPos.add(deltaPos);
+	}
+

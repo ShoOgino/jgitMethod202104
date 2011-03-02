@@ -1,0 +1,16 @@
+		/** @return decode the current field as a bool. */
+		public boolean bool() {
+			checkFieldType(WIRE_VARINT);
+			int val = varint32();
+			switch (val) {
+			case 0:
+				return false;
+			case 1:
+				return true;
+			default:
+				throw new IllegalStateException(MessageFormat.format(DhtText
+						.get().protobufNotBooleanValue, Integer.valueOf(field),
+						Integer.valueOf(val)));
+			}
+		}
+

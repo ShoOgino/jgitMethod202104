@@ -1,0 +1,23 @@
+	/**
+	 * Safely put the chunk to the database.
+	 * <p>
+	 * This method is slow. It first puts the chunk info, waits for success,
+	 * then puts the chunk itself, waits for success, and finally queues up the
+	 * object index with its chunk links in the supplied buffer.
+	 *
+	 * @param db
+	 * @param dbWriteBuffer
+	 * @throws DhtException
+	 */
+	void safePut(Database db, WriteBuffer dbWriteBuffer) throws DhtException {
+		WriteBuffer chunkBuf = db.newWriteBuffer();
+
+		db.repository().put(repo, info, chunkBuf);
+		chunkBuf.flush();
+
+		db.chunk().put(builder, chunkBuf);
+		chunkBuf.flush();
+
+		linkObjects(db, dbWriteBuffer);
+	}
+

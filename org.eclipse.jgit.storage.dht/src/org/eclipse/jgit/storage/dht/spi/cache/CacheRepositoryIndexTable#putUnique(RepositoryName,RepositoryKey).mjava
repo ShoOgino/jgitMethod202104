@@ -1,0 +1,15 @@
+	public void putUnique(RepositoryName name, RepositoryKey key)
+			throws DhtException, TimeoutException {
+		db.putUnique(name, key);
+
+		Sync<Void> sync = Sync.create();
+		CacheKey memKey = ns.key(name);
+		byte[] data = key.asBytes();
+		client.modify(singleton(Change.put(memKey, data)), sync);
+		try {
+			sync.get(options.getTimeout());
+		} catch (InterruptedException e) {
+			throw new TimeoutException();
+		}
+	}
+

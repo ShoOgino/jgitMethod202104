@@ -1,0 +1,48 @@
+	ChunkKey end(MessageDigest md) {
+		if (md == null)
+			md = Constants.newMessageDigest();
+
+		// Embed a small amount of randomness into the chunk content,
+		// and thus impact its name. This prevents malicious clients from
+		// being able to predict what a chunk is called, which keeps them
+		// from replacing an existing chunk.
+		//
+		chunkData = cloneArray(chunkData, ptr + TRAILER_SIZE);
+		NB.encodeInt32(chunkData, ptr, options.nextChunkSalt());
+		ptr += 4;
+
+		md.update(chunkData, 0, ptr);
+		info.chunkKey = ChunkKey.create(repo, ObjectId.fromRaw(md.digest()));
+		info.chunkSize = chunkData.length;
+
+		builder = new PackChunk.Members();
+		builder.setChunkKey(info.chunkKey);
+		builder.setChunkData(chunkData);
+
+		ChunkMeta meta = new ChunkMeta(info.chunkKey);
+		if (baseChunks != null) {
+			meta.baseChunks = new ArrayList<BaseChunk>(baseChunks.size());
+			for (BaseChunkInfo b : baseChunks.values()) {
+				if (0 < b.useCount)
+					meta.baseChunks.add(new BaseChunk(b.relativeStart, b.key));
+			}
+			Collections.sort(meta.baseChunks, new Comparator<BaseChunk>() {
+				public int compare(BaseChunk a, BaseChunk b) {
+					return Long.signum(a.relativeStart - b.relativeStart);
+				}
+			});
+		}
+		if (!meta.isEmpty()) {
+			builder.setMeta(meta);
+			info.metaSize = meta.asBytes().length;
+		}
+
+		if (objectList != null && !objectList.isEmpty()) {
+			byte[] index = ChunkIndex.create(objectList);
+			builder.setChunkIndex(index);
+			info.indexSize = index.length;
+		}
+
+		return getChunkKey();
+	}
+

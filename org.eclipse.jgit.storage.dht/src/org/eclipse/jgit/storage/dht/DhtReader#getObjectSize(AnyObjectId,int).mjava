@@ -1,0 +1,9 @@
+	@Override
+	public long getObjectSize(AnyObjectId objectId, int typeHint)
+			throws MissingObjectException, IncorrectObjectTypeException,
+			IOException {
+		for (ObjectInfo info : find(objectId))
+			return info.getSize();
+		throw missing(objectId, typeHint);
+	}
+

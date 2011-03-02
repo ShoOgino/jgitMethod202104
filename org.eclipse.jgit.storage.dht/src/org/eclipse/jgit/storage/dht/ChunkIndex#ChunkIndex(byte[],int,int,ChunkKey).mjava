@@ -1,0 +1,63 @@
+	ChunkIndex(byte[] indexBuf, int ptr, int len, ChunkKey key)
+			throws DhtException {
+		final int ctl = indexBuf[ptr + 1];
+		final int fanoutFormat = (ctl >>> 3) & 7;
+		final int offsetFormat = ctl & 7;
+
+		switch (fanoutFormat) {
+		case 0:
+			fanout = null; // no fanout, too small
+			break;
+
+		case 1: {
+			int last = 0;
+			fanout = new int[256];
+			for (int i = 0; i < 256; i++) {
+				last += indexBuf[ptr + 2 + i] & 0xff;
+				fanout[i] = last;
+			}
+			break;
+		}
+		case 2: {
+			int last = 0;
+			fanout = new int[256];
+			for (int i = 0; i < 256; i++) {
+				last += NB.decodeUInt16(indexBuf, ptr + 2 + i * 2);
+				fanout[i] = last;
+			}
+			break;
+		}
+		case 3: {
+			int last = 0;
+			fanout = new int[256];
+			for (int i = 0; i < 256; i++) {
+				last += decodeUInt24(indexBuf, ptr + 2 + i * 3);
+				fanout[i] = last;
+			}
+			break;
+		}
+		case 4: {
+			int last = 0;
+			fanout = new int[256];
+			for (int i = 0; i < 256; i++) {
+				last += NB.decodeInt32(indexBuf, ptr + 2 + i * 4);
+				fanout[i] = last;
+			}
+			break;
+		}
+		default:
+			throw new DhtException(MessageFormat.format(
+					DhtText.get().unsupportedChunkIndex,
+					Integer.toHexString(NB.decodeUInt16(indexBuf, ptr)), key));
+		}
+
+		this.indexBuf = indexBuf;
+		this.indexPtr = ptr;
+		this.indexLen = len;
+		this.idTable = indexPtr + 2 + 256 * fanoutFormat;
+
+		int recsz = OBJECT_ID_LENGTH + offsetFormat;
+		this.count = (indexLen - (idTable - indexPtr)) / recsz;
+		this.offsetTable = idTable + count * OBJECT_ID_LENGTH;
+	}
+

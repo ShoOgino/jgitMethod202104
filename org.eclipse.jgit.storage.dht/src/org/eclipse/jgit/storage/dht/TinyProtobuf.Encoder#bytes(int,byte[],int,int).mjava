@@ -1,0 +1,20 @@
+		/**
+		 * Encode a length delimited bytes field.
+		 *
+		 * @param field
+		 *            field tag number.
+		 * @param value
+		 *            the value to store; if null the field is omitted.
+		 * @param off
+		 *            position to copy from.
+		 * @param len
+		 *            number of bytes to copy.
+		 */
+		public void bytes(int field, byte[] value, int off, int len) {
+			if (value != null) {
+				field(field, WIRE_LEN_DELIM);
+				varint(len);
+				copy(value, off, len);
+			}
+		}
+

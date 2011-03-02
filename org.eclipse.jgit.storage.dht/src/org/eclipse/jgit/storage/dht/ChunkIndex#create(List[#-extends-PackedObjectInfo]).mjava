@@ -1,0 +1,91 @@
+	/**
+	 * Format the chunk index and return its binary representation.
+	 *
+	 * @param list
+	 *            the list of objects that appear in the chunk. This list will
+	 *            be sorted in-place if it has more than 1 element.
+	 * @return binary representation of the chunk's objects and their starting
+	 *         offsets. The format is private to this class.
+	 */
+	@SuppressWarnings("null")
+	static byte[] create(List<? extends PackedObjectInfo> list) {
+		int cnt = list.size();
+		sortObjectList(list);
+
+		int fanoutFormat = 0;
+		int[] buckets = null;
+		if (64 < cnt) {
+			buckets = new int[256];
+			for (PackedObjectInfo oe : list)
+				buckets[oe.getFirstByte()]++;
+			fanoutFormat = selectFanoutFormat(buckets);
+		}
+
+		int offsetFormat = selectOffsetFormat(list);
+		byte[] index = new byte[2 // header
+				+ 256 * fanoutFormat // (optional) fanout
+				+ cnt * OBJECT_ID_LENGTH // ids
+				+ cnt * offsetFormat // offsets
+		];
+		index[0] = V1;
+		index[1] = (byte) ((fanoutFormat << 3) | offsetFormat);
+
+		int ptr = 2;
+
+		switch (fanoutFormat) {
+		case 0:
+			break;
+		case 1:
+			for (int i = 0; i < 256; i++, ptr++)
+				index[ptr] = (byte) buckets[i];
+			break;
+		case 2:
+			for (int i = 0; i < 256; i++, ptr += 2)
+				NB.encodeInt16(index, ptr, buckets[i]);
+			break;
+		case 3:
+			for (int i = 0; i < 256; i++, ptr += 3)
+				encodeUInt24(index, ptr, buckets[i]);
+			break;
+		case 4:
+			for (int i = 0; i < 256; i++, ptr += 4)
+				NB.encodeInt32(index, ptr, buckets[i]);
+			break;
+		}
+
+		for (PackedObjectInfo oe : list) {
+			oe.copyRawTo(index, ptr);
+			ptr += OBJECT_ID_LENGTH;
+		}
+
+		switch (offsetFormat) {
+		case 1:
+			for (PackedObjectInfo oe : list)
+				index[ptr++] = (byte) oe.getOffset();
+			break;
+
+		case 2:
+			for (PackedObjectInfo oe : list) {
+				NB.encodeInt16(index, ptr, (int) oe.getOffset());
+				ptr += 2;
+			}
+			break;
+
+		case 3:
+			for (PackedObjectInfo oe : list) {
+				encodeUInt24(index, ptr, (int) oe.getOffset());
+				ptr += 3;
+			}
+			break;
+
+		case 4:
+			for (PackedObjectInfo oe : list) {
+				NB.encodeInt32(index, ptr, (int) oe.getOffset());
+				ptr += 4;
+			}
+			break;
+		}
+
+		return index;
+	}
+

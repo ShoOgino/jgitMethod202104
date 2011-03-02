@@ -1,0 +1,11 @@
+		/** @return get the field tag number, 0 on end of buffer. */
+		public int next() {
+			if (ptr == end)
+				return 0;
+
+			int fieldAndType = varint32();
+			field = fieldAndType >>> 3;
+			type = fieldAndType & 7;
+			return field;
+		}
+

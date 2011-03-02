@@ -1,0 +1,12 @@
+	public void putUnique(RepositoryName name, RepositoryKey key)
+			throws DhtException, TimeoutException {
+		boolean ok = table.compareAndSet( //
+				name.asBytes(), //
+				colId.name(), //
+				null, //
+				key.asBytes());
+		if (!ok)
+			throw new DhtException(MessageFormat.format(
+					DhtText.get().repositoryAlreadyExists, name.asString()));
+	}
+

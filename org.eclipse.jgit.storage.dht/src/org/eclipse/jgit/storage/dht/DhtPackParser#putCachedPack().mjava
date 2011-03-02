@@ -1,0 +1,34 @@
+	private void putCachedPack() throws DhtException {
+		CachedPackInfo info = new CachedPackInfo();
+
+		for (DhtInfo obj : objectMap) {
+			if (!obj.isInPack())
+				return;
+
+			if (!obj.isReferenced())
+				info.tips.add(obj.copy());
+		}
+
+		MessageDigest version = Constants.newMessageDigest();
+		addChunkList(info, version, infoByOrder[OBJ_TAG]);
+		addChunkList(info, version, infoByOrder[OBJ_COMMIT]);
+		addChunkList(info, version, infoByOrder[OBJ_TREE]);
+		addChunkList(info, version, infoByOrder[OBJ_BLOB]);
+
+		info.name = computePackName();
+		info.version = ObjectId.fromRaw(version.digest());
+
+		cachedPackKey = info.getRowKey();
+		for (List<ChunkInfo> list : infoByOrder) {
+			if (list == null)
+				continue;
+			for (ChunkInfo c : list) {
+				c.cachedPack = cachedPackKey;
+				if (c.isFragment())
+					db.repository().put(repo, info, dbWriteBuffer);
+			}
+		}
+
+		db.repository().put(repo, info, dbWriteBuffer);
+	}
+

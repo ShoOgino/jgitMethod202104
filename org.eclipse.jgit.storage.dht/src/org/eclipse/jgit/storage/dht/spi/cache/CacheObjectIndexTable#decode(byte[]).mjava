@@ -1,0 +1,16 @@
+	private static Collection<ObjectInfo> decode(byte[] raw) {
+		List<ObjectInfo> res = new ArrayList<ObjectInfo>(1);
+		TinyProtobuf.Decoder d = TinyProtobuf.decode(raw);
+		for (;;) {
+			switch (d.next()) {
+			case 0:
+				return res;
+			case 1:
+				res.add(decodeItem(d.message()));
+				continue;
+			default:
+				d.skip();
+			}
+		}
+	}
+

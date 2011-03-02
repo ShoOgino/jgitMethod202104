@@ -1,0 +1,25 @@
+	/**
+	 * Wrap a callback to update the buffer.
+	 * <p>
+	 * Flushing the buffer will wait for the returned callback to complete.
+	 *
+	 * @param <T>
+	 *            any type the task might return.
+	 * @param callback
+	 *            callback invoked when the task has finished.
+	 * @param size
+	 *            number of bytes that are buffered within the task.
+	 * @return wrapped callback that will update the buffer state when the
+	 *         callback is invoked.
+	 * @throws DhtException
+	 *             a prior task has completed, and failed.
+	 */
+	protected <T> AsyncCallback<T> wrap(final AsyncCallback<T> callback,
+			int size) throws DhtException {
+		int permits = permitsForSize(size);
+		WrappedCallback<T> op = new WrappedCallback<T>(callback, permits);
+		checkRunningTasks(false);
+		running.add(op);
+		return op;
+	}
+

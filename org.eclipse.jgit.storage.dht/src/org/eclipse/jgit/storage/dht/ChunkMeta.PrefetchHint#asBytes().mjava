@@ -1,0 +1,14 @@
+		TinyProtobuf.Encoder asBytes() {
+			int max = 0;
+
+			max += (2 + ChunkKey.KEYLEN) * edge.size();
+			max += (2 + ChunkKey.KEYLEN) * sequential.size();
+
+			TinyProtobuf.Encoder e = TinyProtobuf.encode(max);
+			for (ChunkKey key : edge)
+				e.bytes(1, key.asBytes());
+			for (ChunkKey key : sequential)
+				e.bytes(2, key.asBytes());
+			return e;
+		}
+

@@ -1,0 +1,28 @@
+	static ObjectLoader read(PackChunk pc, int pos, final DhtReader ctx,
+			final int typeHint) throws IOException {
+		try {
+			return read1(pc, pos, ctx, typeHint, true /* use recentChunks */);
+		} catch (DeltaChainCycleException cycleFound) {
+			// A cycle can occur if recentChunks cache was used by the reader
+			// to satisfy an OBJ_REF_DELTA, but the chunk that was chosen has
+			// a reverse delta back onto an object already being read during
+			// this invocation. Its not as uncommon as it sounds, as the Git
+			// wire protocol can sometimes copy an object the repository already
+			// has when dealing with reverts or cherry-picks.
+			//
+			// Work around the cycle by disabling the recentChunks cache for
+			// this resolution only. This will force the DhtReader to re-read
+			// OBJECT_INDEX and consider only the oldest chunk for any given
+			// object. There cannot be a cycle if the method only walks along
+			// the oldest chunks.
+			try {
+				ctx.getStatistics().deltaChainCycles++;
+				return read1(pc, pos, ctx, typeHint, false /* no recentChunks */);
+			} catch (DeltaChainCycleException cannotRecover) {
+				throw new DhtException(MessageFormat.format(
+						DhtText.get().cycleInDeltaChain, pc.getChunkKey(),
+						Integer.valueOf(pos)));
+			}
+		}
+	}
+

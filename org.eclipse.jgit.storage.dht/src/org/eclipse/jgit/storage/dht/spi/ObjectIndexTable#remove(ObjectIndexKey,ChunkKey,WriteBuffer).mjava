@@ -1,0 +1,21 @@
+	/**
+	 * Remove a single chunk from an object.
+	 * <p>
+	 * If this is the last remaining chunk for the object, the object should
+	 * also be removed from the table. Removal can be deferred, or can occur
+	 * immediately. That is, {@code get()} may return the object with an empty
+	 * collection, but to prevent unlimited disk usage the database should
+	 * eventually remove the object.
+	 *
+	 * @param objId
+	 *            the unique ObjectId.
+	 * @param chunk
+	 *            the chunk that needs to be removed from this object.
+	 * @param buffer
+	 *            buffer to enqueue the remove onto.
+	 * @throws DhtException
+	 *             if the buffer flushed and an enqueued operation failed.
+	 */
+	public void remove(ObjectIndexKey objId, ChunkKey chunk, WriteBuffer buffer)
+			throws DhtException;
+

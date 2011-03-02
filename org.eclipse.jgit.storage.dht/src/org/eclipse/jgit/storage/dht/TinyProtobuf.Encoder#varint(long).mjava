@@ -1,0 +1,17 @@
+		private void varint(long value) {
+			if (buf != null) {
+				if (buf.length - ptr < 10)
+					ensureSpace(varintSize(value));
+
+				do {
+					byte b = (byte) (value & 0x7f);
+					value >>>= 7;
+					if (value != 0)
+						b |= 0x80;
+					buf[ptr++] = b;
+				} while (value != 0);
+			} else {
+				ptr += varintSize(value);
+			}
+		}
+

@@ -1,0 +1,23 @@
+	void stored(String refName, RefData newData) {
+		Ref ref = fromData(refName, newData);
+		RefCache oldCache, newCache;
+		do {
+			oldCache = cache.get();
+			if (oldCache == null)
+				return;
+
+			RefList<Ref> ids = oldCache.ids.put(ref);
+			RefList<Ref> sym = oldCache.sym;
+
+			if (ref.isSymbolic()) {
+				sym.put(ref);
+			} else {
+				int p = sym.find(refName);
+				if (0 <= p)
+					sym = sym.remove(p);
+			}
+
+			newCache = new RefCache(ids, sym, oldCache.hints);
+		} while (!cache.compareAndSet(oldCache, newCache));
+	}
+

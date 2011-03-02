@@ -1,0 +1,8 @@
+	public Collection<CachedPackInfo> getCachedPacks(RepositoryKey repo)
+			throws DhtException, TimeoutException {
+		List<CachedPackInfo> out = new ArrayList<CachedPackInfo>(4);
+		for (MemTable.Cell cell : table.scanFamily(repo.asBytes(), colCachedPack))
+			out.add(CachedPackInfo.fromBytes(cell.getValue()));
+		return out;
+	}
+

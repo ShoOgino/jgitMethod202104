@@ -1,0 +1,8 @@
+		TinyProtobuf.Encoder asBytes() {
+			int max = 11 + 2 + ChunkKey.KEYLEN;
+			TinyProtobuf.Encoder e = TinyProtobuf.encode(max);
+			e.int64(1, relativeStart);
+			e.bytes(2, chunk.asBytes());
+			return e;
+		}
+

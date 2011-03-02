@@ -1,0 +1,10 @@
+	private ObjectId computePackName() {
+		byte[] buf = new byte[Constants.OBJECT_ID_LENGTH];
+		MessageDigest md = Constants.newMessageDigest();
+		for (DhtInfo otp : objectListByName) {
+			otp.copyRawTo(buf, 0);
+			md.update(buf);
+		}
+		return ObjectId.fromRaw(md.digest());
+	}
+

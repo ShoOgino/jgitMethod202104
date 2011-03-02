@@ -1,0 +1,23 @@
+	private void startQuery(final Context context,
+			final Map<ObjectIndexKey, T> batch) {
+		final AsyncCallback<Map<ObjectIndexKey, Collection<ObjectInfo>>> cb;
+
+		cb = new AsyncCallback<Map<ObjectIndexKey, Collection<ObjectInfo>>>() {
+			public void onSuccess(Map<ObjectIndexKey, Collection<ObjectInfo>> r) {
+				resultLock.lock();
+				try {
+					processResults(context, batch, r);
+				} finally {
+					resultLock.unlock();
+					batches.release();
+				}
+			}
+
+			public void onFailure(DhtException e) {
+				error.compareAndSet(null, e);
+				batches.release();
+			}
+		};
+		db.objectIndex().get(context, batch.keySet(), cb);
+	}
+

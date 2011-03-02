@@ -1,0 +1,21 @@
+	ChunkAndOffset find(RepositoryKey repo, AnyObjectId objId) {
+		// TODO(spearce) This method violates our no-collision rules.
+		// Its possible for a duplicate object to be uploaded into a new
+		// chunk, and have that get used if the new chunk is pulled into
+		// the process cache for a different object.
+
+		for (int slot = 0; slot < tableSize; slot++) {
+			for (Entry e = table.get(slot); e != null; e = e.next) {
+				PackChunk chunk = e.ref.get();
+				if (chunk != null) {
+					int pos = chunk.findOffset(repo, objId);
+					if (0 <= pos) {
+						hit(e.ref);
+						return new ChunkAndOffset(chunk, pos);
+					}
+				}
+			}
+		}
+		return null;
+	}
+

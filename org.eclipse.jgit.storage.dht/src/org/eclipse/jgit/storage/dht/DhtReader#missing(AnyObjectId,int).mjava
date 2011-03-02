@@ -1,0 +1,7 @@
+	static MissingObjectException missing(AnyObjectId objId, int typeHint) {
+		ObjectId id = objId.copy();
+		if (typeHint != OBJ_ANY)
+			return new MissingObjectException(id, typeHint);
+		return new MissingObjectException(id, DhtText.get().objectTypeUnknown);
+	}
+

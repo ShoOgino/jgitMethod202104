@@ -1,0 +1,27 @@
+	private Ref doPeel(final Ref leaf) throws MissingObjectException,
+			IOException {
+		RevWalk rw = new RevWalk(getRepository());
+		try {
+			String name = leaf.getName();
+			ObjectId oId = leaf.getObjectId();
+			RevObject obj = rw.parseAny(oId);
+			DhtReader ctx = (DhtReader) rw.getObjectReader();
+
+			ChunkKey key = ctx.findChunk(oId);
+			if (key != null)
+				oId = new RefData.IdWithChunk(oId, key);
+
+			if (obj instanceof RevTag) {
+				ObjectId pId = rw.peel(obj);
+				key = ctx.findChunk(pId);
+				pId = key != null ? new RefData.IdWithChunk(pId, key) : pId
+						.copy();
+				return new PeeledTag(leaf.getStorage(), name, oId, pId);
+			} else {
+				return new PeeledNonTag(leaf.getStorage(), name, oId);
+			}
+		} finally {
+			rw.release();
+		}
+	}
+

@@ -1,0 +1,13 @@
+	private void hit(final Ref r) {
+		// We don't need to be 100% accurate here. Its sufficient that at least
+		// one thread performs the increment. Any other concurrent access at
+		// exactly the same time can simply use the same clock value.
+		//
+		// Consequently we attempt the set, but we don't try to recover should
+		// it fail. This is why we don't use getAndIncrement() here.
+		//
+		final long c = clock.get();
+		clock.compareAndSet(c, c + 1);
+		r.lastAccess = c;
+	}
+

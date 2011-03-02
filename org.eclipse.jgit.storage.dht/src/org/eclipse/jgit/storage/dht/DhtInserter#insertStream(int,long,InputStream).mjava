@@ -1,0 +1,110 @@
+	private ObjectId insertStream(final int type, final long inflatedSize,
+			final InputStream in) throws IOException {
+
+		// TODO Permit multiple chunks to be buffered here at once.
+		// It might be possible to compress and hold all chunks for
+		// an object, which would then allow them to write their
+		// ChunkInfo and chunks in parallel, as well as avoid the
+		// rewrite with the ChunkFragments at the end.
+
+		MessageDigest chunkDigest = Constants.newMessageDigest();
+		LinkedList<ChunkKey> fragmentList = new LinkedList<ChunkKey>();
+
+		ChunkFormatter chunk = newChunk();
+		int position = chunk.position();
+		if (!chunk.whole(type, inflatedSize))
+			throw new DhtException(DhtText.get().cannotInsertObject);
+
+		MessageDigest objDigest = digest();
+		objDigest.update(Constants.encodedTypeString(type));
+		objDigest.update((byte) ' ');
+		objDigest.update(Constants.encodeASCII(inflatedSize));
+		objDigest.update((byte) 0);
+
+		Deflater def = deflater();
+		byte[] inBuf = buffer();
+		long packedSize = 0;
+		long done = 0;
+		while (done < inflatedSize) {
+			if (done == 0 || def.needsInput()) {
+				int inAvail = in.read(inBuf);
+				if (inAvail <= 0)
+					throw new EOFException();
+				objDigest.update(inBuf, 0, inAvail);
+				def.setInput(inBuf, 0, inAvail);
+				done += inAvail;
+			}
+
+			if (chunk.free() == 0) {
+				packedSize += chunk.size();
+				chunk.setObjectType(type);
+				chunk.setFragment();
+				fragmentList.add(chunk.end(chunkDigest));
+				chunk.safePut(db, dbBuffer());
+				chunk = newChunk();
+			}
+			chunk.appendDeflateOutput(def);
+		}
+
+		def.finish();
+
+		while (!def.finished()) {
+			if (chunk.free() == 0) {
+				packedSize += chunk.size();
+				chunk.setObjectType(type);
+				chunk.setFragment();
+				fragmentList.add(chunk.end(chunkDigest));
+				chunk.safePut(db, dbBuffer());
+				chunk = newChunk();
+			}
+			chunk.appendDeflateOutput(def);
+		}
+
+		ObjectId objId = ObjectId.fromRaw(objDigest.digest());
+		PackedObjectInfo oe = new PackedObjectInfo(objId);
+		oe.setOffset(position);
+
+		if (!chunk.isEmpty()) {
+			packedSize += chunk.size();
+			chunk.setObjectType(type);
+
+			if (fragmentList.isEmpty()) {
+				ChunkKey key = chunk.end(chunkDigest);
+				chunk.setChunkIndex(Collections.singletonList(oe));
+				chunk.safePut(db, dbBuffer());
+				ObjectInfo info = new ObjectInfo(key, -1, type, position,
+						packedSize, inflatedSize, null, false);
+				ObjectIndexKey objKey = ObjectIndexKey.create(repo, objId);
+				db.objectIndex().add(objKey, info, dbBuffer());
+				return objId;
+			}
+
+			chunk.setFragment();
+			fragmentList.add(chunk.end(chunkDigest));
+			chunk.safePut(db, dbBuffer());
+		}
+		chunk = null;
+
+		ChunkKey firstChunkKey = fragmentList.get(0);
+		for (ChunkKey key : fragmentList) {
+			PackChunk.Members builder = new PackChunk.Members();
+			builder.setChunkKey(key);
+
+			ChunkMeta meta = new ChunkMeta(key);
+			meta.fragments = fragmentList;
+			builder.setMeta(meta);
+
+			if (firstChunkKey.equals(key))
+				builder.setChunkIndex(ChunkIndex.create(Arrays.asList(oe)));
+
+			db.chunk().put(builder, dbBuffer());
+		}
+
+		ObjectInfo info = new ObjectInfo(firstChunkKey, -1, type, position,
+				packedSize, inflatedSize, null, true);
+		ObjectIndexKey objKey = ObjectIndexKey.create(repo, objId);
+		db.objectIndex().add(objKey, info, dbBuffer());
+
+		return objId;
+	}
+

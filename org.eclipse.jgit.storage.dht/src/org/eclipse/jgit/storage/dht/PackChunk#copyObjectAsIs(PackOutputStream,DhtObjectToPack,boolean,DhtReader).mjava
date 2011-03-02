@@ -1,0 +1,61 @@
+	void copyObjectAsIs(PackOutputStream out, DhtObjectToPack obj,
+			boolean validate, DhtReader ctx) throws IOException,
+			StoredObjectRepresentationNotAvailableException {
+		if (validate && !isValid()) {
+			StoredObjectRepresentationNotAvailableException gone;
+
+			gone = new StoredObjectRepresentationNotAvailableException(obj);
+			gone.initCause(new DhtException(MessageFormat.format(
+					DhtText.get().corruptChunk, getChunkKey())));
+			throw gone;
+		}
+
+		int ptr = dataPtr + obj.offset;
+		int c = dataBuf[ptr++] & 0xff;
+		int typeCode = (c >> 4) & 7;
+		long inflatedSize = c & 15;
+		int shift = 4;
+		while ((c & 0x80) != 0) {
+			c = dataBuf[ptr++] & 0xff;
+			inflatedSize += (c & 0x7f) << shift;
+			shift += 7;
+		}
+
+		switch (typeCode) {
+		case OBJ_OFS_DELTA:
+			do {
+				c = dataBuf[ptr++] & 0xff;
+			} while ((c & 128) != 0);
+			break;
+
+		case OBJ_REF_DELTA:
+			ptr += 20;
+			break;
+		}
+
+		// If the size is positive, its accurate. If its -1, this is a
+		// fragmented object that will need more handling below,
+		// so copy all of the chunk, minus the trailer.
+
+		final int maxAvail = (dataLen - TRAILER_SIZE) - (ptr - dataPtr);
+		final int copyLen;
+		if (0 < obj.size)
+			copyLen = Math.min(obj.size, maxAvail);
+		else if (-1 == obj.size)
+			copyLen = maxAvail;
+		else
+			throw new DhtException(MessageFormat.format(
+					DhtText.get().expectedObjectSizeDuringCopyAsIs, obj));
+		out.writeHeader(obj, inflatedSize);
+		out.write(dataBuf, ptr, copyLen);
+
+		// If the object was fragmented, send all of the other fragments.
+		if (isFragment()) {
+			int cnt = meta.getFragmentCount();
+			for (int fragId = 1; fragId < cnt; fragId++) {
+				PackChunk pc = ctx.getChunk(meta.getFragmentKey(fragId));
+				pc.copyEntireChunkAsIs(out, obj, validate);
+			}
+		}
+	}
+

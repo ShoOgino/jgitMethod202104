@@ -1,0 +1,16 @@
+	/**
+	 * Update properties by setting fields from the configuration.
+	 * <p>
+	 * If a property is not defined in the configuration, then it is left
+	 * unmodified.
+	 *
+	 * @param rc
+	 *            configuration to read properties from.
+	 * @return {@code this}
+	 */
+	public CacheOptions fromConfig(final Config rc) {
+		setTimeout(Timeout.getTimeout(rc, "cache", "dht", "timeout", getTimeout()));
+		setWriteBufferSize(rc.getInt("cache", "dht", "writeBufferSize", getWriteBufferSize()));
+		return this;
+	}
+

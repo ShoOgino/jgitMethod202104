@@ -1,0 +1,20 @@
+	private void init() throws IOException {
+		ObjectWithInfo<T> c;
+
+		while ((c = nextObjectWithInfo()) != null) {
+			ChunkKey chunkKey = c.chunkKey;
+			Collection<ObjectWithInfo<T>> list = byChunk.get(chunkKey);
+			if (list == null) {
+				list = new ArrayList<ObjectWithInfo<T>>();
+				byChunk.put(chunkKey, list);
+
+				if (prefetcher == null)
+					prefetcher = new Prefetcher(reader, 0);
+				prefetcher.push(chunkKey);
+			}
+			list.add(c);
+		}
+
+		chunkItr = byChunk.values().iterator();
+	}
+

@@ -1,0 +1,26 @@
+	ObjectLoader open(RepositoryKey repo, AnyObjectId objId, int typeHint)
+			throws IOException {
+		if (objId instanceof IdWithChunk) {
+			PackChunk chunk = get(((IdWithChunk) objId).getChunkKey());
+			if (chunk != null) {
+				int pos = chunk.findOffset(repo, objId);
+				if (0 <= pos)
+					return PackChunk.read(chunk, pos, reader, typeHint);
+			}
+
+			// IdWithChunk is only a hint, and can be wrong. Locally
+			// searching is faster than looking in the Database.
+		}
+
+		for (Node n = lruHead; n != null; n = n.next) {
+			int pos = n.chunk.findOffset(repo, objId);
+			if (0 <= pos) {
+				hit(n);
+				stats.recentChunks_Hits++;
+				return PackChunk.read(n.chunk, pos, reader, typeHint);
+			}
+		}
+
+		return null;
+	}
+

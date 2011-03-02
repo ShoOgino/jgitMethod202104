@@ -1,0 +1,19 @@
+	void put(PackChunk chunk) {
+		for (Node n = lruHead; n != null; n = n.next) {
+			if (n.chunk == chunk) {
+				hit(n);
+				return;
+			}
+		}
+
+		Node n;
+		if (curSize < maxSize) {
+			n = new Node();
+			curSize++;
+		} else {
+			n = lruTail;
+		}
+		n.chunk = chunk;
+		hit(n);
+	}
+

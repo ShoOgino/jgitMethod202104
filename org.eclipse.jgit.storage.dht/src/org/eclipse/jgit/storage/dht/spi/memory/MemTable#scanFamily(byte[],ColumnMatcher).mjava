@@ -1,0 +1,28 @@
+	/**
+	 * Scan all cells in a row.
+	 *
+	 * @param row
+	 *            the row to scan.
+	 * @param family
+	 *            if not null, the family to filter and return.
+	 * @return iterator for the cells. Cells may appear in any order, including
+	 *         random. Never null.
+	 */
+	public Iterable<Cell> scanFamily(byte[] row, ColumnMatcher family) {
+		synchronized (lock) {
+			Map<Key, Cell> r = map.get(new Key(row));
+			if (r == null)
+				return Collections.emptyList();
+
+			if (family == null)
+				return new ArrayList<Cell>(r.values());
+
+			ArrayList<Cell> out = new ArrayList<Cell>(4);
+			for (Cell cell : r.values()) {
+				if (family.sameFamily(cell.getName()))
+					out.add(cell);
+			}
+			return out;
+		}
+	}
+

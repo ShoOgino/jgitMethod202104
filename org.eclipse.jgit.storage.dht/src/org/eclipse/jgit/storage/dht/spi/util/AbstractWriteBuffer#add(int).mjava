@@ -1,0 +1,28 @@
+	/**
+	 * Notify the buffer data is being added onto it.
+	 * <p>
+	 * This method waits until the buffer has sufficient space for the requested
+	 * data, thereby throttling the calling application code. It returns true if
+	 * its recommendation is for the buffer subclass to copy the data onto its
+	 * internal buffer and defer starting until later. It returns false if the
+	 * recommendation is to start the operation immediately, due to the large
+	 * size of the request.
+	 * <p>
+	 * Buffer implementors should keep in mind that the return value is offered
+	 * as advice only, they may choose to implement different behavior.
+	 *
+	 * @param size
+	 *            an estimated number of bytes that the buffer will be
+	 *            responsible for until the operation completes. This should
+	 *            include the row keys and column headers, in addition to the
+	 *            data values.
+	 * @return true to enqueue the operation; false to start it right away.
+	 * @throws DhtException
+	 *             the current thread was interrupted before space became
+	 *             available in the buffer.
+	 */
+	protected boolean add(int size) throws DhtException {
+		acquireSpace(size);
+		return size < AUTO_FLUSH_SIZE;
+	}
+

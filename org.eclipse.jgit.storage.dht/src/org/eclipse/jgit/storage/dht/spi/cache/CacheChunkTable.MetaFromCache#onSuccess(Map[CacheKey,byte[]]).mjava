@@ -1,0 +1,14 @@
+		public void onSuccess(Map<CacheKey, byte[]> result) {
+			if (result != null && !result.isEmpty())
+				onPartialResult(result);
+
+			synchronized (lock) {
+				if (remaining.isEmpty() || options == Context.FAST_MISSING_OK) {
+					normalCallback.onSuccess(all);
+				} else {
+					db.getMeta(options, remaining, new MetaFromDatabase(all,
+							normalCallback, streamingCallback));
+				}
+			}
+		}
+

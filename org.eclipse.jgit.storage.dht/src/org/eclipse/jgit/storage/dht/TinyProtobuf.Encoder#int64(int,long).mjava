@@ -1,0 +1,17 @@
+		/**
+		 * Encode a variable length positive integer.
+		 *
+		 * @param field
+		 *            field tag number.
+		 * @param value
+		 *            the value to store. Must be >= 0.
+		 */
+		public void int64(int field, long value) {
+			if (value < 0)
+				throw new IllegalArgumentException(
+						DhtText.get().protobufNegativeValuesNotSupported);
+
+			field(field, WIRE_VARINT);
+			varint(value);
+		}
+

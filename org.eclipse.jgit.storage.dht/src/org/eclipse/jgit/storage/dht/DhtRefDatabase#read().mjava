@@ -1,0 +1,26 @@
+	private RefCache read() throws DhtException, TimeoutException {
+		RefList.Builder<Ref> id = new RefList.Builder<Ref>();
+		RefList.Builder<Ref> sym = new RefList.Builder<Ref>();
+		ObjectIdSubclassMap<RefData.IdWithChunk> hints = new ObjectIdSubclassMap<RefData.IdWithChunk>();
+
+		for (Map.Entry<RefKey, RefData> e : scan()) {
+			Ref ref = fromData(e.getKey().getName(), e.getValue());
+
+			if (ref.isSymbolic())
+				sym.add(ref);
+			id.add(ref);
+
+			if (ref.getObjectId() instanceof RefData.IdWithChunk
+					&& !hints.contains(ref.getObjectId()))
+				hints.add((RefData.IdWithChunk) ref.getObjectId());
+			if (ref.getPeeledObjectId() instanceof RefData.IdWithChunk
+					&& !hints.contains(ref.getPeeledObjectId()))
+				hints.add((RefData.IdWithChunk) ref.getPeeledObjectId());
+		}
+
+		id.sort();
+		sym.sort();
+
+		return new RefCache(id.toRefList(), sym.toRefList(), hints);
+	}
+

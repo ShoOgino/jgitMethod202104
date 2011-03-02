@@ -1,0 +1,30 @@
+		public void onPartialResult(Map<CacheKey, byte[]> result) {
+			Map<ObjectIndexKey, Collection<ObjectInfo>> tmp;
+			if (streamingCallback != null)
+				tmp = new HashMap<ObjectIndexKey, Collection<ObjectInfo>>();
+			else
+				tmp = null;
+
+			for (Map.Entry<CacheKey, byte[]> e : result.entrySet()) {
+				ObjectIndexKey objKey;
+				Collection<ObjectInfo> list = decode(e.getValue());
+				objKey = ObjectIndexKey.fromBytes(e.getKey().getBytes());
+
+				if (tmp != null)
+					tmp.put(objKey, list);
+				else {
+					synchronized (lock) {
+						all.put(objKey, list);
+						remaining.remove(objKey);
+					}
+				}
+			}
+
+			if (tmp != null) {
+				streamingCallback.onPartialResult(tmp);
+				synchronized (lock) {
+					remaining.removeAll(tmp.keySet());
+				}
+			}
+		}
+

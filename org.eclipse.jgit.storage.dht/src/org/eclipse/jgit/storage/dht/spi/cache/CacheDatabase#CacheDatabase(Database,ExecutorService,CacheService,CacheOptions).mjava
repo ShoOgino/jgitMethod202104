@@ -1,0 +1,30 @@
+	/**
+	 * Initialize a cache database.
+	 *
+	 * @param database
+	 *            underlying storage database, used for read-misses and all
+	 *            writes.
+	 * @param executor
+	 *            executor service to perform expensive cache updates in the
+	 *            background.
+	 * @param client
+	 *            implementation of the cache service.
+	 * @param options
+	 *            configuration of the cache.
+	 */
+	public CacheDatabase(Database database, ExecutorService executor,
+			CacheService client, CacheOptions options) {
+		this.database = database;
+		this.executorService = executor;
+		this.client = client;
+		this.options = options;
+
+		repositoryIndex = new CacheRepositoryIndexTable(database
+				.repositoryIndex(), this);
+
+		repository = new CacheRepositoryTable(database.repository(), this);
+		ref = new CacheRefTable(database.ref(), this);
+		objectIndex = new CacheObjectIndexTable(database.objectIndex(), this);
+		chunk = new CacheChunkTable(database.chunk(), this);
+	}
+

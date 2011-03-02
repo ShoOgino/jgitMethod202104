@@ -1,0 +1,26 @@
+		public void onPartialResult(Collection<PackChunk.Members> result) {
+			final List<PackChunk.Members> toPutIntoCache = copy(result);
+
+			if (streamingCallback != null)
+				streamingCallback.onPartialResult(result);
+			else {
+				synchronized (lock) {
+					all.addAll(result);
+				}
+			}
+
+			// Encoding is rather expensive, so move the cache population
+			// into it a different background thread to prevent the current
+			// database task from being starved of time.
+			//
+			executor.submit(new Runnable() {
+				public void run() {
+					for (PackChunk.Members members : toPutIntoCache) {
+						ChunkKey key = members.getChunkKey();
+						Change op = Change.put(nsChunk.key(key), encode(members));
+						client.modify(singleton(op), none);
+					}
+				}
+			});
+		}
+

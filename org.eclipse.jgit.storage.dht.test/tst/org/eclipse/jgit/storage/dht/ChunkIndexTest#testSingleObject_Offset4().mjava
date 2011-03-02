@@ -1,0 +1,16 @@
+	@Test
+	public void testSingleObject_Offset4() throws DhtException {
+		assertEquals(header(0, 4), header(list(object(1, 1 << 24))));
+
+		List<PackedObjectInfo> objs = list(object(0x1200, 0x7bcdef42));
+		ChunkIndex idx = index(objs);
+
+		assertEquals(header(0, 4), header(objs));
+		assertEquals(1, idx.getObjectCount());
+		assertEquals(objs.get(0), idx.getObjectId(0));
+
+		assertEquals(2 + 20 + 4, idx.getIndexSize());
+		assertEquals(objs.get(0).getOffset(), idx.getOffset(0));
+		assertEquals(objs.get(0).getOffset(), idx.findOffset(objs.get(0)));
+	}
+

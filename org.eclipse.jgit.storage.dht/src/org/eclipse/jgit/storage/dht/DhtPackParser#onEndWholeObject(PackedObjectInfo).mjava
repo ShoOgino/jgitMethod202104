@@ -1,0 +1,14 @@
+	@Override
+	protected void onEndWholeObject(PackedObjectInfo info) throws IOException {
+		boolean fragmented = currFragments != null;
+		endOneObject();
+
+		DhtInfo oe = (DhtInfo) info;
+		oe.chunkPtr = currChunkPtr;
+		oe.packedSize = currPackedSize;
+		oe.inflatedSize = currInflatedSize;
+		oe.setType(currType);
+		if (fragmented)
+			oe.setFragmented();
+	}
+

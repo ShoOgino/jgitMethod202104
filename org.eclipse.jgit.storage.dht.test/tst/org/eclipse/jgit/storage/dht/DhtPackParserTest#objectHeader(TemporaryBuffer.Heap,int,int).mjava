@@ -1,0 +1,15 @@
+	private void objectHeader(TemporaryBuffer.Heap pack, int type, int sz)
+			throws IOException {
+		byte[] buf = new byte[8];
+		int nextLength = sz >>> 4;
+		buf[0] = (byte) ((nextLength > 0 ? 0x80 : 0x00) | (type << 4) | (sz & 0x0F));
+		sz = nextLength;
+		int n = 1;
+		while (sz > 0) {
+			nextLength >>>= 7;
+			buf[n++] = (byte) ((nextLength > 0 ? 0x80 : 0x00) | (sz & 0x7F));
+			sz = nextLength;
+		}
+		pack.write(buf, 0, n);
+	}
+

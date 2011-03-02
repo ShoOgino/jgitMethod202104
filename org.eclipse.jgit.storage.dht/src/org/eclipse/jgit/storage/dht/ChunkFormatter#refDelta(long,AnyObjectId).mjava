@@ -1,0 +1,13 @@
+	boolean refDelta(long inflatedSize, AnyObjectId baseId) {
+		if (free() < 30 || maxObjects <= info.objectsTotal)
+			return false;
+
+		header(Constants.OBJ_REF_DELTA, inflatedSize);
+		info.objectsRefDelta++;
+		currentObjectType = Constants.OBJ_REF_DELTA;
+
+		baseId.copyRawTo(chunkData, ptr);
+		ptr += 20;
+		return true;
+	}
+

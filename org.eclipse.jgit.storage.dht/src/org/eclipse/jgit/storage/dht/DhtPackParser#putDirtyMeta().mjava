@@ -1,0 +1,9 @@
+	private void putDirtyMeta() throws DhtException {
+		for (ChunkMeta meta : dirtyMeta.values()) {
+			PackChunk.Members builder = new PackChunk.Members();
+			builder.setChunkKey(meta.getChunkKey());
+			builder.setMeta(meta);
+			db.chunk().put(builder, dbWriteBuffer);
+		}
+	}
+

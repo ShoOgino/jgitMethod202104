@@ -1,0 +1,17 @@
+	private int findStreamIndex(long streamPosition) throws DhtException {
+		int high = objStreamPos.size();
+		int low = 0;
+		do {
+			final int mid = (low + high) >>> 1;
+			final long pos = objStreamPos.get(mid);
+			if (streamPosition < pos)
+				high = mid;
+			else if (streamPosition == pos)
+				return mid;
+			else
+				low = mid + 1;
+		} while (low < high);
+		throw new DhtException(MessageFormat.format(
+				DhtText.get().noSavedTypeForBase, Long.valueOf(streamPosition)));
+	}
+

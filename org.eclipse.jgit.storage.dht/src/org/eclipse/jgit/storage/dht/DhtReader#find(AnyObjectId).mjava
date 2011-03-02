@@ -1,0 +1,28 @@
+	private List<ObjectInfo> find(AnyObjectId obj) throws DhtException {
+		List<ObjectInfo> info = recentInfo.get(obj);
+		if (info != null)
+			return info;
+
+		stats.cntObjectIndex_Load++;
+		ObjectIndexKey idxKey = ObjectIndexKey.create(repo, obj);
+		Context opt = Context.READ_REPAIR;
+		Sync<Map<ObjectIndexKey, Collection<ObjectInfo>>> sync = Sync.create();
+		db.objectIndex().get(opt, Collections.singleton(idxKey), sync);
+		try {
+			Collection<ObjectInfo> m;
+
+			m = sync.get(getOptions().getTimeout()).get(idxKey);
+			if (m == null || m.isEmpty())
+				return Collections.emptyList();
+
+			info = new ArrayList<ObjectInfo>(m);
+			ObjectInfo.sort(info);
+			recentInfo.put(obj, info);
+			return info;
+		} catch (InterruptedException e) {
+			throw new DhtTimeoutException(e);
+		} catch (TimeoutException e) {
+			throw new DhtTimeoutException(e);
+		}
+	}
+

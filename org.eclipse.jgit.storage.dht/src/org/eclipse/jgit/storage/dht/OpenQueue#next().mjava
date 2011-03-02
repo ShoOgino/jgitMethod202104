@@ -1,0 +1,17 @@
+	public boolean next() throws MissingObjectException, IOException {
+		if (chunkItr == null)
+			init();
+
+		if (!objectItr.hasNext()) {
+			currChunk = null;
+			if (!chunkItr.hasNext()) {
+				release();
+				return false;
+			}
+			objectItr = chunkItr.next().iterator();
+		}
+
+		current = objectItr.next();
+		return true;
+	}
+

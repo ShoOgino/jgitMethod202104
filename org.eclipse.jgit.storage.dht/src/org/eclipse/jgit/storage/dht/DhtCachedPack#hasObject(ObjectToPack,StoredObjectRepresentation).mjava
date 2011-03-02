@@ -1,0 +1,8 @@
+	@Override
+	public boolean hasObject(ObjectToPack obj, StoredObjectRepresentation rep) {
+		DhtObjectRepresentation objrep = (DhtObjectRepresentation) rep;
+		if (chunkKeySet == null)
+			chunkKeySet = new HashSet<ChunkKey>(info.chunks);
+		return chunkKeySet.contains(objrep.getChunkKey());
+	}
+

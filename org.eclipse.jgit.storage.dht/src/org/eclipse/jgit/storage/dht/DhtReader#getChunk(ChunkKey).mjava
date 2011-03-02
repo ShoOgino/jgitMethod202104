@@ -1,0 +1,19 @@
+	PackChunk getChunk(ChunkKey key) throws DhtException {
+		PackChunk chunk = recentChunks.get(key);
+		if (chunk != null)
+			return chunk;
+
+		chunk = ChunkCache.get().get(key);
+		if (chunk != null)
+			return chunk;
+
+		chunk = load(key);
+		if (chunk != null) {
+			if (chunk.hasIndex())
+				return ChunkCache.get().put(chunk);
+			return chunk;
+		}
+
+		throw new DhtMissingChunkException(key);
+	}
+

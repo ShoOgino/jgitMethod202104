@@ -1,0 +1,10 @@
+	boolean whole(int type, long inflatedSize) {
+		if (free() < 10 || maxObjects <= info.objectsTotal)
+			return false;
+
+		header(type, inflatedSize);
+		info.objectsWhole++;
+		currentObjectType = type;
+		return true;
+	}
+

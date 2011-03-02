@@ -1,0 +1,8 @@
+	private int encodeVarInt(long value) {
+		int n = varIntBuf.length - 1;
+		varIntBuf[n] = (byte) (value & 0x7F);
+		while ((value >>= 7) > 0)
+			varIntBuf[--n] = (byte) (0x80 | (--value & 0x7F));
+		return n;
+	}
+

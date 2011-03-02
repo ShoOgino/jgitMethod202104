@@ -1,0 +1,14 @@
+	@Override
+	protected void onPackHeader(long objCnt) throws IOException {
+		if (Integer.MAX_VALUE < objCnt) {
+			throw new DhtException(MessageFormat.format(
+					DhtText.get().tooManyObjectsInPack, Long.valueOf(objCnt)));
+		}
+
+		objStreamPos = new LongList((int) objCnt);
+		objChunkPtrs = new LongList((int) objCnt);
+
+		if (saveAsCachedPack == null)
+			setSaveAsCachedPack(1000 < objCnt);
+	}
+

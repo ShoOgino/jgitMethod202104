@@ -1,0 +1,26 @@
+	@Override
+	public Map<String, Ref> getRefs(String prefix) throws IOException {
+		RefCache curr = readRefs();
+		RefList<Ref> packed = RefList.emptyList();
+		RefList<Ref> loose = curr.ids;
+		RefList.Builder<Ref> sym = new RefList.Builder<Ref>(curr.sym.size());
+
+		for (int idx = 0; idx < curr.sym.size(); idx++) {
+			Ref ref = curr.sym.get(idx);
+			String name = ref.getName();
+			ref = resolve(ref, 0, loose);
+			if (ref != null && ref.getObjectId() != null) {
+				sym.add(ref);
+			} else {
+				// A broken symbolic reference, we have to drop it from the
+				// collections the client is about to receive. Should be a
+				// rare occurrence so pay a copy penalty.
+				int toRemove = loose.find(name);
+				if (0 <= toRemove)
+					loose = loose.remove(toRemove);
+			}
+		}
+
+		return new RefMap(prefix, packed, loose, sym.toRefList());
+	}
+

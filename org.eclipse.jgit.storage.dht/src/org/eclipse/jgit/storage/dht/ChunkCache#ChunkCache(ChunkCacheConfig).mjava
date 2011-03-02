@@ -1,0 +1,29 @@
+	private ChunkCache(ChunkCacheConfig cfg) {
+		tableSize = tableSize(cfg);
+		final int lockCount = lockCount(cfg);
+		if (tableSize < 0)
+			throw new IllegalArgumentException();
+		if (lockCount < 0)
+			throw new IllegalArgumentException();
+
+		queue = new ReferenceQueue<PackChunk>();
+		clock = new AtomicLong(1);
+		table = new AtomicReferenceArray<Entry>(tableSize);
+		locks = new Lock[lockCount];
+		for (int i = 0; i < locks.length; i++)
+			locks[i] = new Lock();
+		evictLock = new ReentrantLock();
+
+		int eb = (int) (tableSize * .1);
+		if (64 < eb)
+			eb = 64;
+		else if (eb < 4)
+			eb = 4;
+		if (tableSize < eb)
+			eb = tableSize;
+		evictBatch = eb;
+
+		maxBytes = cfg.getChunkCacheLimit();
+		openBytes = new AtomicLong();
+	}
+

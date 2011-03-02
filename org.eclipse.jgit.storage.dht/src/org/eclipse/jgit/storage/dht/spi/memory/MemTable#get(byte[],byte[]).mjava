@@ -1,0 +1,14 @@
+	/**
+	 * Get a single cell, or null.
+	 *
+	 * @param row
+	 * @param col
+	 * @return the cell, or null.
+	 */
+	public Cell get(byte[] row, byte[] col) {
+		synchronized (lock) {
+			Map<Key, Cell> r = map.get(new Key(row));
+			return r != null ? r.get(new Key(col)) : null;
+		}
+	}
+

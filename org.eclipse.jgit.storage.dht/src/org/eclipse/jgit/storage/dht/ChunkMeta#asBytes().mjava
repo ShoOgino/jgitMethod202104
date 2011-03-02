@@ -1,0 +1,22 @@
+	/** @return format as byte array for storage. */
+	public byte[] asBytes() {
+		TinyProtobuf.Encoder e = TinyProtobuf.encode(256);
+
+		if (baseChunks != null) {
+			for (BaseChunk base : baseChunks)
+				e.message(1, base.asBytes());
+		}
+
+		if (fragments != null) {
+			for (ChunkKey key : fragments)
+				e.bytes(2, key.asBytes());
+		}
+
+		if (commitPrefetch != null)
+			e.message(51, commitPrefetch.asBytes());
+		if (treePrefetch != null)
+			e.message(52, treePrefetch.asBytes());
+
+		return e.asByteArray();
+	}
+

@@ -1,0 +1,14 @@
+	private void checkRunningTasks(boolean wait) throws DhtException {
+		if (running.isEmpty())
+			return;
+
+		Iterator<Future<?>> itr = running.iterator();
+		while (itr.hasNext()) {
+			Future<?> task = itr.next();
+			if (task.isDone() || wait) {
+				itr.remove();
+				waitFor(task);
+			}
+		}
+	}
+

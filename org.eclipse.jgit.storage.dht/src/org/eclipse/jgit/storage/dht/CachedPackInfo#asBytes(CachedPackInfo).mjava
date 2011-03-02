@@ -1,0 +1,22 @@
+	private static byte[] asBytes(CachedPackInfo info) {
+		int tipSize = (2 + OBJECT_ID_STRING_LENGTH) * info.tips.size();
+		TinyProtobuf.Encoder tipList = TinyProtobuf.encode(tipSize);
+		for (ObjectId tip : info.tips)
+			tipList.string(1, tip);
+
+		int chunkSize = (2 + ChunkKey.KEYLEN) * info.chunks.size();
+		TinyProtobuf.Encoder chunkList = TinyProtobuf.encode(chunkSize);
+		for (ChunkKey key : info.chunks)
+			chunkList.bytes(1, key.asBytes());
+
+		TinyProtobuf.Encoder e = TinyProtobuf.encode(1024);
+		e.string(1, info.name);
+		e.string(2, info.version);
+		e.int64(3, info.objectsTotal);
+		e.int64IfNotZero(4, info.objectsDelta);
+		e.int64IfNotZero(5, info.bytesTotal);
+		e.message(6, tipList);
+		e.message(7, chunkList);
+		return e.asByteArray();
+	}
+

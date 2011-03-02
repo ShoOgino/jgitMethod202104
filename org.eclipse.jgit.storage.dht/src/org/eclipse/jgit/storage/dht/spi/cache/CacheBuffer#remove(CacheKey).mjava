@@ -1,0 +1,16 @@
+	/**
+	 * Schedule removal of a key from the cache.
+	 * <p>
+	 * Unlike {@link #removeAfterFlush(CacheKey)}, these removals can be flushed
+	 * when the cache buffer is full, potentially before any corresponding
+	 * removal is written to the underlying database.
+	 *
+	 * @param key
+	 *            key to remove.
+	 * @throws DhtException
+	 *             a prior flush failed.
+	 */
+	public void remove(CacheKey key) throws DhtException {
+		modify(CacheService.Change.remove(key));
+	}
+

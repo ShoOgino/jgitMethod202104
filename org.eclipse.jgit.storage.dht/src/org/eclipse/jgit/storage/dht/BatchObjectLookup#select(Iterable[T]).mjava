@@ -1,0 +1,13 @@
+	void select(Iterable<T> objects) throws IOException {
+		selectInBatches(Context.FAST_MISSING_OK, lookInCache(objects));
+
+		// Not all of the selection ran with fast options.
+		if (retryMissingObjects && !retry.isEmpty()) {
+			batches.release(concurrentBatches);
+			selectInBatches(Context.READ_REPAIR, retry);
+		}
+
+		if (progress != null)
+			progress.pollForUpdates();
+	}
+

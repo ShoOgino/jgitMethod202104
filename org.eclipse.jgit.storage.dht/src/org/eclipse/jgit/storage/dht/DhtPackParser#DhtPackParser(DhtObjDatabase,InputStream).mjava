@@ -1,0 +1,47 @@
+	DhtPackParser(DhtObjDatabase objdb, InputStream in) {
+		super(objdb, in);
+
+		// Disable collision checking. DhtReader performs some magic to look
+		// only at old objects, so a colliding replacement will be ignored until
+		// its removed during garbage collection.
+		//
+		setCheckObjectCollisions(false);
+
+		this.objdb = objdb;
+		this.repo = objdb.getRepository().getRepositoryKey();
+		this.db = objdb.getDatabase();
+		this.options = objdb.getInserterOptions();
+		this.chunkKeyDigest = Constants.newMessageDigest();
+
+		dbWriteBuffer = db.newWriteBuffer();
+		openChunks = new ChunkFormatter[5];
+		openEdges = new Edges[5];
+		infoByOrder = newListArray(5);
+		infoByKey = new HashMap<ChunkKey, ChunkInfo>();
+		dirtyMeta = new HashMap<ChunkKey, ChunkMeta>();
+		chunkMeta = new HashMap<ChunkKey, ChunkMeta>();
+		chunkEdges = new HashMap<ChunkKey, Edges>();
+		treeParser = new CanonicalTreeParser();
+		idBuffer = new MutableObjectId();
+		objectMap = new ObjectIdSubclassMap<DhtInfo>();
+
+		final int max = options.getParserCacheSize();
+		chunkReadBackCache = new LinkedHashMap<ChunkKey, PackChunk>(max, 0.75f, true) {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			protected boolean removeEldestEntry(Entry<ChunkKey, PackChunk> e) {
+				return max < size();
+			}
+		};
+
+		// The typical WriteBuffer flushes at 512 KiB increments, and
+		// the typical ObjectInfo record is around 180 bytes. Use these
+		// figures to come up with a rough estimate for how many links
+		// to construct in one region of the DHT before moving onto a
+		// different region in order to increase parallelism on large
+		// object imports.
+		//
+		linkBatchSize = 512 * 1024 / 180;
+	}
+

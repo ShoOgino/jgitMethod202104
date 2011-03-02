@@ -1,0 +1,15 @@
+	void copyEntireChunkAsIs(PackOutputStream out, DhtObjectToPack obj,
+			boolean validate) throws IOException {
+		if (validate && !isValid()) {
+			if (obj != null)
+				throw new CorruptObjectException(obj, MessageFormat.format(
+						DhtText.get().corruptChunk, getChunkKey()));
+			else
+				throw new DhtException(MessageFormat.format(
+						DhtText.get().corruptChunk, getChunkKey()));
+		}
+
+		// Do not copy the trailer onto the output stream.
+		out.write(dataBuf, dataPtr, dataLen - TRAILER_SIZE);
+	}
+

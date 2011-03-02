@@ -1,0 +1,10 @@
+	OpenQueue(DhtReader reader, Iterable<T> objectIds, boolean reportMissing) {
+		super(reader, reportMissing);
+		setCacheLoadedInfo(true);
+		setNeedChunkOnly(true);
+		init(objectIds);
+
+		byChunk = new LinkedHashMap<ChunkKey, Collection<ObjectWithInfo<T>>>();
+		objectItr = Collections.<ObjectWithInfo<T>> emptyList().iterator();
+	}
+

@@ -1,0 +1,18 @@
+	boolean ofsDelta(long inflatedSize, long negativeOffset) {
+		final int ofsPtr = encodeVarInt(negativeOffset);
+		final int ofsLen = varIntBuf.length - ofsPtr;
+		if (free() < 10 + ofsLen || maxObjects <= info.objectsTotal)
+			return false;
+
+		header(Constants.OBJ_OFS_DELTA, inflatedSize);
+		info.objectsOfsDelta++;
+		currentObjectType = Constants.OBJ_OFS_DELTA;
+		currentObjectBase = null;
+
+		if (append(varIntBuf, ofsPtr, ofsLen))
+			return true;
+
+		rollback();
+		return false;
+	}
+

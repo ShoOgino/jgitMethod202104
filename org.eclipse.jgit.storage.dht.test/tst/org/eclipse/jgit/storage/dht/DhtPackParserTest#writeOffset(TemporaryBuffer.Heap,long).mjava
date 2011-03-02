@@ -1,0 +1,10 @@
+	private void writeOffset(TemporaryBuffer.Heap pack, long offsetDiff)
+			throws IOException {
+		byte[] headerBuffer = new byte[32];
+		int n = headerBuffer.length - 1;
+		headerBuffer[n] = (byte) (offsetDiff & 0x7F);
+		while ((offsetDiff >>= 7) > 0)
+			headerBuffer[--n] = (byte) (0x80 | (--offsetDiff & 0x7F));
+		pack.write(headerBuffer, n, headerBuffer.length - n);
+	}
+

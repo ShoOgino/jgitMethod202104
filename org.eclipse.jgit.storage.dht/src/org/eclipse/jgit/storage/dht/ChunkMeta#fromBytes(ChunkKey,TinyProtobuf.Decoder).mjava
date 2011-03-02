@@ -1,0 +1,44 @@
+	/**
+	 * Convert from byte array.
+	 *
+	 * @param key
+	 *            the chunk key this meta object sits in.
+	 * @param d
+	 *            the message decoder.
+	 * @return the chunk meta.
+	 */
+	public static ChunkMeta fromBytes(ChunkKey key, TinyProtobuf.Decoder d) {
+		List<BaseChunk> baseChunk = null;
+		List<ChunkKey> fragment = null;
+		PrefetchHint commit = null;
+		PrefetchHint tree = null;
+
+		PARSE: for (;;) {
+			switch (d.next()) {
+			case 0:
+				break PARSE;
+			case 1:
+				if (baseChunk == null)
+					baseChunk = new ArrayList<BaseChunk>(4);
+				baseChunk.add(BaseChunk.fromBytes(d.message()));
+				continue;
+			case 2:
+				if (fragment == null)
+					fragment = new ArrayList<ChunkKey>(4);
+				fragment.add(ChunkKey.fromBytes(d));
+				continue;
+			case 51:
+				commit = PrefetchHint.fromBytes(d.message());
+				continue;
+			case 52:
+				tree = PrefetchHint.fromBytes(d.message());
+				continue;
+			default:
+				d.skip();
+				continue;
+			}
+		}
+
+		return new ChunkMeta(key, baseChunk, fragment, commit, tree);
+	}
+

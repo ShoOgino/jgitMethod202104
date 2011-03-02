@@ -1,0 +1,17 @@
+	@Test
+	public void testObjects3() throws DhtException {
+		List<PackedObjectInfo> objs = objects(2, 3, 1);
+		ChunkIndex idx = index(objs);
+
+		assertEquals(header(0, 1), header(objs));
+		assertEquals(3, idx.getObjectCount());
+		assertEquals(2 + 3 * 20 + 3 * 1, idx.getIndexSize());
+		assertTrue(isSorted(objs));
+
+		for (int i = 0; i < objs.size(); i++) {
+			assertEquals(objs.get(i), idx.getObjectId(i));
+			assertEquals(objs.get(i).getOffset(), idx.getOffset(i));
+			assertEquals(objs.get(i).getOffset(), idx.findOffset(objs.get(i)));
+		}
+	}
+

@@ -1,0 +1,7 @@
+	private static byte[] inflate(long sz, PackChunk pc, int pos,
+			DhtReader reader) throws DataFormatException, DhtException {
+		if (pc.isFragment())
+			return inflateFragment(sz, pc, pos, reader);
+		return pc.inflateOne(sz, pos, reader);
+	}
+

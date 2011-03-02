@@ -1,0 +1,34 @@
+	@Override
+	public ObjectId insert(int type, byte[] data, int off, int len)
+			throws IOException {
+		// TODO Is it important to avoid duplicate objects here?
+		// IIRC writing out a DirCache just blindly writes all of the
+		// tree objects to the inserter, relying on the inserter to
+		// strip out duplicates. We might need to buffer trees as
+		// long as possible, then collapse the buffer by looking up
+		// any existing objects and avoiding inserting those.
+
+		if (mustFragmentSize() < len)
+			return insertStream(type, len, asStream(data, off, len));
+
+		ObjectId objId = idFor(type, data, off, len);
+
+		if (activeChunk == null)
+			activeChunk = newChunk();
+
+		if (activeChunk.whole(deflater(), type, data, off, len, objId))
+			return objId;
+
+		// TODO Allow more than one chunk pending at a time, this would
+		// permit batching puts of the ChunkInfo records.
+
+		activeChunk.end(digest());
+		activeChunk.safePut(db, dbBuffer());
+		activeChunk = newChunk();
+
+		if (activeChunk.whole(deflater(), type, data, off, len, objId))
+			return objId;
+
+		return insertStream(type, len, asStream(data, off, len));
+	}
+

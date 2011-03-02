@@ -1,0 +1,12 @@
+	private void resolveMissing() throws DhtTimeoutException,
+			InterruptedException {
+		metaToRead = new HashSet<ChunkKey>();
+		for (ChunkKey key : metaMissing) {
+			metaToRead.add(key);
+			if (metaToRead.size() == batchSize)
+				startBatch(Context.LOCAL);
+		}
+		if (!metaToRead.isEmpty())
+			startBatch(Context.LOCAL);
+	}
+

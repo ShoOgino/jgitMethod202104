@@ -1,0 +1,7 @@
+	private long makeObjectPointer(ChunkFormatter w, int typeCode) {
+		List<ChunkInfo> list = infoByOrder[typeCode];
+		int idx = list == null ? 0 : list.size();
+		int ptr = w.position();
+		return (((long) typeCode) << 61) | (((long) idx) << 32) | ptr;
+	}
+

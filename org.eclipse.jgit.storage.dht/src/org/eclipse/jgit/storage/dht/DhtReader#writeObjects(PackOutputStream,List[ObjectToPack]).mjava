@@ -1,0 +1,15 @@
+	@SuppressWarnings("unchecked")
+	public void writeObjects(PackOutputStream out, List<ObjectToPack> objects)
+			throws IOException {
+		prefetcher = new Prefetcher(this, 0);
+		prefetcher.setCacheLoadedChunks(false);
+		try {
+			List itr = objects;
+			new ObjectWriter(this, prefetcher).plan(itr);
+			for (ObjectToPack otp : objects)
+				out.writeObject(otp);
+		} finally {
+			endPrefetch();
+		}
+	}
+

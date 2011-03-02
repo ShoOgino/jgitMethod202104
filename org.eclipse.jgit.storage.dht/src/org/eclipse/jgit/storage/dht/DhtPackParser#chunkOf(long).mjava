@@ -1,0 +1,13 @@
+	private ChunkKey chunkOf(long objectPtr) throws DhtException {
+		List<ChunkInfo> list = infoByOrder[typeOf(objectPtr)];
+		int idx = chunkIdx(objectPtr);
+		if (list == null || list.size() <= idx) {
+			throw new DhtException(MessageFormat.format(
+					DhtText.get().packParserInvalidPointer, //
+					Constants.typeString(typeOf(objectPtr)), //
+					Integer.valueOf(idx), //
+					Integer.valueOf(offsetOf(objectPtr))));
+		}
+		return list.get(idx).getChunkKey();
+	}
+

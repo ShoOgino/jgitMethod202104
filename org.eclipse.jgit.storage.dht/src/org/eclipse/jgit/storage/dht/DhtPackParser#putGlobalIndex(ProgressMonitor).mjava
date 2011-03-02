@@ -1,0 +1,41 @@
+	private void putGlobalIndex(ProgressMonitor pm) throws DhtException {
+		int objcnt = objectListByName.size();
+		pm.beginTask(DhtText.get().recordingObjects, objcnt);
+
+		int segments = Math.max(1, Math.min(objcnt / linkBatchSize, 32));
+		linkIterators = newListIteratorArray(segments);
+
+		int objsPerSegment = objcnt / segments;
+		int beginIdx = 0;
+		for (int i = 0; i < segments - 1; i++) {
+			int endIdx = Math.min(beginIdx + objsPerSegment, objcnt);
+			linkIterators[i] = objectListByName.subList(beginIdx, endIdx)
+					.listIterator();
+			beginIdx = endIdx;
+		}
+		linkIterators[segments - 1] = objectListByName
+				.subList(beginIdx, objcnt).listIterator();
+
+		boolean inserted = true;
+		while (inserted) {
+			inserted = false;
+			for (ListIterator<DhtInfo> itr : linkIterators) {
+				int cnt = 0;
+				while (itr.hasNext() && cnt < linkBatchSize) {
+					DhtInfo oe = itr.next();
+					db.objectIndex().add( //
+							ObjectIndexKey.create(repo, oe), //
+							oe.info(chunkOf(oe.chunkPtr)), //
+							dbWriteBuffer);
+					cnt++;
+				}
+				if (0 < cnt) {
+					pm.update(cnt);
+					inserted = true;
+				}
+			}
+		}
+
+		pm.endTask();
+	}
+

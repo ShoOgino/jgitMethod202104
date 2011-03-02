@@ -1,0 +1,8 @@
+	private static void checkCycle(Delta delta, ChunkKey key, int ofs)
+			throws DeltaChainCycleException {
+		for (; delta != null; delta = delta.next) {
+			if (delta.deltaPos == ofs && delta.deltaChunk.equals(key))
+				throw DeltaChainCycleException.INSTANCE;
+		}
+	}
+

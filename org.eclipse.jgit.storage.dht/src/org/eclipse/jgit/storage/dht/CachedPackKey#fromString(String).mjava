@@ -1,0 +1,11 @@
+	/**
+	 * @param key
+	 * @return the key
+	 */
+	public static CachedPackKey fromString(String key) {
+		int d = key.indexOf('.');
+		ObjectId name = ObjectId.fromString(key.substring(0, d));
+		ObjectId vers = ObjectId.fromString(key.substring(d + 1));
+		return new CachedPackKey(name, vers);
+	}
+

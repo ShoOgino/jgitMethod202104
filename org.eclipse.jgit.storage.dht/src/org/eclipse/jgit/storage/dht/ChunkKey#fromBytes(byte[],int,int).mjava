@@ -1,0 +1,16 @@
+	/**
+	 * @param key
+	 * @param ptr
+	 * @param len
+	 * @return the key
+	 */
+	public static ChunkKey fromBytes(byte[] key, int ptr, int len) {
+		if (len != KEYLEN)
+			throw new IllegalArgumentException(MessageFormat.format(
+					DhtText.get().invalidChunkKey, decode(key, ptr, ptr + len)));
+
+		int repo = parse32(key, ptr + 3);
+		ObjectId chunk = ObjectId.fromString(key, ptr + 12);
+		return new ChunkKey(repo, chunk);
+	}
+

@@ -1,0 +1,22 @@
+	@Test
+	public void testGetTimeout() {
+		Timeout def = Timeout.seconds(2);
+		Config cfg = new Config();
+		Timeout t;
+
+		cfg.setString("core", "dht", "timeout", "500 ms");
+		t = Timeout.getTimeout(cfg, "core", "dht", "timeout", def);
+		assertEquals(500, t.getTime());
+		assertEquals(TimeUnit.MILLISECONDS, t.getUnit());
+
+		cfg.setString("core", "dht", "timeout", "5.2 sec");
+		t = Timeout.getTimeout(cfg, "core", "dht", "timeout", def);
+		assertEquals(5200, t.getTime());
+		assertEquals(TimeUnit.MILLISECONDS, t.getUnit());
+
+		cfg.setString("core", "dht", "timeout", "1 min");
+		t = Timeout.getTimeout(cfg, "core", "dht", "timeout", def);
+		assertEquals(60, t.getTime());
+		assertEquals(TimeUnit.SECONDS, t.getUnit());
+	}
+

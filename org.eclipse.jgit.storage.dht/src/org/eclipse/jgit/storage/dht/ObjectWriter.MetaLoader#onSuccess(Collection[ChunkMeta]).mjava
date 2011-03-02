@@ -1,0 +1,18 @@
+		public void onSuccess(Collection<ChunkMeta> result) {
+			try {
+				synchronized (allMeta) {
+					for (ChunkMeta meta : result) {
+						allMeta.put(meta.getChunkKey(), meta);
+						keys.remove(meta.getChunkKey());
+					}
+				}
+				if (context == Context.FAST_MISSING_OK && !keys.isEmpty()) {
+					synchronized (metaMissing) {
+						metaMissing.addAll(keys);
+					}
+				}
+			} finally {
+				metaBatches.release(1);
+			}
+		}
+

@@ -1,0 +1,14 @@
+	@Override
+	public void walkAdviceBeginCommits(RevWalk rw, Collection<RevCommit> roots)
+			throws IOException {
+		endPrefetch();
+
+		// Don't assign the prefetcher right away. Delay until its
+		// configured as push might invoke our own methods that may
+		// try to call back into the active prefetcher.
+		//
+		Prefetcher p = new Prefetcher(this, OBJ_COMMIT);
+		p.push(this, roots);
+		prefetcher = p;
+	}
+

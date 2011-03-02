@@ -1,0 +1,18 @@
+	/**
+	 * Initialize a new buffer.
+	 *
+	 * @param dbBuffer
+	 *            the underlying database's own buffer.
+	 * @param client
+	 *            connection to the cache service.
+	 * @param options
+	 *            options controlling cache operations.
+	 */
+	public CacheBuffer(WriteBuffer dbBuffer, CacheService client,
+			CacheOptions options) {
+		super(null, options.getWriteBufferSize());
+		this.dbBuffer = dbBuffer;
+		this.client = client;
+		this.none = Sync.none();
+	}
+

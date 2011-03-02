@@ -1,0 +1,6 @@
+	static RefData id(AnyObjectId id) {
+		Encoder e = encode(4 + OBJECT_ID_STRING_LENGTH + ChunkKey.KEYLEN);
+		e.message(TAG_TARGET, IdWithChunk.encode(id));
+		return new RefData(e.asByteArray());
+	}
+

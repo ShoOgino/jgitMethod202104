@@ -1,0 +1,23 @@
+	void removed(String refName) {
+		RefCache oldCache, newCache;
+		do {
+			oldCache = cache.get();
+			if (oldCache == null)
+				return;
+
+			int p;
+
+			RefList<Ref> ids = oldCache.ids;
+			p = ids.find(refName);
+			if (0 <= p)
+				ids = ids.remove(p);
+
+			RefList<Ref> sym = oldCache.sym;
+			p = sym.find(refName);
+			if (0 <= p)
+				sym = sym.remove(p);
+
+			newCache = new RefCache(ids, sym, oldCache.hints);
+		} while (!cache.compareAndSet(oldCache, newCache));
+	}
+

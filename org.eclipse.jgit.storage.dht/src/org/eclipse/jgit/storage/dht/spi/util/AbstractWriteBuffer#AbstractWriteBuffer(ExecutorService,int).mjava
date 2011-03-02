@@ -1,0 +1,15 @@
+	/**
+	 * Initialize a buffer with a backing executor service.
+	 *
+	 * @param executor
+	 *            service to run mutation tasks on.
+	 * @param bufferSize
+	 *            maximum number of bytes to have pending at once.
+	 */
+	protected AbstractWriteBuffer(ExecutorService executor, int bufferSize) {
+		this.executor = executor;
+		this.bufferSize = bufferSize;
+		this.running = new LinkedList<Future<?>>();
+		this.spaceAvailable = new Semaphore(bufferSize);
+	}
+

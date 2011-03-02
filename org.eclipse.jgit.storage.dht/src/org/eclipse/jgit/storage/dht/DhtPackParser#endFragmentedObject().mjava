@@ -1,0 +1,18 @@
+	private void endFragmentedObject() throws DhtException {
+		currChunk.setFragment();
+		ChunkKey lastKey = endChunk(typeOf(currChunkPtr));
+		if (lastKey != null)
+			currFragments.add(lastKey);
+
+		for (ChunkKey key : currFragments) {
+			ChunkMeta meta = chunkMeta.get(key);
+			if (meta == null) {
+				meta = new ChunkMeta(key);
+				chunkMeta.put(key, meta);
+			}
+			meta.fragments = currFragments;
+			dirtyMeta.put(key, meta);
+		}
+		currFragments = null;
+	}
+

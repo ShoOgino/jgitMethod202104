@@ -1,0 +1,27 @@
+	private synchronized void processResults(Context ctx,
+			Map<ObjectIndexKey, T> batch,
+			Map<ObjectIndexKey, Collection<ObjectInfo>> objects) {
+		for (T obj : batch.values()) {
+			Collection<ObjectInfo> matches = objects.get(obj);
+
+			if (matches == null || matches.isEmpty()) {
+				if (ctx == Context.FAST_MISSING_OK)
+					toRetry.add(obj);
+				else if (reportMissing)
+					push(obj, (ChunkKey) null);
+				continue;
+			}
+
+			tmp.clear();
+			tmp.addAll(matches);
+			ObjectInfo.sort(tmp);
+			if (cacheLoadedInfo)
+				reader.getRecentInfoCache().put(obj, tmp);
+
+			push(obj, tmp.get(0));
+		}
+
+		runningBatches--;
+		notify();
+	}
+

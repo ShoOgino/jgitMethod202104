@@ -1,0 +1,15 @@
+	public void put(PackChunk.Members chunk, WriteBuffer buffer)
+			throws DhtException {
+		CacheBuffer buf = (CacheBuffer) buffer;
+		db.put(chunk, buf.getWriteBuffer());
+
+		// Only store fragmented meta. This is all callers should ask for.
+		if (chunk.hasMeta() && chunk.getMeta().getFragmentCount() != 0)
+			buf.put(nsMeta.key(chunk.getChunkKey()), chunk.getMeta().asBytes());
+
+		if (chunk.hasChunkData())
+			buf.put(nsChunk.key(chunk.getChunkKey()), encode(chunk));
+		else
+			buf.removeAfterFlush(nsChunk.key(chunk.getChunkKey()));
+	}
+

@@ -1,0 +1,20 @@
+	private void onCommit(DhtInfo obj, byte[] raw) throws DhtException {
+		Edges edges = edges(obj.chunkPtr);
+		edges.remove(obj);
+
+		// TODO compute hints for trees.
+		if (isSaveAsCachedPack()) {
+			idBuffer.fromString(raw, 5);
+			lookupByName(idBuffer).setReferenced();
+		}
+
+		int ptr = 46;
+		while (raw[ptr] == 'p') {
+			idBuffer.fromString(raw, ptr + 7);
+			DhtInfo p = lookupByName(idBuffer);
+			p.setReferenced();
+			edges.commit(p);
+			ptr += 48;
+		}
+	}
+

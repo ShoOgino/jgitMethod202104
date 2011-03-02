@@ -1,0 +1,18 @@
+	Prefetcher(DhtReader reader, int objectType) {
+		this.db = reader.getDatabase();
+		this.stats = reader.getStatistics();
+		this.objectType = objectType;
+		this.ready = new HashMap<ChunkKey, PackChunk>();
+		this.status = new HashMap<ChunkKey, Status>();
+		this.queue = new LinkedList<ChunkKey>();
+		this.followEdgeHints = reader.getOptions().isPrefetchFollowEdgeHints();
+		this.averageChunkSize = reader.getInserterOptions().getChunkSize();
+		this.highWaterMark = reader.getOptions().getPrefetchLimit();
+
+		int lwm = (highWaterMark / averageChunkSize) - 4;
+		if (lwm <= 0)
+			lwm = (highWaterMark / averageChunkSize) / 2;
+		lowWaterMark = lwm * averageChunkSize;
+		cacheLoadedChunks = true;
+	}
+

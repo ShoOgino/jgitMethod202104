@@ -1,0 +1,42 @@
+	PackChunk put(PackChunk chunk) {
+		if (tableSize == 0)
+			return chunk;
+
+		final ChunkKey chunkKey = chunk.getChunkKey();
+		final int slot = slot(chunkKey);
+		final Entry e1 = table.get(slot);
+		PackChunk v = scan(e1, chunkKey);
+		if (v != null)
+			return v;
+
+		synchronized (lock(chunkKey)) {
+			Entry e2 = table.get(slot);
+			if (e2 != e1) {
+				v = scan(e2, chunkKey);
+				if (v != null)
+					return v;
+			}
+
+			v = chunk;
+			final Ref ref = createRef(chunkKey, v);
+			hit(ref);
+			for (;;) {
+				final Entry n = new Entry(clean(e2), ref);
+				if (table.compareAndSet(slot, e2, n))
+					break;
+				e2 = table.get(slot);
+			}
+		}
+
+		if (evictLock.tryLock()) {
+			try {
+				gc();
+				evict();
+			} finally {
+				evictLock.unlock();
+			}
+		}
+
+		return v;
+	}
+

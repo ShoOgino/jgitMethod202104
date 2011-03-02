@@ -1,0 +1,20 @@
+		static ObjectId decode(TinyProtobuf.Decoder d) {
+			ObjectId id = null;
+			ChunkKey key = null;
+			DECODE: for (;;) {
+				switch (d.next()) {
+				case 0:
+					break DECODE;
+				case 1:
+					id = d.stringObjectId();
+					continue;
+				case 2:
+					key = ChunkKey.fromBytes(d);
+					continue;
+				default:
+					d.skip();
+				}
+			}
+			return key != null ? new IdWithChunk(id, key) : id;
+		}
+

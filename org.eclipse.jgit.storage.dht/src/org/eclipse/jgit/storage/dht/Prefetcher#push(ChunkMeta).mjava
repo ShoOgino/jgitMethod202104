@@ -1,0 +1,26 @@
+	void push(ChunkMeta meta) {
+		if (meta == null)
+			return;
+
+		ChunkMeta.PrefetchHint hint;
+		switch (objectType) {
+		case OBJ_COMMIT:
+			hint = meta.getCommitPrefetch();
+			break;
+		case OBJ_TREE:
+			hint = meta.getTreePrefetch();
+			break;
+		default:
+			return;
+		}
+
+		if (hint != null) {
+			synchronized (this) {
+				if (followEdgeHints && !hint.getEdge().isEmpty())
+					push(hint.getEdge());
+				else
+					push(hint.getSequential());
+			}
+		}
+	}
+

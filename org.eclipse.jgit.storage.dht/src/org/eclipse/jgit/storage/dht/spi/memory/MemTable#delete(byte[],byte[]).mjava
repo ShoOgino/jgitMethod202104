@@ -1,0 +1,19 @@
+	/**
+	 * Delete a cell.
+	 *
+	 * @param row
+	 * @param col
+	 */
+	public void delete(byte[] row, byte[] col) {
+		synchronized (lock) {
+			Key rowKey = new Key(row);
+			Map<Key, Cell> r = map.get(rowKey);
+			if (r == null)
+				return;
+
+			r.remove(new Key(col));
+			if (r.isEmpty())
+				map.remove(rowKey);
+		}
+	}
+

@@ -1,0 +1,22 @@
+	ChunkKey findChunk(AnyObjectId objId) throws DhtException {
+		if (objId instanceof IdWithChunk)
+			return ((IdWithChunk) objId).getChunkKey();
+
+		ChunkKey key = repository.getRefDatabase().findChunk(objId);
+		if (key != null)
+			return key;
+
+		ChunkAndOffset r = recentChunks.find(repo, objId);
+		if (r != null)
+			return r.chunk.getChunkKey();
+
+		r = ChunkCache.get().find(repo, objId);
+		if (r != null)
+			return r.chunk.getChunkKey();
+
+		for (ObjectInfo link : find(objId))
+			return link.getChunkKey();
+
+		return null;
+	}
+

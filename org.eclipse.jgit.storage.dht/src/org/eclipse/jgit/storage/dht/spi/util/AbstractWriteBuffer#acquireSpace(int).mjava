@@ -1,0 +1,17 @@
+	private void acquireSpace(int sz) throws DhtException {
+		try {
+			final int permits = permitsForSize(sz);
+			if (spaceAvailable.tryAcquire(permits))
+				return;
+
+			if (0 < queuedCount) {
+				startQueuedOperations(queuedCount);
+				queuedCount = 0;
+			}
+
+			spaceAvailable.acquire(permits);
+		} catch (InterruptedException e) {
+			throw new DhtTimeoutException(e);
+		}
+	}
+

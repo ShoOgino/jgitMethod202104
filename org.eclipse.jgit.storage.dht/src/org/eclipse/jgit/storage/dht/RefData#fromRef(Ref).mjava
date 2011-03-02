@@ -1,0 +1,19 @@
+	static RefData fromRef(Ref ref) {
+		if (ref.isSymbolic())
+			return symbolic(ref.getTarget().getName());
+
+		if (ref.getObjectId() == null)
+			return RefData.NONE;
+
+		int max = 8 + 2 * OBJECT_ID_STRING_LENGTH + 2 * ChunkKey.KEYLEN;
+		Encoder e = encode(max);
+		e.message(TAG_TARGET, IdWithChunk.encode(ref.getObjectId()));
+		if (ref.isPeeled()) {
+			e.bool(TAG_IS_PEELED, true);
+			if (ref.getPeeledObjectId() != null)
+				e.message(TAG_PEELED,
+						IdWithChunk.encode(ref.getPeeledObjectId()));
+		}
+		return new RefData(e.asByteArray());
+	}
+
