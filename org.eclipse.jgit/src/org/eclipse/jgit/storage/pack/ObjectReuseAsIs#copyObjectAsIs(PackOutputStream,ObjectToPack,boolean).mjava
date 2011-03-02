@@ -12,7 +12,11 @@
 	 *
 	 * <pre>
 	 * MyToPack mtp = (MyToPack) otp;
-	 * byte[] raw = validate(mtp); // throw SORNAE here, if at all
+	 * byte[] raw;
+	 * if (validate)
+	 * 	 raw = validate(mtp); // throw SORNAE here, if at all
+	 * else
+	 * 	 raw = readFast(mtp);
 	 * out.writeHeader(mtp, mtp.inflatedSize);
 	 * out.write(raw);
 	 * </pre>
@@ -21,6 +25,11 @@
 	 *            stream the object should be written to.
 	 * @param otp
 	 *            the object's saved representation information.
+	 * @param validate
+	 *            if true the representation must be validated and not be
+	 *            corrupt before being reused. If false, validation may be
+	 *            skipped as it will be performed elsewhere in the processing
+	 *            pipeline.
 	 * @throws StoredObjectRepresentationNotAvailableException
 	 *             the previously selected representation is no longer
 	 *             available. If thrown before {@code out.writeHeader} the pack
@@ -31,6 +40,7 @@
 	 *             the stream's write method threw an exception. Packing will
 	 *             abort.
 	 */
-	public void copyObjectAsIs(PackOutputStream out, ObjectToPack otp)
-			throws IOException, StoredObjectRepresentationNotAvailableException;
+	public void copyObjectAsIs(PackOutputStream out, ObjectToPack otp,
+			boolean validate) throws IOException,
+			StoredObjectRepresentationNotAvailableException;
 
