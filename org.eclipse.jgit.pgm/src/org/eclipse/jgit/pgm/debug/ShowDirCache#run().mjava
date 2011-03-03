@@ -9,6 +9,7 @@
 			final FileMode mode = FileMode.fromBits(ent.getRawMode());
 			final int len = ent.getLength();
 			final Date mtime = new Date(ent.getLastModified());
+			final int stage = ent.getStage();
 
 			out.print(mode);
 			out.format(" %6d", len);
@@ -16,6 +17,8 @@
 			out.print(fmt.format(mtime));
 			out.print(' ');
 			out.print(ent.getObjectId().name());
+			out.print(' ');
+			out.print(stage);
 			out.print('\t');
 			out.print(ent.getPathString());
 			out.println();
