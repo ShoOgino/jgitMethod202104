@@ -6,10 +6,7 @@
 	 * @param localDb
 	 *            local repository to push from.
 	 * @param srcRef
-	 *            source revision - any string resolvable by
-	 *            {@link Repository#resolve(String)}. This resolves to the new
-	 *            object that the caller want remote ref to be after update. Use
-	 *            null or {@link ObjectId#zeroId()} string for delete request.
+	 *            source revision. Use null to delete.
 	 * @param remoteName
 	 *            full name of a remote ref to update, e.g. "refs/heads/master"
 	 *            (no wildcard, no short name).
@@ -36,12 +33,12 @@
 	 * @throws IllegalArgumentException
 	 *             if some required parameter was null
 	 */
-	public RemoteRefUpdate(final Repository localDb, final String srcRef,
+	public RemoteRefUpdate(final Repository localDb, final Ref srcRef,
 			final String remoteName, final boolean forceUpdate,
 			final String localName, final ObjectId expectedOldObjectId)
 			throws IOException {
-		this(localDb, srcRef, srcRef != null ? localDb.resolve(srcRef)
-				: ObjectId.zeroId(), remoteName, forceUpdate, localName,
-				expectedOldObjectId);
+		this(localDb, srcRef != null ? srcRef.getName() : null,
+				srcRef != null ? srcRef.getObjectId() : null, remoteName,
+				forceUpdate, localName, expectedOldObjectId);
 	}
 
