@@ -1,18 +1,16 @@
-		SshFetchConnection(Connection conn) throws TransportException {
+		SshPushConnection() throws TransportException {
 			super(TransportGitSsh.this);
-			this.conn = conn;
 			try {
+				process = getSession().exec(commandFor(getOptionReceivePack()),
+						getTimeout());
 				final MessageWriter msg = new MessageWriter();
 				setMessageWriter(msg);
 
-				conn.exec(getOptionUploadPack());
-
-				final InputStream upErr = conn.getErrorStream();
-				errorThread = new StreamCopyThread(upErr, msg.getRawStream());
+				final InputStream rpErr = process.getErrorStream();
+				errorThread = new StreamCopyThread(rpErr, msg.getRawStream());
 				errorThread.start();
 
-				init(conn.getInputStream(), conn.getOutputStream());
-				conn.connect();
+				init(process.getInputStream(), process.getOutputStream());
 
 			} catch (TransportException err) {
 				close();
@@ -27,7 +25,7 @@
 				readAdvertisedRefs();
 			} catch (NoRemoteRepositoryException notFound) {
 				final String msgs = getMessages();
-				checkExecFailure(conn.getExitStatus(), getOptionUploadPack(),
+				checkExecFailure(process.exitValue(), getOptionReceivePack(),
 						msgs);
 				throw cleanNotFound(notFound, msgs);
 			}

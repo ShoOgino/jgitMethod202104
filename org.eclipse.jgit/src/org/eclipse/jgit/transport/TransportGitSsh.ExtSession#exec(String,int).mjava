@@ -1,5 +1,5 @@
-		@Override
-		void exec(String commandName) throws TransportException {
+		public Process exec(String command, int timeout)
+				throws TransportException {
 			String ssh = SystemReader.getInstance().getenv("GIT_SSH");
 			boolean putty = ssh.toLowerCase().contains("plink");
 
@@ -15,7 +15,7 @@
 				args.add(getURI().getUser() + "@" + getURI().getHost());
 			else
 				args.add(getURI().getHost());
-			args.add(commandFor(commandName));
+			args.add(command);
 
 			ProcessBuilder pb = new ProcessBuilder();
 			pb.command(args);
@@ -25,9 +25,9 @@
 						local.getDirectory().getPath());
 
 			try {
-				proc = pb.start();
+				return pb.start();
 			} catch (IOException err) {
-				throw new TransportException(uri, err.getMessage(), err);
+				throw new TransportException(err.getMessage(), err);
 			}
 		}
 

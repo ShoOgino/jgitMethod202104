@@ -13,15 +13,13 @@
 	protected JSch getJSch(final OpenSshConfig.Host hc, FS fs) throws JSchException {
 		if (defaultJSch == null) {
 			defaultJSch = createDefaultJSch(fs);
-			for (Object name : defaultJSch.getIdentityNames()) {
+			for (Object name : defaultJSch.getIdentityNames())
 				byIdentityFile.put((String) name, defaultJSch);
-			}
 		}
 
 		final File identityFile = hc.getIdentityFile();
-		if (identityFile == null) {
+		if (identityFile == null)
 			return defaultJSch;
-		}
 
 		final String identityKey = identityFile.getAbsolutePath();
 		JSch jsch = byIdentityFile.get(identityKey);

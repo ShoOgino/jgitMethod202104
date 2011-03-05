@@ -1,4 +1,14 @@
 	TransportGitSsh(final Repository local, final URIish uri) {
 		super(local, uri);
+		if (useExtSession()) {
+			setSshSessionFactory(new SshSessionFactory() {
+				@Override
+				public RemoteSession getSession(URIish uri2,
+						CredentialsProvider credentialsProvider, FS fs, int tms)
+						throws TransportException {
+					return new ExtSession();
+				}
+			});
+		}
 	}
 

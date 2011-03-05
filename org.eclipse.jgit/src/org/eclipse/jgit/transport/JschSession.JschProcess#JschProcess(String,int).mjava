@@ -1,0 +1,29 @@
+		/**
+		 * Opens a channel on the session ("sock") for executing the given
+		 * command, opens streams, and starts command execution.
+		 *
+		 * @param commandName
+		 *            the command to execute
+		 * @param tms
+		 *            the timeout value, in seconds, for the command.
+		 * @throws TransportException
+		 *             on problems opening a channel or connecting to the remote
+		 *             host
+		 * @throws IOException
+		 *             on problems opening streams
+		 */
+		private JschProcess(final String commandName, int tms)
+				throws TransportException, IOException {
+			timeout = tms;
+			try {
+				channel = (ChannelExec) sock.openChannel("exec");
+				channel.setCommand(commandName);
+				setupStreams();
+				channel.connect(timeout > 0 ? timeout * 1000 : 0);
+				if (!channel.isConnected())
+					throw new TransportException(uri, "connection failed");
+			} catch (JSchException e) {
+				throw new TransportException(uri, e.getMessage(), e);
+			}
+		}
+
