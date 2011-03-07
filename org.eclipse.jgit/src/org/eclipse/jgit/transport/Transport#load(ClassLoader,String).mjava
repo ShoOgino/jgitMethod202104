@@ -1,0 +1,29 @@
+	private static void load(ClassLoader ldr, String cn) {
+		Class<?> clazz;
+		try {
+			clazz = Class.forName(cn, false, ldr);
+		} catch (ClassNotFoundException notBuiltin) {
+			// Doesn't exist, even though the service entry is present.
+			//
+			return;
+		}
+
+		for (Field f : clazz.getDeclaredFields()) {
+			if ((f.getModifiers() & Modifier.STATIC) == Modifier.STATIC
+					&& TransportProtocol.class.isAssignableFrom(f.getType())) {
+				TransportProtocol proto;
+				try {
+					proto = (TransportProtocol) f.get(null);
+				} catch (IllegalArgumentException e) {
+					// If we cannot access the field, don't.
+					continue;
+				} catch (IllegalAccessException e) {
+					// If we cannot access the field, don't.
+					continue;
+				}
+				if (proto != null)
+					register(proto);
+			}
+		}
+	}
+

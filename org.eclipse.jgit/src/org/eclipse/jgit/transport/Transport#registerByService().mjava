@@ -1,0 +1,9 @@
+	private static void registerByService() {
+		ClassLoader ldr = Thread.currentThread().getContextClassLoader();
+		if (ldr == null)
+			ldr = Transport.class.getClassLoader();
+		Enumeration<URL> catalogs = catalogs(ldr);
+		while (catalogs.hasMoreElements())
+			scan(ldr, catalogs.nextElement());
+	}
+

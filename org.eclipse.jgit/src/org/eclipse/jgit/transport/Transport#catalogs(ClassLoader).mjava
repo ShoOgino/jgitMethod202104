@@ -1,0 +1,10 @@
+	private static Enumeration<URL> catalogs(ClassLoader ldr) {
+		try {
+			String prefix = "META-INF/services/";
+			String name = prefix + Transport.class.getName();
+			return ldr.getResources(name);
+		} catch (IOException err) {
+			return new Vector<URL>().elements();
+		}
+	}
+
