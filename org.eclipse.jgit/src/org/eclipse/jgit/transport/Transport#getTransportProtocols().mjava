@@ -1,0 +1,18 @@
+	/**
+	 * Obtain a copy of the registered protocols.
+	 *
+	 * @return an immutable copy of the currently registered protocols.
+	 */
+	public static List<TransportProtocol> getTransportProtocols() {
+		int cnt = protocols.size();
+		List<TransportProtocol> res = new ArrayList<TransportProtocol>(cnt);
+		for (WeakReference<TransportProtocol> ref : protocols) {
+			TransportProtocol proto = ref.get();
+			if (proto != null)
+				res.add(proto);
+			else
+				protocols.remove(ref);
+		}
+		return Collections.unmodifiableList(res);
+	}
+

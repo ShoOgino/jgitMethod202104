@@ -1,0 +1,20 @@
+	/**
+	 * Register a TransportProtocol instance for use during open.
+	 * <p>
+	 * Protocol definitions are held by WeakReference, allowing them to be
+	 * garbage collected when the calling application drops all strongly held
+	 * references to the TransportProtocol. Therefore applications should use a
+	 * singleton pattern as described in {@link TransportProtocol}'s class
+	 * documentation to ensure their protocol does not get disabled by garbage
+	 * collection earlier than expected.
+	 * <p>
+	 * The new protocol is registered in front of all earlier protocols, giving
+	 * it higher priority than the built-in protocol definitions.
+	 *
+	 * @param proto
+	 *            the protocol definition. Must not be null.
+	 */
+	public static void register(TransportProtocol proto) {
+		protocols.add(0, new WeakReference<TransportProtocol>(proto));
+	}
+

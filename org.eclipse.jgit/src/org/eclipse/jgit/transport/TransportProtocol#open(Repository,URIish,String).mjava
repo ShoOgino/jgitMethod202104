@@ -1,0 +1,30 @@
+	/**
+	 * Open a Transport instance to the other repository.
+	 * <p>
+	 * Implementations should avoid making remote connections until an operation
+	 * on the returned Transport is invoked, however they may fail fast here if
+	 * they know a connection is impossible, such as when using the local
+	 * filesystem and the target path does not exist.
+	 * <p>
+	 * Implementations may access implementation-specific configuration options
+	 * within {@code local.getConfig()} using the remote block named by the
+	 * {@code remoteName}, if the name is non-null.
+	 *
+	 * @param local
+	 *            the local repository that will communicate with the other Git
+	 *            repository.
+	 * @param uri
+	 *            address of the Git repository.
+	 * @param remoteName
+	 *            name of the remote, if the remote as configured in
+	 *            {@code local}; otherwise null.
+	 * @return the transport.
+	 * @throws NotSupportedException
+	 *             this protocol does not support the URI.
+	 * @throws TransportException
+	 *             the transport cannot open this URI.
+	 */
+	public abstract Transport open(Repository local, URIish uri,
+			String remoteName)
+			throws NotSupportedException, TransportException;
+

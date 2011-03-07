@@ -13,14 +13,16 @@
 	 *         configuration.
 	 * @throws NotSupportedException
 	 *             the protocol specified is not supported.
+	 * @throws TransportException
+	 *             the transport cannot open this URI.
 	 */
 	public static List<Transport> openAll(final Repository local,
 			final RemoteConfig cfg, final Operation op)
-			throws NotSupportedException {
+			throws NotSupportedException, TransportException {
 		final List<URIish> uris = getURIs(cfg, op);
 		final List<Transport> transports = new ArrayList<Transport>(uris.size());
 		for (final URIish uri : uris) {
-			final Transport tn = open(local, uri);
+			final Transport tn = open(local, uri, cfg.getName());
 			tn.applyConfig(cfg);
 			transports.add(tn);
 		}

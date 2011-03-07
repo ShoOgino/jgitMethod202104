@@ -1,0 +1,32 @@
+	/**
+	 * Open a new transport instance to connect two repositories.
+	 *
+	 * @param local
+	 *            existing local repository.
+	 * @param uri
+	 *            location of the remote repository.
+	 * @param remoteName
+	 *            name of the remote, if the remote as configured in
+	 *            {@code local}; otherwise null.
+	 * @return the new transport instance. Never null.
+	 * @throws NotSupportedException
+	 *             the protocol specified is not supported.
+	 * @throws TransportException
+	 *             the transport cannot open this URI.
+	 */
+	public static Transport open(Repository local, URIish uri, String remoteName)
+			throws NotSupportedException, TransportException {
+		for (WeakReference<TransportProtocol> ref : protocols) {
+			TransportProtocol proto = ref.get();
+			if (proto == null) {
+				protocols.remove(ref);
+				continue;
+			}
+
+			if (proto.canHandle(local, uri, remoteName))
+				return proto.open(local, uri, remoteName);
+		}
+
+		throw new NotSupportedException(MessageFormat.format(JGitText.get().URINotSupported, uri));
+	}
+

@@ -16,14 +16,17 @@
 	 *             file and is not a well-formed URL.
 	 * @throws NotSupportedException
 	 *             the protocol specified is not supported.
+	 * @throws TransportException
+	 *             the transport cannot open this URI.
 	 */
 	public static List<Transport> openAll(final Repository local,
 			final String remote, final Operation op)
-			throws NotSupportedException, URISyntaxException {
+			throws NotSupportedException, URISyntaxException,
+			TransportException {
 		final RemoteConfig cfg = new RemoteConfig(local.getConfig(), remote);
 		if (doesNotExist(cfg)) {
 			final ArrayList<Transport> transports = new ArrayList<Transport>(1);
-			transports.add(open(local, new URIish(remote)));
+			transports.add(open(local, new URIish(remote), null));
 			return transports;
 		}
 		return openAll(local, cfg, op);

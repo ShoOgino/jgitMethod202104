@@ -1,0 +1,20 @@
+	/**
+	 * Unregister a TransportProtocol instance.
+	 * <p>
+	 * Unregistering a protocol usually isn't necessary, as protocols are held
+	 * by weak references and will automatically clear when they are garbage
+	 * collected by the JVM. Matching is handled by reference equality, so the
+	 * exact reference given to {@link #register(TransportProtocol)} must be
+	 * used.
+	 *
+	 * @param proto
+	 *            the exact object previously given to register.
+	 */
+	public static void unregister(TransportProtocol proto) {
+		for (WeakReference<TransportProtocol> ref : protocols) {
+			TransportProtocol refProto = ref.get();
+			if (refProto == null || refProto == proto)
+				protocols.remove(ref);
+		}
+	}
+

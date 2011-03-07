@@ -13,18 +13,20 @@
 	 *         in remote configuration, only the first is chosen.
 	 * @throws NotSupportedException
 	 *             the protocol specified is not supported.
+	 * @throws TransportException
+	 *             the transport cannot open this URI.
 	 * @throws IllegalArgumentException
 	 *             if provided remote configuration doesn't have any URI
 	 *             associated.
 	 */
 	public static Transport open(final Repository local,
 			final RemoteConfig cfg, final Operation op)
-			throws NotSupportedException {
+			throws NotSupportedException, TransportException {
 		final List<URIish> uris = getURIs(cfg, op);
 		if (uris.isEmpty())
 			throw new IllegalArgumentException(MessageFormat.format(
 					JGitText.get().remoteConfigHasNoURIAssociated, cfg.getName()));
-		final Transport tn = open(local, uris.get(0));
+		final Transport tn = open(local, uris.get(0), cfg.getName());
 		tn.applyConfig(cfg);
 		return tn;
 	}

@@ -3,35 +3,16 @@
 	 *
 	 * @param local
 	 *            existing local repository.
-	 * @param remote
+	 * @param uri
 	 *            location of the remote repository.
 	 * @return the new transport instance. Never null.
 	 * @throws NotSupportedException
 	 *             the protocol specified is not supported.
+	 * @throws TransportException
+	 *             the transport cannot open this URI.
 	 */
-	public static Transport open(final Repository local, final URIish remote)
-			throws NotSupportedException {
-		if (TransportGitSsh.canHandle(remote))
-			return new TransportGitSsh(local, remote);
-
-		else if (TransportHttp.canHandle(remote))
-			return new TransportHttp(local, remote);
-
-		else if (TransportSftp.canHandle(remote))
-			return new TransportSftp(local, remote);
-
-		else if (TransportGitAnon.canHandle(remote))
-			return new TransportGitAnon(local, remote);
-
-		else if (TransportAmazonS3.canHandle(remote))
-			return new TransportAmazonS3(local, remote);
-
-		else if (TransportBundleFile.canHandle(remote, local.getFS()))
-			return new TransportBundleFile(local, remote);
-
-		else if (TransportLocal.canHandle(remote, local.getFS()))
-			return new TransportLocal(local, remote);
-
-		throw new NotSupportedException(MessageFormat.format(JGitText.get().URINotSupported, remote));
+	public static Transport open(final Repository local, final URIish uri)
+			throws NotSupportedException, TransportException {
+		return open(local, uri, null);
 	}
 
