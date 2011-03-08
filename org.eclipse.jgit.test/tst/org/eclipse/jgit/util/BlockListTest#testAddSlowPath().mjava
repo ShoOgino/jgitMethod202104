@@ -1,0 +1,31 @@
+	@Test
+	public void testAddSlowPath() {
+		BlockList<String> list = new BlockList<String>(4);
+
+		String fooStr = "foo";
+		String barStr = "bar";
+		String foobarStr = "foobar";
+		String firstStr = "first";
+		String zeroStr = "zero";
+
+		list.add(fooStr);
+		list.add(barStr);
+		list.add(foobarStr);
+		assertEquals(3, list.size());
+
+		list.add(1, firstStr);
+		assertEquals(4, list.size());
+		assertSame(fooStr, list.get(0));
+		assertSame(firstStr, list.get(1));
+		assertSame(barStr, list.get(2));
+		assertSame(foobarStr, list.get(3));
+
+		list.add(0, zeroStr);
+		assertEquals(5, list.size());
+		assertSame(zeroStr, list.get(0));
+		assertSame(fooStr, list.get(1));
+		assertSame(firstStr, list.get(2));
+		assertSame(barStr, list.get(3));
+		assertSame(foobarStr, list.get(4));
+	}
+

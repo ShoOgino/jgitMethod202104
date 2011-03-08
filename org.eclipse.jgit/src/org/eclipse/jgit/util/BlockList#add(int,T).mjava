@@ -1,0 +1,21 @@
+	@Override
+	public void add(int index, T element) {
+		if (index == size) {
+			// Fast-path: append onto the end of the list.
+			add(element);
+
+		} else if (index < 0 || size < index) {
+			throw new IndexOutOfBoundsException(String.valueOf(index));
+
+		} else {
+			// Slow-path: the list needs to expand and insert.
+			// Do this the naive way, callers shouldn't abuse
+			// this class by entering this code path.
+			//
+			add(null); // expand the list by one
+			for (int oldIdx = size - 2; index <= oldIdx; oldIdx--)
+				set(oldIdx + 1, get(oldIdx));
+			set(index, element);
+		}
+	}
+

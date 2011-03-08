@@ -1,0 +1,18 @@
+	@Test
+	public void testRemoveRejectsBadIndexes() {
+		BlockList<Integer> list = new BlockList<Integer>(4);
+		list.add(Integer.valueOf(41));
+
+		try {
+			list.remove(-1);
+		} catch (IndexOutOfBoundsException badIndex) {
+			assertEquals(String.valueOf(-1), badIndex.getMessage());
+		}
+
+		try {
+			list.remove(4);
+		} catch (IndexOutOfBoundsException badIndex) {
+			assertEquals(String.valueOf(4), badIndex.getMessage());
+		}
+	}
+

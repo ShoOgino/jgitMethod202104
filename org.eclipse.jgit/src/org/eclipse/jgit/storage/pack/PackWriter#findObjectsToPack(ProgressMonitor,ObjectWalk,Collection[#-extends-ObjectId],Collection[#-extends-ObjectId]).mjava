@@ -120,7 +120,7 @@
 		int typesToPrune = 0;
 		final int maxBases = config.getDeltaSearchWindowSize();
 		Set<RevTree> baseTrees = new HashSet<RevTree>();
-		List<RevCommit> commits = new ArrayList<RevCommit>();
+		BlockList<RevCommit> commits = new BlockList<RevCommit>();
 		RevCommit c;
 		while ((c = walker.next()) != null) {
 			if (c.has(inCachedPack)) {
@@ -128,7 +128,7 @@
 				if (includesAllTips(pack, include, walker)) {
 					useCachedPack(walker, keepOnRestart, //
 							wantObjs, haveObjs, pack);
-					commits = new ArrayList<RevCommit>();
+					commits = new BlockList<RevCommit>();
 
 					countingMonitor.endTask();
 					countingMonitor.beginTask(JGitText.get().countingObjects,
@@ -145,11 +145,6 @@
 
 			commits.add(c);
 			countingMonitor.update(1);
-		}
-
-		if (objectsLists[Constants.OBJ_COMMIT] instanceof ArrayList) {
-			ArrayList<ObjectToPack> list = (ArrayList<ObjectToPack>) objectsLists[Constants.OBJ_COMMIT];
-			list.ensureCapacity(list.size() + commits.size());
 		}
 
 		int commitCnt = 0;

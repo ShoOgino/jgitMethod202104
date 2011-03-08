@@ -1,0 +1,33 @@
+	@Override
+	public T remove(int index) {
+		if (index == size - 1) {
+			// Fast-path: remove the last element.
+			T[] blockRef = directory[toDirectoryIndex(index)];
+			int blockIdx = toBlockIndex(index);
+			T old = blockRef[blockIdx];
+			blockRef[blockIdx] = null;
+			size--;
+			if (0 < tailBlkIdx)
+				tailBlkIdx--;
+			else
+				resetTailBlock();
+			return old;
+
+		} else if (index < 0 || size <= index) {
+			throw new IndexOutOfBoundsException(String.valueOf(index));
+
+		} else {
+			// Slow-path: the list needs to contract and remove.
+			// Do this the naive way, callers shouldn't abuse
+			// this class by entering this code path.
+			//
+			T old = get(index);
+			for (; index < size - 1; index++)
+				set(index, get(index + 1));
+			set(size - 1, null);
+			size--;
+			resetTailBlock();
+			return old;
+		}
+	}
+

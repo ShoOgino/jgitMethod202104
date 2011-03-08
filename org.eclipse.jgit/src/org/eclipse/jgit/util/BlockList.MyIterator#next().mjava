@@ -1,0 +1,16 @@
+		public T next() {
+			if (size <= index)
+				throw new NoSuchElementException();
+
+			T res = block[blkIdx];
+			if (++blkIdx == BLOCK_SIZE) {
+				if (++dirIdx < directory.length)
+					block = directory[dirIdx];
+				else
+					block = null;
+				blkIdx = 0;
+			}
+			index++;
+			return res;
+		}
+

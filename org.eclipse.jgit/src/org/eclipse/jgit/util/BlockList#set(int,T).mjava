@@ -1,0 +1,11 @@
+	@Override
+	public T set(int index, T element) {
+		if (index < 0 || size <= index)
+			throw new IndexOutOfBoundsException(String.valueOf(index));
+		T[] blockRef = directory[toDirectoryIndex(index)];
+		int blockIdx = toBlockIndex(index);
+		T old = blockRef[blockIdx];
+		blockRef[blockIdx] = element;
+		return old;
+	}
+

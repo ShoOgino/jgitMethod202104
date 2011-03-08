@@ -1,0 +1,15 @@
+	/**
+	 * Initialize an empty list with an expected capacity.
+	 *
+	 * @param capacity
+	 *            number of elements expected to be in the list.
+	 */
+	public BlockList(int capacity) {
+		int dirSize = toDirectoryIndex(capacity);
+		if ((capacity & BLOCK_MASK) != 0 || dirSize == 0)
+			dirSize++;
+		directory = BlockList.<T> newDirectory(dirSize);
+		directory[0] = BlockList.<T> newBlock();
+		tailBlock = directory[0];
+	}
+

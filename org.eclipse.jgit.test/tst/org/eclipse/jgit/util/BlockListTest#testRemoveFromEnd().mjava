@@ -1,0 +1,22 @@
+	@Test
+	public void testRemoveFromEnd() {
+		BlockList<String> list = new BlockList<String>(4);
+
+		String fooStr = "foo";
+		String barStr = "bar";
+		String foobarStr = "foobar";
+
+		list.add(fooStr);
+		list.add(barStr);
+		list.add(foobarStr);
+
+		assertSame(foobarStr, list.remove(2));
+		assertEquals(2, list.size());
+
+		assertSame(barStr, list.remove(1));
+		assertEquals(1, list.size());
+
+		assertSame(fooStr, list.remove(0));
+		assertEquals(0, list.size());
+	}
+

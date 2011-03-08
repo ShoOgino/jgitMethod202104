@@ -1,0 +1,17 @@
+	@Test
+	public void testFastIterator() {
+		BlockList<Integer> list = new BlockList<Integer>(4);
+		int cnt = BlockList.BLOCK_SIZE * 3;
+
+		for (int i = 0; i < cnt; i++)
+			list.add(Integer.valueOf(42 + i));
+		assertEquals(cnt, list.size());
+
+		Iterator<Integer> itr = list.iterator();
+		for (int i = 0; i < cnt; i++) {
+			assertTrue(itr.hasNext());
+			assertEquals(Integer.valueOf(42 + i), itr.next());
+		}
+		assertFalse(itr.hasNext());
+	}
+

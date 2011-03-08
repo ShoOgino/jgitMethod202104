@@ -1,0 +1,24 @@
+	@Test
+	public void testAddToEnd() {
+		BlockList<Integer> list = new BlockList<Integer>(4);
+		int cnt = BlockList.BLOCK_SIZE * 3;
+
+		for (int i = 0; i < cnt; i++)
+			list.add(Integer.valueOf(42 + i));
+		assertEquals(cnt, list.size());
+
+		for (int i = 0; i < cnt; i++)
+			assertEquals(Integer.valueOf(42 + i), list.get(i));
+
+		list.clear();
+		assertEquals(0, list.size());
+		assertTrue(list.isEmpty());
+
+		for (int i = 0; i < cnt; i++)
+			list.add(i, Integer.valueOf(42 + i));
+		assertEquals(cnt, list.size());
+
+		for (int i = 0; i < cnt; i++)
+			assertEquals(Integer.valueOf(42 + i), list.get(i));
+	}
+

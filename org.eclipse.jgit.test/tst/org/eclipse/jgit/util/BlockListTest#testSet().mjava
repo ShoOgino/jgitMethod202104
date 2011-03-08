@@ -1,0 +1,47 @@
+	@Test
+	public void testSet() {
+		BlockList<String> list = new BlockList<String>(4);
+
+		try {
+			list.set(-1, "foo");
+		} catch (IndexOutOfBoundsException badIndex) {
+			assertEquals(String.valueOf(-1), badIndex.getMessage());
+		}
+
+		try {
+			list.set(0, "foo");
+		} catch (IndexOutOfBoundsException badIndex) {
+			assertEquals(String.valueOf(0), badIndex.getMessage());
+		}
+
+		try {
+			list.set(4, "foo");
+		} catch (IndexOutOfBoundsException badIndex) {
+			assertEquals(String.valueOf(4), badIndex.getMessage());
+		}
+
+		String fooStr = "foo";
+		String barStr = "bar";
+		String foobarStr = "foobar";
+
+		list.add(fooStr);
+		list.add(barStr);
+		list.add(foobarStr);
+
+		assertSame(fooStr, list.get(0));
+		assertSame(barStr, list.get(1));
+		assertSame(foobarStr, list.get(2));
+
+		assertSame(fooStr, list.set(0, barStr));
+		assertSame(barStr, list.set(1, fooStr));
+
+		assertSame(barStr, list.get(0));
+		assertSame(fooStr, list.get(1));
+
+		try {
+			list.set(3, "bar");
+		} catch (IndexOutOfBoundsException badIndex) {
+			assertEquals(String.valueOf(3), badIndex.getMessage());
+		}
+	}
+
