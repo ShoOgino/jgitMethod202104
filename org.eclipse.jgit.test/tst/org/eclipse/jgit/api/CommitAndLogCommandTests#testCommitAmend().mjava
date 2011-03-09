@@ -1,7 +1,7 @@
 	@Test
 	public void testCommitAmend() throws NoHeadException, NoMessageException,
-			UnmergedPathException, ConcurrentRefUpdateException,
-			JGitInternalException, WrongRepositoryStateException {
+			ConcurrentRefUpdateException, JGitInternalException,
+			WrongRepositoryStateException, IOException {
 		Git git = new Git(db);
 		git.commit().setMessage("first comit").call(); // typo
 		git.commit().setAmend(true).setMessage("first commit").call();
@@ -13,5 +13,8 @@
 			c++;
 		}
 		assertEquals(1, c);
+		ReflogReader reader = db.getReflogReader(Constants.HEAD);
+		assertTrue(reader.getLastEntry().getComment()
+				.startsWith("commit (amend):"));
 	}
 

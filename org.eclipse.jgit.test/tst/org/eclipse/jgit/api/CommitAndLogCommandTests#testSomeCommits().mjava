@@ -1,7 +1,7 @@
 	@Test
 	public void testSomeCommits() throws NoHeadException, NoMessageException,
-			UnmergedPathException, ConcurrentRefUpdateException,
-			JGitInternalException, WrongRepositoryStateException {
+			ConcurrentRefUpdateException, JGitInternalException,
+			WrongRepositoryStateException, IOException {
 
 		// do 4 commits
 		Git git = new Git(db);
@@ -30,5 +30,7 @@
 			l--;
 		}
 		assertEquals(l, -1);
+		ReflogReader reader = db.getReflogReader(Constants.HEAD);
+		assertTrue(reader.getLastEntry().getComment().startsWith("commit:"));
 	}
 
