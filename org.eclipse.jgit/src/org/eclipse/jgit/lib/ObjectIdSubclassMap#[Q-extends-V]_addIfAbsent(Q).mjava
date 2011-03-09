@@ -20,12 +20,14 @@
 	 */
 	public <Q extends V> V addIfAbsent(final Q newValue) {
 		int i = newValue.w1 & mask;
+		final V[] tbl = table;
+		final int end = tbl.length;
 		V obj;
 
-		while ((obj = table[i]) != null) {
+		while ((obj = tbl[i]) != null) {
 			if (AnyObjectId.equals(obj, newValue))
 				return obj;
-			if (++i == table.length)
+			if (++i == end)
 				i = 0;
 		}
 
@@ -33,7 +35,7 @@
 			grow();
 			insert(newValue);
 		} else {
-			table[i] = newValue;
+			tbl[i] = newValue;
 		}
 		return newValue;
 	}
