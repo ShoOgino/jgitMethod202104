@@ -21,7 +21,8 @@
 				if (e.length() != Constants.OBJECT_ID_STRING_LENGTH - 2)
 					continue;
 				try {
-					unpackedObjects.add(ObjectId.fromString(d + e));
+					ObjectId id = ObjectId.fromString(d + e);
+					unpackedObjects.add(new UnpackedObjectId(id));
 				} catch (IllegalArgumentException notAnObject) {
 					// ignoring the file that does not represent loose object
 				}

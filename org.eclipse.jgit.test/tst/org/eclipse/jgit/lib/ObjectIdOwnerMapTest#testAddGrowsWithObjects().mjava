@@ -1,0 +1,14 @@
+	@Test
+	public void testAddGrowsWithObjects() {
+		int n = 16384;
+		ObjectIdOwnerMap<SubId> m = new ObjectIdOwnerMap<SubId>();
+		m.add(id_1);
+		for (int i = 32; i < n; i++)
+			m.add(new SubId(id(i)));
+		assertEquals(n - 32 + 1, m.size());
+
+		assertSame(id_1, m.get(id_1.copy()));
+		for (int i = 32; i < n; i++)
+			assertTrue(m.contains(id(i)));
+	}
+

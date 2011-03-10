@@ -1,0 +1,22 @@
+	@Test
+	public void testAddGetAndContains() {
+		ObjectIdOwnerMap<SubId> m = new ObjectIdOwnerMap<SubId>();
+		m.add(id_1);
+		m.add(id_2);
+		m.add(id_3);
+		m.add(id_a31);
+		m.add(id_b31);
+		assertFalse(m.isEmpty());
+		assertEquals(5, m.size());
+
+		assertSame(id_1, m.get(id_1));
+		assertSame(id_1, m.get(id(1)));
+		assertSame(id_1, m.get(id(1).copy()));
+		assertSame(id_2, m.get(id(2).copy()));
+		assertSame(id_3, m.get(id(3).copy()));
+		assertSame(id_a31, m.get(id(31).copy()));
+		assertSame(id_b31, m.get(id_b31.copy()));
+
+		assertTrue(m.contains(id_1));
+	}
+

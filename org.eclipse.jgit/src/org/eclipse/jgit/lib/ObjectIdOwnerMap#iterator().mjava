@@ -1,0 +1,48 @@
+	public Iterator<V> iterator() {
+		return new Iterator<V>() {
+			private int found;
+
+			private int dirIdx;
+
+			private int tblIdx;
+
+			private V next;
+
+			public boolean hasNext() {
+				return found < size;
+			}
+
+			public V next() {
+				if (next != null)
+					return found(next);
+
+				for (;;) {
+					V[] table = directory[dirIdx];
+					if (tblIdx == table.length) {
+						if (++dirIdx >= (1 << bits))
+							throw new NoSuchElementException();
+						table = directory[dirIdx];
+						tblIdx = 0;
+					}
+
+					while (tblIdx < table.length) {
+						V v = table[tblIdx++];
+						if (v != null)
+							return found(v);
+					}
+				}
+			}
+
+			@SuppressWarnings("unchecked")
+			private V found(V v) {
+				found++;
+				next = (V) v.next;
+				return v;
+			}
+
+			public void remove() {
+				throw new UnsupportedOperationException();
+			}
+		};
+	}
+

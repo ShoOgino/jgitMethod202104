@@ -1,0 +1,33 @@
+	@Test
+	public void testIterator() {
+		ObjectIdOwnerMap<SubId> m = new ObjectIdOwnerMap<SubId>();
+		m.add(id_1);
+		m.add(id_2);
+		m.add(id_3);
+
+		Iterator<SubId> i = m.iterator();
+		assertTrue(i.hasNext());
+		assertSame(id_1, i.next());
+		assertTrue(i.hasNext());
+		assertSame(id_2, i.next());
+		assertTrue(i.hasNext());
+		assertSame(id_3, i.next());
+
+		assertFalse(i.hasNext());
+		try {
+			i.next();
+			fail("did not fail on next with no next");
+		} catch (NoSuchElementException expected) {
+			// OK
+		}
+
+		i = m.iterator();
+		assertSame(id_1, i.next());
+		try {
+			i.remove();
+			fail("did not fail on remove");
+		} catch (UnsupportedOperationException expected) {
+			// OK
+		}
+	}
+

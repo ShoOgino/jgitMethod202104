@@ -1,0 +1,38 @@
+	/**
+	 * Store an object for future lookup.
+	 * <p>
+	 * Stores {@code newValue}, but only if there is not already an object for
+	 * the same object name. Callers can tell if the value is new by checking
+	 * the return value with reference equality:
+	 *
+	 * <pre>
+	 * V obj = ...;
+	 * boolean wasNew = map.addIfAbsent(obj) == obj;
+	 * </pre>
+	 *
+	 * @param newValue
+	 *            the object to store.
+	 * @return {@code newValue} if stored, or the prior value already stored and
+	 *         that would have been returned had the caller used
+	 *         {@code get(newValue)} first.
+	 * @param <Q>
+	 *            type of instance to store.
+	 */
+	@SuppressWarnings("unchecked")
+	public <Q extends V> V addIfAbsent(final Q newValue) {
+		int h = newValue.w1;
+		V[] table = directory[h & mask];
+		h >>>= SEGMENT_SHIFT;
+
+		for (V obj = table[h]; obj != null; obj = (V) obj.next)
+			if (equals(obj, newValue))
+				return obj;
+
+		newValue.next = table[h];
+		table[h] = newValue;
+
+		if (++size == grow)
+			grow();
+		return newValue;
+	}
+

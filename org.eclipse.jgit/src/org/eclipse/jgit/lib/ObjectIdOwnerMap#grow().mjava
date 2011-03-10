@@ -1,0 +1,54 @@
+	@SuppressWarnings("unchecked")
+	private void grow() {
+		final int oldDirLen = 1 << bits;
+		final int s = 1 << bits;
+
+		bits++;
+		mask = (1 << bits) - 1;
+		grow = computeGrowAt(bits);
+
+		// Quadruple the directory if it needs to expand. Expanding the
+		// directory is expensive because it generates garbage, so try
+		// to avoid doing it often.
+		//
+		final int newDirLen = 1 << bits;
+		if (directory.length < newDirLen) {
+			V[][] newDir = (V[][]) new Entry[newDirLen << 1][];
+			System.arraycopy(directory, 0, newDir, 0, oldDirLen);
+			directory = newDir;
+		}
+
+		// For every bucket of every old segment, split the chain between
+		// the old segment and the new segment's corresponding bucket. To
+		// select between them use the lowest bit that was just added into
+		// the mask above. This causes the table to double in capacity.
+		//
+		for (int dirIdx = 0; dirIdx < oldDirLen; dirIdx++) {
+			final V[] oldTable = directory[dirIdx];
+			final V[] newTable = newSegment();
+
+			for (int i = 0; i < oldTable.length; i++) {
+				V chain0 = null;
+				V chain1 = null;
+				V next;
+
+				for (V obj = oldTable[i]; obj != null; obj = next) {
+					next = (V) obj.next;
+
+					if ((obj.w1 & s) == 0) {
+						obj.next = chain0;
+						chain0 = obj;
+					} else {
+						obj.next = chain1;
+						chain1 = obj;
+					}
+				}
+
+				oldTable[i] = chain0;
+				newTable[i] = chain1;
+			}
+
+			directory[oldDirLen + dirIdx] = newTable;
+		}
+	}
+

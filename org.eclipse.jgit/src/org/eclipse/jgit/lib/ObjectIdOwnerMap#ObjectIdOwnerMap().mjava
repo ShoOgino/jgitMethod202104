@@ -1,0 +1,11 @@
+	/** Create an empty map. */
+	@SuppressWarnings("unchecked")
+	public ObjectIdOwnerMap() {
+		bits = 0;
+		mask = 0;
+		grow = computeGrowAt(bits);
+
+		directory = (V[][]) new Entry[INITIAL_DIRECTORY][];
+		directory[0] = newSegment();
+	}
+

@@ -1,0 +1,18 @@
+	@Test
+	public void testClear() {
+		ObjectIdOwnerMap<SubId> m = new ObjectIdOwnerMap<SubId>();
+
+		m.add(id_1);
+		assertSame(id_1, m.get(id_1));
+
+		m.clear();
+		assertTrue(m.isEmpty());
+		assertEquals(0, m.size());
+
+		Iterator<SubId> i = m.iterator();
+		assertNotNull(i);
+		assertFalse(i.hasNext());
+
+		assertFalse(m.contains(id(1)));
+	}
+
