@@ -6,13 +6,15 @@
 	 * @return the instance mapped to toFind, or null if no mapping exists.
 	 */
 	public V get(final AnyObjectId toFind) {
-		int i = index(toFind);
+		int i = toFind.w1 & mask;
+		final V[] tbl = table;
+		final int end = tbl.length;
 		V obj;
 
-		while ((obj = table[i]) != null) {
+		while ((obj = tbl[i]) != null) {
 			if (AnyObjectId.equals(obj, toFind))
 				return obj;
-			if (++i == table.length)
+			if (++i == end)
 				i = 0;
 		}
 		return null;

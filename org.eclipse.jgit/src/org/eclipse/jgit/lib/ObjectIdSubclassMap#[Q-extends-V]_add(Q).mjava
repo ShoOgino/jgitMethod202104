@@ -12,9 +12,8 @@
 	 *            type of instance to store.
 	 */
 	public <Q extends V> void add(final Q newValue) {
-		if (table.length - 1 <= size * 2)
+		if (++size == grow)
 			grow();
 		insert(newValue);
-		size++;
 	}
 
