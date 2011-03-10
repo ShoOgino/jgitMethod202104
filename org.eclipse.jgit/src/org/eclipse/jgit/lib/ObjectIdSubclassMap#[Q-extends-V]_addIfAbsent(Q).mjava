@@ -19,16 +19,15 @@
 	 *            type of instance to store.
 	 */
 	public <Q extends V> V addIfAbsent(final Q newValue) {
-		int i = newValue.w1 & mask;
+		final int msk = mask;
+		int i = newValue.w1 & msk;
 		final V[] tbl = table;
-		final int end = tbl.length;
 		V obj;
 
 		while ((obj = tbl[i]) != null) {
 			if (AnyObjectId.equals(obj, newValue))
 				return obj;
-			if (++i == end)
-				i = 0;
+			i = (i + 1) & msk;
 		}
 
 		if (++size == grow) {

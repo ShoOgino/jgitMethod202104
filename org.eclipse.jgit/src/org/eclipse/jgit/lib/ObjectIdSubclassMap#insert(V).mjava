@@ -1,11 +1,9 @@
 	private void insert(final V newValue) {
-		int j = newValue.w1 & mask;
+		final int msk = mask;
+		int j = newValue.w1 & msk;
 		final V[] tbl = table;
-		final int end = tbl.length;
-		while (tbl[j] != null) {
-			if (++j == end)
-				j = 0;
-		}
+		while (tbl[j] != null)
+			j = (j + 1) & msk;
 		tbl[j] = newValue;
 	}
 
