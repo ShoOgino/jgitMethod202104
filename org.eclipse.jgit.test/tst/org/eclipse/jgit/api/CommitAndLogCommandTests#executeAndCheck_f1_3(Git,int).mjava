@@ -1,0 +1,9 @@
+	private void executeAndCheck_f1_3(final Git git, final int state)
+			throws Exception {
+		git.commit().setOnly(F1).setMessage(MSG).call();
+
+		assertEquals("", getHead(git, F1));
+		assertEquals(expected_f3_head(state), getHead(git, F3));
+		assertEquals(expected_f3_idx(state), indexState(CONTENT));
+	}
+

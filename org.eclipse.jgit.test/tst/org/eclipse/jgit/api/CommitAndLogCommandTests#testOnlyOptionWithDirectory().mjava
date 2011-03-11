@@ -1,0 +1,59 @@
+	@Test
+	public void testOnlyOptionWithDirectory() throws Exception {
+		final Git git = new Git(db);
+
+		// write files
+		final File f1 = writeTrashFile("d1/d2/f1.txt", "c1");
+		writeTrashFile("d1/d2/f2.txt", "c2");
+		final File f3 = writeTrashFile("d1/f3.txt", "c3");
+		writeTrashFile("d1/f4.txt", "c4");
+		final File f5 = writeTrashFile("d3/d4/f5.txt", "c5");
+		writeTrashFile("d3/d4/f6.txt", "c6");
+		final File f7 = writeTrashFile("d3/f7.txt", "c7");
+		writeTrashFile("d3/f8.txt", "c8");
+		final File f9 = writeTrashFile("d5/f9.txt", "c9");
+		writeTrashFile("d5/f10.txt", "c10");
+		final File f11 = writeTrashFile("d6/f11.txt", "c11");
+		writeTrashFile("d6/f12.txt", "c12");
+
+		// add files
+		git.add().addFilepattern(".").call();
+
+		// modify files, but do not stage changes
+		write(f1, "c1'");
+		write(f3, "c3'");
+		write(f5, "c5'");
+		write(f7, "c7'");
+		write(f9, "c9'");
+		write(f11, "c11'");
+
+		// commit selected files only
+		git.commit().setOnly("d1").setOnly("d3/d4/").setOnly("d5")
+				.setOnly("d6/f11.txt").setMessage(MSG).call();
+
+		assertEquals("c1'", getHead(git, "d1/d2/f1.txt"));
+		assertEquals("c2", getHead(git, "d1/d2/f2.txt"));
+		assertEquals("c3'", getHead(git, "d1/f3.txt"));
+		assertEquals("c4", getHead(git, "d1/f4.txt"));
+		assertEquals("c5'", getHead(git, "d3/d4/f5.txt"));
+		assertEquals("c6", getHead(git, "d3/d4/f6.txt"));
+		assertEquals("", getHead(git, "d3/f7.txt"));
+		assertEquals("", getHead(git, "d3/f8.txt"));
+		assertEquals("c9'", getHead(git, "d5/f9.txt"));
+		assertEquals("c10", getHead(git, "d5/f10.txt"));
+		assertEquals("c11'", getHead(git, "d6/f11.txt"));
+		assertEquals("", getHead(git, "d6/f12.txt"));
+		assertEquals("[d1/d2/f1.txt, mode:100644, content:c1']"
+				+ "[d1/d2/f2.txt, mode:100644, content:c2]"
+				+ "[d1/f3.txt, mode:100644, content:c3']"
+				+ "[d1/f4.txt, mode:100644, content:c4]"
+				+ "[d3/d4/f5.txt, mode:100644, content:c5']"
+				+ "[d3/d4/f6.txt, mode:100644, content:c6]"
+				+ "[d3/f7.txt, mode:100644, content:c7]"
+				+ "[d3/f8.txt, mode:100644, content:c8]"
+				+ "[d5/f10.txt, mode:100644, content:c10]"
+				+ "[d5/f9.txt, mode:100644, content:c9']"
+				+ "[d6/f11.txt, mode:100644, content:c11']"
+				+ "[d6/f12.txt, mode:100644, content:c12]", indexState(CONTENT));
+	}
+

@@ -66,6 +66,9 @@
 			// lock the index
 			DirCache index = repo.lockDirCache();
 			try {
+				if (!only.isEmpty())
+					index = createTemporaryIndex(headId, index);
+
 				ObjectInserter odi = repo.newObjectInserter();
 				try {
 					// Write the index as tree to the object database. This may

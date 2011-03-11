@@ -1,0 +1,18 @@
+	@SuppressWarnings("null")
+	private void executeAndCheck_f1_1_f2_f14(final Git git, final int state)
+			throws Exception {
+		JGitInternalException exception = null;
+		try {
+			git.commit().setOnly(F1).setOnly(F2).setMessage(MSG).call();
+		} catch (JGitInternalException e) {
+			exception = e;
+		}
+		assertNotNull(exception);
+		assertTrue(exception.getMessage().contains(F1));
+
+		assertEquals("c2", getHead(git, F2));
+		assertEquals(expected_f3_head(state), getHead(git, F3));
+		assertEquals("[f2.txt, mode:100644, content:c2']"
+				+ expected_f3_idx(state), indexState(CONTENT));
+	}
+

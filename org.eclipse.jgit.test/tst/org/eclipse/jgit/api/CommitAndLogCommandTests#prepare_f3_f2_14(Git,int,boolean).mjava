@@ -1,0 +1,29 @@
+	private void prepare_f3_f2_14(final Git git, final int state,
+			final boolean include_f2) throws Exception {
+		File f2 = null;
+		if (include_f2) {
+			f2 = writeTrashFile(F2, "c2");
+			git.add().addFilepattern(F2).call();
+			git.commit().setMessage(MSG).call();
+		}
+
+		if (state >= 1) {
+			writeTrashFile(F3, "c3");
+			git.add().addFilepattern(F3).call();
+		}
+		if (state >= 2)
+			git.commit().setMessage(MSG).call();
+		if (state >= 3)
+			git.rm().addFilepattern(F3).call();
+		if (state == 4) {
+			writeTrashFile(F3, "c3'");
+			git.add().addFilepattern(F3).call();
+		}
+
+		if (include_f2) {
+			write(f2, "c2'");
+			git.add().addFilepattern(F2).call();
+			write(f2, "c2''");
+		}
+	}
+

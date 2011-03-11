@@ -1,0 +1,25 @@
+	/**
+	 * Commit dedicated path only
+	 *
+	 * This method can be called several times to add multiple paths. Full file
+	 * paths are supported as well as directory paths; in the latter case this
+	 * commits all files/ directories below the specified path.
+	 *
+	 * @param only
+	 *            path to commit
+	 * @return {@code this}
+	 */
+	public CommitCommand setOnly(String only) {
+		checkCallable();
+		if (all)
+			throw new JGitInternalException(MessageFormat.format(
+					JGitText.get().illegalCombinationOfArguments, "--only",
+					"--all"));
+		String o = only.endsWith("/") ? only.substring(0, only.length() - 1)
+				: only;
+		// ignore duplicates
+		if (!this.only.contains(o))
+			this.only.add(o);
+		return this;
+	}
+

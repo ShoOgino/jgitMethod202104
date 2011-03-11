@@ -6,6 +6,11 @@
 			commitCmd.setAuthor(RawParseUtils.parsePersonIdent(author));
 		if (message != null)
 			commitCmd.setMessage(message);
+		if (only && paths.isEmpty())
+			throw die(CLIText.get().pathsRequired);
+		if (!paths.isEmpty())
+			for (String p : paths)
+				commitCmd.setOnly(p);
 		Ref head = db.getRef(Constants.HEAD);
 		RevCommit commit = commitCmd.call();
 

@@ -1,0 +1,29 @@
+	/**
+	 * Look an entry's path up in the list of paths specified by the --only/ -o
+	 * option
+	 *
+	 * In case the complete (file) path (e.g. "d1/d2/f1") cannot be found in
+	 * <code>only</code>, lookup is also tried with (parent) directory paths
+	 * (e.g. "d1/d2" and "d1").
+	 *
+	 * @param pathString
+	 *            entry's path
+	 * @return the item's index in <code>only</code>; -1 if no item matches
+	 */
+	private int lookupOnly(String pathString) {
+		int i = 0;
+		for (String o : only) {
+			String p = pathString;
+			while (true) {
+				if (p.equals(o))
+					return i;
+				int l = p.lastIndexOf("/");
+				if (l < 1)
+					break;
+				p = p.substring(0, l);
+			}
+			i++;
+		}
+		return -1;
+	}
+

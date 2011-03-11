@@ -1,0 +1,16 @@
+	@SuppressWarnings("null")
+	private void executeAndCheck_f1_1(final Git git, final int state)
+			throws Exception {
+		JGitInternalException exception = null;
+		try {
+			git.commit().setOnly(F1).setMessage(MSG).call();
+		} catch (JGitInternalException e) {
+			exception = e;
+		}
+		assertNotNull(exception);
+		assertTrue(exception.getMessage().contains(F1));
+
+		assertEquals(expected_f3_head(state), getHead(git, F3));
+		assertEquals(expected_f3_idx(state), indexState(CONTENT));
+	}
+

@@ -1,0 +1,10 @@
+	private void executeAndCheck_f1_8(final Git git, final int state)
+			throws Exception {
+		git.commit().setOnly(F1).setMessage(MSG).call();
+
+		assertEquals("c1'", getHead(git, F1));
+		assertEquals(expected_f3_head(state), getHead(git, F3));
+		assertEquals("[f1.txt, mode:100644, content:c1']"
+				+ expected_f3_idx(state), indexState(CONTENT));
+	}
+
