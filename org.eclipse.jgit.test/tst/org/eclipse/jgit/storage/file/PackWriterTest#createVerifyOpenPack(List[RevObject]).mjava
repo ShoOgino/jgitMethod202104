@@ -1,8 +1,9 @@
-	private void createVerifyOpenPack(final Iterator<RevObject> objectSource)
+	private void createVerifyOpenPack(final List<RevObject> objectSource)
 			throws MissingObjectException, IOException {
 		NullProgressMonitor m = NullProgressMonitor.INSTANCE;
 		writer = new PackWriter(config, db.newObjectReader());
-		writer.preparePack(objectSource);
+		writer.preparePack(objectSource.iterator());
+		assertEquals(objectSource.size(), writer.getObjectsNumber());
 		writer.writePack(m, m, os);
 		writer.release();
 		verifyOpenPack(false);

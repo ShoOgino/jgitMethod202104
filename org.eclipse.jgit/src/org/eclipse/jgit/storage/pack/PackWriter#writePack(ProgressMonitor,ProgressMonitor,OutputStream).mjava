@@ -38,13 +38,8 @@
 		final PackOutputStream out = new PackOutputStream(writeMonitor,
 				packStream, this);
 
-		long objCnt = 0;
-		for (List<ObjectToPack> list : objectsLists)
-			objCnt += list.size();
-		for (CachedPack pack : cachedPacks)
-			objCnt += pack.getObjectCount();
+		long objCnt = getObjectsNumber();
 		stats.totalObjects = objCnt;
-
 		writeMonitor.beginTask(JGitText.get().writingObjects, (int) objCnt);
 		long writeStart = System.currentTimeMillis();
 
