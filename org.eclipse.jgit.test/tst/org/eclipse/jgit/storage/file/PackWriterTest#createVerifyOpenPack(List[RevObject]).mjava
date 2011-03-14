@@ -3,7 +3,7 @@
 		NullProgressMonitor m = NullProgressMonitor.INSTANCE;
 		writer = new PackWriter(config, db.newObjectReader());
 		writer.preparePack(objectSource.iterator());
-		assertEquals(objectSource.size(), writer.getObjectsNumber());
+		assertEquals(objectSource.size(), writer.getObjectCount());
 		writer.writePack(m, m, os);
 		writer.release();
 		verifyOpenPack(false);
