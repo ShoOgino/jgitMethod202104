@@ -1,0 +1,22 @@
+	/**
+	 * Determine if this protocol can handle a particular URI.
+	 * <p>
+	 * Implementations should try to avoid looking at the local filesystem, but
+	 * may look at implementation specific configuration options in the remote
+	 * block of {@code local.getConfig()} using {@code remoteName} if the name
+	 * is non-null.
+	 * <p>
+	 * The default implementation of this method matches the scheme against
+	 * {@link #getSchemes()}, required fields against
+	 * {@link #getRequiredFields()}, and optional fields against
+	 * {@link #getOptionalFields()}, returning true only if all of the fields
+	 * match the specification.
+	 *
+	 * @param uri
+	 *            address of the Git repository; never null.
+	 * @return true if this protocol can handle this URI; false otherwise.
+	 */
+	public boolean canHandle(URIish uri) {
+		return canHandle(uri, null, null);
+	}
+
