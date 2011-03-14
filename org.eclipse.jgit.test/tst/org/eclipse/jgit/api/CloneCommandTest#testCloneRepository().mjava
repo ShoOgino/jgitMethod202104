@@ -8,6 +8,8 @@
 					+ git.getRepository().getWorkTree().getPath());
 			Git git2 = command.call();
 			assertNotNull(git2);
+			ObjectId id = git2.getRepository().resolve("tag-for-blob");
+			assertNotNull(id);
 		} catch (Exception e) {
 			fail(e.getMessage());
 		}
