@@ -1,3 +1,10 @@
 	/** @return the $prefix directory C Git would use. */
-	public abstract File gitPrefix();
+	public File gitPrefix() {
+		Holder<File> p = gitPrefix;
+		if (p == null) {
+			p = new Holder<File>(discoverGitPrefix());
+			gitPrefix = p;
+		}
+		return p.value;
+	}
 
