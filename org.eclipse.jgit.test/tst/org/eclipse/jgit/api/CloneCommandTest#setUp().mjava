@@ -1,5 +1,7 @@
 	public void setUp() throws Exception {
 		super.setUp();
+		tr = new TestRepository<Repository>(db);
+
 		git = new Git(db);
 		// commit something
 		writeTrashFile("Test.txt", "Hello world");
@@ -15,5 +17,7 @@
 		writeTrashFile("Test.txt", "Some change");
 		git.add().addFilepattern("Test.txt").call();
 		git.commit().setMessage("Second commit").call();
+		RevBlob blob = tr.blob("blob-not-in-master-branch");
+		git.tag().setName("tag-for-blob").setObjectId(blob).call();
 	}
 
