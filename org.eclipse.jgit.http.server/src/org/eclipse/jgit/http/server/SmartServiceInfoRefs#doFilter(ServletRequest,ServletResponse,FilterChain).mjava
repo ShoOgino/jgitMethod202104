@@ -1,24 +1,27 @@
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain chain) throws IOException, ServletException {
 		final HttpServletRequest req = (HttpServletRequest) request;
+		final HttpServletResponse rsp = (HttpServletResponse) response;
 
 		if (svc.equals(req.getParameter("service"))) {
-			final HttpServletResponse rsp = (HttpServletResponse) response;
+			final Repository db = getRepository(req);
 			try {
-				final Repository db = getRepository(req);
-				rsp.setContentType("application/x-" + svc + "-advertisement");
-
-				final SmartOutputStream buf = new SmartOutputStream(req, rsp);
-				final PacketLineOut out = new PacketLineOut(buf);
-				out.writeString("# service=" + svc + "\n");
-				out.end();
-				advertise(req, db, new PacketLineOutRefAdvertiser(out));
-				buf.close();
+				begin(req, db);
 			} catch (ServiceNotAuthorizedException e) {
 				rsp.sendError(SC_UNAUTHORIZED);
-
+				return;
 			} catch (ServiceNotEnabledException e) {
 				rsp.sendError(SC_FORBIDDEN);
+				return;
+			}
+
+			try {
+				if (filters.length == 0)
+					service(req, response);
+				else
+					new Chain().doFilter(request, response);
+			} finally {
+				req.removeAttribute(ATTRIBUTE_HANDLER);
 			}
 		} else {
 			chain.doFilter(request, response);

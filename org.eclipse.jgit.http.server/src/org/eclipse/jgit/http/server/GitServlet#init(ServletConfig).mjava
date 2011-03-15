@@ -11,23 +11,29 @@
 		initialized = true;
 
 		if (uploadPackFactory != UploadPackFactory.DISABLED) {
-			serve("*/git-upload-pack")//
-					.with(new UploadPackServlet(uploadPackFactory));
+			ServletBinder b = serve("*/git-upload-pack");
+			b = b.through(new UploadPackServlet.Factory(uploadPackFactory));
+			for (Filter f : uploadPackFilters)
+				b = b.through(f);
+			b.with(new UploadPackServlet());
 		}
 
 		if (receivePackFactory != ReceivePackFactory.DISABLED) {
-			serve("*/git-receive-pack")//
-					.with(new ReceivePackServlet(receivePackFactory));
+			ServletBinder b = serve("*/git-receive-pack");
+			b = b.through(new ReceivePackServlet.Factory(receivePackFactory));
+			for (Filter f : receivePackFilters)
+				b = b.through(f);
+			b.with(new ReceivePackServlet());
 		}
 
 		ServletBinder refs = serve("*/" + Constants.INFO_REFS);
 		if (uploadPackFactory != UploadPackFactory.DISABLED) {
-			refs = refs.through(//
-					new UploadPackServlet.InfoRefs(uploadPackFactory));
+			refs = refs.through(new UploadPackServlet.InfoRefs(
+					uploadPackFactory, uploadPackFilters));
 		}
 		if (receivePackFactory != ReceivePackFactory.DISABLED) {
-			refs = refs.through(//
-					new ReceivePackServlet.InfoRefs(receivePackFactory));
+			refs = refs.through(new ReceivePackServlet.InfoRefs(
+					receivePackFactory, receivePackFilters));
 		}
 		if (asIs != AsIsFileService.DISABLED) {
 			refs = refs.through(new IsLocalFilter());

@@ -1,8 +1,8 @@
 		@Override
-		protected void advertise(HttpServletRequest req, Repository db,
+		protected void advertise(HttpServletRequest req,
 				PacketLineOutRefAdvertiser pck) throws IOException,
 				ServiceNotEnabledException, ServiceNotAuthorizedException {
-			ReceivePack rp = receivePackFactory.create(req, db);
+			ReceivePack rp = (ReceivePack) req.getAttribute(ATTRIBUTE_HANDLER);
 			try {
 				rp.sendAdvertisedRefs(pck);
 			} finally {

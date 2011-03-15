@@ -6,9 +6,8 @@
 			return;
 		}
 
-		final Repository db = getRepository(req);
+		UploadPack up = (UploadPack) req.getAttribute(ATTRIBUTE_HANDLER);
 		try {
-			final UploadPack up = uploadPackFactory.create(req, db);
 			up.setBiDirectionalPipe(false);
 			rsp.setContentType(RSP_TYPE);
 
@@ -20,16 +19,6 @@
 			};
 			up.upload(getInputStream(req), out, null);
 			out.close();
-
-		} catch (ServiceNotAuthorizedException e) {
-			rsp.reset();
-			rsp.sendError(SC_UNAUTHORIZED);
-			return;
-
-		} catch (ServiceNotEnabledException e) {
-			rsp.reset();
-			rsp.sendError(SC_FORBIDDEN);
-			return;
 
 		} catch (IOException e) {
 			getServletContext().log(HttpServerText.get().internalErrorDuringUploadPack, e);

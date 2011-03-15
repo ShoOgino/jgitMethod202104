@@ -1,0 +1,8 @@
+		@Override
+		protected void begin(HttpServletRequest req, Repository db)
+				throws IOException, ServiceNotEnabledException,
+				ServiceNotAuthorizedException {
+			ReceivePack rp = receivePackFactory.create(req, db);
+			req.setAttribute(ATTRIBUTE_HANDLER, rp);
+		}
+
