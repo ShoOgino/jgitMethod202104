@@ -10,6 +10,11 @@
 	 * @return the user's home directory; null if the user does not have one.
 	 */
 	public File userHome() {
-		return userHome;
+		Holder<File> p = userHome;
+		if (p == null) {
+			p = new Holder<File>(userHomeImpl());
+			userHome = p;
+		}
+		return p.value;
 	}
 
