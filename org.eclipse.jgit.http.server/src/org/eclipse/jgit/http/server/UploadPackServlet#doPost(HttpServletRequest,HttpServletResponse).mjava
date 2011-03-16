@@ -20,6 +20,11 @@
 			up.upload(getInputStream(req), out, null);
 			out.close();
 
+		} catch (UploadPackMayNotContinueException e) {
+			if (!e.isOutput())
+				rsp.sendError(SC_SERVICE_UNAVAILABLE);
+			return;
+
 		} catch (IOException e) {
 			getServletContext().log(HttpServerText.get().internalErrorDuringUploadPack, e);
 			rsp.reset();

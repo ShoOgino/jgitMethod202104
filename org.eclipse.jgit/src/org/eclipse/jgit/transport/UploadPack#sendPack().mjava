@@ -20,6 +20,24 @@
 			}
 		}
 
+		try {
+			if (wantAll.isEmpty()) {
+				preUploadHook.onSendPack(this, wantIds, commonBase);
+			} else {
+				preUploadHook.onSendPack(this, wantAll, commonBase);
+			}
+		} catch (UploadPackMayNotContinueException noPack) {
+			if (sideband && noPack.getMessage() != null) {
+				noPack.setOutput();
+				SideBandOutputStream err = new SideBandOutputStream(
+						SideBandOutputStream.CH_ERROR,
+						SideBandOutputStream.SMALL_BUF, rawOut);
+				err.write(Constants.encode(noPack.getMessage()));
+				err.flush();
+			}
+			throw noPack;
+		}
+
 		PackConfig cfg = packConfig;
 		if (cfg == null)
 			cfg = new PackConfig(db);

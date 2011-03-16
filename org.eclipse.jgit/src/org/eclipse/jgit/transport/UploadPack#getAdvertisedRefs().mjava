@@ -1,5 +1,8 @@
 	/** @return all refs which were advertised to the client. */
 	public final Map<String, Ref> getAdvertisedRefs() {
+		if (refs == null) {
+			refs = refFilter.filter(db.getAllRefs());
+		}
 		return refs;
 	}
 

@@ -5,8 +5,21 @@
 	 *            the advertisement formatter.
 	 * @throws IOException
 	 *             the formatter failed to write an advertisement.
+	 * @throws UploadPackMayNotContinueException
+	 *             the hook denied advertisement.
 	 */
-	public void sendAdvertisedRefs(final RefAdvertiser adv) throws IOException {
+	public void sendAdvertisedRefs(final RefAdvertiser adv) throws IOException,
+			UploadPackMayNotContinueException {
+		try {
+			preUploadHook.onPreAdvertiseRefs(this);
+		} catch (UploadPackMayNotContinueException fail) {
+			if (fail.getMessage() != null) {
+				adv.writeOne("ERR " + fail.getMessage());
+				fail.setOutput();
+			}
+			throw fail;
+		}
+
 		adv.init(db);
 		adv.advertiseCapability(OPTION_INCLUDE_TAG);
 		adv.advertiseCapability(OPTION_MULTI_ACK_DETAILED);
@@ -17,8 +30,7 @@
 		adv.advertiseCapability(OPTION_THIN_PACK);
 		adv.advertiseCapability(OPTION_NO_PROGRESS);
 		adv.setDerefTags(true);
-		refs = refFilter.filter(db.getAllRefs());
-		advertised = adv.send(refs);
+		advertised = adv.send(getAdvertisedRefs());
 		adv.end();
 	}
 

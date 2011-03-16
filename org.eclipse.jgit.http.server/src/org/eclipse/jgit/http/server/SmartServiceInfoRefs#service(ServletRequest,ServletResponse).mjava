@@ -2,10 +2,10 @@
 			throws IOException {
 		final HttpServletRequest req = (HttpServletRequest) request;
 		final HttpServletResponse rsp = (HttpServletResponse) response;
+		final SmartOutputStream buf = new SmartOutputStream(req, rsp);
 		try {
 			rsp.setContentType("application/x-" + svc + "-advertisement");
 
-			final SmartOutputStream buf = new SmartOutputStream(req, rsp);
 			final PacketLineOut out = new PacketLineOut(buf);
 			out.writeString("# service=" + svc + "\n");
 			out.end();
@@ -16,6 +16,12 @@
 
 		} catch (ServiceNotEnabledException e) {
 			rsp.sendError(SC_FORBIDDEN);
+
+		} catch (UploadPackMayNotContinueException e) {
+			if (e.isOutput())
+				buf.close();
+			else
+				rsp.sendError(SC_SERVICE_UNAVAILABLE);
 		}
 	}
 
