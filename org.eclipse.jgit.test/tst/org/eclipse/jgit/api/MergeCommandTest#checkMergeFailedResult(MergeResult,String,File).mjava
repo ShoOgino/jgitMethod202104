@@ -1,0 +1,11 @@
+	private void checkMergeFailedResult(final MergeResult result,
+			final String indexState, final File fileA) throws Exception {
+		assertEquals(MergeStatus.FAILED, result.getMergeStatus());
+		assertEquals("a(modified)", read(fileA));
+		assertFalse(new File(db.getWorkTree(), "b").exists());
+		assertEquals("c", read(new File(db.getWorkTree(), "c")));
+		assertEquals(indexState, indexState(CONTENT));
+		assertEquals(null, result.getConflicts());
+		assertEquals(RepositoryState.SAFE, db.getRepositoryState());
+	}
+
