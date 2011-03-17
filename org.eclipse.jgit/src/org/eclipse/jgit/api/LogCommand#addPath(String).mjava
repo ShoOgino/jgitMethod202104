@@ -1,0 +1,15 @@
+	/**
+	 * Show only commits that affect any of the specified paths. The path must
+	 * either name a file or a directory exactly. Note that regex expressions or
+	 * wildcards are not supported.
+	 *
+	 * @param path
+	 *            a path is relative to the top level of the repository
+	 * @return {@code this}
+	 */
+	public LogCommand addPath(String path) {
+		checkCallable();
+		pathFilters.add(PathFilter.create(path));
+		return this;
+	}
+

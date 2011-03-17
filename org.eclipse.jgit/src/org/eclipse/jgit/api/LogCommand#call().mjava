@@ -10,6 +10,8 @@
 	public Iterable<RevCommit> call() throws NoHeadException,
 			JGitInternalException {
 		checkCallable();
+		if (pathFilters.size() > 0)
+			walk.setTreeFilter(PathFilterGroup.create(pathFilters));
 		if (!startSpecified) {
 			try {
 				ObjectId headId = repo.resolve(Constants.HEAD);
