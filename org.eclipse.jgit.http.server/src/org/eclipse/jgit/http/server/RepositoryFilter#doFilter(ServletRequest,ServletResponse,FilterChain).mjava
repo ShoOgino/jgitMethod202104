@@ -23,13 +23,13 @@
 		try {
 			db = resolver.open(req, name);
 		} catch (RepositoryNotFoundException e) {
-			((HttpServletResponse) rsp).sendError(SC_NOT_FOUND);
+			sendError(SC_NOT_FOUND, req, (HttpServletResponse) rsp);
+			return;
+		} catch (ServiceNotEnabledException e) {
+			sendError(SC_FORBIDDEN, req, (HttpServletResponse) rsp);
 			return;
 		} catch (ServiceNotAuthorizedException e) {
 			((HttpServletResponse) rsp).sendError(SC_UNAUTHORIZED);
-			return;
-		} catch (ServiceNotEnabledException e) {
-			((HttpServletResponse) rsp).sendError(SC_FORBIDDEN);
 			return;
 		}
 		try {
