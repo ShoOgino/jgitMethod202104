@@ -76,6 +76,9 @@
 					// (unresolved conflicts)
 					ObjectId indexTreeId = index.writeTree(odi);
 
+					if (insertChangeId)
+						insertChangeId(indexTreeId);
+
 					// Create a Commit object, populate it and write it
 					CommitBuilder commit = new CommitBuilder();
 					commit.setCommitter(committer);

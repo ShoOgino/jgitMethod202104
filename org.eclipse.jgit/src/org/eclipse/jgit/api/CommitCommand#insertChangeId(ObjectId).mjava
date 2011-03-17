@@ -1,0 +1,13 @@
+	private void insertChangeId(ObjectId treeId) throws IOException {
+		ObjectId firstParentId = null;
+		if (!parents.isEmpty())
+			firstParentId = parents.get(0);
+		ObjectId changeId = ChangeIdUtil.computeChangeId(treeId, firstParentId,
+				author, committer, message);
+		message = ChangeIdUtil.insertId(message, changeId);
+		if (changeId != null)
+			message = message.replaceAll("\nChange-Id: I"
+					+ ObjectId.zeroId().getName() + "\n", "\nChange-Id: I"
+					+ changeId.getName() + "\n");
+	}
+
