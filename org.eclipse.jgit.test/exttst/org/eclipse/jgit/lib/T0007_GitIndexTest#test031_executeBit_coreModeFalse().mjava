@@ -20,7 +20,7 @@
 			index.filemode = Boolean.FALSE; // TODO: we need a way to set this using config
 			index.add(trash, execFile);
 			index.add(trash, nonexecFile);
-			Tree tree = db.mapTree(index.writeTree());
+			Tree tree = mapTree(index.writeTree().name());
 			assertEquals(FileMode.REGULAR_FILE, tree.findBlobMember(execFile.getName()).getMode());
 			assertEquals(FileMode.REGULAR_FILE, tree.findBlobMember(nonexecFile.getName()).getMode());
 

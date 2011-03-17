@@ -3,6 +3,6 @@
 		Merger ourMerger = MergeStrategy.THEIRS.newMerger(db);
 		boolean merge = ourMerger.merge(new ObjectId[] { db.resolve("a"), db.resolve("c") });
 		assertTrue(merge);
-		assertEquals(db.mapTree("c").getId(), ourMerger.getResultTreeId());
+		assertEquals(db.resolve("c^{tree}"), ourMerger.getResultTreeId());
 	}
 
