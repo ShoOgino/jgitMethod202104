@@ -1,0 +1,13 @@
+	private boolean isIndexDirty() {
+		final int modeI = tw.getRawMode(T_INDEX);
+		final int modeO = tw.getRawMode(T_OURS);
+
+		// Index entry has to match ours to be considered clean
+		final boolean isDirty = nonTree(modeI)
+				&& !(tw.idEqual(T_INDEX, T_OURS) && modeO == modeI);
+		if (isDirty)
+			failingPaths
+					.put(tw.getPathString(), MergeFailureReason.DIRTY_INDEX);
+		return isDirty;
+	}
+
