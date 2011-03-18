@@ -1,0 +1,14 @@
+	@Override
+	public boolean hasObject(ObjectToPack obj, StoredObjectRepresentation rep) {
+		try {
+			LocalObjectRepresentation local = (LocalObjectRepresentation) rep;
+			for (PackFile pack : getPacks()) {
+				if (local.pack == pack)
+					return true;
+			}
+			return false;
+		} catch (FileNotFoundException packGone) {
+			return false;
+		}
+	}
+

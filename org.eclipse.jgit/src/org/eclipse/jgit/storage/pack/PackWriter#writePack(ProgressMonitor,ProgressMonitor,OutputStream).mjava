@@ -30,7 +30,10 @@
 		if (writeMonitor == null)
 			writeMonitor = NullProgressMonitor.INSTANCE;
 
-		if ((reuseDeltas || config.isReuseObjects()) && reuseSupport != null)
+		if (reuseSupport != null && (
+				   reuseDeltas
+				|| config.isReuseObjects()
+				|| !cachedPacks.isEmpty()))
 			searchForReuse(compressMonitor);
 		if (config.isDeltaCompress())
 			searchForDeltas(compressMonitor);
