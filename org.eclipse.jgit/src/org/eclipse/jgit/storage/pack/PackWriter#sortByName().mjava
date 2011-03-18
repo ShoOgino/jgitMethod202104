@@ -1,11 +1,16 @@
 	private List<ObjectToPack> sortByName() {
 		if (sortedByName == null) {
 			int cnt = 0;
-			for (List<ObjectToPack> list : objectsLists)
-				cnt += list.size();
+			cnt += objectsLists[Constants.OBJ_COMMIT].size();
+			cnt += objectsLists[Constants.OBJ_TREE].size();
+			cnt += objectsLists[Constants.OBJ_BLOB].size();
+			cnt += objectsLists[Constants.OBJ_TAG].size();
+
 			sortedByName = new BlockList<ObjectToPack>(cnt);
-			for (List<ObjectToPack> list : objectsLists)
-				sortedByName.addAll(list);
+			sortedByName.addAll(objectsLists[Constants.OBJ_COMMIT]);
+			sortedByName.addAll(objectsLists[Constants.OBJ_TREE]);
+			sortedByName.addAll(objectsLists[Constants.OBJ_BLOB]);
+			sortedByName.addAll(objectsLists[Constants.OBJ_TAG]);
 			Collections.sort(sortedByName);
 		}
 		return sortedByName;

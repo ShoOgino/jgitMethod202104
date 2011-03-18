@@ -1,22 +1,11 @@
-	private void addObject(final RevObject object, final int pathHashCode)
-			throws IncorrectObjectTypeException {
+	private void addObject(final RevObject object, final int pathHashCode) {
 		final ObjectToPack otp;
 		if (reuseSupport != null)
 			otp = reuseSupport.newObjectToPack(object);
 		else
 			otp = new ObjectToPack(object);
 		otp.setPathHash(pathHashCode);
-
-		try {
-			objectsLists[object.getType()].add(otp);
-		} catch (ArrayIndexOutOfBoundsException x) {
-			throw new IncorrectObjectTypeException(object,
-					JGitText.get().incorrectObjectType_COMMITnorTREEnorBLOBnorTAG);
-		} catch (UnsupportedOperationException x) {
-			// index pointing to "dummy" empty list
-			throw new IncorrectObjectTypeException(object,
-					JGitText.get().incorrectObjectType_COMMITnorTREEnorBLOBnorTAG);
-		}
+		objectsLists[object.getType()].add(otp);
 		objectsMap.add(otp);
 	}
 

@@ -8,8 +8,12 @@
 	public long getObjectCount() throws IOException {
 		if (stats.totalObjects == 0) {
 			long objCnt = 0;
-			for (List<ObjectToPack> list : objectsLists)
-				objCnt += list.size();
+
+			objCnt += objectsLists[Constants.OBJ_COMMIT].size();
+			objCnt += objectsLists[Constants.OBJ_TREE].size();
+			objCnt += objectsLists[Constants.OBJ_BLOB].size();
+			objCnt += objectsLists[Constants.OBJ_TAG].size();
+
 			for (CachedPack pack : cachedPacks)
 				objCnt += pack.getObjectCount();
 			return objCnt;
