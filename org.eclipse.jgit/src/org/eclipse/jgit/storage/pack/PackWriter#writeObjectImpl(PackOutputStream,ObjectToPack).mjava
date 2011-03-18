@@ -1,0 +1,65 @@
+	private void writeObjectImpl(PackOutputStream out, ObjectToPack otp)
+			throws IOException {
+		if (otp.wantWrite()) {
+			// A cycle exists in this delta chain. This should only occur if a
+			// selected object representation disappeared during writing
+			// (for example due to a concurrent repack) and a different base
+			// was chosen, forcing a cycle. Select something other than a
+			// delta, and write this object.
+			//
+			reuseDeltas = false;
+			otp.clearDeltaBase();
+			otp.clearReuseAsIs();
+			reuseSupport.selectObjectRepresentation(this,
+					NullProgressMonitor.INSTANCE,
+					Collections.singleton(otp));
+		}
+		otp.markWantWrite();
+
+		while (otp.isReuseAsIs()) {
+			writeBase(out, otp.getDeltaBase());
+			if (otp.isWritten())
+				return; // Delta chain cycle caused this to write already.
+
+			out.resetCRC32();
+			otp.setOffset(out.length());
+			try {
+				reuseSupport.copyObjectAsIs(out, otp, reuseValidate);
+				out.endObject();
+				otp.setCRC(out.getCRC32());
+				typeStats.reusedObjects++;
+				if (otp.isDeltaRepresentation()) {
+					typeStats.reusedDeltas++;
+					typeStats.deltaBytes += out.length() - otp.getOffset();
+				}
+				return;
+			} catch (StoredObjectRepresentationNotAvailableException gone) {
+				if (otp.getOffset() == out.length()) {
+					otp.setOffset(0);
+					otp.clearDeltaBase();
+					otp.clearReuseAsIs();
+					reuseSupport.selectObjectRepresentation(this,
+							NullProgressMonitor.INSTANCE,
+							Collections.singleton(otp));
+					continue;
+				} else {
+					// Object writing already started, we cannot recover.
+					//
+					CorruptObjectException coe;
+					coe = new CorruptObjectException(otp, "");
+					coe.initCause(gone);
+					throw coe;
+				}
+			}
+		}
+
+		// If we reached here, reuse wasn't possible.
+		//
+		if (otp.isDeltaRepresentation())
+			writeDeltaObjectDeflate(out, otp);
+		else
+			writeWholeObjectDeflate(out, otp);
+		out.endObject();
+		otp.setCRC(out.getCRC32());
+	}
+

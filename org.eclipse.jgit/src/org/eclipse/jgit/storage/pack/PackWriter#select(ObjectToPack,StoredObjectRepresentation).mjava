@@ -29,38 +29,28 @@
 			}
 		}
 
-		int nWeight;
-		if (otp.isReuseAsIs()) {
-			// We've already chosen to reuse a packed form, if next
-			// cannot beat that break out early.
-			//
-			if (PACK_WHOLE < nFmt)
-				return; // next isn't packed
-			else if (PACK_DELTA < nFmt && otp.isDeltaRepresentation())
-				return; // next isn't a delta, but we are
-
-			nWeight = next.getWeight();
-			if (otp.getWeight() <= nWeight)
-				return; // next would be bigger
-		} else
-			nWeight = next.getWeight();
-
 		if (nFmt == PACK_DELTA && reuseDeltas && reuseDeltaFor(otp)) {
 			ObjectId baseId = next.getDeltaBase();
 			ObjectToPack ptr = objectsMap.get(baseId);
 			if (ptr != null && !ptr.isEdge()) {
 				otp.setDeltaBase(ptr);
 				otp.setReuseAsIs();
-				otp.setWeight(nWeight);
 			} else if (thin && ptr != null && ptr.isEdge()) {
 				otp.setDeltaBase(baseId);
 				otp.setReuseAsIs();
-				otp.setWeight(nWeight);
 			} else {
 				otp.clearDeltaBase();
 				otp.clearReuseAsIs();
 			}
 		} else if (nFmt == PACK_WHOLE && config.isReuseObjects()) {
+			int nWeight = next.getWeight();
+			if (otp.isReuseAsIs() && !otp.isDeltaRepresentation()) {
+				// We've chosen another PACK_WHOLE format for this object,
+				// choose the one that has the smaller compressed size.
+				//
+				if (otp.getWeight() <= nWeight)
+					return;
+			}
 			otp.clearDeltaBase();
 			otp.setReuseAsIs();
 			otp.setWeight(nWeight);

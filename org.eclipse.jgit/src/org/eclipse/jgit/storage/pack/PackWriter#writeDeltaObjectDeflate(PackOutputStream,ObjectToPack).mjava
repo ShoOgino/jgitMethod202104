@@ -1,5 +1,10 @@
 	private void writeDeltaObjectDeflate(PackOutputStream out,
 			final ObjectToPack otp) throws IOException {
+		writeBase(out, otp.getDeltaBase());
+
+		out.resetCRC32();
+		otp.setOffset(out.length());
+
 		DeltaCache.Ref ref = otp.popCachedDelta();
 		if (ref != null) {
 			byte[] zbuf = ref.get();
