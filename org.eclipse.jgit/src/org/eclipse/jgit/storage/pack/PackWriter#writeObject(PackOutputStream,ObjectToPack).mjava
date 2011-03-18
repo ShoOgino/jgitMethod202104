@@ -14,10 +14,10 @@
 				reuseSupport.copyObjectAsIs(out, otp, reuseValidate);
 				out.endObject();
 				otp.setCRC(out.getCRC32());
-				stats.reusedObjects++;
+				typeStats.reusedObjects++;
 				if (otp.isDeltaRepresentation()) {
-					stats.totalDeltas++;
-					stats.reusedDeltas++;
+					typeStats.reusedDeltas++;
+					typeStats.deltaBytes += out.length() - otp.getOffset();
 				}
 				return;
 			} catch (StoredObjectRepresentationNotAvailableException gone) {
