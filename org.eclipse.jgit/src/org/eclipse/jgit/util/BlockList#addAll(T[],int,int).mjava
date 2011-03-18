@@ -1,0 +1,29 @@
+	/**
+	 * Quickly append all elements from an array.
+	 *
+	 * @param src
+	 *            the source array.
+	 * @param srcIdx
+	 *            first index to copy.
+	 * @param srcCnt
+	 *            number of elements to copy.
+	 */
+	public void addAll(T[] src, int srcIdx, int srcCnt) {
+		while (0 < srcCnt) {
+			int i = tailBlkIdx;
+			int n = Math.min(srcCnt, BLOCK_SIZE - i);
+			if (n == 0) {
+				// Our tail is full, expand by one.
+				add(src[srcIdx++]);
+				srcCnt--;
+				continue;
+			}
+
+			System.arraycopy(src, srcIdx, tailBlock, i, n);
+			tailBlkIdx += n;
+			size += n;
+			srcIdx += n;
+			srcCnt -= n;
+		}
+	}
+
