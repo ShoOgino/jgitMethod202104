@@ -43,14 +43,17 @@
 		writeMonitor.beginTask(JGitText.get().writingObjects, (int) objCnt);
 		long writeStart = System.currentTimeMillis();
 
-		long headerStart = out.length();
 		out.writeFileHeader(PACK_VERSION_GENERATED, objCnt);
 		out.flush();
-		long headerEnd = out.length();
 
 		writeObjects(out);
-		if (!edgeObjects.isEmpty() || !cachedPacks.isEmpty())
-			stats.thinPackBytes = out.length() - (headerEnd - headerStart);
+		if (!edgeObjects.isEmpty() || !cachedPacks.isEmpty()) {
+			for (Statistics.ObjectType typeStat : stats.objectTypes) {
+				if (typeStat == null)
+					continue;
+				stats.thinPackBytes += typeStat.bytes;
+			}
+		}
 
 		for (CachedPack pack : cachedPacks) {
 			long deltaCnt = pack.getDeltaCount();
@@ -64,6 +67,16 @@
 		stats.timeWriting = System.currentTimeMillis() - writeStart;
 		stats.totalBytes = out.length();
 		stats.reusedPacks = Collections.unmodifiableList(cachedPacks);
+
+		for (Statistics.ObjectType typeStat : stats.objectTypes) {
+			if (typeStat == null)
+				continue;
+			typeStat.cntDeltas += typeStat.reusedDeltas;
+
+			stats.reusedObjects += typeStat.reusedObjects;
+			stats.reusedDeltas += typeStat.reusedDeltas;
+			stats.totalDeltas += typeStat.cntDeltas;
+		}
 
 		reader.release();
 		writeMonitor.endTask();

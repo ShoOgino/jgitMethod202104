@@ -18,6 +18,7 @@
 		DeflaterOutputStream dst = new DeflaterOutputStream(out, deflater);
 		delta.writeTo(dst, null);
 		dst.finish();
-		stats.totalDeltas++;
+		typeStats.cntDeltas++;
+		typeStats.deltaBytes += out.length() - otp.getOffset();
 	}
 
