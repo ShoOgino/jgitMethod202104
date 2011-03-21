@@ -1,15 +1,15 @@
-	private void checkoutBranch(String branchName)
+	protected void checkoutBranch(String branchName)
 			throws IllegalStateException, IOException {
 		RevWalk walk = new RevWalk(db);
 		RevCommit head = walk.parseCommit(db.resolve(Constants.HEAD));
 		RevCommit branch = walk.parseCommit(db.resolve(branchName));
-		DirCacheCheckout dco = new DirCacheCheckout(db, head.getTree(),
-				db.lockDirCache(), branch.getTree());
+		DirCacheCheckout dco = new DirCacheCheckout(db, head.getTree().getId(),
+				db.lockDirCache(), branch.getTree().getId());
 		dco.setFailOnConflict(true);
-		assertTrue(dco.checkout());
+		dco.checkout();
 		walk.release();
 		// update the HEAD
 		RefUpdate refUpdate = db.updateRef(Constants.HEAD);
-		assertEquals(Result.FORCED, refUpdate.link(branchName));
+		refUpdate.link(branchName);
 	}
 
