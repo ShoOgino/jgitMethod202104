@@ -31,6 +31,7 @@
 		MergeResult result = git.merge().include(sideCommit.getId())
 				.setStrategy(MergeStrategy.RESOLVE).call();
 
-		checkMergeFailedResult(result, indexState, fileA);
+		checkMergeFailedResult(result, MergeFailureReason.DIRTY_WORKTREE,
+				indexState, fileA);
 	}
 

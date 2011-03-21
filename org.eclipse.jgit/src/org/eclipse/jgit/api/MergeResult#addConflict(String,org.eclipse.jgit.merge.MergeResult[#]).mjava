@@ -3,6 +3,8 @@
 	 * @param lowLevelResult
 	 */
 	public void addConflict(String path, org.eclipse.jgit.merge.MergeResult<?> lowLevelResult) {
+		if (!lowLevelResult.containsConflicts())
+			return;
 		if (conflicts == null)
 			conflicts = new HashMap<String, int[][]>();
 		int nrOfConflicts = 0;

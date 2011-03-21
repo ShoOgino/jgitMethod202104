@@ -12,7 +12,11 @@
 	 * @param mergeStrategy
 	 *            the used {@link MergeStrategy}
 	 * @param lowLevelResults
-	 *            merge results as returned by {@link ResolveMerger#getMergeResults()}
+	 *            merge results as returned by
+	 *            {@link ResolveMerger#getMergeResults()}
+	 * @param failingPaths
+	 *            list of paths causing this merge to fail abnormally as
+	 *            returned by {@link ResolveMerger#getFailingPaths()}
 	 * @param description
 	 *            a user friendly description of the merge result
 	 */
@@ -20,8 +24,17 @@
 			ObjectId[] mergedCommits, MergeStatus mergeStatus,
 			MergeStrategy mergeStrategy,
 			Map<String, org.eclipse.jgit.merge.MergeResult<?>> lowLevelResults,
-			String description) {
-		this(newHead, base, mergedCommits, mergeStatus, mergeStrategy,
-				lowLevelResults, null, null);
+			Map<String, MergeFailureReason> failingPaths, String description) {
+		this.newHead = newHead;
+		this.mergedCommits = mergedCommits;
+		this.base = base;
+		this.mergeStatus = mergeStatus;
+		this.mergeStrategy = mergeStrategy;
+		this.description = description;
+		this.failingPaths = failingPaths;
+		if (lowLevelResults != null)
+			for (Map.Entry<String, org.eclipse.jgit.merge.MergeResult<?>> result : lowLevelResults
+					.entrySet())
+				addConflict(result.getKey(), result.getValue());
 	}
 
