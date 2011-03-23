@@ -1,0 +1,19 @@
+	private void doCherryPickAndCheckResult(final Git git,
+			final RevCommit sideCommit, final MergeFailureReason reason)
+			throws Exception {
+		// get current index state
+		String indexState = indexState(CONTENT);
+
+		// cherry-pick
+		CherryPickResult result = git.cherryPick().include(sideCommit.getId())
+				.call();
+		assertEquals(CherryPickStatus.FAILED, result.getStatus());
+		// staged file a causes DIRTY_INDEX
+		assertEquals(1, result.getFailingPaths().size());
+		assertEquals(reason, result.getFailingPaths().get("a"));
+		assertEquals("a(modified)", read(new File(db.getWorkTree(), "a")));
+		// index shall be unchanged
+		assertEquals(indexState, indexState(CONTENT));
+		assertEquals(RepositoryState.SAFE, db.getRepositoryState());
+	}
+
