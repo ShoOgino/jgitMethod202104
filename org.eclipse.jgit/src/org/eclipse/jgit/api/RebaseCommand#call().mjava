@@ -16,7 +16,7 @@
 			switch (operation) {
 			case ABORT:
 				try {
-					return abort();
+					return abort(new RebaseResult(Status.ABORTED));
 				} catch (IOException ioe) {
 					throw new JGitInternalException(ioe.getMessage(), ioe);
 				}
@@ -34,12 +34,12 @@
 			}
 
 			if (monitor.isCancelled())
-				return abort();
+				return abort(new RebaseResult(Status.ABORTED));
 
-			if (this.operation == Operation.CONTINUE)
+			if (operation == Operation.CONTINUE)
 				newHead = continueRebase();
 
-			if (this.operation == Operation.SKIP)
+			if (operation == Operation.SKIP)
 				newHead = checkoutCurrentHead();
 
 			ObjectReader or = repo.newObjectReader();
@@ -55,23 +55,37 @@
 						.parseCommit(ids.iterator().next());
 				if (monitor.isCancelled())
 					return new RebaseResult(commitToPick);
-				monitor.beginTask(MessageFormat.format(
-						JGitText.get().applyingCommit, commitToPick
-								.getShortMessage()), ProgressMonitor.UNKNOWN);
-				// if the first parent of commitToPick is the current HEAD,
-				// we do a fast-forward instead of cherry-pick to avoid
-				// unnecessary object rewriting
-				newHead = tryFastForward(commitToPick);
-				lastStepWasForward = newHead != null;
-				if (!lastStepWasForward)
-					// TODO if the content of this commit is already merged here
-					// we should skip this step in order to avoid confusing
-					// pseudo-changed
-					newHead = new Git(repo).cherryPick().include(commitToPick)
-							.call().getNewHead();
-				monitor.endTask();
-				if (newHead == null) {
-					return stop(commitToPick);
+				try {
+					monitor.beginTask(MessageFormat.format(
+							JGitText.get().applyingCommit,
+							commitToPick.getShortMessage()),
+							ProgressMonitor.UNKNOWN);
+					// if the first parent of commitToPick is the current HEAD,
+					// we do a fast-forward instead of cherry-pick to avoid
+					// unnecessary object rewriting
+					newHead = tryFastForward(commitToPick);
+					lastStepWasForward = newHead != null;
+					if (!lastStepWasForward) {
+						// TODO if the content of this commit is already merged
+						// here we should skip this step in order to avoid
+						// confusing pseudo-changed
+						CherryPickResult cherryPickResult = new Git(repo)
+								.cherryPick().include(commitToPick).call();
+						switch (cherryPickResult.getStatus()) {
+						case FAILED:
+							if (operation == Operation.BEGIN)
+								return abort(new RebaseResult(
+										cherryPickResult.getFailingPaths()));
+							else
+								return stop(commitToPick);
+						case CONFLICTING:
+							return stop(commitToPick);
+						case OK:
+							newHead = cherryPickResult.getNewHead();
+						}
+					}
+				} finally {
+					monitor.endTask();
 				}
 			}
 			if (newHead != null) {

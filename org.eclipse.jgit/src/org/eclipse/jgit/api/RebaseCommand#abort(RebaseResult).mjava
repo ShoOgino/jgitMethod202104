@@ -1,14 +1,20 @@
-	private RebaseResult abort() throws IOException {
+	private RebaseResult abort(RebaseResult result) throws IOException {
 		try {
 			String commitId = readFile(repo.getDirectory(), Constants.ORIG_HEAD);
 			monitor.beginTask(MessageFormat.format(
 					JGitText.get().abortingRebase, commitId),
 					ProgressMonitor.UNKNOWN);
 
+			DirCacheCheckout dco;
 			RevCommit commit = walk.parseCommit(repo.resolve(commitId));
-			// no head in order to reset --hard
-			DirCacheCheckout dco = new DirCacheCheckout(repo, repo
-					.lockDirCache(), commit.getTree());
+			if (result.getStatus().equals(Status.FAILED)) {
+				RevCommit head = walk.parseCommit(repo.resolve(Constants.HEAD));
+				dco = new DirCacheCheckout(repo, head.getTree(),
+						repo.lockDirCache(), commit.getTree());
+			} else {
+				dco = new DirCacheCheckout(repo, repo.lockDirCache(),
+						commit.getTree());
+			}
 			dco.setFailOnConflict(false);
 			dco.checkout();
 			walk.release();
@@ -37,7 +43,7 @@
 			}
 			// cleanup the files
 			FileUtils.delete(rebaseDir, FileUtils.RECURSIVE);
-			return new RebaseResult(Status.ABORTED);
+			return result;
 
 		} finally {
 			monitor.endTask();
