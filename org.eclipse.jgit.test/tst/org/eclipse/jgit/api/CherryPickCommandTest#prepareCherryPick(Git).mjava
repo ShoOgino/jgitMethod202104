@@ -1,0 +1,24 @@
+	private RevCommit prepareCherryPick(final Git git) throws Exception {
+		// create, add and commit file a
+		writeTrashFile("a", "a");
+		git.add().addFilepattern("a").call();
+		RevCommit firstMasterCommit = git.commit().setMessage("first master")
+				.call();
+
+		// create and checkout side branch
+		createBranch(firstMasterCommit, "refs/heads/side");
+		checkoutBranch("refs/heads/side");
+		// modify, add and commit file a
+		writeTrashFile("a", "a(side)");
+		git.add().addFilepattern("a").call();
+		RevCommit sideCommit = git.commit().setMessage("side").call();
+
+		// checkout master branch
+		checkoutBranch("refs/heads/master");
+		// modify, add and commit file a
+		writeTrashFile("a", "a(master)");
+		git.add().addFilepattern("a").call();
+		git.commit().setMessage("second master").call();
+		return sideCommit;
+	}
+

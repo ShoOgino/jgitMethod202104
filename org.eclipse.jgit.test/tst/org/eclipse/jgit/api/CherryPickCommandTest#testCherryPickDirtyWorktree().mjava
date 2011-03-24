@@ -1,0 +1,13 @@
+	@Test
+	public void testCherryPickDirtyWorktree() throws Exception {
+		Git git = new Git(db);
+		RevCommit sideCommit = prepareCherryPick(git);
+
+		// modify file a
+		writeTrashFile("a", "a(modified)");
+		// do not add and commit
+
+		doCherryPickAndCheckResult(git, sideCommit,
+				MergeFailureReason.DIRTY_WORKTREE);
+	}
+
