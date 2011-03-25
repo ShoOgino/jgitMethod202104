@@ -19,7 +19,7 @@
 
 			newObj = safeParse(walk, newValue);
 			oldObj = safeParse(walk, oldValue);
-			if (newObj == oldObj)
+			if (newObj == oldObj && !detachingSymbolicRef)
 				return store.execute(Result.NO_CHANGE);
 
 			if (newObj instanceof RevCommit && oldObj instanceof RevCommit) {
