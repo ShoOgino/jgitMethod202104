@@ -32,7 +32,9 @@
 				}
 			}
 		} catch (IOException e) {
-			// ignore
+			if (SystemReader.getInstance().getProperty("jgit.fs.debug") != null)
+				System.err.println(e);
+			// Ignore error (but report)
 		}
 		return null;
 	}
