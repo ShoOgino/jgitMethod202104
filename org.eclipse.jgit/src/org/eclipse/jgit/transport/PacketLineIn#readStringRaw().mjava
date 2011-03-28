@@ -1,4 +1,14 @@
-	String readStringRaw() throws IOException {
+	/**
+	 * Read a single UTF-8 encoded string packet from the input stream.
+	 * <p>
+	 * Unlike {@link #readString()} a trailing LF will be retained.
+	 *
+	 * @return the string. {@link #END} if the string was the magic flush
+	 *         packet.
+	 * @throws IOException
+	 *             the stream cannot be read.
+	 */
+	public String readStringRaw() throws IOException {
 		int len = readLength();
 		if (len == 0)
 			return END;

@@ -1,4 +1,16 @@
-	String readString() throws IOException {
+	/**
+	 * Read a single UTF-8 encoded string packet from the input stream.
+	 * <p>
+	 * If the string ends with an LF, it will be removed before returning the
+	 * value to the caller. If this automatic trimming behavior is not desired,
+	 * use {@link #readStringRaw()} instead.
+	 *
+	 * @return the string. {@link #END} if the string was the magic flush
+	 *         packet.
+	 * @throws IOException
+	 *             the stream cannot be read.
+	 */
+	public String readString() throws IOException {
 		int len = readLength();
 		if (len == 0)
 			return END;
