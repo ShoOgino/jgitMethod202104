@@ -25,7 +25,8 @@
 				builder.setGitDir(d);
 			}
 			Repository repository = builder.build();
-			repository.create(bare);
+			if (!repository.getObjectDatabase().exists())
+				repository.create(bare);
 			return new Git(repository);
 		} catch (IOException e) {
 			throw new JGitInternalException(e.getMessage(), e);
