@@ -1,0 +1,14 @@
+	@Test
+	public void testAddAndRemoveNote() throws Exception {
+		git.notesAdd().setObjectId(commit2).setMessage("data").call();
+		Note note = git.notesShow().setObjectId(commit2).call();
+		String content = new String(db.open(note.getData()).getCachedBytes(),
+				"UTF-8");
+		assertEquals(content, "data");
+
+		git.notesRemove().setObjectId(commit2).call();
+
+		List<Note> notes = git.notesList().call();
+		assertTrue(notes.size() == 1);
+	}
+

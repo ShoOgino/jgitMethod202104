@@ -1,0 +1,24 @@
+	/**
+	 * @throws JGitInternalException
+	 *             upon internal failure
+	 */
+	public Note call() throws JGitInternalException {
+		checkCallable();
+		RevWalk walk = new RevWalk(repo);
+		NoteMap map = NoteMap.newEmptyMap();
+		RevCommit notesCommit = null;
+		try {
+			Ref ref = repo.getRef(notesRef);
+			// if we have a notes ref, use it
+			if (ref != null) {
+				notesCommit = walk.parseCommit(ref.getObjectId());
+				map = NoteMap.read(walk.getObjectReader(), notesCommit);
+			}
+			return map.getNote(id);
+		} catch (IOException e) {
+			throw new JGitInternalException(e.getMessage(), e);
+		} finally {
+			walk.release();
+		}
+	}
+
