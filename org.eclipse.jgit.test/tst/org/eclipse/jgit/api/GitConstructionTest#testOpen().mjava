@@ -1,0 +1,21 @@
+	@Test
+	public void testOpen() throws IOException {
+		Git git = Git.open(db.getDirectory());
+		assertEquals(1, git.branchList().call().size());
+
+		git = Git.open(bareRepo.getDirectory());
+		assertEquals(1, git.branchList().setListMode(ListMode.ALL).call()
+				.size());
+
+		git = Git.open(db.getWorkTree());
+		assertEquals(1, git.branchList().setListMode(ListMode.ALL).call()
+				.size());
+
+		try {
+			Git.open(db.getObjectsDirectory());
+			fail("Expected exception has not been thrown");
+		} catch (RepositoryNotFoundException e) {
+			// should not get here
+		}
+	}
+
