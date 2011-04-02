@@ -54,7 +54,7 @@
 					if (sz != delta.deltaSize)
 						break SEARCH;
 
-					DeltaBaseCache.Entry e = DeltaBaseCache.get(this, base);
+					DeltaBaseCache.Entry e = curs.getDeltaBaseCache().get(this, base);
 					if (e != null) {
 						type = e.type;
 						data = e.data;
@@ -72,7 +72,7 @@
 					if (sz != delta.deltaSize)
 						break SEARCH;
 
-					DeltaBaseCache.Entry e = DeltaBaseCache.get(this, base);
+					DeltaBaseCache.Entry e = curs.getDeltaBaseCache().get(this, base);
 					if (e != null) {
 						type = e.type;
 						data = e.data;
@@ -100,7 +100,7 @@
 				if (cached)
 					cached = false;
 				else if (delta.next == null)
-					DeltaBaseCache.store(this, delta.basePos, data, type);
+					curs.getDeltaBaseCache().store(this, delta.basePos, data, type);
 
 				pos = delta.deltaPos;
 
