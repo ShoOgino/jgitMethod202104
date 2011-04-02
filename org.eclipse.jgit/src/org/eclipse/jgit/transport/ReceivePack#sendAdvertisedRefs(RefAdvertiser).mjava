@@ -18,12 +18,9 @@
 		adv.advertiseCapability(CAPABILITY_REPORT_STATUS);
 		if (allowOfsDelta)
 			adv.advertiseCapability(CAPABILITY_OFS_DELTA);
-		refs = refFilter.filter(db.getAllRefs());
-		final Ref head = refs.remove(Constants.HEAD);
-		adv.send(refs);
-		if (head != null && !head.isSymbolic())
-			adv.advertiseHave(head.getObjectId());
-		adv.includeAdditionalHaves(db);
+		adv.send(getAdvertisedRefs());
+		for (ObjectId obj : advertisedHaves)
+			adv.advertiseHave(obj);
 		if (adv.isEmpty())
 			adv.advertiseId(ObjectId.zeroId(), "capabilities^{}");
 		adv.end();
