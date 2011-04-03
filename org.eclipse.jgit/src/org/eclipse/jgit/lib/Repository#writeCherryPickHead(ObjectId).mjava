@@ -1,0 +1,25 @@
+	/**
+	 * Write cherry pick commit into $GIT_DIR/CHERRY_PICK_HEAD. This is used in
+	 * case of conflicts to store the cherry which was tried to be picked.
+	 *
+	 * @param head
+	 *            an object id of the cherry commit or <code>null</code> to
+	 *            delete the file
+	 * @throws IOException
+	 */
+	public void writeCherryPickHead(ObjectId head) throws IOException {
+		File cherryPickHeadFile = new File(gitDir, Constants.CHERRY_PICK_HEAD);
+		if (head != null) {
+			BufferedOutputStream bos = new BufferedOutputStream(
+					new FileOutputStream(cherryPickHeadFile));
+			try {
+				head.copyTo(bos);
+				bos.write('\n');
+			} finally {
+				bos.close();
+			}
+		} else {
+			FileUtils.delete(cherryPickHeadFile, FileUtils.SKIP_MISSING);
+		}
+	}
+

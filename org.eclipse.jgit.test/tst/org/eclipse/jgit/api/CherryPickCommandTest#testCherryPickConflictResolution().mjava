@@ -1,0 +1,28 @@
+	@Test
+	public void testCherryPickConflictResolution() throws Exception {
+		Git git = new Git(db);
+		RevCommit sideCommit = prepareCherryPick(git);
+
+		CherryPickResult result = git.cherryPick().include(sideCommit.getId())
+				.call();
+
+		assertEquals(CherryPickStatus.CONFLICTING, result.getStatus());
+		assertTrue(new File(db.getDirectory(), Constants.MERGE_MSG).exists());
+		assertEquals("side\n\nConflicts:\n\ta\n", db.readMergeCommitMsg());
+		assertTrue(new File(db.getDirectory(), Constants.CHERRY_PICK_HEAD)
+				.exists());
+		assertEquals(sideCommit.getId(), db.readCherryPickHead());
+		assertEquals(RepositoryState.CHERRY_PICKING, db.getRepositoryState());
+
+		// Resolve
+		writeTrashFile("a", "a");
+		git.add().addFilepattern("a").call();
+
+		assertEquals(RepositoryState.CHERRY_PICKING_RESOLVED,
+				db.getRepositoryState());
+
+		git.commit().setOnly("a").setMessage("resolve").call();
+
+		assertEquals(RepositoryState.SAFE, db.getRepositoryState());
+	}
+

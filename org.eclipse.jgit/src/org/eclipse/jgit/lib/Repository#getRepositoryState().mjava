@@ -25,7 +25,7 @@
 			return RepositoryState.REBASING_MERGE;
 
 		// Both versions
-		if (new File(getDirectory(), "MERGE_HEAD").exists()) {
+		if (new File(getDirectory(), Constants.MERGE_HEAD).exists()) {
 			// we are merging - now check whether we have unmerged paths
 			try {
 				if (!readDirCache().hasUnmergedPaths()) {
@@ -43,6 +43,20 @@
 
 		if (new File(getDirectory(), "BISECT_LOG").exists())
 			return RepositoryState.BISECTING;
+
+		if (new File(getDirectory(), Constants.CHERRY_PICK_HEAD).exists()) {
+			try {
+				if (!readDirCache().hasUnmergedPaths()) {
+					// no unmerged paths
+					return RepositoryState.CHERRY_PICKING_RESOLVED;
+				}
+			} catch (IOException e) {
+				// fall through to CHERRY_PICKING
+				e.printStackTrace();
+			}
+
+			return RepositoryState.CHERRY_PICKING;
+		}
 
 		return RepositoryState.SAFE;
 	}

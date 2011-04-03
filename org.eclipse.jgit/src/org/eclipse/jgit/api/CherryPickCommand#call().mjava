@@ -62,7 +62,15 @@
 					if (merger.failed())
 						return new CherryPickResult(merger.getFailingPaths());
 
-					// merge conflicts
+					// there are merge conflicts
+
+					String message = new MergeMessageFormatter()
+							.formatWithConflicts(srcCommit.getFullMessage(),
+									merger.getUnmergedPaths());
+
+					repo.writeCherryPickHead(srcCommit.getId());
+					repo.writeMergeCommitMsg(message);
+
 					return CherryPickResult.CONFLICT;
 				}
 			}
