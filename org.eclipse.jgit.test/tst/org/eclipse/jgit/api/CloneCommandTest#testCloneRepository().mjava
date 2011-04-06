@@ -10,6 +10,20 @@
 			assertNotNull(git2);
 			ObjectId id = git2.getRepository().resolve("tag-for-blob");
 			assertNotNull(id);
+			assertEquals(git2.getRepository().getFullBranch(),
+					"refs/heads/test");
+			assertEquals(
+					"origin",
+					git2.getRepository()
+							.getConfig()
+							.getString(ConfigConstants.CONFIG_BRANCH_SECTION,
+									"test", ConfigConstants.CONFIG_KEY_REMOTE));
+			assertEquals(
+					"refs/heads/test",
+					git2.getRepository()
+							.getConfig()
+							.getString(ConfigConstants.CONFIG_BRANCH_SECTION,
+									"test", ConfigConstants.CONFIG_KEY_MERGE));
 		} catch (Exception e) {
 			fail(e.getMessage());
 		}

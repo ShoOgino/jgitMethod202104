@@ -2,15 +2,22 @@
 			throws JGitInternalException,
 			MissingObjectException, IncorrectObjectTypeException, IOException {
 
-		if (branch.startsWith(Constants.R_HEADS)) {
-			final RefUpdate head = repo.updateRef(Constants.HEAD);
-			head.disableRefLog();
-			head.link(branch);
+		Ref head = result.getAdvertisedRef(branch);
+		if (branch.equals(Constants.HEAD)) {
+			Ref foundBranch = findBranchToCheckout(result);
+			if (foundBranch != null)
+				head = foundBranch;
 		}
 
-		final Ref head = result.getAdvertisedRef(branch);
 		if (head == null || head.getObjectId() == null)
 			return; // throw exception?
+
+		if (head.getName().startsWith(Constants.R_HEADS)) {
+			final RefUpdate newHead = repo.updateRef(Constants.HEAD);
+			newHead.disableRefLog();
+			newHead.link(head.getName());
+			addMergeConfig(repo, head);
+		}
 
 		final RevCommit commit = parseCommit(repo, head);
 

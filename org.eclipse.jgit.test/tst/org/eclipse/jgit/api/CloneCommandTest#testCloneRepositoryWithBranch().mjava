@@ -3,14 +3,14 @@
 		try {
 			File directory = createTempDirectory("testCloneRepositoryWithBranch");
 			CloneCommand command = Git.cloneRepository();
-			command.setBranch("refs/heads/test");
+			command.setBranch("refs/heads/master");
 			command.setDirectory(directory);
 			command.setURI("file://"
 					+ git.getRepository().getWorkTree().getPath());
 			Git git2 = command.call();
 			assertNotNull(git2);
 			assertEquals(git2.getRepository().getFullBranch(),
-					"refs/heads/test");
+					"refs/heads/master");
 		} catch (Exception e) {
 			fail(e.getMessage());
 		}
