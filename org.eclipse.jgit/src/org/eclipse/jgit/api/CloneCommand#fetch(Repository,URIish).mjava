@@ -21,8 +21,13 @@
 		command.setRemote(remote);
 		command.setProgressMonitor(monitor);
 		command.setTagOpt(TagOpt.FETCH_TAGS);
+		command.setTimeout(timeout);
 		if (credentialsProvider != null)
 			command.setCredentialsProvider(credentialsProvider);
+
+		List<RefSpec> specs = calculateRefSpecs(dst);
+		command.setRefSpecs(specs);
+
 		return command.call();
 	}
 
