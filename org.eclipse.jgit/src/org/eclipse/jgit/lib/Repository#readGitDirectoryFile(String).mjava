@@ -1,0 +1,17 @@
+	/**
+	 * Read a file from the git directory.
+	 *
+	 * @param filename
+	 * @return the raw contents or null if the file doesn't exist or is empty
+	 * @throws IOException
+	 */
+	private byte[] readGitDirectoryFile(String filename) throws IOException {
+		File file = new File(getDirectory(), filename);
+		try {
+			byte[] raw = IO.readFully(file);
+			return raw.length > 0 ? raw : null;
+		} catch (FileNotFoundException notFound) {
+			return null;
+		}
+	}
+

@@ -14,16 +14,8 @@
 		if (isBare() || getDirectory() == null)
 			throw new NoWorkTreeException();
 
-		File mergeHeadFile = new File(getDirectory(),
-				Constants.CHERRY_PICK_HEAD);
-		byte[] raw;
-		try {
-			raw = IO.readFully(mergeHeadFile);
-		} catch (FileNotFoundException notFound) {
-			return null;
-		}
-
-		if (raw.length == 0)
+		byte[] raw = readGitDirectoryFile(Constants.CHERRY_PICK_HEAD);
+		if (raw == null)
 			return null;
 
 		return ObjectId.fromString(raw, 0);

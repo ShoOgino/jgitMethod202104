@@ -8,18 +8,8 @@
 	 * @throws IOException
 	 */
 	public void writeCherryPickHead(ObjectId head) throws IOException {
-		File cherryPickHeadFile = new File(gitDir, Constants.CHERRY_PICK_HEAD);
-		if (head != null) {
-			BufferedOutputStream bos = new BufferedOutputStream(
-					new FileOutputStream(cherryPickHeadFile));
-			try {
-				head.copyTo(bos);
-				bos.write('\n');
-			} finally {
-				bos.close();
-			}
-		} else {
-			FileUtils.delete(cherryPickHeadFile, FileUtils.SKIP_MISSING);
-		}
+		List<ObjectId> heads = (head != null) ? Collections.singletonList(head)
+				: null;
+		writeHeadsFile(heads, Constants.CHERRY_PICK_HEAD);
 	}
 
