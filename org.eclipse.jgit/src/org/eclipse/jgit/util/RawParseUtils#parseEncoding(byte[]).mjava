@@ -16,6 +16,19 @@
 		if (enc < 0)
 			return Constants.CHARSET;
 		final int lf = nextLF(b, enc);
-		return Charset.forName(decode(Constants.CHARSET, b, enc, lf - 1));
+		String decoded = decode(Constants.CHARSET, b, enc, lf - 1);
+		try {
+			return Charset.forName(decoded);
+		} catch (IllegalCharsetNameException badName) {
+			Charset aliased = charsetForAlias(decoded);
+			if (aliased != null)
+				return aliased;
+			throw badName;
+		} catch (UnsupportedCharsetException badName) {
+			Charset aliased = charsetForAlias(decoded);
+			if (aliased != null)
+				return aliased;
+			throw badName;
+		}
 	}
 
