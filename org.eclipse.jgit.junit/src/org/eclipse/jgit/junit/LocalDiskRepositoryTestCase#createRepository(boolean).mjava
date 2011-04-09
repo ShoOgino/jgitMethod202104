@@ -9,11 +9,8 @@
 	 *             the repository could not be created in the temporary area
 	 */
 	private FileRepository createRepository(boolean bare) throws IOException {
-		String uniqueId = System.currentTimeMillis() + "_" + (testCount++);
-		String gitdirName = "test" + uniqueId + (bare ? "" : "/") + Constants.DOT_GIT;
-		File gitdir = new File(trash, gitdirName).getCanonicalFile();
+		File gitdir = createUniqueTestGitDir(bare);
 		FileRepository db = new FileRepository(gitdir);
-
 		assertFalse(gitdir.exists());
 		db.create();
 		toClose.add(db);
