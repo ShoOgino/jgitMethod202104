@@ -15,6 +15,10 @@
 				last = processHaveLines(peerHas, last);
 				if (commonBase.isEmpty() || multiAck != MultiAck.OFF)
 					pckOut.writeString("NAK\n");
+				if (noDone && sentReady) {
+					pckOut.writeString("ACK " + last.name() + "\n");
+					return true;
+				}
 				if (!biDirectionalPipe)
 					return false;
 				pckOut.flush();
