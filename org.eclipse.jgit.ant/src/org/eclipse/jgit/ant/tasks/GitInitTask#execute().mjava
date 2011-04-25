@@ -1,0 +1,12 @@
+	@Override
+	public void execute() throws BuildException {
+		if (bare) {
+			log("Initializing bare repository at " + destination);
+		} else {
+			log("Initializing repository at " + destination);
+		}
+		InitCommand init = Git.init();
+		init.setBare(bare).setDirectory(destination);
+		init.call();
+	}
+
