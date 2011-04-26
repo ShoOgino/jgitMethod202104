@@ -1,0 +1,20 @@
+	@Override
+	public void execute() throws BuildException {
+		CheckoutCommand checkout;
+		try {
+			Repository repo = new FileRepositoryBuilder().readEnvironment()
+					.findGitDir(src).build();
+			checkout = new Git(repo).checkout();
+		} catch (IOException e) {
+			throw new BuildException("Could not access repository " + src, e);
+		}
+
+		try {
+			checkout.setCreateBranch(createBranch).setForce(force)
+					.setName(branch);
+			checkout.call();
+		} catch (Exception e) {
+			throw new BuildException("Could not checkout repository " + src, e);
+		}
+	}
+
