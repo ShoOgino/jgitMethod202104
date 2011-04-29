@@ -1,5 +1,5 @@
 	@Test
-	public void testConflicting() throws Exception {
+	public void testConflictingDeletedAndModified() throws Exception {
 		Git git = new Git(db);
 
 		writeTrashFile("a", "1\na\n3\n");
@@ -7,12 +7,10 @@
 		git.add().addFilepattern("a").addFilepattern("b").call();
 		RevCommit initialCommit = git.commit().setMessage("initial").call();
 
-		// create side branch with two modifications
+		// create side branch and delete "a"
 		createBranch(initialCommit, "refs/heads/side");
 		checkoutBranch("refs/heads/side");
-		writeTrashFile("a", "1\na(side)\n3\n");
-		writeTrashFile("b", "1\nb\n3\n(side)");
-		git.add().addFilepattern("a").addFilepattern("b").call();
+		git.rm().addFilepattern("a").call();
 		RevCommit secondCommit = git.commit().setMessage("side").call();
 
 		// update a on master to generate conflict
@@ -30,8 +28,7 @@
 		IndexDiff diff = new IndexDiff(db, Constants.HEAD, iterator);
 		diff.diff();
 
-		assertEquals("[b]",
-				new TreeSet<String>(diff.getChanged()).toString());
+		assertEquals("[]", new TreeSet<String>(diff.getChanged()).toString());
 		assertEquals("[]", diff.getAdded().toString());
 		assertEquals("[]", diff.getRemoved().toString());
 		assertEquals("[]", diff.getMissing().toString());
