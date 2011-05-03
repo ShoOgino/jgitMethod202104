@@ -1,0 +1,19 @@
+	@Override
+	@Before
+	public void setUp() throws Exception {
+		super.setUp();
+		git = new Git(db);
+		writeTrashFile(FILE1, "1");
+		writeTrashFile(FILE2, "a");
+		git.add().addFilepattern(FILE1).addFilepattern(FILE2).call();
+		initialCommit = git.commit().setMessage("Initial commit").call();
+		writeTrashFile(FILE1, "2");
+		writeTrashFile(FILE2, "b");
+		git.add().addFilepattern(FILE1).addFilepattern(FILE2).call();
+		secondCommit = git.commit().setMessage("Second commit").call();
+		writeTrashFile(FILE1, "3");
+		writeTrashFile(FILE2, "c");
+		git.add().addFilepattern(FILE1).addFilepattern(FILE2).call();
+		git.commit().setMessage("Third commit").call();
+	}
+
