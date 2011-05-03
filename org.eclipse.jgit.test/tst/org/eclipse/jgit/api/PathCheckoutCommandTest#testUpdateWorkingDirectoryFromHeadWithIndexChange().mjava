@@ -1,0 +1,13 @@
+	@Test
+	public void testUpdateWorkingDirectoryFromHeadWithIndexChange()
+			throws Exception {
+		CheckoutCommand co = git.checkout();
+		File written = writeTrashFile(FILE1, "3a");
+		git.add().addFilepattern(FILE1).call();
+		written = writeTrashFile(FILE1, "");
+		assertEquals("", read(written));
+		co.addPath(FILE1).setStartPoint("HEAD").call();
+		assertEquals("3", read(written));
+		assertEquals("c", read(new File(db.getWorkTree(), FILE2)));
+	}
+

@@ -1,0 +1,10 @@
+	@Test
+	public void testUpdateWorkingDirectory() throws Exception {
+		CheckoutCommand co = git.checkout();
+		File written = writeTrashFile(FILE1, "");
+		assertEquals("", read(written));
+		co.addPath(FILE1).call();
+		assertEquals("3", read(written));
+		assertEquals("c", read(new File(db.getWorkTree(), FILE2)));
+	}
+

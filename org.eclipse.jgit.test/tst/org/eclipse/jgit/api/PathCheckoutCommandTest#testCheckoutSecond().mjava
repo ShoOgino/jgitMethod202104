@@ -1,0 +1,9 @@
+	@Test
+	public void testCheckoutSecond() throws Exception {
+		CheckoutCommand co = git.checkout();
+		File written = writeTrashFile(FILE1, "");
+		co.setStartPoint("HEAD~1").addPath(FILE1).call();
+		assertEquals("2", read(written));
+		assertEquals("c", read(new File(db.getWorkTree(), FILE2)));
+	}
+

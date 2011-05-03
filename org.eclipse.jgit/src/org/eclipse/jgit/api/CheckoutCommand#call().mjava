@@ -14,6 +14,12 @@
 		checkCallable();
 		processOptions();
 		try {
+			if (!paths.isEmpty()) {
+				checkoutPaths();
+				status = CheckoutResult.OK_RESULT;
+				setCallable(false);
+				return null;
+			}
 
 			if (createBranch) {
 				Git git = new Git(repo);
