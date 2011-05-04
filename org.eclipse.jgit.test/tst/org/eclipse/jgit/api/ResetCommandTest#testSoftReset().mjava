@@ -4,6 +4,7 @@
 			NoHeadException, NoMessageException, ConcurrentRefUpdateException,
 			WrongRepositoryStateException {
 		setupRepository();
+		ObjectId prevHead = db.resolve(Constants.HEAD);
 		git.reset().setMode(ResetType.SOFT).setRef(initialCommit.getName())
 				.call();
 		// check if HEAD points to initial commit now
@@ -16,5 +17,6 @@
 		String fileInIndexPath = indexFile.getAbsolutePath();
 		assertFalse(inHead(fileInIndexPath));
 		assertTrue(inIndex(indexFile.getName()));
+		assertReflog(prevHead, head);
 	}
 
