@@ -1,9 +1,6 @@
 	private PackChunk useReadyChunk(ChunkKey key) {
 		PackChunk chunk = ready.remove(key);
 
-		if (cacheLoadedChunks)
-			chunk = ChunkCache.get().put(chunk);
-
 		status.put(chunk.getChunkKey(), Status.DONE);
 		bytesReady -= chunk.getTotalSize();
 

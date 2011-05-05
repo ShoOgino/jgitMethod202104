@@ -1,5 +1,4 @@
-	void push(DhtReader ctx, Collection<RevCommit> roots) throws DhtException,
-			MissingObjectException {
+	void push(DhtReader ctx, Collection<RevCommit> roots) {
 		// Approximate walk by using hints from the most recent commit.
 		// Since the commits were recently parsed by the reader, we can
 		// ask the reader for their chunk locations and most likely get
@@ -10,7 +9,7 @@
 
 		for (RevCommit cmit : roots) {
 			if (time < cmit.getCommitTime()) {
-				ChunkAndOffset p = ctx.getChunkGently(cmit, cmit.getType());
+				ChunkAndOffset p = ctx.getChunkGently(cmit);
 				if (p != null && p.chunk.getMeta() != null) {
 					time = cmit.getCommitTime();
 					chunk = p.chunk;

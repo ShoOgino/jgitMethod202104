@@ -4,26 +4,19 @@
 		// set's iterator order to load in the order we want data.
 		//
 		LinkedHashSet<ChunkKey> toLoad = new LinkedHashSet<ChunkKey>();
-		ChunkCache cache = ChunkCache.get();
 
 		while (bytesReady + bytesLoading < highWaterMark && !queue.isEmpty()) {
 			ChunkKey key = queue.removeFirst();
-			PackChunk chunk = cache.get(key);
 
-			if (chunk != null) {
-				stats.access(key).cntPrefetcher_ChunkCacheHit++;
-				chunkIsReady(chunk);
-			} else {
-				stats.access(key).cntPrefetcher_Load++;
-				toLoad.add(key);
-				status.put(key, Status.LOADING);
-				bytesLoading += averageChunkSize;
+			stats.access(key).cntPrefetcher_Load++;
+			toLoad.add(key);
+			status.put(key, Status.LOADING);
+			bytesLoading += averageChunkSize;
 
-				// For the first chunk, start immediately to reduce the
-				// startup latency associated with additional chunks.
-				if (first)
-					break;
-			}
+			// For the first chunk, start immediately to reduce the
+			// startup latency associated with additional chunks.
+			if (first)
+				break;
 		}
 
 		if (!toLoad.isEmpty() && error == null)
