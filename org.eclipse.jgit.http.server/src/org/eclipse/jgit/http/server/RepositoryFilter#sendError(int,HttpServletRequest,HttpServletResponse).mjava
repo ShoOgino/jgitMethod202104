@@ -1,10 +1,8 @@
 	static void sendError(int statusCode, HttpServletRequest req,
 			HttpServletResponse rsp) throws IOException {
 		String svc = req.getParameter("service");
-		String accept = req.getHeader(HDR_ACCEPT);
 
-		if (svc != null && svc.startsWith("git-") && accept != null
-				&& accept.contains("application/x-" + svc + "-advertisement")) {
+		if (req.getRequestURI().endsWith("/info/refs") && isService(svc)) {
 			// Smart HTTP service request, use an ERR response.
 			rsp.setContentType("application/x-" + svc + "-advertisement");
 
@@ -17,6 +15,7 @@
 			return;
 		}
 
+		String accept = req.getHeader(HDR_ACCEPT);
 		if (accept != null && accept.contains(UploadPackServlet.RSP_TYPE)) {
 			// An upload-pack wants ACK or NAK, return ERR
 			// and the client will print this instead.
