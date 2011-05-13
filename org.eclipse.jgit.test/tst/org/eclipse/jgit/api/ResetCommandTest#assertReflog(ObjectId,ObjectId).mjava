@@ -1,0 +1,25 @@
+	private void assertReflog(ObjectId prevHead, ObjectId head)
+			throws IOException {
+		// Check the reflog for HEAD
+		String actualHeadMessage = db.getReflogReader(Constants.HEAD)
+				.getLastEntry().getComment();
+		String expectedHeadMessage = head.getName() + ": updating HEAD";
+		assertEquals(expectedHeadMessage, actualHeadMessage);
+		assertEquals(head.getName(), db.getReflogReader(Constants.HEAD)
+				.getLastEntry().getNewId().getName());
+		assertEquals(prevHead.getName(), db
+				.getReflogReader(Constants.HEAD).getLastEntry().getOldId()
+				.getName());
+
+		// The reflog for master contains the same as the one for HEAD
+		String actualMasterMessage = db.getReflogReader("refs/heads/master")
+				.getLastEntry().getComment();
+		String expectedMasterMessage = head.getName() + ": updating HEAD"; // yes!
+		assertEquals(expectedMasterMessage, actualMasterMessage);
+		assertEquals(head.getName(), db.getReflogReader(Constants.HEAD)
+				.getLastEntry().getNewId().getName());
+		assertEquals(prevHead.getName(),
+				db.getReflogReader("refs/heads/master").getLastEntry()
+						.getOldId().getName());
+	}
+
