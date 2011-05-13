@@ -12,7 +12,7 @@
 	void safePut(Database db, WriteBuffer dbWriteBuffer) throws DhtException {
 		WriteBuffer chunkBuf = db.newWriteBuffer();
 
-		db.repository().put(repo, info, chunkBuf);
+		db.repository().put(repo, getChunkInfo(), chunkBuf);
 		chunkBuf.flush();
 
 		db.chunk().put(builder, chunkBuf);

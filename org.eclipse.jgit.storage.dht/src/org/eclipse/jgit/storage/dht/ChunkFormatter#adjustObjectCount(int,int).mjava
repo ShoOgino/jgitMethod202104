@@ -1,23 +1,23 @@
 	void adjustObjectCount(int delta, int type) {
-		info.objectsTotal += delta;
+		objectsTotal += delta;
 
 		switch (type) {
 		case Constants.OBJ_COMMIT:
 		case Constants.OBJ_TREE:
 		case Constants.OBJ_BLOB:
 		case Constants.OBJ_TAG:
-			info.objectsWhole += delta;
+			objectsWhole += delta;
 			break;
 
 		case Constants.OBJ_OFS_DELTA:
-			info.objectsOfsDelta += delta;
+			objectsOfsDelta += delta;
 			if (currentObjectBase != null && --currentObjectBase.useCount == 0)
 				baseChunks.remove(currentObjectBase.key);
 			currentObjectBase = null;
 			break;
 
 		case Constants.OBJ_REF_DELTA:
-			info.objectsRefDelta += delta;
+			objectsRefDelta += delta;
 			break;
 		}
 	}

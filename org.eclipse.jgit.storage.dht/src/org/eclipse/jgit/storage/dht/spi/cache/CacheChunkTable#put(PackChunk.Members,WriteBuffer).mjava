@@ -4,8 +4,10 @@
 		db.put(chunk, buf.getWriteBuffer());
 
 		// Only store fragmented meta. This is all callers should ask for.
-		if (chunk.hasMeta() && chunk.getMeta().getFragmentCount() != 0)
-			buf.put(nsMeta.key(chunk.getChunkKey()), chunk.getMeta().asBytes());
+		if (chunk.hasMeta() && chunk.getMeta().getFragmentCount() != 0) {
+			buf.put(nsMeta.key(chunk.getChunkKey()),
+					chunk.getMeta().toByteArray());
+		}
 
 		if (chunk.hasChunkData())
 			buf.put(nsChunk.key(chunk.getChunkKey()), encode(chunk));

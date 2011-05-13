@@ -22,12 +22,13 @@
 		// TODO Allow more than one chunk pending at a time, this would
 		// permit batching puts of the ChunkInfo records.
 
-		activeChunk.end(digest());
-		activeChunk.safePut(db, dbBuffer());
-		activeChunk = newChunk();
-
-		if (activeChunk.whole(deflater(), type, data, off, len, objId))
-			return objId;
+		if (!activeChunk.isEmpty()) {
+			activeChunk.end(digest());
+			activeChunk.safePut(db, dbBuffer());
+			activeChunk = newChunk();
+			if (activeChunk.whole(deflater(), type, data, off, len, objId))
+				return objId;
+		}
 
 		return insertStream(type, len, asStream(data, off, len));
 	}

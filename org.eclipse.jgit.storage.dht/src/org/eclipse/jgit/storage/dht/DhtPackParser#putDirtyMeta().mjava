@@ -1,8 +1,8 @@
 	private void putDirtyMeta() throws DhtException {
-		for (ChunkMeta meta : dirtyMeta.values()) {
+		for (Map.Entry<ChunkKey, ChunkMeta> meta : dirtyMeta.entrySet()) {
 			PackChunk.Members builder = new PackChunk.Members();
-			builder.setChunkKey(meta.getChunkKey());
-			builder.setMeta(meta);
+			builder.setChunkKey(meta.getKey());
+			builder.setMeta(meta.getValue());
 			db.chunk().put(builder, dbWriteBuffer);
 		}
 	}

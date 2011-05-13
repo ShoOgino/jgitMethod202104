@@ -1,0 +1,28 @@
+      public int getSerializedSize() {
+        int size = memoizedSerializedSize;
+        if (size != -1) return size;
+
+        size = 0;
+        {
+          int dataSize = 0;
+          for (int i = 0; i < edge_.size(); i++) {
+            dataSize += com.google.protobuf.CodedOutputStream
+              .computeBytesSizeNoTag(edge_.getByteString(i));
+          }
+          size += dataSize;
+          size += 1 * getEdgeList().size();
+        }
+        {
+          int dataSize = 0;
+          for (int i = 0; i < sequential_.size(); i++) {
+            dataSize += com.google.protobuf.CodedOutputStream
+              .computeBytesSizeNoTag(sequential_.getByteString(i));
+          }
+          size += dataSize;
+          size += 1 * getSequentialList().size();
+        }
+        size += getUnknownFields().getSerializedSize();
+        memoizedSerializedSize = size;
+        return size;
+      }
+

@@ -1,0 +1,30 @@
+    @java.lang.Override
+    public boolean equals(final Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.eclipse.jgit.generated.storage.dht.proto.GitStore.ChunkMeta)) {
+        return super.equals(obj);
+      }
+      org.eclipse.jgit.generated.storage.dht.proto.GitStore.ChunkMeta other = (org.eclipse.jgit.generated.storage.dht.proto.GitStore.ChunkMeta) obj;
+
+      boolean result = true;
+      result = result && getBaseChunkList()
+          .equals(other.getBaseChunkList());
+      result = result && getFragmentList()
+          .equals(other.getFragmentList());
+      result = result && (hasCommitPrefetch() == other.hasCommitPrefetch());
+      if (hasCommitPrefetch()) {
+        result = result && getCommitPrefetch()
+            .equals(other.getCommitPrefetch());
+      }
+      result = result && (hasTreePrefetch() == other.hasTreePrefetch());
+      if (hasTreePrefetch()) {
+        result = result && getTreePrefetch()
+            .equals(other.getTreePrefetch());
+      }
+      result = result &&
+          getUnknownFields().equals(other.getUnknownFields());
+      return result;
+    }
+

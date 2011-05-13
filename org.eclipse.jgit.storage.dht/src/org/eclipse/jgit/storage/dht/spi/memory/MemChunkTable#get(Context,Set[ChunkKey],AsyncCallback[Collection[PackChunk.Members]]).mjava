@@ -20,8 +20,15 @@
 				m.setChunkIndex(cell.getValue());
 
 			cell = table.get(row, colMeta.name());
-			if (cell != null)
-				m.setMeta(ChunkMeta.fromBytes(chunk, cell.getValue()));
+			if (cell != null) {
+				try {
+					m.setMeta(ChunkMeta.parseFrom(cell.getValue()));
+				} catch (InvalidProtocolBufferException err) {
+					callback.onFailure(new DhtException(MessageFormat.format(
+							DhtText.get().invalidChunkMeta, chunk), err));
+					return;
+				}
+			}
 
 			out.add(m);
 		}

@@ -1,0 +1,16 @@
+		public void onSuccess(Map<ChunkKey, ChunkMeta> result) {
+			try {
+				synchronized (allMeta) {
+					allMeta.putAll(result);
+					keys.removeAll(result.keySet());
+				}
+				if (context == Context.FAST_MISSING_OK && !keys.isEmpty()) {
+					synchronized (metaMissing) {
+						metaMissing.addAll(keys);
+					}
+				}
+			} finally {
+				metaBatches.release(1);
+			}
+		}
+

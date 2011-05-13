@@ -1,0 +1,7 @@
+	private static int computeByteBufferSize(int fieldNumber, ByteBuffer data) {
+		int n = data.remaining();
+		return CodedOutputStream.computeTagSize(fieldNumber)
+				+ CodedOutputStream.computeRawVarint32Size(n)
+				+ n;
+	}
+

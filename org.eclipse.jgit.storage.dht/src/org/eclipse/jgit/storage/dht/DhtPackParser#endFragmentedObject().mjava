@@ -4,14 +4,24 @@
 		if (lastKey != null)
 			currFragments.add(lastKey);
 
+		ChunkMeta.Builder protoBuilder = ChunkMeta.newBuilder();
+		for (ChunkKey key : currFragments)
+			protoBuilder.addFragment(key.asString());
+		ChunkMeta protoMeta = protoBuilder.build();
+
 		for (ChunkKey key : currFragments) {
-			ChunkMeta meta = chunkMeta.get(key);
-			if (meta == null) {
-				meta = new ChunkMeta(key);
+			ChunkMeta oldMeta = chunkMeta.get(key);
+			if (oldMeta != null) {
+				ChunkMeta.Builder newMeta = ChunkMeta.newBuilder(oldMeta);
+				newMeta.clearFragment();
+				newMeta.mergeFrom(protoMeta);
+				ChunkMeta meta = newMeta.build();
+				dirtyMeta.put(key, meta);
 				chunkMeta.put(key, meta);
+			} else {
+				dirtyMeta.put(key, protoMeta);
+				chunkMeta.put(key, protoMeta);
 			}
-			meta.fragments = currFragments;
-			dirtyMeta.put(key, meta);
 		}
 		currFragments = null;
 	}

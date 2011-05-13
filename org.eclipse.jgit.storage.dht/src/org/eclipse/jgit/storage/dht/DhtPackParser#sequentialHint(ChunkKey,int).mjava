@@ -1,12 +1,7 @@
 	private List<ChunkKey> sequentialHint(ChunkKey key, int typeCode) {
-		List<ChunkInfo> infoList = infoByOrder[typeCode];
-		if (infoList == null)
+		List<ChunkKey> all = chunkByOrder[typeCode];
+		if (all == null)
 			return null;
-
-		List<ChunkKey> all = new ArrayList<ChunkKey>(infoList.size());
-		for (ChunkInfo info : infoList)
-			all.add(info.getChunkKey());
-
 		int idx = all.indexOf(key);
 		if (0 <= idx) {
 			int max = options.getPrefetchDepth();

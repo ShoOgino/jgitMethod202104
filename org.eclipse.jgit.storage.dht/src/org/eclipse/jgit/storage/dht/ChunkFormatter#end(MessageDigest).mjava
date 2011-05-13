@@ -12,37 +12,58 @@
 		ptr += 4;
 
 		md.update(chunkData, 0, ptr);
-		info.chunkKey = ChunkKey.create(repo, ObjectId.fromRaw(md.digest()));
-		info.chunkSize = chunkData.length;
+		ChunkKey key = ChunkKey.create(repo, ObjectId.fromRaw(md.digest()));
+
+		GitStore.ChunkInfo.Builder info = GitStore.ChunkInfo.newBuilder();
+		info.setSource(source);
+		info.setObjectType(GitStore.ChunkInfo.ObjectType.valueOf(objectType));
+		if (fragment)
+			info.setIsFragment(true);
+		info.setChunkSize(chunkData.length);
+
+		GitStore.ChunkInfo.ObjectCounts.Builder cnts = info.getObjectCountsBuilder();
+		cnts.setTotal(objectsTotal);
+		if (objectsWhole > 0)
+			cnts.setWhole(objectsWhole);
+		if (objectsRefDelta > 0)
+			cnts.setRefDelta(objectsRefDelta);
+		if (objectsOfsDelta > 0)
+			cnts.setOfsDelta(objectsOfsDelta);
 
 		builder = new PackChunk.Members();
-		builder.setChunkKey(info.chunkKey);
+		builder.setChunkKey(key);
 		builder.setChunkData(chunkData);
 
-		ChunkMeta meta = new ChunkMeta(info.chunkKey);
 		if (baseChunks != null) {
-			meta.baseChunks = new ArrayList<BaseChunk>(baseChunks.size());
+			List<BaseChunk> list = new ArrayList<BaseChunk>(baseChunks.size());
 			for (BaseChunkInfo b : baseChunks.values()) {
-				if (0 < b.useCount)
-					meta.baseChunks.add(new BaseChunk(b.relativeStart, b.key));
+				if (0 < b.useCount) {
+					BaseChunk.Builder c = BaseChunk.newBuilder();
+					c.setRelativeStart(b.relativeStart);
+					c.setChunkKey(b.key.asString());
+					list.add(c.build());
+				}
 			}
-			Collections.sort(meta.baseChunks, new Comparator<BaseChunk>() {
+			Collections.sort(list, new Comparator<BaseChunk>() {
 				public int compare(BaseChunk a, BaseChunk b) {
-					return Long.signum(a.relativeStart - b.relativeStart);
+					return Long.signum(a.getRelativeStart()
+							- b.getRelativeStart());
 				}
 			});
-		}
-		if (!meta.isEmpty()) {
+			ChunkMeta.Builder b = ChunkMeta.newBuilder();
+			b.addAllBaseChunk(list);
+			ChunkMeta meta = b.build();
 			builder.setMeta(meta);
-			info.metaSize = meta.asBytes().length;
+			info.setMetaSize(meta.getSerializedSize());
 		}
 
 		if (objectList != null && !objectList.isEmpty()) {
 			byte[] index = ChunkIndex.create(objectList);
 			builder.setChunkIndex(index);
-			info.indexSize = index.length;
+			info.setIndexSize(index.length);
 		}
 
+		chunkInfo = new ChunkInfo(key, info.build());
 		return getChunkKey();
 	}
 

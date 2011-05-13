@@ -72,8 +72,13 @@
 				ChunkKey key = chunk.end(chunkDigest);
 				chunk.setChunkIndex(Collections.singletonList(oe));
 				chunk.safePut(db, dbBuffer());
-				ObjectInfo info = new ObjectInfo(key, -1, type, position,
-						packedSize, inflatedSize, null, false);
+
+				GitStore.ObjectInfo.Builder b = GitStore.ObjectInfo.newBuilder();
+				b.setObjectType(ObjectType.valueOf(type));
+				b.setOffset(position);
+				b.setPackedSize(packedSize);
+				b.setInflatedSize(inflatedSize);
+				ObjectInfo info = new ObjectInfo(key, b.build());
 				ObjectIndexKey objKey = ObjectIndexKey.create(repo, objId);
 				db.objectIndex().add(objKey, info, dbBuffer());
 				return objId;
@@ -86,12 +91,15 @@
 		chunk = null;
 
 		ChunkKey firstChunkKey = fragmentList.get(0);
+
+		ChunkMeta.Builder metaBuilder = ChunkMeta.newBuilder();
+		for (ChunkKey k : fragmentList)
+			metaBuilder.addFragment(k.asString());
+		ChunkMeta meta = metaBuilder.build();
+
 		for (ChunkKey key : fragmentList) {
 			PackChunk.Members builder = new PackChunk.Members();
 			builder.setChunkKey(key);
-
-			ChunkMeta meta = new ChunkMeta(key);
-			meta.fragments = fragmentList;
 			builder.setMeta(meta);
 
 			if (firstChunkKey.equals(key))
@@ -100,8 +108,12 @@
 			db.chunk().put(builder, dbBuffer());
 		}
 
-		ObjectInfo info = new ObjectInfo(firstChunkKey, -1, type, position,
-				packedSize, inflatedSize, null, true);
+		GitStore.ObjectInfo.Builder b = GitStore.ObjectInfo.newBuilder();
+		b.setObjectType(ObjectType.valueOf(type));
+		b.setOffset(position);
+		b.setPackedSize(packedSize);
+		b.setInflatedSize(inflatedSize);
+		ObjectInfo info = new ObjectInfo(firstChunkKey, b.build());
 		ObjectIndexKey objKey = ObjectIndexKey.create(repo, objId);
 		db.objectIndex().add(objKey, info, dbBuffer());
 

@@ -1,14 +1,14 @@
 	private boolean longOfsDelta(ChunkFormatter w, long infSize, long basePtr) {
 		final int type = typeOf(basePtr);
-		final List<ChunkInfo> infoList = infoByOrder[type];
+		final List<ChunkKey> infoList = chunkByOrder[type];
 		final int baseIdx = chunkIdx(basePtr);
-		final ChunkInfo baseInfo = infoList.get(baseIdx);
+		final ChunkInfo baseInfo = infoByKey.get(infoList.get(baseIdx));
 
 		// Go backwards to the start of the base's chunk.
 		long relativeChunkStart = 0;
 		for (int i = infoList.size() - 1; baseIdx <= i; i--) {
-			ChunkInfo info = infoList.get(i);
-			int packSize = info.chunkSize - ChunkFormatter.TRAILER_SIZE;
+			GitStore.ChunkInfo info = infoByKey.get(infoList.get(i)).getData();
+			int packSize = info.getChunkSize() - ChunkFormatter.TRAILER_SIZE;
 			relativeChunkStart += packSize;
 		}
 

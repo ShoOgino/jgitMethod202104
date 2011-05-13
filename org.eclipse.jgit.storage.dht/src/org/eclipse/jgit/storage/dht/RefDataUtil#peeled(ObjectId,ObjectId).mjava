@@ -1,0 +1,9 @@
+	static RefData peeled(ObjectId targetId, ObjectId peeledId) {
+		RefData.Builder b = RefData.newBuilder();
+		b.setTarget(toRefData(targetId));
+		b.setIsPeeled(true);
+		if (peeledId != null)
+			b.setPeeled(toRefData(peeledId));
+		return b.build();
+	}
+

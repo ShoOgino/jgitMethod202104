@@ -1,0 +1,56 @@
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder(
+            this.getUnknownFields());
+        while (true) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              this.setUnknownFields(unknownFields.build());
+              onChanged();
+              return this;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                this.setUnknownFields(unknownFields.build());
+                onChanged();
+                return this;
+              }
+              break;
+            }
+            case 10: {
+              org.eclipse.jgit.generated.storage.dht.proto.GitStore.ChunkMeta.BaseChunk.Builder subBuilder = org.eclipse.jgit.generated.storage.dht.proto.GitStore.ChunkMeta.BaseChunk.newBuilder();
+              input.readMessage(subBuilder, extensionRegistry);
+              addBaseChunk(subBuilder.buildPartial());
+              break;
+            }
+            case 18: {
+              ensureFragmentIsMutable();
+              fragment_.add(input.readBytes());
+              break;
+            }
+            case 410: {
+              org.eclipse.jgit.generated.storage.dht.proto.GitStore.ChunkMeta.PrefetchHint.Builder subBuilder = org.eclipse.jgit.generated.storage.dht.proto.GitStore.ChunkMeta.PrefetchHint.newBuilder();
+              if (hasCommitPrefetch()) {
+                subBuilder.mergeFrom(getCommitPrefetch());
+              }
+              input.readMessage(subBuilder, extensionRegistry);
+              setCommitPrefetch(subBuilder.buildPartial());
+              break;
+            }
+            case 418: {
+              org.eclipse.jgit.generated.storage.dht.proto.GitStore.ChunkMeta.PrefetchHint.Builder subBuilder = org.eclipse.jgit.generated.storage.dht.proto.GitStore.ChunkMeta.PrefetchHint.newBuilder();
+              if (hasTreePrefetch()) {
+                subBuilder.mergeFrom(getTreePrefetch());
+              }
+              input.readMessage(subBuilder, extensionRegistry);
+              setTreePrefetch(subBuilder.buildPartial());
+              break;
+            }
+          }
+        }
+      }
+

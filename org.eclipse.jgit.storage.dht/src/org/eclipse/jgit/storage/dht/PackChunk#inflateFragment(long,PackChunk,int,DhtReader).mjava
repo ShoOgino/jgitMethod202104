@@ -16,7 +16,8 @@
 				if (inf.needsInput()) {
 					if (meta.getFragmentCount() <= nextChunk)
 						break;
-					pc = reader.getChunk(meta.getFragmentKey(nextChunk++));
+					pc = reader.getChunk(ChunkKey.fromString(
+							meta.getFragment(nextChunk++)));
 					if (meta.getFragmentCount() == nextChunk)
 						bs = pc.dataLen; // Include trailer on last chunk.
 					else
@@ -32,7 +33,7 @@
 		if (dstoff != sz) {
 			throw new DataFormatException(MessageFormat.format(
 					DhtText.get().shortCompressedObject,
-					meta.getChunkKey(),
+					ChunkKey.fromString(meta.getFragment(0)),
 					Integer.valueOf(pos)));
 		}
 		return dstbuf;

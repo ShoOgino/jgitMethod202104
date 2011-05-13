@@ -1,10 +1,10 @@
 	boolean whole(Deflater def, int type, byte[] data, int off, final int size,
 			ObjectId objId) {
-		if (free() < 10 || maxObjects <= info.objectsTotal)
+		if (free() < 10 || maxObjects <= objectsTotal)
 			return false;
 
 		header(type, size);
-		info.objectsWhole++;
+		objectsWhole++;
 		currentObjectType = type;
 
 		int endOfHeader = ptr;
@@ -32,10 +32,10 @@
 		final int packedSize = ptr - endOfHeader;
 		objectList.add(new StoredObject(objId, type, mark, packedSize, size));
 
-		if (info.objectType < 0)
-			info.objectType = type;
-		else if (info.objectType != type)
-			info.objectType = ChunkInfo.OBJ_MIXED;
+		if (objectType < 0)
+			objectType = type;
+		else if (objectType != type)
+			objectType = ChunkInfo.OBJ_MIXED;
 
 		return true;
 	}

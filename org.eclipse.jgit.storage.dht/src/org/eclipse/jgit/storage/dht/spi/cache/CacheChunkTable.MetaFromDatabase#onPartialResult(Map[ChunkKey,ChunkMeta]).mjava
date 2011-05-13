@@ -1,0 +1,28 @@
+		public void onPartialResult(Map<ChunkKey, ChunkMeta> result) {
+			final Map<ChunkKey, ChunkMeta> toPutIntoCache = copy(result);
+
+			if (streamingCallback != null)
+				streamingCallback.onPartialResult(result);
+			else {
+				synchronized (lock) {
+					all.putAll(result);
+				}
+			}
+
+			// Encoding is rather expensive, so move the cache population
+			// into it a different background thread to prevent the current
+			// database task from being starved of time.
+			//
+			executor.submit(new Runnable() {
+				public void run() {
+					for (Map.Entry<ChunkKey, ChunkMeta> ent
+							: toPutIntoCache.entrySet()) {
+						ChunkKey key = ent.getKey();
+						Change op = Change.put(nsMeta.key(key),
+								ent.getValue().toByteArray());
+						client.modify(singleton(op), none);
+					}
+				}
+			});
+		}
+

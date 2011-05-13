@@ -1,0 +1,15 @@
+		MetaFromCache(Context options, Set<ChunkKey> keys,
+				AsyncCallback<Map<ChunkKey, ChunkMeta>> callback) {
+			this.options = options;
+			this.remaining = new HashSet<ChunkKey>(keys);
+			this.normalCallback = callback;
+
+			if (callback instanceof StreamingCallback<?>) {
+				streamingCallback = (StreamingCallback<Map<ChunkKey, ChunkMeta>>) callback;
+				all = null;
+			} else {
+				streamingCallback = null;
+				all = new HashMap<ChunkKey, ChunkMeta>();
+			}
+		}
+

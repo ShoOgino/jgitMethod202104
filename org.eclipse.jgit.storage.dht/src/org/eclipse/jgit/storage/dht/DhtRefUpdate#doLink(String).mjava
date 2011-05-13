@@ -1,7 +1,7 @@
 	@Override
 	protected Result doLink(String target) throws IOException {
 		try {
-			newData = RefData.symbolic(target);
+			newData = RefDataUtil.symbolic(target);
 			boolean r = db.ref().compareAndPut(refKey, oldData, newData);
 			if (r) {
 				getRefDatabase().stored(dstRef.getName(), newData);

@@ -1,5 +1,5 @@
 	private ChunkKey chunkOf(long objectPtr) throws DhtException {
-		List<ChunkInfo> list = infoByOrder[typeOf(objectPtr)];
+		List<ChunkKey> list = chunkByOrder[typeOf(objectPtr)];
 		int idx = chunkIdx(objectPtr);
 		if (list == null || list.size() <= idx) {
 			throw new DhtException(MessageFormat.format(
@@ -8,6 +8,6 @@
 					Integer.valueOf(idx), //
 					Integer.valueOf(offsetOf(objectPtr))));
 		}
-		return list.get(idx).getChunkKey();
+		return list.get(idx);
 	}
 

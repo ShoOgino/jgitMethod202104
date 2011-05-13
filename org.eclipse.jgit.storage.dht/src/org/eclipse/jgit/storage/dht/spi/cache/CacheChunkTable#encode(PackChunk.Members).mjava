@@ -1,23 +1,30 @@
 	private static byte[] encode(PackChunk.Members members) {
-		final byte[] meta;
-		if (members.hasMeta())
-			meta = members.getMeta().asBytes();
-		else
-			meta = null;
+		// Its too slow to encode ByteBuffer through the standard code.
+		// Since the message is only 3 fields, do it by hand.
+		ByteBuffer data = members.getChunkDataAsByteBuffer();
+		ByteBuffer index = members.getChunkIndexAsByteBuffer();
+		ChunkMeta meta = members.getMeta();
 
-		ByteBuffer chunkData = members.getChunkDataAsByteBuffer();
-		ByteBuffer chunkIndex = members.getChunkIndexAsByteBuffer();
+		int sz = 0;
+		if (data != null)
+			sz += computeByteBufferSize(1, data);
+		if (index != null)
+			sz += computeByteBufferSize(2, index);
+		if (meta != null)
+			sz += CodedOutputStream.computeMessageSize(3, meta);
 
-		TinyProtobuf.Encoder sizer = TinyProtobuf.size();
-		TinyProtobuf.Encoder e = sizer;
-		do {
-			e.bytes(1, chunkData);
-			e.bytes(2, chunkIndex);
-			e.bytes(3, meta);
-			if (e == sizer)
-				e = TinyProtobuf.encode(e.size());
-			else
-				return e.asByteArray();
-		} while (true);
+		byte[] r = new byte[sz];
+		CodedOutputStream out = CodedOutputStream.newInstance(r);
+		try {
+			if (data != null)
+				writeByteBuffer(out, 1, data);
+			if (index != null)
+				writeByteBuffer(out, 2, index);
+			if (meta != null)
+				out.writeMessage(3, meta);
+		} catch (IOException err) {
+			throw new RuntimeException("Cannot buffer chunk", err);
+		}
+		return r;
 	}
 

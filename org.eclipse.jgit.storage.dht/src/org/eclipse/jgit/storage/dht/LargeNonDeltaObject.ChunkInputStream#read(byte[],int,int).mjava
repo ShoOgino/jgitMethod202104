@@ -9,7 +9,8 @@
 				if (fragment == meta.getFragmentCount())
 					return -1;
 
-				pc = ctx.getChunk(meta.getFragmentKey(++fragment));
+				pc = ctx.getChunk(ChunkKey.fromString(
+						meta.getFragment(++fragment)));
 				ptr = 0;
 				n = pc.read(ptr, dstbuf, dstptr, dstlen);
 				if (n == 0)

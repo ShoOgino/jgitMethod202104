@@ -53,7 +53,8 @@
 		if (isFragment()) {
 			int cnt = meta.getFragmentCount();
 			for (int fragId = 1; fragId < cnt; fragId++) {
-				PackChunk pc = ctx.getChunk(meta.getFragmentKey(fragId));
+				PackChunk pc = ctx.getChunk(ChunkKey.fromString(
+						meta.getFragment(fragId)));
 				pc.copyEntireChunkAsIs(out, obj, validate);
 			}
 		}

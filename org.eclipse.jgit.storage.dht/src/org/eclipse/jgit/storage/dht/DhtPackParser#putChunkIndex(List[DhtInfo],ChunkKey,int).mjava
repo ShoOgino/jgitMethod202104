@@ -1,47 +1,63 @@
 	private void putChunkIndex(List<DhtInfo> objectList, ChunkKey key, int type)
 			throws DhtException {
-		ChunkInfo info = infoByKey.get(key);
-		info.objectsTotal = objectList.size();
-		info.objectType = type;
+		ChunkInfo oldInfo = infoByKey.get(key);
+		GitStore.ChunkInfo.Builder info
+			= GitStore.ChunkInfo.newBuilder(oldInfo.getData());
 
 		PackChunk.Members builder = new PackChunk.Members();
 		builder.setChunkKey(key);
 
 		byte[] index = ChunkIndex.create(objectList);
-		info.indexSize = index.length;
+		info.setIndexSize(index.length);
 		builder.setChunkIndex(index);
 
 		ChunkMeta meta = dirtyMeta.remove(key);
 		if (meta == null)
 			meta = chunkMeta.get(key);
-		if (meta == null)
-			meta = new ChunkMeta(key);
 
 		switch (type) {
 		case OBJ_COMMIT: {
 			Edges edges = chunkEdges.get(key);
-			if (edges != null) {
-				List<ChunkKey> e = edges.commitEdges;
-				List<ChunkKey> s = sequentialHint(key, OBJ_COMMIT);
-				meta.commitPrefetch = new ChunkMeta.PrefetchHint(e, s);
+			List<ChunkKey> e = edges != null ? edges.commitEdges : null;
+			List<ChunkKey> s = sequentialHint(key, OBJ_COMMIT);
+			if (e == null)
+				e = Collections.emptyList();
+			if (s == null)
+				s = Collections.emptyList();
+			if (!e.isEmpty() || !s.isEmpty()) {
+				ChunkMeta.Builder m = edit(meta);
+				ChunkMeta.PrefetchHint.Builder h = m.getCommitPrefetchBuilder();
+				for (ChunkKey k : e)
+					h.addEdge(k.asString());
+				for (ChunkKey k : s)
+					h.addSequential(k.asString());
+				meta = m.build();
 			}
 			break;
 		}
 		case OBJ_TREE: {
 			List<ChunkKey> s = sequentialHint(key, OBJ_TREE);
-			meta.treePrefetch = new ChunkMeta.PrefetchHint(null, s);
+			if (s == null)
+				s = Collections.emptyList();
+			if (!s.isEmpty()) {
+				ChunkMeta.Builder m = edit(meta);
+				ChunkMeta.PrefetchHint.Builder h = m.getTreePrefetchBuilder();
+				for (ChunkKey k : s)
+					h.addSequential(k.asString());
+				meta = m.build();
+			}
 			break;
 		}
 		}
 
-		if (meta.isEmpty()) {
-			info.metaSize = 0;
-		} else {
-			info.metaSize = meta.asBytes().length;
+		if (meta != null) {
+			info.setMetaSize(meta.getSerializedSize());
 			builder.setMeta(meta);
 		}
 
-		db.repository().put(repo, info, dbWriteBuffer);
+		ChunkInfo newInfo = new ChunkInfo(key, info.build());
+		infoByKey.put(key, newInfo);
+		db.repository().put(repo, newInfo, dbWriteBuffer);
 		db.chunk().put(builder, dbWriteBuffer);
 	}
 

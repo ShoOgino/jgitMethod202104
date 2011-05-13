@@ -9,13 +9,12 @@
 
 			ChunkKey key = ctx.findChunk(oId);
 			if (key != null)
-				oId = new RefData.IdWithChunk(oId, key);
+				oId = new IdWithChunk(oId, key);
 
 			if (obj instanceof RevTag) {
 				ObjectId pId = rw.peel(obj);
 				key = ctx.findChunk(pId);
-				pId = key != null ? new RefData.IdWithChunk(pId, key) : pId
-						.copy();
+				pId = key != null ? new IdWithChunk(pId, key) : pId.copy();
 				return new PeeledTag(leaf.getStorage(), name, oId, pId);
 			} else {
 				return new PeeledNonTag(leaf.getStorage(), name, oId);

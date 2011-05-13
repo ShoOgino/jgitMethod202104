@@ -1,0 +1,9 @@
+	private void deleteChunks(List<ChunkKey> list) throws DhtException {
+		if (list != null) {
+			for (ChunkKey key : list) {
+				db.chunk().remove(key, dbWriteBuffer);
+				db.repository().remove(repo, key, dbWriteBuffer);
+			}
+		}
+	}
+
