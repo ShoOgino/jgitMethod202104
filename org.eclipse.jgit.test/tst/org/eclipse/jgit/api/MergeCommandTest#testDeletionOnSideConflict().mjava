@@ -27,5 +27,8 @@
 		assertTrue(new File(db.getWorkTree(), "a").exists());
 		assertEquals("1\na(main)\n3\n", read(new File(db.getWorkTree(), "a")));
 		assertEquals("1\nb\n3\n", read(new File(db.getWorkTree(), "b")));
+
+		assertEquals(1, result.getConflicts().size());
+		assertEquals(3, result.getConflicts().get("a")[0].length);
 	}
 
