@@ -3,8 +3,8 @@
 		try {
 			RepositoryKey repo = repository.getRepositoryKey();
 			RefKey key = RefKey.create(repo, newLeaf.getName());
-			RefData oldData = RefDataUtil.fromRef(oldLeaf);
-			RefData newData = RefDataUtil.fromRef(newLeaf);
+			RefData oldData = ((DhtRef) oldLeaf).getRefData();
+			RefData newData = ((DhtRef) newLeaf).getRefData();
 			db.ref().compareAndPut(key, oldData, newData);
 		} catch (TimeoutException e) {
 			// Ignore a timeout here, we were only trying to update

@@ -4,12 +4,12 @@
 		if (oldLeaf.isPeeled() || oldLeaf.getObjectId() == null)
 			return ref;
 
-		Ref newLeaf = doPeel(oldLeaf);
+		DhtRef newLeaf = doPeel(oldLeaf);
 
 		RefCache cur = readRefs();
 		int idx = cur.ids.find(oldLeaf.getName());
 		if (0 <= idx && cur.ids.get(idx) == oldLeaf) {
-			RefList<Ref> newList = cur.ids.set(idx, newLeaf);
+			RefList<DhtRef> newList = cur.ids.set(idx, newLeaf);
 			if (cache.compareAndSet(cur, new RefCache(newList, cur)))
 				cachePeeledState(oldLeaf, newLeaf);
 		}

@@ -1,19 +1,7 @@
-	private static Ref fromData(String name, RefData data) {
-		if (data.hasSymref()) {
-			Ref leaf = new Unpeeled(NEW, data.getSymref(), null);
-			return new SymbolicRef(name, leaf);
-		}
-
-		if (!data.hasTarget())
-			return new Unpeeled(LOOSE, name, null);
-
-		ObjectId oId = IdWithChunk.create(data.getTarget());
-		if (data.getIsPeeled() && data.hasPeeled()) {
-			ObjectId pId = IdWithChunk.create(data.getPeeled());
-			return new PeeledTag(LOOSE, name, oId, pId);
-		}
-		if (data.getIsPeeled())
-			return new PeeledNonTag(LOOSE, name, oId);
-		return new Unpeeled(LOOSE, name, oId);
+	static DhtRef fromData(String name, RefData data) {
+		if (data.hasSymref())
+			return new DhtSymbolicRef(name, data);
+		else
+			return new DhtObjectIdRef(name, data);
 	}
 

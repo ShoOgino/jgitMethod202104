@@ -1,10 +1,10 @@
 	private RefCache read() throws DhtException, TimeoutException {
-		RefList.Builder<Ref> id = new RefList.Builder<Ref>();
-		RefList.Builder<Ref> sym = new RefList.Builder<Ref>();
+		RefList.Builder<DhtRef> id = new RefList.Builder<DhtRef>();
+		RefList.Builder<DhtRef> sym = new RefList.Builder<DhtRef>();
 		ObjectIdSubclassMap<IdWithChunk> hints = new ObjectIdSubclassMap<IdWithChunk>();
 
 		for (Map.Entry<RefKey, RefData> e : scan()) {
-			Ref ref = fromData(e.getKey().getName(), e.getValue());
+			DhtRef ref = fromData(e.getKey().getName(), e.getValue());
 
 			if (ref.isSymbolic())
 				sym.add(ref);

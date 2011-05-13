@@ -1,10 +1,25 @@
 	@Override
 	public DhtRefUpdate newUpdate(String refName, boolean detach)
 			throws IOException {
-		Ref ref = getRefs(ALL).get(refName);
+		boolean detachingSymbolicRef = false;
+		DhtRef ref = getOneRef(refName);
 		if (ref == null)
-			ref = new Unpeeled(NEW, refName, null);
+			ref = new DhtObjectIdRef(refName, NONE);
+		else
+			detachingSymbolicRef = detach && ref.isSymbolic();
+
+		if (detachingSymbolicRef) {
+			RefData src = ((DhtRef) ref.getLeaf()).getRefData();
+			RefData.Builder b = RefData.newBuilder(ref.getRefData());
+			b.clearSymref();
+			b.setTarget(src.getTarget());
+			ref = new DhtObjectIdRef(refName, b.build());
+		}
+
 		RepositoryKey repo = repository.getRepositoryKey();
-		return new DhtRefUpdate(this, repo, db, ref);
+		DhtRefUpdate update = new DhtRefUpdate(this, repo, db, ref);
+		if (detachingSymbolicRef)
+			update.setDetachingSymbolicRef();
+		return update;
 	}
 

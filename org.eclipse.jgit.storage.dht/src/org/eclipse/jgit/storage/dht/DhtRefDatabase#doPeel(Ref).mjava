@@ -1,24 +1,33 @@
-	private Ref doPeel(final Ref leaf) throws MissingObjectException,
+	private DhtRef doPeel(final Ref leaf) throws MissingObjectException,
 			IOException {
 		RevWalk rw = new RevWalk(getRepository());
 		try {
-			String name = leaf.getName();
-			ObjectId oId = leaf.getObjectId();
-			RevObject obj = rw.parseAny(oId);
 			DhtReader ctx = (DhtReader) rw.getObjectReader();
+			RevObject obj = rw.parseAny(leaf.getObjectId());
+			RefData.Builder d = RefData.newBuilder(((DhtRef) leaf).getRefData());
 
-			ChunkKey key = ctx.findChunk(oId);
-			if (key != null)
-				oId = new IdWithChunk(oId, key);
+			ChunkKey oKey = ctx.findChunk(leaf.getObjectId());
+			if (oKey != null)
+				d.getTargetBuilder().setChunkKey(oKey.asString());
+			else
+				d.getTargetBuilder().clearChunkKey();
 
 			if (obj instanceof RevTag) {
 				ObjectId pId = rw.peel(obj);
-				key = ctx.findChunk(pId);
-				pId = key != null ? new IdWithChunk(pId, key) : pId.copy();
-				return new PeeledTag(leaf.getStorage(), name, oId, pId);
+				d.getPeeledBuilder().setObjectName(pId.name());
+
+				ChunkKey pKey = ctx.findChunk(pId);
+				if (pKey != null)
+					d.getPeeledBuilder().setChunkKey(pKey.asString());
+				else
+					d.getPeeledBuilder().clearChunkKey();
 			} else {
-				return new PeeledNonTag(leaf.getStorage(), name, oId);
+				d.clearPeeled();
 			}
+
+			d.setIsPeeled(true);
+			d.setSequence(d.getSequence() + 1);
+			return new DhtObjectIdRef(leaf.getName(), d.build());
 		} finally {
 			rw.release();
 		}

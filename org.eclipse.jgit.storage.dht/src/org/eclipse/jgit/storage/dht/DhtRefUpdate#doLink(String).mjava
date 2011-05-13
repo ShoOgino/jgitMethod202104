@@ -1,7 +1,11 @@
 	@Override
 	protected Result doLink(String target) throws IOException {
 		try {
-			newData = RefDataUtil.symbolic(target);
+			RefData.Builder d = RefData.newBuilder(oldData);
+			clearRefData(d);
+			updateSequence(d);
+			d.setSymref(target);
+			newData = d.build();
 			boolean r = db.ref().compareAndPut(refKey, oldData, newData);
 			if (r) {
 				getRefDatabase().stored(dstRef.getName(), newData);

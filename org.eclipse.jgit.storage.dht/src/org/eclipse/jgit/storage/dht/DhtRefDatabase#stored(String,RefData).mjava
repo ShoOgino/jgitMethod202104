@@ -1,13 +1,13 @@
 	void stored(String refName, RefData newData) {
-		Ref ref = fromData(refName, newData);
+		DhtRef ref = fromData(refName, newData);
 		RefCache oldCache, newCache;
 		do {
 			oldCache = cache.get();
 			if (oldCache == null)
 				return;
 
-			RefList<Ref> ids = oldCache.ids.put(ref);
-			RefList<Ref> sym = oldCache.sym;
+			RefList<DhtRef> ids = oldCache.ids.put(ref);
+			RefList<DhtRef> sym = oldCache.sym;
 
 			if (ref.isSymbolic()) {
 				sym.put(ref);

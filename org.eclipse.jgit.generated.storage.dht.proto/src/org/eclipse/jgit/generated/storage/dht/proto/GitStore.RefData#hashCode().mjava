@@ -2,6 +2,10 @@
     public int hashCode() {
       int hash = 41;
       hash = (19 * hash) + getDescriptorForType().hashCode();
+      if (hasSequence()) {
+        hash = (37 * hash) + SEQUENCE_FIELD_NUMBER;
+        hash = (53 * hash) + getSequence();
+      }
       if (hasSymref()) {
         hash = (37 * hash) + SYMREF_FIELD_NUMBER;
         hash = (53 * hash) + getSymref().hashCode();

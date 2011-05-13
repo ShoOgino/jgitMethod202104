@@ -1,12 +1,12 @@
 	@Override
 	public Map<String, Ref> getRefs(String prefix) throws IOException {
 		RefCache curr = readRefs();
-		RefList<Ref> packed = RefList.emptyList();
-		RefList<Ref> loose = curr.ids;
-		RefList.Builder<Ref> sym = new RefList.Builder<Ref>(curr.sym.size());
+		RefList<DhtRef> packed = RefList.emptyList();
+		RefList<DhtRef> loose = curr.ids;
+		RefList.Builder<DhtRef> sym = new RefList.Builder<DhtRef>(curr.sym.size());
 
 		for (int idx = 0; idx < curr.sym.size(); idx++) {
-			Ref ref = curr.sym.get(idx);
+			DhtRef ref = curr.sym.get(idx);
 			String name = ref.getName();
 			ref = resolve(ref, 0, loose);
 			if (ref != null && ref.getObjectId() != null) {
