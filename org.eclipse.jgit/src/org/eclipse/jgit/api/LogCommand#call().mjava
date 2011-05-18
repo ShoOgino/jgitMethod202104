@@ -11,7 +11,8 @@
 			JGitInternalException {
 		checkCallable();
 		if (pathFilters.size() > 0)
-			walk.setTreeFilter(PathFilterGroup.create(pathFilters));
+			walk.setTreeFilter(AndTreeFilter.create(
+					PathFilterGroup.create(pathFilters), TreeFilter.ANY_DIFF));
 		if (!startSpecified) {
 			try {
 				ObjectId headId = repo.resolve(Constants.HEAD);
