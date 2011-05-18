@@ -16,7 +16,7 @@
 			switch (operation) {
 			case ABORT:
 				try {
-					return abort(new RebaseResult(Status.ABORTED));
+					return abort(RebaseResult.ABORTED_RESULT);
 				} catch (IOException ioe) {
 					throw new JGitInternalException(ioe.getMessage(), ioe);
 				}
@@ -34,7 +34,7 @@
 			}
 
 			if (monitor.isCancelled())
-				return abort(new RebaseResult(Status.ABORTED));
+				return abort(RebaseResult.ABORTED_RESULT);
 
 			if (operation == Operation.CONTINUE)
 				newHead = continueRebase();
@@ -89,37 +89,14 @@
 				}
 			}
 			if (newHead != null) {
-				// point the previous head (if any) to the new commit
 				String headName = readFile(rebaseDir, HEAD_NAME);
-				if (headName.startsWith(Constants.R_REFS)) {
-					RefUpdate rup = repo.updateRef(headName);
-					rup.setNewObjectId(newHead);
-					Result res = rup.forceUpdate();
-					switch (res) {
-					case FAST_FORWARD:
-					case FORCED:
-					case NO_CHANGE:
-						break;
-					default:
-						throw new JGitInternalException("Updating HEAD failed");
-					}
-					rup = repo.updateRef(Constants.HEAD);
-					res = rup.link(headName);
-					switch (res) {
-					case FAST_FORWARD:
-					case FORCED:
-					case NO_CHANGE:
-						break;
-					default:
-						throw new JGitInternalException("Updating HEAD failed");
-					}
-				}
+				updateHead(headName, newHead);
 				FileUtils.delete(rebaseDir, FileUtils.RECURSIVE);
 				if (lastStepWasForward)
-					return new RebaseResult(Status.FAST_FORWARD);
-				return new RebaseResult(Status.OK);
+					return RebaseResult.FAST_FORWARD_RESULT;
+				return RebaseResult.OK_RESULT;
 			}
-			return new RebaseResult(Status.UP_TO_DATE);
+			return RebaseResult.FAST_FORWARD_RESULT;
 		} catch (IOException ioe) {
 			throw new JGitInternalException(ioe.getMessage(), ioe);
 		}
