@@ -1,0 +1,36 @@
+	@Test
+	public void testPullFastForwardWithBranchInSource() throws Exception {
+		PullResult res = target.pull().call();
+		// nothing to update since we don't have different data yet
+		assertTrue(res.getFetchResult().getTrackingRefUpdates().isEmpty());
+		assertEquals(Status.UP_TO_DATE, res.getRebaseResult().getStatus());
+
+		assertFileContentsEqual(targetFile, "Hello world");
+
+		// change the source file
+		writeToFile(sourceFile, "Another change\n\n\n\nFoo");
+		source.add().addFilepattern("SomeFile.txt").call();
+		RevCommit initialCommit = source.commit()
+				.setMessage("Some change in remote").call();
+
+		// modify the source file in a branch
+		createBranch(initialCommit, "refs/heads/side");
+		checkoutBranch("refs/heads/side");
+		writeToFile(sourceFile, "Another change\n\n\n\nBoo");
+		source.add().addFilepattern("SomeFile.txt").call();
+		RevCommit sideCommit = source.commit()
+				.setMessage("Some change in remote").call();
+
+		// modify the source file on master
+		checkoutBranch("refs/heads/master");
+		writeToFile(sourceFile, "More change\n\n\n\nFoo");
+		source.add().addFilepattern("SomeFile.txt").call();
+		source.commit().setMessage("Some change in remote").call();
+
+		// merge side into master
+		MergeResult result = source.merge().include(sideCommit.getId())
+				.setStrategy(MergeStrategy.RESOLVE).call();
+		assertEquals(MergeStatus.MERGED, result.getMergeStatus());
+
+	}
+

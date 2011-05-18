@@ -1,0 +1,14 @@
+	@Test
+	public void testRebaseParentOntoHeadShouldBeUptoDate() throws Exception {
+		writeTrashFile(FILE1, FILE1);
+		git.add().addFilepattern(FILE1).call();
+		RevCommit parent = git.commit().setMessage("parent comment").call();
+
+		writeTrashFile(FILE1, "another change");
+		git.add().addFilepattern(FILE1).call();
+		git.commit().setMessage("head commit").call();
+
+		RebaseResult result = git.rebase().setUpstream(parent).call();
+		assertEquals(Status.UP_TO_DATE, result.getStatus());
+	}
+
