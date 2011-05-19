@@ -15,7 +15,10 @@
 
 		// add file and commit it
 		git.add().addFilepattern("a.txt").call();
-		git.commit().setMessage("adding a.txt").call();
+		secondCommit = git.commit().setMessage("adding a.txt").call();
+
+		prestage = DirCache.read(db.getIndexFile(), db.getFS()).getEntry(
+				indexFile.getName());
 
 		// modify file and add to index
 		writer.print("new content");

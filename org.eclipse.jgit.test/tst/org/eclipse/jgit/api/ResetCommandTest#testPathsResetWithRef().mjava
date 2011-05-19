@@ -1,0 +1,28 @@
+	@Test
+	public void testPathsResetWithRef() throws Exception {
+		setupRepository();
+
+		DirCacheEntry preReset = DirCache.read(db.getIndexFile(), db.getFS())
+				.getEntry(indexFile.getName());
+		assertNotNull(preReset);
+
+		git.add().addFilepattern(untrackedFile.getName()).call();
+
+		// 'a.txt' has already been modified in setupRepository
+		// 'notAddedToIndex.txt' has been added to repository
+		// reset to the inital commit
+		git.reset().setRef(initialCommit.getName())
+				.addPath(indexFile.getName())
+				.addPath(untrackedFile.getName()).call();
+
+		// check that HEAD hasn't moved
+		ObjectId head = db.resolve(Constants.HEAD);
+		assertTrue(head.equals(secondCommit));
+		// check if files still exist
+		assertTrue(untrackedFile.exists());
+		assertTrue(indexFile.exists());
+		assertTrue(inHead(indexFile.getName()));
+		assertFalse(inIndex(indexFile.getName()));
+		assertFalse(inIndex(untrackedFile.getName()));
+	}
+

@@ -4,6 +4,10 @@
 	 * @return this instance
 	 */
 	public ResetCommand setMode(ResetType mode) {
+		if (!filepaths.isEmpty())
+			throw new JGitInternalException(MessageFormat.format(
+					JGitText.get().illegalCombinationOfArguments,
+					"[--mixed | --soft | --hard]", "<paths>..."));
 		this.mode = mode;
 		return this;
 	}
