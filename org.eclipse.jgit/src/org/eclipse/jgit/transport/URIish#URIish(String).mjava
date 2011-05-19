@@ -5,6 +5,10 @@
 	 * @throws URISyntaxException
 	 */
 	public URIish(String s) throws URISyntaxException {
+		if (StringUtils.isEmptyOrNull(s)) {
+			throw new URISyntaxException("The uri was empty or null",
+					JGitText.get().cannotParseGitURIish);
+		}
 		Matcher matcher = SINGLE_SLASH_FILE_URI.matcher(s);
 		if (matcher.matches()) {
 			scheme = matcher.group(1);
