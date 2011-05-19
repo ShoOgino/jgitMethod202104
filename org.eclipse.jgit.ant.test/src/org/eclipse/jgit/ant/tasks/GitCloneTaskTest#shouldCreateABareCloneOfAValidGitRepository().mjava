@@ -1,0 +1,13 @@
+	@Test
+	public void shouldCreateABareCloneOfAValidGitRepository() throws Exception {
+		FileRepository repo = createBareRepository();
+		File directory = repo.getDirectory();
+		task.setUri("file://" + directory);
+		task.setBare(true);
+		File dest = createTempFile();
+		task.setDest(dest);
+		task.execute();
+
+		assertTrue(RepositoryCache.FileKey.isGitRepository(dest, FS.DETECTED));
+	}
+

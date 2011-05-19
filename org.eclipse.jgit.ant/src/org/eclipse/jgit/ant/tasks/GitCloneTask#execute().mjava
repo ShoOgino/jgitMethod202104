@@ -3,10 +3,11 @@
 		log("Cloning repository " + uri);
 		
 		CloneCommand clone = Git.cloneRepository();
-		clone.setURI(uri).setDirectory(destination).setBranch(branch).setBare(bare);
 		try {
+			clone.setURI(uri).setDirectory(destination).setBranch(branch).setBare(bare);
 			clone.call();
-		} catch (JGitInternalException e) {
+		} catch (RuntimeException e) {
+			log("Could not clone repository: " + e, e, Project.MSG_ERR);
 			throw new BuildException("Could not clone repository: " + e.getMessage(), e);
 		}
 	}
