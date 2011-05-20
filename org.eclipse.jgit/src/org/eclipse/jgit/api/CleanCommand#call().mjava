@@ -1,0 +1,25 @@
+	/**
+	 * Executes the {@code clean} command with all the options and parameters
+	 * collected by the setter methods of this class. Each instance of this
+	 * class should only be used for one invocation of the command (means: one
+	 * call to {@link #call()})
+	 *
+	 * @return a set of strings representing each file cleaned.
+	 */
+	public Set<String> call() {
+		Set<String> files = Collections.emptySet();
+		try {
+			StatusCommand command = new StatusCommand(repo);
+			Status status = command.call();
+			files = status.getUntracked();
+
+			for (String file : files) {
+				if (paths.isEmpty() || paths.contains(file))
+					FileUtils.delete(new File(repo.getWorkTree(), file));
+			}
+		} catch (IOException e) {
+			throw new JGitInternalException(e.getMessage(), e);
+		}
+		return files;
+	}
+
