@@ -1,16 +1,19 @@
+	@SuppressWarnings("null")
 	private LooseRef scanRef(LooseRef ref, String name) throws IOException {
 		final File path = fileFor(name);
-		final long modified = path.lastModified();
+		FileSnapshot currentSnapshot = null;
 
 		if (ref != null) {
-			if (ref.getLastModified() == modified)
+			currentSnapshot = ref.getSnapShot();
+			if (!currentSnapshot.isModified(path))
 				return ref;
 			name = ref.getName();
-		} else if (modified == 0)
+		} else if (!path.exists())
 			return null;
 
 		final int limit = 4096;
 		final byte[] buf;
+		FileSnapshot otherSnapshot = FileSnapshot.save(path);
 		try {
 			buf = IO.readSome(path, limit);
 		} catch (FileNotFoundException noFile) {
@@ -33,7 +36,12 @@
 				throw new IOException(MessageFormat.format(JGitText.get().notARef, name, content));
 			}
 			final String target = RawParseUtils.decode(buf, 5, n);
-			return newSymbolicRef(modified, name, target);
+			if (ref != null && ref.isSymbolic()
+					&& ref.getTarget().getName().equals(target)) {
+				currentSnapshot.setClean(otherSnapshot);
+				return ref;
+			}
+			return newSymbolicRef(path.lastModified(), name, target);
 		}
 
 		if (n < OBJECT_ID_STRING_LENGTH)
@@ -42,12 +50,18 @@
 		final ObjectId id;
 		try {
 			id = ObjectId.fromString(buf, 0);
+			if (ref != null && !ref.isSymbolic()
+					&& ref.getTarget().getObjectId().equals(id)) {
+				currentSnapshot.setClean(otherSnapshot);
+				return ref;
+			}
+
 		} catch (IllegalArgumentException notRef) {
 			while (0 < n && Character.isWhitespace(buf[n - 1]))
 				n--;
 			String content = RawParseUtils.decode(buf, 0, n);
 			throw new IOException(MessageFormat.format(JGitText.get().notARef, name, content));
 		}
-		return new LooseUnpeeled(modified, name, id);
+		return new LooseUnpeeled(path.lastModified(), name, id);
 	}
 
