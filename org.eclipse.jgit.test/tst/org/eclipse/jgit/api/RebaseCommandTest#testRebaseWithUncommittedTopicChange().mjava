@@ -21,7 +21,7 @@
 
 		// checkout topic branch / modify file2 and add
 		checkoutBranch("refs/heads/topic");
-		writeTrashFile("file2", "uncommitted file2");
+		File uncommittedFile = writeTrashFile("file2", "uncommitted file2");
 		git.add().addFilepattern("file2").call();
 		// do not commit
 
@@ -35,5 +35,8 @@
 		assertNotNull(exception);
 		assertEquals("Checkout conflict with files: \nfile2",
 				exception.getMessage());
+
+		checkFile(uncommittedFile, "uncommitted file2");
+		assertEquals(RepositoryState.SAFE, git.getRepository().getRepositoryState());
 	}
 
