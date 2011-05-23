@@ -1,4 +1,4 @@
-	private void checkoutCommit(RevCommit commit) throws IOException {
+	private boolean checkoutCommit(RevCommit commit) throws IOException {
 		try {
 			RevCommit head = walk.parseCommit(repo.resolve(Constants.HEAD));
 			DirCacheCheckout dco = new DirCacheCheckout(repo, head.getTree(),
@@ -22,5 +22,6 @@
 			walk.release();
 			monitor.endTask();
 		}
+		return true;
 	}
 

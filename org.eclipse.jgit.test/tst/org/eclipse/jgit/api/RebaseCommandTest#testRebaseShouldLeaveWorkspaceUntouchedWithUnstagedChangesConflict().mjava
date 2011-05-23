@@ -1,0 +1,34 @@
+	@Test
+	public void testRebaseShouldLeaveWorkspaceUntouchedWithUnstagedChangesConflict()
+			throws Exception {
+		writeTrashFile(FILE1, "initial file");
+		git.add().addFilepattern(FILE1).call();
+		RevCommit initial = git.commit().setMessage("initial commit").call();
+		createBranch(initial, "refs/heads/side");
+
+		writeTrashFile(FILE1, "updated file");
+		git.add().addFilepattern(FILE1).call();
+		git.commit().setMessage("updated FILE1 on master").call();
+
+		// switch to side, modify the file
+		checkoutBranch("refs/heads/side");
+		writeTrashFile(FILE1, "side update");
+		git.add().addFilepattern(FILE1).call();
+		git.commit().setMessage("updated FILE1 on side").call();
+
+		File theFile = writeTrashFile(FILE1, "dirty the file");
+
+		// and attempt to rebase
+		try {
+			RebaseResult rebaseResult = git.rebase()
+					.setUpstream("refs/heads/master").call();
+			fail("Checkout with conflict should have occured, not "
+					+ rebaseResult.getStatus());
+		} catch (JGitInternalException e) {
+			checkFile(theFile, "dirty the file");
+		}
+
+		assertEquals(RepositoryState.SAFE, git.getRepository()
+				.getRepositoryState());
+	}
+
