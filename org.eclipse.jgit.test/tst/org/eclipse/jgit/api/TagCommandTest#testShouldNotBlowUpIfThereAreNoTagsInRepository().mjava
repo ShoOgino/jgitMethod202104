@@ -1,0 +1,10 @@
+	@Test
+	public void testShouldNotBlowUpIfThereAreNoTagsInRepository()
+			throws Exception {
+		Git git = new Git(db);
+		git.add().addFilepattern("*").call();
+		git.commit().setMessage("initial commit").call();
+		List<RevTag> list = git.tagList().call();
+		assertEquals(0, list.size());
+	}
+
