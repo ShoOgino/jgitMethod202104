@@ -10,7 +10,8 @@
 			URIish u = new URIish(uri);
 			Repository repository = init(u);
 			FetchResult result = fetch(repository, u);
-			checkout(repository, result);
+			if (!noCheckout)
+				checkout(repository, result);
 			return new Git(repository);
 		} catch (IOException ioe) {
 			throw new JGitInternalException(ioe.getMessage(), ioe);
