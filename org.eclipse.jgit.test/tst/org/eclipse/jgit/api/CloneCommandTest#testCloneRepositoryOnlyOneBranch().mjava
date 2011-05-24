@@ -10,6 +10,7 @@
 			command.setURI("file://"
 					+ git.getRepository().getWorkTree().getPath());
 			Git git2 = command.call();
+			addRepoToClose(git2.getRepository());
 			assertNotNull(git2);
 			assertEquals(git2.getRepository().getFullBranch(),
 					"refs/heads/master");
@@ -28,6 +29,7 @@
 					+ git.getRepository().getWorkTree().getPath());
 			command.setBare(true);
 			git2 = command.call();
+			addRepoToClose(git2.getRepository());
 			assertNotNull(git2);
 			assertEquals(git2.getRepository().getFullBranch(),
 					"refs/heads/master");
