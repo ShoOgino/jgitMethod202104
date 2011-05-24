@@ -7,15 +7,15 @@
 	 * @return a set of strings representing each file cleaned.
 	 */
 	public Set<String> call() {
-		Set<String> files = Collections.emptySet();
+		Set<String> files = new TreeSet<String>();
 		try {
 			StatusCommand command = new StatusCommand(repo);
 			Status status = command.call();
-			files = status.getUntracked();
-
-			for (String file : files) {
-				if (paths.isEmpty() || paths.contains(file))
+			for (String file : status.getUntracked()) {
+				if (paths.isEmpty() || paths.contains(file)) {
 					FileUtils.delete(new File(repo.getWorkTree(), file));
+					files.add(file);
+				}
 			}
 		} catch (IOException e) {
 			throw new JGitInternalException(e.getMessage(), e);

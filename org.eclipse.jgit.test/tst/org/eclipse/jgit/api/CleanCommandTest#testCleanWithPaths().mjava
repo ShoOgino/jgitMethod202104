@@ -1,0 +1,20 @@
+	@Test
+	public void testCleanWithPaths() throws NoWorkTreeException, IOException {
+		// create status
+		StatusCommand command = git.status();
+		Status status = command.call();
+		Set<String> files = status.getUntracked();
+		assertTrue(files.size() > 0);
+
+		// run clean with setPaths
+		Set<String> paths = new TreeSet<String>();
+		paths.add("File3.txt");
+		Set<String> cleanedFiles = git.clean().setPaths(paths).call();
+
+		status = git.status().call();
+		files = status.getUntracked();
+		assertTrue(files.size() == 1);
+		assertTrue(cleanedFiles.contains("File3.txt"));
+		assertTrue(!cleanedFiles.contains("File2.txt"));
+	}
+

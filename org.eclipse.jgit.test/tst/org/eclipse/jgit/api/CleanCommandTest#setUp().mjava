@@ -1,0 +1,15 @@
+	@Before
+	public void setUp() throws Exception {
+		super.setUp();
+		git = new Git(db);
+
+		// create test files
+		writeTrashFile("File1.txt", "Hello world");
+		writeTrashFile("File2.txt", "Delete Me");
+		writeTrashFile("File3.txt", "Delete Me");
+
+		// add and commit first file
+		git.add().addFilepattern("File1.txt").call();
+		git.commit().setMessage("Initial commit").call();
+	}
+

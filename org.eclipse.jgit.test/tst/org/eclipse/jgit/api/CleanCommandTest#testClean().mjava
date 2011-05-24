@@ -1,0 +1,19 @@
+	@Test
+	public void testClean() throws NoWorkTreeException, IOException {
+		// create status
+		StatusCommand command = git.status();
+		Status status = command.call();
+		Set<String> files = status.getUntracked();
+		assertTrue(files.size() > 0);
+
+		// run clean
+		Set<String> cleanedFiles = git.clean().call();
+
+		status = git.status().call();
+		files = status.getUntracked();
+
+		assertTrue(files.size() == 0);
+		assertTrue(cleanedFiles.contains("File2.txt"));
+		assertTrue(cleanedFiles.contains("File3.txt"));
+	}
+
