@@ -73,15 +73,7 @@
 		}
 
 		if (!ent.getOldId().equals(ent.getNewId())) {
-			o.write(encodeASCII("index " //
-					+ format(ent.getOldId()) //
-					+ ".." //
-					+ format(ent.getNewId())));
-			if (oldMode.equals(newMode)) {
-				o.write(' ');
-				newMode.copyTo(o);
-			}
-			o.write('\n');
+			formatIndexLine(o, ent);
 		}
 	}
 
