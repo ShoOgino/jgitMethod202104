@@ -1,0 +1,24 @@
+	private boolean split(Candidate parent, Candidate source)
+			throws IOException {
+		EditList editList = diffAlgorithm.diff(textComparator,
+				parent.sourceText, source.sourceText);
+		if (editList.isEmpty()) {
+			// Ignoring whitespace (or some other special comparator) can
+			// cause non-identical blobs to have an empty edit list. In
+			// a case like this push the parent alone.
+			parent.regionList = source.regionList;
+			push(parent);
+			return false;
+		}
+
+		parent.takeBlame(editList, source);
+		if (parent.regionList != null)
+			push(parent);
+		if (source.regionList != null) {
+			if (source instanceof ReverseCandidate)
+				return reverseResult(parent, source);
+			return result(source);
+		}
+		return false;
+	}
+

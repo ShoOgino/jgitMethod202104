@@ -1,0 +1,42 @@
+	/**
+	 * Generate a list of lines with information about when the lines were
+	 * introduced into the file path.
+	 *
+	 * @return list of lines
+	 */
+	public BlameResult call() throws JGitInternalException {
+		checkCallable();
+		BlameGenerator gen = new BlameGenerator(repo, path);
+		try {
+			if (diffAlgorithm != null)
+				gen.setDiffAlgorithm(diffAlgorithm);
+			if (textComparator != null)
+				gen.setTextComparator(textComparator);
+			if (followFileRenames != null)
+				gen.setFollowFileRenames(followFileRenames.booleanValue());
+
+			if (reverseEndCommits != null)
+				gen.reverse(startCommit, reverseEndCommits);
+			else if (startCommit != null)
+				gen.push(null, startCommit);
+			else {
+				gen.push(null, repo.resolve(Constants.HEAD));
+				if (!repo.isBare()) {
+					DirCache dc = repo.readDirCache();
+					int entry = dc.findEntry(path);
+					if (0 <= entry)
+						gen.push(null, dc.getEntry(entry).getObjectId());
+
+					File inTree = new File(repo.getWorkTree(), path);
+					if (inTree.isFile())
+						gen.push(null, new RawText(inTree));
+				}
+			}
+			return gen.computeBlameResult();
+		} catch (IOException e) {
+			throw new JGitInternalException(e.getMessage(), e);
+		} finally {
+			gen.release();
+		}
+	}
+

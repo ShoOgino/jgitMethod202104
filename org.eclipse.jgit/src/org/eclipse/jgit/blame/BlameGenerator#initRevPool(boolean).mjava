@@ -1,0 +1,18 @@
+	private void initRevPool(boolean reverse) {
+		if (queue != null)
+			throw new IllegalStateException();
+
+		if (revPool != null)
+			revPool.release();
+
+		if (reverse)
+			revPool = new ReverseWalk(getRepository());
+		else
+			revPool = new RevWalk(getRepository());
+
+		revPool.setRetainBody(true);
+		SEEN = revPool.newFlag("SEEN");
+		reader = revPool.getObjectReader();
+		treeWalk = new TreeWalk(reader);
+	}
+

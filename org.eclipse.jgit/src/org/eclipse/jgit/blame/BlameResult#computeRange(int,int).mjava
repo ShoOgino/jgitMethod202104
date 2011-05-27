@@ -1,0 +1,42 @@
+	/**
+	 * Compute until the entire range has been populated.
+	 *
+	 * @param start
+	 *            first index to examine.
+	 * @param end
+	 *            last index to examine.
+	 * @throws IOException
+	 *             the repository cannot be read.
+	 */
+	public void computeRange(int start, int end) throws IOException {
+		BlameGenerator gen = generator;
+		if (gen == null)
+			return;
+
+		while (start < end) {
+			if (hasSourceData(start, end))
+				return;
+
+			if (!gen.next()) {
+				gen.release();
+				generator = null;
+				return;
+			}
+
+			loadFrom(gen);
+
+			// If the result contains either end of our current range bounds,
+			// update the bounds to avoid scanning that section during the
+			// next loop iteration.
+
+			int resLine = gen.getResultStart();
+			int resEnd = gen.getResultEnd();
+
+			if (resLine <= start && start < resEnd)
+				start = resEnd;
+
+			if (resLine <= end && end < resEnd)
+				end = resLine;
+		}
+	}
+

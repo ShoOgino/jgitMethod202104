@@ -1,0 +1,46 @@
+	private boolean processOne(Candidate n) throws IOException {
+		RevCommit parent = n.getParent(0);
+		if (parent == null)
+			return split(n.getNextCandidate(0), n);
+		if (parent.has(SEEN))
+			return false;
+		revPool.parseHeaders(parent);
+
+		if (find(parent, n.sourcePath)) {
+			if (idBuf.equals(n.sourceBlob)) {
+				// The common case of the file not being modified in
+				// a simple string-of-pearls history. Blame parent.
+				n.sourceCommit = parent;
+				push(n);
+				return false;
+			}
+
+			Candidate next = n.create(parent, n.sourcePath);
+			next.sourceBlob = idBuf.toObjectId();
+			next.loadText(reader);
+			return split(next, n);
+		}
+
+		if (n.sourceCommit == null)
+			return result(n);
+
+		DiffEntry r = findRename(parent, n.sourceCommit, n.sourcePath);
+		if (r == null)
+			return result(n);
+
+		if (0 == r.getOldId().prefixCompare(n.sourceBlob)) {
+			// A 100% rename without any content change can also
+			// skip directly to the parent.
+			n.sourceCommit = parent;
+			n.sourcePath = PathFilter.create(r.getOldPath());
+			push(n);
+			return false;
+		}
+
+		Candidate next = n.create(parent, PathFilter.create(r.getOldPath()));
+		next.sourceBlob = r.getOldId().toObjectId();
+		next.renameScore = r.getScore();
+		next.loadText(reader);
+		return split(next, n);
+	}
+

@@ -1,0 +1,20 @@
+	/**
+	 * Construct a new BlameResult for a generator.
+	 *
+	 * @param gen
+	 *            the generator the result will consume records from.
+	 * @return the new result object. null if the generator cannot find the path
+	 *         it starts from.
+	 * @throws IOException
+	 *             the repository cannot be read.
+	 */
+	public static BlameResult create(BlameGenerator gen) throws IOException {
+		String path = gen.getResultPath();
+		RawText contents = gen.getResultContents();
+		if (contents == null) {
+			gen.release();
+			return null;
+		}
+		return new BlameResult(gen, path, contents);
+	}
+

@@ -1,0 +1,10 @@
+	private boolean reverseResult(Candidate parent, Candidate source)
+			throws IOException {
+		// On a reverse blame present the application the parent
+		// (as this is what did the removals), however the region
+		// list to enumerate is the source's surviving list.
+		Candidate res = parent.copy(parent.sourceCommit);
+		res.regionList = source.regionList;
+		return result(res);
+	}
+

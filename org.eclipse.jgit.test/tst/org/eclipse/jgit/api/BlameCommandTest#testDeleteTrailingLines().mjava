@@ -1,0 +1,32 @@
+	@Test
+	public void testDeleteTrailingLines() throws Exception {
+		Git git = new Git(db);
+
+		String[] content1 = new String[] { "a", "b", "c", "d" };
+		String[] content2 = new String[] { "a", "b" };
+
+		writeTrashFile("file.txt", join(content2));
+		git.add().addFilepattern("file.txt").call();
+		RevCommit commit1 = git.commit().setMessage("create file").call();
+
+		writeTrashFile("file.txt", join(content1));
+		git.add().addFilepattern("file.txt").call();
+		git.commit().setMessage("edit file").call();
+
+		writeTrashFile("file.txt", join(content2));
+		git.add().addFilepattern("file.txt").call();
+		git.commit().setMessage("edit file").call();
+
+		BlameCommand command = new BlameCommand(db);
+
+		command.setFilePath("file.txt");
+		BlameResult lines = command.call();
+		assertEquals(content2.length, lines.getResultContents().size());
+
+		assertEquals(commit1, lines.getSourceCommit(0));
+		assertEquals(commit1, lines.getSourceCommit(1));
+
+		assertEquals(0, lines.getSourceLine(0));
+		assertEquals(1, lines.getSourceLine(1));
+	}
+
