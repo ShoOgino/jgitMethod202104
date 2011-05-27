@@ -1,0 +1,15 @@
+	private boolean reportInternalServerErrorOverSideband() {
+		try {
+			SideBandOutputStream err = new SideBandOutputStream(
+					SideBandOutputStream.CH_ERROR,
+					SideBandOutputStream.SMALL_BUF,
+					rawOut);
+			err.write(Constants.encode(JGitText.get().internalServerError));
+			err.flush();
+			return true;
+		} catch (Throwable cannotReport) {
+			// Ignore the reason. This is a secondary failure.
+			return false;
+		}
+	}
+

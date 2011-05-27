@@ -1,15 +1,6 @@
 	private ObjectId processHaveLines(List<ObjectId> peerHas, ObjectId last)
 			throws IOException {
-		try {
-			preUploadHook.onBeginNegotiateRound(this, wantIds, peerHas.size());
-		} catch (UploadPackMayNotContinueException fail) {
-			if (fail.getMessage() != null) {
-				pckOut.writeString("ERR " + fail.getMessage() + "\n");
-				fail.setOutput();
-			}
-			throw fail;
-		}
-
+		preUploadHook.onBeginNegotiateRound(this, wantIds, peerHas.size());
 		if (peerHas.isEmpty())
 			return last;
 
@@ -40,7 +31,6 @@
 					if (wantIds.contains(id)) {
 						String msg = MessageFormat.format(
 								JGitText.get().wantNotValid, id.name());
-						pckOut.writeString("ERR " + msg);
 						throw new PackProtocolException(msg, notFound);
 					}
 					continue;
@@ -55,7 +45,6 @@
 					if (!advertised.contains(obj)) {
 						String msg = MessageFormat.format(
 								JGitText.get().wantNotValid, obj.name());
-						pckOut.writeString("ERR " + msg);
 						throw new PackProtocolException(msg);
 					}
 
@@ -153,17 +142,7 @@
 			sentReady = true;
 		}
 
-		try {
-			preUploadHook.onEndNegotiateRound(this, wantAll, //
-					haveCnt, missCnt, sentReady);
-		} catch (UploadPackMayNotContinueException fail) {
-			if (fail.getMessage() != null) {
-				pckOut.writeString("ERR " + fail.getMessage() + "\n");
-				fail.setOutput();
-			}
-			throw fail;
-		}
-
+		preUploadHook.onEndNegotiateRound(this, wantAll, haveCnt, missCnt, sentReady);
 		peerHas.clear();
 		return last;
 	}
