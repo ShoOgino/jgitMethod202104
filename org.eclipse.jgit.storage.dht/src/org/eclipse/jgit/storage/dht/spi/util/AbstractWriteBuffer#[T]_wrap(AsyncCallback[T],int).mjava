@@ -18,8 +18,10 @@
 			int size) throws DhtException {
 		int permits = permitsForSize(size);
 		WrappedCallback<T> op = new WrappedCallback<T>(callback, permits);
-		checkRunningTasks(false);
-		running.add(op);
+		synchronized (runningLock) {
+			checkRunningTasks(false);
+			running.add(op);
+		}
 		return op;
 	}
 

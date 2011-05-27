@@ -31,8 +31,10 @@
 			return;
 		}
 
-		if (!flushing)
-			checkRunningTasks(false);
-		running.add(executor.submit(op));
+		synchronized (runningLock) {
+			if (!flushing)
+				checkRunningTasks(false);
+			running.add(executor.submit(op));
+		}
 	}
 
