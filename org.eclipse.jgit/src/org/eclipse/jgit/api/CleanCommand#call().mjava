@@ -13,7 +13,8 @@
 			Status status = command.call();
 			for (String file : status.getUntracked()) {
 				if (paths.isEmpty() || paths.contains(file)) {
-					FileUtils.delete(new File(repo.getWorkTree(), file));
+					if (!dryRun)
+						FileUtils.delete(new File(repo.getWorkTree(), file));
 					files.add(file);
 				}
 			}
