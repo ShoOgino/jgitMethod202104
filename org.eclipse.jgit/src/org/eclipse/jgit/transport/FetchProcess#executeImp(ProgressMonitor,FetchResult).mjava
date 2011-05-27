@@ -62,10 +62,16 @@
 
 		final RevWalk walk = new RevWalk(transport.local);
 		try {
+			if (monitor instanceof BatchingProgressMonitor) {
+				((BatchingProgressMonitor) monitor).setDelayStart(
+						250, TimeUnit.MILLISECONDS);
+			}
+			monitor.beginTask(JGitText.get().updatingReferences, localUpdates.size());
 			if (transport.isRemoveDeletedRefs())
 				deleteStaleTrackingRefs(result, walk);
 			for (TrackingRefUpdate u : localUpdates) {
 				try {
+					monitor.update(1);
 					u.update(walk);
 					result.add(u);
 				} catch (IOException err) {
@@ -74,6 +80,7 @@
 							u.getLocalName(), err.getMessage()), err);
 				}
 			}
+			monitor.endTask();
 		} finally {
 			walk.release();
 		}
