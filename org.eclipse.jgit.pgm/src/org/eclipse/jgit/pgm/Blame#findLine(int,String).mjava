@@ -1,0 +1,15 @@
+	private int findLine(int b, String regex) {
+		String re = regex.substring(1, regex.length() - 1);
+		if (!re.startsWith("^"))
+			re = ".*" + re;
+		if (!re.endsWith("$"))
+			re = re + ".*";
+		Pattern p = Pattern.compile(re);
+		RawText text = blame.getResultContents();
+		for (int line = b; line < text.size(); line++) {
+			if (p.matcher(text.getString(line)).matches())
+				return line;
+		}
+		return b;
+	}
+

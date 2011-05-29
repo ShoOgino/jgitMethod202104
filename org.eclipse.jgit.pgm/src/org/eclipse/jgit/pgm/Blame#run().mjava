@@ -1,0 +1,97 @@
+	@Override
+	protected void run() throws Exception {
+		if (file == null) {
+			if (revision == null)
+				throw die(CLIText.get().fileIsRequired);
+			file = revision;
+			revision = null;
+		}
+
+		if (abbrev == 0)
+			abbrev = db.getConfig().getInt("core", "abbrev", 7);
+		if (!showBlankBoundary)
+			root = db.getConfig().getBoolean("blame", "blankboundary", false);
+		if (!root)
+			root = db.getConfig().getBoolean("blame", "showroot", false);
+
+		if (showRawTimestamp)
+			dateFmt = new SimpleDateFormat("ZZZZ");
+		else
+			dateFmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss ZZZZ");
+
+		BlameGenerator generator = new BlameGenerator(db, file);
+		reader = db.newObjectReader();
+		try {
+			generator.setTextComparator(comparator);
+
+			if (!reverseRange.isEmpty()) {
+				RevCommit rangeStart = null;
+				List<RevCommit> rangeEnd = new ArrayList<RevCommit>(2);
+				for (RevCommit c : reverseRange) {
+					if (c.has(RevFlag.UNINTERESTING))
+						rangeStart = c;
+					else
+						rangeEnd.add(c);
+				}
+				generator.reverse(rangeStart, rangeEnd);
+			} else if (revision != null) {
+				generator.push(null, db.resolve(revision + "^{commit}"));
+			} else {
+				generator.push(null, db.resolve(Constants.HEAD));
+				if (!db.isBare()) {
+					DirCache dc = db.readDirCache();
+					int entry = dc.findEntry(file);
+					if (0 <= entry)
+						generator.push(null, dc.getEntry(entry).getObjectId());
+
+					File inTree = new File(db.getWorkTree(), file);
+					if (inTree.isFile())
+						generator.push(null, new RawText(inTree));
+				}
+			}
+
+			blame = BlameResult.create(generator);
+			begin = 0;
+			end = blame.getResultContents().size();
+			if (rangeString != null)
+				parseLineRangeOption();
+			blame.computeRange(begin, end);
+
+			int authorWidth = 8;
+			int dateWidth = 8;
+			int pathWidth = 1;
+			int maxSourceLine = 1;
+			for (int line = begin; line < end; line++) {
+				authorWidth = Math.max(authorWidth, author(line).length());
+				dateWidth = Math.max(dateWidth, date(line).length());
+				pathWidth = Math.max(pathWidth, path(line).length());
+				maxSourceLine = Math.max(maxSourceLine, blame.getSourceLine(line));
+			}
+
+			String pathFmt = MessageFormat.format(" %{0}s", pathWidth);
+			String numFmt = MessageFormat.format(" %{0}d",
+					1 + (int) Math.log10(maxSourceLine + 1));
+			String lineFmt = MessageFormat.format(" %{0}d) ",
+					1 + (int) Math.log10(end + 1));
+			String authorFmt = MessageFormat.format(" (%-{0}s %{1}s",
+					authorWidth, dateWidth);
+
+			for (int line = begin; line < end; line++) {
+				out.print(abbreviate(blame.getSourceCommit(line)));
+				if (showSourcePath)
+					out.format(pathFmt, path(line));
+				if (showSourceLine)
+					out.format(numFmt, blame.getSourceLine(line) + 1);
+				if (!noAuthor)
+					out.format(authorFmt, author(line), date(line));
+				out.format(lineFmt, line + 1);
+				out.flush();
+				blame.getResultContents().writeLine(System.out, line);
+				out.print('\n');
+			}
+		} finally {
+			generator.release();
+			reader.release();
+		}
+	}
+

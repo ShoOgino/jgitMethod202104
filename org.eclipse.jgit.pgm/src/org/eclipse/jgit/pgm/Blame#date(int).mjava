@@ -1,0 +1,15 @@
+	private String date(int line) {
+		if (blame.getSourceCommit(line) == null)
+			return "";
+
+		PersonIdent author = blame.getSourceAuthor(line);
+		if (author == null)
+			return "";
+
+		dateFmt.setTimeZone(author.getTimeZone());
+		if (!showRawTimestamp)
+			return dateFmt.format(author.getWhen());
+		return String.format("%d %s", author.getWhen().getTime() / 1000L,
+				dateFmt.format(author.getWhen()));
+	}
+

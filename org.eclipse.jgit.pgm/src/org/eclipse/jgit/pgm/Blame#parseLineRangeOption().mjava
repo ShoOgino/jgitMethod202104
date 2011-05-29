@@ -1,0 +1,45 @@
+	private void parseLineRangeOption() {
+		String beginStr, endStr;
+		if (rangeString.startsWith("/")) {
+			int c = rangeString.indexOf("/,", 1);
+			if (c < 0) {
+				beginStr = rangeString;
+				endStr = String.valueOf(end);
+			} else {
+				beginStr = rangeString.substring(0, c);
+				endStr = rangeString.substring(c + 2);
+			}
+
+		} else {
+			int c = rangeString.indexOf(',');
+			if (c < 0) {
+				beginStr = rangeString;
+				endStr = String.valueOf(end);
+			} else if (c == 0) {
+				beginStr = "0";
+				endStr = rangeString.substring(1);
+			} else {
+				beginStr = rangeString.substring(0, c);
+				endStr = rangeString.substring(c + 1);
+			}
+		}
+
+		if (beginStr.equals(""))
+			begin = 0;
+		else if (beginStr.startsWith("/"))
+			begin = findLine(0, beginStr);
+		else
+			begin = Math.max(0, Integer.parseInt(beginStr) - 1);
+
+		if (endStr.equals(""))
+			end = blame.getResultContents().size();
+		else if (endStr.startsWith("/"))
+			end = findLine(begin, endStr);
+		else if (endStr.startsWith("-"))
+			end = begin + Integer.parseInt(endStr);
+		else if (endStr.startsWith("+"))
+			end = begin + Integer.parseInt(endStr.substring(1));
+		else
+			end = Math.max(0, Integer.parseInt(endStr) - 1);
+	}
+
