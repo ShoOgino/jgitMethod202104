@@ -8,8 +8,7 @@
 			if (!currentSnapshot.isModified(path))
 				return ref;
 			name = ref.getName();
-		} else if (!path.exists())
-			return null;
+		}
 
 		final int limit = 4096;
 		final byte[] buf;
@@ -41,7 +40,7 @@
 				currentSnapshot.setClean(otherSnapshot);
 				return ref;
 			}
-			return newSymbolicRef(path.lastModified(), name, target);
+			return newSymbolicRef(otherSnapshot, name, target);
 		}
 
 		if (n < OBJECT_ID_STRING_LENGTH)
@@ -62,6 +61,6 @@
 			String content = RawParseUtils.decode(buf, 0, n);
 			throw new IOException(MessageFormat.format(JGitText.get().notARef, name, content));
 		}
-		return new LooseUnpeeled(path.lastModified(), name, id);
+		return new LooseUnpeeled(otherSnapshot, name, id);
 	}
 

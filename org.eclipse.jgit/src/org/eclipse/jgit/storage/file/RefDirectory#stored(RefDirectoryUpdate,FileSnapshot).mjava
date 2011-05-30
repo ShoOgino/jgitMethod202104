@@ -1,0 +1,6 @@
+	void stored(RefDirectoryUpdate update, FileSnapshot snapshot) {
+		final ObjectId target = update.getNewObjectId().copy();
+		final Ref leaf = update.getRef().getLeaf();
+		putLooseRef(new LooseUnpeeled(snapshot, leaf.getName(), target));
+	}
+
