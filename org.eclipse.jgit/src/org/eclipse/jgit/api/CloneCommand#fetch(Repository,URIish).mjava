@@ -6,7 +6,8 @@
 		RemoteConfig config = new RemoteConfig(repo.getConfig(), remote);
 		config.addURI(u);
 
-		final String dst = Constants.R_REMOTES + config.getName();
+		final String dst = bare ? Constants.R_HEADS : Constants.R_REMOTES
+				+ config.getName();
 		RefSpec refSpec = new RefSpec();
 		refSpec = refSpec.setForceUpdate(true);
 		refSpec = refSpec.setSourceDestination(Constants.R_HEADS + "*", dst + "/*"); //$NON-NLS-1$ //$NON-NLS-2$

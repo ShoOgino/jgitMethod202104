@@ -18,7 +18,9 @@
 				}
 			}
 
-			checkRunningTasks(true);
+			synchronized (runningLock) {
+				checkRunningTasks(true);
+			}
 		} finally {
 			flushing = false;
 		}
