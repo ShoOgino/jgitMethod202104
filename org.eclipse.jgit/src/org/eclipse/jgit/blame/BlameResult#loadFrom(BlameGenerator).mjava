@@ -1,0 +1,28 @@
+	private void loadFrom(BlameGenerator gen) {
+		RevCommit srcCommit = gen.getSourceCommit();
+		PersonIdent srcAuthor = gen.getSourceAuthor();
+		PersonIdent srcCommitter = gen.getSourceCommitter();
+		String srcPath = gen.getSourcePath();
+		int srcLine = gen.getSourceStart();
+		int resLine = gen.getResultStart();
+		int resEnd = gen.getResultEnd();
+
+		for (; resLine < resEnd; resLine++) {
+			// Reverse blame can generate multiple results for the same line.
+			// Favor the first one selected, as this is the oldest and most
+			// likely to be nearest to the inquiry made by the user.
+			if (sourceLines[resLine] != 0)
+				continue;
+
+			sourceCommits[resLine] = srcCommit;
+			sourceAuthors[resLine] = srcAuthor;
+			sourceCommitters[resLine] = srcCommitter;
+			sourcePaths[resLine] = srcPath;
+
+			// Since sourceLines is 1-based to permit hasSourceData to use 0 to
+			// mean the line has not been annotated yet, pre-increment instead
+			// of the traditional post-increment when making the assignment.
+			sourceLines[resLine] = ++srcLine;
+		}
+	}
+

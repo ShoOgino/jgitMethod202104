@@ -1,0 +1,19 @@
+	/**
+	 * Create a blame generator for the repository and path
+	 *
+	 * @param repository
+	 *            repository to access revision data from.
+	 * @param path
+	 *            initial path of the file to start scanning.
+	 */
+	public BlameGenerator(Repository repository, String path) {
+		this.repository = repository;
+		this.resultPath = PathFilter.create(path);
+
+		idBuf = new MutableObjectId();
+		setFollowFileRenames(true);
+		initRevPool(false);
+
+		remaining = -1;
+	}
+

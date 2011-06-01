@@ -1,0 +1,174 @@
+	private boolean processMerge(Candidate n) throws IOException {
+		int pCnt = n.getParentCount();
+
+		for (int pIdx = 0; pIdx < pCnt; pIdx++) {
+			RevCommit parent = n.getParent(pIdx);
+			if (parent.has(SEEN))
+				continue;
+			revPool.parseHeaders(parent);
+		}
+
+		// If any single parent exactly matches the merge, follow only
+		// that one parent through history.
+		ObjectId[] ids = null;
+		for (int pIdx = 0; pIdx < pCnt; pIdx++) {
+			RevCommit parent = n.getParent(pIdx);
+			if (parent.has(SEEN))
+				continue;
+			if (!find(parent, n.sourcePath))
+				continue;
+			if (!(n instanceof ReverseCandidate) && idBuf.equals(n.sourceBlob)) {
+				n.sourceCommit = parent;
+				push(n);
+				return false;
+			}
+			if (ids == null)
+				ids = new ObjectId[pCnt];
+			ids[pIdx] = idBuf.toObjectId();
+		}
+
+		// If rename detection is enabled, search for any relevant names.
+		DiffEntry[] renames = null;
+		if (renameDetector != null) {
+			renames = new DiffEntry[pCnt];
+			for (int pIdx = 0; pIdx < pCnt; pIdx++) {
+				RevCommit parent = n.getParent(pIdx);
+				if (parent.has(SEEN))
+					continue;
+				if (ids != null && ids[pIdx] != null)
+					continue;
+
+				DiffEntry r = findRename(parent, n.sourceCommit, n.sourcePath);
+				if (r == null)
+					continue;
+
+				if (n instanceof ReverseCandidate) {
+					if (ids == null)
+						ids = new ObjectId[pCnt];
+					ids[pCnt] = r.getOldId().toObjectId();
+				} else if (0 == r.getOldId().prefixCompare(n.sourceBlob)) {
+					// A 100% rename without any content change can also
+					// skip directly to the parent. Note this bypasses an
+					// earlier parent that had the path (above) but did not
+					// have an exact content match. For performance reasons
+					// we choose to follow the one parent over trying to do
+					// possibly both parents.
+					n.sourceCommit = parent;
+					n.sourcePath = PathFilter.create(r.getOldPath());
+					push(n);
+					return false;
+				}
+
+				renames[pIdx] = r;
+			}
+		}
+
+		// Construct the candidate for each parent.
+		Candidate[] parents = new Candidate[pCnt];
+		for (int pIdx = 0; pIdx < pCnt; pIdx++) {
+			RevCommit parent = n.getParent(pIdx);
+			if (parent.has(SEEN))
+				continue;
+
+			Candidate p;
+			if (renames != null && renames[pIdx] != null) {
+				p = n.create(parent,
+						PathFilter.create(renames[pIdx].getOldPath()));
+				p.renameScore = renames[pIdx].getScore();
+				p.sourceBlob = renames[pIdx].getOldId().toObjectId();
+			} else if (ids != null && ids[pIdx] != null) {
+				p = n.create(parent, n.sourcePath);
+				p.sourceBlob = ids[pIdx];
+			} else {
+				continue;
+			}
+
+			EditList editList;
+			if (n instanceof ReverseCandidate
+					&& p.sourceBlob.equals(n.sourceBlob)) {
+				// This special case happens on ReverseCandidate forks.
+				p.sourceText = n.sourceText;
+				editList = new EditList(0);
+			} else {
+				p.loadText(reader);
+				editList = diffAlgorithm.diff(textComparator,
+						p.sourceText, n.sourceText);
+			}
+
+			if (editList.isEmpty()) {
+				// Ignoring whitespace (or some other special comparator) can
+				// cause non-identical blobs to have an empty edit list. In
+				// a case like this push the parent alone.
+				if (n instanceof ReverseCandidate) {
+					parents[pIdx] = p;
+					continue;
+				}
+
+				p.regionList = n.regionList;
+				push(p);
+				return false;
+			}
+
+			p.takeBlame(editList, n);
+
+			// Only remember this parent candidate if there is at least
+			// one region that was blamed on the parent.
+			if (p.regionList != null) {
+				// Reverse blame requires inverting the regions. This puts
+				// the regions the parent deleted from us into the parent,
+				// and retains the common regions to look at other parents
+				// for deletions.
+				if (n instanceof ReverseCandidate) {
+					Region r = p.regionList;
+					p.regionList = n.regionList;
+					n.regionList = r;
+				}
+
+				parents[pIdx] = p;
+			}
+		}
+
+		if (n instanceof ReverseCandidate) {
+			// On a reverse blame report all deletions found in the children,
+			// and pass on to them a copy of our region list.
+			Candidate resultHead = null;
+			Candidate resultTail = null;
+
+			for (int pIdx = 0; pIdx < pCnt; pIdx++) {
+				Candidate p = parents[pIdx];
+				if (p == null)
+					continue;
+
+				if (p.regionList != null) {
+					Candidate r = p.copy(p.sourceCommit);
+					if (resultTail != null) {
+						resultTail.queueNext = r;
+						resultTail = r;
+					} else {
+						resultHead = r;
+						resultTail = r;
+					}
+				}
+
+				if (n.regionList != null) {
+					p.regionList = n.regionList.deepCopy();
+					push(p);
+				}
+			}
+
+			if (resultHead != null)
+				return result(resultHead);
+			return false;
+		}
+
+		// Push any parents that are still candidates.
+		for (int pIdx = 0; pIdx < pCnt; pIdx++) {
+			if (parents[pIdx] != null)
+				push(parents[pIdx]);
+		}
+
+		if (n.regionList != null)
+			return result(n);
+		return false;
+	}
+

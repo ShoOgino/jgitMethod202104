@@ -1,0 +1,52 @@
+	/**
+	 * Configure the generator to compute reverse blame (history of deletes).
+	 * <p>
+	 * This method is expensive as it immediately runs a RevWalk over the
+	 * history spanning the expression {@code start..end} (end being more recent
+	 * than start) and then performs the equivalent operation as
+	 * {@link #push(String, AnyObjectId)} to begin blame traversal from the
+	 * commit named by {@code start} walking forwards through history until
+	 * {@code end} blaming line deletions.
+	 * <p>
+	 * A reverse blame may produce multiple sources for the same result line,
+	 * each of these is a descendant commit that removed the line, typically
+	 * this occurs when the same deletion appears in multiple side branches such
+	 * as due to a cherry-pick. Applications relying on reverse should use
+	 * {@link BlameResult} as it filters these duplicate sources and only
+	 * remembers the first (oldest) deletion.
+	 *
+	 * @param start
+	 *            oldest commit to traverse from. The result file will be loaded
+	 *            from this commit's tree.
+	 * @param end
+	 *            most recent commits to stop traversal at. Usually an active
+	 *            branch tip, tag, or HEAD.
+	 * @return {@code this}
+	 * @throws IOException
+	 *             the repository cannot be read.
+	 */
+	public BlameGenerator reverse(AnyObjectId start,
+			Collection<? extends ObjectId> end) throws IOException {
+		initRevPool(true);
+
+		ReverseCommit result = (ReverseCommit) revPool.parseCommit(start);
+		if (!find(result, resultPath))
+			return this;
+
+		revPool.markUninteresting(result);
+		for (ObjectId id : end)
+			revPool.markStart(revPool.parseCommit(id));
+
+		while (revPool.next() != null) {
+			// just pump the queue
+		}
+
+		ReverseCandidate c = new ReverseCandidate(result, resultPath);
+		c.sourceBlob = idBuf.toObjectId();
+		c.loadText(reader);
+		c.regionList = new Region(0, 0, c.sourceText.size());
+		remaining = c.sourceText.size();
+		push(c);
+		return this;
+	}
+

@@ -1,0 +1,27 @@
+	/**
+	 * Compute the next available segment and return the first index.
+	 * <p>
+	 * Computes one segment and returns to the caller the first index that is
+	 * available. After return the caller can also inspect {@link #lastLength()}
+	 * to determine how many lines of the result were computed.
+	 *
+	 * @return index that is now available. -1 if no more are available.
+	 * @throws IOException
+	 *             the repository cannot be read.
+	 */
+	public int computeNext() throws IOException {
+		BlameGenerator gen = generator;
+		if (gen == null)
+			return -1;
+
+		if (gen.next()) {
+			loadFrom(gen);
+			lastLength = gen.getRegionLength();
+			return gen.getResultStart();
+		} else {
+			gen.release();
+			generator = null;
+			return -1;
+		}
+	}
+

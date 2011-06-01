@@ -1,0 +1,18 @@
+	/**
+	 * Configure the command to compute reverse blame (history of deletes).
+	 *
+	 * @param start
+	 *            oldest commit to traverse from. The result file will be loaded
+	 *            from this commit's tree.
+	 * @param end
+	 *            most recent commit to stop traversal at. Usually an active
+	 *            branch tip, tag, or HEAD.
+	 * @return {@code this}
+	 * @throws IOException
+	 *             the repository cannot be read.
+	 */
+	public BlameCommand reverse(AnyObjectId start, AnyObjectId end)
+			throws IOException {
+		return reverse(start, Collections.singleton(end.toObjectId()));
+	}
+

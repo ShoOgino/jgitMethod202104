@@ -1,0 +1,20 @@
+	/**
+	 * Compute all pending information.
+	 *
+	 * @throws IOException
+	 *             the repository cannot be read.
+	 */
+	public void computeAll() throws IOException {
+		BlameGenerator gen = generator;
+		if (gen == null)
+			return;
+
+		try {
+			while (gen.next())
+				loadFrom(gen);
+		} finally {
+			gen.release();
+			generator = null;
+		}
+	}
+

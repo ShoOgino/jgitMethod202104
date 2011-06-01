@@ -1,0 +1,18 @@
+	/**
+	 * Execute the generator in a blocking fashion until all data is ready.
+	 *
+	 * @return the complete result. Null if no file exists for the given path.
+	 * @throws IOException
+	 *             the repository cannot be read.
+	 */
+	public BlameResult computeBlameResult() throws IOException {
+		try {
+			BlameResult r = BlameResult.create(this);
+			if (r != null)
+				r.computeAll();
+			return r;
+		} finally {
+			release();
+		}
+	}
+

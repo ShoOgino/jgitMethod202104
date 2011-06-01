@@ -1,0 +1,26 @@
+	private static Region add(Region aTail, Candidate a, Region n) {
+		// If there is no region on the list, use only this one.
+		if (aTail == null) {
+			a.regionList = n;
+			n.next = null;
+			return n;
+		}
+
+		// If the prior region ends exactly where the new region begins
+		// in both the result and the source, combine these together into
+		// one contiguous region. This occurs when intermediate commits
+		// have inserted and deleted lines in the middle of a region. Try
+		// to report this region as a single region to the application,
+		// rather than in fragments.
+		if (aTail.resultStart + aTail.length == n.resultStart
+				&& aTail.sourceStart + aTail.length == n.sourceStart) {
+			aTail.length += n.length;
+			return aTail;
+		}
+
+		// Append the region onto the end of the list.
+		aTail.next = n;
+		n.next = null;
+		return n;
+	}
+

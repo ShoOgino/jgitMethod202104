@@ -1,0 +1,36 @@
+	@Test
+	public void testLinesAllDeletedShortenedWalk() throws Exception {
+		Git git = new Git(db);
+
+		String[] content1 = new String[] { "first", "second", "third" };
+
+		writeTrashFile("file.txt", join(content1));
+		git.add().addFilepattern("file.txt").call();
+		git.commit().setMessage("create file").call();
+
+		String[] content2 = new String[] { "" };
+
+		writeTrashFile("file.txt", join(content2));
+		git.add().addFilepattern("file.txt").call();
+		git.commit().setMessage("create file").call();
+
+		writeTrashFile("file.txt", join(content1));
+		git.add().addFilepattern("file.txt").call();
+		RevCommit c3 = git.commit().setMessage("create file").call();
+
+		BlameGenerator generator = new BlameGenerator(db, "file.txt");
+		try {
+			generator.push(null, db.resolve(Constants.HEAD));
+			assertEquals(3, generator.getResultContents().size());
+
+			assertTrue(generator.next());
+			assertEquals(c3, generator.getSourceCommit());
+			assertEquals(0, generator.getResultStart());
+			assertEquals(3, generator.getResultEnd());
+
+			assertFalse(generator.next());
+		} finally {
+			generator.release();
+		}
+	}
+

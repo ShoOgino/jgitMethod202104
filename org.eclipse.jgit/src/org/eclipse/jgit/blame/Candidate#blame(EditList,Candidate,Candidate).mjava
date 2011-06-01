@@ -1,0 +1,85 @@
+	private static void blame(EditList editList, Candidate a, Candidate b) {
+		Region r = b.clearRegionList();
+		Region aTail = null;
+		Region bTail = null;
+
+		for (int eIdx = 0; eIdx < editList.size();) {
+			// If there are no more regions left, neither side has any
+			// more responsibility for the result. Remaining edits can
+			// be safely ignored.
+			if (r == null)
+				return;
+
+			Edit e = editList.get(eIdx);
+
+			// Edit ends before the next candidate region. Skip the edit.
+			if (e.getEndB() <= r.sourceStart) {
+				eIdx++;
+				continue;
+			}
+
+			// Next candidate region starts before the edit. Assign some
+			// of the blame onto A, but possibly split and also on B.
+			if (r.sourceStart < e.getBeginB()) {
+				int d = e.getBeginB() - r.sourceStart;
+				if (r.length <= d) {
+					// Pass the blame for this region onto A.
+					Region next = r.next;
+					r.sourceStart = e.getBeginA() - d;
+					aTail = add(aTail, a, r);
+					r = next;
+					continue;
+				}
+
+				// Split the region and assign some to A, some to B.
+				aTail = add(aTail, a, r.splitFirst(e.getBeginA() - d, d));
+				r.slideAndShrink(d);
+			}
+
+			// At this point e.getBeginB() <= r.sourceStart.
+
+			// An empty edit on the B side isn't relevant to this split,
+			// as it does not overlap any candidate region.
+			if (e.getLengthB() == 0) {
+				eIdx++;
+				continue;
+			}
+
+			// If the region ends before the edit, blame on B.
+			int rEnd = r.sourceStart + r.length;
+			if (rEnd <= e.getEndB()) {
+				Region next = r.next;
+				bTail = add(bTail, b, r);
+				r = next;
+				if (rEnd == e.getEndB())
+					eIdx++;
+				continue;
+			}
+
+			// This region extends beyond the edit. Blame the first
+			// half of the region on B, and process the rest after.
+			int len = e.getEndB() - r.sourceStart;
+			bTail = add(bTail, b, r.splitFirst(r.sourceStart, len));
+			r.slideAndShrink(len);
+			eIdx++;
+		}
+
+		if (r == null)
+			return;
+
+		// For any remaining region, pass the blame onto A after shifting
+		// the source start to account for the difference between the two.
+		Edit e = editList.get(editList.size() - 1);
+		int endB = e.getEndB();
+		int d = endB - e.getEndA();
+		if (aTail == null)
+			a.regionList = r;
+		else
+			aTail.next = r;
+		do {
+			if (endB <= r.sourceStart)
+				r.sourceStart -= d;
+			r = r.next;
+		} while (r != null);
+	}
+
