@@ -2,7 +2,12 @@
 	public DhtReaderOptions() {
 		setTimeout(Timeout.seconds(5));
 		setPrefetchFollowEdgeHints(true);
-		setPrefetchLimit(5 * MiB);
+
+		setChunkLimit(5 * MiB);
+		setOpenQueuePrefetchRatio(20 /* percent */);
+		setWalkCommitsPrefetchRatio(20 /* percent */);
+		setWalkTreesPrefetchRatio(20 /* percent */);
+		setWriteObjectsPrefetchRatio(90 /* percent */);
 
 		setObjectIndexConcurrentBatches(2);
 		setObjectIndexBatchSize(512);
@@ -11,6 +16,5 @@
 		setDeltaBaseCacheLimit(10 * MiB);
 
 		setRecentInfoCacheSize(4096);
-		setRecentChunkCacheSize(4);
 	}
 

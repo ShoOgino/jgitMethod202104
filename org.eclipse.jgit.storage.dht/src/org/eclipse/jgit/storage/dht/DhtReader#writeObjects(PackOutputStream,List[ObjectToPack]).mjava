@@ -1,7 +1,7 @@
 	@SuppressWarnings("unchecked")
 	public void writeObjects(PackOutputStream out, List<ObjectToPack> objects)
 			throws IOException {
-		prefetcher = new Prefetcher(this, 0);
+		prefetcher = prefetch(0, readerOptions.getWriteObjectsPrefetchRatio());
 		try {
 			List itr = objects;
 			new ObjectWriter(this, prefetcher).plan(itr);

@@ -5,15 +5,12 @@
 			return;
 		}
 
-		if (curSize < maxSize) {
-			n = new Node();
-			curSize++;
-		} else {
-			n = lruTail;
-			byKey.remove(n.chunk.getChunkKey());
-		}
+		curBytes += chunk.getTotalSize();
+		prune();
+
+		n = new Node();
 		n.chunk = chunk;
 		byKey.put(chunk.getChunkKey(), n);
-		hit(n);
+		first(n);
 	}
 
