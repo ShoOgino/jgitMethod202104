@@ -1,0 +1,27 @@
+	@Test
+	public void testGetRefs_LooseSorting_Bug_348834() throws IOException {
+		Map<String, Ref> refs;
+
+		writeLooseRef("refs/heads/my/a+b", A);
+		writeLooseRef("refs/heads/my/a/b/c", B);
+
+		final int[] count = new int[1];
+
+		ListenerHandle listener = Repository.getGlobalListenerList()
+				.addRefsChangedListener(new RefsChangedListener() {
+
+					public void onRefsChanged(RefsChangedEvent event) {
+						count[0]++;
+					}
+				});
+
+		refs = refdir.getRefs(RefDatabase.ALL);
+		refs = refdir.getRefs(RefDatabase.ALL);
+		listener.remove();
+		assertEquals(1, count[0]); // Bug 348834 multiple RefsChangedEvents
+		assertEquals(2, refs.size());
+		assertEquals(A, refs.get("refs/heads/my/a+b").getObjectId());
+		assertEquals(B, refs.get("refs/heads/my/a/b/c").getObjectId());
+
+	}
+
