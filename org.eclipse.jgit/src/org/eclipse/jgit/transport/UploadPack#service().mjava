@@ -9,22 +9,51 @@
 			}
 		}
 
-		recvWants();
-		if (wantIds.isEmpty()) {
-			preUploadHook.onBeginNegotiateRound(this, wantIds, 0);
-			preUploadHook.onEndNegotiateRound(this, wantIds, 0, 0, false);
-			return;
+		boolean sendPack;
+		try {
+			recvWants();
+			if (wantIds.isEmpty()) {
+				preUploadHook.onBeginNegotiateRound(this, wantIds, 0);
+				preUploadHook.onEndNegotiateRound(this, wantIds, 0, 0, false);
+				return;
+			}
+
+			if (options.contains(OPTION_MULTI_ACK_DETAILED)) {
+				multiAck = MultiAck.DETAILED;
+				noDone = options.contains(OPTION_NO_DONE);
+			} else if (options.contains(OPTION_MULTI_ACK))
+				multiAck = MultiAck.CONTINUE;
+			else
+				multiAck = MultiAck.OFF;
+
+			sendPack = negotiate();
+		} catch (PackProtocolException err) {
+			reportErrorDuringNegotiate(err.getMessage());
+			throw err;
+
+		} catch (UploadPackMayNotContinueException err) {
+			if (!err.isOutput() && err.getMessage() != null) {
+				try {
+					pckOut.writeString("ERR " + err.getMessage() + "\n");
+					err.setOutput();
+				} catch (Throwable err2) {
+					// Ignore this secondary failure (and not mark output).
+				}
+			}
+			throw err;
+
+		} catch (IOException err) {
+			reportErrorDuringNegotiate(JGitText.get().internalServerError);
+			throw err;
+		} catch (RuntimeException err) {
+			reportErrorDuringNegotiate(JGitText.get().internalServerError);
+			throw err;
+		} catch (Error err) {
+			reportErrorDuringNegotiate(JGitText.get().internalServerError);
+			throw err;
 		}
 
-		if (options.contains(OPTION_MULTI_ACK_DETAILED)) {
-			multiAck = MultiAck.DETAILED;
-			noDone = options.contains(OPTION_NO_DONE);
-		} else if (options.contains(OPTION_MULTI_ACK))
-			multiAck = MultiAck.CONTINUE;
-		else
-			multiAck = MultiAck.OFF;
-
-		if (negotiate())
+		if (sendPack)
 			sendPack();
 	}
 

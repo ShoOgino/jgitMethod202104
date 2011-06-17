@@ -19,9 +19,18 @@
 			};
 			rp.receive(getInputStream(req), out, null);
 			out.close();
+		} catch (UnpackException e) {
+			// This should be already reported to the client.
+			getServletContext().log(
+					HttpServerText.get().internalErrorDuringReceivePack,
+					e.getCause());
+
 		} catch (IOException e) {
 			getServletContext().log(HttpServerText.get().internalErrorDuringReceivePack, e);
-			rsp.sendError(SC_INTERNAL_SERVER_ERROR);
+			if (!rsp.isCommitted()) {
+				rsp.reset();
+				rsp.sendError(SC_INTERNAL_SERVER_ERROR);
+			}
 			return;
 		}
 	}
