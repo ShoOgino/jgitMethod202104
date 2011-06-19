@@ -1,0 +1,10 @@
+	@Test
+	public void testReflog() throws Exception {
+		Collection<ReflogEntry> reflog = git.reflog().call();
+		assertTrue(reflog.size() == 2);
+		ReflogEntry[] reflogs = reflog.toArray(new ReflogEntry[reflog.size()]);
+		assertEquals(reflogs[1].getComment(), "commit: Initial commit");
+		assertEquals(reflogs[0].getNewId(), commit2.getId());
+		assertEquals(reflogs[0].getOldId(), commit1.getId());
+	}
+
