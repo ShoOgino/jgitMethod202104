@@ -4,7 +4,7 @@
 	 * @return all reflog entries in reverse order
 	 * @throws IOException
 	 */
-	public List<Entry> getReverseEntries(int max) throws IOException {
+	public List<ReflogEntry> getReverseEntries(int max) throws IOException {
 		final byte[] log;
 		try {
 			log = IO.readFully(logName);
@@ -13,10 +13,10 @@
 		}
 
 		int rs = RawParseUtils.prevLF(log, log.length);
-		List<Entry> ret = new ArrayList<Entry>();
+		List<ReflogEntry> ret = new ArrayList<ReflogEntry>();
 		while (rs >= 0 && max-- > 0) {
 			rs = RawParseUtils.prevLF(log, rs);
-			Entry entry = new Entry(log, rs < 0 ? 0 : rs + 2);
+			ReflogEntry entry = new ReflogEntry(log, rs < 0 ? 0 : rs + 2);
 			ret.add(entry);
 		}
 		return ret;
