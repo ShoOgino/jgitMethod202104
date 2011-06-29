@@ -1,0 +1,33 @@
+	/**
+	 * Read an existing pack index file from a buffered stream.
+	 * <p>
+	 * The format of the file will be automatically detected and a proper access
+	 * implementation for that format will be constructed and returned to the
+	 * caller. The file may or may not be held open by the returned instance.
+	 *
+	 * @param fd
+	 *            stream to read the index file from. The stream must be
+	 *            buffered as some small IOs are performed against the stream.
+	 *            The caller is responsible for closing the stream.
+	 * @return a copy of the index in-memory.
+	 * @throws IOException
+	 *             the stream cannot be read.
+	 * @throws CorruptObjectException
+	 *             the stream does not contain a valid pack index.
+	 */
+	public static PackIndex read(InputStream fd) throws IOException,
+			CorruptObjectException {
+		final byte[] hdr = new byte[8];
+		IO.readFully(fd, hdr, 0, hdr.length);
+		if (isTOC(hdr)) {
+			final int v = NB.decodeInt32(hdr, 4);
+			switch (v) {
+			case 2:
+				return new PackIndexV2(fd);
+			default:
+				throw new IOException(MessageFormat.format(JGitText.get().unsupportedPackIndexVersion, v));
+			}
+		}
+		return new PackIndexV1(fd, hdr);
+	}
+
