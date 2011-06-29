@@ -12,65 +12,10 @@
 	 * @throws IOException
 	 */
 	public boolean checkout() throws IOException {
-		toBeDeleted.clear();
-		if (headCommitTree != null)
-			preScanTwoTrees();
-		else
-			prescanOneTree();
-
-		if (!conflicts.isEmpty()) {
-			if (failOnConflict) {
-				dc.unlock();
-				throw new CheckoutConflictException(conflicts.toArray(new String[conflicts.size()]));
-			} else
-				cleanUpConflicts();
-		}
-
-		// update our index
-		builder.finish();
-
-		File file=null;
-		String last = "";
-		// when deleting files process them in the opposite order as they have
-		// been reported. This ensures the files are deleted before we delete
-		// their parent folders
-		for (int i = removed.size() - 1; i >= 0; i--) {
-			String r = removed.get(i);
-			file = new File(repo.getWorkTree(), r);
-			if (!file.delete() && file.exists())
-					toBeDeleted.add(r);
-			else {
-				if (!isSamePrefix(r, last))
-					removeEmptyParents(file);
-				last = r;
-			}
-		}
-		if (file != null)
-			removeEmptyParents(file);
-
-		for (String path : updated.keySet()) {
-			// ... create/overwrite this file ...
-			file = new File(repo.getWorkTree(), path);
-			if (!file.getParentFile().mkdirs()) {
-				// ignore
-			}
-
-			DirCacheEntry entry = dc.getEntry(path);
-
-			// submodules are handled with separate operations
-			if (FileMode.GITLINK.equals(entry.getRawMode()))
-				continue;
-
-			checkoutEntry(repo, file, entry);
-		}
-
-
-		// commit the index builder - a new index is persisted
-		if (!builder.commit()) {
+		try {
+			return doCheckout();
+		} finally {
 			dc.unlock();
-			throw new IndexWriteException();
 		}
-
-		return toBeDeleted.size() == 0;
 	}
 
