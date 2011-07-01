@@ -1,0 +1,17 @@
+	private ObjectId insertOneObject(final File tmp, final ObjectId id)
+			throws IOException, ObjectWritingException {
+		switch (db.insertUnpackedObject(tmp, id, false /* no duplicate */)) {
+		case INSERTED:
+		case EXISTS_PACKED:
+		case EXISTS_LOOSE:
+			return id;
+
+		case FAILURE:
+		default:
+			break;
+		}
+
+		final File dst = db.fileFor(id);
+		throw new ObjectWritingException("Unable to create new object: " + dst);
+	}
+

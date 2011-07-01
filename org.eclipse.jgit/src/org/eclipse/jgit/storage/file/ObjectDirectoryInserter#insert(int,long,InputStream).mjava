@@ -1,22 +1,16 @@
 	@Override
 	public ObjectId insert(final int type, long len, final InputStream is)
 			throws IOException {
-		final MessageDigest md = digest();
-		final File tmp = toTemp(md, type, len, is);
-		final ObjectId id = ObjectId.fromRaw(md.digest());
+		if (len <= buffer().length) {
+			byte[] buf = buffer();
+			IO.readFully(is, buf, 0, (int) len);
+			return insert(type, buf, 0, (int) len);
 
-		switch (db.insertUnpackedObject(tmp, id, false /* no duplicate */)) {
-		case INSERTED:
-		case EXISTS_PACKED:
-		case EXISTS_LOOSE:
-			return id;
-
-		case FAILURE:
-		default:
-			break;
+		} else {
+			MessageDigest md = digest();
+			File tmp = toTemp(md, type, len, is);
+			ObjectId id = ObjectId.fromRaw(md.digest());
+			return insertOneObject(tmp, id);
 		}
-
-		final File dst = db.fileFor(id);
-		throw new ObjectWritingException("Unable to create new object: " + dst);
 	}
 
