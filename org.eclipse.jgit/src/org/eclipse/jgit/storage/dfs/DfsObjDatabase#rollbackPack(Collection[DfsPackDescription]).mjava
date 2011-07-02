@@ -1,0 +1,17 @@
+	/**
+	 * Try to rollback a pack creation.
+	 * <p>
+	 * JGit DFS always writes the pack first, then the index. If the pack does
+	 * not yet exist, then neither does the index. A safe DFS implementation
+	 * would try to remove both files to ensure they are really gone.
+	 * <p>
+	 * A rollback does not support failures, as it only occurs when there is
+	 * already a failure in progress. A DFS implementor may wish to log
+	 * warnings/error messages when a rollback fails, but should not send new
+	 * exceptions up the Java callstack.
+	 *
+	 * @param desc
+	 *            pack to delete.
+	 */
+	protected abstract void rollbackPack(Collection<DfsPackDescription> desc);
+

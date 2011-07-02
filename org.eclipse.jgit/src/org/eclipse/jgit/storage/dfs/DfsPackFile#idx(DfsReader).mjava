@@ -1,0 +1,54 @@
+	private PackIndex idx(DfsReader ctx) throws IOException {
+		DfsBlockCache.Ref<PackIndex> idxref = index;
+		if (idxref != null) {
+			PackIndex idx = idxref.get();
+			if (idx != null)
+				return idx;
+		}
+
+		if (invalid)
+			throw new PackInvalidException(getPackName());
+
+		synchronized (initLock) {
+			idxref = index;
+			if (idxref != null) {
+				PackIndex idx = idxref.get();
+				if (idx != null)
+					return idx;
+			}
+
+			PackIndex idx;
+			try {
+				ReadableChannel rc = ctx.db.openPackIndex(packDesc);
+				try {
+					InputStream in = Channels.newInputStream(rc);
+					int wantSize = 8192;
+					int bs = rc.blockSize();
+					if (0 < bs && bs < wantSize)
+						bs = (wantSize / bs) * bs;
+					else if (bs <= 0)
+						bs = wantSize;
+					in = new BufferedInputStream(in, bs);
+					idx = PackIndex.read(in);
+				} finally {
+					rc.close();
+				}
+			} catch (EOFException e) {
+				invalid = true;
+				IOException e2 = new IOException(MessageFormat.format(
+						DfsText.get().shortReadOfIndex, packDesc.getIndexName()));
+				e2.initCause(e);
+				throw e2;
+			} catch (IOException e) {
+				invalid = true;
+				IOException e2 = new IOException(MessageFormat.format(
+						DfsText.get().cannotReadIndex, packDesc.getIndexName()));
+				e2.initCause(e);
+				throw e2;
+			}
+
+			setPackIndex(idx);
+			return idx;
+		}
+	}
+

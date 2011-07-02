@@ -1,0 +1,56 @@
+	private void addObjectsToPack(PackWriter pw, DfsReader ctx,
+			ProgressMonitor pm) throws IOException,
+			IncorrectObjectTypeException {
+		// Sort packs by description ordering, this places newer packs before
+		// older packs, allowing the PackWriter to be handed newer objects
+		// first and older objects last.
+		Collections.sort(srcPacks, new Comparator<DfsPackFile>() {
+			public int compare(DfsPackFile a, DfsPackFile b) {
+				return a.getPackDescription().compareTo(b.getPackDescription());
+			}
+		});
+
+		RevWalk rw = new RevWalk(ctx);
+		RevFlag added = rw.newFlag("ADDED");
+
+		pm.beginTask(JGitText.get().countingObjects, ProgressMonitor.UNKNOWN);
+		for (DfsPackFile src : srcPacks) {
+			List<ObjectIdWithOffset> want = new BlockList<ObjectIdWithOffset>();
+			for (PackIndex.MutableEntry ent : src.getPackIndex(ctx)) {
+				ObjectId id = ent.toObjectId();
+				RevObject obj = rw.lookupOrNull(id);
+				if (obj == null || !obj.has(added))
+					want.add(new ObjectIdWithOffset(id, ent.getOffset()));
+			}
+
+			// Sort objects by the order they appear in the pack file, for
+			// two benefits. Scanning object type information is faster when
+			// the pack is traversed in order, and this allows the PackWriter
+			// to be given the new objects in a relatively sane newest-first
+			// ordering without additional logic, like unpacking commits and
+			// walking a commit queue.
+			Collections.sort(want, new Comparator<ObjectIdWithOffset>() {
+				public int compare(ObjectIdWithOffset a, ObjectIdWithOffset b) {
+					return Long.signum(a.offset - b.offset);
+				}
+			});
+
+			// Only pack each object at most once into the output file. The
+			// PackWriter will later select a representation to reuse, which
+			// may be the version in this pack, or may be from another pack if
+			// the object was copied here to complete a thin pack and is larger
+			// than a delta from another pack. This is actually somewhat common
+			// if an object is modified frequently, such as the top level tree.
+			for (ObjectIdWithOffset id : want) {
+				int type = src.getObjectType(ctx, id.offset);
+				RevObject obj = rw.lookupAny(id, type);
+				if (!obj.has(added)) {
+					pm.update(1);
+					pw.addObject(obj);
+					obj.add(added);
+				}
+			}
+		}
+		pm.endTask();
+	}
+

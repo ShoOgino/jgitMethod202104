@@ -1,0 +1,14 @@
+		@Override
+		protected RefCache scanAllRefs() throws IOException {
+			RefList.Builder<Ref> ids = new RefList.Builder<Ref>();
+			RefList.Builder<Ref> sym = new RefList.Builder<Ref>();
+			for (Ref ref : refs.values()) {
+				if (ref.isSymbolic())
+					sym.add(ref);
+				ids.add(ref);
+			}
+			ids.sort();
+			sym.sort();
+			return new RefCache(ids.toRefList(), sym.toRefList());
+		}
+

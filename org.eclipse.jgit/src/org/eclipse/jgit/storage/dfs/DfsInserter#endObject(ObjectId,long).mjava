@@ -1,0 +1,9 @@
+	private ObjectId endObject(ObjectId id, long offset) {
+		PackedObjectInfo obj = new PackedObjectInfo(id);
+		obj.setOffset(offset);
+		obj.setCRC((int) packOut.crc32.getValue());
+		objectList.add(obj);
+		objectMap.addIfAbsent(obj);
+		return id;
+	}
+

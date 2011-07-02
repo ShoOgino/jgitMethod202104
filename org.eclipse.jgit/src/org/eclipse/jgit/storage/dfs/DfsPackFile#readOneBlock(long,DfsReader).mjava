@@ -1,0 +1,73 @@
+	DfsBlock readOneBlock(long pos, DfsReader ctx)
+			throws IOException {
+		if (invalid)
+			throw new PackInvalidException(getPackName());
+
+		boolean close = true;
+		ReadableChannel rc = ctx.db.openPackFile(packDesc);
+		try {
+			// If the block alignment is not yet known, discover it. Prefer the
+			// larger size from either the cache or the file itself.
+			int size = blockSize;
+			if (size == 0) {
+				size = rc.blockSize();
+				if (size <= 0)
+					size = cache.getBlockSize();
+				else if (size < cache.getBlockSize())
+					size = (cache.getBlockSize() / size) * size;
+				blockSize = size;
+				pos = (pos / size) * size;
+			}
+
+			// If the size of the file is not yet known, try to discover it.
+			// Channels may choose to return -1 to indicate they don't
+			// know the length yet, in this case read up to the size unit
+			// given by the caller, then recheck the length.
+			long len = length;
+			if (len < 0) {
+				len = rc.size();
+				if (0 <= len)
+					length = len;
+			}
+
+			if (0 <= len && len < pos + size)
+				size = (int) (len - pos);
+			if (size <= 0)
+				throw new EOFException(MessageFormat.format(
+						DfsText.get().shortReadOfBlock, Long.valueOf(pos),
+						getPackName(), Long.valueOf(0), Long.valueOf(0)));
+
+			byte[] buf = new byte[size];
+			rc.position(pos);
+			int cnt = IO.read(rc, buf, 0, size);
+			if (cnt != size) {
+				if (0 <= len) {
+					throw new EOFException(MessageFormat.format(
+						    DfsText.get().shortReadOfBlock,
+						    Long.valueOf(pos),
+						    getPackName(),
+						    Integer.valueOf(size),
+						    Integer.valueOf(cnt)));
+				}
+
+				// Assume the entire thing was read in a single shot, compact
+				// the buffer to only the space required.
+				byte[] n = new byte[cnt];
+				System.arraycopy(buf, 0, n, 0, n.length);
+				buf = n;
+			} else if (len < 0) {
+				// With no length at the start of the read, the channel should
+				// have the length available at the end.
+				length = len = rc.size();
+			}
+
+			DfsBlock v = new DfsBlock(key, pos, buf);
+			if (v.end < len)
+				close = !cache.readAhead(rc, key, size, v.end, len, ctx);
+			return v;
+		} finally {
+			if (close)
+				rc.close();
+		}
+	}
+

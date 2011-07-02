@@ -1,0 +1,9 @@
+	private RefCache read() throws IOException {
+		RefCache c = cache.get();
+		if (c == null) {
+			c = scanAllRefs();
+			cache.set(c);
+		}
+		return c;
+	}
+

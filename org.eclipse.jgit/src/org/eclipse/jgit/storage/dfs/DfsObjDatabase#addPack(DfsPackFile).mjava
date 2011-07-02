@@ -1,0 +1,28 @@
+	void addPack(DfsPackFile newPack) throws IOException {
+		PackList o, n;
+		do {
+			o = packList.get();
+			if (o == NO_PACKS) {
+				// The repository may not have needed any existing objects to
+				// complete the current task of creating a pack (e.g. push of a
+				// pack with no external deltas). Because we don't scan for
+				// newly added packs on missed object lookups, scan now to
+				// make sure all older packs are available in the packList.
+				o = scanPacks(o);
+
+				// Its possible the scan identified the pack we were asked to
+				// add, as the pack was already committed via commitPack().
+				// If this is the case return without changing the list.
+				for (DfsPackFile p : o.packs) {
+					if (p == newPack)
+						return;
+				}
+			}
+
+			DfsPackFile[] packs = new DfsPackFile[1 + o.packs.length];
+			packs[0] = newPack;
+			System.arraycopy(o.packs, 0, packs, 1, o.packs.length);
+			n = new PackList(packs);
+		} while (!packList.compareAndSet(o, n));
+	}
+

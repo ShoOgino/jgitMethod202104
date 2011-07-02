@@ -1,0 +1,14 @@
+		@Override
+		protected boolean compareAndPut(Ref oldRef, Ref newRef)
+				throws IOException {
+			String name = newRef.getName();
+			if (oldRef == null || oldRef.getStorage() == Storage.NEW)
+				return refs.putIfAbsent(name, newRef) == null;
+			Ref cur = refs.get(name);
+			if (cur != null && eq(cur, oldRef))
+				return refs.replace(name, cur, newRef);
+			else
+				return false;
+
+		}
+

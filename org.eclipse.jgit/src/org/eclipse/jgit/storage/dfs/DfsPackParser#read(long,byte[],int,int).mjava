@@ -1,0 +1,17 @@
+	private int read(long pos, byte[] dst, int off, int len) throws IOException {
+		if (len == 0)
+			return 0;
+
+		int cnt = 0;
+		while (0 < len) {
+			int r = out.read(pos, ByteBuffer.wrap(dst, off, len));
+			if (r <= 0)
+				break;
+			pos += r;
+			off += r;
+			len -= r;
+			cnt += r;
+		}
+		return cnt != 0 ? cnt : -1;
+	}
+

@@ -1,0 +1,15 @@
+		private void flushBlock() throws IOException {
+			out.write(currBuf, 0, currPtr);
+
+			byte[] buf;
+			if (currPtr == currBuf.length)
+				buf = currBuf;
+			else
+				buf = copyOf(currBuf, 0, currPtr);
+			cache.put(new DfsBlock(packKey, currPos, buf));
+
+			currPos += currPtr;
+			currPtr = 0;
+			currBuf = null;
+		}
+

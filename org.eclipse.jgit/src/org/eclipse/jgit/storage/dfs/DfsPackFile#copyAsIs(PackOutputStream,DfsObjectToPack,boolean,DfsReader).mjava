@@ -1,0 +1,189 @@
+	void copyAsIs(PackOutputStream out, DfsObjectToPack src,
+			boolean validate, DfsReader ctx) throws IOException,
+			StoredObjectRepresentationNotAvailableException {
+		final CRC32 crc1 = validate ? new CRC32() : null;
+		final CRC32 crc2 = validate ? new CRC32() : null;
+		final byte[] buf = out.getCopyBuffer();
+
+		// Rip apart the header so we can discover the size.
+		//
+		try {
+			readFully(src.offset, buf, 0, 20, ctx);
+		} catch (IOException ioError) {
+			StoredObjectRepresentationNotAvailableException gone;
+			gone = new StoredObjectRepresentationNotAvailableException(src);
+			gone.initCause(ioError);
+			throw gone;
+		}
+		int c = buf[0] & 0xff;
+		final int typeCode = (c >> 4) & 7;
+		long inflatedLength = c & 15;
+		int shift = 4;
+		int headerCnt = 1;
+		while ((c & 0x80) != 0) {
+			c = buf[headerCnt++] & 0xff;
+			inflatedLength += (c & 0x7f) << shift;
+			shift += 7;
+		}
+
+		if (typeCode == Constants.OBJ_OFS_DELTA) {
+			do {
+				c = buf[headerCnt++] & 0xff;
+			} while ((c & 128) != 0);
+			if (validate) {
+				crc1.update(buf, 0, headerCnt);
+				crc2.update(buf, 0, headerCnt);
+			}
+		} else if (typeCode == Constants.OBJ_REF_DELTA) {
+			if (validate) {
+				crc1.update(buf, 0, headerCnt);
+				crc2.update(buf, 0, headerCnt);
+			}
+
+			readFully(src.offset + headerCnt, buf, 0, 20, ctx);
+			if (validate) {
+				crc1.update(buf, 0, 20);
+				crc2.update(buf, 0, 20);
+			}
+			headerCnt += 20;
+		} else if (validate) {
+			crc1.update(buf, 0, headerCnt);
+			crc2.update(buf, 0, headerCnt);
+		}
+
+		final long dataOffset = src.offset + headerCnt;
+		final long dataLength = src.length;
+		final long expectedCRC;
+		final DfsBlock quickCopy;
+
+		// Verify the object isn't corrupt before sending. If it is,
+		// we report it missing instead.
+		//
+		try {
+			quickCopy = ctx.quickCopy(this, dataOffset, dataLength);
+
+			if (validate && idx(ctx).hasCRC32Support()) {
+				// Index has the CRC32 code cached, validate the object.
+				//
+				expectedCRC = idx(ctx).findCRC32(src);
+				if (quickCopy != null) {
+					quickCopy.crc32(crc1, dataOffset, (int) dataLength);
+				} else {
+					long pos = dataOffset;
+					long cnt = dataLength;
+					while (cnt > 0) {
+						final int n = (int) Math.min(cnt, buf.length);
+						readFully(pos, buf, 0, n, ctx);
+						crc1.update(buf, 0, n);
+						pos += n;
+						cnt -= n;
+					}
+				}
+				if (crc1.getValue() != expectedCRC) {
+					setCorrupt(src.offset);
+					throw new CorruptObjectException(MessageFormat.format(
+							JGitText.get().objectAtHasBadZlibStream,
+							Long.valueOf(src.offset), getPackName()));
+				}
+			} else if (validate) {
+				// We don't have a CRC32 code in the index, so compute it
+				// now while inflating the raw data to get zlib to tell us
+				// whether or not the data is safe.
+				//
+				Inflater inf = ctx.inflater();
+				byte[] tmp = new byte[1024];
+				if (quickCopy != null) {
+					quickCopy.check(inf, tmp, dataOffset, (int) dataLength);
+				} else {
+					long pos = dataOffset;
+					long cnt = dataLength;
+					while (cnt > 0) {
+						final int n = (int) Math.min(cnt, buf.length);
+						readFully(pos, buf, 0, n, ctx);
+						crc1.update(buf, 0, n);
+						inf.setInput(buf, 0, n);
+						while (inf.inflate(tmp, 0, tmp.length) > 0)
+							continue;
+						pos += n;
+						cnt -= n;
+					}
+				}
+				if (!inf.finished() || inf.getBytesRead() != dataLength) {
+					setCorrupt(src.offset);
+					throw new EOFException(MessageFormat.format(
+							JGitText.get().shortCompressedStreamAt,
+							Long.valueOf(src.offset)));
+				}
+				expectedCRC = crc1.getValue();
+			} else {
+				expectedCRC = -1;
+			}
+		} catch (DataFormatException dataFormat) {
+			setCorrupt(src.offset);
+
+			CorruptObjectException corruptObject = new CorruptObjectException(
+					MessageFormat.format(
+							JGitText.get().objectAtHasBadZlibStream,
+							Long.valueOf(src.offset), getPackName()));
+			corruptObject.initCause(dataFormat);
+
+			StoredObjectRepresentationNotAvailableException gone;
+			gone = new StoredObjectRepresentationNotAvailableException(src);
+			gone.initCause(corruptObject);
+			throw gone;
+
+		} catch (IOException ioError) {
+			StoredObjectRepresentationNotAvailableException gone;
+			gone = new StoredObjectRepresentationNotAvailableException(src);
+			gone.initCause(ioError);
+			throw gone;
+		}
+
+		if (quickCopy != null) {
+			// The entire object fits into a single byte array window slice,
+			// and we have it pinned.  Write this out without copying.
+			//
+			out.writeHeader(src, inflatedLength);
+			quickCopy.write(out, dataOffset, (int) dataLength, null);
+
+		} else if (dataLength <= buf.length) {
+			// Tiny optimization: Lots of objects are very small deltas or
+			// deflated commits that are likely to fit in the copy buffer.
+			//
+			if (!validate) {
+				long pos = dataOffset;
+				long cnt = dataLength;
+				while (cnt > 0) {
+					final int n = (int) Math.min(cnt, buf.length);
+					readFully(pos, buf, 0, n, ctx);
+					pos += n;
+					cnt -= n;
+				}
+			}
+			out.writeHeader(src, inflatedLength);
+			out.write(buf, 0, (int) dataLength);
+		} else {
+			// Now we are committed to sending the object. As we spool it out,
+			// check its CRC32 code to make sure there wasn't corruption between
+			// the verification we did above, and us actually outputting it.
+			//
+			out.writeHeader(src, inflatedLength);
+			long pos = dataOffset;
+			long cnt = dataLength;
+			while (cnt > 0) {
+				final int n = (int) Math.min(cnt, buf.length);
+				readFully(pos, buf, 0, n, ctx);
+				if (validate)
+					crc2.update(buf, 0, n);
+				out.write(buf, 0, n);
+				pos += n;
+				cnt -= n;
+			}
+			if (validate && crc2.getValue() != expectedCRC) {
+				throw new CorruptObjectException(MessageFormat.format(
+						JGitText.get().objectAtHasBadZlibStream,
+						Long.valueOf(src.offset), getPackName()));
+			}
+		}
+	}
+

@@ -1,0 +1,9 @@
+	private void cancelReadAhead() {
+		if (pendingReadAhead != null) {
+			for (ReadAheadTask.BlockFuture f : pendingReadAhead)
+				f.cancel(true);
+			pendingReadAhead = null;
+		}
+		wantReadAhead = false;
+	}
+

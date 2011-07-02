@@ -1,0 +1,14 @@
+	private void packHeads(ProgressMonitor pm) throws IOException {
+		if (allHeads.isEmpty())
+			return;
+
+		PackWriter pw = newPackWriter();
+		try {
+			pw.preparePack(pm, allHeads, Collections.<ObjectId> emptySet());
+			if (0 < pw.getObjectCount())
+				writePack(GC, pw, pm).setTips(allHeads);
+		} finally {
+			pw.release();
+		}
+	}
+

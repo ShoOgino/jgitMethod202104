@@ -1,0 +1,27 @@
+	private PackList scanPacksImpl(PackList old) throws IOException {
+		DfsBlockCache cache = DfsBlockCache.getInstance();
+		Map<DfsPackDescription, DfsPackFile> forReuse = reuseMap(old);
+		List<DfsPackDescription> scanned = listPacks();
+		Collections.sort(scanned);
+
+		List<DfsPackFile> list = new ArrayList<DfsPackFile>(scanned.size());
+		boolean foundNew = false;
+		for (DfsPackDescription dsc : scanned) {
+			DfsPackFile oldPack = forReuse.remove(dsc);
+			if (oldPack != null) {
+				list.add(oldPack);
+			} else {
+				list.add(cache.getOrCreate(dsc, null));
+				foundNew = true;
+			}
+		}
+
+		for (DfsPackFile p : forReuse.values())
+			p.close();
+		if (list.isEmpty())
+			return new PackList(NO_PACKS.packs);
+		if (!foundNew)
+			return old;
+		return new PackList(list.toArray(new DfsPackFile[list.size()]));
+	}
+

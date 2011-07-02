@@ -1,0 +1,141 @@
+	ObjectLoader load(DfsReader ctx, long pos)
+			throws IOException {
+		try {
+			final byte[] ib = ctx.tempId;
+			Delta delta = null;
+			byte[] data = null;
+			int type = Constants.OBJ_BAD;
+			boolean cached = false;
+
+			SEARCH: for (;;) {
+				readFully(pos, ib, 0, 20, ctx);
+				int c = ib[0] & 0xff;
+				final int typeCode = (c >> 4) & 7;
+				long sz = c & 15;
+				int shift = 4;
+				int p = 1;
+				while ((c & 0x80) != 0) {
+					c = ib[p++] & 0xff;
+					sz += (c & 0x7f) << shift;
+					shift += 7;
+				}
+
+				switch (typeCode) {
+				case Constants.OBJ_COMMIT:
+				case Constants.OBJ_TREE:
+				case Constants.OBJ_BLOB:
+				case Constants.OBJ_TAG: {
+					if (delta != null) {
+						data = decompress(pos + p, (int) sz, ctx);
+						type = typeCode;
+						break SEARCH;
+					}
+
+					if (sz < ctx.getStreamFileThreshold()) {
+						data = decompress(pos + p, (int) sz, ctx);
+						if (data != null)
+							return new ObjectLoader.SmallObject(typeCode, data);
+					}
+					return new LargePackedWholeObject(typeCode, sz, pos, p, this, ctx.db);
+				}
+
+				case Constants.OBJ_OFS_DELTA: {
+					c = ib[p++] & 0xff;
+					long base = c & 127;
+					while ((c & 128) != 0) {
+						base += 1;
+						c = ib[p++] & 0xff;
+						base <<= 7;
+						base += (c & 127);
+					}
+					base = pos - base;
+					delta = new Delta(delta, pos, (int) sz, p, base);
+					if (sz != delta.deltaSize)
+						break SEARCH;
+
+					DeltaBaseCache.Entry e = ctx.getDeltaBaseCache().get(key, base);
+					if (e != null) {
+						type = e.type;
+						data = e.data;
+						cached = true;
+						break SEARCH;
+					}
+					pos = base;
+					continue SEARCH;
+				}
+
+				case Constants.OBJ_REF_DELTA: {
+					readFully(pos + p, ib, 0, 20, ctx);
+					long base = findDeltaBase(ctx, ObjectId.fromRaw(ib));
+					delta = new Delta(delta, pos, (int) sz, p + 20, base);
+					if (sz != delta.deltaSize)
+						break SEARCH;
+
+					DeltaBaseCache.Entry e = ctx.getDeltaBaseCache().get(key, base);
+					if (e != null) {
+						type = e.type;
+						data = e.data;
+						cached = true;
+						break SEARCH;
+					}
+					pos = base;
+					continue SEARCH;
+				}
+
+				default:
+					throw new IOException(MessageFormat.format(
+							JGitText.get().unknownObjectType, Integer.valueOf(typeCode)));
+				}
+			}
+
+			// At this point there is at least one delta to apply to data.
+			// (Whole objects with no deltas to apply return early above.)
+
+			if (data == null)
+				throw new LargeObjectException();
+
+			do {
+				// Cache only the base immediately before desired object.
+				if (cached)
+					cached = false;
+				else if (delta.next == null)
+					ctx.getDeltaBaseCache().put(key, delta.basePos, type, data);
+
+				pos = delta.deltaPos;
+
+				byte[] cmds = decompress(pos + delta.hdrLen, delta.deltaSize, ctx);
+				if (cmds == null) {
+					data = null; // Discard base in case of OutOfMemoryError
+					throw new LargeObjectException();
+				}
+
+				final long sz = BinaryDelta.getResultSize(cmds);
+				if (Integer.MAX_VALUE <= sz)
+					throw new LargeObjectException.ExceedsByteArrayLimit();
+
+				final byte[] result;
+				try {
+					result = new byte[(int) sz];
+				} catch (OutOfMemoryError tooBig) {
+					data = null; // Discard base in case of OutOfMemoryError
+					cmds = null;
+					throw new LargeObjectException.OutOfMemory(tooBig);
+				}
+
+				BinaryDelta.apply(data, cmds, result);
+				data = result;
+				delta = delta.next;
+			} while (delta != null);
+
+			return new ObjectLoader.SmallObject(type, data);
+
+		} catch (DataFormatException dfe) {
+			CorruptObjectException coe = new CorruptObjectException(
+					MessageFormat.format(
+							JGitText.get().objectAtHasBadZlibStream, Long.valueOf(pos),
+							getPackName()));
+			coe.initCause(dfe);
+			throw coe;
+		}
+	}
+

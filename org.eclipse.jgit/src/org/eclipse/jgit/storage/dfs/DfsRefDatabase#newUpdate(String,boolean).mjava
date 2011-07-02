@@ -1,0 +1,20 @@
+	@Override
+	public DfsRefUpdate newUpdate(String refName, boolean detach)
+			throws IOException {
+		boolean detachingSymbolicRef = false;
+		Ref ref = getOneRef(refName);
+		if (ref == null)
+			ref = new ObjectIdRef.Unpeeled(NEW, refName, null);
+		else
+			detachingSymbolicRef = detach && ref.isSymbolic();
+
+		if (detachingSymbolicRef) {
+			ref = new ObjectIdRef.Unpeeled(NEW, refName, ref.getObjectId());
+		}
+
+		DfsRefUpdate update = new DfsRefUpdate(this, ref);
+		if (detachingSymbolicRef)
+			update.setDetachingSymbolicRef();
+		return update;
+	}
+

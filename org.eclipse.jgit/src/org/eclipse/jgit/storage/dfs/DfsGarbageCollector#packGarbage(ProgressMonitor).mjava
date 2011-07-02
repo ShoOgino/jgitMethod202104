@@ -1,0 +1,33 @@
+	private void packGarbage(ProgressMonitor pm) throws IOException {
+		if (objectsPacked == getObjectsBefore())
+			return;
+
+		// TODO(sop) This is ugly. The garbage pack needs to be deleted.
+		List<PackIndex> newIdx = new ArrayList<PackIndex>(newPackList.size());
+		for (DfsPackFile pack : newPackList)
+			newIdx.add(pack.getPackIndex(ctx));
+
+		PackWriter pw = newPackWriter();
+		try {
+			RevWalk pool = new RevWalk(ctx);
+			for (DfsPackFile oldPack : packsBefore) {
+				PackIndex oldIdx = oldPack.getPackIndex(ctx);
+				pm.beginTask("Finding garbage", (int) oldIdx.getObjectCount());
+				for (PackIndex.MutableEntry ent : oldIdx) {
+					pm.update(1);
+					ObjectId id = ent.toObjectId();
+					if (pool.lookupOrNull(id) != null || anyIndexHas(newIdx, id))
+						continue;
+
+					int type = oldPack.getObjectType(ctx, ent.getOffset());
+					pw.addObject(pool.lookupAny(id, type));
+				}
+				pm.endTask();
+			}
+			if (0 < pw.getObjectCount())
+				writePack(UNREACHABLE_GARBAGE, pw, pm);
+		} finally {
+			pw.release();
+		}
+	}
+

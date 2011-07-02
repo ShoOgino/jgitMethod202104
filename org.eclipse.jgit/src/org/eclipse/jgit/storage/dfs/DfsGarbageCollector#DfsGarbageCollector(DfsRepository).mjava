@@ -1,0 +1,18 @@
+	/**
+	 * Initialize a garbage collector.
+	 *
+	 * @param repository
+	 *            repository objects to be packed will be read from.
+	 */
+	public DfsGarbageCollector(DfsRepository repository) {
+		repo = repository;
+		refdb = repo.getRefDatabase();
+		objdb = repo.getObjectDatabase();
+		newPackDesc = new ArrayList<DfsPackDescription>(4);
+		newPackStats = new ArrayList<PackWriter.Statistics>(4);
+		newPackList = new ArrayList<DfsPackFile>(4);
+
+		packConfig = new PackConfig(repo);
+		packConfig.setIndexVersion(2);
+	}
+

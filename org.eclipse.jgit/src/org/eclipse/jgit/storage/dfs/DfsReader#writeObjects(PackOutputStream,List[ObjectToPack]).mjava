@@ -1,0 +1,34 @@
+	public void writeObjects(PackOutputStream out, List<ObjectToPack> list)
+			throws IOException {
+		if (list.isEmpty())
+			return;
+
+		// Sorting objects by order in the current packs is usually
+		// worthwhile. Most packs are going to be OFS_DELTA style,
+		// where the base must appear before the deltas. If both base
+		// and delta are to be reused, this ensures the base writes in
+		// the output first without the recursive write-base-first logic
+		// used by PackWriter to ensure OFS_DELTA can be used.
+		//
+		// Sorting by pack also ensures newer objects go first, which
+		// typically matches the desired order.
+		//
+		// Only do this sorting for OBJ_TREE and OBJ_BLOB. Commits
+		// are very likely to already be sorted in a good order in the
+		// incoming list, and if they aren't, JGit's PackWriter has fixed
+		// the order to be more optimal for readers, so honor that.
+		switch (list.get(0).getType()) {
+		case OBJ_TREE:
+		case OBJ_BLOB:
+			Collections.sort(list, WRITE_SORT);
+		}
+
+		try {
+			wantReadAhead = true;
+			for (ObjectToPack otp : list)
+				out.writeObject(otp);
+		} finally {
+			cancelReadAhead();
+		}
+	}
+

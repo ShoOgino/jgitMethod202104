@@ -1,0 +1,18 @@
+	private void beginPack() throws IOException {
+		objectList = new BlockList<PackedObjectInfo>();
+		objectMap = new ObjectIdOwnerMap<PackedObjectInfo>();
+		cache = DfsBlockCache.getInstance();
+
+		rollback = true;
+		packDsc = db.newPack(DfsObjDatabase.PackSource.INSERT);
+		packOut = new PackStream(db.writePackFile(packDsc));
+		packKey = new DfsPackKey();
+
+		// Write the header as though it were a single object pack.
+		byte[] buf = packOut.hdrBuf;
+		System.arraycopy(Constants.PACK_SIGNATURE, 0, buf, 0, 4);
+		NB.encodeInt32(buf, 4, 2); // Always use pack version 2.
+		NB.encodeInt32(buf, 8, 1); // Always assume 1 object.
+		packOut.write(buf, 0, 12);
+	}
+

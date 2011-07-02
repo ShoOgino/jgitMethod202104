@@ -1,0 +1,33 @@
+	private DfsPackDescription writePack(PackSource source, PackWriter pw,
+			ProgressMonitor pm) throws IOException {
+		DfsOutputStream out;
+		DfsPackDescription pack = repo.getObjectDatabase().newPack(source);
+		newPackDesc.add(pack);
+
+		out = objdb.writePackFile(pack);
+		try {
+			pw.writePack(pm, pm, out);
+		} finally {
+			out.close();
+		}
+
+		out = objdb.writePackIndex(pack);
+		try {
+			CountingOutputStream cnt = new CountingOutputStream(out);
+			pw.writeIndex(cnt);
+			pack.setIndexSize(cnt.getCount());
+		} finally {
+			out.close();
+		}
+
+		PackWriter.Statistics stats = pw.getStatistics();
+		pack.setPackStats(stats);
+		pack.setPackSize(stats.getTotalBytes());
+		pack.setObjectCount(stats.getTotalObjects());
+		pack.setDeltaCount(stats.getTotalDeltas());
+		objectsPacked += stats.getTotalObjects();
+		newPackStats.add(stats);
+		newPackList.add(DfsBlockCache.getInstance().getOrCreate(pack, null));
+		return pack;
+	}
+

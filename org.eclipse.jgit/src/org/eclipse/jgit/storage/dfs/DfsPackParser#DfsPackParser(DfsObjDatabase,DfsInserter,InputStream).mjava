@@ -1,0 +1,18 @@
+	/**
+	 * Initialize a new pack parser.
+	 *
+	 * @param db
+	 *            database the objects will be imported into.
+	 * @param ins
+	 *            inserter the parser will use to help it inject the objects.
+	 * @param in
+	 *            the stream to parse.
+	 */
+	protected DfsPackParser(DfsObjDatabase db, DfsInserter ins, InputStream in) {
+		super(db, in);
+		this.objdb = db;
+		this.objins = ins;
+		this.crc = new CRC32();
+		this.packDigest = Constants.newMessageDigest();
+	}
+

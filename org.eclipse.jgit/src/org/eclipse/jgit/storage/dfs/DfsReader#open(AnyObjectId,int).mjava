@@ -1,0 +1,25 @@
+	@Override
+	public ObjectLoader open(AnyObjectId objectId, int typeHint)
+			throws MissingObjectException, IncorrectObjectTypeException,
+			IOException {
+		if (last != null) {
+			ObjectLoader ldr = last.get(this, objectId);
+			if (ldr != null)
+				return ldr;
+		}
+
+		for (DfsPackFile pack : db.getPacks()) {
+			if (pack == last)
+				continue;
+			ObjectLoader ldr = pack.get(this, objectId);
+			if (ldr != null) {
+				last = pack;
+				return ldr;
+			}
+		}
+
+		if (typeHint == OBJ_ANY)
+			throw new MissingObjectException(objectId.copy(), "unknown");
+		throw new MissingObjectException(objectId.copy(), typeHint);
+	}
+

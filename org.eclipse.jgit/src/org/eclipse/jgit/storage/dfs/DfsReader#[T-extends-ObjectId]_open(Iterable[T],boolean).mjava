@@ -1,0 +1,56 @@
+	@Override
+	public <T extends ObjectId> AsyncObjectLoaderQueue<T> open(
+			Iterable<T> objectIds, final boolean reportMissing) {
+		wantReadAhead = true;
+
+		Iterable<FoundObject<T>> order;
+		IOException error = null;
+		try {
+			order = findAll(objectIds);
+		} catch (IOException e) {
+			order = Collections.emptyList();
+			error = e;
+		}
+
+		final Iterator<FoundObject<T>> idItr = order.iterator();
+		final IOException findAllError = error;
+		return new AsyncObjectLoaderQueue<T>() {
+			private FoundObject<T> cur;
+
+			public boolean next() throws MissingObjectException, IOException {
+				if (idItr.hasNext()) {
+					cur = idItr.next();
+					return true;
+				} else if (findAllError != null) {
+					throw findAllError;
+				} else {
+					cancelReadAhead();
+					return false;
+				}
+			}
+
+			public T getCurrent() {
+				return cur.id;
+			}
+
+			public ObjectId getObjectId() {
+				return cur.id;
+			}
+
+			public ObjectLoader open() throws IOException {
+				if (cur.pack == null)
+					throw new MissingObjectException(cur.id, "unknown");
+				return cur.pack.load(DfsReader.this, cur.offset);
+			}
+
+			public boolean cancel(boolean mayInterruptIfRunning) {
+				cancelReadAhead();
+				return true;
+			}
+
+			public void release() {
+				cancelReadAhead();
+			}
+		};
+	}
+

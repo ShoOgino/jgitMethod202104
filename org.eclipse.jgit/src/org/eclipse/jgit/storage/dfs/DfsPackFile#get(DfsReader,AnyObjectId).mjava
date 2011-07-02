@@ -1,0 +1,18 @@
+	/**
+	 * Get an object from this pack.
+	 *
+	 * @param ctx
+	 *            temporary working space associated with the calling thread.
+	 * @param id
+	 *            the object to obtain from the pack. Must not be null.
+	 * @return the object loader for the requested object if it is contained in
+	 *         this pack; null if the object was not found.
+	 * @throws IOException
+	 *             the pack file or the index could not be read.
+	 */
+	ObjectLoader get(DfsReader ctx, AnyObjectId id)
+			throws IOException {
+		long offset = idx(ctx).findOffset(id);
+		return 0 < offset && !isCorrupt(offset) ? load(ctx, offset) : null;
+	}
+

@@ -1,0 +1,10 @@
+	void abort() {
+		for (BlockFuture f : futures)
+			f.abort();
+
+		synchronized (this) {
+			if (!running)
+				close();
+		}
+	}
+

@@ -1,0 +1,22 @@
+	@Override
+	public void release() {
+		if (packOut != null) {
+			try {
+				packOut.close();
+			} catch (IOException err) {
+				// Ignore a close failure, the pack should be removed.
+			} finally {
+				packOut = null;
+			}
+		}
+		if (rollback && packDsc != null) {
+			try {
+				db.rollbackPack(Collections.singletonList(packDsc));
+			} finally {
+				packDsc = null;
+				rollback = false;
+			}
+		}
+		clear();
+	}
+

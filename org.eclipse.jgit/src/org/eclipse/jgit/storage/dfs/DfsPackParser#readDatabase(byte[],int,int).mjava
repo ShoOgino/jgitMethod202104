@@ -1,0 +1,34 @@
+	@Override
+	protected int readDatabase(byte[] dst, int pos, int cnt) throws IOException {
+		if (cnt == 0)
+			return 0;
+
+		if (currPos <= readPos) {
+			// Requested read is still buffered. Copy direct from buffer.
+			int p = (int) (readPos - currPos);
+			int n = Math.min(cnt, currEnd - p);
+			if (n == 0)
+				throw new EOFException();
+			System.arraycopy(currBuf, p, dst, pos, n);
+			readPos += n;
+			return n;
+		}
+
+		if (readBlock == null || !readBlock.contains(packKey, readPos)) {
+			long start = toBlockStart(readPos);
+			readBlock = blockCache.get(packKey, start);
+			if (readBlock == null) {
+				int size = (int) Math.min(blockSize, packEnd - start);
+				byte[] buf = new byte[size];
+				if (read(start, buf, 0, size) != size)
+					throw new EOFException();
+				readBlock = new DfsBlock(packKey, start, buf);
+				blockCache.put(readBlock);
+			}
+		}
+
+		int n = readBlock.copy(readPos, dst, pos, cnt);
+		readPos += n;
+		return n;
+	}
+

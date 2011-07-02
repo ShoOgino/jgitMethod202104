@@ -1,0 +1,17 @@
+		private void writeNoHash(byte[] data, int off, int len)
+				throws IOException {
+			while (0 < len) {
+				int n = Math.min(len, currBuf.length - currPtr);
+				if (n == 0) {
+					flushBlock();
+					currBuf = new byte[blockSize];
+					continue;
+				}
+
+				System.arraycopy(data, off, currBuf, currPtr, n);
+				off += n;
+				len -= n;
+				currPtr += n;
+			}
+		}
+

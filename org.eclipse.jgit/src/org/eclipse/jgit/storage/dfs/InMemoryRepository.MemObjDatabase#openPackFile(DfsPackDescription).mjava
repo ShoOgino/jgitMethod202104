@@ -1,0 +1,9 @@
+		@Override
+		protected ReadableChannel openPackFile(DfsPackDescription desc)
+				throws FileNotFoundException {
+			MemPack memPack = (MemPack) desc;
+			if (memPack.packFile == null)
+				throw new FileNotFoundException(desc.getPackName());
+			return new ByteArrayReadableChannel(memPack.packFile);
+		}
+

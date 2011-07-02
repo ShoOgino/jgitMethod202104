@@ -1,0 +1,59 @@
+	@Override
+	public PackLock parse(ProgressMonitor receiving, ProgressMonitor resolving)
+			throws IOException {
+		boolean rollback = true;
+		try {
+			blockCache = DfsBlockCache.getInstance();
+			super.parse(receiving, resolving);
+			if (isEmptyPack)
+				return null;
+			buffer(packHash, 0, packHash.length);
+			if (currEnd != 0)
+				flushBlock();
+			out.close();
+			out = null;
+			currBuf = null;
+			readBlock = null;
+			packDsc.setPackSize(packEnd);
+
+			writePackIndex();
+			objdb.commitPack(Collections.singletonList(packDsc), null);
+			rollback = false;
+
+			DfsPackFile p = blockCache.getOrCreate(packDsc, packKey);
+			p.setBlockSize(blockSize);
+			if (packIndex != null)
+				p.setPackIndex(packIndex);
+
+			objdb.addPack(p);
+
+			return null;
+		} finally {
+			blockCache = null;
+			currBuf = null;
+			readBlock = null;
+
+			if (def != null) {
+				def.end();
+				def = null;
+			}
+
+			if (out != null) {
+				try {
+					out.close();
+				} catch (IOException err) {
+					// Ignore a close error, rollbackPack is also important.
+				}
+				out = null;
+			}
+
+			if (rollback && packDsc != null) {
+				try {
+					objdb.rollbackPack(Collections.singletonList(packDsc));
+				} finally {
+					packDsc = null;
+				}
+			}
+		}
+	}
+

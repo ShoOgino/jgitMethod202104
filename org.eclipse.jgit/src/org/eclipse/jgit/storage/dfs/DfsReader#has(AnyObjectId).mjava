@@ -1,0 +1,15 @@
+	@Override
+	public boolean has(AnyObjectId objectId) throws IOException {
+		if (last != null && last.hasObject(this, objectId))
+			return true;
+		for (DfsPackFile pack : db.getPacks()) {
+			if (last == pack)
+				continue;
+			if (pack.hasObject(this, objectId)) {
+				last = pack;
+				return true;
+			}
+		}
+		return false;
+	}
+

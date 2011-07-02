@@ -1,0 +1,22 @@
+	/**
+	 * Update the cached peeled state of a reference
+	 * <p>
+	 * The ref database invokes this method after it peels a reference that had
+	 * not been peeled before. This allows the storage to cache the peel state
+	 * of the reference, and if it is actually peelable, the target that it
+	 * peels to, so that on-the-fly peeling doesn't have to happen on the next
+	 * reference read.
+	 *
+	 * @param oldLeaf
+	 *            the old reference.
+	 * @param newLeaf
+	 *            the new reference, with peel information.
+	 */
+	protected void cachePeeledState(Ref oldLeaf, Ref newLeaf) {
+		try {
+			compareAndPut(oldLeaf, newLeaf);
+		} catch (IOException e) {
+			// Ignore an exception during caching.
+		}
+	}
+

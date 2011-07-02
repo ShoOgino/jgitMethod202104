@@ -1,0 +1,17 @@
+	private void removeFromTable(Slot e) {
+		int tableIdx = hash(e.offset);
+		Slot p = table[tableIdx];
+
+		if (p == e) {
+			table[tableIdx] = e.tableNext;
+			return;
+		}
+
+		for (; p != null; p = p.tableNext) {
+			if (p.tableNext == e) {
+				p.tableNext = e.tableNext;
+				return;
+			}
+		}
+	}
+

@@ -1,0 +1,14 @@
+	Entry get(DfsPackKey key, long position) {
+		Slot e = table[hash(position)];
+		for (; e != null; e = e.tableNext) {
+			if (e.offset == position && key.equals(e.pack)) {
+				Entry buf = e.data.get();
+				if (buf != null) {
+					moveToHead(e);
+					return buf;
+				}
+			}
+		}
+		return null;
+	}
+

@@ -1,0 +1,23 @@
+	/**
+	 * Sort packs according to the optimal lookup ordering.
+	 * <p>
+	 * This method tries to position packs in the order readers should examine
+	 * them when looking for objects by SHA-1. The default tries to sort packs
+	 * with more recent modification dates before older packs, and packs with
+	 * fewer objects before packs with more objects.
+	 *
+	 * @param b
+	 *            the other pack.
+	 */
+	public int compareTo(DfsPackDescription b) {
+		// Newer packs should sort first.
+		int cmp = Long.signum(b.getLastModified() - getLastModified());
+		if (cmp != 0)
+			return cmp;
+
+		// Break ties on smaller index. Readers may get lucky and find
+		// the object they care about in the smaller index. This also pushes
+		// big historical packs to the end of the list, due to more objects.
+		return Long.signum(getObjectCount() - b.getObjectCount());
+	}
+

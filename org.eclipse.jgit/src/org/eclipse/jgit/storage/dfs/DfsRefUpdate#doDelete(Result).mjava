@@ -1,0 +1,9 @@
+	@Override
+	protected Result doDelete(Result desiredResult) throws IOException {
+		if (getRefDatabase().compareAndRemove(dstRef)) {
+			getRefDatabase().removed(dstRef.getName());
+			return desiredResult;
+		}
+		return Result.LOCK_FAILURE;
+	}
+

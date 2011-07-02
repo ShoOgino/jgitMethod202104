@@ -1,0 +1,11 @@
+		@Override
+		protected DfsOutputStream writePackFile(DfsPackDescription desc) {
+			final MemPack memPack = (MemPack) desc;
+			return new Out() {
+				@Override
+				public void flush() {
+					memPack.packFile = getData();
+				}
+			};
+		}
+
