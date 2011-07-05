@@ -1,0 +1,13 @@
+	@Test
+	public void testCreateFromLightweightTag() throws Exception {
+		RefUpdate rup = db.updateRef("refs/tags/V10");
+		rup.setNewObjectId(initialCommit);
+		rup.setExpectedOldObjectId(ObjectId.zeroId());
+		rup.update();
+
+		Ref branch = git.branchCreate().setName("FromLightweightTag")
+				.setStartPoint("refs/tags/V10").call();
+		assertEquals(initialCommit.getId(), branch.getObjectId());
+
+	}
+
