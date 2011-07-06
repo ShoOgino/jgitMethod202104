@@ -1,60 +1,47 @@
 	@Test
-	public void testCloneRepositoryWithBranch() {
-		try {
-			File directory = createTempDirectory("testCloneRepositoryWithBranch");
-			CloneCommand command = Git.cloneRepository();
-			command.setBranch("refs/heads/master");
-			command.setDirectory(directory);
-			command.setURI("file://"
-					+ git.getRepository().getWorkTree().getPath());
-			Git git2 = command.call();
-			addRepoToClose(git2.getRepository());
+	public void testCloneRepositoryWithBranch() throws IOException {
+		File directory = createTempDirectory("testCloneRepositoryWithBranch");
+		CloneCommand command = Git.cloneRepository();
+		command.setBranch("refs/heads/master");
+		command.setDirectory(directory);
+		command.setURI("file://" + git.getRepository().getWorkTree().getPath());
+		Git git2 = command.call();
+		addRepoToClose(git2.getRepository());
 
-			assertNotNull(git2);
-			assertEquals(git2.getRepository().getFullBranch(),
-					"refs/heads/master");
-			assertEquals(
-					"refs/heads/master, refs/remotes/origin/master, refs/remotes/origin/test",
-					allRefNames(git2.branchList().setListMode(ListMode.ALL)
-							.call()));
+		assertNotNull(git2);
+		assertEquals(git2.getRepository().getFullBranch(), "refs/heads/master");
+		assertEquals(
+				"refs/heads/master, refs/remotes/origin/master, refs/remotes/origin/test",
+				allRefNames(git2.branchList().setListMode(ListMode.ALL).call()));
 
-			// Same thing, but now without checkout
-			directory = createTempDirectory("testCloneRepositoryWithBranch_bare");
-			command = Git.cloneRepository();
-			command.setBranch("refs/heads/master");
-			command.setDirectory(directory);
-			command.setURI("file://"
-					+ git.getRepository().getWorkTree().getPath());
-			command.setNoCheckout(true);
-			git2 = command.call();
-			addRepoToClose(git2.getRepository());
+		// Same thing, but now without checkout
+		directory = createTempDirectory("testCloneRepositoryWithBranch_bare");
+		command = Git.cloneRepository();
+		command.setBranch("refs/heads/master");
+		command.setDirectory(directory);
+		command.setURI("file://" + git.getRepository().getWorkTree().getPath());
+		command.setNoCheckout(true);
+		git2 = command.call();
+		addRepoToClose(git2.getRepository());
 
-			assertNotNull(git2);
-			assertEquals(git2.getRepository().getFullBranch(),
-					"refs/heads/master");
-			assertEquals(
-					"refs/remotes/origin/master, refs/remotes/origin/test",
-					allRefNames(git2.branchList().setListMode(ListMode.ALL)
-							.call()));
+		assertNotNull(git2);
+		assertEquals(git2.getRepository().getFullBranch(), "refs/heads/master");
+		assertEquals("refs/remotes/origin/master, refs/remotes/origin/test",
+				allRefNames(git2.branchList().setListMode(ListMode.ALL).call()));
 
-			// Same thing, but now test with bare repo
-			directory = createTempDirectory("testCloneRepositoryWithBranch_bare");
-			command = Git.cloneRepository();
-			command.setBranch("refs/heads/master");
-			command.setDirectory(directory);
-			command.setURI("file://"
-					+ git.getRepository().getWorkTree().getPath());
-			command.setBare(true);
-			git2 = command.call();
-			addRepoToClose(git2.getRepository());
+		// Same thing, but now test with bare repo
+		directory = createTempDirectory("testCloneRepositoryWithBranch_bare");
+		command = Git.cloneRepository();
+		command.setBranch("refs/heads/master");
+		command.setDirectory(directory);
+		command.setURI("file://" + git.getRepository().getWorkTree().getPath());
+		command.setBare(true);
+		git2 = command.call();
+		addRepoToClose(git2.getRepository());
 
-			assertNotNull(git2);
-			assertEquals(git2.getRepository().getFullBranch(),
-					"refs/heads/master");
-			assertEquals("refs/heads/master, refs/heads/test", allRefNames(git2
-					.branchList().setListMode(ListMode.ALL).call()));
-		} catch (Exception e) {
-			fail(e.getMessage());
-		}
+		assertNotNull(git2);
+		assertEquals(git2.getRepository().getFullBranch(), "refs/heads/master");
+		assertEquals("refs/heads/master, refs/heads/test", allRefNames(git2
+				.branchList().setListMode(ListMode.ALL).call()));
 	}
 
