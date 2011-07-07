@@ -1,0 +1,16 @@
+	/**
+	 * Creates a unique directory for a test
+	 *
+	 * @param name
+	 *            a subdirectory
+	 * @return a unique directory for a test
+	 * @throws IOException
+	 */
+	protected File createTempDirectory(String name) throws IOException {
+		String gitdirName = createUniqueTestFolderPrefix();
+		File parent = new File(trash, gitdirName);
+		File directory = new File(parent, name);
+		FileUtils.mkdirs(directory);
+		return directory.getCanonicalFile();
+	}
+
