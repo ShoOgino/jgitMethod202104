@@ -47,6 +47,7 @@
 			if (!deferredCheckBlobs.isEmpty())
 				doDeferredCheckBlobs();
 			if (deltaCount > 0) {
+				resolving.beginTask(JGitText.get().resolvingDeltas, deltaCount);
 				resolveDeltas(resolving);
 				if (entryCount < objectCount) {
 					if (!isAllowThin()) {
@@ -63,6 +64,7 @@
 								(objectCount - entryCount)));
 					}
 				}
+				resolving.endTask();
 			}
 
 			packDigest = null;

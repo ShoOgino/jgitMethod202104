@@ -1,15 +1,11 @@
 	private void resolveDeltas(final ProgressMonitor progress)
 			throws IOException {
-		progress.beginTask(JGitText.get().resolvingDeltas, deltaCount);
 		final int last = entryCount;
 		for (int i = 0; i < last; i++) {
-			final int before = entryCount;
-			resolveDeltas(entries[i]);
-			progress.update(entryCount - before);
+			resolveDeltas(entries[i], progress);
 			if (progress.isCancelled())
 				throw new IOException(
 						JGitText.get().downloadCancelledDuringIndexing);
 		}
-		progress.endTask();
 	}
 
