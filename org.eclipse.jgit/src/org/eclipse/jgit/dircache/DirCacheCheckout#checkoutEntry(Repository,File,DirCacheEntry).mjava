@@ -2,12 +2,19 @@
 	 * Updates the file in the working tree with content and mode from an entry
 	 * in the index. The new content is first written to a new temporary file in
 	 * the same directory as the real file. Then that new file is renamed to the
-	 * final filename.
+	 * final filename. Use this method only for checkout of a single entry.
+	 * Otherwise use
+	 * {@code checkoutEntry(Repository, File f, DirCacheEntry, ObjectReader)}
+	 * instead which allows to reuse one {@code ObjectReader} for multiple
+	 * entries.
 	 *
+	 * <p>
 	 * TODO: this method works directly on File IO, we may need another
 	 * abstraction (like WorkingTreeIterator). This way we could tell e.g.
 	 * Eclipse that Files in the workspace got changed
-	 * @param repo
+	 * </p>
+	 *
+	 * @param repository
 	 * @param f
 	 *            the file to be modified. The parent directory for this file
 	 *            has to exist already
@@ -15,39 +22,13 @@
 	 *            the entry containing new mode and content
 	 * @throws IOException
 	 */
-	public static void checkoutEntry(final Repository repo, File f,
+	public static void checkoutEntry(final Repository repository, File f,
 			DirCacheEntry entry) throws IOException {
-		ObjectLoader ol = repo.open(entry.getObjectId());
-		File parentDir = f.getParentFile();
-		File tmpFile = File.createTempFile("._" + f.getName(), null, parentDir);
-		FileOutputStream channel = new FileOutputStream(tmpFile);
+		ObjectReader or = repository.newObjectReader();
 		try {
-			ol.copyTo(channel);
+			checkoutEntry(repository, f, entry, repository.newObjectReader());
 		} finally {
-			channel.close();
+			or.release();
 		}
-		FS fs = repo.getFS();
-		WorkingTreeOptions opt = repo.getConfig().get(WorkingTreeOptions.KEY);
-		if (opt.isFileMode() && fs.supportsExecute()) {
-			if (FileMode.EXECUTABLE_FILE.equals(entry.getRawMode())) {
-				if (!fs.canExecute(tmpFile))
-					fs.setExecute(tmpFile, true);
-			} else {
-				if (fs.canExecute(tmpFile))
-					fs.setExecute(tmpFile, false);
-			}
-		}
-		if (!tmpFile.renameTo(f)) {
-			// tried to rename which failed. Let' delete the target file and try
-			// again
-			FileUtils.delete(f);
-			if (!tmpFile.renameTo(f)) {
-				throw new IOException(MessageFormat.format(
-						JGitText.get().couldNotWriteFile, tmpFile.getPath(),
-						f.getPath()));
-			}
-		}
-		entry.setLastModified(f.lastModified());
-		entry.setLength((int) ol.getSize());
 	}
 
