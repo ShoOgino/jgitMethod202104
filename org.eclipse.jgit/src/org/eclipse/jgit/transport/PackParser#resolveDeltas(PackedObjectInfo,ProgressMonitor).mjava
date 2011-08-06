@@ -1,4 +1,5 @@
-	private void resolveDeltas(final PackedObjectInfo oe) throws IOException {
+	private void resolveDeltas(final PackedObjectInfo oe,
+			ProgressMonitor progress) throws IOException {
 		UnresolvedDelta children = firstChildOf(oe);
 		if (children == null)
 			return;
@@ -26,6 +27,6 @@
 							.getOffset()));
 		}
 
-		resolveDeltas(visit.next(), info.type, info);
+		resolveDeltas(visit.next(), info.type, info, progress);
 	}
 

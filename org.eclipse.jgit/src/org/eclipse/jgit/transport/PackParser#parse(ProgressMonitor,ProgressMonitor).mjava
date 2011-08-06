@@ -47,6 +47,12 @@
 			if (!deferredCheckBlobs.isEmpty())
 				doDeferredCheckBlobs();
 			if (deltaCount > 0) {
+				if (resolving instanceof BatchingProgressMonitor) {
+					((BatchingProgressMonitor) resolving).setDelayStart(
+							1000,
+							TimeUnit.MILLISECONDS);
+				}
+				resolving.beginTask(JGitText.get().resolvingDeltas, deltaCount);
 				resolveDeltas(resolving);
 				if (entryCount < objectCount) {
 					if (!isAllowThin()) {
@@ -63,6 +69,7 @@
 								(objectCount - entryCount)));
 					}
 				}
+				resolving.endTask();
 			}
 
 			packDigest = null;

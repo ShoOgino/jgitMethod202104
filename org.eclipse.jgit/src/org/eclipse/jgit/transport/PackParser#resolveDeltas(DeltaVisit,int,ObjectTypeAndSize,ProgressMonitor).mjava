@@ -1,6 +1,8 @@
 	private void resolveDeltas(DeltaVisit visit, final int type,
-			ObjectTypeAndSize info) throws IOException {
+			ObjectTypeAndSize info, ProgressMonitor progress)
+			throws IOException {
 		do {
+			progress.update(1);
 			info = openDatabase(visit.delta, info);
 			switch (info.type) {
 			case Constants.OBJ_OFS_DELTA:
