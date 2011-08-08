@@ -1,0 +1,17 @@
+	private TreeVisit newTreeVisit(RevObject obj) throws LargeObjectException,
+			MissingObjectException, IncorrectObjectTypeException, IOException {
+		TreeVisit tv = freeVisit;
+		if (tv != null) {
+			freeVisit = tv.parent;
+			tv.ptr = 0;
+			tv.namePtr = 0;
+			tv.nameEnd = 0;
+			tv.pathLen = 0;
+		} else {
+			tv = new TreeVisit();
+		}
+		tv.obj = obj;
+		tv.buf = reader.open(obj, OBJ_TREE).getCachedBytes();
+		return tv;
+	}
+

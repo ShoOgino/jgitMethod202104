@@ -3,11 +3,14 @@
 			IncorrectObjectTypeException, IOException {
 		for (;;) {
 			final RevCommit r = super.next();
-			if (r == null)
+			if (r == null) {
+				if (firstCommit != null)
+					reader.walkAdviceBeginTrees(this, firstCommit, lastCommit);
 				return null;
+			}
 			if ((r.flags & UNINTERESTING) != 0) {
 				markTreeUninteresting(r.getTree());
-				if (hasRevSort(RevSort.BOUNDARY))
+				if (boundary)
 					return r;
 				continue;
 			}

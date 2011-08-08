@@ -12,6 +12,11 @@
 	 *         has no path, such as for annotated tags or root level trees.
 	 */
 	public String getPathString() {
-		return last != null ? treeWalk.getEntryPathString() : null;
+		if (pathLen == 0) {
+			pathLen = updatePathBuf(currVisit);
+			if (pathLen == 0)
+				return null;
+		}
+		return RawParseUtils.decode(pathBuf, 0, pathLen);
 	}
 

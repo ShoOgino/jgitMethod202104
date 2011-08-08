@@ -1,5 +1,7 @@
 	/** @return the internal buffer holding the current path. */
 	public byte[] getPathBuffer() {
-		return last != null ? treeWalk.getEntryPathBuffer() : EMPTY_PATH;
+		if (pathLen == 0)
+			pathLen = updatePathBuf(currVisit);
+		return pathBuf;
 	}
 

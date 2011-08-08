@@ -5,36 +5,44 @@
 			return;
 		tree.flags |= UNINTERESTING;
 
-		treeWalk = treeWalk.resetRoot(reader, tree);
-		while (!treeWalk.eof()) {
-			final FileMode mode = treeWalk.getEntryFileMode();
-			final int sType = mode.getObjectType();
+		byte[] raw = reader.open(tree, OBJ_TREE).getCachedBytes();
+		for (int ptr = 0; ptr < raw.length;) {
+			byte c = raw[ptr];
+			int mode = c - '0';
+			for (;;) {
+				c = raw[++ptr];
+				if (' ' == c)
+					break;
+				mode <<= 3;
+				mode += c - '0';
+			}
+			while (raw[++ptr] != 0) {
+				// Skip entry name.
+			}
+			ptr++; // Skip NUL after entry name.
 
-			switch (sType) {
-			case Constants.OBJ_BLOB: {
-				treeWalk.getEntryObjectId(idBuffer);
+			switch (mode >>> TYPE_SHIFT) {
+			case TYPE_FILE:
+			case TYPE_SYMLINK:
+				idBuffer.fromRaw(raw, ptr);
 				lookupBlob(idBuffer).flags |= UNINTERESTING;
 				break;
-			}
-			case Constants.OBJ_TREE: {
-				treeWalk.getEntryObjectId(idBuffer);
-				final RevTree t = lookupTree(idBuffer);
-				if ((t.flags & UNINTERESTING) == 0) {
-					t.flags |= UNINTERESTING;
-					treeWalk = treeWalk.createSubtreeIterator0(reader, t);
-					continue;
-				}
-				break;
-			}
-			default:
-				if (FileMode.GITLINK.equals(mode))
-					break;
-				treeWalk.getEntryObjectId(idBuffer);
-				throw new CorruptObjectException(MessageFormat.format(JGitText.get().corruptObjectInvalidMode3
-						, mode , idBuffer.name() , treeWalk.getEntryPathString() , tree));
-			}
 
-			treeWalk = treeWalk.next();
+			case TYPE_TREE:
+				idBuffer.fromRaw(raw, ptr);
+				markTreeUninteresting(lookupTree(idBuffer));
+				break;
+
+			case TYPE_GITLINK:
+				break;
+
+			default:
+				idBuffer.fromRaw(raw, ptr);
+				throw new CorruptObjectException(MessageFormat.format(JGitText
+						.get().corruptObjectInvalidMode3, String.format("%o",
+						mode), idBuffer.name(), "", tree));
+			}
+			ptr += ID_SZ;
 		}
 	}
 

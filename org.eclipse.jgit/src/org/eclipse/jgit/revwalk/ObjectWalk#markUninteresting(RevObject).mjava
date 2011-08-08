@@ -38,7 +38,7 @@
 			IncorrectObjectTypeException, IOException {
 		while (o instanceof RevTag) {
 			o.flags |= UNINTERESTING;
-			if (hasRevSort(RevSort.BOUNDARY))
+			if (boundary)
 				addObject(o);
 			o = ((RevTag) o).getObject();
 			parseHeaders(o);
@@ -51,8 +51,7 @@
 		else
 			o.flags |= UNINTERESTING;
 
-		if (o.getType() != Constants.OBJ_COMMIT && hasRevSort(RevSort.BOUNDARY)) {
+		if (o.getType() != OBJ_COMMIT && boundary)
 			addObject(o);
-		}
 	}
 
