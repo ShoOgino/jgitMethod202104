@@ -9,8 +9,8 @@
 			throw new IllegalArgumentException(MessageFormat.format(
 					DhtText.get().invalidChunkKey, decode(key, ptr, ptr + len)));
 
-		int repo = parse32(key, ptr + 3);
-		ObjectId chunk = ObjectId.fromString(key, ptr + 12);
+		int repo = parse32(key, ptr);
+		ObjectId chunk = ObjectId.fromString(key, ptr + 9);
 		return new ChunkKey(repo, chunk);
 	}
 
