@@ -16,6 +16,7 @@
 		if (!cachedPacks.isEmpty())
 			throw new IOException(JGitText.get().cachedPacksPreventsIndexCreation);
 
+		long writeStart = System.currentTimeMillis();
 		final List<ObjectToPack> list = sortByName();
 		final PackIndexWriter iw;
 		int indexVersion = config.getIndexVersion();
@@ -24,5 +25,6 @@
 		else
 			iw = PackIndexWriter.createVersion(indexStream, indexVersion);
 		iw.write(list, packcsum);
+		stats.timeWriting += System.currentTimeMillis() - writeStart;
 	}
 
