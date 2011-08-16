@@ -1,0 +1,21 @@
+	@Test
+	public void testDiffCached() throws Exception {
+		write(new File(db.getDirectory().getParent(), "test.txt"), "test");
+		File folder = new File(db.getDirectory().getParent(), "folder");
+		folder.mkdir();
+		Git git = new Git(db);
+		git.add().addFilepattern(".").call();
+		git.commit().setMessage("Initial commit").call();
+		write(new File(folder, "folder.txt"), "folder");
+		git.add().addFilepattern(".").call();
+
+		List<DiffEntry> entries = git.diff().setCached(true).call();
+		assertEquals(1, entries.size());
+		assertEquals(ChangeType.ADD, entries.get(0)
+				.getChangeType());
+		assertEquals("/dev/null", entries.get(0)
+				.getOldPath());
+		assertEquals("folder/folder.txt", entries.get(0)
+				.getNewPath());
+	}
+
