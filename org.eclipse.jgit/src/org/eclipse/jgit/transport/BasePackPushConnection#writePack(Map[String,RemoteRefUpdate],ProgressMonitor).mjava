@@ -1,7 +1,7 @@
 	private void writePack(final Map<String, RemoteRefUpdate> refUpdates,
 			final ProgressMonitor monitor) throws IOException {
-		List<ObjectId> remoteObjects = new ArrayList<ObjectId>(getRefs().size());
-		List<ObjectId> newObjects = new ArrayList<ObjectId>(refUpdates.size());
+		Set<ObjectId> remoteObjects = new HashSet<ObjectId>();
+		Set<ObjectId> newObjects = new HashSet<ObjectId>();
 
 		final PackWriter writer = new PackWriter(transport.getPackConfig(),
 				local.newObjectReader());

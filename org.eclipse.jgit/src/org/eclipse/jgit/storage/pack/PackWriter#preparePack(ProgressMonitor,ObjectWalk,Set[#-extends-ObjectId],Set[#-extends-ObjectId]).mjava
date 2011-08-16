@@ -22,16 +22,15 @@
 	 *            points of graph traversal).
 	 * @throws IOException
 	 *             when some I/O problem occur during reading objects.
-	 * @deprecated to be removed in 2.0; use the Set version of this method.
 	 */
-	@Deprecated
 	public void preparePack(ProgressMonitor countingMonitor,
 			final ObjectWalk walk,
-			final Collection<? extends ObjectId> interestingObjects,
-			final Collection<? extends ObjectId> uninterestingObjects)
+			final Set<? extends ObjectId> interestingObjects,
+			final Set<? extends ObjectId> uninterestingObjects)
 			throws IOException {
-		preparePack(countingMonitor, walk,
-				ensureSet(interestingObjects),
-				ensureSet(uninterestingObjects));
+		if (countingMonitor == null)
+			countingMonitor = NullProgressMonitor.INSTANCE;
+		findObjectsToPack(countingMonitor, walk, interestingObjects,
+				uninterestingObjects);
 	}
 
