@@ -1,0 +1,16 @@
+	@Test
+	public void testResetToNonexistingHEAD() throws JGitInternalException,
+			AmbiguousObjectException, IOException {
+
+		// create a file in the working tree of a fresh repo
+		git = new Git(db);
+		writeTrashFile("f", "content");
+
+		try {
+			git.reset().setRef(Constants.HEAD).call();
+			fail("Expected JGitInternalException didn't occur");
+		} catch (JGitInternalException e) {
+			// got the expected exception
+		}
+	}
+
