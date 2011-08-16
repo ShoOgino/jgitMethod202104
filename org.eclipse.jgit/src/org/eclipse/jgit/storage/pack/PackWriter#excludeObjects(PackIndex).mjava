@@ -1,0 +1,19 @@
+	/**
+	 * Add a pack index whose contents should be excluded from the result.
+	 *
+	 * @param idx
+	 *            objects in this index will not be in the output pack.
+	 */
+	public void excludeObjects(PackIndex idx) {
+		if (excludeInPacks == null) {
+			excludeInPacks = new PackIndex[] { idx };
+			excludeInPackLast = idx;
+		} else {
+			int cnt = excludeInPacks.length;
+			PackIndex[] newList = new PackIndex[cnt + 1];
+			System.arraycopy(excludeInPacks, 0, newList, 0, cnt);
+			newList[cnt] = idx;
+			excludeInPacks = newList;
+		}
+	}
+

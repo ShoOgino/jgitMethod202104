@@ -122,6 +122,8 @@
 		BlockList<RevCommit> commits = new BlockList<RevCommit>();
 		RevCommit c;
 		while ((c = walker.next()) != null) {
+			if (exclude(c))
+				continue;
 			if (c.has(inCachedPack)) {
 				CachedPack pack = tipToPack.get(c);
 				if (includesAllTips(pack, include, walker)) {
@@ -187,6 +189,8 @@
 			while ((o = walker.nextObject()) != null) {
 				if (o.has(RevFlag.UNINTERESTING))
 					continue;
+				if (exclude(o))
+					continue;
 
 				int pathHash = walker.getPathHashCode();
 				byte[] pathBuf = walker.getPathBuffer();
@@ -199,6 +203,8 @@
 			RevObject o;
 			while ((o = walker.nextObject()) != null) {
 				if (o.has(RevFlag.UNINTERESTING))
+					continue;
+				if (exclude(o))
 					continue;
 				addObject(o, walker.getPathHashCode());
 				countingMonitor.update(1);
