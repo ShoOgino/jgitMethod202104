@@ -8,9 +8,9 @@
 		writeTrashFile(FILE, "Hello world");
 		git.add().addFilepattern(FILE).call();
 		commit1 = git.commit().setMessage("Initial commit").call();
+		git.checkout().setCreateBranch(true).setName("b1").call();
 		git.rm().addFilepattern(FILE).call();
 		commit2 = git.commit().setMessage("Removed file").call();
-		git.notesAdd().setObjectId(commit1)
-				.setMessage("data").call();
+		git.notesAdd().setObjectId(commit1).setMessage("data").call();
 	}
 
