@@ -1,0 +1,66 @@
+	/**
+	 * Convert the TreeWalk into DiffEntry headers, depending on
+	 * {@code includeTrees} it will add tree objects into result or not.
+	 *
+	 * @param walk
+	 *            the TreeWalk to walk through. Must have exactly two trees and
+	 *            when {@code includeTrees} parameter is {@code true} it can't
+	 *            be recursive.
+	 * @param includeTrees
+	 *            include tree object's.
+	 * @return headers describing the changed files.
+	 * @throws IOException
+	 *             the repository cannot be accessed.
+	 * @throws IllegalArgumentException
+	 *             when {@code includeTrees} is true and given TreeWalk is
+	 *             recursive. Or when given TreeWalk doesn't have exactly two
+	 *             trees
+	 */
+	public static List<DiffEntry> scan(TreeWalk walk, boolean includeTrees)
+			throws IOException {
+		if (walk.getTreeCount() != 2)
+			throw new IllegalArgumentException(
+					JGitText.get().treeWalkMustHaveExactlyTwoTrees);
+		if (includeTrees && walk.isRecursive())
+			throw new IllegalArgumentException(
+					JGitText.get().cannotBeRecursiveWhenTreesAreIncluded);
+
+		List<DiffEntry> r = new ArrayList<DiffEntry>();
+		MutableObjectId idBuf = new MutableObjectId();
+		while (walk.next()) {
+			DiffEntry entry = new DiffEntry();
+
+			walk.getObjectId(idBuf, 0);
+			entry.oldId = AbbreviatedObjectId.fromObjectId(idBuf);
+
+			walk.getObjectId(idBuf, 1);
+			entry.newId = AbbreviatedObjectId.fromObjectId(idBuf);
+
+			entry.oldMode = walk.getFileMode(0);
+			entry.newMode = walk.getFileMode(1);
+			entry.newPath = entry.oldPath = walk.getPathString();
+
+			if (entry.oldMode == FileMode.MISSING) {
+				entry.oldPath = DiffEntry.DEV_NULL;
+				entry.changeType = ChangeType.ADD;
+				r.add(entry);
+
+			} else if (entry.newMode == FileMode.MISSING) {
+				entry.newPath = DiffEntry.DEV_NULL;
+				entry.changeType = ChangeType.DELETE;
+				r.add(entry);
+
+			} else if (!entry.oldId.equals(entry.newId)) {
+				entry.changeType = ChangeType.MODIFY;
+				if (RenameDetector.sameType(entry.oldMode, entry.newMode))
+					r.add(entry);
+				else
+					r.addAll(breakModify(entry));
+			}
+
+			if (includeTrees && walk.isSubtree())
+				walk.enterSubtree();
+		}
+		return r;
+	}
+

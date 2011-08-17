@@ -6,41 +6,10 @@
 	 * @return headers describing the changed files.
 	 * @throws IOException
 	 *             the repository cannot be accessed.
+	 * @throws IllegalArgumentException
+	 *             When given TreeWalk doesn't have exactly two trees.
 	 */
 	public static List<DiffEntry> scan(TreeWalk walk) throws IOException {
-		List<DiffEntry> r = new ArrayList<DiffEntry>();
-		MutableObjectId idBuf = new MutableObjectId();
-		while (walk.next()) {
-			DiffEntry entry = new DiffEntry();
-
-			walk.getObjectId(idBuf, 0);
-			entry.oldId = AbbreviatedObjectId.fromObjectId(idBuf);
-
-			walk.getObjectId(idBuf, 1);
-			entry.newId = AbbreviatedObjectId.fromObjectId(idBuf);
-
-			entry.oldMode = walk.getFileMode(0);
-			entry.newMode = walk.getFileMode(1);
-			entry.newPath = entry.oldPath = walk.getPathString();
-
-			if (entry.oldMode == FileMode.MISSING) {
-				entry.oldPath = DiffEntry.DEV_NULL;
-				entry.changeType = ChangeType.ADD;
-				r.add(entry);
-
-			} else if (entry.newMode == FileMode.MISSING) {
-				entry.newPath = DiffEntry.DEV_NULL;
-				entry.changeType = ChangeType.DELETE;
-				r.add(entry);
-
-			} else {
-				entry.changeType = ChangeType.MODIFY;
-				if (RenameDetector.sameType(entry.oldMode, entry.newMode))
-					r.add(entry);
-				else
-					r.addAll(breakModify(entry));
-			}
-		}
-		return r;
+		return scan(walk, false);
 	}
 
