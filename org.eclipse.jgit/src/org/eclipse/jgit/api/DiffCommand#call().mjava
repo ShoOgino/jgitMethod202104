@@ -7,7 +7,8 @@
 	 * @return a DiffEntry for each path which is different
 	 */
 	public List<DiffEntry> call() throws GitAPIException, IOException {
-		final DiffFormatter diffFmt = new DiffFormatter(null);
+		final DiffFormatter diffFmt = new DiffFormatter(
+				new BufferedOutputStream(out));
 		diffFmt.setRepository(repo);
 		try {
 			if (cached) {
@@ -34,11 +35,13 @@
 
 			diffFmt.setPathFilter(pathFilter);
 
+			List<DiffEntry> result = diffFmt.scan(oldTree, newTree);
 			if (showNameAndStatusOnly) {
-				return diffFmt.scan(oldTree, newTree);
+				return result;
 			} else {
-				// TODO: not implemented yet
-				throw new UnsupportedOperationException();
+				diffFmt.format(result);
+				diffFmt.flush();
+				return result;
 			}
 		} finally {
 			diffFmt.release();
