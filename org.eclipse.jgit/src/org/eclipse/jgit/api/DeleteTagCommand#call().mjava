@@ -1,0 +1,48 @@
+	/**
+	 * @throws JGitInternalException
+	 *             when trying to delete a tag that doesn't exist
+	 *
+	 * @return the list with the full names of the deleted tags
+	 */
+	public List<String> call() throws JGitInternalException {
+		checkCallable();
+		List<String> result = new ArrayList<String>();
+		if (tags.isEmpty())
+			return result;
+		try {
+			setCallable(false);
+			for (String tagName : tags) {
+				if (tagName == null)
+					continue;
+				Ref currentRef = repo.getRef(tagName);
+				if (currentRef == null)
+					continue;
+				String fullName = currentRef.getName();
+				RefUpdate update = repo.updateRef(fullName);
+				update.setForceUpdate(true);
+				Result deleteResult = update.delete();
+
+				boolean ok = true;
+				switch (deleteResult) {
+				case IO_FAILURE:
+				case LOCK_FAILURE:
+				case REJECTED:
+					ok = false;
+					break;
+				default:
+					break;
+				}
+
+				if (ok) {
+					result.add(fullName);
+				} else
+					throw new JGitInternalException(MessageFormat.format(
+							JGitText.get().deleteTagUnexpectedResult,
+							deleteResult.name()));
+			}
+			return result;
+		} catch (IOException ioe) {
+			throw new JGitInternalException(ioe.getMessage(), ioe);
+		}
+	}
+

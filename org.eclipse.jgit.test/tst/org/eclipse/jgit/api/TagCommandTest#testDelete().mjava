@@ -1,0 +1,23 @@
+	@Test
+	public void testDelete() throws Exception {
+		Git git = new Git(db);
+		git.commit().setMessage("initial commit").call();
+		RevTag tag = git.tag().setName("tag").call();
+		assertEquals(1, db.getTags().size());
+
+		List<String> deleted = git.tagDelete().setTags(tag.getTagName())
+				.call();
+		assertEquals(1, deleted.size());
+		assertEquals(tag.getTagName(),
+				Repository.shortenRefName(deleted.get(0)));
+		assertEquals(0, db.getTags().size());
+
+		RevTag tag1 = git.tag().setName("tag1").call();
+		RevTag tag2 = git.tag().setName("tag2").call();
+		assertEquals(2, db.getTags().size());
+		deleted = git.tagDelete()
+				.setTags(tag1.getTagName(), tag2.getTagName()).call();
+		assertEquals(2, deleted.size());
+		assertEquals(0, db.getTags().size());
+	}
+

@@ -1,0 +1,9 @@
+	@Test
+	public void testDeleteNonExisting() throws Exception {
+		Git git = new Git(db);
+		git.commit().setMessage("initial commit").call();
+
+		List<String> deleted = git.tagDelete().setTags("tag").call();
+		assertEquals(0, deleted.size());
+	}
+
