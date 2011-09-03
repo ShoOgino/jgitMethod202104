@@ -184,11 +184,14 @@
 		if (i == null) {
 			// make sure not to overwrite untracked files
 			if (f != null) {
-				// a dirty worktree: the index is empty but we have a
-				// workingtree-file
-				if (mId == null || !mId.equals(f.getEntryObjectId())) {
-					conflict(name, null, h, m);
-					return;
+				// A submodule is not a file. We should ignore it
+				if (!FileMode.GITLINK.equals(m.getEntryFileMode())) {
+					// a dirty worktree: the index is empty but we have a
+					// workingtree-file
+					if (mId == null || !mId.equals(f.getEntryObjectId())) {
+						conflict(name, null, h, m);
+						return;
+					}
 				}
 			}
 
@@ -250,21 +253,33 @@
 				 * </pre>
 				 */
 
-				if (hId.equals(iId)) {
-					if (f == null || f.isModified(dce, true))
+				if (dce.getFileMode() == FileMode.GITLINK) {
+					// Submodules that disappear from the checkout must
+					// be removed from the index, but not deleted from disk.
+					remove(name);
+				} else {
+					if (hId.equals(iId)) {
+						if (f == null || f.isModified(dce, true))
+							conflict(name, dce, h, m);
+						else
+							remove(name);
+					} else
 						conflict(name, dce, h, m);
-					else
-						remove(name);
-				} else
-					conflict(name, dce, h, m);
+				}
 			} else {
 				if (!hId.equals(mId) && !hId.equals(iId) && !mId.equals(iId))
 					conflict(name, dce, h, m);
 				else if (hId.equals(iId) && !mId.equals(iId)) {
-					if (dce != null && (f == null || f.isModified(dce, true)))
-						conflict(name, dce, h, m);
-					else
+					// For submodules just update the index with the new SHA-1
+					if (dce != null
+							&& FileMode.GITLINK.equals(dce.getFileMode())) {
 						update(name, mId, m.getEntryFileMode());
+					} else if (dce != null
+							&& (f == null || f.isModified(dce, true))) {
+						conflict(name, dce, h, m);
+					} else {
+						update(name, mId, m.getEntryFileMode());
+					}
 				} else {
 					keep(dce);
 				}
