@@ -32,8 +32,8 @@
 			}
 
 			Ref headRef = repo.getRef(Constants.HEAD);
-			String refLogMessage = "checkout: moving from "
-					+ headRef.getTarget().getName();
+			String shortHeadRef = getShortBranchName(headRef);
+			String refLogMessage = "checkout: moving from " + shortHeadRef;
 			ObjectId branch = repo.resolve(name);
 			if (branch == null)
 				throw new RefNotFoundException(MessageFormat.format(JGitText
@@ -58,10 +58,10 @@
 			Ref ref = repo.getRef(name);
 			if (ref != null && !ref.getName().startsWith(Constants.R_HEADS))
 				ref = null;
+			String toName = Repository.shortenRefName(name);
 			RefUpdate refUpdate = repo.updateRef(Constants.HEAD, ref == null);
 			refUpdate.setForceUpdate(force);
-			refUpdate.setRefLogMessage(refLogMessage + " to "
-					+ newCommit.getName(), false);
+			refUpdate.setRefLogMessage(refLogMessage + " to " + toName, false);
 			Result updateResult;
 			if (ref != null)
 				updateResult = refUpdate.link(ref.getName());
