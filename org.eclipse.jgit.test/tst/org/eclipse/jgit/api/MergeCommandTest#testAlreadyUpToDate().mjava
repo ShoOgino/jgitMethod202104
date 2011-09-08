@@ -8,6 +8,10 @@
 		MergeResult result = git.merge().include(db.getRef("refs/heads/branch1")).call();
 		assertEquals(MergeResult.MergeStatus.ALREADY_UP_TO_DATE, result.getMergeStatus());
 		assertEquals(second, result.getNewHead());
-
+		// no reflog entry written by merge
+		assertEquals("commit: second commit", db
+				.getReflogReader(Constants.HEAD).getLastEntry().getComment());
+		assertEquals("commit: second commit", db
+				.getReflogReader(db.getBranch()).getLastEntry().getComment());
 	}
 

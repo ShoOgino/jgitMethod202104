@@ -23,5 +23,13 @@
 				.setStrategy(MergeStrategy.RESOLVE).call();
 		assertEquals(MergeStatus.MERGED, result.getMergeStatus());
 		assertEquals("1\nb(1)\n3\n", read(new File(db.getWorkTree(), "b")));
+		assertEquals("merge " + secondCommit.getId().getName()
+				+ ": Merge made by resolve.", db
+				.getReflogReader(Constants.HEAD)
+				.getLastEntry().getComment());
+		assertEquals("merge " + secondCommit.getId().getName()
+				+ ": Merge made by resolve.", db
+				.getReflogReader(db.getBranch())
+				.getLastEntry().getComment());
 	}
 

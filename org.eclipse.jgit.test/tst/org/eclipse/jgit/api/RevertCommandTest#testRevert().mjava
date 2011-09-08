@@ -40,5 +40,13 @@
 		assertEquals("create b", history.next().getFullMessage());
 		assertEquals("create a", history.next().getFullMessage());
 		assertFalse(history.hasNext());
+
+		ReflogReader reader = db.getReflogReader(Constants.HEAD);
+		assertTrue(reader.getLastEntry().getComment()
+				.startsWith("revert: Revert \""));
+		reader = db.getReflogReader(db.getBranch());
+		assertTrue(reader.getLastEntry().getComment()
+				.startsWith("revert: Revert \""));
+
 	}
 

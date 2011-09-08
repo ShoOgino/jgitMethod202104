@@ -23,5 +23,9 @@
 		assertTrue(new File(db.getWorkTree(), "file2").exists());
 		assertEquals(MergeResult.MergeStatus.FAST_FORWARD, result.getMergeStatus());
 		assertEquals(second, result.getNewHead());
+		assertEquals("merge refs/heads/master: Fast-forward",
+				db.getReflogReader(Constants.HEAD).getLastEntry().getComment());
+		assertEquals("merge refs/heads/master: Fast-forward",
+				db.getReflogReader(db.getBranch()).getLastEntry().getComment());
 	}
 
