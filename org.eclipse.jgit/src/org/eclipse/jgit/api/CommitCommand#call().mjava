@@ -95,10 +95,14 @@
 						RevCommit revCommit = revWalk.parseCommit(commitId);
 						RefUpdate ru = repo.updateRef(Constants.HEAD);
 						ru.setNewObjectId(commitId);
-						String prefix = amend ? "commit (amend): " : "commit: ";
-						ru.setRefLogMessage(
-								prefix + revCommit.getShortMessage(), false);
-
+						if (reflogComment != null) {
+							ru.setRefLogMessage(reflogComment, false);
+						} else {
+							String prefix = amend ? "commit (amend): "
+									: "commit: ";
+							ru.setRefLogMessage(
+									prefix + revCommit.getShortMessage(), false);
+						}
 						ru.setExpectedOldObjectId(headId);
 						Result rc = ru.forceUpdate();
 						switch (rc) {
