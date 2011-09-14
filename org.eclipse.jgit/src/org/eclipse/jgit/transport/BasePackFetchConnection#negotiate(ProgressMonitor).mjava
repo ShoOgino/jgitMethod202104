@@ -12,7 +12,7 @@
 			state.writeTo(out, null);
 
 		negotiateBegin();
-		SEND_HAVES: while (!receivedReady) {
+		SEND_HAVES: for (;;) {
 			final RevCommit c = walk.next();
 			if (c == null)
 				break SEND_HAVES;
@@ -87,6 +87,8 @@
 					throw new CancelledException();
 			}
 
+			if (noDone & receivedReady)
+				break SEND_HAVES;
 			if (statelessRPC)
 				state.writeTo(out, null);
 
