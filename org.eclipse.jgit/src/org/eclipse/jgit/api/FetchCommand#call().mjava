@@ -29,6 +29,8 @@
 				transport.setFetchThin(thin);
 				if (credentialsProvider != null)
 					transport.setCredentialsProvider(credentialsProvider);
+				if (transportConfigCallback != null)
+					transportConfigCallback.configure(transport);
 
 				FetchResult result = transport.fetch(monitor, refSpecs);
 				return result;
