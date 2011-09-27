@@ -1,0 +1,17 @@
+	public static void validateIndex(Git git) throws NoWorkTreeException,
+			IOException {
+		DirCache dc = git.getRepository().lockDirCache();
+		ObjectReader r = git.getRepository().getObjectDatabase().newReader();
+		try {
+			for (int i = 0; i < dc.getEntryCount(); ++i) {
+				DirCacheEntry entry = dc.getEntry(i);
+				if (entry.getLength() > 0)
+					assertEquals(entry.getLength(), r.getObjectSize(
+							entry.getObjectId(), ObjectReader.OBJ_ANY));
+			}
+		} finally {
+			dc.unlock();
+			r.release();
+		}
+	}
+
