@@ -8,9 +8,7 @@
 		File indexFile = getIndexFile();
 		if (snapshot == null)
 			snapshot = FileSnapshot.save(indexFile);
-		else if (snapshot.isModified(indexFile)) {
-			snapshot = FileSnapshot.save(indexFile);
-			fireEvent(new IndexChangedEvent());
-		}
+		else if (snapshot.isModified(indexFile))
+			notifyIndexChanged();
 	}
 

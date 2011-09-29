@@ -16,6 +16,9 @@
 		if (!tmp.commit())
 			return false;
 		snapshot = tmp.getCommitSnapshot();
+		if (indexChangedListener != null
+				&& !Arrays.equals(readIndexChecksum, writeIndexChecksum))
+			indexChangedListener.onIndexChanged(new IndexChangedEvent());
 		return true;
 	}
 
