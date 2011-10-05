@@ -1,0 +1,26 @@
+	@Test
+	public void testAddDeletePathAndTreeNormalNames() {
+		DirCache dc = DirCache.newInCore();
+		DirCacheEditor editor = dc.editor();
+		editor.add(new AddEdit("a"));
+		editor.add(new AddEdit("b/c"));
+		editor.add(new AddEdit("c/d"));
+		editor.finish();
+		assertEquals(3, dc.getEntryCount());
+		assertEquals("a", dc.getEntry(0).getPathString());
+		assertEquals("b/c", dc.getEntry(1).getPathString());
+		assertEquals("c/d", dc.getEntry(2).getPathString());
+
+		editor = dc.editor();
+		editor.add(new DirCacheEditor.DeletePath("b/c"));
+		editor.finish();
+		assertEquals(2, dc.getEntryCount());
+		assertEquals("a", dc.getEntry(0).getPathString());
+		assertEquals("c/d", dc.getEntry(1).getPathString());
+
+		editor = dc.editor();
+		editor.add(new DirCacheEditor.DeleteTree(""));
+		editor.finish();
+		assertEquals(0, dc.getEntryCount());
+	}
+
