@@ -1,5 +1,10 @@
-	/** Initialize a new in-memory repository. */
-	public InMemoryRepository() {
+	/**
+	 * Initialize a new in-memory repository.
+	 *
+	 * @param repoDesc
+	 *             description of the repository.
+	 */
+	public InMemoryRepository(DfsRepository repoDesc) {
 		super(new DfsRepositoryBuilder<DfsRepositoryBuilder, InMemoryRepository>() {
 			@Override
 			public InMemoryRepository build() throws IOException {
@@ -7,7 +12,7 @@
 			}
 		});
 
-		objdb = new MemObjDatabase();
+		objdb = new MemObjDatabase(this);
 		refdb = new MemRefDatabase();
 	}
 

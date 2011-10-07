@@ -1,5 +1,5 @@
 	/**
-	 * Initialize a description by pack name.
+	 * Initialize a description by pack name and repository.
 	 * <p>
 	 * The corresponding index file is assumed to exist and end with ".idx"
 	 * instead of ".pack". If this is not true implementors must extend the
@@ -10,8 +10,11 @@
 	 *
 	 * @param name
 	 *            name of the pack file. Must end with ".pack".
+	 * @param repoDesc
+	 *            description of the repo containing the pack file.
 	 */
-	public DfsPackDescription(String name) {
+	public DfsPackDescription(DfsRepositoryDescription repoDesc, String name) {
+		this.repoDesc = repoDesc;
 		this.packName = name;
 	}
 
