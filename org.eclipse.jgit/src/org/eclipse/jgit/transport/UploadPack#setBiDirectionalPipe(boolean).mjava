@@ -9,5 +9,7 @@
 	 */
 	public void setBiDirectionalPipe(final boolean twoWay) {
 		biDirectionalPipe = twoWay;
+		if (!biDirectionalPipe && requestPolicy == RequestPolicy.ADVERTISED)
+			requestPolicy = RequestPolicy.REACHABLE_COMMIT;
 	}
 

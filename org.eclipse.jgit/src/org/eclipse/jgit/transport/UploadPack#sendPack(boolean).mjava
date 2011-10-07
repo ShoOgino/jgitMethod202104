@@ -46,7 +46,7 @@
 			pw.setThin(options.contains(OPTION_THIN_PACK));
 			pw.setReuseValidatingObjects(false);
 
-			if (commonBase.isEmpty()) {
+			if (commonBase.isEmpty() && refs != null) {
 				Set<ObjectId> tagTargets = new HashSet<ObjectId>();
 				for (Ref ref : refs.values()) {
 					if (ref.getPeeledObjectId() != null)
@@ -73,7 +73,7 @@
 				rw = ow;
 			}
 
-			if (options.contains(OPTION_INCLUDE_TAG)) {
+			if (options.contains(OPTION_INCLUDE_TAG) && refs != null) {
 				for (Ref ref : refs.values()) {
 					ObjectId objectId = ref.getObjectId();
 

@@ -1,6 +1,8 @@
 	private void service() throws IOException {
 		if (biDirectionalPipe)
 			sendAdvertisedRefs(new PacketLineOutRefAdvertiser(pckOut));
+		else if (requestPolicy == RequestPolicy.ANY)
+			advertised = Collections.emptySet();
 		else {
 			advertised = new HashSet<ObjectId>();
 			for (Ref ref : getAdvertisedRefs().values()) {

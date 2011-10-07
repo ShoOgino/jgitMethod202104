@@ -19,6 +19,7 @@
 			needMissing = true;
 		}
 
+		Set<RevObject> notAdvertisedWants = null;
 		int haveCnt = 0;
 		AsyncRevObjectQueue q = walk.parseAny(toParse, needMissing);
 		try {
@@ -42,10 +43,10 @@
 				// list wasn't parsed earlier, and was done in this batch.
 				//
 				if (wantIds.remove(obj)) {
-					if (!advertised.contains(obj)) {
-						String msg = MessageFormat.format(
-								JGitText.get().wantNotValid, obj.name());
-						throw new PackProtocolException(msg);
+					if (!advertised.contains(obj) && requestPolicy != RequestPolicy.ANY) {
+						if (notAdvertisedWants == null)
+							notAdvertisedWants = new HashSet<RevObject>();
+						notAdvertisedWants.add(obj);
 					}
 
 					if (!obj.has(WANT)) {
@@ -105,6 +106,26 @@
 		} finally {
 			q.release();
 		}
+
+		// If the client asked for non advertised object, check our policy.
+		if (notAdvertisedWants != null && !notAdvertisedWants.isEmpty()) {
+			switch (requestPolicy) {
+			case ADVERTISED:
+			default:
+				throw new PackProtocolException(MessageFormat.format(
+						JGitText.get().wantNotValid,
+						notAdvertisedWants.iterator().next().name()));
+
+			case REACHABLE_COMMIT:
+				checkNotAdvertisedWants(notAdvertisedWants);
+				break;
+
+			case ANY:
+				// Allow whatever was asked for.
+				break;
+			}
+		}
+
 		int missCnt = peerHas.size() - haveCnt;
 
 		// If we don't have one of the objects but we're also willing to
