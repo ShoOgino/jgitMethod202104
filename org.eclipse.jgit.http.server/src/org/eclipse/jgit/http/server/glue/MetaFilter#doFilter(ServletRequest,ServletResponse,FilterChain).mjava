@@ -1,0 +1,11 @@
+	public void doFilter(ServletRequest request, ServletResponse response,
+			FilterChain chain) throws IOException, ServletException {
+		HttpServletRequest req = (HttpServletRequest) request;
+		HttpServletResponse res = (HttpServletResponse) response;
+		UrlPipeline p = find(req);
+		if (p != null)
+			p.service(req, res);
+		else
+			chain.doFilter(req, res);
+	}
+
