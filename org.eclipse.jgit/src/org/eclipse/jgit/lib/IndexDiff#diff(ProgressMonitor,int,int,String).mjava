@@ -49,7 +49,8 @@
 		if (filter != null)
 			filters.add(filter);
 		filters.add(new SkipWorkTreeFilter(INDEX));
-		filters.add(new IndexDiffFilter(INDEX, WORKDIR));
+		IndexDiffFilter indexDiffFilter = new IndexDiffFilter(INDEX, WORKDIR);
+		filters.add(indexDiffFilter);
 		treeWalk.setFilter(AndTreeFilter.create(filters));
 		while (treeWalk.next()) {
 			AbstractTreeIterator treeIterator = treeWalk.getTree(TREE,
@@ -113,6 +114,7 @@
 		if (monitor != null)
 			monitor.endTask();
 
+		ignored = indexDiffFilter.getIgnoredPaths();
 		if (added.isEmpty() && changed.isEmpty() && removed.isEmpty()
 				&& missing.isEmpty() && modified.isEmpty()
 				&& untracked.isEmpty())
