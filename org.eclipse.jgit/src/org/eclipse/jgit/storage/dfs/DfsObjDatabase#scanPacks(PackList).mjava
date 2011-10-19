@@ -1,6 +1,6 @@
 	private PackList scanPacks(final PackList original) throws IOException {
+		PackList o, n;
 		synchronized (packList) {
-			PackList o, n;
 			do {
 				o = packList.get();
 				if (o != original) {
@@ -13,7 +13,8 @@
 				if (n == o)
 					return n;
 			} while (!packList.compareAndSet(o, n));
-			return n;
 		}
+		getRepository().fireEvent(new DfsPacksChangedEvent());
+		return n;
 	}
 
