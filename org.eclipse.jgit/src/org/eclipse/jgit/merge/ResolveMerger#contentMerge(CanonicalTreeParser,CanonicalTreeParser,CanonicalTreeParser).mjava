@@ -1,80 +1,25 @@
-	private boolean contentMerge(CanonicalTreeParser base,
+	/**
+	 * Does the content merge. The three texts base, ours and theirs are
+	 * specified with {@link CanonicalTreeParser}. If any of the parsers is
+	 * specified as <code>null</code> then an empty text will be used instead.
+	 *
+	 * @param base
+	 * @param ours
+	 * @param theirs
+	 *
+	 * @return the result of the content merge
+	 * @throws IOException
+	 */
+	private MergeResult<RawText> contentMerge(CanonicalTreeParser base,
 			CanonicalTreeParser ours, CanonicalTreeParser theirs)
-			throws FileNotFoundException, IllegalStateException, IOException {
-		MergeFormatter fmt = new MergeFormatter();
-
+			throws IOException {
 		RawText baseText = base == null ? RawText.EMPTY_TEXT : getRawText(
 				base.getEntryObjectId(), db);
-
-		// do the merge
-		MergeResult<RawText> result = mergeAlgorithm.merge(
-				RawTextComparator.DEFAULT, baseText,
-				getRawText(ours.getEntryObjectId(), db),
-				getRawText(theirs.getEntryObjectId(), db));
-
-		File of = null;
-		FileOutputStream fos;
-		if (!inCore) {
-			File workTree = db.getWorkTree();
-			if (workTree == null)
-				// TODO: This should be handled by WorkingTreeIterators which
-				// support write operations
-				throw new UnsupportedOperationException();
-
-			of = new File(workTree, tw.getPathString());
-			fos = new FileOutputStream(of);
-			try {
-				fmt.formatMerge(fos, result, Arrays.asList(commitNames),
-						Constants.CHARACTER_ENCODING);
-			} finally {
-				fos.close();
-			}
-		}
-		else if (!result.containsConflicts()) {
-			// When working inCore, only trivial merges can be handled,
-			// so we generate objects only in conflict free cases
-			of = File.createTempFile("merge_", "_temp", null);
-			fos = new FileOutputStream(of);
-			try {
-				fmt.formatMerge(fos, result, Arrays.asList(commitNames),
-						Constants.CHARACTER_ENCODING);
-			} finally {
-				fos.close();
-			}
-		}
-
-		if (result.containsConflicts()) {
-			// a conflict occurred, the file will contain conflict markers
-			// the index will be populated with the three stages and only the
-			// workdir (if used) contains the halfways merged content
-			add(tw.getRawPath(), base, DirCacheEntry.STAGE_1);
-			add(tw.getRawPath(), ours, DirCacheEntry.STAGE_2);
-			add(tw.getRawPath(), theirs, DirCacheEntry.STAGE_3);
-			mergeResults.put(tw.getPathString(), result);
-			return false;
-		} else {
-			// no conflict occurred, the file will contain fully merged content.
-			// the index will be populated with the new merged version
-			DirCacheEntry dce = new DirCacheEntry(tw.getPathString());
-			int newMode = mergeFileModes(tw.getRawMode(0), tw.getRawMode(1),
-					tw.getRawMode(2));
-			// set the mode for the new content. Fall back to REGULAR_FILE if
-			// you can't merge modes of OURS and THEIRS
-			dce.setFileMode((newMode == FileMode.MISSING.getBits()) ? FileMode.REGULAR_FILE
-					: FileMode.fromBits(newMode));
-			dce.setLastModified(of.lastModified());
-			dce.setLength((int) of.length());
-			InputStream is = new FileInputStream(of);
-			try {
-				dce.setObjectId(oi.insert(Constants.OBJ_BLOB, of.length(),
-						is));
-			} finally {
-				is.close();
-				if (inCore)
-					FileUtils.delete(of);
-			}
-			builder.add(dce);
-			return true;
-		}
+		RawText ourText = ours == null ? RawText.EMPTY_TEXT : getRawText(
+				ours.getEntryObjectId(), db);
+		RawText theirsText = theirs == null ? RawText.EMPTY_TEXT : getRawText(
+				theirs.getEntryObjectId(), db);
+		return (mergeAlgorithm.merge(RawTextComparator.DEFAULT, baseText,
+				ourText, theirsText));
 	}
 
