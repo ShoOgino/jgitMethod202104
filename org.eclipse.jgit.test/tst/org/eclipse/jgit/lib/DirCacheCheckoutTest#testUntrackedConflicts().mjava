@@ -29,11 +29,11 @@
 		} catch (CheckoutConflictException e) {
 			assertConflict("foo");
 			assertWorkDir(mkmap("foo", "bar"));
-			assertIndex(mkmap());
+			assertIndex(mkmap("other", "other"));
 		}
 
 		// TODO: Why should we expect conflicts here?
-		// H and M are emtpy and according to rule #5 of
+		// H and M are empty and according to rule #5 of
 		// the carry-over rules a dirty index is no reason
 		// for a conflict. (I also feel it should be a
 		// conflict because we are going to overwrite

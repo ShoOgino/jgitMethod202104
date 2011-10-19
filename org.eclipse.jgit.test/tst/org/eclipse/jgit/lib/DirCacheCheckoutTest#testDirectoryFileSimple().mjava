@@ -1,0 +1,49 @@
+	/*-
+	 * Directory/File Conflict cases:
+	 * It's entirely possible that in practice a number of these may be equivalent
+	 * to the cases described in git-read-tree.txt. As long as it does the right thing,
+	 * that's all I care about. These are basically reverse-engineered from
+	 * what git currently does. If there are tests for these in git, it's kind of
+	 * hard to track them all down...
+	 *
+	 *     H        I       M     Clean     H==M     H==I    I==M         Result
+	 *     ------------------------------------------------------------------
+	 *1    D        D       F       Y         N       Y       N           Update
+	 *2    D        D       F       N         N       Y       N           Conflict
+	 *3    D        F       D                 Y       N       N           Update
+	 *4    D        F       D                 N       N       N           Update
+	 *5    D        F       F       Y         N       N       Y           Keep
+	 *6    D        F       F       N         N       N       Y           Keep
+	 *7    F        D       F       Y         Y       N       N           Update
+	 *8    F        D       F       N         Y       N       N           Conflict
+	 *9    F        D       F       Y         N       N       N           Update
+	 *10   F        D       D                 N       N       Y           Keep
+	 *11   F		D		D				  N		  N		  N			  Conflict
+	 *12   F		F		D		Y		  N		  Y		  N			  Update
+	 *13   F		F		D		N		  N		  Y		  N			  Conflict
+	 *14   F		F		D				  N		  N		  N			  Conflict
+	 *15   0		F		D				  N		  N		  N			  Conflict
+	 *16   0		D		F		Y		  N		  N		  N			  Update
+	 *17   0		D		F		 		  N		  N		  N			  Conflict
+	 *18   F        0       D    										  Update
+	 *19   D	    0       F											  Update
+	 */
+	@Test
+	public void testDirectoryFileSimple() throws IOException {
+		Tree treeDF = buildTree(mkmap("DF", "DF"));
+		Tree treeDFDF = buildTree(mkmap("DF/DF", "DF/DF"));
+		buildIndex(mkmap("DF", "DF"));
+
+		prescanTwoTrees(treeDF, treeDFDF);
+
+		assertTrue(getRemoved().contains("DF"));
+		assertTrue(getUpdated().containsKey("DF/DF"));
+
+		recursiveDelete(new File(trash, "DF"));
+		buildIndex(mkmap("DF/DF", "DF/DF"));
+
+		prescanTwoTrees(treeDFDF, treeDF);
+		assertTrue(getRemoved().contains("DF/DF"));
+		assertTrue(getUpdated().containsKey("DF"));
+	}
+

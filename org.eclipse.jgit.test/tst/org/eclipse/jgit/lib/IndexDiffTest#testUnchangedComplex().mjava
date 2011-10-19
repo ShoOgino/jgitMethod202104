@@ -1,21 +1,25 @@
 	/**
-	 * This test has both files and directories that involve
-	 * the tricky ordering used by Git.
+	 * This test has both files and directories that involve the tricky ordering
+	 * used by Git.
 	 *
 	 * @throws IOException
+	 * @throws NoFilepatternException
 	 */
 	@Test
-	public void testUnchangedComplex() throws IOException {
-		GitIndex index = new GitIndex(db);
-
-		index.add(trash, writeTrashFile("a.b", "a.b"));
-		index.add(trash, writeTrashFile("a.c", "a.c"));
-		index.add(trash, writeTrashFile("a/b.b/b", "a/b.b/b"));
-		index.add(trash, writeTrashFile("a/b", "a/b"));
-		index.add(trash, writeTrashFile("a/c", "a/c"));
-		index.add(trash, writeTrashFile("a=c", "a=c"));
-		index.add(trash, writeTrashFile("a=d", "a=d"));
-		index.write();
+	public void testUnchangedComplex() throws IOException,
+			NoFilepatternException {
+		Git git = new Git(db);
+		writeTrashFile("a.b", "a.b");
+		writeTrashFile("a.c", "a.c");
+		writeTrashFile("a/b.b/b", "a/b.b/b");
+		writeTrashFile("a/b", "a/b");
+		writeTrashFile("a/c", "a/c");
+		writeTrashFile("a=c", "a=c");
+		writeTrashFile("a=d", "a=d");
+		git.add().addFilepattern("a.b").addFilepattern("a.c")
+				.addFilepattern("a/b.b/b").addFilepattern("a/b")
+				.addFilepattern("a/c").addFilepattern("a=c")
+				.addFilepattern("a=d").call();
 
 		Tree tree = new Tree(db);
 		// got the hash id'd from the data using echo -n a.b|git hash-object -t blob --stdin

@@ -1,11 +1,11 @@
 	@Test
-	public void testModified() throws IOException {
-		GitIndex index = new GitIndex(db);
+	public void testModified() throws IOException, NoFilepatternException {
 
+		writeTrashFile("file2", "file2");
+		writeTrashFile("dir/file3", "dir/file3");
 
-		index.add(trash, writeTrashFile("file2", "file2"));
-		index.add(trash, writeTrashFile("dir/file3", "dir/file3"));
-		index.write();
+		Git git = new Git(db);
+		git.add().addFilepattern("file2").addFilepattern("dir/file3").call();
 
 		writeTrashFile("dir/file3", "changed");
 

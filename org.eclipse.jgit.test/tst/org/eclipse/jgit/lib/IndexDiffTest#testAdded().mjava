@@ -1,14 +1,15 @@
 	@Test
 	public void testAdded() throws IOException {
-		GitIndex index = new GitIndex(db);
 		writeTrashFile("file1", "file1");
 		writeTrashFile("dir/subfile", "dir/subfile");
 		Tree tree = new Tree(db);
 		tree.setId(insertTree(tree));
 
-		index.add(trash, new File(trash, "file1"));
-		index.add(trash, new File(trash, "dir/subfile"));
-		index.write();
+		DirCache index = db.lockDirCache();
+		DirCacheEditor editor = index.editor();
+		editor.add(add(db, trash, "file1"));
+		editor.add(add(db, trash, "dir/subfile"));
+		editor.commit();
 		FileTreeIterator iterator = new FileTreeIterator(db);
 		IndexDiff diff = new IndexDiff(db, tree.getId(), iterator);
 		diff.diff();
