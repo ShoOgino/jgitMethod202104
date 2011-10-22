@@ -1,0 +1,39 @@
+	/**
+	 * Create a new Git oriented date formatter
+	 *
+	 * @param format
+	 */
+	public GitDateFormatter(Format format) {
+		this.format = format;
+		switch (format) {
+		default:
+			break;
+		case DEFAULT: // Not default:
+			dateTimeInstance = new SimpleDateFormat(
+					"EEE MMM dd HH:mm:ss yyyy Z", Locale.US);
+			break;
+		case ISO:
+			dateTimeInstance = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z",
+					Locale.US);
+			break;
+		case LOCAL:
+			dateTimeInstance = new SimpleDateFormat("EEE MMM dd HH:mm:ss yyyy",
+					Locale.US);
+			break;
+		case RFC:
+			dateTimeInstance = new SimpleDateFormat(
+					"EEE, dd MMM yyyy HH:mm:ss Z", Locale.US);
+			break;
+		case SHORT:
+			dateTimeInstance = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+			break;
+		case LOCALE:
+		case LOCALELOCAL:
+			Locale locale = SystemReader.getInstance().getLocale();
+			dateTimeInstance = DateFormat.getDateTimeInstance(
+					DateFormat.DEFAULT, DateFormat.DEFAULT, locale);
+			dateTimeInstance2 = new SimpleDateFormat("Z", locale);
+			break;
+		}
+	}
+
