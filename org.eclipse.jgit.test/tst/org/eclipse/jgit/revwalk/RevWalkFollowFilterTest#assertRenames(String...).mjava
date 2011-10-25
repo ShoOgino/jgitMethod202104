@@ -1,0 +1,25 @@
+	/**
+	 * Assert which renames should have happened, in traversal order.
+	 * @param expectedRenames
+	 *            the rename specs, each one in the form "srcPath->destPath"
+	 */
+	protected void assertRenames(String... expectedRenames) {
+		Assert.assertEquals("Unexpected number of renames. Expected: " +
+				expectedRenames.length + ", actual: " + diffCollector.diffs.size(),
+				expectedRenames.length, diffCollector.diffs.size());
+
+		for (int i = 0; i < expectedRenames.length; i++) {
+			DiffEntry diff = diffCollector.diffs.get(i);
+			Assert.assertNotNull(diff);
+			String[] split = expectedRenames[i].split("->");
+
+			Assert.assertNotNull(split);
+			Assert.assertEquals(2, split.length);
+			String src = split[0];
+			String target = split[1];
+
+			Assert.assertEquals(src, diff.getOldPath());
+			Assert.assertEquals(target, diff.getNewPath());
+		}
+	}
+
