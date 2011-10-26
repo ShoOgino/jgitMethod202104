@@ -19,10 +19,8 @@
 
 		final PersonIdent author = c.getAuthorIdent();
 		out.println(MessageFormat.format(CLIText.get().authorInfo, author.getName(), author.getEmailAddress()));
-
-		final TimeZone authorTZ = author.getTimeZone();
-		fmt.setTimeZone(authorTZ != null ? authorTZ : myTZ);
-		out.println(MessageFormat.format(CLIText.get().dateInfo, fmt.format(author.getWhen())));
+		out.println(MessageFormat.format(CLIText.get().dateInfo,
+				dateFormatter.formatDate(author)));
 
 		out.println();
 		final String[] lines = c.getFullMessage().split("\n");

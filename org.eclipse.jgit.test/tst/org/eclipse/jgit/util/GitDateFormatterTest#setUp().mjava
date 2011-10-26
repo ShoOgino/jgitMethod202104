@@ -1,0 +1,13 @@
+	@Before
+	public void setUp() {
+		mockSystemReader = new MockSystemReader() {
+			@Override
+			public long getCurrentTime() {
+				return 1318125997291L;
+			}
+		};
+		SystemReader.setInstance(mockSystemReader);
+		ident = RawParseUtils
+				.parsePersonIdent("A U Thor <author@example.com> 1316560165 -0400");
+	}
+
