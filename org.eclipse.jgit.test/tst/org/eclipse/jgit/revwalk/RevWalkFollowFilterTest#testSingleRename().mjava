@@ -1,0 +1,18 @@
+	@Test
+	public void testSingleRename() throws Exception {
+		final RevCommit a = commit(tree(file("a", blob("A"))));
+
+		// rename a to b
+		CommitBuilder commitBuilder = commitBuilder().parent(a)
+				.add("b", blob("A")).rm("a");
+		RevCommit renameCommit = commitBuilder.create();
+
+		follow("b");
+		markStart(renameCommit);
+		assertCommit(renameCommit, rw.next());
+		assertCommit(a, rw.next());
+		assertNull(rw.next());
+
+		assertRenames("a->b");
+	}
+
