@@ -1,0 +1,23 @@
+	/**
+	 * Copy all entries which are still in untrackedParentFolders and which
+	 * belong to a path this treewalk has left into untrackedFolders. It is sure
+	 * that we will not find any tracked files underneath these paths. Therefore
+	 * these paths definitely belong to untracked folders.
+	 *
+	 * @param currentPath
+	 *            the current path of the treewalk
+	 */
+	private void copyUntrackedFolders(String currentPath) {
+		String pathToBeSaved = null;
+		while (!untrackedParentFolders.isEmpty()
+				&& !currentPath.startsWith(untrackedParentFolders.getFirst()
+						+ "/"))
+			pathToBeSaved = untrackedParentFolders.removeFirst();
+		if (pathToBeSaved != null) {
+			while (!untrackedFolders.isEmpty()
+					&& untrackedFolders.getLast().startsWith(pathToBeSaved))
+				untrackedFolders.removeLast();
+			untrackedFolders.addLast(pathToBeSaved);
+		}
+	}
+
