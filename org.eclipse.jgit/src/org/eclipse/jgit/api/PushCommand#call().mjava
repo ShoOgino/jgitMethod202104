@@ -46,6 +46,8 @@
 				transport.setDryRun(dryRun);
 				if (credentialsProvider != null)
 					transport.setCredentialsProvider(credentialsProvider);
+				if (transportConfigCallback != null)
+					transportConfigCallback.configure(transport);
 
 				final Collection<RemoteRefUpdate> toPush = transport
 						.findRemoteRefUpdatesFor(refSpecs);
