@@ -1,0 +1,25 @@
+	/**
+	 * Read the entire byte array into memory, unless input is shorter
+	 *
+	 * @param fd
+	 *            input stream to read the data from.
+	 * @param dst
+	 *            buffer that must be fully populated, [off, off+len).
+	 * @param off
+	 *            position within the buffer to start writing to.
+	 * @return number of bytes in buffer or stream, whichever is shortest
+	 * @throws IOException
+	 *             there was an error reading from the stream.
+	 */
+	public static int readFully(InputStream fd, byte[] dst, int off)
+			throws IOException {
+		int r;
+		int len = 0;
+		while ((r = fd.read(dst, off, dst.length - off)) >= 0
+				&& len < dst.length) {
+			off += r;
+			len += r;
+		}
+		return len;
+	}
+

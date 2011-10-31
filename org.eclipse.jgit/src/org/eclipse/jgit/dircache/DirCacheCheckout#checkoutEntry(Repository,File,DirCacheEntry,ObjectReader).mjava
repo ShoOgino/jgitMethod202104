@@ -25,14 +25,19 @@
 		ObjectLoader ol = or.open(entry.getObjectId());
 		File parentDir = f.getParentFile();
 		File tmpFile = File.createTempFile("._" + f.getName(), null, parentDir);
-		FileOutputStream channel = new FileOutputStream(tmpFile);
+		WorkingTreeOptions opt = repo.getConfig().get(WorkingTreeOptions.KEY);
+		FileOutputStream rawChannel = new FileOutputStream(tmpFile);
+		OutputStream channel;
+		if (opt.getAutoCRLF() == AutoCRLF.TRUE)
+			channel = new AutoCRLFOutputStream(rawChannel);
+		else
+			channel = rawChannel;
 		try {
 			ol.copyTo(channel);
 		} finally {
 			channel.close();
 		}
 		FS fs = repo.getFS();
-		WorkingTreeOptions opt = repo.getConfig().get(WorkingTreeOptions.KEY);
 		if (opt.isFileMode() && fs.supportsExecute()) {
 			if (FileMode.EXECUTABLE_FILE.equals(entry.getRawMode())) {
 				if (!fs.canExecute(tmpFile))
@@ -53,6 +58,9 @@
 			}
 		}
 		entry.setLastModified(f.lastModified());
-		entry.setLength((int) ol.getSize());
+		if (opt.getAutoCRLF() != AutoCRLF.FALSE)
+			entry.setLength(f.length()); // AutoCRLF wants on-disk-size
+		else
+			entry.setLength((int) ol.getSize());
 	}
 

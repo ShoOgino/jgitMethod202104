@@ -1,0 +1,12 @@
+	private int buffer(byte[] b, int off, int len) throws IOException {
+		if (binbufcnt > binbuf.length)
+			return len;
+		int copy = Math.min(binbuf.length - binbufcnt, len);
+		System.arraycopy(b, off, binbuf, binbufcnt, copy);
+		binbufcnt += copy;
+		int remaining = len - copy;
+		if (remaining > 0)
+			decideMode();
+		return remaining;
+	}
+

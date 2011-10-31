@@ -1,0 +1,9 @@
+	@Test
+	public void testCheckoutOutChangesAutoCRLFtrueBinary() throws IOException {
+		setupCase(mk("foo"), mkmap("foo/bar", "foo\nb\u0000ar"), mk("foo"));
+		db.getConfig().setString("core", null, "autocrlf", "true");
+		checkout();
+		assertIndex(mkmap("foo/bar", "foo\nb\u0000ar"));
+		assertWorkDir(mkmap("foo/bar", "foo\nb\u0000ar"));
+	}
+

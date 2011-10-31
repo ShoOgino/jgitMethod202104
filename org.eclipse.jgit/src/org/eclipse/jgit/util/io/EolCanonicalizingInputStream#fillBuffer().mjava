@@ -2,6 +2,10 @@
 		cnt = in.read(buf, 0, buf.length);
 		if (cnt < 1)
 			return false;
+		if (!modeDetected) {
+			isBinary = RawText.isBinary(buf, cnt);
+			modeDetected = true;
+		}
 		ptr = 0;
 		return true;
 	}
