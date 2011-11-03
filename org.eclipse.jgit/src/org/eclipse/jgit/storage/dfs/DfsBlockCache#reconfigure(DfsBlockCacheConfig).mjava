@@ -15,7 +15,11 @@
 		DfsBlockCache oc = cache;
 		cache = nc;
 
-		if (oc != null && oc.readAheadService != null)
-			oc.readAheadService.shutdown();
+		if (oc != null) {
+			if (oc.readAheadService != null)
+				oc.readAheadService.shutdown();
+			for (DfsPackFile pack : oc.getPackFiles())
+				pack.key.cachedSize.set(0);
+		}
 	}
 
