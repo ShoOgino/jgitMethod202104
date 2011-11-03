@@ -1,15 +1,6 @@
 	@SuppressWarnings("unchecked")
 	private <T> T scan(HashEntry n, DfsPackKey pack, long position) {
-		for (; n != null; n = n.next) {
-			Ref<T> r = n.ref;
-			if (r.pack != pack || r.position != position)
-				continue;
-			T v = r.get();
-			if (v == null)
-				return null;
-			statHit.incrementAndGet();
-			return v;
-		}
-		return null;
+		Ref<T> r = scanRef(n, pack, position);
+		return r != null ? r.get() : null;
 	}
 
