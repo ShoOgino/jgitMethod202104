@@ -27,7 +27,9 @@
 		readAheadLimit = cfg.getReadAheadLimit();
 		readAheadService = cfg.getReadAheadService();
 
-		packCache = new HashMap<DfsPackDescription, DfsPackFile>();
+		packCache = new ConcurrentHashMap<DfsPackDescription, DfsPackFile>(
+				16, 0.75f, 1);
+		packFiles = Collections.unmodifiableCollection(packCache.values());
 
 		statHit = new AtomicLong();
 		statMiss = new AtomicLong();
