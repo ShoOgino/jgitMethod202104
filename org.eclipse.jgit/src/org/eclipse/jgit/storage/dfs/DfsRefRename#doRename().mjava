@@ -1,0 +1,17 @@
+	@Override
+	protected Result doRename() throws IOException {
+		// TODO Correctly handle renaming foo/bar to foo.
+		// TODO Batch these together into one log update.
+
+		destination.setExpectedOldObjectId(ObjectId.zeroId());
+		destination.setNewObjectId(source.getRef().getObjectId());
+		switch (destination.update()) {
+		case NEW:
+			source.delete();
+			return Result.RENAMED;
+
+		default:
+			return destination.getResult();
+		}
+	}
+

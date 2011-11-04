@@ -1,0 +1,23 @@
+	private PackReverseIndex getReverseIdx(DfsReader ctx) throws IOException {
+		DfsBlockCache.Ref<PackReverseIndex> revref = reverseIndex;
+		if (revref != null) {
+			PackReverseIndex revidx = revref.get();
+			if (revidx != null)
+				return revidx;
+		}
+
+		synchronized (initLock) {
+			revref = reverseIndex;
+			if (revref != null) {
+				PackReverseIndex revidx = revref.get();
+				if (revidx != null)
+					return revidx;
+			}
+
+			PackReverseIndex revidx = new PackReverseIndex(idx(ctx));
+			reverseIndex = cache.put(key, POS_REVERSE_INDEX,
+					packDesc.getReverseIndexSize(), revidx);
+			return revidx;
+		}
+	}
+

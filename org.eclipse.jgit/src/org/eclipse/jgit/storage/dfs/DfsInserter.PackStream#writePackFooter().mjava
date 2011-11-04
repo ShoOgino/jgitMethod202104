@@ -1,0 +1,8 @@
+		byte[] writePackFooter() throws IOException {
+			byte[] packHash = md.digest();
+			writeNoHash(packHash, 0, packHash.length);
+			if (currPtr != 0)
+				flushBlock();
+			return packHash;
+		}
+

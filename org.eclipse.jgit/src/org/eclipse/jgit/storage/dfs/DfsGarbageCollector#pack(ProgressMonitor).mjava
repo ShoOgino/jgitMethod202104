@@ -1,0 +1,64 @@
+	/**
+	 * Create a single new pack file containing all of the live objects.
+	 * <p>
+	 * This method safely decides which packs can be expired after the new pack
+	 * is created by validating the references have not been modified in an
+	 * incompatible way.
+	 *
+	 * @param pm
+	 *            progress monitor to receive updates on as packing may take a
+	 *            while, depending on the size of the repository.
+	 * @return true if the repack was successful without race conditions. False
+	 *         if a race condition was detected and the repack should be run
+	 *         again later.
+	 * @throws IOException
+	 *             a new pack cannot be created.
+	 */
+	public boolean pack(ProgressMonitor pm) throws IOException {
+		if (pm == null)
+			pm = NullProgressMonitor.INSTANCE;
+		if (packConfig.getIndexVersion() != 2)
+			throw new IllegalStateException("Only index version 2");
+
+		ctx = (DfsReader) objdb.newReader();
+		try {
+			refdb.clearCache();
+			objdb.clearCache();
+
+			refsBefore = repo.getAllRefs();
+			packsBefore = Arrays.asList(objdb.getPacks());
+			if (packsBefore.isEmpty())
+				return true;
+
+			allHeads = new HashSet<ObjectId>();
+			nonHeads = new HashSet<ObjectId>();
+			tagTargets = new HashSet<ObjectId>();
+			for (Ref ref : refsBefore.values()) {
+				if (ref.isSymbolic() || ref.getObjectId() == null)
+					continue;
+				if (isHead(ref))
+					allHeads.add(ref.getObjectId());
+				else
+					nonHeads.add(ref.getObjectId());
+				if (ref.getPeeledObjectId() != null)
+					tagTargets.add(ref.getPeeledObjectId());
+			}
+			tagTargets.addAll(allHeads);
+
+			boolean rollback = true;
+			try {
+				packHeads(pm);
+				packRest(pm);
+				packGarbage(pm);
+				objdb.commitPack(newPackDesc, toPrune());
+				rollback = false;
+				return true;
+			} finally {
+				if (rollback)
+					objdb.rollbackPack(newPackDesc);
+			}
+		} finally {
+			ctx.release();
+		}
+	}
+

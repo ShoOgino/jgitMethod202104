@@ -1,0 +1,17 @@
+	@Override
+	protected Result doLink(String target) throws IOException {
+		final SymbolicRef newRef = new SymbolicRef(
+				dstRef.getName(),
+				new ObjectIdRef.Unpeeled(
+						Storage.NEW,
+						target,
+						null));
+		if (getRefDatabase().compareAndPut(dstRef, newRef)) {
+			getRefDatabase().stored(newRef);
+			if (dstRef.getStorage() == Ref.Storage.NEW)
+				return Result.NEW;
+			return Result.FORCED;
+		}
+		return Result.LOCK_FAILURE;
+	}
+

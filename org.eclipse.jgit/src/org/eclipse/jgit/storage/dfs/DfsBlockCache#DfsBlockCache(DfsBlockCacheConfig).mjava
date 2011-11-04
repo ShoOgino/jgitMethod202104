@@ -1,0 +1,37 @@
+	private DfsBlockCache(final DfsBlockCacheConfig cfg) {
+		tableSize = tableSize(cfg);
+		if (tableSize < 1)
+			throw new IllegalArgumentException(JGitText.get().tSizeMustBeGreaterOrEqual1);
+
+		table = new AtomicReferenceArray<HashEntry>(tableSize);
+		loadLocks = new ReentrantLock[32];
+		for (int i = 0; i < loadLocks.length; i++)
+			loadLocks[i] = new ReentrantLock(true /* fair */);
+
+		int eb = (int) (tableSize * .1);
+		if (64 < eb)
+			eb = 64;
+		else if (eb < 4)
+			eb = 4;
+		if (tableSize < eb)
+			eb = tableSize;
+
+		maxBytes = cfg.getBlockLimit();
+		blockSize = cfg.getBlockSize();
+		blockSizeShift = Integer.numberOfTrailingZeros(blockSize);
+
+		clockLock = new ReentrantLock(true /* fair */);
+		clockHand = new Ref<Object>(null, -1, 0, null);
+		clockHand.next = clockHand;
+
+		readAheadLimit = cfg.getReadAheadLimit();
+		readAheadService = cfg.getReadAheadService();
+
+		packCache = new ConcurrentHashMap<DfsPackDescription, DfsPackFile>(
+				16, 0.75f, 1);
+		packFiles = Collections.unmodifiableCollection(packCache.values());
+
+		statHit = new AtomicLong();
+		statMiss = new AtomicLong();
+	}
+

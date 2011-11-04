@@ -1,0 +1,14 @@
+	/** Release the current window cursor. */
+	@Override
+	public void release() {
+		cancelReadAhead();
+		last = null;
+		block = null;
+		baseCache = null;
+		try {
+			InflaterCache.release(inf);
+		} finally {
+			inf = null;
+		}
+	}
+

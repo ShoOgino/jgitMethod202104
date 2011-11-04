@@ -1,0 +1,13 @@
+		@Override
+		protected synchronized void commitPack(
+				Collection<DfsPackDescription> desc,
+				Collection<DfsPackDescription> replace) {
+			List<DfsPackDescription> n;
+			n = new ArrayList<DfsPackDescription>(desc.size() + packs.size());
+			n.addAll(desc);
+			n.addAll(packs);
+			if (replace != null)
+				n.removeAll(replace);
+			packs = n;
+		}
+

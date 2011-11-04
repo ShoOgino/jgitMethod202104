@@ -1,0 +1,11 @@
+	PackInputStream(DfsPackFile pack, long pos, DfsReader ctx)
+			throws IOException {
+		this.pack = pack;
+		this.pos = pos;
+		this.ctx = ctx;
+
+		// Pin the first window, to ensure the pack is open and valid.
+		//
+		ctx.pin(pack, pos);
+	}
+

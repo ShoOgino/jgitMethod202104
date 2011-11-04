@@ -1,0 +1,10 @@
+		public boolean cancel(boolean mayInterruptIfRunning) {
+			Future<?> t = task;
+			if (t == null)
+				return false;
+
+			boolean r = t.cancel(mayInterruptIfRunning);
+			abort();
+			return r;
+		}
+

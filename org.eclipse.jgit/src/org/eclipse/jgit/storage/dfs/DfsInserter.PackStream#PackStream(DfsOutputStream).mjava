@@ -1,0 +1,18 @@
+		PackStream(DfsOutputStream out) {
+			this.out = out;
+
+			hdrBuf = new byte[32];
+			md = Constants.newMessageDigest();
+			crc32 = new CRC32();
+			deflater = new Deflater(Deflater.BEST_COMPRESSION);
+			compress = new DeflaterOutputStream(this, deflater, 8192);
+
+			int size = out.blockSize();
+			if (size <= 0)
+				size = cache.getBlockSize();
+			else if (size < cache.getBlockSize())
+				size = (cache.getBlockSize() / size) * size;
+			blockSize = size;
+			currBuf = new byte[blockSize];
+		}
+

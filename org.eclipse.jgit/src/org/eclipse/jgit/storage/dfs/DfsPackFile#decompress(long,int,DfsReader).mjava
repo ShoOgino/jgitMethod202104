@@ -1,0 +1,23 @@
+	private byte[] decompress(long position, int sz, DfsReader ctx)
+			throws IOException, DataFormatException {
+		byte[] dstbuf;
+		try {
+			dstbuf = new byte[sz];
+		} catch (OutOfMemoryError noMemory) {
+			// The size may be larger than our heap allows, return null to
+			// let the caller know allocation isn't possible and it should
+			// use the large object streaming approach instead.
+			//
+			// For example, this can occur when sz is 640 MB, and JRE
+			// maximum heap size is only 256 MB. Even if the JRE has
+			// 200 MB free, it cannot allocate a 640 MB byte array.
+			return null;
+		}
+
+		if (ctx.inflate(this, position, dstbuf, false) != sz)
+			throw new EOFException(MessageFormat.format(
+					JGitText.get().shortCompressedStreamAt,
+					Long.valueOf(position)));
+		return dstbuf;
+	}
+

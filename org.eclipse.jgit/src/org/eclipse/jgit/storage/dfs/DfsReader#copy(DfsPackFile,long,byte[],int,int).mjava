@@ -1,0 +1,44 @@
+	/**
+	 * Copy bytes from the window to a caller supplied buffer.
+	 *
+	 * @param pack
+	 *            the file the desired window is stored within.
+	 * @param position
+	 *            position within the file to read from.
+	 * @param dstbuf
+	 *            destination buffer to copy into.
+	 * @param dstoff
+	 *            offset within <code>dstbuf</code> to start copying into.
+	 * @param cnt
+	 *            number of bytes to copy. This value may exceed the number of
+	 *            bytes remaining in the window starting at offset
+	 *            <code>pos</code>.
+	 * @return number of bytes actually copied; this may be less than
+	 *         <code>cnt</code> if <code>cnt</code> exceeded the number of bytes
+	 *         available.
+	 * @throws IOException
+	 *             this cursor does not match the provider or id and the proper
+	 *             window could not be acquired through the provider's cache.
+	 */
+	int copy(DfsPackFile pack, long position, byte[] dstbuf, int dstoff, int cnt)
+			throws IOException {
+		if (cnt == 0)
+			return 0;
+
+		long length = pack.length;
+		if (0 <= length && length <= position)
+			return 0;
+
+		int need = cnt;
+		do {
+			pin(pack, position);
+			int r = block.copy(position, dstbuf, dstoff, need);
+			position += r;
+			dstoff += r;
+			need -= r;
+			if (length < 0)
+				length = pack.length;
+		} while (0 < need && position < length);
+		return cnt - need;
+	}
+

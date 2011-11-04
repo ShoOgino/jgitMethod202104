@@ -1,0 +1,29 @@
+	/**
+	 * Update properties by setting fields from the configuration.
+	 * <p>
+	 * If a property is not defined in the configuration, then it is left
+	 * unmodified.
+	 *
+	 * @param rc
+	 *            configuration to read properties from.
+	 * @return {@code this}
+	 */
+	public DfsReaderOptions fromConfig(Config rc) {
+		setDeltaBaseCacheLimit(rc.getInt(
+				CONFIG_CORE_SECTION,
+				CONFIG_DFS_SECTION,
+				CONFIG_KEY_DELTA_BASE_CACHE_LIMIT,
+				getDeltaBaseCacheLimit()));
+
+		long maxMem = Runtime.getRuntime().maxMemory();
+		long sft = rc.getLong(
+				CONFIG_CORE_SECTION,
+				CONFIG_DFS_SECTION,
+				CONFIG_KEY_STREAM_FILE_TRESHOLD,
+				getStreamFileThreshold());
+		sft = Math.min(sft, maxMem / 4); // don't use more than 1/4 of the heap
+		sft = Math.min(sft, Integer.MAX_VALUE); // cannot exceed array length
+		setStreamFileThreshold((int) sft);
+		return this;
+	}
+

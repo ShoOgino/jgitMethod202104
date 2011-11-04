@@ -1,0 +1,22 @@
+		/**
+		 * Obtain a modified copy of the cache with a ref stored.
+		 * <p>
+		 * This cache instance is not modified by this method.
+		 *
+		 * @param ref
+		 *            reference to add or replace.
+		 * @return a copy of this cache, with the reference added or replaced.
+		 */
+		public RefCache put(Ref ref) {
+			RefList<Ref> newIds = this.ids.put(ref);
+			RefList<Ref> newSym = this.sym;
+			if (ref.isSymbolic()) {
+				newSym = newSym.put(ref);
+			} else {
+				int p = newSym.find(ref.getName());
+				if (0 <= p)
+					newSym = newSym.remove(p);
+			}
+			return new RefCache(newIds, newSym);
+		}
+

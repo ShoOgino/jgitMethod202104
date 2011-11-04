@@ -1,0 +1,20 @@
+	private DfsBlock flushBlock() throws IOException {
+		if (isEmptyPack)
+			throw new IOException(DfsText.get().willNotStoreEmptyPack);
+
+		out.write(currBuf, 0, currEnd);
+
+		byte[] buf;
+		if (currEnd == currBuf.length) {
+			buf = currBuf;
+		} else {
+			buf = new byte[currEnd];
+			System.arraycopy(currBuf, 0, buf, 0, currEnd);
+		}
+
+		DfsBlock v = new DfsBlock(packKey, currPos, buf);
+		readBlock = v;
+		blockCache.put(v);
+		return v;
+	}
+

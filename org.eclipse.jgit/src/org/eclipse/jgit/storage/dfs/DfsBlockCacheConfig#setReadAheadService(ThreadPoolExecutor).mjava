@@ -1,0 +1,14 @@
+	/**
+	 * @param svc
+	 *            service to perform read-ahead of sequential blocks with. If
+	 *            not null the {@link RejectedExecutionHandler} must be managed
+	 *            by the JGit DFS library and not the application.
+	 * @return {@code this}.
+	 */
+	public DfsBlockCacheConfig setReadAheadService(ThreadPoolExecutor svc) {
+		if (svc != null)
+			svc.setRejectedExecutionHandler(ReadAheadRejectedExecutionHandler.INSTANCE);
+		readAheadService = svc;
+		return this;
+	}
+

@@ -1,0 +1,19 @@
+	@Override
+	public Ref peel(Ref ref) throws IOException {
+		final Ref oldLeaf = ref.getLeaf();
+		if (oldLeaf.isPeeled() || oldLeaf.getObjectId() == null)
+			return ref;
+
+		Ref newLeaf = doPeel(oldLeaf);
+
+		RefCache cur = read();
+		int idx = cur.ids.find(oldLeaf.getName());
+		if (0 <= idx && cur.ids.get(idx) == oldLeaf) {
+			RefList<Ref> newList = cur.ids.set(idx, newLeaf);
+			cache.compareAndSet(cur, new RefCache(newList, cur));
+			cachePeeledState(oldLeaf, newLeaf);
+		}
+
+		return recreate(ref, newLeaf);
+	}
+

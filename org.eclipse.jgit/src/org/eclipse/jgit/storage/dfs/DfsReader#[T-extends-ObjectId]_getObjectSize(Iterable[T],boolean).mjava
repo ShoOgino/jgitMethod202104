@@ -1,0 +1,59 @@
+	@Override
+	public <T extends ObjectId> AsyncObjectSizeQueue<T> getObjectSize(
+			Iterable<T> objectIds, final boolean reportMissing) {
+		wantReadAhead = true;
+
+		Iterable<FoundObject<T>> order;
+		IOException error = null;
+		try {
+			order = findAll(objectIds);
+		} catch (IOException e) {
+			order = Collections.emptyList();
+			error = e;
+		}
+
+		final Iterator<FoundObject<T>> idItr = order.iterator();
+		final IOException findAllError = error;
+		return new AsyncObjectSizeQueue<T>() {
+			private FoundObject<T> cur;
+
+			private long sz;
+
+			public boolean next() throws MissingObjectException, IOException {
+				if (idItr.hasNext()) {
+					cur = idItr.next();
+					if (cur.pack == null)
+						throw new MissingObjectException(cur.id, "unknown");
+					sz = cur.pack.getObjectSize(DfsReader.this, cur.offset);
+					return true;
+				} else if (findAllError != null) {
+					throw findAllError;
+				} else {
+					cancelReadAhead();
+					return false;
+				}
+			}
+
+			public T getCurrent() {
+				return cur.id;
+			}
+
+			public ObjectId getObjectId() {
+				return cur.id;
+			}
+
+			public long getSize() {
+				return sz;
+			}
+
+			public boolean cancel(boolean mayInterruptIfRunning) {
+				cancelReadAhead();
+				return true;
+			}
+
+			public void release() {
+				cancelReadAhead();
+			}
+		};
+	}
+

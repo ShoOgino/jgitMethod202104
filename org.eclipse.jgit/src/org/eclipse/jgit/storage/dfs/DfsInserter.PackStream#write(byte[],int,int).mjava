@@ -1,0 +1,7 @@
+		@Override
+		public void write(byte[] data, int off, int len) throws IOException {
+			crc32.update(data, off, len);
+			md.update(data, off, len);
+			writeNoHash(data, off, len);
+		}
+

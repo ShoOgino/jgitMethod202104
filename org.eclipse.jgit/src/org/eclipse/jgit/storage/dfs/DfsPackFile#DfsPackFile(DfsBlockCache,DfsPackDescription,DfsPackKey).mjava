@@ -1,0 +1,20 @@
+	/**
+	 * Construct a reader for an existing, packfile.
+	 *
+	 * @param cache
+	 *            cache that owns the pack data.
+	 * @param desc
+	 *            description of the pack within the DFS.
+	 * @param key
+	 *            interned key used to identify blocks in the block cache.
+	 */
+	DfsPackFile(DfsBlockCache cache, DfsPackDescription desc, DfsPackKey key) {
+		this.cache = cache;
+		this.packDesc = desc;
+		this.key = key;
+
+		length = desc.getPackSize();
+		if (length <= 0)
+			length = -1;
+	}
+

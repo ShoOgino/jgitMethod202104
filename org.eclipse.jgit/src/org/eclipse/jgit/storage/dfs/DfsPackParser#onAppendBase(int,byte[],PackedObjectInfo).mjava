@@ -1,0 +1,39 @@
+	@Override
+	protected boolean onAppendBase(final int typeCode, final byte[] data,
+			final PackedObjectInfo info) throws IOException {
+		info.setOffset(packEnd);
+
+		final byte[] buf = buffer();
+		int sz = data.length;
+		int len = 0;
+		buf[len++] = (byte) ((typeCode << 4) | sz & 15);
+		sz >>>= 4;
+		while (sz > 0) {
+			buf[len - 1] |= 0x80;
+			buf[len++] = (byte) (sz & 0x7f);
+			sz >>>= 7;
+		}
+
+		packDigest.update(buf, 0, len);
+		crc.reset();
+		crc.update(buf, 0, len);
+		buffer(buf, 0, len);
+
+		if (def == null)
+			def = new Deflater(Deflater.DEFAULT_COMPRESSION, false);
+		else
+			def.reset();
+		def.setInput(data);
+		def.finish();
+
+		while (!def.finished()) {
+			len = def.deflate(buf);
+			packDigest.update(buf, 0, len);
+			crc.update(buf, 0, len);
+			buffer(buf, 0, len);
+		}
+
+		info.setCRC((int) crc.getValue());
+		return true;
+	}
+

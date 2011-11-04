@@ -1,0 +1,21 @@
+	@Override
+	protected void onPackHeader(long objectCount) throws IOException {
+		if (objectCount == 0) {
+			isEmptyPack = true;
+			currBuf = new byte[256];
+			return;
+		}
+
+		packDsc = objdb.newPack(DfsObjDatabase.PackSource.RECEIVE);
+		packKey = new DfsPackKey();
+
+		out = objdb.writePackFile(packDsc);
+		int size = out.blockSize();
+		if (size <= 0)
+			size = blockCache.getBlockSize();
+		else if (size < blockCache.getBlockSize())
+			size = (blockCache.getBlockSize() / size) * size;
+		blockSize = size;
+		currBuf = new byte[blockSize];
+	}
+

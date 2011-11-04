@@ -1,0 +1,10 @@
+	void removed(String refName) {
+		RefCache oldCache, newCache;
+		do {
+			oldCache = cache.get();
+			if (oldCache == null)
+				return;
+			newCache = oldCache.remove(refName);
+		} while (!cache.compareAndSet(oldCache, newCache));
+	}
+

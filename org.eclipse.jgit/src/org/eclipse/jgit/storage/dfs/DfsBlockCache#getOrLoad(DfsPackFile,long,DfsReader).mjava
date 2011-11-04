@@ -1,0 +1,78 @@
+	/**
+	 * Lookup a cached object, creating and loading it if it doesn't exist.
+	 *
+	 * @param pack
+	 *            the pack that "contains" the cached object.
+	 * @param position
+	 *            offset within <code>pack</code> of the object.
+	 * @param ctx
+	 *            current thread's reader.
+	 * @return the object reference.
+	 * @throws IOException
+	 *             the reference was not in the cache and could not be loaded.
+	 */
+	DfsBlock getOrLoad(DfsPackFile pack, long position, DfsReader ctx)
+			throws IOException {
+		final long requestedPosition = position;
+		position = pack.alignToBlock(position);
+
+		DfsPackKey key = pack.key;
+		int slot = slot(key, position);
+		HashEntry e1 = table.get(slot);
+		DfsBlock v = scan(e1, key, position);
+		if (v != null) {
+			statHit.incrementAndGet();
+			return v;
+		}
+
+		reserveSpace(blockSize);
+		ReentrantLock regionLock = lockFor(key, position);
+		regionLock.lock();
+		try {
+			HashEntry e2 = table.get(slot);
+			if (e2 != e1) {
+				v = scan(e2, key, position);
+				if (v != null) {
+					statHit.incrementAndGet();
+					creditSpace(blockSize);
+					return v;
+				}
+			}
+
+			statMiss.incrementAndGet();
+			boolean credit = true;
+			try {
+				v = pack.readOneBlock(position, ctx);
+				credit = false;
+			} finally {
+				if (credit)
+					creditSpace(blockSize);
+			}
+			if (position != v.start) {
+				// The file discovered its blockSize and adjusted.
+				position = v.start;
+				slot = slot(key, position);
+				e2 = table.get(slot);
+			}
+
+			key.cachedSize.addAndGet(v.size());
+			Ref<DfsBlock> ref = new Ref<DfsBlock>(key, position, v.size(), v);
+			ref.hot = true;
+			for (;;) {
+				HashEntry n = new HashEntry(clean(e2), ref);
+				if (table.compareAndSet(slot, e2, n))
+					break;
+				e2 = table.get(slot);
+			}
+			addToClock(ref, blockSize - v.size());
+		} finally {
+			regionLock.unlock();
+		}
+
+		// If the block size changed from the default, it is possible the block
+		// that was loaded is the wrong block for the requested position.
+		if (v.contains(pack.key, requestedPosition))
+			return v;
+		return getOrLoad(pack, requestedPosition, ctx);
+	}
+

@@ -1,0 +1,24 @@
+	@Override
+	protected Result doUpdate(Result desiredResult) throws IOException {
+		ObjectIdRef newRef;
+		RevObject obj = rw.parseAny(getNewObjectId());
+		if (obj instanceof RevTag) {
+			newRef = new ObjectIdRef.PeeledTag(
+					Storage.PACKED,
+					dstRef.getName(),
+					getNewObjectId(),
+					rw.peel(obj).copy());
+		} else {
+			newRef = new ObjectIdRef.PeeledNonTag(
+					Storage.PACKED,
+					dstRef.getName(),
+					getNewObjectId());
+		}
+
+		if (getRefDatabase().compareAndPut(dstRef, newRef)) {
+			getRefDatabase().stored(newRef);
+			return desiredResult;
+		}
+		return Result.LOCK_FAILURE;
+	}
+

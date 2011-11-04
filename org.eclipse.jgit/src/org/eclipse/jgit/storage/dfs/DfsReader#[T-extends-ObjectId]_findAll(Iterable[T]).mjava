@@ -1,0 +1,49 @@
+	private <T extends ObjectId> Iterable<FoundObject<T>> findAll(
+			Iterable<T> objectIds) throws IOException {
+		ArrayList<FoundObject<T>> r = new ArrayList<FoundObject<T>>();
+		DfsPackFile[] packList = db.getPacks();
+		if (packList.length == 0) {
+			for (T t : objectIds)
+				r.add(new FoundObject<T>(t));
+			return r;
+		}
+
+		int lastIdx = 0;
+		DfsPackFile lastPack = packList[lastIdx];
+
+		OBJECT_SCAN: for (T t : objectIds) {
+			try {
+				long p = lastPack.findOffset(this, t);
+				if (0 < p) {
+					r.add(new FoundObject<T>(t, lastIdx, lastPack, p));
+					continue;
+				}
+			} catch (IOException e) {
+				// Fall though and try to examine other packs.
+			}
+
+			for (int i = 0; i < packList.length; i++) {
+				if (i == lastIdx)
+					continue;
+				DfsPackFile pack = packList[i];
+				try {
+					long p = pack.findOffset(this, t);
+					if (0 < p) {
+						r.add(new FoundObject<T>(t, i, pack, p));
+						lastIdx = i;
+						lastPack = pack;
+						continue OBJECT_SCAN;
+					}
+				} catch (IOException e) {
+					// Examine other packs.
+				}
+			}
+
+			r.add(new FoundObject<T>(t));
+		}
+
+		Collections.sort(r, FOUND_OBJECT_SORT);
+		last = lastPack;
+		return r;
+	}
+

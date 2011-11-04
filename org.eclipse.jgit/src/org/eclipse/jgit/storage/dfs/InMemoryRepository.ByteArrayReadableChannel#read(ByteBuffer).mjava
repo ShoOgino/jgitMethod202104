@@ -1,0 +1,9 @@
+		public int read(ByteBuffer dst) {
+			int n = Math.min(dst.remaining(), data.length - position);
+			if (n == 0)
+				return -1;
+			dst.put(data, position, n);
+			position += n;
+			return n;
+		}
+

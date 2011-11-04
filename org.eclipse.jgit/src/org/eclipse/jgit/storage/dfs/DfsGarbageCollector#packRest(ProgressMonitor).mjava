@@ -1,0 +1,16 @@
+	private void packRest(ProgressMonitor pm) throws IOException {
+		if (nonHeads.isEmpty() || objectsPacked == getObjectsBefore())
+			return;
+
+		PackWriter pw = newPackWriter();
+		try {
+			for (DfsPackFile pack : newPackList)
+				pw.excludeObjects(pack.getPackIndex(ctx));
+			pw.preparePack(pm, nonHeads, allHeads);
+			if (0 < pw.getObjectCount())
+				writePack(GC, pw, pm);
+		} finally {
+			pw.release();
+		}
+	}
+

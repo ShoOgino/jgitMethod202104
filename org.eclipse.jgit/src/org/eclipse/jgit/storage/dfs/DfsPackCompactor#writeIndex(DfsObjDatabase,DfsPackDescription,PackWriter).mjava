@@ -1,0 +1,12 @@
+	private void writeIndex(DfsObjDatabase objdb, DfsPackDescription pack,
+			PackWriter pw) throws IOException {
+		DfsOutputStream out = objdb.writePackIndex(pack);
+		try {
+			CountingOutputStream cnt = new CountingOutputStream(out);
+			pw.writeIndex(cnt);
+			pack.setIndexSize(cnt.getCount());
+		} finally {
+			out.close();
+		}
+	}
+

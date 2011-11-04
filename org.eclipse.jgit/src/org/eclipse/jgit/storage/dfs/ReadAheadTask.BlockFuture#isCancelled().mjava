@@ -1,0 +1,11 @@
+		public boolean isCancelled() {
+			State s = state;
+			if (s == State.DONE)
+				return false;
+			if (s == State.CANCELLED)
+				return true;
+
+			Future<?> t = task;
+			return t != null ? t.isCancelled() : true;
+		}
+

@@ -1,0 +1,10 @@
+	void stored(Ref ref) {
+		RefCache oldCache, newCache;
+		do {
+			oldCache = cache.get();
+			if (oldCache == null)
+				return;
+			newCache = oldCache.put(ref);
+		} while (!cache.compareAndSet(oldCache, newCache));
+	}
+

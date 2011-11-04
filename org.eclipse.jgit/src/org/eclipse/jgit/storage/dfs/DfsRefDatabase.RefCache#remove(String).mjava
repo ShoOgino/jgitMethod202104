@@ -1,0 +1,22 @@
+		/**
+		 * Obtain a modified copy of the cache with the ref removed.
+		 * <p>
+		 * This cache instance is not modified by this method.
+		 *
+		 * @param refName
+		 *            reference to remove, if it exists.
+		 * @return a copy of this cache, with the reference removed.
+		 */
+		public RefCache remove(String refName) {
+			RefList<Ref> newIds = this.ids;
+			int p = newIds.find(refName);
+			if (0 <= p)
+				newIds = newIds.remove(p);
+
+			RefList<Ref> newSym = this.sym;
+			p = newSym.find(refName);
+			if (0 <= p)
+				newSym = newSym.remove(p);
+			return new RefCache(newIds, newSym);
+		}
+

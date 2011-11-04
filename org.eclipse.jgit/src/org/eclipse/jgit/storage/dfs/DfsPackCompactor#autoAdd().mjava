@@ -1,0 +1,20 @@
+	/**
+	 * Automatically select packs to be included, and add them.
+	 * <p>
+	 * Packs are selected based on size, smaller packs get included while bigger
+	 * ones are omitted.
+	 *
+	 * @return {@code this}
+	 * @throws IOException
+	 *             existing packs cannot be read.
+	 */
+	public DfsPackCompactor autoAdd() throws IOException {
+		DfsObjDatabase objdb = repo.getObjectDatabase();
+		for (DfsPackFile pack : objdb.getPacks()) {
+			DfsPackDescription d = pack.getPackDescription();
+			if (d.getPackSize() < autoAddSize)
+				add(pack);
+		}
+		return this;
+	}
+
