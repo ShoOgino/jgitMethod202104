@@ -1,10 +1,12 @@
 	@Override
-	protected void service(final HttpServletRequest req,
-			final HttpServletResponse rsp) throws ServletException, IOException {
-		final UrlPipeline p = find(req);
-		if (p != null)
-			p.service(req, rsp);
-		else
-			rsp.sendError(SC_NOT_FOUND);
+	protected void service(HttpServletRequest req, HttpServletResponse res)
+			throws ServletException, IOException {
+		filter.doFilter(req, res, new FilterChain() {
+			public void doFilter(ServletRequest request,
+					ServletResponse response) throws IOException,
+					ServletException {
+				((HttpServletResponse) response).sendError(SC_NOT_FOUND);
+			}
+		});
 	}
 

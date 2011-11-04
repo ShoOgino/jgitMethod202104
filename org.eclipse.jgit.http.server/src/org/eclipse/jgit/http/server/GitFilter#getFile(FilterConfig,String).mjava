@@ -1,5 +1,6 @@
-	private File getFile(final String param) throws ServletException {
-		String n = getInitParameter(param);
+	private static File getFile(FilterConfig cfg, String param)
+			throws ServletException {
+		String n = cfg.getInitParameter(param);
 		if (n == null || "".equals(n))
 			throw new ServletException(MessageFormat.format(HttpServerText.get().parameterNotSet, param));
 

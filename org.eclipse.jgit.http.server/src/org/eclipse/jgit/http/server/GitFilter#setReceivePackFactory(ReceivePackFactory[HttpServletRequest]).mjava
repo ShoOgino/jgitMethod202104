@@ -5,6 +5,7 @@
 	 */
 	@SuppressWarnings("unchecked")
 	public void setReceivePackFactory(ReceivePackFactory<HttpServletRequest> f) {
-		gitFilter.setReceivePackFactory(f);
+		assertNotInitialized();
+		this.receivePackFactory = f != null ? f : (ReceivePackFactory<HttpServletRequest>)ReceivePackFactory.DISABLED;
 	}
 

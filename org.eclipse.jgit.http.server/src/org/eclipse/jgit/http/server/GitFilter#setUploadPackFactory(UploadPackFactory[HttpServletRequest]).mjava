@@ -5,6 +5,7 @@
 	 */
 	@SuppressWarnings("unchecked")
 	public void setUploadPackFactory(UploadPackFactory<HttpServletRequest> f) {
-		gitFilter.setUploadPackFactory(f);
+		assertNotInitialized();
+		this.uploadPackFactory = f != null ? f : (UploadPackFactory<HttpServletRequest>)UploadPackFactory.DISABLED;
 	}
 
