@@ -1,0 +1,36 @@
+	/**
+	 * Get submodule id using the repository at the location of the entry
+	 * relative to the directory.
+	 *
+	 * @param directory
+	 * @param e
+	 * @return non-null submodule id
+	 */
+	protected byte[] idSubmodule(File directory, Entry e) {
+		final String gitDirPath = e.getName() + "/" + Constants.DOT_GIT;
+		final File submoduleGitDir = new File(directory, gitDirPath);
+		if (!submoduleGitDir.isDirectory())
+			return zeroid;
+		final Repository submoduleRepo;
+		try {
+			FS fs = repository != null ? repository.getFS() : FS.DETECTED;
+			submoduleRepo = new RepositoryBuilder().setGitDir(submoduleGitDir)
+					.setMustExist(true).setFS(fs).build();
+		} catch (IOException exception) {
+			return zeroid;
+		}
+		final ObjectId head;
+		try {
+			head = submoduleRepo.resolve(Constants.HEAD);
+		} catch (IOException exception) {
+			return zeroid;
+		} finally {
+			submoduleRepo.close();
+		}
+		if (head == null)
+			return zeroid;
+		final byte[] id = new byte[Constants.OBJECT_ID_LENGTH];
+		head.copyRawTo(id, 0);
+		return id;
+	}
+
