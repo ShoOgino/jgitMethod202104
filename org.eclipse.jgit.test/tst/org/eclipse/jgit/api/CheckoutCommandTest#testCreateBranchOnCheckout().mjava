@@ -1,10 +1,6 @@
 	@Test
-	public void testCreateBranchOnCheckout() throws IOException {
-		try {
-			git.checkout().setCreateBranch(true).setName("test2").call();
-		} catch (Exception e) {
-			fail(e.getMessage());
-		}
+	public void testCreateBranchOnCheckout() throws Exception {
+		git.checkout().setCreateBranch(true).setName("test2").call();
 		assertNotNull(db.getRef("test2"));
 	}
 
