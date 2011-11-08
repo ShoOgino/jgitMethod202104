@@ -1,0 +1,14 @@
+	/**
+	 * Configure a child command with the current configuration set in
+	 * {@code this} command
+	 *
+	 * @param childCommand
+	 * @return {@code this}
+	 */
+	protected C configure(final TransportCommand childCommand) {
+		childCommand.setCredentialsProvider(credentialsProvider);
+		childCommand.setTimeout(timeout);
+		childCommand.setTransportConfigCallback(transportConfigCallback);
+		return self();
+	}
+

@@ -38,16 +38,11 @@
 			final List<Transport> transports;
 			transports = Transport.openAll(repo, remote, Transport.Operation.PUSH);
 			for (final Transport transport : transports) {
-				if (0 <= timeout)
-					transport.setTimeout(timeout);
 				transport.setPushThin(thin);
 				if (receivePack != null)
 					transport.setOptionReceivePack(receivePack);
 				transport.setDryRun(dryRun);
-				if (credentialsProvider != null)
-					transport.setCredentialsProvider(credentialsProvider);
-				if (transportConfigCallback != null)
-					transportConfigCallback.configure(transport);
+				configure(transport);
 
 				final Collection<RemoteRefUpdate> toPush = transport
 						.findRemoteRefUpdatesFor(refSpecs);

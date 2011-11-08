@@ -1,0 +1,16 @@
+	/**
+	 * Configure transport with credentials provider, timeout, and config
+	 * callback
+	 *
+	 * @param transport
+	 * @return {@code this}
+	 */
+	protected C configure(final Transport transport) {
+		if (credentialsProvider != null)
+			transport.setCredentialsProvider(credentialsProvider);
+		transport.setTimeout(timeout);
+		if (transportConfigCallback != null)
+			transportConfigCallback.configure(transport);
+		return self();
+	}
+

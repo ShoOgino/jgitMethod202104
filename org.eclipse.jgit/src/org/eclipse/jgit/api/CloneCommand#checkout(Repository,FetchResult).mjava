@@ -1,4 +1,4 @@
-	private void checkout(Repository repo, FetchResult result)
+	private void checkout(Repository clonedRepo, FetchResult result)
 			throws JGitInternalException,
 			MissingObjectException, IncorrectObjectTypeException, IOException {
 
@@ -13,22 +13,22 @@
 			return; // throw exception?
 
 		if (head.getName().startsWith(Constants.R_HEADS)) {
-			final RefUpdate newHead = repo.updateRef(Constants.HEAD);
+			final RefUpdate newHead = clonedRepo.updateRef(Constants.HEAD);
 			newHead.disableRefLog();
 			newHead.link(head.getName());
-			addMergeConfig(repo, head);
+			addMergeConfig(clonedRepo, head);
 		}
 
-		final RevCommit commit = parseCommit(repo, head);
+		final RevCommit commit = parseCommit(clonedRepo, head);
 
 		boolean detached = !head.getName().startsWith(Constants.R_HEADS);
-		RefUpdate u = repo.updateRef(Constants.HEAD, detached);
+		RefUpdate u = clonedRepo.updateRef(Constants.HEAD, detached);
 		u.setNewObjectId(commit.getId());
 		u.forceUpdate();
 
 		if (!bare) {
-			DirCache dc = repo.lockDirCache();
-			DirCacheCheckout co = new DirCacheCheckout(repo, dc,
+			DirCache dc = clonedRepo.lockDirCache();
+			DirCacheCheckout co = new DirCacheCheckout(clonedRepo, dc,
 					commit.getTree());
 			co.checkout();
 		}

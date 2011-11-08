@@ -1,9 +1,10 @@
-	private void addMergeConfig(Repository repo, Ref head) throws IOException {
+	private void addMergeConfig(Repository clonedRepo, Ref head)
+			throws IOException {
 		String branchName = Repository.shortenRefName(head.getName());
-		repo.getConfig().setString(ConfigConstants.CONFIG_BRANCH_SECTION,
+		clonedRepo.getConfig().setString(ConfigConstants.CONFIG_BRANCH_SECTION,
 				branchName, ConfigConstants.CONFIG_KEY_REMOTE, remote);
-		repo.getConfig().setString(ConfigConstants.CONFIG_BRANCH_SECTION,
+		clonedRepo.getConfig().setString(ConfigConstants.CONFIG_BRANCH_SECTION,
 				branchName, ConfigConstants.CONFIG_KEY_MERGE, head.getName());
-		repo.getConfig().save();
+		clonedRepo.getConfig().save();
 	}
 

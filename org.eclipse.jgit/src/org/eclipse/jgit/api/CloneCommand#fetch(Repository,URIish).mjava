@@ -1,9 +1,9 @@
-	private FetchResult fetch(Repository repo, URIish u)
+	private FetchResult fetch(Repository clonedRepo, URIish u)
 			throws URISyntaxException,
 			JGitInternalException,
 			InvalidRemoteException, IOException {
 		// create the remote config and save it
-		RemoteConfig config = new RemoteConfig(repo.getConfig(), remote);
+		RemoteConfig config = new RemoteConfig(clonedRepo.getConfig(), remote);
 		config.addURI(u);
 
 		final String dst = bare ? Constants.R_HEADS : Constants.R_REMOTES
@@ -13,19 +13,16 @@
 		refSpec = refSpec.setSourceDestination(Constants.R_HEADS + "*", dst + "/*"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		config.addFetchRefSpec(refSpec);
-		config.update(repo.getConfig());
+		config.update(clonedRepo.getConfig());
 
-		repo.getConfig().save();
+		clonedRepo.getConfig().save();
 
 		// run the fetch command
-		FetchCommand command = new FetchCommand(repo);
+		FetchCommand command = new FetchCommand(clonedRepo);
 		command.setRemote(remote);
 		command.setProgressMonitor(monitor);
 		command.setTagOpt(TagOpt.FETCH_TAGS);
-		command.setTimeout(timeout);
-		if (credentialsProvider != null)
-			command.setCredentialsProvider(credentialsProvider);
-		command.setTransportConfigCallback(transportConfigCallback);
+		configure(command);
 
 		List<RefSpec> specs = calculateRefSpecs(dst);
 		command.setRefSpecs(specs);
