@@ -1,9 +1,10 @@
 	@Test
 	public void testRules1thru3_NoIndexEntry() throws IOException {
-		Tree head = new Tree(db);
-		head = buildTree(mk("foo"));
-		ObjectId objectId = head.findBlobMember("foo").getId();
-		Tree merge = new Tree(db);
+		ObjectId head = buildTree(mk("foo"));
+		TreeWalk tw = TreeWalk.forPath(db, "foo", head);
+		ObjectId objectId = tw.getObjectId(0);
+		ObjectId merge = db.newObjectInserter().insert(Constants.OBJ_TREE,
+				new byte[0]);
 
 		prescanTwoTrees(head, merge);
 
@@ -14,7 +15,8 @@
 		assertEquals(objectId, getUpdated().get("foo"));
 
 		merge = buildTree(mkmap("foo", "a"));
-		ObjectId anotherId = merge.findBlobMember("foo").getId();
+		tw = TreeWalk.forPath(db, "foo", merge);
+		ObjectId anotherId = tw.getObjectId(0);
 
 		prescanTwoTrees(head, merge);
 

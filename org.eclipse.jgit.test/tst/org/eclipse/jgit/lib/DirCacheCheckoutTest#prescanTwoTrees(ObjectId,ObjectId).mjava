@@ -1,8 +1,8 @@
-	private void prescanTwoTrees(Tree head, Tree merge)
+	private void prescanTwoTrees(ObjectId head, ObjectId merge)
 			throws IllegalStateException, IOException {
 		DirCache dc = db.lockDirCache();
 		try {
-			dco = new DirCacheCheckout(db, head.getId(), dc, merge.getId());
+			dco = new DirCacheCheckout(db, head, dc, merge);
 			dco.preScanTwoTrees();
 		} finally {
 			dc.unlock();

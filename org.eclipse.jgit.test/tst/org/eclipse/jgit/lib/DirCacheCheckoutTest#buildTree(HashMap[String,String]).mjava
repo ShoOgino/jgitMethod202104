@@ -1,24 +1,16 @@
-	private Tree buildTree(HashMap<String, String> headEntries) throws IOException {
-		Tree tree = new Tree(db);
-		if (headEntries == null)
-			return tree;
-		FileTreeEntry fileEntry;
-		Tree parent;
-		ObjectInserter oi = db.newObjectInserter();
-		try {
+	private ObjectId buildTree(HashMap<String, String> headEntries)
+			throws IOException {
+		DirCache lockDirCache = DirCache.newInCore();
+		// assertTrue(lockDirCache.lock());
+		DirCacheEditor editor = lockDirCache.editor();
+		if (headEntries != null) {
 			for (java.util.Map.Entry<String, String> e : headEntries.entrySet()) {
-				fileEntry = tree.addFile(e.getKey());
-				fileEntry.setId(genSha1(e.getValue()));
-				parent = fileEntry.getParent();
-				while (parent != null) {
-					parent.setId(oi.insert(Constants.OBJ_TREE, parent.format()));
-					parent = parent.getParent();
-				}
+				AddEdit addEdit = new AddEdit(e.getKey(),
+						genSha1(e.getValue()), e.getValue().length());
+				editor.add(addEdit);
 			}
-			oi.flush();
-		} finally {
-			oi.release();
 		}
-		return tree;
+		editor.finish();
+		return lockDirCache.writeTree(db.newObjectInserter());
 	}
 
