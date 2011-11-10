@@ -6,7 +6,7 @@
 		cnt += objectsLists[Constants.OBJ_TAG].size();
 
 		long start = System.currentTimeMillis();
-		monitor.beginTask(JGitText.get().searchForReuse, cnt);
+		beginPhase(PackingPhase.FINDING_SOURCES, monitor, cnt);
 
 		if (cnt <= 4096) {
 			// For small object counts, do everything as one list.
@@ -31,7 +31,7 @@
 			searchForReuse(monitor, objectsLists[Constants.OBJ_TAG]);
 		}
 
-		monitor.endTask();
+		endPhase(monitor);
 		stats.timeSearchingForReuse = System.currentTimeMillis() - start;
 	}
 

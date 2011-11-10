@@ -57,7 +57,7 @@
 
 		long objCnt = getObjectCount();
 		stats.totalObjects = objCnt;
-		writeMonitor.beginTask(JGitText.get().writingObjects, (int) objCnt);
+		beginPhase(PackingPhase.WRITING, writeMonitor, (int) objCnt);
 		long writeStart = System.currentTimeMillis();
 
 		out.writeFileHeader(PACK_VERSION_GENERATED, objCnt);
@@ -97,6 +97,6 @@
 		}
 
 		reader.release();
-		writeMonitor.endTask();
+		endPhase(writeMonitor);
 	}
 

@@ -4,8 +4,7 @@
 			throws MissingObjectException, IOException,
 			IncorrectObjectTypeException {
 		final long countingStart = System.currentTimeMillis();
-		countingMonitor.beginTask(JGitText.get().countingObjects,
-				ProgressMonitor.UNKNOWN);
+		beginPhase(PackingPhase.COUNTING, countingMonitor, ProgressMonitor.UNKNOWN);
 
 		if (have == null)
 			have = Collections.emptySet();
@@ -51,7 +50,7 @@
 					cachedPacks.addAll(shortCircuit);
 					for (CachedPack pack : shortCircuit)
 						countingMonitor.update((int) pack.getObjectCount());
-					countingMonitor.endTask();
+					endPhase(countingMonitor);
 					stats.timeCounting = System.currentTimeMillis() - countingStart;
 					return;
 				}
@@ -141,8 +140,8 @@
 							wantObjs, haveObjs, pack);
 					commits = new BlockList<RevCommit>();
 
-					countingMonitor.endTask();
-					countingMonitor.beginTask(JGitText.get().countingObjects,
+					endPhase(countingMonitor);
+					beginPhase(PackingPhase.COUNTING, countingMonitor,
 							ProgressMonitor.UNKNOWN);
 					continue;
 				}
@@ -229,7 +228,7 @@
 
 		for (CachedPack pack : cachedPacks)
 			countingMonitor.update((int) pack.getObjectCount());
-		countingMonitor.endTask();
+		endPhase(countingMonitor);
 		stats.timeCounting = System.currentTimeMillis() - countingStart;
 	}
 
