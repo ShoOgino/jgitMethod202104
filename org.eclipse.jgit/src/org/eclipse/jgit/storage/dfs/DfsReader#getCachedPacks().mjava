@@ -4,9 +4,8 @@
 		List<CachedPack> cached = new ArrayList<CachedPack>(packList.length);
 		for (DfsPackFile pack : packList) {
 			DfsPackDescription desc = pack.getPackDescription();
-			if (desc.getTips() == null || desc.getTips().isEmpty())
-				continue;
-			cached.add(new DfsCachedPack(pack));
+			if (canBeCachedPack(desc))
+				cached.add(new DfsCachedPack(pack));
 		}
 		return cached;
 	}
