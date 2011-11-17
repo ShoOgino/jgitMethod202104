@@ -1,5 +1,5 @@
 	private void beginPhase(PackingPhase phase, ProgressMonitor monitor,
-			int cnt) {
+			long cnt) {
 		state.phase = phase;
 		String task;
 		switch (phase) {
@@ -22,6 +22,6 @@
 			throw new IllegalArgumentException(
 					MessageFormat.format(JGitText.get().illegalPackingPhase, phase));
 		}
-		monitor.beginTask(task, cnt);
+		monitor.beginTask(task, (int) cnt);
 	}
 

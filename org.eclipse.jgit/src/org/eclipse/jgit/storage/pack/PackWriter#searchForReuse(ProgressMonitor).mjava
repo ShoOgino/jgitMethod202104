@@ -1,5 +1,5 @@
 	private void searchForReuse(ProgressMonitor monitor) throws IOException {
-		int cnt = 0;
+		long cnt = 0;
 		cnt += objectsLists[Constants.OBJ_COMMIT].size();
 		cnt += objectsLists[Constants.OBJ_TREE].size();
 		cnt += objectsLists[Constants.OBJ_BLOB].size();
@@ -10,7 +10,7 @@
 
 		if (cnt <= 4096) {
 			// For small object counts, do everything as one list.
-			BlockList<ObjectToPack> tmp = new BlockList<ObjectToPack>(cnt);
+			BlockList<ObjectToPack> tmp = new BlockList<ObjectToPack>((int) cnt);
 			tmp.addAll(objectsLists[Constants.OBJ_TAG]);
 			tmp.addAll(objectsLists[Constants.OBJ_COMMIT]);
 			tmp.addAll(objectsLists[Constants.OBJ_TREE]);
