@@ -1,0 +1,15 @@
+	/**
+	 * Construct a too large object in pack exception when the exact size of the
+	 * too large object is not available. This will be used when we find out
+	 * that a delta sequence is already larger than the maxObjectSizeLimit but
+	 * don't want to inflate the delta just to find out the exact size of the
+	 * resulting object.
+	 *
+	 * @param maxObjectSizeLimit
+	 *            the maximum object size limit
+	 */
+	public TooLargeObjectInPackException(long maxObjectSizeLimit) {
+		super(MessageFormat.format(JGitText.get().receivePackObjectTooLarge1,
+				maxObjectSizeLimit));
+	}
+

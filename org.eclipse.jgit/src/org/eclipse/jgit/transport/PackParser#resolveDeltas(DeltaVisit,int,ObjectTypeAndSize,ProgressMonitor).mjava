@@ -14,8 +14,11 @@
 						JGitText.get().unknownObjectType, info.type));
 			}
 
-			visit.data = BinaryDelta.apply(visit.parent.data, //
-					inflateAndReturn(Source.DATABASE, info.size));
+			byte[] delta = inflateAndReturn(Source.DATABASE, info.size);
+			checkIfTooLarge(type, BinaryDelta.getResultSize(delta));
+
+			visit.data = BinaryDelta.apply(visit.parent.data, delta);
+			delta = null;
 
 			if (!checkCRC(visit.delta.crc))
 				throw new IOException(MessageFormat.format(
