@@ -1,10 +1,10 @@
 	private void service(ServletRequest request, ServletResponse response)
 			throws IOException {
 		final HttpServletRequest req = (HttpServletRequest) request;
-		final HttpServletResponse rsp = (HttpServletResponse) response;
-		final SmartOutputStream buf = new SmartOutputStream(req, rsp);
+		final HttpServletResponse res = (HttpServletResponse) response;
+		final SmartOutputStream buf = new SmartOutputStream(req, res);
 		try {
-			rsp.setContentType("application/x-" + svc + "-advertisement");
+			res.setContentType(infoRefsResultType(svc));
 
 			final PacketLineOut out = new PacketLineOut(buf);
 			out.writeString("# service=" + svc + "\n");
@@ -12,16 +12,16 @@
 			advertise(req, new PacketLineOutRefAdvertiser(out));
 			buf.close();
 		} catch (ServiceNotAuthorizedException e) {
-			rsp.sendError(SC_UNAUTHORIZED);
+			res.sendError(SC_UNAUTHORIZED);
 
 		} catch (ServiceNotEnabledException e) {
-			rsp.sendError(SC_FORBIDDEN);
+			sendError(req, res, SC_FORBIDDEN);
 
 		} catch (UploadPackMayNotContinueException e) {
 			if (e.isOutput())
 				buf.close();
 			else
-				rsp.sendError(SC_SERVICE_UNAVAILABLE);
+				sendError(req, res, SC_FORBIDDEN, e.getMessage());
 		}
 	}
 

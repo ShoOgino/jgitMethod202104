@@ -1,0 +1,11 @@
+	/**
+	 * Check a request for Git-over-HTTP indicators.
+	 *
+	 * @param req
+	 *            the current HTTP request that may have been made by Git.
+	 * @return true if the request is likely made by a Git client program.
+	 */
+	public static boolean isGitClient(HttpServletRequest req) {
+		return isInfoRefs(req) || isUploadPack(req) || isReceivePack(req);
+	}
+

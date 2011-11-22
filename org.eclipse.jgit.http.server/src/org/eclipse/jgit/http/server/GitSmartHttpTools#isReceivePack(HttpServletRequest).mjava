@@ -1,0 +1,13 @@
+	/**
+	 * Check if the HTTP request was for the /git-receive-pack Git handler.
+	 *
+	 * @param req
+	 *            current request.
+	 * @return true if the request is for the /git-receive-pack handler.
+	 */
+	public static boolean isReceivePack(HttpServletRequest req) {
+		String uri = req.getRequestURI();
+		return uri != null && uri.endsWith(RECEIVE_PACK_PATH)
+				&& RECEIVE_PACK_REQUEST_TYPE.equals(req.getContentType());
+	}
+

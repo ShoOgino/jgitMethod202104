@@ -1,0 +1,62 @@
+	/**
+	 * Send an error to the Git client or browser.
+	 * <p>
+	 * Server implementors may use this method to send customized error messages
+	 * to a Git protocol client using an HTTP 200 OK response with the error
+	 * embedded in the payload. If the request was not issued by a Git client,
+	 * an HTTP response code is returned instead.
+	 *
+	 * @param req
+	 *            current request.
+	 * @param res
+	 *            current response.
+	 * @param httpStatus
+	 *            HTTP status code to set if the client is not a Git client.
+	 * @param textForGit
+	 *            plain text message to display on the user's console. This is
+	 *            shown only if the client is likely to be a Git client. If null
+	 *            or the empty string a default text is chosen based on the HTTP
+	 *            response code.
+	 * @throws IOException
+	 *             the response cannot be sent.
+	 */
+	public static void sendError(HttpServletRequest req,
+			HttpServletResponse res, int httpStatus, String textForGit)
+			throws IOException {
+		if (textForGit == null || textForGit.length() == 0) {
+			switch (httpStatus) {
+			case SC_FORBIDDEN:
+				textForGit = HttpServerText.get().repositoryAccessForbidden;
+				break;
+			case SC_NOT_FOUND:
+				textForGit = HttpServerText.get().repositoryNotFound;
+				break;
+			case SC_INTERNAL_SERVER_ERROR:
+				textForGit = HttpServerText.get().internalServerError;
+				break;
+			default:
+				textForGit = "HTTP " + httpStatus;
+				break;
+			}
+		}
+
+		ByteArrayOutputStream buf = new ByteArrayOutputStream(128);
+		PacketLineOut pck = new PacketLineOut(buf);
+
+		if (isInfoRefs(req)) {
+			String svc = req.getParameter("service");
+			pck.writeString("# service=" + svc + "\n");
+			pck.end();
+			pck.writeString("ERR " + textForGit);
+			send(res, infoRefsResultType(svc), buf.toByteArray());
+		} else if (isUploadPack(req)) {
+			pck.writeString("ERR " + textForGit);
+			send(res, UPLOAD_PACK_RESULT_TYPE, buf.toByteArray());
+		} else if (isReceivePack(req)) {
+			pck.writeString("ERR " + textForGit);
+			send(res, RECEIVE_PACK_RESULT_TYPE, buf.toByteArray());
+		} else {
+			res.sendError(httpStatus);
+		}
+	}
+
