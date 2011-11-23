@@ -1,0 +1,22 @@
+	/**
+	 * Send an error to the Git client or browser.
+	 * <p>
+	 * Server implementors may use this method to send customized error messages
+	 * to a Git protocol client using an HTTP 200 OK response with the error
+	 * embedded in the payload. If the request was not issued by a Git client,
+	 * an HTTP response code is returned instead.
+	 *
+	 * @param req
+	 *            current request.
+	 * @param res
+	 *            current response.
+	 * @param httpStatus
+	 *            HTTP status code to set if the client is not a Git client.
+	 * @throws IOException
+	 *             the response cannot be sent.
+	 */
+	public static void sendError(HttpServletRequest req,
+			HttpServletResponse res, int httpStatus) throws IOException {
+		sendError(req, res, httpStatus, null);
+	}
+

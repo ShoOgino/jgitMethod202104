@@ -1,17 +1,17 @@
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain chain) throws IOException, ServletException {
 		final HttpServletRequest req = (HttpServletRequest) request;
-		final HttpServletResponse rsp = (HttpServletResponse) response;
+		final HttpServletResponse res = (HttpServletResponse) response;
 
 		if (svc.equals(req.getParameter("service"))) {
 			final Repository db = getRepository(req);
 			try {
 				begin(req, db);
 			} catch (ServiceNotAuthorizedException e) {
-				rsp.sendError(SC_UNAUTHORIZED);
+				res.sendError(SC_UNAUTHORIZED);
 				return;
 			} catch (ServiceNotEnabledException e) {
-				rsp.sendError(SC_FORBIDDEN);
+				sendError(req, res, SC_FORBIDDEN);
 				return;
 			}
 

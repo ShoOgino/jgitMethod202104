@@ -1,0 +1,12 @@
+	/**
+	 * Check if the HTTP request was for the /info/refs?service= Git handler.
+	 *
+	 * @param req
+	 *            current request.
+	 * @return true if the request is for the /info/refs service.
+	 */
+	public static boolean isInfoRefs(HttpServletRequest req) {
+		return req.getRequestURI().endsWith(INFO_REFS_PATH)
+				&& VALID_SERVICES.contains(req.getParameter("service"));
+	}
+

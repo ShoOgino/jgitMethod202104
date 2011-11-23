@@ -1,0 +1,24 @@
+	/**
+	 * Get the response Content-Type a client expects for the request.
+	 * <p>
+	 * This method should only be invoked if
+	 * {@link #isGitClient(HttpServletRequest)} is true.
+	 *
+	 * @param req
+	 *            current request.
+	 * @return the Content-Type the client expects.
+	 * @throws IllegalArgumentException
+	 *             the request is not a Git client request. See
+	 *             {@link #isGitClient(HttpServletRequest)}.
+	 */
+	public static String getResponseContentType(HttpServletRequest req) {
+		if (isInfoRefs(req))
+			return infoRefsResultType(req.getParameter("service"));
+		else if (isUploadPack(req))
+			return UPLOAD_PACK_RESULT_TYPE;
+		else if (isReceivePack(req))
+			return RECEIVE_PACK_RESULT_TYPE;
+		else
+			throw new IllegalArgumentException();
+	}
+
