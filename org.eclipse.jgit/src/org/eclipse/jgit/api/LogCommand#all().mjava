@@ -1,0 +1,18 @@
+	/**
+	 * Add all refs as commits to start the graph traversal from.
+	 *
+	 * @see #add(AnyObjectId)
+	 * @return {@code this}
+	 * @throws IOException
+	 *             the references could not be accessed
+	 */
+	public LogCommand all() throws IOException {
+		for (Ref ref : getRepository().getAllRefs().values()) {
+			ObjectId objectId = ref.getPeeledObjectId();
+			if (objectId == null)
+				objectId = ref.getObjectId();
+			add(objectId);
+		}
+		return this;
+	}
+
