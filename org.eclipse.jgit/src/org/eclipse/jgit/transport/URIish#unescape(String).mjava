@@ -1,0 +1,30 @@
+	private static String unescape(String s) throws URISyntaxException {
+		if (s == null)
+			return null;
+		if (s.indexOf('%') < 0)
+			return s;
+
+		byte[] bytes;
+		try {
+			bytes = s.getBytes(Constants.CHARACTER_ENCODING);
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e); // can't happen
+		}
+
+		byte[] os = new byte[bytes.length];
+		int j = 0;
+		for (int i = 0; i < bytes.length; ++i) {
+			byte c = bytes[i];
+			if (c == '%') {
+				if (i + 2 >= bytes.length)
+					throw new URISyntaxException(s, JGitText.get().cannotParseGitURIish);
+				int val = (RawParseUtils.parseHexInt4(bytes[i + 1]) << 4)
+						| RawParseUtils.parseHexInt4(bytes[i + 2]);
+				os[j++] = (byte) val;
+				i += 2;
+			} else
+				os[j++] = c;
+		}
+		return RawParseUtils.decode(os, 0, j);
+	}
+

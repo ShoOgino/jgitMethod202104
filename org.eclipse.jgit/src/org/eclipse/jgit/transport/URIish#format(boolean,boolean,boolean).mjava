@@ -1,4 +1,5 @@
-	private String format(final boolean includePassword) {
+	private String format(final boolean includePassword, boolean escape,
+			boolean escapeNonAscii) {
 		final StringBuilder r = new StringBuilder();
 		if (getScheme() != null) {
 			r.append(getScheme());
@@ -6,17 +7,17 @@
 		}
 
 		if (getUser() != null) {
-			r.append(getUser());
+			r.append(escape(getUser(), true, escapeNonAscii));
 			if (includePassword && getPass() != null) {
 				r.append(':');
-				r.append(getPass());
+				r.append(escape(getPass(), true, escapeNonAscii));
 			}
 		}
 
 		if (getHost() != null) {
 			if (getUser() != null)
 				r.append('@');
-			r.append(getHost());
+			r.append(escape(getHost(), false, escapeNonAscii));
 			if (getScheme() != null && getPort() > 0) {
 				r.append(':');
 				r.append(getPort());
@@ -29,7 +30,13 @@
 					r.append('/');
 			} else if (getHost() != null)
 				r.append(':');
-			r.append(getPath());
+			if (getScheme() != null)
+				if (escapeNonAscii)
+					r.append(escape(getPath(), false, escapeNonAscii));
+				else
+					r.append(getRawPath());
+			else
+				r.append(getPath());
 		}
 
 		return r.toString();

@@ -5,9 +5,11 @@
 		assertEquals("git", u.getScheme());
 		assertTrue(u.isRemote());
 		assertEquals("example.com", u.getHost());
+		assertEquals("/home/m y", u.getRawPath());
 		assertEquals("/home/m y", u.getPath());
 		assertEquals(333, u.getPort());
-		assertEquals(str, u.toString());
+		assertEquals("git://example.com:333/home/m y", u.toString());
+		assertEquals("git://example.com:333/home/m%20y", u.toASCIIString());
 		assertEquals(u, new URIish(str));
 	}
 

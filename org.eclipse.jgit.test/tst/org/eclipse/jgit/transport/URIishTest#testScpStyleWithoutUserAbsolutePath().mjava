@@ -4,10 +4,12 @@
 		URIish u = new URIish(str);
 		assertNull(u.getScheme());
 		assertTrue(u.isRemote());
+		assertEquals("/some/p ath", u.getRawPath());
 		assertEquals("/some/p ath", u.getPath());
 		assertEquals("example.com", u.getHost());
 		assertEquals(-1, u.getPort());
 		assertEquals(str, u.toString());
+		assertEquals(str, u.toASCIIString());
 		assertEquals(u, new URIish(str));
 	}
 

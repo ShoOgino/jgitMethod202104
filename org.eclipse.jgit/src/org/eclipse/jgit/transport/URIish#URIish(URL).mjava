@@ -7,6 +7,11 @@
 	public URIish(final URL u) {
 		scheme = u.getProtocol();
 		path = u.getPath();
+		try {
+			rawPath = u.toURI().getRawPath();
+		} catch (URISyntaxException e) {
+			throw new RuntimeException(e); // Impossible
+		}
 
 		final String ui = u.getUserInfo();
 		if (ui != null) {

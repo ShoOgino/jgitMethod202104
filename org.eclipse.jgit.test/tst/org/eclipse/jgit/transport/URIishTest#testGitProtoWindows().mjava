@@ -4,10 +4,12 @@
 		URIish u = new URIish(str);
 		assertEquals("git", u.getScheme());
 		assertTrue(u.isRemote());
+		assertEquals("D:/m y", u.getRawPath());
 		assertEquals("D:/m y", u.getPath());
 		assertEquals("example.com", u.getHost());
 		assertEquals(-1, u.getPort());
-		assertEquals(str, u.toString());
+		assertEquals("git://example.com/D:/m y", u.toString());
+		assertEquals("git://example.com/D:/m%20y", u.toASCIIString());
 		assertEquals(u, new URIish(str));
 	}
 

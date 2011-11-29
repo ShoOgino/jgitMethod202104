@@ -1,0 +1,39 @@
+	/**
+	 * Escape unprintable characters optionally URI-reserved characters
+	 *
+	 * @param s
+	 *            The Java String to encode (may contain any character)
+	 * @param escapeReservedChars
+	 *            true to escape URI reserved characters
+	 * @param encodeNonAscii
+	 *            encode any non-ASCII characters
+	 * @return a URI-encoded string
+	 */
+	private static String escape(String s, boolean escapeReservedChars,
+			boolean encodeNonAscii) {
+		if (s == null)
+			return null;
+		ByteArrayOutputStream os = new ByteArrayOutputStream(s.length());
+		byte[] bytes;
+		try {
+			bytes = s.getBytes(Constants.CHARACTER_ENCODING);
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e); // cannot happen
+		}
+		for (int i = 0; i < bytes.length; ++i) {
+			int b = bytes[i] & 0xFF;
+			if (b <= 32 || (encodeNonAscii && b > 127) || b == '%'
+					|| (escapeReservedChars && reservedChars.get(b))) {
+				os.write('%');
+				byte[] tmp = Constants.encodeASCII(String.format("%02x",
+						Integer.valueOf(b)));
+				os.write(tmp[0]);
+				os.write(tmp[1]);
+			} else {
+				os.write(b);
+			}
+		}
+		byte[] buf = os.toByteArray();
+		return RawParseUtils.decode(buf, 0, buf.length);
+	}
+

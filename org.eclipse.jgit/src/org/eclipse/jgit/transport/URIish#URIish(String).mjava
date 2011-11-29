@@ -12,19 +12,21 @@
 		Matcher matcher = SINGLE_SLASH_FILE_URI.matcher(s);
 		if (matcher.matches()) {
 			scheme = matcher.group(1);
-			path = cleanLeadingSlashes(matcher.group(2), scheme);
+			rawPath = cleanLeadingSlashes(matcher.group(2), scheme);
+			path = unescape(rawPath);
 			return;
 		}
 		matcher = FULL_URI.matcher(s);
 		if (matcher.matches()) {
 			scheme = matcher.group(1);
-			user = matcher.group(2);
-			pass = matcher.group(3);
-			host = matcher.group(4);
+			user = unescape(matcher.group(2));
+			pass = unescape(matcher.group(3));
+			host = unescape(matcher.group(4));
 			if (matcher.group(5) != null)
 				port = Integer.parseInt(matcher.group(5));
-			path = cleanLeadingSlashes(
+			rawPath = cleanLeadingSlashes(
 					n2e(matcher.group(6)) + n2e(matcher.group(7)), scheme);
+			path = unescape(rawPath);
 			return;
 		}
 		matcher = RELATIVE_SCP_URI.matcher(s);
@@ -32,7 +34,8 @@
 			user = matcher.group(1);
 			pass = matcher.group(2);
 			host = matcher.group(3);
-			path = matcher.group(4);
+			rawPath = matcher.group(4);
+			path = rawPath;
 			return;
 		}
 		matcher = ABSOLUTE_SCP_URI.matcher(s);
@@ -40,12 +43,14 @@
 			user = matcher.group(1);
 			pass = matcher.group(2);
 			host = matcher.group(3);
-			path = matcher.group(4);
+			rawPath = matcher.group(4);
+			path = rawPath;
 			return;
 		}
 		matcher = LOCAL_FILE.matcher(s);
 		if (matcher.matches()) {
-			path = matcher.group(1);
+			rawPath = matcher.group(1);
+			path = rawPath;
 			return;
 		}
 		throw new URISyntaxException(s, JGitText.get().cannotParseGitURIish);

@@ -1,0 +1,13 @@
+	@Test
+	public void testURIEncode_0a() throws Exception {
+		final String str = "file:///home/m%0ay";
+		URIish u = new URIish(str);
+		assertEquals("file", u.getScheme());
+		assertFalse(u.isRemote());
+		assertEquals("/home/m%0ay", u.getRawPath());
+		assertEquals("/home/m\ny", u.getPath());
+		assertEquals("file:///home/m%0ay", u.toString());
+		assertEquals("file:///home/m%0ay", u.toASCIIString());
+		assertEquals(u, new URIish(str));
+	}
+

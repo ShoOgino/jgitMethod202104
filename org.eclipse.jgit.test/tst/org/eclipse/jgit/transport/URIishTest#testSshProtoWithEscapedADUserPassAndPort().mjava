@@ -1,18 +1,19 @@
 	@Test
-	public void testSshProtoWithADUserPassAndPort() throws Exception {
-		final String str = "ssh://DOMAIN\\user:pass@example.com:33/some/p ath";
+	public void testSshProtoWithEscapedADUserPassAndPort() throws Exception {
+		final String str = "ssh://DOMAIN%5c\u00fcser:pass@example.com:33/some/p ath";
 		URIish u = new URIish(str);
 		assertEquals("ssh", u.getScheme());
 		assertTrue(u.isRemote());
 		assertEquals("/some/p ath", u.getRawPath());
 		assertEquals("/some/p ath", u.getPath());
 		assertEquals("example.com", u.getHost());
-		assertEquals("DOMAIN\\user", u.getUser());
+		assertEquals("DOMAIN\\\u00fcser", u.getUser());
 		assertEquals("pass", u.getPass());
 		assertEquals(33, u.getPort());
-		assertEquals("ssh://DOMAIN\\user:pass@example.com:33/some/p ath",
+		assertEquals("ssh://DOMAIN\\\u00fcser:pass@example.com:33/some/p ath",
 				u.toPrivateString());
-		assertEquals("ssh://DOMAIN\\user:pass@example.com:33/some/p%20ath",
+		assertEquals(
+				"ssh://DOMAIN\\%c3%bcser:pass@example.com:33/some/p%20ath",
 				u.toPrivateASCIIString());
 		assertEquals(u.setPass(null).toPrivateString(), u.toString());
 		assertEquals(u.setPass(null).toPrivateASCIIString(), u.toASCIIString());

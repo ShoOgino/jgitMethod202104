@@ -4,8 +4,10 @@
 		URIish u = new URIish(str);
 		assertEquals("file", u.getScheme());
 		assertFalse(u.isRemote());
+		assertEquals("/home/m y", u.getRawPath());
 		assertEquals("/home/m y", u.getPath());
-		assertEquals(str, u.toString());
+		assertEquals("file:///home/m y", u.toString());
+		assertEquals("file:///home/m%20y", u.toASCIIString());
 		assertEquals(u, new URIish(str));
 	}
 

@@ -4,12 +4,15 @@
 		URIish u = new URIish(str);
 		assertEquals("ssh", u.getScheme());
 		assertTrue(u.isRemote());
+		assertEquals("/some/p ath", u.getRawPath());
 		assertEquals("/some/p ath", u.getPath());
 		assertEquals("example.com", u.getHost());
 		assertEquals("user", u.getUser());
 		assertNull(u.getPass());
 		assertEquals(33, u.getPort());
-		assertEquals(str, u.toString());
+		assertEquals("ssh://user@example.com:33/some/p ath", u.toString());
+		assertEquals("ssh://user@example.com:33/some/p%20ath",
+				u.toASCIIString());
 		assertEquals(u, new URIish(str));
 	}
 
