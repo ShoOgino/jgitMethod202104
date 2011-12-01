@@ -1,0 +1,56 @@
+	@Test
+	public void testPush_UnpackError_TruncatedPack() throws Exception {
+		StringBuilder sb = new StringBuilder();
+		sb.append(ObjectId.zeroId().name());
+		sb.append(' ');
+		sb.append(a_blob.name());
+		sb.append(' ');
+		sb.append("refs/objects/A");
+		sb.append('\0');
+		sb.append("report-status");
+
+		ByteArrayOutputStream reqbuf = new ByteArrayOutputStream();
+		PacketLineOut reqpck = new PacketLineOut(reqbuf);
+		reqpck.writeString(sb.toString());
+		reqpck.end();
+
+		packHeader(reqbuf, 1);
+
+		byte[] reqbin = reqbuf.toByteArray();
+
+		URL u = new URL(remoteURI.toString() + "/git-receive-pack");
+		HttpURLConnection c = (HttpURLConnection) u.openConnection();
+		try {
+			c.setRequestMethod("POST");
+			c.setDoOutput(true);
+			c.setRequestProperty("Content-Type",
+					GitSmartHttpTools.RECEIVE_PACK_REQUEST_TYPE);
+			c.setFixedLengthStreamingMode(reqbin.length);
+			OutputStream out = c.getOutputStream();
+			try {
+				out.write(reqbin);
+			} finally {
+				out.close();
+			}
+
+			assertEquals(200, c.getResponseCode());
+			assertEquals(GitSmartHttpTools.RECEIVE_PACK_RESULT_TYPE,
+					c.getContentType());
+
+			InputStream rawin = c.getInputStream();
+			try {
+				PacketLineIn pckin = new PacketLineIn(rawin);
+				assertEquals("unpack error "
+						+ JGitText.get().packfileIsTruncated,
+						pckin.readString());
+				assertEquals("ng refs/objects/A n/a (unpacker error)",
+						pckin.readString());
+				assertSame(PacketLineIn.END, pckin.readString());
+			} finally {
+				rawin.close();
+			}
+		} finally {
+			c.disconnect();
+		}
+	}
+
