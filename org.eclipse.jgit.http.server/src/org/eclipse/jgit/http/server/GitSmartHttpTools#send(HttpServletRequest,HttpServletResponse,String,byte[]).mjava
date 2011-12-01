@@ -1,0 +1,14 @@
+	private static void send(HttpServletRequest req, HttpServletResponse res,
+			String type, byte[] buf) throws IOException {
+		ServletUtils.consumeRequestBody(req);
+		res.setStatus(HttpServletResponse.SC_OK);
+		res.setContentType(type);
+		res.setContentLength(buf.length);
+		OutputStream os = res.getOutputStream();
+		try {
+			os.write(buf);
+		} finally {
+			os.close();
+		}
+	}
+

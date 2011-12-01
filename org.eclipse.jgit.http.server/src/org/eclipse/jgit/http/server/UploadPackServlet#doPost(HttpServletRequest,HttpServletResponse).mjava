@@ -23,6 +23,7 @@
 
 		} catch (UploadPackMayNotContinueException e) {
 			if (e.isOutput()) {
+				consumeRequestBody(req);
 				out.close();
 			} else if (!rsp.isCommitted()) {
 				rsp.reset();
@@ -35,6 +36,7 @@
 			getServletContext().log(
 					HttpServerText.get().internalErrorDuringUploadPack,
 					e.getCause());
+			consumeRequestBody(req);
 			out.close();
 
 		} catch (Throwable e) {
