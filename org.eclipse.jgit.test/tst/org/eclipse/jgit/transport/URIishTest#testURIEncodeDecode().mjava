@@ -1,0 +1,22 @@
+	@Test
+	public void testURIEncodeDecode() throws Exception {
+		final String str = "ssh://%3ax%25:%40%41x@example.com:33/some%c3%a5/p%20a th";
+		URIish u = new URIish(str);
+		assertEquals("ssh", u.getScheme());
+		assertTrue(u.isRemote());
+		assertEquals("/some%c3%a5/p%20a th", u.getRawPath());
+		assertEquals("/some\u00e5/p a th", u.getPath());
+		assertEquals("example.com", u.getHost());
+		assertEquals(":x%", u.getUser());
+		assertEquals("@Ax", u.getPass());
+		assertEquals(33, u.getPort());
+		assertEquals("ssh://%3ax%25:%40Ax@example.com:33/some%c3%a5/p%20a th",
+				u.toPrivateString());
+		assertEquals(
+				"ssh://%3ax%25:%40Ax@example.com:33/some%c3%a5/p%20a%20th",
+				u.toPrivateASCIIString());
+		assertEquals(u.setPass(null).toPrivateString(), u.toString());
+		assertEquals(u.setPass(null).toPrivateASCIIString(), u.toASCIIString());
+		assertEquals(u, new URIish(str));
+	}
+

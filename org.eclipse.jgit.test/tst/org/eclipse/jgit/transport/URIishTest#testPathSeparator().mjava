@@ -1,0 +1,21 @@
+	/**
+	 * Exemplify what happens with the special case of encoding '/' as %2F. Web
+	 * services in general parse path components before decoding the characters.
+	 *
+	 * @throws URISyntaxException
+	 */
+	@Test
+	public void testPathSeparator() throws URISyntaxException {
+		String str = "http://user:secret@host.xy:80/some%2Fpath";
+		URIish u = new URIish(str);
+		assertEquals("http", u.getScheme());
+		assertTrue(u.isRemote());
+		assertEquals("/some%2Fpath", u.getRawPath());
+		assertEquals("/some/path", u.getPath());
+		assertEquals("host.xy", u.getHost());
+		assertEquals(80, u.getPort());
+		assertEquals("user", u.getUser());
+		assertEquals("secret", u.getPass());
+		assertEquals(u, new URIish(str));
+	}
+

@@ -4,13 +4,17 @@
 		URIish u = new URIish(str);
 		assertEquals("git", u.getScheme());
 		assertTrue(u.isRemote());
+		assertEquals("~some/p ath", u.getRawPath());
 		assertEquals("~some/p ath", u.getPath());
 		assertEquals("example.com", u.getHost());
 		assertNull(u.getUser());
 		assertNull(u.getPass());
 		assertEquals(-1, u.getPort());
-		assertEquals(str, u.toPrivateString());
+		assertEquals("git://example.com/~some/p ath", u.toPrivateString());
+		assertEquals("git://example.com/~some/p%20ath",
+				u.toPrivateASCIIString());
 		assertEquals(u.setPass(null).toPrivateString(), u.toString());
+		assertEquals(u.setPass(null).toPrivateASCIIString(), u.toASCIIString());
 		assertEquals(u, new URIish(str));
 	}
 
