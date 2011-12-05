@@ -48,14 +48,16 @@
 			pck.writeString("# service=" + svc + "\n");
 			pck.end();
 			pck.writeString("ERR " + textForGit);
-			send(res, infoRefsResultType(svc), buf.toByteArray());
+			send(req, res, infoRefsResultType(svc), buf.toByteArray());
 		} else if (isUploadPack(req)) {
 			pck.writeString("ERR " + textForGit);
-			send(res, UPLOAD_PACK_RESULT_TYPE, buf.toByteArray());
+			send(req, res, UPLOAD_PACK_RESULT_TYPE, buf.toByteArray());
 		} else if (isReceivePack(req)) {
 			pck.writeString("ERR " + textForGit);
-			send(res, RECEIVE_PACK_RESULT_TYPE, buf.toByteArray());
+			send(req, res, RECEIVE_PACK_RESULT_TYPE, buf.toByteArray());
 		} else {
+			if (httpStatus < 400)
+				ServletUtils.consumeRequestBody(req);
 			res.sendError(httpStatus);
 		}
 	}
