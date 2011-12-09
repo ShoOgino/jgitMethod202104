@@ -56,7 +56,12 @@
 			// no conflict occurred, the file will contain fully merged content.
 			// the index will be populated with the new merged version
 			DirCacheEntry dce = new DirCacheEntry(tw.getPathString());
-			dce.setFileMode(tw.getFileMode(0));
+			int newMode = mergeFileModes(tw.getRawMode(0), tw.getRawMode(1),
+					tw.getRawMode(2));
+			// set the mode for the new content. Fall back to REGULAR_FILE if
+			// you can't merge modes of OURS and THEIRS
+			dce.setFileMode((newMode == FileMode.MISSING.getBits()) ? FileMode.REGULAR_FILE
+					: FileMode.fromBits(newMode));
 			dce.setLastModified(of.lastModified());
 			dce.setLength((int) of.length());
 			InputStream is = new FileInputStream(of);
