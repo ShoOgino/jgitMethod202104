@@ -5,8 +5,8 @@
 			ReflogReader reader = new ReflogReader(repo, ref);
 			return reader.getReverseEntries();
 		} catch (IOException e) {
-			throw new InvalidRemoteException(MessageFormat.format(
-					JGitText.get().cannotRead, ref));
+			throw new InvalidRefNameException(MessageFormat.format(
+					JGitText.get().cannotRead, ref), e);
 		}
 	}
 
