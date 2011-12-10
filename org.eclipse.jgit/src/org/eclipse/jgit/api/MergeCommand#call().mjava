@@ -20,6 +20,7 @@
 									Integer.valueOf(commits.size())));
 
 		RevWalk revWalk = null;
+		DirCacheCheckout dco = null;
 		try {
 			Ref head = repo.getRef(Constants.HEAD);
 			if (head == null)
@@ -45,7 +46,7 @@
 			ObjectId headId = head.getObjectId();
 			if (headId == null) {
 				revWalk.parseHeaders(srcCommit);
-				DirCacheCheckout dco = new DirCacheCheckout(repo,
+				dco = new DirCacheCheckout(repo,
 						repo.lockDirCache(), srcCommit.getTree());
 				dco.setFailOnConflict(true);
 				dco.checkout();
@@ -74,7 +75,7 @@
 				// FAST_FORWARD detected: skip doing a real merge but only
 				// update HEAD
 				refLogMessage.append(": " + MergeStatus.FAST_FORWARD);
-				DirCacheCheckout dco = new DirCacheCheckout(repo,
+				dco = new DirCacheCheckout(repo,
 						headCommit.getTree(), repo.lockDirCache(),
 						srcCommit.getTree());
 				dco.setFailOnConflict(true);
@@ -112,7 +113,7 @@
 				refLogMessage.append(mergeStrategy.getName());
 				refLogMessage.append('.');
 				if (noProblems) {
-					DirCacheCheckout dco = new DirCacheCheckout(repo,
+					dco = new DirCacheCheckout(repo,
 							headCommit.getTree(), repo.lockDirCache(),
 							merger.getResultTreeId());
 					dco.setFailOnConflict(true);
@@ -148,6 +149,10 @@
 					}
 				}
 			}
+		} catch (org.eclipse.jgit.errors.CheckoutConflictException e) {
+			List<String> conflicts = (dco == null) ? Collections
+					.<String> emptyList() : dco.getConflicts();
+			throw new CheckoutConflictException(conflicts, e);
 		} catch (IOException e) {
 			throw new JGitInternalException(
 					MessageFormat.format(
