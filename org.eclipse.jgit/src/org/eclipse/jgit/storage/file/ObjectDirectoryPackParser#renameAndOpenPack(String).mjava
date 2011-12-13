@@ -42,8 +42,9 @@
 			//
 			try {
 				if (!keep.lock(lockMessage))
-					throw new IOException(MessageFormat.format(
-							JGitText.get().cannotLockPackIn, finalPack));
+					throw new LockFailedException(finalPack,
+							MessageFormat.format(
+									JGitText.get().cannotLockPackIn, finalPack));
 			} catch (IOException e) {
 				cleanupTemporaryFiles();
 				throw e;
