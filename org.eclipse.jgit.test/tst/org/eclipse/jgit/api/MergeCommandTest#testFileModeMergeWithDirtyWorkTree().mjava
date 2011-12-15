@@ -1,5 +1,9 @@
 	@Test
 	public void testFileModeMergeWithDirtyWorkTree() throws Exception {
+		if (!FS.DETECTED.supportsExecute())
+			return;
+		// Only Java6 (or set x bit in index)
+
 		Git git = new Git(db);
 
 		writeTrashFile("mergeableButDirty", "a");
