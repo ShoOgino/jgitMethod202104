@@ -54,12 +54,46 @@
 		if (isIndexDirty())
 			return false;
 
-		if (nonTree(modeO) && modeO == modeT && tw.idEqual(T_OURS, T_THEIRS)) {
-			// OURS and THEIRS are equal: it doesn't matter which one we choose.
-			// OURS is chosen.
-			add(tw.getRawPath(), ours, DirCacheEntry.STAGE_0);
-			// no checkout needed!
-			return true;
+		if (nonTree(modeO) && nonTree(modeT) && tw.idEqual(T_OURS, T_THEIRS)) {
+			// OURS and THEIRS have equal content. Check the file mode
+			if (modeO == modeT) {
+				// content and mode of OURS and THEIRS are equal: it doesn't
+				// matter which one we choose. OURS is chosen.
+				add(tw.getRawPath(), ours, DirCacheEntry.STAGE_0);
+				// no checkout needed!
+				return true;
+			} else {
+				// same content but different mode on OURS and THEIRS.
+				// Try to merge the mode and report an error if this is
+				// not possible.
+				int newMode = mergeFileModes(modeB, modeO, modeT);
+				if (newMode != FileMode.MISSING.getBits()) {
+					if (newMode == modeO)
+						// ours version is preferred
+						add(tw.getRawPath(), ours, DirCacheEntry.STAGE_0);
+					else {
+						// the preferred version THEIRS has a different mode
+						// than ours. Check it out!
+						if (isWorktreeDirty())
+							return false;
+						DirCacheEntry e = add(tw.getRawPath(), theirs,
+								DirCacheEntry.STAGE_0);
+						toBeCheckedOut.put(tw.getPathString(), e);
+					}
+					return true;
+				} else {
+					// FileModes are not mergeable. We found a conflict on modes
+					add(tw.getRawPath(), base, DirCacheEntry.STAGE_1);
+					add(tw.getRawPath(), ours, DirCacheEntry.STAGE_2);
+					add(tw.getRawPath(), theirs, DirCacheEntry.STAGE_3);
+					unmergedPaths.add(tw.getPathString());
+					mergeResults.put(
+							tw.getPathString(),
+							new MergeResult<RawText>(Collections
+									.<RawText> emptyList()));
+				}
+				return true;
+			}
 		}
 
 		if (nonTree(modeO) && modeB == modeT && tw.idEqual(T_BASE, T_THEIRS)) {

@@ -1,0 +1,28 @@
+	/**
+	 * Try to merge filemodes. If only ours or theirs have changed the mode
+	 * (compared to base) we choose that one. If ours and theirs have equal
+	 * modes return that one. If also that is not the case the modes are not
+	 * mergeable. Return {@link FileMode#MISSING} int that case.
+	 *
+	 * @param modeB
+	 *            filemode found in BASE
+	 * @param modeO
+	 *            filemode found in OURS
+	 * @param modeT
+	 *            filemode found in THEIRS
+	 *
+	 * @return the merged filemode or {@link FileMode#MISSING} in case of a
+	 *         conflict
+	 */
+	private int mergeFileModes(int modeB, int modeO, int modeT) {
+		if (modeO == modeT)
+			return modeO;
+		if (modeB == modeO)
+			// Base equal to Ours -> chooses Theirs if that is not missing
+			return (modeT == FileMode.MISSING.getBits()) ? modeO : modeT;
+		if (modeB == modeT)
+			// Base equal to Theirs -> chooses Ours if that is not missing
+			return (modeO == FileMode.MISSING.getBits()) ? modeT : modeO;
+		return FileMode.MISSING.getBits();
+	}
+
