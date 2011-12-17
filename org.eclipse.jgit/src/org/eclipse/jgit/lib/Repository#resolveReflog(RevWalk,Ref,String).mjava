@@ -1,0 +1,24 @@
+	private RevCommit resolveReflog(RevWalk rw, Ref ref, String time)
+			throws IOException {
+		int number;
+		try {
+			number = Integer.parseInt(time);
+		} catch (NumberFormatException nfe) {
+			throw new RevisionSyntaxException(MessageFormat.format(
+					JGitText.get().invalidReflogRevision, time));
+		}
+		if (number < 0)
+			throw new RevisionSyntaxException(MessageFormat.format(
+					JGitText.get().invalidReflogRevision, time));
+
+		ReflogReader reader = new ReflogReader(this, ref.getName());
+		List<ReflogEntry> entries = reader.getReverseEntries(number + 1);
+		if (number >= entries.size())
+			throw new RevisionSyntaxException(MessageFormat.format(
+					JGitText.get().reflogEntryNotFound,
+					Integer.valueOf(number), ref.getName(),
+					Integer.valueOf(entries.size())));
+
+		return rw.parseCommit(entries.get(number).getNewId());
+	}
+
