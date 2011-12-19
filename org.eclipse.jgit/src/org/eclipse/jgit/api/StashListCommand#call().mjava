@@ -1,0 +1,36 @@
+	public Collection<RevCommit> call() throws Exception {
+		checkCallable();
+
+		try {
+			if (repo.getRef(Constants.R_STASH) == null)
+				return Collections.emptyList();
+		} catch (IOException e) {
+			throw new InvalidRefNameException(MessageFormat.format(
+					JGitText.get().cannotRead, Constants.R_STASH), e);
+		}
+
+		final ReflogCommand refLog = new ReflogCommand(repo);
+		refLog.setRef(Constants.R_STASH);
+		final Collection<ReflogEntry> stashEntries = refLog.call();
+		if (stashEntries.isEmpty())
+			return Collections.emptyList();
+
+		final List<RevCommit> stashCommits = new ArrayList<RevCommit>(
+				stashEntries.size());
+		final RevWalk walk = new RevWalk(repo);
+		walk.setRetainBody(true);
+		try {
+			for (ReflogEntry entry : stashEntries)
+				try {
+					stashCommits.add(walk.parseCommit(entry.getNewId()));
+				} catch (IOException e) {
+					throw new JGitInternalException(MessageFormat.format(
+							JGitText.get().cannotReadCommit, entry.getNewId()),
+							e);
+				}
+		} finally {
+			walk.dispose();
+		}
+		return stashCommits;
+	}
+

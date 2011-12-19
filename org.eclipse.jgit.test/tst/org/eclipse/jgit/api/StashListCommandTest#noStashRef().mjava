@@ -1,0 +1,8 @@
+	@Test
+	public void noStashRef() throws Exception {
+		StashListCommand command = Git.wrap(db).stashList();
+		Collection<RevCommit> stashed = command.call();
+		assertNotNull(stashed);
+		assertTrue(stashed.isEmpty());
+	}
+

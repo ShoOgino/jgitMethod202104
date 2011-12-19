@@ -1,0 +1,18 @@
+	@Test
+	public void singleStashedCommit() throws Exception {
+		Git git = Git.wrap(db);
+		writeTrashFile("file.txt", "content");
+		git.add().addFilepattern("file.txt").call();
+		RevCommit commit = git.commit().setMessage("create file").call();
+
+		RefUpdate update = db.updateRef(Constants.R_STASH);
+		update.setNewObjectId(commit);
+		assertEquals(Result.NEW, update.update());
+
+		StashListCommand command = git.stashList();
+		Collection<RevCommit> stashed = command.call();
+		assertNotNull(stashed);
+		assertEquals(1, stashed.size());
+		assertEquals(commit, stashed.iterator().next());
+	}
+
