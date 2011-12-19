@@ -1,0 +1,10 @@
+	@Test
+	public void commandWithEmptyUri() {
+		try {
+			new SubmoduleAddCommand(db).setPath("sub").setURI("").call();
+			fail("Exception not thrown");
+		} catch (IllegalArgumentException e) {
+			assertEquals(JGitText.get().uriNotConfigured, e.getMessage());
+		}
+	}
+

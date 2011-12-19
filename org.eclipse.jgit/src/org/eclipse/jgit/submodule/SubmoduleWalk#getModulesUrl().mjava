@@ -1,0 +1,15 @@
+	/**
+	 * Get the configured remote URL for current entry. This will be the value
+	 * from the .gitmodules file in the current repository's working tree.
+	 *
+	 * @return configured URL
+	 * @throws ConfigInvalidException
+	 * @throws IOException
+	 */
+	public String getModulesUrl() throws IOException, ConfigInvalidException {
+		loadModulesConfig();
+		return modulesConfig.getString(
+				ConfigConstants.CONFIG_SUBMODULE_SECTION, path,
+				ConfigConstants.CONFIG_KEY_URL);
+	}
+

@@ -1,0 +1,15 @@
+	/**
+	 * Create a generator to walk over the submodule entries currently in the
+	 * index
+	 *
+	 * @param repository
+	 * @return generator over submodule index entries
+	 * @throws IOException
+	 */
+	public static SubmoduleWalk forIndex(Repository repository)
+			throws IOException {
+		SubmoduleWalk generator = new SubmoduleWalk(repository);
+		generator.setTree(new DirCacheIterator(repository.readDirCache()));
+		return generator;
+	}
+

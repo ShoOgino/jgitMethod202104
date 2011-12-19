@@ -1,0 +1,34 @@
+	@Test
+	public void generatorFilteredToOneOfTwoSubmodules() throws IOException {
+		final ObjectId id1 = ObjectId
+				.fromString("abcd1234abcd1234abcd1234abcd1234abcd1234");
+		final String path1 = "sub1";
+		final ObjectId id2 = ObjectId
+				.fromString("abcd1234abcd1234abcd1234abcd1234abcd1235");
+		final String path2 = "sub2";
+		DirCache cache = db.lockDirCache();
+		DirCacheEditor editor = cache.editor();
+		editor.add(new PathEdit(path1) {
+
+			public void apply(DirCacheEntry ent) {
+				ent.setFileMode(FileMode.GITLINK);
+				ent.setObjectId(id1);
+			}
+		});
+		editor.add(new PathEdit(path2) {
+
+			public void apply(DirCacheEntry ent) {
+				ent.setFileMode(FileMode.GITLINK);
+				ent.setObjectId(id2);
+			}
+		});
+		editor.commit();
+
+		SubmoduleWalk gen = SubmoduleWalk.forIndex(db);
+		gen.setFilter(PathFilter.create(path1));
+		assertTrue(gen.next());
+		assertEquals(path1, gen.getPath());
+		assertEquals(id1, gen.getObjectId());
+		assertFalse(gen.next());
+	}
+

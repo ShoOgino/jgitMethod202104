@@ -1,0 +1,31 @@
+	@Test
+	public void repositoryWithMissingSubmodule() throws IOException {
+		final ObjectId id = ObjectId
+				.fromString("abcd1234abcd1234abcd1234abcd1234abcd1234");
+		final String path = "sub";
+		DirCache cache = db.lockDirCache();
+		DirCacheEditor editor = cache.editor();
+		editor.add(new PathEdit(path) {
+
+			public void apply(DirCacheEntry ent) {
+				ent.setFileMode(FileMode.GITLINK);
+				ent.setObjectId(id);
+			}
+		});
+		editor.commit();
+
+		SubmoduleStatusCommand command = new SubmoduleStatusCommand(db);
+		Map<String, SubmoduleStatus> statuses = command.call();
+		assertNotNull(statuses);
+		assertEquals(1, statuses.size());
+		Entry<String, SubmoduleStatus> module = statuses.entrySet().iterator()
+				.next();
+		assertNotNull(module);
+		assertEquals(path, module.getKey());
+		SubmoduleStatus status = module.getValue();
+		assertNotNull(status);
+		assertEquals(path, status.getPath());
+		assertEquals(id, status.getIndexId());
+		assertEquals(SubmoduleStatusType.MISSING, status.getType());
+	}
+

@@ -1,0 +1,63 @@
+	public Repository call() throws JGitInternalException {
+		checkCallable();
+		if (path == null || path.length() == 0)
+			throw new IllegalArgumentException(JGitText.get().pathNotConfigured);
+		if (uri == null || uri.length() == 0)
+			throw new IllegalArgumentException(JGitText.get().uriNotConfigured);
+
+		try {
+			if (submoduleExists())
+				throw new JGitInternalException(MessageFormat.format(
+						JGitText.get().submoduleExists, path));
+		} catch (IOException e) {
+			throw new JGitInternalException(e.getMessage(), e);
+		}
+
+		// Clone submodule repository
+		File moduleDirectory = SubmoduleWalk.getSubmoduleDirectory(repo, path);
+		CloneCommand clone = Git.cloneRepository();
+		clone.setDirectory(moduleDirectory);
+		clone.setURI(uri);
+		if (monitor != null)
+			clone.setProgressMonitor(monitor);
+		if (credentialsProvider != null)
+			clone.setCredentialsProvider(credentialsProvider);
+		Repository subRepo = clone.call().getRepository();
+
+		// Save submodule URL to parent repository's config
+		StoredConfig config = repo.getConfig();
+		config.setString(ConfigConstants.CONFIG_SUBMODULE_SECTION, path,
+				ConfigConstants.CONFIG_KEY_URL, uri);
+		try {
+			config.save();
+		} catch (IOException e) {
+			throw new JGitInternalException(e.getMessage(), e);
+		}
+
+		// Save path and URL to parent repository's .gitmodules file
+		FileBasedConfig modulesConfig = new FileBasedConfig(new File(
+				repo.getWorkTree(), Constants.DOT_GIT_MODULES), repo.getFS());
+		modulesConfig.setString(ConfigConstants.CONFIG_SUBMODULE_SECTION, path,
+				ConfigConstants.CONFIG_KEY_PATH, path);
+		modulesConfig.setString(ConfigConstants.CONFIG_SUBMODULE_SECTION, path,
+				ConfigConstants.CONFIG_KEY_URL, uri);
+		try {
+			modulesConfig.save();
+		} catch (IOException e) {
+			throw new JGitInternalException(e.getMessage(), e);
+		}
+
+		AddCommand add = new AddCommand(repo);
+		// Add .gitmodules file to parent repository's index
+		add.addFilepattern(Constants.DOT_GIT_MODULES);
+		// Add submodule directory to parent repository's index
+		add.addFilepattern(path);
+		try {
+			add.call();
+		} catch (NoFilepatternException e) {
+			throw new JGitInternalException(e.getMessage(), e);
+		}
+
+		return subRepo;
+	}
+

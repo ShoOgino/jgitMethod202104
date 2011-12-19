@@ -1,0 +1,15 @@
+	/**
+	 * Get the configured path for current entry. This will be the value from
+	 * the .gitmodules file in the current repository's working tree.
+	 *
+	 * @return configured path
+	 * @throws ConfigInvalidException
+	 * @throws IOException
+	 */
+	public String getModulesPath() throws IOException, ConfigInvalidException {
+		loadModulesConfig();
+		return modulesConfig.getString(
+				ConfigConstants.CONFIG_SUBMODULE_SECTION, path,
+				ConfigConstants.CONFIG_KEY_PATH);
+	}
+

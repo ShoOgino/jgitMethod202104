@@ -1,0 +1,49 @@
+	public Map<String, String> call() throws JGitInternalException {
+		checkCallable();
+
+		try {
+			SubmoduleWalk generator = SubmoduleWalk.forIndex(repo);
+			if (!paths.isEmpty())
+				generator.setFilter(PathFilterGroup.createFromStrings(paths));
+			Map<String, String> synced = new HashMap<String, String>();
+			StoredConfig config = repo.getConfig();
+			while (generator.next()) {
+				String remoteUrl = generator.getModulesUrl();
+				if (remoteUrl == null)
+					continue;
+
+				String path = generator.getPath();
+				config.setString(ConfigConstants.CONFIG_SUBMODULE_SECTION,
+						path, ConfigConstants.CONFIG_KEY_URL, remoteUrl);
+				synced.put(path, remoteUrl);
+
+				Repository subRepo = generator.getRepository();
+				if (subRepo == null)
+					continue;
+
+				StoredConfig subConfig = subRepo.getConfig();
+				// Get name of remote associated with current branch and
+				// fall back to default remote name as last resort
+				String branch = getHeadBranch(subRepo);
+				String remote = null;
+				if (branch != null)
+					remote = subConfig.getString(
+							ConfigConstants.CONFIG_BRANCH_SECTION, branch,
+							ConfigConstants.CONFIG_KEY_REMOTE);
+				if (remote == null)
+					remote = Constants.DEFAULT_REMOTE_NAME;
+
+				subConfig.setString(ConfigConstants.CONFIG_REMOTE_SECTION,
+						remote, ConfigConstants.CONFIG_KEY_URL, remoteUrl);
+				subConfig.save();
+			}
+			if (!synced.isEmpty())
+				config.save();
+			return synced;
+		} catch (IOException e) {
+			throw new JGitInternalException(e.getMessage(), e);
+		} catch (ConfigInvalidException e) {
+			throw new JGitInternalException(e.getMessage(), e);
+		}
+	}
+

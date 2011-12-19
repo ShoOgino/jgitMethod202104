@@ -1,0 +1,14 @@
+	/**
+	 * Get ref that HEAD points to in the current submodule's repository
+	 *
+	 * @return ref name, null on failures
+	 * @throws IOException
+	 */
+	public String getHeadRef() throws IOException {
+		Repository subRepo = getRepository();
+		if (subRepo == null)
+			return null;
+		Ref head = subRepo.getRef(Constants.HEAD);
+		return head != null ? head.getLeaf().getName() : null;
+	}
+

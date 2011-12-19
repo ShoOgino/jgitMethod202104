@@ -1,0 +1,27 @@
+	@Test
+	public void repositoryWithInitializedSubmodule() throws IOException {
+		final ObjectId id = ObjectId
+				.fromString("abcd1234abcd1234abcd1234abcd1234abcd1234");
+		final String path = "sub";
+		DirCache cache = db.lockDirCache();
+		DirCacheEditor editor = cache.editor();
+		editor.add(new PathEdit(path) {
+
+			public void apply(DirCacheEntry ent) {
+				ent.setFileMode(FileMode.GITLINK);
+				ent.setObjectId(id);
+			}
+		});
+		editor.commit();
+
+		Repository subRepo = Git.init().setBare(false)
+				.setDirectory(new File(db.getWorkTree(), path)).call()
+				.getRepository();
+		assertNotNull(subRepo);
+
+		SubmoduleUpdateCommand command = new SubmoduleUpdateCommand(db);
+		Collection<String> updated = command.call();
+		assertNotNull(updated);
+		assertTrue(updated.isEmpty());
+	}
+

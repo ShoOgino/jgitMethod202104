@@ -1,0 +1,11 @@
+	/**
+	 * Is the configured already a submodule in the index?
+	 *
+	 * @return true if submodule exists in index, false otherwise
+	 * @throws IOException
+	 */
+	protected boolean submoduleExists() throws IOException {
+		TreeFilter filter = PathFilter.create(path);
+		return SubmoduleWalk.forIndex(repo).setFilter(filter).next();
+	}
+

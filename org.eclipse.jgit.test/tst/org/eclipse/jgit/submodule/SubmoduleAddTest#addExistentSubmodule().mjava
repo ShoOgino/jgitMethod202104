@@ -1,0 +1,29 @@
+	@Test
+	public void addExistentSubmodule() throws Exception {
+		final ObjectId id = ObjectId
+				.fromString("abcd1234abcd1234abcd1234abcd1234abcd1234");
+		final String path = "sub";
+		DirCache cache = db.lockDirCache();
+		DirCacheEditor editor = cache.editor();
+		editor.add(new PathEdit(path) {
+
+			public void apply(DirCacheEntry ent) {
+				ent.setFileMode(FileMode.GITLINK);
+				ent.setObjectId(id);
+			}
+		});
+		editor.commit();
+
+		SubmoduleAddCommand command = new SubmoduleAddCommand(db);
+		command.setPath(path);
+		command.setURI("git://server/repo.git");
+		try {
+			command.call();
+			fail("Exception not thrown");
+		} catch (JGitInternalException e) {
+			assertEquals(
+					MessageFormat.format(JGitText.get().submoduleExists, path),
+					e.getMessage());
+		}
+	}
+

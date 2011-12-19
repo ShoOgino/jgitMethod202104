@@ -1,0 +1,37 @@
+	private SubmoduleStatus getStatus(SubmoduleWalk generator)
+			throws IOException, ConfigInvalidException {
+		ObjectId id = generator.getObjectId();
+		String path = generator.getPath();
+
+		// Report missing if no path in .gitmodules file
+		if (generator.getModulesPath() == null)
+			return new SubmoduleStatus(SubmoduleStatusType.MISSING, path, id);
+
+		// Report uninitialized if no URL in config file
+		if (generator.getConfigUrl() == null)
+			return new SubmoduleStatus(SubmoduleStatusType.UNINITIALIZED, path,
+					id);
+
+		// Report uninitialized if no submodule repository
+		Repository subRepo = generator.getRepository();
+		if (subRepo == null)
+			return new SubmoduleStatus(SubmoduleStatusType.UNINITIALIZED, path,
+					id);
+
+		ObjectId headId = subRepo.resolve(Constants.HEAD);
+
+		// Report uninitialized if no HEAD commit in submodule repository
+		if (headId == null)
+			return new SubmoduleStatus(SubmoduleStatusType.UNINITIALIZED, path,
+					id, headId);
+
+		// Report checked out if HEAD commit is different than index commit
+		if (!headId.equals(id))
+			return new SubmoduleStatus(SubmoduleStatusType.REV_CHECKED_OUT,
+					path, id, headId);
+
+		// Report initialized if HEAD commit is the same as the index commit
+		return new SubmoduleStatus(SubmoduleStatusType.INITIALIZED, path, id,
+				headId);
+	}
+

@@ -1,0 +1,66 @@
+	public Collection<String> call() throws JGitInternalException {
+		checkCallable();
+
+		try {
+			SubmoduleWalk generator = SubmoduleWalk.forIndex(repo);
+			if (!paths.isEmpty())
+				generator.setFilter(PathFilterGroup.createFromStrings(paths));
+			List<String> updated = new ArrayList<String>();
+			while (generator.next()) {
+				// Skip submodules not registered in .gitmodules file
+				if (generator.getModulesPath() == null)
+					continue;
+				// Skip submodules not registered in parent repository's config
+				String url = generator.getConfigUrl();
+				if (url == null)
+					continue;
+
+				Repository submoduleRepo = generator.getRepository();
+				// Clone repository is not present
+				if (submoduleRepo == null) {
+					CloneCommand clone = Git.cloneRepository();
+					clone.setURI(url);
+					clone.setDirectory(generator.getDirectory());
+					if (monitor != null)
+						clone.setProgressMonitor(monitor);
+					if (credentialsProvider != null)
+						clone.setCredentialsProvider(credentialsProvider);
+					submoduleRepo = clone.call().getRepository();
+				}
+
+				RevWalk walk = new RevWalk(submoduleRepo);
+				RevCommit commit = walk.parseCommit(generator.getObjectId());
+
+				String update = generator.getConfigUpdate();
+				if (ConfigConstants.CONFIG_KEY_MERGE.equals(update)) {
+					MergeCommand merge = new MergeCommand(submoduleRepo);
+					merge.include(commit);
+					merge.call();
+				} else if (ConfigConstants.CONFIG_KEY_REBASE.equals(update)) {
+					RebaseCommand rebase = new RebaseCommand(submoduleRepo);
+					rebase.setUpstream(commit);
+					rebase.call();
+				} else {
+					// Checkout commit referenced in parent repository's index
+					// as a detached HEAD
+					DirCacheCheckout co = new DirCacheCheckout(submoduleRepo,
+							submoduleRepo.lockDirCache(), commit.getTree());
+					co.setFailOnConflict(true);
+					co.checkout();
+					RefUpdate refUpdate = submoduleRepo.updateRef(
+							Constants.HEAD, true);
+					refUpdate.setNewObjectId(commit);
+					refUpdate.forceUpdate();
+				}
+				updated.add(generator.getPath());
+			}
+			return updated;
+		} catch (IOException e) {
+			throw new JGitInternalException(e.getMessage(), e);
+		} catch (ConfigInvalidException e) {
+			throw new JGitInternalException(e.getMessage(), e);
+		} catch (GitAPIException e) {
+			throw new JGitInternalException(e.getMessage(), e);
+		}
+	}
+

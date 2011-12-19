@@ -1,0 +1,20 @@
+	/**
+	 * Advance to next submodule in the index tree.
+	 *
+	 * The object id and path of the next entry can be obtained by calling
+	 * {@link #getObjectId()} and {@link #getPath()}.
+	 *
+	 * @return true if entry found, false otherwise
+	 * @throws IOException
+	 */
+	public boolean next() throws IOException {
+		while (walk.next()) {
+			if (FileMode.GITLINK != walk.getFileMode(0))
+				continue;
+			path = walk.getPathString();
+			return true;
+		}
+		path = null;
+		return false;
+	}
+
