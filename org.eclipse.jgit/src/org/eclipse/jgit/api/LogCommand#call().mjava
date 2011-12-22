@@ -13,6 +13,8 @@
 		if (pathFilters.size() > 0)
 			walk.setTreeFilter(AndTreeFilter.create(
 					PathFilterGroup.create(pathFilters), TreeFilter.ANY_DIFF));
+		if (maxCount > -1)
+			walk.setRevFilter(MaxCountRevFilter.create(maxCount));
 		if (!startSpecified) {
 			try {
 				ObjectId headId = repo.resolve(Constants.HEAD);

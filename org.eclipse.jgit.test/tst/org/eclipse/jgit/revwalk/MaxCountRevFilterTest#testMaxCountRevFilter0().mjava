@@ -1,0 +1,11 @@
+	@Test
+	public void testMaxCountRevFilter0() throws Exception {
+		final RevCommit a = commit();
+		final RevCommit b = commit(a);
+
+		rw.reset();
+		rw.setRevFilter(MaxCountRevFilter.create(0));
+		markStart(b);
+		assertNull(rw.next());
+	}
+
