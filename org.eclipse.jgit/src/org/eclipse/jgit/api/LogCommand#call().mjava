@@ -13,7 +13,12 @@
 		if (pathFilters.size() > 0)
 			walk.setTreeFilter(AndTreeFilter.create(
 					PathFilterGroup.create(pathFilters), TreeFilter.ANY_DIFF));
-		if (maxCount > -1)
+		if (skip > -1 && maxCount > -1)
+			walk.setRevFilter(AndRevFilter.create(SkipRevFilter.create(skip),
+					MaxCountRevFilter.create(maxCount)));
+		else if (skip > -1)
+			walk.setRevFilter(SkipRevFilter.create(skip));
+		else if (maxCount > -1)
 			walk.setRevFilter(MaxCountRevFilter.create(maxCount));
 		if (!startSpecified) {
 			try {

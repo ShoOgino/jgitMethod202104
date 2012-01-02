@@ -1,0 +1,13 @@
+	@Test
+	public void testSkipRevFilter0() throws Exception {
+		final RevCommit a = commit();
+		final RevCommit b = commit(a);
+
+		rw.reset();
+		rw.setRevFilter(SkipRevFilter.create(0));
+		markStart(b);
+		assertCommit(b, rw.next());
+		assertCommit(a, rw.next());
+		assertNull(rw.next());
+	}
+

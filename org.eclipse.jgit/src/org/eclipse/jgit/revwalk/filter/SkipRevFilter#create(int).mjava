@@ -1,0 +1,14 @@
+	/**
+	 * Create a new skip filter.
+	 *
+	 * @param skip
+	 *            the number of commits to skip
+	 * @return a new filter
+	 */
+	public static RevFilter create(int skip) {
+		if (skip < 0)
+			throw new IllegalArgumentException(
+					JGitText.get().skipMustBeNonNegative);
+		return new SkipRevFilter(skip);
+	}
+

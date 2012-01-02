@@ -1,16 +1,12 @@
 	@Test
-	public void logAllCommitsWithMaxCount() throws Exception {
+	public void logAllCommitsWithSkipAndMaxCount() throws Exception {
 		Git git = Git.wrap(db);
 		List<RevCommit> commits = createCommits(git);
 
-		Iterator<RevCommit> log = git.log().all().setMaxCount(2).call()
+		Iterator<RevCommit> log = git.log().all().setSkip(1).setMaxCount(1).call()
 				.iterator();
 		assertTrue(log.hasNext());
 		RevCommit commit = log.next();
-		assertTrue(commits.contains(commit));
-		assertEquals("commit#3", commit.getShortMessage());
-		assertTrue(log.hasNext());
-		commit = log.next();
 		assertTrue(commits.contains(commit));
 		assertEquals("commit#2", commit.getShortMessage());
 		assertFalse(log.hasNext());
