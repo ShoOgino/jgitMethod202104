@@ -1,0 +1,38 @@
+	@Test
+	public void testDontDeleteSymlinkOnTopOfRootDir() throws Exception {
+		// create a parent folder containing a folder with a test repository
+		File repos = createTempDirectory("repos");
+		File testRepo = new File(repos, "repo");
+		testRepo.mkdirs();
+		Git git = Git.init().setDirectory(testRepo).call();
+		db = (FileRepository) git.getRepository();
+
+		// Create a situation where a checkout of master whould delete a file in
+		// a subfolder of the root of the worktree. No other files/folders exist
+		writeTrashFile("d/f", "f");
+		git.add().addFilepattern(".").call();
+		RevCommit initial = git.commit().setMessage("inital").call();
+		git.rm().addFilepattern("d/f").call();
+		git.commit().setMessage("modifyOnMaster").call();
+		git.checkout().setCreateBranch(true).setName("side")
+				.setStartPoint(initial).call();
+		writeTrashFile("d/f", "f2");
+		git.add().addFilepattern(".").call();
+		git.commit().setMessage("modifyOnSide").call();
+		git.getRepository().close();
+
+		// Create a symlink pointing to the parent folder of the repo and open
+		// the repo with the path containing the symlink
+		File reposSymlink = createTempFile();
+		FileUtils.createSymLink(reposSymlink, repos.getPath());
+
+		Repository symlinkDB = FileRepositoryBuilder.create(new File(
+				reposSymlink, "repo/.git"));
+		Git symlinkRepo = Git.wrap(symlinkDB);
+		symlinkRepo.checkout().setName("master").call();
+
+		// check that the symlink still exists
+		assertTrue("The symlink to the repo should exist after a checkout",
+				reposSymlink.exists());
+	}
+
