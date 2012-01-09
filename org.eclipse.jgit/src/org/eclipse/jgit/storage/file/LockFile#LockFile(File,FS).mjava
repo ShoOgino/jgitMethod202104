@@ -7,9 +7,9 @@
 	 *            the file system abstraction which will be necessary to perform
 	 *            certain file system operations.
 	 */
-	public LockFile(final File f, FS fs) {
+	public LockFile(final File f, final FS fs) {
 		ref = f;
-		lck = new File(ref.getParentFile(), ref.getName() + SUFFIX);
+		lck = getLockFile(ref);
 		this.fs = fs;
 	}
 

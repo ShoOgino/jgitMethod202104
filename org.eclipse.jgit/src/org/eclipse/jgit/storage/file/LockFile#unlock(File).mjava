@@ -1,0 +1,21 @@
+	/**
+	 * Unlock the given file.
+	 * <p>
+	 * This method can be used for recovering from a thrown
+	 * {@link LockFailedException} . This method does not validate that the lock
+	 * is or is not currently held before attempting to unlock it.
+	 *
+	 * @param file
+	 * @return true if unlocked, false if unlocking failed
+	 */
+	public static boolean unlock(final File file) {
+		final File lockFile = getLockFile(file);
+		final int flags = FileUtils.RETRY | FileUtils.SKIP_MISSING;
+		try {
+			FileUtils.delete(lockFile, flags);
+		} catch (IOException ignored) {
+			// Ignore and return whether lock file still exists
+		}
+		return !lockFile.exists();
+	}
+
