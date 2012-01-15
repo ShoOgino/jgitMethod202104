@@ -46,8 +46,12 @@
 		} catch (URISyntaxException e) {
 			throw new InvalidRemoteException(MessageFormat.format(
 					JGitText.get().invalidRemote, remote));
-		} catch (IOException e) {
+		} catch (NotSupportedException e) {
 			throw new JGitInternalException(
+					JGitText.get().exceptionCaughtDuringExecutionOfLsRemoteCommand,
+					e);
+		} catch (TransportException e) {
+				throw new org.eclipse.jgit.api.errors.TransportException(
 					JGitText.get().exceptionCaughtDuringExecutionOfLsRemoteCommand,
 					e);
 		} finally {
