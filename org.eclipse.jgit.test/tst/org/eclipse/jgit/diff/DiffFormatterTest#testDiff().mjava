@@ -10,7 +10,7 @@
 		write(new File(folder, "folder.txt"), "folder change");
 
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		DiffFormatter df = new DiffFormatter(new BufferedOutputStream(os));
+		DiffFormatter df = new DiffFormatter(new SafeBufferedOutputStream(os));
 		df.setRepository(db);
 		df.setPathFilter(PathFilter.create("folder"));
 		DirCacheIterator oldTree = new DirCacheIterator(db.readDirCache());

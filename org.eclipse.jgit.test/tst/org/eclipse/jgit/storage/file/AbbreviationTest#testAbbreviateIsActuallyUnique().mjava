@@ -19,7 +19,7 @@
 		File idxFile = new File(packDir, packName + ".idx");
 		File packFile = new File(packDir, packName + ".pack");
 		FileUtils.mkdir(packDir, true);
-		OutputStream dst = new BufferedOutputStream(new FileOutputStream(
+		OutputStream dst = new SafeBufferedOutputStream(new FileOutputStream(
 				idxFile));
 		try {
 			PackIndexWriter writer = new PackIndexWriterV2(dst);

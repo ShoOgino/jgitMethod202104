@@ -12,7 +12,7 @@
 			throws FileNotFoundException, IOException {
 		File headsFile = new File(getDirectory(), filename);
 		if (heads != null) {
-			BufferedOutputStream bos = new BufferedOutputStream(
+			BufferedOutputStream bos = new SafeBufferedOutputStream(
 					new FileOutputStream(headsFile));
 			try {
 				for (ObjectId id : heads) {

@@ -4,14 +4,14 @@
 		NullProgressMonitor m = NullProgressMonitor.INSTANCE;
 		OutputStream out;
 
-		out = new BufferedOutputStream(new FileOutputStream(files[0]));
+		out = new SafeBufferedOutputStream(new FileOutputStream(files[0]));
 		try {
 			pw.writePack(m, m, out);
 		} finally {
 			out.close();
 		}
 
-		out = new BufferedOutputStream(new FileOutputStream(files[1]));
+		out = new SafeBufferedOutputStream(new FileOutputStream(files[1]));
 		try {
 			pw.writeIndex(out);
 		} finally {

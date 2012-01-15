@@ -23,7 +23,7 @@
 				OutputStream out;
 
 				pack = nameFor(odb, name, ".pack");
-				out = new BufferedOutputStream(new FileOutputStream(pack));
+				out = new SafeBufferedOutputStream(new FileOutputStream(pack));
 				try {
 					pw.writePack(m, m, out);
 				} finally {
@@ -32,7 +32,7 @@
 				pack.setReadOnly();
 
 				idx = nameFor(odb, name, ".idx");
-				out = new BufferedOutputStream(new FileOutputStream(idx));
+				out = new SafeBufferedOutputStream(new FileOutputStream(idx));
 				try {
 					pw.writeIndex(out);
 				} finally {
