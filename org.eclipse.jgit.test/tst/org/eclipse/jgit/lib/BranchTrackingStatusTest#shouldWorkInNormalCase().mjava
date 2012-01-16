@@ -1,0 +1,15 @@
+	@Test
+	public void shouldWorkInNormalCase() throws Exception {
+		RevCommit remoteTracking = util.branch("refs/remotes/origin/master")
+				.commit().create();
+		util.branch("master").commit().parent(remoteTracking).create();
+		util.branch("master").commit().create();
+
+		BranchTrackingStatus status = BranchTrackingStatus.of(
+				util.getRepository(), "master");
+		assertEquals(2, status.getAheadCount());
+		assertEquals(0, status.getBehindCount());
+		assertEquals("refs/remotes/origin/master",
+				status.getRemoteTrackingBranch());
+	}
+

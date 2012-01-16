@@ -1,0 +1,10 @@
+	@Test
+	public void shouldWorkWithoutMergeBase() throws Exception {
+		util.branch("refs/remotes/origin/master").commit().create();
+		util.branch("master").commit().create();
+
+		BranchTrackingStatus status = BranchTrackingStatus.of(util.getRepository(), "master");
+		assertEquals(1, status.getAheadCount());
+		assertEquals(1, status.getBehindCount());
+	}
+
