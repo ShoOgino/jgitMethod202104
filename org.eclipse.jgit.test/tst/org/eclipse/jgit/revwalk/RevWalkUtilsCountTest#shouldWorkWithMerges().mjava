@@ -1,0 +1,10 @@
+	@Test
+	public void shouldWorkWithMerges() throws Exception {
+		final RevCommit a = commit();
+		final RevCommit b1 = commit(a);
+		final RevCommit b2 = commit(a);
+		final RevCommit c = commit(b1, b2);
+
+		assertEquals(3, count(c, a));
+	}
+
