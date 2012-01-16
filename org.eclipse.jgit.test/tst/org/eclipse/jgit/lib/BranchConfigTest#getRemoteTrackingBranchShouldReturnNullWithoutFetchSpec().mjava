@@ -1,0 +1,12 @@
+	@Test
+	public void getRemoteTrackingBranchShouldReturnNullWithoutFetchSpec() {
+		Config c = parse("" //
+				+ "[remote \"origin\"]\n"
+				+ "  fetch = +refs/heads/onlyone:refs/remotes/origin/onlyone\n"
+				+ "[branch \"master\"]\n"
+				+ "  remote = origin\n"
+				+ "  merge = refs/heads/master\n");
+		BranchConfig branchConfig = new BranchConfig(c, "master");
+		assertNull(branchConfig.getRemoteTrackingBranch());
+	}
+

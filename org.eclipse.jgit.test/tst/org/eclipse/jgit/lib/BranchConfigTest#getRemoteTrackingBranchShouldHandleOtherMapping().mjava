@@ -1,0 +1,16 @@
+	@Test
+	public void getRemoteTrackingBranchShouldHandleOtherMapping() {
+		Config c = parse("" //
+				+ "[remote \"test\"]\n"
+				+ "  fetch = +refs/foo/*:refs/remotes/origin/foo/*\n"
+				+ "  fetch = +refs/heads/*:refs/remotes/origin/*\n"
+				+ "  fetch = +refs/other/*:refs/remotes/origin/other/*\n"
+				+ "[branch \"master\"]\n"
+				+ "  remote = test\n"
+				+ "  merge = refs/foo/master\n" + "\n");
+
+		BranchConfig branchConfig = new BranchConfig(c, "master");
+		assertEquals("refs/remotes/origin/foo/master",
+				branchConfig.getRemoteTrackingBranch());
+	}
+

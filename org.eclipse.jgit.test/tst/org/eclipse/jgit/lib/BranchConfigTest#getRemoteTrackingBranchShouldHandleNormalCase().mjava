@@ -1,0 +1,14 @@
+	@Test
+	public void getRemoteTrackingBranchShouldHandleNormalCase() {
+		Config c = parse("" //
+				+ "[remote \"origin\"]\n"
+				+ "  fetch = +refs/heads/*:refs/remotes/origin/*\n"
+				+ "[branch \"master\"]\n"
+				+ "  remote = origin\n"
+				+ "  merge = refs/heads/master\n");
+
+		BranchConfig branchConfig = new BranchConfig(c, "master");
+		assertEquals("refs/remotes/origin/master",
+				branchConfig.getRemoteTrackingBranch());
+	}
+
