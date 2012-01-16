@@ -1,0 +1,8 @@
+	@Test
+	public void testCheckoutOutChangesAutoCRLFfalse() throws IOException {
+		setupCase(mk("foo"), mkmap("foo/bar", "foo\nbar"), mk("foo"));
+		checkout();
+		assertIndex(mkmap("foo/bar", "foo\nbar"));
+		assertWorkDir(mkmap("foo/bar", "foo\nbar"));
+	}
+

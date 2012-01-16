@@ -1,0 +1,10 @@
+	private void assertNoCrLf(String string, String string2) throws IOException {
+		assertNoCrLfHelper(string, string2);
+		// \u00e5 = LATIN SMALL LETTER A WITH RING ABOVE
+		// the byte value is negative
+		assertNoCrLfHelper("\u00e5" + string, "\u00e5" + string2);
+		assertNoCrLfHelper("\u00e5" + string + "\u00e5", "\u00e5" + string2
+				+ "\u00e5");
+		assertNoCrLfHelper(string + "\u00e5", string2 + "\u00e5");
+	}
+
