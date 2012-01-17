@@ -1,0 +1,34 @@
+	@Test
+	public void resolveInvalidParentUrl() throws IOException,
+			ConfigInvalidException {
+		final String path = addSubmoduleToIndex();
+
+		String base = "no_slash";
+		FileBasedConfig config = db.getConfig();
+		config.setString(ConfigConstants.CONFIG_REMOTE_SECTION,
+				Constants.DEFAULT_REMOTE_NAME, ConfigConstants.CONFIG_KEY_URL,
+				base);
+		config.save();
+
+		SubmoduleWalk generator = SubmoduleWalk.forIndex(db);
+		assertTrue(generator.next());
+		assertNull(generator.getConfigUrl());
+		assertNull(generator.getConfigUpdate());
+
+		FileBasedConfig modulesConfig = new FileBasedConfig(new File(
+				db.getWorkTree(), Constants.DOT_GIT_MODULES), db.getFS());
+		modulesConfig.setString(ConfigConstants.CONFIG_SUBMODULE_SECTION, path,
+				ConfigConstants.CONFIG_KEY_PATH, path);
+		String url = "../sub.git";
+		modulesConfig.setString(ConfigConstants.CONFIG_SUBMODULE_SECTION, path,
+				ConfigConstants.CONFIG_KEY_URL, url);
+		modulesConfig.save();
+
+		try {
+			new SubmoduleInitCommand(db).call();
+			fail("Exception not thrown");
+		} catch (JGitInternalException e) {
+			assertTrue(e.getCause() instanceof IOException);
+		}
+	}
+
