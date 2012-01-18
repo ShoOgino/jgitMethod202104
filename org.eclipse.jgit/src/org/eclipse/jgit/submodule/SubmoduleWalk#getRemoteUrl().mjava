@@ -1,0 +1,15 @@
+	/**
+	 * Get the resolved remote URL for the current submodule.
+	 * <p>
+	 * This method resolves the value of {@link #getModulesUrl()} to an absolute
+	 * URL
+	 *
+	 * @return resolved remote URL
+	 * @throws IOException
+	 * @throws ConfigInvalidException
+	 */
+	public String getRemoteUrl() throws IOException, ConfigInvalidException {
+		String url = getModulesUrl();
+		return url != null ? getSubmoduleRemoteUrl(repository, url) : null;
+	}
+

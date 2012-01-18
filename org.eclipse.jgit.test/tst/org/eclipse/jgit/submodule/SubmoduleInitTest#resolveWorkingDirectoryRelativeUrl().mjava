@@ -1,7 +1,16 @@
 	@Test
-	public void repositoryWithUninitializedModule() throws IOException,
+	public void resolveWorkingDirectoryRelativeUrl() throws IOException,
 			ConfigInvalidException {
 		final String path = addSubmoduleToIndex();
+
+		String base = db.getWorkTree().getAbsolutePath();
+		if (File.separatorChar == '\\')
+			base = base.replace('\\', '/');
+		FileBasedConfig config = db.getConfig();
+		config.setString(ConfigConstants.CONFIG_REMOTE_SECTION,
+				Constants.DEFAULT_REMOTE_NAME, ConfigConstants.CONFIG_KEY_URL,
+				null);
+		config.save();
 
 		SubmoduleWalk generator = SubmoduleWalk.forIndex(db);
 		assertTrue(generator.next());
@@ -12,7 +21,7 @@
 				db.getWorkTree(), Constants.DOT_GIT_MODULES), db.getFS());
 		modulesConfig.setString(ConfigConstants.CONFIG_SUBMODULE_SECTION, path,
 				ConfigConstants.CONFIG_KEY_PATH, path);
-		String url = "git://server/repo.git";
+		String url = "./sub.git";
 		modulesConfig.setString(ConfigConstants.CONFIG_SUBMODULE_SECTION, path,
 				ConfigConstants.CONFIG_KEY_URL, url);
 		String update = "rebase";
@@ -28,7 +37,7 @@
 
 		generator = SubmoduleWalk.forIndex(db);
 		assertTrue(generator.next());
-		assertEquals(url, generator.getConfigUrl());
+		assertEquals(base + "/sub.git", generator.getConfigUrl());
 		assertEquals(update, generator.getConfigUpdate());
 	}
 
