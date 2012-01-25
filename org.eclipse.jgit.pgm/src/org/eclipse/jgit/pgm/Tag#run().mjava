@@ -1,13 +1,22 @@
 	@Override
 	protected void run() throws Exception {
 		Git git = new Git(db);
-		TagCommand command = git.tag().setForceUpdate(force).setMessage(message).setName(tagName);
+		if (tagName != null) {
+			TagCommand command = git.tag().setForceUpdate(force)
+					.setMessage(message).setName(tagName);
 
-		if (object != null) {
-			RevWalk walk = new RevWalk(db);
-			command.setObjectId(walk.parseAny(object));
+			if (object != null) {
+				RevWalk walk = new RevWalk(db);
+				command.setObjectId(walk.parseAny(object));
+			}
+
+			command.call();
+		} else {
+			ListTagCommand command = git.tagList();
+			List<RevTag> list = command.call();
+			for (RevTag revTag : list) {
+				out.println(revTag.getTagName());
+			}
 		}
-
-		command.call();
 	}
 
