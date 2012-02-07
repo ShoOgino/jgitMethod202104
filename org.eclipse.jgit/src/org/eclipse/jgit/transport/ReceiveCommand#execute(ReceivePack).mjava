@@ -1,0 +1,41 @@
+	/**
+	 * Execute this command during a receive-pack session.
+	 * <p>
+	 * Sets the status of the command as a side effect.
+	 *
+	 * @param rp
+	 *            receive-pack session.
+	 */
+	public void execute(final ReceivePack rp) {
+		try {
+			final RefUpdate ru = rp.getRepository().updateRef(getRefName());
+			ru.setRefLogIdent(rp.getRefLogIdent());
+			switch (getType()) {
+			case DELETE:
+				if (!ObjectId.zeroId().equals(getOldId())) {
+					// We can only do a CAS style delete if the client
+					// didn't bork its delete request by sending the
+					// wrong zero id rather than the advertised one.
+					//
+					ru.setExpectedOldObjectId(getOldId());
+				}
+				ru.setForceUpdate(true);
+				setResult(ru.delete(rp.getRevWalk()));
+				break;
+
+			case CREATE:
+			case UPDATE:
+			case UPDATE_NONFASTFORWARD:
+				ru.setForceUpdate(rp.isAllowNonFastForwards());
+				ru.setExpectedOldObjectId(getOldId());
+				ru.setNewObjectId(getNewId());
+				ru.setRefLogMessage("push", true);
+				setResult(ru.update(rp.getRevWalk()));
+				break;
+			}
+		} catch (IOException err) {
+			setResult(Result.REJECTED_OTHER_REASON, MessageFormat.format(
+					JGitText.get().lockError, err.getMessage()));
+		}
+	}
+
