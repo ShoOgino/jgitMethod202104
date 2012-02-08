@@ -5,7 +5,7 @@
 			advertised = Collections.emptySet();
 		else {
 			advertised = new HashSet<ObjectId>();
-			for (Ref ref : getAdvertisedRefs().values()) {
+			for (Ref ref : getAdvertisedOrDefaultRefs().values()) {
 				if (ref.getObjectId() != null)
 					advertised.add(ref.getObjectId());
 			}
@@ -35,7 +35,7 @@
 			reportErrorDuringNegotiate(err.getMessage());
 			throw err;
 
-		} catch (UploadPackMayNotContinueException err) {
+		} catch (ServiceMayNotContinueException err) {
 			if (!err.isOutput() && err.getMessage() != null) {
 				try {
 					pckOut.writeString("ERR " + err.getMessage() + "\n");

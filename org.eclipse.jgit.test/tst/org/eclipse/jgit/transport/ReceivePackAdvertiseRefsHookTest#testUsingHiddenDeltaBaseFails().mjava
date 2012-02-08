@@ -1,14 +1,18 @@
 	@Test
-	public void testUsingUnknownTreeFails() throws Exception {
+	public void testUsingHiddenDeltaBaseFails() throws Exception {
+		byte[] delta = { 0x1, 0x1, 0x1, 'c' };
 		TestRepository<Repository> s = new TestRepository<Repository>(src);
-		RevCommit N = s.commit().parent(B).add("q", s.blob("a")).create();
-		RevTree t = s.parseBody(N).getTree();
+		RevCommit N = s.commit().parent(B).add("q",
+				s.blob(BinaryDelta.apply(dst.open(b).getCachedBytes(), delta)))
+				.create();
 
-		// Don't include the tree in the pack.
-		//
 		final TemporaryBuffer.Heap pack = new TemporaryBuffer.Heap(1024);
-		packHeader(pack, 1);
+		packHeader(pack, 3);
 		copy(pack, src.open(N));
+		copy(pack, src.open(s.parseBody(N).getTree()));
+		pack.write((Constants.OBJ_REF_DELTA) << 4 | 4);
+		b.copyRawTo(pack);
+		deflate(pack, delta);
 		digest(pack);
 
 		final TemporaryBuffer.Heap inBuf = new TemporaryBuffer.Heap(1024);
@@ -23,7 +27,7 @@
 		final ReceivePack rp = new ReceivePack(dst);
 		rp.setCheckReceivedObjects(true);
 		rp.setCheckReferencedObjectsAreReachable(true);
-		rp.setRefFilter(new HidePrivateFilter());
+		rp.setAdvertiseRefsHook(new HidePrivateHook());
 		try {
 			receive(rp, inBuf, outBuf);
 			fail("Expected UnpackException");
@@ -31,7 +35,7 @@
 			Throwable err = failed.getCause();
 			assertTrue(err instanceof MissingObjectException);
 			MissingObjectException moe = (MissingObjectException) err;
-			assertEquals(t, moe.getObjectId());
+			assertEquals(b, moe.getObjectId());
 		}
 
 		final PacketLineIn r = asPacketLineIn(outBuf);
@@ -41,7 +45,7 @@
 		assertEquals(B.name() + ' ' + R_MASTER, master.substring(0, nul));
 		assertSame(PacketLineIn.END, r.readString());
 
-		assertEquals("unpack error Missing tree " + t.name(), r.readString());
+		assertEquals("unpack error Missing blob " + b.name(), r.readString());
 		assertEquals("ng refs/heads/s n/a (unpacker error)", r.readString());
 		assertSame(PacketLineIn.END, r.readString());
 	}

@@ -26,7 +26,7 @@
 		final ReceivePack rp = new ReceivePack(dst);
 		rp.setCheckReceivedObjects(true);
 		rp.setCheckReferencedObjectsAreReachable(true);
-		rp.setRefFilter(new HidePrivateFilter());
+		rp.setAdvertiseRefsHook(new HidePrivateHook());
 		try {
 			receive(rp, inBuf, outBuf);
 			fail("Expected UnpackException");

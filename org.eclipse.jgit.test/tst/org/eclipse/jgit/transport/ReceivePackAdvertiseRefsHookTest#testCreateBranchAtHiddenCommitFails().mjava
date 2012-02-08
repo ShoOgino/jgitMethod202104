@@ -1,21 +1,12 @@
 	@Test
-	public void testUsingHiddenCommonBlobFails() throws Exception {
-		// Try to use the 'b' blob that is hidden.
-		//
-		TestRepository<Repository> s = new TestRepository<Repository>(src);
-		RevCommit N = s.commit().parent(B).add("q", s.blob("b")).create();
-
-		// But don't include it in the pack.
-		//
-		final TemporaryBuffer.Heap pack = new TemporaryBuffer.Heap(1024);
-		packHeader(pack, 2);
-		copy(pack, src.open(N));
-		copy(pack,src.open(s.parseBody(N).getTree()));
+	public void testCreateBranchAtHiddenCommitFails() throws Exception {
+		final TemporaryBuffer.Heap pack = new TemporaryBuffer.Heap(64);
+		packHeader(pack, 0);
 		digest(pack);
 
-		final TemporaryBuffer.Heap inBuf = new TemporaryBuffer.Heap(1024);
+		final TemporaryBuffer.Heap inBuf = new TemporaryBuffer.Heap(256);
 		final PacketLineOut inPckLine = new PacketLineOut(inBuf);
-		inPckLine.writeString(ObjectId.zeroId().name() + ' ' + N.name() + ' '
+		inPckLine.writeString(ObjectId.zeroId().name() + ' ' + P.name() + ' '
 				+ "refs/heads/s" + '\0'
 				+ BasePackPushConnection.CAPABILITY_REPORT_STATUS);
 		inPckLine.end();
@@ -25,7 +16,7 @@
 		final ReceivePack rp = new ReceivePack(dst);
 		rp.setCheckReceivedObjects(true);
 		rp.setCheckReferencedObjectsAreReachable(true);
-		rp.setRefFilter(new HidePrivateFilter());
+		rp.setAdvertiseRefsHook(new HidePrivateHook());
 		try {
 			receive(rp, inBuf, outBuf);
 			fail("Expected UnpackException");
@@ -33,7 +24,7 @@
 			Throwable err = failed.getCause();
 			assertTrue(err instanceof MissingObjectException);
 			MissingObjectException moe = (MissingObjectException) err;
-			assertEquals(b, moe.getObjectId());
+			assertEquals(P, moe.getObjectId());
 		}
 
 		final PacketLineIn r = asPacketLineIn(outBuf);
@@ -43,7 +34,7 @@
 		assertEquals(B.name() + ' ' + R_MASTER, master.substring(0, nul));
 		assertSame(PacketLineIn.END, r.readString());
 
-		assertEquals("unpack error Missing blob " + b.name(), r.readString());
+		assertEquals("unpack error Missing commit " + P.name(), r.readString());
 		assertEquals("ng refs/heads/s n/a (unpacker error)", r.readString());
 		assertSame(PacketLineIn.END, r.readString());
 	}

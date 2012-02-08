@@ -5,11 +5,24 @@
 	 *            the advertisement formatter.
 	 * @throws IOException
 	 *             the formatter failed to write an advertisement.
+	 * @throws ServiceMayNotContinueException
+	 *             the hook denied advertisement.
 	 */
-	public void sendAdvertisedRefs(final RefAdvertiser adv) throws IOException {
+	public void sendAdvertisedRefs(final RefAdvertiser adv) throws IOException,
+			 ServiceMayNotContinueException {
 		if (advertiseError != null) {
 			adv.writeOne("ERR " + advertiseError);
 			return;
+		}
+
+		try {
+			advertiseRefsHook.advertiseRefs(this);
+		} catch (ServiceMayNotContinueException fail) {
+			if (fail.getMessage() != null) {
+				adv.writeOne("ERR " + fail.getMessage());
+				fail.setOutput();
+			}
+			throw fail;
 		}
 
 		adv.init(db);
@@ -18,7 +31,7 @@
 		adv.advertiseCapability(CAPABILITY_REPORT_STATUS);
 		if (allowOfsDelta)
 			adv.advertiseCapability(CAPABILITY_OFS_DELTA);
-		adv.send(getAdvertisedRefs());
+		adv.send(getAdvertisedOrDefaultRefs());
 		for (ObjectId obj : advertisedHaves)
 			adv.advertiseHave(obj);
 		if (adv.isEmpty())
