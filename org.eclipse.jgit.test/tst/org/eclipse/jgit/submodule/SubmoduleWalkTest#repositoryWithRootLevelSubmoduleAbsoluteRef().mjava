@@ -1,9 +1,22 @@
 	@Test
-	public void repositoryWithRootLevelSubmodule() throws IOException,
-			ConfigInvalidException {
+	public void repositoryWithRootLevelSubmoduleAbsoluteRef()
+			throws IOException, ConfigInvalidException {
 		final ObjectId id = ObjectId
 				.fromString("abcd1234abcd1234abcd1234abcd1234abcd1234");
 		final String path = "sub";
+		File dotGit = new File(db.getWorkTree(), path + File.separatorChar
+				+ Constants.DOT_GIT);
+		if (!dotGit.getParentFile().exists())
+			dotGit.getParentFile().mkdirs();
+
+		File modulesGitDir = new File(db.getDirectory(), "modules"
+				+ File.separatorChar + path);
+		new FileWriter(dotGit).append(
+				"gitdir: " + modulesGitDir.getAbsolutePath()).close();
+		FileRepositoryBuilder builder = new FileRepositoryBuilder();
+		builder.setWorkTree(new File(db.getWorkTree(), path));
+		builder.build().create();
+
 		DirCache cache = db.lockDirCache();
 		DirCacheEditor editor = cache.editor();
 		editor.add(new PathEdit(path) {
@@ -25,7 +38,10 @@
 		assertNull(gen.getModulesPath());
 		assertNull(gen.getModulesUpdate());
 		assertNull(gen.getModulesUrl());
-		assertNull(gen.getRepository());
+		Repository subRepo = gen.getRepository();
+		assertNotNull(subRepo);
+		assertEquals(modulesGitDir, subRepo.getDirectory());
+		assertEquals(new File(db.getWorkTree(), path), subRepo.getWorkTree());
 		assertFalse(gen.next());
 	}
 
