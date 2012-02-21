@@ -12,7 +12,8 @@
 	 *             if deletion of {@code f} fails. This may occur if {@code f}
 	 *             didn't exist when the method was called. This can therefore
 	 *             cause IOExceptions during race conditions when multiple
-	 *             concurrent threads all try to delete the same file.
+	 *             concurrent threads all try to delete the same file. This
+	 *             exception is not thrown when IGNORE_ERRORS is set.
 	 */
 	public static void delete(final File f, int options) throws IOException {
 		if ((options & SKIP_MISSING) != 0 && !f.exists())
@@ -37,8 +38,9 @@
 						return;
 				}
 			}
-			throw new IOException(MessageFormat.format(
-					JGitText.get().deleteFileFailed, f.getAbsolutePath()));
+			if ((options & IGNORE_ERRORS) == 0)
+				throw new IOException(MessageFormat.format(
+						JGitText.get().deleteFileFailed, f.getAbsolutePath()));
 		}
 	}
 
