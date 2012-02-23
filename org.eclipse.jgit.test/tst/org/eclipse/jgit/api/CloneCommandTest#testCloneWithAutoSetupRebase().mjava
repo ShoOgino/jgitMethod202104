@@ -1,0 +1,50 @@
+	@Test
+	public void testCloneWithAutoSetupRebase() throws Exception {
+		File directory = createTempDirectory("testCloneRepository1");
+		CloneCommand command = Git.cloneRepository();
+		command.setDirectory(directory);
+		command.setURI("file://" + git.getRepository().getWorkTree().getPath());
+		Git git2 = command.call();
+		addRepoToClose(git2.getRepository());
+		assertFalse(git2
+				.getRepository()
+				.getConfig()
+				.getBoolean(ConfigConstants.CONFIG_BRANCH_SECTION, "test",
+						ConfigConstants.CONFIG_KEY_REBASE, false));
+
+		FileBasedConfig userConfig = SystemReader.getInstance().openUserConfig(
+				null, git.getRepository().getFS());
+		userConfig.setString(ConfigConstants.CONFIG_BRANCH_SECTION, null,
+				ConfigConstants.CONFIG_KEY_AUTOSETUPREBASE,
+				ConfigConstants.CONFIG_KEY_ALWAYS);
+		userConfig.save();
+		directory = createTempDirectory("testCloneRepository2");
+		command = Git.cloneRepository();
+		command.setDirectory(directory);
+		command.setURI("file://" + git.getRepository().getWorkTree().getPath());
+		git2 = command.call();
+		addRepoToClose(git2.getRepository());
+		assertTrue(git2
+				.getRepository()
+				.getConfig()
+				.getBoolean(ConfigConstants.CONFIG_BRANCH_SECTION, "test",
+						ConfigConstants.CONFIG_KEY_REBASE, false));
+
+		userConfig.setString(ConfigConstants.CONFIG_BRANCH_SECTION, null,
+				ConfigConstants.CONFIG_KEY_AUTOSETUPREBASE,
+				ConfigConstants.CONFIG_KEY_REMOTE);
+		userConfig.save();
+		directory = createTempDirectory("testCloneRepository2");
+		command = Git.cloneRepository();
+		command.setDirectory(directory);
+		command.setURI("file://" + git.getRepository().getWorkTree().getPath());
+		git2 = command.call();
+		addRepoToClose(git2.getRepository());
+		assertTrue(git2
+				.getRepository()
+				.getConfig()
+				.getBoolean(ConfigConstants.CONFIG_BRANCH_SECTION, "test",
+						ConfigConstants.CONFIG_KEY_REBASE, false));
+
+	}
+
