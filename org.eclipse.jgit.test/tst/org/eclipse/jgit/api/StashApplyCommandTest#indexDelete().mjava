@@ -1,0 +1,24 @@
+	@Test
+	public void indexDelete() throws Exception {
+		git.rm().addFilepattern("file.txt").call();
+
+		RevCommit stashed = Git.wrap(db).stashCreate().call();
+		assertNotNull(stashed);
+		assertEquals("content", read(committedFile));
+
+		ObjectId unstashed = git.stashApply().call();
+		assertEquals(stashed, unstashed);
+		assertFalse(committedFile.exists());
+
+		Status status = git.status().call();
+		assertTrue(status.getAdded().isEmpty());
+		assertTrue(status.getChanged().isEmpty());
+		assertTrue(status.getConflicting().isEmpty());
+		assertTrue(status.getModified().isEmpty());
+		assertTrue(status.getMissing().isEmpty());
+		assertTrue(status.getUntracked().isEmpty());
+
+		assertEquals(1, status.getRemoved().size());
+		assertTrue(status.getRemoved().contains(PATH));
+	}
+

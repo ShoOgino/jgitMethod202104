@@ -1,0 +1,27 @@
+	@Test
+	public void workingDirectoryModifyIndexChanged() throws Exception {
+		writeTrashFile("file.txt", "content2");
+		git.add().addFilepattern("file.txt").call();
+		writeTrashFile("file.txt", "content3");
+
+		RevCommit stashed = Git.wrap(db).stashCreate().call();
+		assertNotNull(stashed);
+		assertEquals("content", read(committedFile));
+
+		ObjectId unstashed = git.stashApply().call();
+		assertEquals(stashed, unstashed);
+		assertEquals("content3", read(committedFile));
+
+		Status status = git.status().call();
+		assertTrue(status.getAdded().isEmpty());
+		assertTrue(status.getConflicting().isEmpty());
+		assertTrue(status.getMissing().isEmpty());
+		assertTrue(status.getRemoved().isEmpty());
+		assertTrue(status.getUntracked().isEmpty());
+
+		assertEquals(1, status.getChanged().size());
+		assertTrue(status.getChanged().contains(PATH));
+		assertEquals(1, status.getModified().size());
+		assertTrue(status.getModified().contains(PATH));
+	}
+

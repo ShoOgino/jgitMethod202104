@@ -1,0 +1,88 @@
+	/**
+	 * Apply the changes in a stashed commit to the working directory and index
+	 *
+	 * @return id of stashed commit that was applied
+	 */
+	public ObjectId call() throws GitAPIException, JGitInternalException {
+		checkCallable();
+
+		if (repo.getRepositoryState() != RepositoryState.SAFE)
+			throw new WrongRepositoryStateException(MessageFormat.format(
+					JGitText.get().stashApplyOnUnsafeRepository,
+					repo.getRepositoryState()));
+
+		final String revision = stashRef != null ? stashRef : DEFAULT_REF;
+		final ObjectId stashId;
+		try {
+			stashId = repo.resolve(revision);
+		} catch (IOException e) {
+			throw new JGitInternalException(JGitText.get().stashApplyFailed, e);
+		}
+		if (stashId == null)
+			throw new InvalidRefNameException(MessageFormat.format(
+					JGitText.get().stashResolveFailed, revision));
+
+		ObjectReader reader = repo.newObjectReader();
+		try {
+			RevWalk revWalk = new RevWalk(reader);
+			RevCommit wtCommit = revWalk.parseCommit(stashId);
+			if (wtCommit.getParentCount() != 2)
+				throw new JGitInternalException(MessageFormat.format(
+						JGitText.get().stashCommitMissingTwoParents,
+						stashId.name()));
+
+			// Apply index changes
+			RevTree indexTree = revWalk.parseCommit(wtCommit.getParent(1))
+					.getTree();
+			DirCacheCheckout dco = new DirCacheCheckout(repo,
+					repo.lockDirCache(), indexTree, new FileTreeIterator(repo));
+			dco.setFailOnConflict(true);
+			dco.checkout();
+
+			// Apply working directory changes
+			RevTree headTree = revWalk.parseCommit(wtCommit.getParent(0))
+					.getTree();
+			DirCache cache = repo.lockDirCache();
+			DirCacheEditor editor = cache.editor();
+			try {
+				TreeWalk treeWalk = new TreeWalk(reader);
+				treeWalk.setRecursive(true);
+				treeWalk.addTree(headTree);
+				treeWalk.addTree(indexTree);
+				treeWalk.addTree(wtCommit.getTree());
+				treeWalk.setFilter(TreeFilter.ANY_DIFF);
+				File workingTree = repo.getWorkTree();
+				while (treeWalk.next()) {
+					String path = treeWalk.getPathString();
+					File file = new File(workingTree, path);
+					AbstractTreeIterator headIter = treeWalk.getTree(0,
+							AbstractTreeIterator.class);
+					AbstractTreeIterator indexIter = treeWalk.getTree(1,
+							AbstractTreeIterator.class);
+					AbstractTreeIterator wtIter = treeWalk.getTree(2,
+							AbstractTreeIterator.class);
+					if (wtIter != null) {
+						DirCacheEntry entry = new DirCacheEntry(
+								treeWalk.getRawPath());
+						entry.setObjectId(wtIter.getEntryObjectId());
+						DirCacheCheckout.checkoutEntry(repo, file, entry);
+					} else {
+						if (indexIter != null && headIter != null
+								&& !indexIter.idEqual(headIter))
+							editor.add(new DeletePath(path));
+						FileUtils.delete(file, FileUtils.RETRY
+								| FileUtils.SKIP_MISSING);
+					}
+				}
+			} finally {
+				editor.commit();
+				cache.unlock();
+			}
+		} catch (IOException e) {
+			throw new JGitInternalException(JGitText.get().stashApplyFailed, e);
+		} finally {
+			reader.release();
+		}
+		return stashId;
+	}
+

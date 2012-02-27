@@ -1,0 +1,29 @@
+	@Test
+	public void workingDirectoryDeleteIndexAdd() throws Exception {
+		String path = "file2.txt";
+		File added = writeTrashFile(path, "content2");
+		assertTrue(added.exists());
+		git.add().addFilepattern(path).call();
+		FileUtils.delete(added);
+		assertFalse(added.exists());
+
+		RevCommit stashed = Git.wrap(db).stashCreate().call();
+		assertNotNull(stashed);
+		assertFalse(added.exists());
+
+		ObjectId unstashed = git.stashApply().call();
+		assertEquals(stashed, unstashed);
+		assertEquals("content2", read(added));
+
+		Status status = git.status().call();
+		assertTrue(status.getChanged().isEmpty());
+		assertTrue(status.getConflicting().isEmpty());
+		assertTrue(status.getMissing().isEmpty());
+		assertTrue(status.getModified().isEmpty());
+		assertTrue(status.getRemoved().isEmpty());
+		assertTrue(status.getUntracked().isEmpty());
+
+		assertEquals(1, status.getAdded().size());
+		assertTrue(status.getAdded().contains(path));
+	}
+

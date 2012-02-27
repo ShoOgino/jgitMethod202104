@@ -1,0 +1,27 @@
+	@Test
+	public void indexAdd() throws Exception {
+		String addedPath = "file2.txt";
+		File addedFile = writeTrashFile(addedPath, "content2");
+		git.add().addFilepattern(addedPath).call();
+
+		RevCommit stashed = Git.wrap(db).stashCreate().call();
+		assertNotNull(stashed);
+		assertFalse(addedFile.exists());
+
+		ObjectId unstashed = git.stashApply().call();
+		assertEquals(stashed, unstashed);
+		assertTrue(addedFile.exists());
+		assertEquals("content2", read(addedFile));
+
+		Status status = git.status().call();
+		assertTrue(status.getChanged().isEmpty());
+		assertTrue(status.getConflicting().isEmpty());
+		assertTrue(status.getMissing().isEmpty());
+		assertTrue(status.getModified().isEmpty());
+		assertTrue(status.getRemoved().isEmpty());
+		assertTrue(status.getUntracked().isEmpty());
+
+		assertEquals(1, status.getAdded().size());
+		assertTrue(status.getAdded().contains(addedPath));
+	}
+
