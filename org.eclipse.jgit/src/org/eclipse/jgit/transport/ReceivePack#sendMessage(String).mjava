@@ -9,11 +9,6 @@
 	 *            string must not end with an LF, and must not contain an LF.
 	 */
 	public void sendMessage(final String what) {
-		try {
-			if (msgOut != null)
-				msgOut.write(Constants.encode(what + "\n"));
-		} catch (IOException e) {
-			// Ignore write failures.
-		}
+		msgOutWrapper.write(Constants.encode(what + "\n"));
 	}
 
