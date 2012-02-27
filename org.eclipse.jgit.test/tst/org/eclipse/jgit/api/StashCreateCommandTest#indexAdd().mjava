@@ -1,0 +1,18 @@
+	@Test
+	public void indexAdd() throws Exception {
+		File addedFile = writeTrashFile("file2.txt", "content2");
+		git.add().addFilepattern("file2.txt").call();
+
+		RevCommit stashed = Git.wrap(db).stashCreate().call();
+		assertNotNull(stashed);
+		assertFalse(addedFile.exists());
+		validateStashedCommit(stashed);
+
+		assertEquals(stashed.getTree(), stashed.getParent(1).getTree());
+
+		List<DiffEntry> diffs = diffWorkingAgainstHead(stashed);
+		assertEquals(1, diffs.size());
+		assertEquals(DiffEntry.ChangeType.ADD, diffs.get(0).getChangeType());
+		assertEquals("file2.txt", diffs.get(0).getNewPath());
+	}
+

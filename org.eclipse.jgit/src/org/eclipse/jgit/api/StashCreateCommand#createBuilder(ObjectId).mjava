@@ -1,0 +1,11 @@
+	private CommitBuilder createBuilder(ObjectId headId) {
+		CommitBuilder builder = new CommitBuilder();
+		PersonIdent author = person;
+		if (author == null)
+			author = new PersonIdent(repo);
+		builder.setAuthor(author);
+		builder.setCommitter(author);
+		builder.setParentId(headId);
+		return builder;
+	}
+

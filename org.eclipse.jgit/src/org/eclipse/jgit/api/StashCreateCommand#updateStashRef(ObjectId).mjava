@@ -1,0 +1,11 @@
+	private void updateStashRef(ObjectId commitId) throws IOException {
+		Ref currentRef = repo.getRef(ref);
+		RefUpdate refUpdate = repo.updateRef(ref);
+		refUpdate.setNewObjectId(commitId);
+		if (currentRef != null)
+			refUpdate.setExpectedOldObjectId(currentRef.getObjectId());
+		else
+			refUpdate.setExpectedOldObjectId(ObjectId.zeroId());
+		refUpdate.forceUpdate();
+	}
+

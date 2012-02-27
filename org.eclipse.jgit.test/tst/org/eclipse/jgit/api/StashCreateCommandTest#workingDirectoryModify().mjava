@@ -1,0 +1,17 @@
+	@Test
+	public void workingDirectoryModify() throws Exception {
+		writeTrashFile("file.txt", "content2");
+
+		RevCommit stashed = Git.wrap(db).stashCreate().call();
+		assertNotNull(stashed);
+		assertEquals("content", read(committedFile));
+		validateStashedCommit(stashed);
+
+		assertEquals(head.getTree(), stashed.getParent(1).getTree());
+
+		List<DiffEntry> diffs = diffWorkingAgainstHead(stashed);
+		assertEquals(1, diffs.size());
+		assertEquals(DiffEntry.ChangeType.MODIFY, diffs.get(0).getChangeType());
+		assertEquals("file.txt", diffs.get(0).getNewPath());
+	}
+

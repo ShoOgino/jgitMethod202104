@@ -1,0 +1,17 @@
+	@Test
+	public void indexDelete() throws Exception {
+		git.rm().addFilepattern("file.txt").call();
+
+		RevCommit stashed = Git.wrap(db).stashCreate().call();
+		assertNotNull(stashed);
+		assertEquals("content", read(committedFile));
+		validateStashedCommit(stashed);
+
+		assertEquals(stashed.getTree(), stashed.getParent(1).getTree());
+
+		List<DiffEntry> diffs = diffWorkingAgainstHead(stashed);
+		assertEquals(1, diffs.size());
+		assertEquals(DiffEntry.ChangeType.DELETE, diffs.get(0).getChangeType());
+		assertEquals("file.txt", diffs.get(0).getOldPath());
+	}
+

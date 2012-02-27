@@ -1,0 +1,22 @@
+	@Test
+	public void workingDirectoryModifyInSubfolder() throws Exception {
+		String path = "d1/d2/f.txt";
+		File subfolderFile = writeTrashFile(path, "content");
+		git.add().addFilepattern(path).call();
+		head = git.commit().setMessage("add file").call();
+
+		writeTrashFile(path, "content2");
+
+		RevCommit stashed = Git.wrap(db).stashCreate().call();
+		assertNotNull(stashed);
+		assertEquals("content", read(subfolderFile));
+		validateStashedCommit(stashed);
+
+		assertEquals(head.getTree(), stashed.getParent(1).getTree());
+
+		List<DiffEntry> diffs = diffWorkingAgainstHead(stashed);
+		assertEquals(1, diffs.size());
+		assertEquals(DiffEntry.ChangeType.MODIFY, diffs.get(0).getChangeType());
+		assertEquals(path, diffs.get(0).getNewPath());
+	}
+

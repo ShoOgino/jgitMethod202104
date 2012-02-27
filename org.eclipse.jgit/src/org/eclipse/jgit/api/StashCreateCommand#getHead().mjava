@@ -1,0 +1,11 @@
+	private Ref getHead() throws GitAPIException {
+		try {
+			Ref head = repo.getRef(Constants.HEAD);
+			if (head == null || head.getObjectId() == null)
+				throw new NoHeadException(JGitText.get().headRequiredToStash);
+			return head;
+		} catch (IOException e) {
+			throw new JGitInternalException(JGitText.get().stashFailed, e);
+		}
+	}
+
