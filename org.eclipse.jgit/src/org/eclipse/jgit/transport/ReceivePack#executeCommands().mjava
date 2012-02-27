@@ -1,7 +1,9 @@
 	private void executeCommands() {
-		preReceive.onPreReceive(this, filterCommands(Result.NOT_ATTEMPTED));
+		preReceive.onPreReceive(this,
+				ReceiveCommand.filter(commands, Result.NOT_ATTEMPTED));
 
-		List<ReceiveCommand> toApply = filterCommands(Result.NOT_ATTEMPTED);
+		List<ReceiveCommand> toApply = ReceiveCommand.filter(commands,
+				Result.NOT_ATTEMPTED);
 		ProgressMonitor updating = NullProgressMonitor.INSTANCE;
 		if (sideBand) {
 			SideBandProgressMonitor pm = new SideBandProgressMonitor(msgOut);
