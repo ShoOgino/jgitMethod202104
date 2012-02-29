@@ -5,7 +5,7 @@
 		File addedFile = writeTrashFile(addedPath, "content2");
 		git.add().addFilepattern(addedPath).call();
 
-		RevCommit stashed = Git.wrap(db).stashCreate().call();
+		RevCommit stashed = git.stashCreate().call();
 		assertNotNull(stashed);
 		assertTrue(committedFile.exists());
 		assertFalse(addedFile.exists());

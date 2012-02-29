@@ -2,7 +2,7 @@
 	public void indexDelete() throws Exception {
 		git.rm().addFilepattern("file.txt").call();
 
-		RevCommit stashed = Git.wrap(db).stashCreate().call();
+		RevCommit stashed = git.stashCreate().call();
 		assertNotNull(stashed);
 		assertEquals("content", read(committedFile));
 
