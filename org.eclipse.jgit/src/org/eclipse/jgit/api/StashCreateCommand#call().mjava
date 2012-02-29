@@ -96,7 +96,8 @@
 				commitId = inserter.insert(builder);
 				inserter.flush();
 
-				updateStashRef(commitId);
+				updateStashRef(commitId, builder.getAuthor(),
+						builder.getMessage());
 			} finally {
 				inserter.release();
 				cache.unlock();

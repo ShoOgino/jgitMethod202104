@@ -1,0 +1,19 @@
+	@Test
+	public void refLogIncludesCommitMessage() throws Exception {
+		PersonIdent who = new PersonIdent("user", "user@email.com");
+		deleteTrashFile("file.txt");
+		RevCommit stashed = git.stashCreate().setPerson(who).call();
+		assertNotNull(stashed);
+		assertEquals("content", read(committedFile));
+		validateStashedCommit(stashed);
+
+		ReflogReader reader = new ReflogReader(git.getRepository(),
+				Constants.R_STASH);
+		ReflogEntry entry = reader.getLastEntry();
+		assertNotNull(entry);
+		assertEquals(ObjectId.zeroId(), entry.getOldId());
+		assertEquals(stashed, entry.getNewId());
+		assertEquals(who, entry.getWho());
+		assertEquals(stashed.getFullMessage(), entry.getComment());
+	}
+
