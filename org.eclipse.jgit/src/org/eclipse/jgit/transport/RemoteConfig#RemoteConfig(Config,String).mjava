@@ -21,14 +21,17 @@
 		String val;
 
 		vlst = rc.getStringList(SECTION, name, KEY_URL);
+		Map<String, String> insteadOf = getReplacements(rc, KEY_INSTEADOF);
 		uris = new ArrayList<URIish>(vlst.length);
 		for (final String s : vlst)
-			uris.add(new URIish(s));
+			uris.add(new URIish(replaceUri(s, insteadOf)));
 
+		Map<String, String> pushInsteadOf = getReplacements(rc,
+				KEY_PUSHINSTEADOF);
 		vlst = rc.getStringList(SECTION, name, KEY_PUSHURL);
 		pushURIs = new ArrayList<URIish>(vlst.length);
 		for (final String s : vlst)
-			pushURIs.add(new URIish(s));
+			pushURIs.add(new URIish(replaceUri(s, pushInsteadOf)));
 
 		vlst = rc.getStringList(SECTION, name, KEY_FETCH);
 		fetch = new ArrayList<RefSpec>(vlst.length);

@@ -1,0 +1,10 @@
+	@Test
+	public void singleInsteadOf() throws Exception {
+		config.setString("remote", "origin", "url", "short:project.git");
+		config.setString("url", "https://server/repos/", "insteadOf", "short:");
+		RemoteConfig rc = new RemoteConfig(config, "origin");
+		assertFalse(rc.getURIs().isEmpty());
+		assertEquals("https://server/repos/project.git", rc.getURIs().get(0)
+				.toASCIIString());
+	}
+
