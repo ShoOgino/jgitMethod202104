@@ -1,0 +1,70 @@
+	/**
+	 * @param f
+	 * @param fh
+	 * @throws IOException
+	 * @throws PatchApplyException
+	 */
+	private void apply(File f, FileHeader fh)
+			throws IOException, PatchApplyException {
+		RawText rt = new RawText(f);
+		List<String> oldLines = new ArrayList<String>(rt.size());
+		for (int i = 0; i < rt.size(); i++)
+			oldLines.add(rt.getString(i));
+		List<String> newLines = new ArrayList<String>(oldLines);
+		for (HunkHeader hh : fh.getHunks()) {
+			StringBuilder hunk = new StringBuilder();
+			for (int j = hh.getStartOffset(); j < hh.getEndOffset(); j++)
+				hunk.append((char) hh.getBuffer()[j]);
+			RawText hrt = new RawText(hunk.toString().getBytes());
+			List<String> hunkLines = new ArrayList<String>(hrt.size());
+			for (int i = 0; i < hrt.size(); i++)
+				hunkLines.add(hrt.getString(i));
+			int pos = 0;
+			for (int j = 1; j < hunkLines.size(); j++) {
+				String hunkLine = hunkLines.get(j);
+				switch (hunkLine.charAt(0)) {
+				case ' ':
+					if (!newLines.get(hh.getNewStartLine() - 1 + pos).equals(
+							hunkLine.substring(1))) {
+						throw new PatchApplyException(MessageFormat.format(
+								JGitText.get().patchApplyException, hh));
+					}
+					pos++;
+					break;
+				case '-':
+					if (!newLines.get(hh.getNewStartLine() - 1 + pos).equals(
+							hunkLine.substring(1))) {
+						throw new PatchApplyException(MessageFormat.format(
+								JGitText.get().patchApplyException, hh));
+					}
+					newLines.remove(hh.getNewStartLine() - 1 + pos);
+					break;
+				case '+':
+					newLines.add(hh.getNewStartLine() - 1 + pos,
+							hunkLine.substring(1));
+					pos++;
+					break;
+				}
+			}
+		}
+		if (!isNoNewlineAtEndOfFile(fh))
+			newLines.add("");
+		if (!rt.isMissingNewlineAtEnd())
+			oldLines.add("");
+		if (!isChanged(oldLines, newLines))
+			return; // don't touch the file
+		StringBuilder sb = new StringBuilder();
+		final String eol = rt.size() == 0
+				|| (rt.size() == 1 && rt.isMissingNewlineAtEnd()) ? "\n" : rt
+				.getEOL();
+		for (String l : newLines) {
+			sb.append(l);
+			if (eol != null)
+				sb.append(eol);
+		}
+		sb.deleteCharAt(sb.length() - 1);
+		FileWriter fw = new FileWriter(f);
+		fw.write(sb.toString());
+		fw.close();
+	}
+

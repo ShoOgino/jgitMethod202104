@@ -1,0 +1,9 @@
+	@Test
+	public void testDeleteD() throws Exception {
+		ApplyResult result = init("D", true, false);
+		assertEquals(1, result.getUpdatedFiles().size());
+		assertEquals(new File(db.getWorkTree(), "D"), result.getUpdatedFiles()
+				.get(0));
+		assertFalse(new File(db.getWorkTree(), "D").exists());
+	}
+

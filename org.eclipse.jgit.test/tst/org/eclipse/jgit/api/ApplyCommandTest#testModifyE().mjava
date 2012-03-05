@@ -1,0 +1,10 @@
+	@Test
+	public void testModifyE() throws Exception {
+		ApplyResult result = init("E");
+		assertEquals(1, result.getUpdatedFiles().size());
+		assertEquals(new File(db.getWorkTree(), "E"), result.getUpdatedFiles()
+				.get(0));
+		checkFile(new File(db.getWorkTree(), "E"),
+				b.getString(0, b.size(), false));
+	}
+

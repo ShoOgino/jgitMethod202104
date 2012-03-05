@@ -1,0 +1,10 @@
+	@Test
+	public void testModifyZ() throws Exception {
+		ApplyResult result = init("Z");
+		assertEquals(1, result.getUpdatedFiles().size());
+		assertEquals(new File(db.getWorkTree(), "Z"), result.getUpdatedFiles()
+				.get(0));
+		checkFile(new File(db.getWorkTree(), "Z"),
+				b.getString(0, b.size(), false));
+	}
+

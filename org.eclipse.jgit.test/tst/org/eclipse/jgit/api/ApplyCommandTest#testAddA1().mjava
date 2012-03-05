@@ -1,0 +1,10 @@
+	@Test
+	public void testAddA1() throws Exception {
+		ApplyResult result = init("A1", false, true);
+		assertEquals(1, result.getUpdatedFiles().size());
+		assertEquals(new File(db.getWorkTree(), "A1"), result.getUpdatedFiles()
+				.get(0));
+		checkFile(new File(db.getWorkTree(), "A1"),
+				b.getString(0, b.size(), false));
+	}
+

@@ -1,0 +1,13 @@
+	private File getFile(String path, boolean create)
+			throws PatchApplyException {
+		File f = new File(getRepository().getWorkTree(), path);
+		if (create)
+			try {
+				FileUtils.createNewFile(f);
+			} catch (IOException e) {
+				throw new PatchApplyException(MessageFormat.format(
+						JGitText.get().createNewFileFailed, f), e);
+			}
+		return f;
+	}
+

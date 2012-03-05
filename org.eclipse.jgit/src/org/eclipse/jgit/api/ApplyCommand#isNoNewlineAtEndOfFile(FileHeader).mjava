@@ -1,0 +1,7 @@
+	private boolean isNoNewlineAtEndOfFile(FileHeader fh) {
+		HunkHeader lastHunk = fh.getHunks().get(fh.getHunks().size() - 1);
+		RawText lhrt = new RawText(lastHunk.getBuffer());
+		return lhrt.getString(lhrt.size() - 1).equals(
+				"\\ No newline at end of file"); //$NON-NLS-1$
+	}
+

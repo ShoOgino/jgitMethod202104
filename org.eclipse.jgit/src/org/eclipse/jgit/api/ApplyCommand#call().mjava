@@ -1,0 +1,64 @@
+	/**
+	 * Executes the {@code ApplyCommand} command with all the options and
+	 * parameters collected by the setter methods (e.g.
+	 * {@link #setPatch(InputStream)} of this class. Each instance of this class
+	 * should only be used for one invocation of the command. Don't call this
+	 * method twice on an instance.
+	 *
+	 * @return an {@link ApplyResult} object representing the command result
+	 */
+	public ApplyResult call() throws GitAPIException {
+		checkCallable();
+		ApplyResult r = new ApplyResult();
+		try {
+			final Patch p = new Patch();
+			try {
+				p.parse(in);
+			} finally {
+				in.close();
+			}
+			if (!p.getErrors().isEmpty())
+				throw new PatchFormatException(p.getErrors());
+			for (FileHeader fh : p.getFiles()) {
+				ChangeType type = fh.getChangeType();
+				File f = null;
+				switch (type) {
+				case ADD:
+					f = getFile(fh.getNewPath(), true);
+					apply(f, fh);
+					break;
+				case MODIFY:
+					f = getFile(fh.getOldPath(), false);
+					apply(f, fh);
+					break;
+				case DELETE:
+					f = getFile(fh.getOldPath(), false);
+					if (!f.delete())
+						throw new PatchApplyException(MessageFormat.format(
+								JGitText.get().cannotDeleteFile, f));
+					break;
+				case RENAME:
+					f = getFile(fh.getOldPath(), false);
+					File dest = getFile(fh.getNewPath(), false);
+					if (!f.renameTo(dest))
+						throw new PatchApplyException(MessageFormat.format(
+								JGitText.get().renameFileFailed, f, dest));
+					break;
+				case COPY:
+					f = getFile(fh.getOldPath(), false);
+					byte[] bs = IO.readFully(f);
+					FileWriter fw = new FileWriter(getFile(fh.getNewPath(),
+							true));
+					fw.write(new String(bs));
+					fw.close();
+				}
+				r.addUpdatedFile(f);
+			}
+		} catch (IOException e) {
+			throw new PatchApplyException(MessageFormat.format(
+					JGitText.get().patchApplyException, e.getMessage()), e);
+		}
+		setCallable(false);
+		return r;
+	}
+
