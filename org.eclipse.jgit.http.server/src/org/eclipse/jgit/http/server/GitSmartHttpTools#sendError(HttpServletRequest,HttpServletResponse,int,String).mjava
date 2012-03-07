@@ -5,6 +5,11 @@
 	 * to a Git protocol client using an HTTP 200 OK response with the error
 	 * embedded in the payload. If the request was not issued by a Git client,
 	 * an HTTP response code is returned instead.
+	 * <p>
+	 * This method may only be called before handing off the request to
+	 * {@link UploadPack#upload(java.io.InputStream, OutputStream, OutputStream)}
+	 * or
+	 * {@link ReceivePack#receive(java.io.InputStream, OutputStream, OutputStream)}.
 	 *
 	 * @param req
 	 *            current request.
@@ -40,21 +45,12 @@
 			}
 		}
 
-		ByteArrayOutputStream buf = new ByteArrayOutputStream(128);
-		PacketLineOut pck = new PacketLineOut(buf);
-
 		if (isInfoRefs(req)) {
-			String svc = req.getParameter("service");
-			pck.writeString("# service=" + svc + "\n");
-			pck.end();
-			pck.writeString("ERR " + textForGit);
-			send(req, res, infoRefsResultType(svc), buf.toByteArray());
+			sendInfoRefsError(req, res, textForGit);
 		} else if (isUploadPack(req)) {
-			pck.writeString("ERR " + textForGit);
-			send(req, res, UPLOAD_PACK_RESULT_TYPE, buf.toByteArray());
+			sendUploadPackError(req, res, textForGit);
 		} else if (isReceivePack(req)) {
-			pck.writeString("ERR " + textForGit);
-			send(req, res, RECEIVE_PACK_RESULT_TYPE, buf.toByteArray());
+			sendReceivePackError(req, res, textForGit);
 		} else {
 			if (httpStatus < 400)
 				ServletUtils.consumeRequestBody(req);
