@@ -12,12 +12,9 @@
 				break;
 
 			if (commands.isEmpty()) {
-				final int nul = line.indexOf('\0');
-				if (nul >= 0) {
-					for (String c : line.substring(nul + 1).split(" "))
-						enabledCapablities.add(c);
-					line = line.substring(0, nul);
-				}
+				final FirstLine firstLine = new FirstLine(line);
+				enabledCapabilities = firstLine.getCapabilities();
+				line = firstLine.getLine();
 			}
 
 			if (line.length() < 83) {

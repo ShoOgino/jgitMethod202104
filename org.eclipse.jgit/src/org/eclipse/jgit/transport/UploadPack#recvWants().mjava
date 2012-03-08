@@ -27,12 +27,9 @@
 				throw new PackProtocolException(MessageFormat.format(JGitText.get().expectedGot, "want", line));
 
 			if (isFirst && line.length() > 45) {
-				String opt = line.substring(45);
-				if (opt.startsWith(" "))
-					opt = opt.substring(1);
-				for (String c : opt.split(" "))
-					options.add(c);
-				line = line.substring(0, 45);
+				final FirstLine firstLine = new FirstLine(line);
+				options = firstLine.getOptions();
+				line = firstLine.getLine();
 			}
 
 			wantIds.add(ObjectId.fromString(line.substring(5)));

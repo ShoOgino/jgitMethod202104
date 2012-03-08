@@ -1,0 +1,23 @@
+	private static void sendReceivePackError(HttpServletRequest req,
+			HttpServletResponse res, String textForGit) throws IOException {
+		ByteArrayOutputStream buf = new ByteArrayOutputStream(128);
+		PacketLineOut pckOut = new PacketLineOut(buf);
+
+		boolean sideband;
+		ReceivePack rp = (ReceivePack) req.getAttribute(ATTRIBUTE_HANDLER);
+		if (rp != null) {
+			try {
+				sideband = rp.isSideBand();
+			} catch (RequestNotYetReadException e) {
+				sideband = isReceivePackSideBand(req);
+			}
+		} else
+			sideband = isReceivePackSideBand(req);
+
+		if (sideband)
+			writeSideBand(buf, textForGit);
+		else
+			writePacket(pckOut, textForGit);
+		send(req, res, RECEIVE_PACK_RESULT_TYPE, buf.toByteArray());
+	}
+

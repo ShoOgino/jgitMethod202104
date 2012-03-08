@@ -1,0 +1,17 @@
+		/**
+		 * Parse the first line of a receive-pack request.
+		 *
+		 * @param line
+		 *            line from the client.
+		 */
+		public FirstLine(String line) {
+			final HashSet<String> caps = new HashSet<String>();
+			final int nul = line.indexOf('\0');
+			if (nul >= 0) {
+				for (String c : line.substring(nul + 1).split(" "))
+					caps.add(c);
+			}
+			this.line = line.substring(0, nul);
+			this.capabilities = Collections.unmodifiableSet(caps);
+		}
+
