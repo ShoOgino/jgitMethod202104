@@ -4,7 +4,7 @@
 			// capability and are expecting a response in the sideband, but we might
 			// not have a ReceivePack, or it might not have read any of the request.
 			// So, cheat and read the first line.
-			String line = new PacketLineIn(req.getInputStream()).readStringRaw();
+			String line = new PacketLineIn(req.getInputStream()).readString();
 			ReceivePack.FirstLine parsed = new ReceivePack.FirstLine(line);
 			return parsed.getCapabilities().contains(CAPABILITY_SIDE_BAND_64K);
 		} catch (IOException e) {
