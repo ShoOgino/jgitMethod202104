@@ -1,11 +1,13 @@
 	@Test
 	public void testTaggingOnHead() throws NoHeadException, NoMessageException,
-			UnmergedPathException, ConcurrentRefUpdateException,
-			JGitInternalException, WrongRepositoryStateException,
-			InvalidTagNameException {
+			ConcurrentRefUpdateException, JGitInternalException,
+			WrongRepositoryStateException, InvalidTagNameException,
+			MissingObjectException, IncorrectObjectTypeException, IOException {
 		Git git = new Git(db);
 		RevCommit commit = git.commit().setMessage("initial commit").call();
-		RevTag tag = git.tag().setName("tag").call();
-		assertEquals(commit.getId(), tag.getObject().getId());
+		Ref tagRef = git.tag().setName("tag").call();
+		assertEquals(commit.getId(), db.peel(tagRef).getPeeledObjectId());
+		RevWalk walk = new RevWalk(db);
+		assertEquals("tag", walk.parseTag(tagRef.getObjectId()).getTagName());
 	}
 

@@ -7,7 +7,7 @@
 		git.commit().setMessage("initial commit").call();
 		RevCommit commit = git.commit().setMessage("second commit").call();
 		git.commit().setMessage("third commit").call();
-		RevTag tag = git.tag().setObjectId(commit).setName("tag").call();
-		assertEquals(commit.getId(), tag.getObject().getId());
+		Ref tagRef = git.tag().setObjectId(commit).setName("tag").call();
+		assertEquals(commit.getId(), db.peel(tagRef).getPeeledObjectId());
 	}
 

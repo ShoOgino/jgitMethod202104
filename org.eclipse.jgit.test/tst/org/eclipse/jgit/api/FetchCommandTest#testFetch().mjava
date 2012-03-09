@@ -16,7 +16,7 @@
 
 		// create some refs via commits and tag
 		RevCommit commit = git2.commit().setMessage("initial commit").call();
-		RevTag tag = git2.tag().setName("tag").call();
+		Ref tagRef = git2.tag().setName("tag").call();
 
 		Git git1 = new Git(db);
 
@@ -26,7 +26,8 @@
 
 		assertEquals(commit.getId(),
 				db.resolve(commit.getId().getName() + "^{commit}"));
-		assertEquals(tag.getId(), db.resolve(tag.getId().getName()));
+		assertEquals(tagRef.getObjectId(),
+				db.resolve(tagRef.getObjectId().getName()));
 
 	}
 
