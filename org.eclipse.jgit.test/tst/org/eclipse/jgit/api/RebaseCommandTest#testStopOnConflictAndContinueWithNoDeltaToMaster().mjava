@@ -1,5 +1,6 @@
 	@Test
-	public void testStopOnConflictCommitAndContinue() throws Exception {
+	public void testStopOnConflictAndContinueWithNoDeltaToMaster()
+			throws Exception {
 		// create file1 on master
 		RevCommit firstInMaster = writeFileAndCommit(FILE1, "Add file1", "1",
 				"2", "3");
@@ -13,18 +14,10 @@
 		// we have the old content again
 		checkFile(FILE1, "1", "2", "3");
 
-		// add a line (non-conflicting)
-		writeFileAndCommit(FILE1, "add a line to file1 in topic", "1", "2",
-				"3", "4topic");
-
 		// change first line (conflicting)
 		writeFileAndCommit(FILE1,
 				"change file1 in topic\n\nThis is conflicting", "1topic", "2",
 				"3", "4topic");
-
-		// change second line (not conflicting)
-		writeFileAndCommit(FILE1, "change file1 in topic again", "1topic", "2",
-				"3topic", "4topic");
 
 		RebaseResult res = git.rebase().setUpstream("refs/heads/master").call();
 		assertEquals(Status.STOPPED, res.getStatus());
@@ -38,15 +31,10 @@
 		}
 
 		// merge the file; the second topic commit should go through
-		writeFileAndCommit(FILE1, "A different commit message", "1topic", "2",
-				"3", "4topic");
+		writeFileAndAdd(FILE1, "1master", "2", "3");
 
 		res = git.rebase().setOperation(Operation.CONTINUE).call();
 		assertNotNull(res);
-
-		// nothing to commit. this leaves the repo state in rebase, so that the
-		// user can decide what to do. if he accidentally committed, reset soft,
-		// and continue, if he really has nothing to commit, skip.
 		assertEquals(Status.NOTHING_TO_COMMIT, res.getStatus());
 		assertEquals(RepositoryState.REBASING_INTERACTIVE,
 				db.getRepositoryState());
@@ -56,7 +44,6 @@
 		ObjectId headId = db.resolve(Constants.HEAD);
 		RevWalk rw = new RevWalk(db);
 		RevCommit rc = rw.parseCommit(headId);
-		RevCommit parent = rw.parseCommit(rc.getParent(0));
-		assertEquals("A different commit message", parent.getFullMessage());
+		assertEquals("change file1 in master", rc.getFullMessage());
 	}
 
