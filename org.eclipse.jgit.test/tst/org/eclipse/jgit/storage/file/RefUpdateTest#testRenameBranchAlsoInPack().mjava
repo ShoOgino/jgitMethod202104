@@ -9,7 +9,7 @@
 		Result update = updateRef.update();
 		assertEquals("internal check new ref is loose", Result.FORCED, update);
 		assertEquals(Ref.Storage.LOOSE, db.getRef("refs/heads/b").getStorage());
-		writeReflog(db, rb, rb, "Just a message", "refs/heads/b");
+		writeReflog(db, rb, "Just a message", "refs/heads/b");
 		assertTrue("log on old branch", new File(db.getDirectory(),
 				"logs/refs/heads/b").exists());
 		RefRename renameRef = db.renameRef("refs/heads/b",

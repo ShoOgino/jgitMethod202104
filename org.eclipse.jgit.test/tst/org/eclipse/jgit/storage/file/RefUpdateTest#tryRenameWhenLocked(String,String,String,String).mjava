@@ -4,8 +4,7 @@
 		writeSymref(Constants.HEAD, headPointsTo);
 		ObjectId oldfromId = db.resolve(fromName);
 		ObjectId oldHeadId = db.resolve(Constants.HEAD);
-		writeReflog(db, oldfromId, oldfromId, "Just a message",
-				fromName);
+		writeReflog(db, oldfromId, "Just a message", fromName);
 		List<org.eclipse.jgit.storage.file.ReflogEntry> oldFromLog = db
 				.getReflogReader(fromName).getReverseEntries();
 		List<org.eclipse.jgit.storage.file.ReflogEntry> oldHeadLog = oldHeadId != null ? db
