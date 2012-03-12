@@ -1,0 +1,11 @@
+	@Test
+	public void emptyRepositoryFormatVersion() throws Exception {
+		FileRepository r = createWorkRepository();
+		FileBasedConfig config = r.getConfig();
+		config.setString(ConfigConstants.CONFIG_CORE_SECTION, null,
+				ConfigConstants.CONFIG_KEY_REPO_FORMAT_VERSION, "");
+		config.save();
+
+		new FileRepository(r.getDirectory());
+	}
+

@@ -1,0 +1,16 @@
+	@Test
+	public void invalidRepositoryFormatVersion() throws Exception {
+		FileRepository r = createWorkRepository();
+		FileBasedConfig config = r.getConfig();
+		config.setString(ConfigConstants.CONFIG_CORE_SECTION, null,
+				ConfigConstants.CONFIG_KEY_REPO_FORMAT_VERSION, "notanumber");
+		config.save();
+
+		try {
+			new FileRepository(r.getDirectory());
+			fail("IllegalArgumentException not thrown");
+		} catch (IllegalArgumentException e) {
+			assertNotNull(e.getMessage());
+		}
+	}
+
