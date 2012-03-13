@@ -2,10 +2,14 @@
 			out.close();
 
 			if (conn == null) {
-				// Output hasn't started yet, because everything fit into
-				// our request buffer. Send with a Content-Length header.
-				//
 				if (out.length() == 0) {
+					// Request output hasn't started yet, but more data is being
+					// requested. If there is no request data buffered and the
+					// final request was already sent, do nothing to ensure the
+					// caller is shown EOF on the InputStream; otherwise an
+					// programming error has occurred within this module.
+					if (finalRequest)
+						return;
 					throw new TransportException(uri,
 							JGitText.get().startingReadStageWithoutWrittenRequestDataPendingIsNotSupported);
 				}
@@ -51,7 +55,8 @@
 			}
 
 			in.add(openInputStream(conn));
-			in.add(execute);
+			if (!finalRequest)
+				in.add(execute);
 			conn = null;
 		}
 
