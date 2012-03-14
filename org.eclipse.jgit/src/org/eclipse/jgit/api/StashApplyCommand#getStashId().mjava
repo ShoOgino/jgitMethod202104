@@ -1,0 +1,15 @@
+	private ObjectId getStashId() throws JGitInternalException, GitAPIException {
+		final String revision = stashRef != null ? stashRef : DEFAULT_REF;
+		final ObjectId stashId;
+		try {
+			stashId = repo.resolve(revision);
+		} catch (IOException e) {
+			throw new InvalidRefNameException(MessageFormat.format(
+					JGitText.get().stashResolveFailed, revision), e);
+		}
+		if (stashId == null)
+			throw new InvalidRefNameException(MessageFormat.format(
+					JGitText.get().stashResolveFailed, revision));
+		return stashId;
+	}
+

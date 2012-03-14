@@ -1,0 +1,12 @@
+	@Test
+	public void unstashNonStashCommit() throws Exception {
+		try {
+			git.stashApply().setStashRef(head.name()).call();
+			fail("Exception not thrown");
+		} catch (JGitInternalException e) {
+			assertEquals(MessageFormat.format(
+					JGitText.get().stashCommitMissingTwoParents, head.name()),
+					e.getMessage());
+		}
+	}
+

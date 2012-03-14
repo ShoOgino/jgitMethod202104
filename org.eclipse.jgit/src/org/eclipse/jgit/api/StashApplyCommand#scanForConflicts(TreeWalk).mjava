@@ -1,0 +1,26 @@
+	private void scanForConflicts(TreeWalk treeWalk) throws IOException {
+		File workingTree = repo.getWorkTree();
+		while (treeWalk.next()) {
+			// State of the stashed index and working directory
+			AbstractTreeIterator stashIndexIter = treeWalk.getTree(1,
+					AbstractTreeIterator.class);
+			AbstractTreeIterator stashWorkingIter = treeWalk.getTree(2,
+					AbstractTreeIterator.class);
+
+			// State of the current HEAD, index, and working directory
+			AbstractTreeIterator headIter = treeWalk.getTree(3,
+					AbstractTreeIterator.class);
+			AbstractTreeIterator indexIter = treeWalk.getTree(4,
+					AbstractTreeIterator.class);
+			AbstractTreeIterator workingIter = treeWalk.getTree(5,
+					AbstractTreeIterator.class);
+
+			if (isConflict(stashIndexIter, stashWorkingIter, headIter,
+					indexIter, workingIter)) {
+				String path = treeWalk.getPathString();
+				File file = new File(workingTree, path);
+				throw new CheckoutConflictException(file.getAbsolutePath());
+			}
+		}
+	}
+

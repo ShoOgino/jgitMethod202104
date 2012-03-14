@@ -1,0 +1,13 @@
+	private ObjectId getHeadTree() throws JGitInternalException,
+			GitAPIException {
+		final ObjectId headTree;
+		try {
+			headTree = repo.resolve(Constants.HEAD + "^{tree}");
+		} catch (IOException e) {
+			throw new JGitInternalException(JGitText.get().cannotReadTree, e);
+		}
+		if (headTree == null)
+			throw new NoHeadException(JGitText.get().cannotReadTree);
+		return headTree;
+	}
+

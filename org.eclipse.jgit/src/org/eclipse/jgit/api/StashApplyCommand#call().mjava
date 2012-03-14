@@ -11,73 +11,68 @@
 					JGitText.get().stashApplyOnUnsafeRepository,
 					repo.getRepositoryState()));
 
-		final String revision = stashRef != null ? stashRef : DEFAULT_REF;
-		final ObjectId stashId;
-		try {
-			stashId = repo.resolve(revision);
-		} catch (IOException e) {
-			throw new JGitInternalException(JGitText.get().stashApplyFailed, e);
-		}
-		if (stashId == null)
-			throw new InvalidRefNameException(MessageFormat.format(
-					JGitText.get().stashResolveFailed, revision));
+		final ObjectId headTree = getHeadTree();
+		final ObjectId stashId = getStashId();
 
 		ObjectReader reader = repo.newObjectReader();
 		try {
 			RevWalk revWalk = new RevWalk(reader);
-			RevCommit wtCommit = revWalk.parseCommit(stashId);
-			if (wtCommit.getParentCount() != 2)
+			RevCommit stashCommit = revWalk.parseCommit(stashId);
+			if (stashCommit.getParentCount() != 2)
 				throw new JGitInternalException(MessageFormat.format(
 						JGitText.get().stashCommitMissingTwoParents,
 						stashId.name()));
 
-			// Apply index changes
-			RevTree indexTree = revWalk.parseCommit(wtCommit.getParent(1))
-					.getTree();
-			DirCacheCheckout dco = new DirCacheCheckout(repo,
-					repo.lockDirCache(), indexTree, new FileTreeIterator(repo));
-			dco.setFailOnConflict(true);
-			dco.checkout();
+			RevTree stashWorkingTree = stashCommit.getTree();
+			RevTree stashIndexTree = revWalk.parseCommit(
+					stashCommit.getParent(1)).getTree();
+			RevTree stashHeadTree = revWalk.parseCommit(
+					stashCommit.getParent(0)).getTree();
 
-			// Apply working directory changes
-			RevTree headTree = revWalk.parseCommit(wtCommit.getParent(0))
-					.getTree();
+			CanonicalTreeParser stashWorkingIter = new CanonicalTreeParser();
+			stashWorkingIter.reset(reader, stashWorkingTree);
+			CanonicalTreeParser stashIndexIter = new CanonicalTreeParser();
+			stashIndexIter.reset(reader, stashIndexTree);
+			CanonicalTreeParser stashHeadIter = new CanonicalTreeParser();
+			stashHeadIter.reset(reader, stashHeadTree);
+			CanonicalTreeParser headIter = new CanonicalTreeParser();
+			headIter.reset(reader, headTree);
+
 			DirCache cache = repo.lockDirCache();
 			DirCacheEditor editor = cache.editor();
 			try {
+				DirCacheIterator indexIter = new DirCacheIterator(cache);
+				FileTreeIterator workingIter = new FileTreeIterator(repo);
+
 				TreeWalk treeWalk = new TreeWalk(reader);
 				treeWalk.setRecursive(true);
-				treeWalk.addTree(headTree);
-				treeWalk.addTree(indexTree);
-				treeWalk.addTree(wtCommit.getTree());
-				treeWalk.setFilter(TreeFilter.ANY_DIFF);
-				File workingTree = repo.getWorkTree();
-				while (treeWalk.next()) {
-					String path = treeWalk.getPathString();
-					File file = new File(workingTree, path);
-					AbstractTreeIterator headIter = treeWalk.getTree(0,
-							AbstractTreeIterator.class);
-					AbstractTreeIterator indexIter = treeWalk.getTree(1,
-							AbstractTreeIterator.class);
-					AbstractTreeIterator wtIter = treeWalk.getTree(2,
-							AbstractTreeIterator.class);
-					if (wtIter != null) {
-						DirCacheEntry entry = new DirCacheEntry(
-								treeWalk.getRawPath());
-						entry.setObjectId(wtIter.getEntryObjectId());
-						DirCacheCheckout.checkoutEntry(repo, file, entry);
-					} else {
-						if (indexIter != null && headIter != null
-								&& !indexIter.idEqual(headIter))
-							editor.add(new DeletePath(path));
-						FileUtils.delete(file, FileUtils.RETRY
-								| FileUtils.SKIP_MISSING);
-					}
-				}
+				treeWalk.setFilter(new StashDiffFilter());
+
+				treeWalk.addTree(stashHeadIter);
+				treeWalk.addTree(stashIndexIter);
+				treeWalk.addTree(stashWorkingIter);
+				treeWalk.addTree(headIter);
+				treeWalk.addTree(indexIter);
+				treeWalk.addTree(workingIter);
+
+				scanForConflicts(treeWalk);
+
+				// Reset trees and walk
+				treeWalk.reset();
+				stashWorkingIter.reset(reader, stashWorkingTree);
+				stashIndexIter.reset(reader, stashIndexTree);
+				stashHeadIter.reset(reader, stashHeadTree);
+				treeWalk.addTree(stashHeadIter);
+				treeWalk.addTree(stashIndexIter);
+				treeWalk.addTree(stashWorkingIter);
+
+				applyChanges(treeWalk, cache, editor);
 			} finally {
 				editor.commit();
 				cache.unlock();
 			}
+		} catch (JGitInternalException e) {
+			throw e;
 		} catch (IOException e) {
 			throw new JGitInternalException(JGitText.get().stashApplyFailed, e);
 		} finally {

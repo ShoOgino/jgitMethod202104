@@ -1,0 +1,21 @@
+	@Test
+	public void indexContentConflict() throws Exception {
+		writeTrashFile(PATH, "content2");
+
+		RevCommit stashed = git.stashCreate().call();
+		assertNotNull(stashed);
+		assertEquals("content", read(committedFile));
+		assertTrue(git.status().call().isClean());
+
+		writeTrashFile(PATH, "content3");
+		git.add().addFilepattern(PATH).call();
+		writeTrashFile(PATH, "content2");
+
+		try {
+			git.stashApply().call();
+			fail("Exception not thrown");
+		} catch (JGitInternalException e) {
+			assertTrue(e.getCause() instanceof CheckoutConflictException);
+		}
+	}
+

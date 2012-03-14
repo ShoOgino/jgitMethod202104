@@ -1,0 +1,10 @@
+	@Test
+	public void noStashedCommits() throws Exception {
+		try {
+			git.stashApply().call();
+			fail("Exception not thrown");
+		} catch (InvalidRefNameException e) {
+			assertNotNull(e.getMessage());
+		}
+	}
+

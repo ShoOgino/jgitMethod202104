@@ -1,0 +1,11 @@
+	@Test
+	public void unstashNoHead() throws Exception {
+		Repository repo = createWorkRepository();
+		try {
+			Git.wrap(repo).stashApply().call();
+			fail("Exception not thrown");
+		} catch (NoHeadException e) {
+			assertNotNull(e.getMessage());
+		}
+	}
+

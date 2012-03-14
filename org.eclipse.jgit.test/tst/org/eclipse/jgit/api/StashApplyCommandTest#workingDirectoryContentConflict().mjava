@@ -1,0 +1,19 @@
+	@Test
+	public void workingDirectoryContentConflict() throws Exception {
+		writeTrashFile(PATH, "content2");
+
+		RevCommit stashed = git.stashCreate().call();
+		assertNotNull(stashed);
+		assertEquals("content", read(committedFile));
+		assertTrue(git.status().call().isClean());
+
+		writeTrashFile(PATH, "content3");
+
+		try {
+			git.stashApply().call();
+			fail("Exception not thrown");
+		} catch (JGitInternalException e) {
+			assertTrue(e.getCause() instanceof CheckoutConflictException);
+		}
+	}
+
