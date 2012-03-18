@@ -1,0 +1,14 @@
+	@Test
+	public void logPathWithMaxCount() throws Exception {
+		Git git = Git.wrap(db);
+		List<RevCommit> commits = createCommits(git);
+
+		Iterator<RevCommit> log = git.log().addPath("Test.txt").setMaxCount(1)
+				.call().iterator();
+		assertTrue(log.hasNext());
+		RevCommit commit = log.next();
+		assertTrue(commits.contains(commit));
+		assertEquals("commit#2", commit.getShortMessage());
+		assertFalse(log.hasNext());
+	}
+
