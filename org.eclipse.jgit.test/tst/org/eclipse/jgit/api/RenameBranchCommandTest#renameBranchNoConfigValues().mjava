@@ -1,0 +1,19 @@
+	@Test
+	public void renameBranchNoConfigValues() throws Exception {
+		StoredConfig config = git.getRepository().getConfig();
+		config.unsetSection(ConfigConstants.CONFIG_BRANCH_SECTION,
+				Constants.MASTER);
+		config.save();
+
+		String branch = "b1";
+		assertTrue(config.getNames(ConfigConstants.CONFIG_BRANCH_SECTION,
+				Constants.MASTER).isEmpty());
+		assertNotNull(git.branchRename().setNewName(branch).call());
+
+		config = git.getRepository().getConfig();
+		assertTrue(config.getNames(ConfigConstants.CONFIG_BRANCH_SECTION,
+				Constants.MASTER).isEmpty());
+		assertTrue(config.getNames(ConfigConstants.CONFIG_BRANCH_SECTION,
+				branch).isEmpty());
+	}
+
