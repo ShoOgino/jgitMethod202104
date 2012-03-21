@@ -1,0 +1,31 @@
+	/**
+	 * Write the given ref update to the ref's log
+	 *
+	 * @param update
+	 * @param msg
+	 * @param deref
+	 * @return this writer
+	 * @throws IOException
+	 */
+	public ReflogWriter log(final RefUpdate update, final String msg,
+			final boolean deref) throws IOException {
+		final ObjectId oldId = update.getOldObjectId();
+		final ObjectId newId = update.getNewObjectId();
+		final Ref ref = update.getRef();
+
+		PersonIdent ident = update.getRefLogIdent();
+		if (ident == null)
+			ident = new PersonIdent(parent);
+		else
+			ident = new PersonIdent(ident);
+
+		final byte[] rec = encode(oldId, newId, ident, msg);
+		if (deref && ref.isSymbolic()) {
+			log(ref.getName(), rec);
+			log(ref.getLeaf().getName(), rec);
+		} else
+			log(ref.getName(), rec);
+
+		return this;
+	}
+

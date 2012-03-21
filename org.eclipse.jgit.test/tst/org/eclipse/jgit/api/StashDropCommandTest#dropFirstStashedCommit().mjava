@@ -1,0 +1,34 @@
+	@Test
+	public void dropFirstStashedCommit() throws Exception {
+		write(committedFile, "content2");
+		Ref stashRef = git.getRepository().getRef(Constants.R_STASH);
+		assertNull(stashRef);
+		RevCommit firstStash = git.stashCreate().call();
+		assertNotNull(firstStash);
+		stashRef = git.getRepository().getRef(Constants.R_STASH);
+		assertNotNull(stashRef);
+		assertEquals(firstStash, git.getRepository().getRef(Constants.R_STASH)
+				.getObjectId());
+
+		write(committedFile, "content3");
+		RevCommit secondStash = git.stashCreate().call();
+		assertNotNull(secondStash);
+		stashRef = git.getRepository().getRef(Constants.R_STASH);
+		assertNotNull(stashRef);
+		assertEquals(secondStash, git.getRepository().getRef(Constants.R_STASH)
+				.getObjectId());
+
+		assertEquals(firstStash, git.stashDrop().call());
+		stashRef = git.getRepository().getRef(Constants.R_STASH);
+		assertNotNull(stashRef);
+		assertEquals(firstStash, stashRef.getObjectId());
+
+		ReflogReader reader = new ReflogReader(git.getRepository(),
+				Constants.R_STASH);
+		List<ReflogEntry> entries = reader.getReverseEntries();
+		assertEquals(1, entries.size());
+		assertEquals(ObjectId.zeroId(), entries.get(0).getOldId());
+		assertEquals(firstStash, entries.get(0).getNewId());
+		assertTrue(entries.get(0).getComment().length() > 0);
+	}
+

@@ -1,0 +1,73 @@
+	/**
+	 * Drop the configured entry from the stash reflog and return value of the
+	 * stash reference after the drop occurs
+	 *
+	 * @return commit id of stash reference or null if no more stashed changes
+	 */
+	public ObjectId call() throws GitAPIException, JGitInternalException {
+		checkCallable();
+
+		Ref stashRef = getRef();
+		if (stashRef == null)
+			return null;
+
+		if (all) {
+			deleteRef(stashRef);
+			return null;
+		}
+
+		ReflogReader reader = new ReflogReader(repo, R_STASH);
+		List<ReflogEntry> entries;
+		try {
+			entries = reader.getReverseEntries();
+		} catch (IOException e) {
+			throw new JGitInternalException(JGitText.get().stashDropFailed, e);
+		}
+
+		if (stashRefEntry >= entries.size())
+			throw new JGitInternalException(
+					JGitText.get().stashDropMissingReflog);
+
+		if (entries.size() == 1) {
+			deleteRef(stashRef);
+			return null;
+		}
+
+		ReflogWriter writer = new ReflogWriter(repo, true);
+		String stashLockRef = ReflogWriter.refLockFor(R_STASH);
+		File stashLockFile = writer.logFor(stashLockRef);
+		File stashFile = writer.logFor(R_STASH);
+		if (stashLockFile.exists())
+			throw new JGitInternalException(JGitText.get().stashDropFailed,
+					new LockFailedException(stashFile));
+
+		entries.remove(stashRefEntry);
+		ObjectId entryId = ObjectId.zeroId();
+		try {
+			for (int i = entries.size() - 1; i >= 0; i--) {
+				ReflogEntry entry = entries.get(i);
+				writer.log(stashLockRef, entryId, entry.getNewId(),
+						entry.getWho(), entry.getComment());
+				entryId = entry.getNewId();
+			}
+			if (!stashLockFile.renameTo(stashFile)) {
+				FileUtils.delete(stashFile);
+				if (!stashLockFile.renameTo(stashFile))
+					throw new JGitInternalException(MessageFormat.format(
+							JGitText.get().couldNotWriteFile,
+							stashLockFile.getPath(), stashFile.getPath()));
+			}
+		} catch (IOException e) {
+			throw new JGitInternalException(JGitText.get().stashDropFailed, e);
+		}
+		updateRef(stashRef, entryId);
+
+		try {
+			Ref newStashRef = repo.getRef(R_STASH);
+			return newStashRef != null ? newStashRef.getObjectId() : null;
+		} catch (IOException e) {
+			throw new InvalidRefNameException(MessageFormat.format(
+					JGitText.get().cannotRead, R_STASH), e);
+		}
+	}
+

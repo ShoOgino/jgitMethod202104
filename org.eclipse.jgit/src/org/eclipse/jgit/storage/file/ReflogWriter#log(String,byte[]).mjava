@@ -1,0 +1,37 @@
+	private ReflogWriter log(final String refName, final byte[] rec)
+			throws IOException {
+		final File log = logFor(refName);
+		final boolean write = forceWrite
+				|| (isLogAllRefUpdates() && shouldAutoCreateLog(refName))
+				|| log.isFile();
+		if (!write)
+			return this;
+
+		WriteConfig wc = getRepository().getConfig().get(WriteConfig.KEY);
+		FileOutputStream out;
+		try {
+			out = new FileOutputStream(log, true);
+		} catch (FileNotFoundException err) {
+			final File dir = log.getParentFile();
+			if (dir.exists())
+				throw err;
+			if (!dir.mkdirs() && !dir.isDirectory())
+				throw new IOException(MessageFormat.format(
+						JGitText.get().cannotCreateDirectory, dir));
+			out = new FileOutputStream(log, true);
+		}
+		try {
+			if (wc.getFSyncRefFiles()) {
+				FileChannel fc = out.getChannel();
+				ByteBuffer buf = ByteBuffer.wrap(rec);
+				while (0 < buf.remaining())
+					fc.write(buf);
+				fc.force(true);
+			} else
+				out.write(rec);
+		} finally {
+			out.close();
+		}
+		return this;
+	}
+

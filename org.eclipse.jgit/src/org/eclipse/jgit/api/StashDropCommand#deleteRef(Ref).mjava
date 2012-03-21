@@ -1,0 +1,11 @@
+	private void deleteRef(final Ref stashRef) {
+		try {
+			Result result = createRefUpdate(stashRef).delete();
+			if (Result.FORCED != result)
+				throw new JGitInternalException(MessageFormat.format(
+						JGitText.get().stashDropDeleteRefFailed, result));
+		} catch (IOException e) {
+			throw new JGitInternalException(JGitText.get().stashDropFailed, e);
+		}
+	}
+

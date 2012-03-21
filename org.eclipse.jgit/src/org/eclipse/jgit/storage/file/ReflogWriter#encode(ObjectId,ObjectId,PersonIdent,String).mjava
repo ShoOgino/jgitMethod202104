@@ -1,0 +1,14 @@
+	private byte[] encode(ObjectId oldId, ObjectId newId, PersonIdent ident,
+			String message) {
+		final StringBuilder r = new StringBuilder();
+		r.append(ObjectId.toString(oldId));
+		r.append(' ');
+		r.append(ObjectId.toString(newId));
+		r.append(' ');
+		r.append(ident.toExternalString());
+		r.append('\t');
+		r.append(message);
+		r.append('\n');
+		return Constants.encode(r.toString());
+	}
+

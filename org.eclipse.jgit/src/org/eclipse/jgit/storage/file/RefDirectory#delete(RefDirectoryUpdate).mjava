@@ -31,7 +31,7 @@
 		} while (!looseRefs.compareAndSet(curLoose, newLoose));
 
 		int levels = levelsIn(name) - 2;
-		delete(logFor(name), levels);
+		delete(logWriter.logFor(name), levels);
 		if (dst.getStorage().isLoose()) {
 			update.unlock();
 			delete(fileFor(name), levels);

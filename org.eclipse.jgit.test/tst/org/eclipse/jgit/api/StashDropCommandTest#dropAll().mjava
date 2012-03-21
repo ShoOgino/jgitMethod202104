@@ -1,0 +1,28 @@
+	@Test
+	public void dropAll() throws Exception {
+		write(committedFile, "content2");
+		Ref stashRef = git.getRepository().getRef(Constants.R_STASH);
+		assertNull(stashRef);
+		RevCommit firstStash = git.stashCreate().call();
+		assertNotNull(firstStash);
+		stashRef = git.getRepository().getRef(Constants.R_STASH);
+		assertNotNull(stashRef);
+		assertEquals(firstStash, git.getRepository().getRef(Constants.R_STASH)
+				.getObjectId());
+
+		write(committedFile, "content3");
+		RevCommit secondStash = git.stashCreate().call();
+		assertNotNull(secondStash);
+		stashRef = git.getRepository().getRef(Constants.R_STASH);
+		assertNotNull(stashRef);
+		assertEquals(secondStash, git.getRepository().getRef(Constants.R_STASH)
+				.getObjectId());
+
+		assertNull(git.stashDrop().setAll(true).call());
+		assertNull(git.getRepository().getRef(Constants.R_STASH));
+
+		ReflogReader reader = new ReflogReader(git.getRepository(),
+				Constants.R_STASH);
+		assertTrue(reader.getReverseEntries().isEmpty());
+	}
+

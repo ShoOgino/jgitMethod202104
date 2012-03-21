@@ -1,0 +1,20 @@
+	private void updateRef(Ref stashRef, ObjectId newId) {
+		try {
+			RefUpdate update = createRefUpdate(stashRef);
+			update.setNewObjectId(newId);
+			Result result = update.update();
+			switch (result) {
+			case FORCED:
+			case NEW:
+			case NO_CHANGE:
+				return;
+			default:
+				throw new JGitInternalException(MessageFormat.format(
+						JGitText.get().updatingRefFailed, R_STASH, newId,
+						result));
+			}
+		} catch (IOException e) {
+			throw new JGitInternalException(JGitText.get().stashDropFailed, e);
+		}
+	}
+

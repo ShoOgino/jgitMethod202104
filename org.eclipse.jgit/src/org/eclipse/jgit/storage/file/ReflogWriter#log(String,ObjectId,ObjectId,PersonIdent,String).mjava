@@ -1,0 +1,18 @@
+	/**
+	 * Write the given entry information to the ref's log
+	 *
+	 * @param refName
+	 * @param oldId
+	 * @param newId
+	 * @param ident
+	 * @param message
+	 * @return this writer
+	 * @throws IOException
+	 */
+	public ReflogWriter log(final String refName, final ObjectId oldId,
+			final ObjectId newId, final PersonIdent ident, final String message)
+			throws IOException {
+		byte[] encoded = encode(oldId, newId, ident, message);
+		return log(refName, encoded);
+	}
+
