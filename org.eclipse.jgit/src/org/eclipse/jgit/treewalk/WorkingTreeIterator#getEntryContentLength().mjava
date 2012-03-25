@@ -1,0 +1,23 @@
+	/**
+	 * Get the filtered input length of this entry
+	 *
+	 * @return size of the content, in bytes
+	 * @throws IOException
+	 */
+	public long getEntryContentLength() throws IOException {
+		if (canonLen == -1) {
+			long rawLen = getEntryLength();
+			if (rawLen == 0)
+				canonLen = 0;
+			InputStream is = current().openInputStream();
+			try {
+				// canonLen gets updated here
+				possiblyFilteredInputStream(current(), is, current()
+						.getLength());
+			} finally {
+				safeClose(is);
+			}
+		}
+		return canonLen;
+	}
+
