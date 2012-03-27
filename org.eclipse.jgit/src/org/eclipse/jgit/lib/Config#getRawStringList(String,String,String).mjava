@@ -1,10 +1,5 @@
-	private List<String> getRawStringList(final String section,
-			final String subsection, final String name) {
-		List<String> r = null;
-		for (final ConfigLine e : state.get().entryList) {
-			if (e.match(section, subsection, name))
-				r = add(r, e.value);
-		}
-		return r;
+	private String[] getRawStringList(String section, String subsection,
+			String name) {
+		return state.get().get(section, subsection, name);
 	}
 

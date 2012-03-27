@@ -1,0 +1,12 @@
+	String[] get(String section, String subsection, String name) {
+		List<ConfigLine> s = sorted();
+		int idx = find(s, section, subsection, name);
+		if (idx < 0)
+			return null;
+		int end = end(s, idx, section, subsection, name);
+		String[] r = new String[end - idx];
+		for (int i = 0; idx < end;)
+			r[i++] = s.get(idx++).value;
+		return r;
+	}
+

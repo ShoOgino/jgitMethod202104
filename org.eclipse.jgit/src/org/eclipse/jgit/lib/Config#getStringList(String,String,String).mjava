@@ -14,21 +14,21 @@
 	 */
 	public String[] getStringList(final String section, String subsection,
 			final String name) {
-		final String[] baseList;
+		String[] base;
 		if (baseConfig != null)
-			baseList = baseConfig.getStringList(section, subsection, name);
+			base = baseConfig.getStringList(section, subsection, name);
 		else
-			baseList = EMPTY_STRING_ARRAY;
+			base = EMPTY_STRING_ARRAY;
 
-		final List<String> lst = getRawStringList(section, subsection, name);
-		if (lst != null) {
-			final String[] res = new String[baseList.length + lst.size()];
-			int idx = baseList.length;
-			System.arraycopy(baseList, 0, res, 0, idx);
-			for (final String val : lst)
-				res[idx++] = val;
-			return res;
-		}
-		return baseList;
+		String[] self = getRawStringList(section, subsection, name);
+		if (self == null)
+			return base;
+		if (base.length == 0)
+			return self;
+		String[] res = new String[base.length + self.length];
+		int n = base.length;
+		System.arraycopy(base, 0, res, 0, n);
+		System.arraycopy(self, 0, res, n, self.length);
+		return res;
 	}
 
