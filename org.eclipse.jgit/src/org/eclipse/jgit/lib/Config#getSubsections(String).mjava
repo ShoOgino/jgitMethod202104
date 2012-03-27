@@ -3,9 +3,11 @@
 	 *            section to search for.
 	 * @return set of all subsections of specified section within this
 	 *         configuration and its base configuration; may be empty if no
-	 *         subsection exists.
+	 *         subsection exists. The set's iterator returns sections in the
+	 *         order they are declared by the configuration starting from this
+	 *         instance and progressing through the base.
 	 */
 	public Set<String> getSubsections(final String section) {
-		return get(new SubsectionNames(section));
+		return getState().getSubsections(section);
 	}
 
