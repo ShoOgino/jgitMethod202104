@@ -1,10 +1,11 @@
-	private State unsetSection(final State srcState, final String section,
+	private ConfigSnapshot unsetSection(final ConfigSnapshot srcState,
+			final String section,
 			final String subsection) {
 		final int max = srcState.entryList.size();
-		final ArrayList<Entry> r = new ArrayList<Entry>(max);
+		final ArrayList<ConfigLine> r = new ArrayList<ConfigLine>(max);
 
 		boolean lastWasMatch = false;
-		for (Entry e : srcState.entryList) {
+		for (ConfigLine e : srcState.entryList) {
 			if (e.match(section, subsection)) {
 				// Skip this record, it's for the section we are removing.
 				lastWasMatch = true;
