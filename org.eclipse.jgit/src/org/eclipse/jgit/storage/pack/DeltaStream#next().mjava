@@ -16,7 +16,7 @@
 			if ((cmd & 0x04) != 0)
 				copyOffset |= (cmdbuf[cmdptr++] & 0xff) << 16;
 			if ((cmd & 0x08) != 0)
-				copyOffset |= (cmdbuf[cmdptr++] & 0xff) << 24;
+				copyOffset |= ((long) (cmdbuf[cmdptr++] & 0xff)) << 24;
 
 			copySize = 0;
 			if ((cmd & 0x10) != 0)
