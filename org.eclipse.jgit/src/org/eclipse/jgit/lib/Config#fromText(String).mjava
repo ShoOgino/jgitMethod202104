@@ -8,10 +8,10 @@
 	 *             made to {@code this}.
 	 */
 	public void fromText(final String text) throws ConfigInvalidException {
-		final List<Entry> newEntries = new ArrayList<Entry>();
+		final List<ConfigLine> newEntries = new ArrayList<ConfigLine>();
 		final StringReader in = new StringReader(text);
-		Entry last = null;
-		Entry e = new Entry();
+		ConfigLine last = null;
+		ConfigLine e = new ConfigLine();
 		for (;;) {
 			int input = in.read();
 			if (-1 == input)
@@ -23,7 +23,7 @@
 				newEntries.add(e);
 				if (e.section != null)
 					last = e;
-				e = new Entry();
+				e = new ConfigLine();
 
 			} else if (e.suffix != null) {
 				// Everything up until the end-of-line is in the suffix.

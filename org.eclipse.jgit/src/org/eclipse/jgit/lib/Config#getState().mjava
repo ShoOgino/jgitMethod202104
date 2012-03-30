@@ -1,11 +1,11 @@
-	private State getState() {
-		State cur, upd;
+	private ConfigSnapshot getState() {
+		ConfigSnapshot cur, upd;
 		do {
 			cur = state.get();
-			final State base = getBaseState();
+			final ConfigSnapshot base = getBaseState();
 			if (cur.baseState == base)
 				return cur;
-			upd = new State(cur.entryList, base);
+			upd = new ConfigSnapshot(cur.entryList, base);
 		} while (!state.compareAndSet(cur, upd));
 		return upd;
 	}

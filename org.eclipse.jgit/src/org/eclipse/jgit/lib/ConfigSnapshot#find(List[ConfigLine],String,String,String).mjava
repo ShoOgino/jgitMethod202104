@@ -1,0 +1,19 @@
+	private int find(List<ConfigLine> s, String s1, String s2, String name) {
+		int low = 0;
+		int high = s.size();
+		while (low < high) {
+			int mid = (low + high) >>> 1;
+			ConfigLine e = s.get(mid);
+			int cmp = compare2(
+					s1, s2, name,
+					e.section, e.subsection, e.name);
+			if (cmp < 0)
+				high = mid;
+			else if (cmp == 0)
+				return first(s, mid, s1, s2, name);
+			else
+				low = mid + 1;
+		}
+		return -(low + 1);
+	}
+
