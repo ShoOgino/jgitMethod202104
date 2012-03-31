@@ -1,6 +1,9 @@
 	@Override
 	protected void run() throws Exception {
 		final TreeWalk walk = new TreeWalk(db);
+		walk.reset(); // drop the first empty tree, which we do not need here
+		if (paths.size() > 0)
+			walk.setFilter(PathFilterGroup.createFromStrings(paths));
 		walk.setRecursive(recursive);
 		walk.addTree(tree);
 
