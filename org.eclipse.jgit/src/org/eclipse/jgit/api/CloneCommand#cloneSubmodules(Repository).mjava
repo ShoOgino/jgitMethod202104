@@ -1,4 +1,4 @@
-	private void cloneSubmodules(Repository clonedRepo) {
+	private void cloneSubmodules(Repository clonedRepo) throws IOException {
 		SubmoduleInitCommand init = new SubmoduleInitCommand(clonedRepo);
 		if (init.call().isEmpty())
 			return;
@@ -6,6 +6,13 @@
 		SubmoduleUpdateCommand update = new SubmoduleUpdateCommand(clonedRepo);
 		configure(update);
 		update.setProgressMonitor(monitor);
-		update.call();
+		if (!update.call().isEmpty()) {
+			SubmoduleWalk walk = SubmoduleWalk.forIndex(clonedRepo);
+			while (walk.next()) {
+				Repository subRepo = walk.getRepository();
+				if (subRepo != null)
+					cloneSubmodules(subRepo);
+			}
+		}
 	}
 
