@@ -1,0 +1,10 @@
+	Set<String> getSubsections(String section) {
+		Map<String, Set<String>> m = names().subsections;
+		Set<String> r = m.get(section);
+		if (r == null)
+			r = m.get(toLowerCase(section));
+		if (r == null)
+			return Collections.emptySet();
+		return Collections.unmodifiableSet(r);
+	}
+

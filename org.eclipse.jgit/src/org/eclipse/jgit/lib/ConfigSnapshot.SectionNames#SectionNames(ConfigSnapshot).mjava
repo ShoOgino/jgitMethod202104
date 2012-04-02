@@ -1,0 +1,29 @@
+		SectionNames(ConfigSnapshot cfg) {
+			Map<String, String> sec = new LinkedHashMap<String, String>();
+			Map<String, Set<String>> sub = new HashMap<String, Set<String>>();
+			while (cfg != null) {
+				for (ConfigLine e : cfg.entryList) {
+					if (e.section == null)
+						continue;
+
+					String l1 = toLowerCase(e.section);
+					if (!sec.containsKey(l1))
+						sec.put(l1, e.section);
+
+					if (e.subsection == null)
+						continue;
+
+					Set<String> m = sub.get(l1);
+					if (m == null) {
+						m = new LinkedHashSet<String>();
+						sub.put(l1, m);
+					}
+					m.add(e.subsection);
+				}
+				cfg = cfg.baseState;
+			}
+
+			sections = new CaseFoldingSet(sec);
+			subsections = sub;
+		}
+
