@@ -16,11 +16,9 @@
 	 */
 	public InputStream openEntryStream() throws IOException {
 		InputStream rawis = current().openInputStream();
-		InputStream is;
-		if (getOptions().getAutoCRLF() != AutoCRLF.FALSE)
-			is = new EolCanonicalizingInputStream(rawis, true);
+		if (mightNeedCleaning())
+			return filterClean(rawis);
 		else
-			is = rawis;
-		return is;
+			return rawis;
 	}
 
