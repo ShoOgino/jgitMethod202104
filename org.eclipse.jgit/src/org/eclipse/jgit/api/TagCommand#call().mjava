@@ -4,7 +4,7 @@
 	 * class should only be used for one invocation of the command (means: one
 	 * call to {@link #call()})
 	 *
-	 * @return a {@link RevTag} object representing the successful tag
+	 * @return a {@link Ref} a ref pointing to a tag
 	 * @throws NoHeadException
 	 *             when called on a git repo without a HEAD reference
 	 * @throws JGitInternalException
@@ -13,7 +13,7 @@
 	 *             {@link Exception#getCause()}. Expect only
 	 *             {@code IOException's} to be wrapped.
 	 */
-	public RevTag call() throws JGitInternalException,
+	public Ref call() throws JGitInternalException,
 			ConcurrentRefUpdateException, InvalidTagNameException, NoHeadException {
 		checkCallable();
 
@@ -47,7 +47,6 @@
 
 				RevWalk revWalk = new RevWalk(repo);
 				try {
-					RevTag revTag = revWalk.parseTag(tagId);
 					String refName = Constants.R_TAGS + newTag.getTag();
 					RefUpdate tagRef = repo.updateRef(refName);
 					tagRef.setNewObjectId(tagId);
@@ -57,7 +56,7 @@
 					switch (updateResult) {
 					case NEW:
 					case FORCED:
-						return revTag;
+						return repo.getRef(refName);
 					case LOCK_FAILURE:
 						throw new ConcurrentRefUpdateException(
 								JGitText.get().couldNotLockHEAD,
