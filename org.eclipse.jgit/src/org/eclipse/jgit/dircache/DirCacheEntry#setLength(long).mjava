@@ -3,15 +3,9 @@
 	 *
 	 * @param sz
 	 *            new cached size of the file, as bytes.
-	 * @throws IllegalArgumentException
-	 *             if the size exceeds the 2 GiB barrier imposed by current file
-	 *             format limitations.
 	 */
 	@SuppressWarnings("boxing")
 	public void setLength(final long sz) {
-		if (Integer.MAX_VALUE <= sz)
-			throw new IllegalArgumentException(MessageFormat.format(JGitText
-					.get().sizeExceeds2GB, getPathString(), sz));
 		setLength((int) sz);
 	}
 
