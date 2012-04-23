@@ -1,0 +1,8 @@
+	@Test
+	public void testMaliciousAbsoluteWindowsPath1OnUnix() throws Exception {
+		if (File.separatorChar == '\\')
+			return; // cannot emulate Unix on Windows for this test
+		((MockSystemReader) SystemReader.getInstance()).setUnix();
+		testMaliciousPathGoodFirstCheckout("c:\\temp\\x");
+	}
+

@@ -15,11 +15,14 @@
 	 * @throws IOException
 	 */
 
-	void processEntry(AbstractTreeIterator h, AbstractTreeIterator m,
+	void processEntry(CanonicalTreeParser h, CanonicalTreeParser m,
 			DirCacheBuildIterator i, WorkingTreeIterator f) throws IOException {
 		DirCacheEntry dce = i != null ? i.getDirCacheEntry() : null;
 
 		String name = walk.getPathString();
+
+		if (m != null && !isValidPath(m))
+			throw new InvalidPathException(m.getEntryPathString());
 
 		if (i == null && m == null && h == null) {
 			// File/Directory conflict case #20

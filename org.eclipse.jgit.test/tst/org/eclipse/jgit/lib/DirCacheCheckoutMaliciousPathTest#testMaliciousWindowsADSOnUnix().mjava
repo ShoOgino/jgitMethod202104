@@ -1,0 +1,8 @@
+	@Test
+	public void testMaliciousWindowsADSOnUnix() throws Exception {
+		if (File.separatorChar == '\\')
+			return; // cannot emulate Unix on Windows for this test
+		((MockSystemReader) SystemReader.getInstance()).setUnix();
+		testMaliciousPathGoodFirstCheckout("some:path");
+	}
+
