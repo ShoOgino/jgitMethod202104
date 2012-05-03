@@ -1,0 +1,27 @@
+	/**
+	 * Release any resources used by this object.
+	 *
+	 * @throws IOException
+	 *             the pack could not be unlocked.
+	 */
+	protected void release() throws IOException {
+		walk.release();
+		unlockPack();
+		timeoutIn = null;
+		rawIn = null;
+		rawOut = null;
+		msgOut = null;
+		pckIn = null;
+		pckOut = null;
+		refs = null;
+		enabledCapabilities = null;
+		commands = null;
+		if (timer != null) {
+			try {
+				timer.terminate();
+			} finally {
+				timer = null;
+			}
+		}
+	}
+

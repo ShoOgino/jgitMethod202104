@@ -1,0 +1,32 @@
+	/**
+	 * Close and flush (if necessary) the underlying streams.
+	 *
+	 * @throws IOException
+	 */
+	protected void close() throws IOException {
+		if (sideBand) {
+			// If we are using side band, we need to send a final
+			// flush-pkt to tell the remote peer the side band is
+			// complete and it should stop decoding. We need to
+			// use the original output stream as rawOut is now the
+			// side band data channel.
+			//
+			((SideBandOutputStream) msgOut).flushBuffer();
+			((SideBandOutputStream) rawOut).flushBuffer();
+
+			PacketLineOut plo = new PacketLineOut(origOut);
+			plo.setFlushOnEnd(false);
+			plo.end();
+		}
+
+		if (biDirectionalPipe) {
+			// If this was a native git connection, flush the pipe for
+			// the caller. For smart HTTP we don't do this flush and
+			// instead let the higher level HTTP servlet code do it.
+			//
+			if (!sideBand && msgOut != null)
+				msgOut.flush();
+			rawOut.flush();
+		}
+	}
+

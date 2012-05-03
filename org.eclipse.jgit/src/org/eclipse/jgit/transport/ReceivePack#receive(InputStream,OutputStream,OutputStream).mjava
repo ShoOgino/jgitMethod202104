@@ -18,74 +18,14 @@
 	 */
 	public void receive(final InputStream input, final OutputStream output,
 			final OutputStream messages) throws IOException {
+		init(input, output, messages);
 		try {
-			rawIn = input;
-			rawOut = output;
-			msgOut = messages;
-
-			if (timeout > 0) {
-				final Thread caller = Thread.currentThread();
-				timer = new InterruptTimer(caller.getName() + "-Timer");
-				timeoutIn = new TimeoutInputStream(rawIn, timer);
-				TimeoutOutputStream o = new TimeoutOutputStream(rawOut, timer);
-				timeoutIn.setTimeout(timeout * 1000);
-				o.setTimeout(timeout * 1000);
-				rawIn = timeoutIn;
-				rawOut = o;
-			}
-
-			pckIn = new PacketLineIn(rawIn);
-			pckOut = new PacketLineOut(rawOut);
-			pckOut.setFlushOnEnd(false);
-
-			commands = new ArrayList<ReceiveCommand>();
-
 			service();
 		} finally {
-			walk.release();
 			try {
-				if (sideBand) {
-					// If we are using side band, we need to send a final
-					// flush-pkt to tell the remote peer the side band is
-					// complete and it should stop decoding. We need to
-					// use the original output stream as rawOut is now the
-					// side band data channel.
-					//
-					((SideBandOutputStream) msgOut).flushBuffer();
-					((SideBandOutputStream) rawOut).flushBuffer();
-
-					PacketLineOut plo = new PacketLineOut(output);
-					plo.setFlushOnEnd(false);
-					plo.end();
-				}
-
-				if (biDirectionalPipe) {
-					// If this was a native git connection, flush the pipe for
-					// the caller. For smart HTTP we don't do this flush and
-					// instead let the higher level HTTP servlet code do it.
-					//
-					if (!sideBand && msgOut != null)
-						msgOut.flush();
-					rawOut.flush();
-				}
+				close();
 			} finally {
-				unlockPack();
-				timeoutIn = null;
-				rawIn = null;
-				rawOut = null;
-				msgOut = null;
-				pckIn = null;
-				pckOut = null;
-				refs = null;
-				enabledCapabilities = null;
-				commands = null;
-				if (timer != null) {
-					try {
-						timer.terminate();
-					} finally {
-						timer = null;
-					}
-				}
+				release();
 			}
 		}
 	}

@@ -4,19 +4,16 @@
 			pckOut.flush();
 		} else
 			getAdvertisedOrDefaultRefs();
-		if (advertiseError != null)
+		if (hasError())
 			return;
 		recvCommands();
-		if (!commands.isEmpty()) {
+		if (hasCommands()) {
 			enableCapabilities();
 
+			Throwable unpackError = null;
 			if (needPack()) {
 				try {
-					receivePack();
-					if (needCheckConnectivity())
-						checkConnectivity();
-					parser = null;
-					unpackError = null;
+					receivePackAndCheckConnectivity();
 				} catch (IOException err) {
 					unpackError = err;
 				} catch (RuntimeException err) {
@@ -28,27 +25,27 @@
 
 			if (unpackError == null) {
 				validateCommands();
+				preReceive.onPreReceive(this, filterCommands(Result.NOT_ATTEMPTED));
 				executeCommands();
 			}
 			unlockPack();
 
 			if (reportStatus) {
-				sendStatusReport(true, new Reporter() {
+				sendStatusReport(true, unpackError, new Reporter() {
 					void sendString(final String s) throws IOException {
 						pckOut.writeString(s + "\n");
 					}
 				});
 				pckOut.end();
 			} else if (msgOut != null) {
-				sendStatusReport(false, new Reporter() {
+				sendStatusReport(false, unpackError, new Reporter() {
 					void sendString(final String s) throws IOException {
 						msgOut.write(Constants.encode(s + "\n"));
 					}
 				});
 			}
 
-			postReceive.onPostReceive(this,
-					ReceiveCommand.filter(commands, Result.OK));
+			postReceive.onPostReceive(this, filterCommands(Result.OK));
 
 			if (unpackError != null)
 				throw new UnpackException(unpackError);

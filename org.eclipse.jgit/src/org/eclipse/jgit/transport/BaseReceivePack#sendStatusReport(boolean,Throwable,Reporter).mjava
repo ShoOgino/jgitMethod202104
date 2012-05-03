@@ -1,5 +1,18 @@
-	private void sendStatusReport(final boolean forClient, final Reporter out)
-			throws IOException {
+	/**
+	 * Send a status report.
+	 *
+	 * @param forClient
+	 *            true if this report is for a Git client, false if it is for an
+	 *            end-user.
+	 * @param unpackError
+	 *            an error that occurred during unpacking, or {@code null}
+	 * @param out
+	 *            the reporter for sending the status strings.
+	 * @throws IOException
+	 *             an error occurred writing the status report.
+	 */
+	protected void sendStatusReport(final boolean forClient,
+			final Throwable unpackError, final Reporter out) throws IOException {
 		if (unpackError != null) {
 			out.sendString("unpack error " + unpackError.getMessage());
 			if (forClient) {
