@@ -1,16 +1,12 @@
 	private void checkoutIndex(RevCommit commit) throws IOException {
-		DirCache dc = null;
+		DirCache dc = repo.lockDirCache();
 		try {
-			dc = repo.lockDirCache();
 			DirCacheCheckout checkout = new DirCacheCheckout(repo, dc,
 					commit.getTree());
 			checkout.setFailOnConflict(false);
 			checkout.checkout();
-		} catch (IOException e) {
-			throw e;
 		} finally {
-			if (dc != null)
-				dc.unlock();
+			dc.unlock();
 		}
 	}
 
