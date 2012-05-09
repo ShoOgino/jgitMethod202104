@@ -7,8 +7,11 @@
 	 * @return a DiffEntry for each path which is different
 	 */
 	public List<DiffEntry> call() throws GitAPIException, IOException {
-		final DiffFormatter diffFmt = new DiffFormatter(
-				new BufferedOutputStream(out));
+		final DiffFormatter diffFmt;
+		if (out != null && !showNameAndStatusOnly)
+			diffFmt = new DiffFormatter(new BufferedOutputStream(out));
+		else
+			diffFmt = new DiffFormatter(NullOutputStream.INSTANCE);
 		diffFmt.setRepository(repo);
 		diffFmt.setProgressMonitor(monitor);
 		try {
@@ -35,17 +38,17 @@
 			}
 
 			diffFmt.setPathFilter(pathFilter);
-			if (contextLines >= 0)
-				diffFmt.setContext(contextLines);
-			if (destinationPrefix != null)
-				diffFmt.setNewPrefix(destinationPrefix);
-			if (sourcePrefix != null)
-				diffFmt.setOldPrefix(sourcePrefix);
 
 			List<DiffEntry> result = diffFmt.scan(oldTree, newTree);
-			if (showNameAndStatusOnly) {
+			if (showNameAndStatusOnly)
 				return result;
-			} else {
+			else {
+				if (contextLines >= 0)
+					diffFmt.setContext(contextLines);
+				if (destinationPrefix != null)
+					diffFmt.setNewPrefix(destinationPrefix);
+				if (sourcePrefix != null)
+					diffFmt.setOldPrefix(sourcePrefix);
 				diffFmt.format(result);
 				diffFmt.flush();
 				return result;
