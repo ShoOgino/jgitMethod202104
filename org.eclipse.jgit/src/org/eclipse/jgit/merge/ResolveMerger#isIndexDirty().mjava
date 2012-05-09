@@ -4,7 +4,7 @@
 
 		// Index entry has to match ours to be considered clean
 		final boolean isDirty = nonTree(modeI)
-				&& !(tw.idEqual(T_INDEX, T_OURS) && modeO == modeI);
+				&& !(modeO == modeI && tw.idEqual(T_INDEX, T_OURS));
 		if (isDirty)
 			failingPaths
 					.put(tw.getPathString(), MergeFailureReason.DIRTY_INDEX);

@@ -7,7 +7,7 @@
 
 		// Worktree entry has to match ours to be considered clean
 		final boolean isDirty = nonTree(modeF)
-				&& !(tw.idEqual(T_FILE, T_OURS) && modeO == modeF);
+				&& !(modeO == modeF && tw.idEqual(T_FILE, T_OURS));
 		if (isDirty)
 			failingPaths.put(tw.getPathString(),
 					MergeFailureReason.DIRTY_WORKTREE);
