@@ -11,7 +11,8 @@
 
 			default:
 				throw new IOException(MessageFormat.format(
-						JGitText.get().unknownObjectType, info.type));
+						JGitText.get().unknownObjectType,
+						Integer.valueOf(info.type)));
 			}
 
 			byte[] delta = inflateAndReturn(Source.DATABASE, info.size);
@@ -23,7 +24,7 @@
 			if (!checkCRC(visit.delta.crc))
 				throw new IOException(MessageFormat.format(
 						JGitText.get().corruptionDetectedReReadingAt,
-						visit.delta.position));
+						Long.valueOf(visit.delta.position)));
 
 			objectDigest.update(Constants.encodedTypeString(type));
 			objectDigest.update((byte) ' ');

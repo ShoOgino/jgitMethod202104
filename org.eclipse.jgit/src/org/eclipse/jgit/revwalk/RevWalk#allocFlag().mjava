@@ -1,7 +1,8 @@
 	int allocFlag() {
 		if (freeFlags == 0)
 			throw new IllegalArgumentException(MessageFormat.format(
-					JGitText.get().flagsAlreadyCreated, 32 - RESERVED_FLAGS));
+					JGitText.get().flagsAlreadyCreated,
+					Integer.valueOf(32 - RESERVED_FLAGS)));
 		final int m = Integer.lowestOneBit(freeFlags);
 		freeFlags &= ~m;
 		return m;

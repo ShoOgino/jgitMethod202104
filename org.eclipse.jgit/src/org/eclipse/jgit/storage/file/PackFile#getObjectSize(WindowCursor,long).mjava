@@ -34,14 +34,15 @@
 
 		default:
 			throw new IOException(MessageFormat.format(
-					JGitText.get().unknownObjectType, type));
+					JGitText.get().unknownObjectType, Integer.valueOf(type)));
 		}
 
 		try {
 			return BinaryDelta.getResultSize(getDeltaHeader(curs, deltaAt));
 		} catch (DataFormatException e) {
-			throw new CorruptObjectException(MessageFormat.format(JGitText
-					.get().objectAtHasBadZlibStream, pos, getPackFile()));
+			throw new CorruptObjectException(MessageFormat.format(
+					JGitText.get().objectAtHasBadZlibStream, Long.valueOf(pos),
+					getPackFile()));
 		}
 	}
 

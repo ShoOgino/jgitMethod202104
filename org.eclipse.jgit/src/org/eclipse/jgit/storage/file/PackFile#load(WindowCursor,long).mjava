@@ -85,7 +85,8 @@
 
 				default:
 					throw new IOException(MessageFormat.format(
-							JGitText.get().unknownObjectType, typeCode));
+							JGitText.get().unknownObjectType,
+							Integer.valueOf(typeCode)));
 				}
 			}
 
@@ -133,8 +134,8 @@
 		} catch (DataFormatException dfe) {
 			CorruptObjectException coe = new CorruptObjectException(
 					MessageFormat.format(
-							JGitText.get().objectAtHasBadZlibStream, pos,
-							getPackFile()));
+							JGitText.get().objectAtHasBadZlibStream,
+							Long.valueOf(pos), getPackFile()));
 			coe.initCause(dfe);
 			throw coe;
 		}

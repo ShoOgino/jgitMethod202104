@@ -56,17 +56,17 @@
 				resolveDeltas(resolving);
 				if (entryCount < objectCount) {
 					if (!isAllowThin()) {
-						throw new IOException(MessageFormat.format(JGitText
-								.get().packHasUnresolvedDeltas,
-								(objectCount - entryCount)));
+						throw new IOException(MessageFormat.format(
+								JGitText.get().packHasUnresolvedDeltas,
+								Long.valueOf(objectCount - entryCount)));
 					}
 
 					resolveDeltasWithExternalBases(resolving);
 
 					if (entryCount < objectCount) {
-						throw new IOException(MessageFormat.format(JGitText
-								.get().packHasUnresolvedDeltas,
-								(objectCount - entryCount)));
+						throw new IOException(MessageFormat.format(
+								JGitText.get().packHasUnresolvedDeltas,
+								Long.valueOf(objectCount - entryCount)));
 					}
 				}
 				resolving.endTask();

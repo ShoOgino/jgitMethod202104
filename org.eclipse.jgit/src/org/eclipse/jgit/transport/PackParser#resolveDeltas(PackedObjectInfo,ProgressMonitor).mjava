@@ -18,13 +18,14 @@
 			break;
 		default:
 			throw new IOException(MessageFormat.format(
-					JGitText.get().unknownObjectType, info.type));
+					JGitText.get().unknownObjectType,
+					Integer.valueOf(info.type)));
 		}
 
 		if (!checkCRC(oe.getCRC())) {
 			throw new IOException(MessageFormat.format(
-					JGitText.get().corruptionDetectedReReadingAt, oe
-							.getOffset()));
+					JGitText.get().corruptionDetectedReReadingAt,
+					Long.valueOf(oe.getOffset())));
 		}
 
 		resolveDeltas(visit.next(), info.type, info, progress);

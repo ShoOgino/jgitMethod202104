@@ -76,7 +76,7 @@
 					setCorrupt(src.offset);
 					throw new CorruptObjectException(MessageFormat.format(
 							JGitText.get().objectAtHasBadZlibStream,
-							src.offset, getPackFile()));
+							Long.valueOf(src.offset), getPackFile()));
 				}
 			} else if (validate) {
 				// We don't have a CRC32 code in the index, so compute it
@@ -105,7 +105,7 @@
 					setCorrupt(src.offset);
 					throw new EOFException(MessageFormat.format(
 							JGitText.get().shortCompressedStreamAt,
-							src.offset));
+							Long.valueOf(src.offset)));
 				}
 				expectedCRC = crc1.getValue();
 			} else {
@@ -117,7 +117,7 @@
 			CorruptObjectException corruptObject = new CorruptObjectException(
 					MessageFormat.format(
 							JGitText.get().objectAtHasBadZlibStream,
-							src.offset, getPackFile()));
+							Long.valueOf(src.offset), getPackFile()));
 			corruptObject.initCause(dataFormat);
 
 			StoredObjectRepresentationNotAvailableException gone;
@@ -173,9 +173,9 @@
 				cnt -= n;
 			}
 			if (validate && crc2.getValue() != expectedCRC) {
-				throw new CorruptObjectException(MessageFormat.format(JGitText
-						.get().objectAtHasBadZlibStream, src.offset,
-						getPackFile()));
+				throw new CorruptObjectException(MessageFormat.format(
+						JGitText.get().objectAtHasBadZlibStream,
+						Long.valueOf(src.offset), getPackFile()));
 			}
 		}
 	}

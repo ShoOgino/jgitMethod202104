@@ -15,7 +15,8 @@
 		if (ver == 3)
 			extended = true;
 		else if (ver != 2)
-			throw new CorruptObjectException(MessageFormat.format(JGitText.get().unknownDIRCVersion, ver));
+			throw new CorruptObjectException(MessageFormat.format(
+					JGitText.get().unknownDIRCVersion, Integer.valueOf(ver)));
 		entryCnt = NB.decodeInt32(hdr, 8);
 		if (entryCnt < 0)
 			throw new CorruptObjectException(JGitText.get().DIRCHasTooManyEntries);
@@ -50,8 +51,9 @@
 			switch (NB.decodeInt32(hdr, 0)) {
 			case EXT_TREE: {
 				if (Integer.MAX_VALUE < sz) {
-					throw new CorruptObjectException(MessageFormat.format(JGitText.get().DIRCExtensionIsTooLargeAt
-							, formatExtensionName(hdr), sz));
+					throw new CorruptObjectException(MessageFormat.format(
+							JGitText.get().DIRCExtensionIsTooLargeAt,
+							formatExtensionName(hdr), Long.valueOf(sz)));
 				}
 				final byte[] raw = new byte[(int) sz];
 				IO.readFully(in, raw, 0, raw.length);

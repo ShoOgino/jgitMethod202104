@@ -9,11 +9,14 @@
 		final long vers = NB.decodeUInt32(buf, 4);
 		final long packCnt = NB.decodeUInt32(buf, 8);
 		if (vers != 2 && vers != 3)
-			throw new IOException(MessageFormat.format(JGitText.get().unsupportedPackVersion, vers));
+			throw new IOException(MessageFormat.format(
+					JGitText.get().unsupportedPackVersion, Long.valueOf(vers)));
 
 		if (packCnt != idx.getObjectCount())
 			throw new PackMismatchException(MessageFormat.format(
-					JGitText.get().packObjectCountMismatch, packCnt, idx.getObjectCount(), getPackFile()));
+					JGitText.get().packObjectCountMismatch,
+					Long.valueOf(packCnt), Long.valueOf(idx.getObjectCount()),
+					getPackFile()));
 
 		fd.seek(length - 20);
 		fd.readFully(buf, 0, 20);
