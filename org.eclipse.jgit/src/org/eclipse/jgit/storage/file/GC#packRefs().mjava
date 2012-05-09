@@ -1,0 +1,21 @@
+	/**
+	 * Packs all non-symbolic, loose refs into packed-refs.
+	 *
+	 * @throws IOException
+	 */
+	public void packRefs() throws IOException {
+		Collection<Ref> refs = repo.getAllRefs().values();
+		List<String> refsToBePacked = new ArrayList<String>(refs.size());
+		pm.beginTask(JGitText.get().packRefs, refs.size());
+		try {
+			for (Ref ref : refs) {
+				if (!ref.isSymbolic() && ref.getStorage().isLoose())
+					refsToBePacked.add(ref.getName());
+				pm.update(1);
+			}
+			((RefDirectory) repo.getRefDatabase()).pack(refsToBePacked);
+		} finally {
+			pm.endTask();
+		}
+	}
+

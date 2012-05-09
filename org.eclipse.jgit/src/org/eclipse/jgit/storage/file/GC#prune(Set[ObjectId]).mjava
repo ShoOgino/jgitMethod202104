@@ -1,0 +1,126 @@
+	/**
+	 * Like "git prune" this method tries to prune all loose objects which are
+	 * unreferenced. If certain objects can't be pruned (e.g. because the
+	 * filesystem delete operation fails) this is silently ignored.
+	 *
+	 * @param objectsToKeep
+	 *            a set of objects which should explicitly not be pruned
+	 *
+	 * @throws IOException
+	 */
+	public void prune(Set<ObjectId> objectsToKeep)
+			throws IOException {
+		long expireDate = (expireAgeMillis == 0) ? Long.MAX_VALUE : System
+				.currentTimeMillis() - expireAgeMillis;
+
+		// Collect all loose objects which are old enough, not referenced from
+		// the index and not in objectsToKeep
+		Map<ObjectId, File> deletionCandidates = new HashMap<ObjectId, File>();
+		Set<ObjectId> indexObjects = null;
+		File objects = repo.getObjectsDirectory();
+		String[] fanout = objects.list();
+		if (fanout != null && fanout.length > 0) {
+			pm.beginTask(JGitText.get().pruneLooseUnreferencedObjects,
+					fanout.length);
+			for (String d : fanout) {
+				pm.update(1);
+				if (d.length() != 2)
+					continue;
+				File[] entries = new File(objects, d).listFiles();
+				if (entries == null)
+					continue;
+				for (File f : entries) {
+					String fName = f.getName();
+					if (fName.length() != Constants.OBJECT_ID_STRING_LENGTH - 2)
+						continue;
+					if (f.lastModified() >= expireDate)
+						continue;
+					try {
+						ObjectId id = ObjectId.fromString(d + fName);
+						if (objectsToKeep.contains(id))
+							continue;
+						if (indexObjects == null)
+							indexObjects = listNonHEADIndexObjects();
+						if (indexObjects.contains(id))
+							continue;
+						deletionCandidates.put(id, f);
+					} catch (IllegalArgumentException notAnObject) {
+						// ignoring the file that does not represent loose
+						// object
+						continue;
+					}
+				}
+			}
+		}
+		if (deletionCandidates.isEmpty())
+			return;
+
+		// From the set of current refs remove all those which have been handled
+		// during last repack(). Only those refs will survive which have been
+		// added or modified since the last repack. Only these can save existing
+		// loose refs from being pruned.
+		Map<String, Ref> newRefs;
+		if (lastPackedRefs == null || lastPackedRefs.isEmpty())
+			newRefs = getAllRefs();
+		else {
+			newRefs = new HashMap<String, Ref>();
+			for (Iterator<Map.Entry<String, Ref>> i = getAllRefs().entrySet()
+					.iterator(); i.hasNext();) {
+				Entry<String, Ref> newEntry = i.next();
+				Ref old = lastPackedRefs.get(newEntry.getKey());
+				if (!equals(newEntry.getValue(), old))
+					newRefs.put(newEntry.getKey(), newEntry.getValue());
+			}
+		}
+
+		if (!newRefs.isEmpty()) {
+			// There are new/modified refs! Check which loose objects are now
+			// referenced by these modified refs (or their reflogentries).
+			// Remove these loose objects
+			// from the deletionCandidates. When the last candidate is removed
+			// leave this method.
+			ObjectWalk w = new ObjectWalk(repo);
+			try {
+				for (Ref cr : newRefs.values())
+					w.markStart(w.parseAny(cr.getObjectId()));
+				if (lastPackedRefs != null)
+					for (Ref lpr : lastPackedRefs.values())
+						w.markUninteresting(w.parseAny(lpr.getObjectId()));
+				removeReferenced(deletionCandidates, w);
+			} finally {
+				w.dispose();
+			}
+		}
+
+		if (deletionCandidates.isEmpty())
+			return;
+
+		// Since we have not left the method yet there are still
+		// deletionCandidates. Last chance for these objects not to be pruned is
+		// that they are referenced by reflog entries. Even refs which currently
+		// point to the same object as during last repack() may have
+		// additional reflog entries not handled during last repack()
+		ObjectWalk w = new ObjectWalk(repo);
+		try {
+			for (Ref ar : getAllRefs().values())
+				for (ObjectId id : listRefLogObjects(ar, lastRepackTime))
+					w.markStart(w.parseAny(id));
+			if (lastPackedRefs != null)
+				for (Ref lpr : lastPackedRefs.values())
+					w.markUninteresting(w.parseAny(lpr.getObjectId()));
+			removeReferenced(deletionCandidates, w);
+		} finally {
+			w.dispose();
+		}
+
+		if (deletionCandidates.isEmpty())
+			return;
+
+		// delete all candidates which have survived: these are unreferenced
+		// loose objects
+		for (File f : deletionCandidates.values())
+			f.delete();
+
+		repo.getObjectDatabase().close();
+	}
+

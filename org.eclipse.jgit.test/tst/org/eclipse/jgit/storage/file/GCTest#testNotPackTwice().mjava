@@ -1,0 +1,32 @@
+	@Test
+	public void testNotPackTwice() throws Exception {
+		BranchBuilder bb = tr.branch("refs/heads/master");
+		RevCommit first = bb.commit().message("M").add("M", "M").create();
+		bb.commit().message("B").add("B", "Q").create();
+		bb.commit().message("A").add("A", "A").create();
+		RevCommit second = tr.commit().parent(first).message("R").add("R", "Q")
+				.create();
+		tr.update("refs/tags/t1", second);
+
+		Collection<PackFile> oldPacks = tr.getRepository().getObjectDatabase()
+				.getPacks();
+		assertEquals(0, oldPacks.size());
+		stats = gc.getStatistics();
+		assertEquals(11, stats.numberOfLooseObjects);
+		assertEquals(0, stats.numberOfPackedObjects);
+
+		gc.setExpireAgeMillis(0);
+		gc.gc();
+		stats = gc.getStatistics();
+		assertEquals(0, stats.numberOfLooseObjects);
+
+		Iterator<PackFile> pIt = repo.getObjectDatabase().getPacks().iterator();
+		long c = pIt.next().getObjectCount();
+		if (c == 9)
+			assertEquals(2, pIt.next().getObjectCount());
+		else {
+			assertEquals(2, c);
+			assertEquals(9, pIt.next().getObjectCount());
+		}
+	}
+

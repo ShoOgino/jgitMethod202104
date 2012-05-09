@@ -1,0 +1,24 @@
+	/**
+	 * @param ref
+	 *            the ref which log should be inspected
+	 * @param minTime only reflog entries not older then this time are processed
+	 * @return the {@link ObjectId}s contained in the reflog
+	 * @throws IOException
+	 */
+	private Set<ObjectId> listRefLogObjects(Ref ref, long minTime) throws IOException {
+		List<ReflogEntry> rlEntries = repo.getReflogReader(ref.getName())
+				.getReverseEntries();
+		if (rlEntries == null || rlEntries.isEmpty())
+			return Collections.<ObjectId> emptySet();
+		Set<ObjectId> ret = new HashSet<ObjectId>();
+		for (ReflogEntry e : rlEntries) {
+			if (e.getWho().getWhen().getTime() < minTime)
+				break;
+			ret.add(e.getNewId());
+			ObjectId oldId = e.getOldId();
+			if (oldId != null && !ObjectId.zeroId().equals(oldId))
+				ret.add(oldId);
+		}
+		return ret;
+	}
+

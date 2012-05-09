@@ -1,0 +1,14 @@
+	/**
+	 * Returns a map of all refs and additional refs (e.g. FETCH_HEAD,
+	 * MERGE_HEAD, ...)
+	 *
+	 * @return a map where names of refs point to ref objects
+	 * @throws IOException
+	 */
+	private Map<String, Ref> getAllRefs() throws IOException {
+		Map<String, Ref> ret = repo.getAllRefs();
+		for (Ref ref : repo.getRefDatabase().getAdditionalRefs())
+			ret.put(ref.getName(), ref);
+		return ret;
+	}
+

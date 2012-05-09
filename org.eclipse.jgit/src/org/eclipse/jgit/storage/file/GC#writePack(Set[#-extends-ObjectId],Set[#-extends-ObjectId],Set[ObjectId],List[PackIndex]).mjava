@@ -1,0 +1,88 @@
+	private PackFile writePack(Set<? extends ObjectId> want,
+			Set<? extends ObjectId> have, Set<ObjectId> tagTargets,
+			List<PackIndex> excludeObjects) throws IOException {
+		File tmpPack = null;
+		File tmpIdx = null;
+		PackWriter pw = new PackWriter(repo);
+		try {
+			// prepare the PackWriter
+			pw.setDeltaBaseAsOffset(true);
+			pw.setReuseDeltaCommits(false);
+			if (tagTargets != null)
+				pw.setTagTargets(tagTargets);
+			if (excludeObjects != null)
+				for (PackIndex idx : excludeObjects)
+					pw.excludeObjects(idx);
+			pw.preparePack(pm, want, have);
+			if (pw.getObjectCount() == 0)
+				return null;
+
+			// create temporary files
+			String id = pw.computeName().getName();
+			File packdir = new File(repo.getObjectsDirectory(), "pack");
+			tmpPack = File.createTempFile("gc_", ".pack_tmp", packdir);
+			tmpIdx = new File(packdir, tmpPack.getName().substring(0,
+					tmpPack.getName().lastIndexOf('.'))
+					+ ".idx_tmp");
+
+			if (!tmpIdx.createNewFile())
+				throw new IOException(MessageFormat.format(
+						JGitText.get().cannotCreateIndexfile, tmpIdx.getPath()));
+
+			// write the packfile
+			FileChannel channel = new FileOutputStream(tmpPack).getChannel();
+			OutputStream channelStream = Channels.newOutputStream(channel);
+			try {
+				pw.writePack(pm, pm, channelStream);
+			} finally {
+				channel.force(true);
+				channelStream.close();
+				channel.close();
+			}
+
+			// write the packindex
+			FileChannel idxChannel = new FileOutputStream(tmpIdx).getChannel();
+			OutputStream idxStream = Channels.newOutputStream(idxChannel);
+			try {
+				pw.writeIndex(idxStream);
+			} finally {
+				idxChannel.force(true);
+				idxStream.close();
+				idxChannel.close();
+			}
+
+			// rename the temporary files to real files
+			File realPack = nameFor(id, ".pack");
+			tmpPack.setReadOnly();
+			File realIdx = nameFor(id, ".idx");
+			realIdx.setReadOnly();
+			boolean delete = true;
+			try {
+				if (!tmpPack.renameTo(realPack))
+					return null;
+				delete = false;
+				if (!tmpIdx.renameTo(realIdx)) {
+					File newIdx = new File(realIdx.getParentFile(),
+							realIdx.getName() + ".new");
+					if (!tmpIdx.renameTo(newIdx))
+						newIdx = tmpIdx;
+					throw new IOException(MessageFormat.format(
+							JGitText.get().panicCantRenameIndexFile, newIdx,
+							realIdx));
+				}
+			} finally {
+				if (delete && tmpPack.exists())
+					tmpPack.delete();
+				if (delete && tmpIdx.exists())
+					tmpIdx.delete();
+			}
+			return repo.getObjectDatabase().openPack(realPack, realIdx);
+		} finally {
+			pw.release();
+			if (tmpPack != null && tmpPack.exists())
+				tmpPack.delete();
+			if (tmpIdx != null && tmpIdx.exists())
+				tmpIdx.delete();
+		}
+	}
+
