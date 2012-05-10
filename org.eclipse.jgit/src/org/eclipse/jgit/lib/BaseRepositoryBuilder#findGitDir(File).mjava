@@ -21,7 +21,13 @@
 				if (FileKey.isGitRepository(dir, tryFS)) {
 					setGitDir(dir);
 					break;
-				}
+				} else if (dir.isFile())
+					try {
+						setGitDir(getSymRef(current, dir));
+						break;
+					} catch (IOException ignored) {
+						// Continue searching if gitdir ref isn't found
+					}
 
 				current = current.getParentFile();
 				if (current != null && ceilingDirectories != null
