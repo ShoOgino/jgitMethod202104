@@ -1,6 +1,7 @@
 	private RebaseResult abort(RebaseResult result) throws IOException {
 		try {
-			String commitId = readFile(repo.getDirectory(), Constants.ORIG_HEAD);
+			ObjectId origHead = repo.readOrigHead();
+			String commitId = origHead != null ? origHead.name() : null;
 			monitor.beginTask(MessageFormat.format(
 					JGitText.get().abortingRebase, commitId),
 					ProgressMonitor.UNKNOWN);
