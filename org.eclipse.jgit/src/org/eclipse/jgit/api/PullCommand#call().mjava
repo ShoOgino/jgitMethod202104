@@ -63,10 +63,24 @@
 		String remoteBranchName = repoConfig.getString(
 				ConfigConstants.CONFIG_BRANCH_SECTION, branchName,
 				ConfigConstants.CONFIG_KEY_MERGE);
-		// check if the branch is configured for pull-rebase
-		boolean doRebase = repoConfig.getBoolean(
-				ConfigConstants.CONFIG_BRANCH_SECTION, branchName,
-				ConfigConstants.CONFIG_KEY_REBASE, false);
+
+        // determines whether rebase should be used after fetching
+        boolean doRebase = false;
+        switch (pullRebaseMode) {
+            case REBASE:
+                doRebase = true;
+                break;
+            case NO_REBASE:
+                doRebase = false;
+                break;
+            case USE_CONFIG:
+            default:
+                // check if the branch is configured for pull-rebase
+                doRebase = repoConfig.getBoolean(
+                        ConfigConstants.CONFIG_BRANCH_SECTION, branchName,
+                        ConfigConstants.CONFIG_KEY_REBASE, false);
+                break;
+        }
 
 		if (remoteBranchName == null) {
 			String missingKey = ConfigConstants.CONFIG_BRANCH_SECTION + DOT
