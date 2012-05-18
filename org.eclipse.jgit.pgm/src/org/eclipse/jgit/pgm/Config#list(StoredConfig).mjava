@@ -1,0 +1,24 @@
+	private void list(StoredConfig config) throws IOException,
+			ConfigInvalidException {
+		config.load();
+		Set<String> sections = config.getSections();
+		for (String section : sections) {
+			Set<String> names = config.getNames(section);
+			for (String name : names) {
+				for (String value : config.getStringList(section, null, name))
+					out.println(section + "." + name + "=" + value);
+			}
+			if (names.isEmpty()) {
+				for (String subsection : config.getSubsections(section)) {
+					names = config.getNames(section, subsection);
+					for (String name : names) {
+						for (String value : config.getStringList(section,
+								subsection, name))
+							out.println(section + "." + subsection + "."
+									+ name + "=" + value);
+					}
+				}
+			}
+		}
+	}
+

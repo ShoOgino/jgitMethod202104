@@ -1,0 +1,15 @@
+	private void list() throws IOException, ConfigInvalidException {
+		final FS fs = getRepository().getFS();
+		if (configFile != null) {
+			list(new FileBasedConfig(configFile, fs));
+			return;
+		}
+		if (system || isListAll())
+			list(SystemReader.getInstance().openSystemConfig(null, fs));
+		if (global || isListAll())
+			list(SystemReader.getInstance().openUserConfig(null, fs));
+		if (local || isListAll())
+			list(new FileBasedConfig(fs.resolve(getRepository().getDirectory(),
+					Constants.CONFIG), fs));
+	}
+
