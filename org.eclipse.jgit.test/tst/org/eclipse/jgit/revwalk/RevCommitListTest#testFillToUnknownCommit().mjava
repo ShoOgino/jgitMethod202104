@@ -1,0 +1,11 @@
+	@Test
+	public void testFillToUnknownCommit() throws Exception {
+		setup(258);
+		RevCommit c = new RevCommit(
+				ObjectId.fromString("9473095c4cb2f12aefe1db8a355fe3fafba42f67"));
+
+		list.fillTo(c, 300);
+		assertEquals("loading to unknown commit should load all commits", 258,
+				list.size());
+	}
+
