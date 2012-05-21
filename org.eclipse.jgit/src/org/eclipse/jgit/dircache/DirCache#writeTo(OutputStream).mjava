@@ -33,6 +33,13 @@
 			smudge_s = 0;
 		}
 
+		// Check if tree is non-null here since calling updateSmudgedEntries
+		// will automatically build it via creating a DirCacheIterator
+		final boolean writeTree = tree != null;
+
+		if (repository != null && entryCnt > 0)
+			updateSmudgedEntries();
+
 		for (int i = 0; i < entryCnt; i++) {
 			final DirCacheEntry e = sortedEntries[i];
 			if (e.mightBeRacilyClean(smudge_s, smudge_ns))
@@ -40,7 +47,7 @@
 			e.write(dos);
 		}
 
-		if (tree != null) {
+		if (writeTree) {
 			final TemporaryBuffer bb = new TemporaryBuffer.LocalFile();
 			tree.write(tmp, bb);
 			bb.close();
