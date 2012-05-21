@@ -1,5 +1,6 @@
 	DirCacheEntry(final byte[] sharedInfo, final MutableInteger infoAt,
-			final InputStream in, final MessageDigest md) throws IOException {
+			final InputStream in, final MessageDigest md, final int smudge_s,
+			final int smudge_ns) throws IOException {
 		info = sharedInfo;
 		infoOffset = infoAt.value;
 
@@ -57,5 +58,9 @@
 			IO.skipFully(in, padLen);
 			md.update(nullpad, 0, padLen);
 		}
+
+		if (mightBeRacilyClean(smudge_s, smudge_ns))
+			smudgeRacilyClean();
+
 	}
 
