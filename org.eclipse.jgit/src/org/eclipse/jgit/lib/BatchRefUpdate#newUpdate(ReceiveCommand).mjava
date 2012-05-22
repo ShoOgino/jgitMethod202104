@@ -1,0 +1,36 @@
+	/**
+	 * Create a new RefUpdate copying the batch settings.
+	 *
+	 * @param cmd
+	 *            specific command the update should be created to copy.
+	 * @return a single reference update command.
+	 * @throws IOException
+	 *             the reference database cannot make a new update object for
+	 *             the given reference.
+	 */
+	protected RefUpdate newUpdate(ReceiveCommand cmd) throws IOException {
+		RefUpdate ru = refdb.newUpdate(cmd.getRefName(), false);
+		if (isRefLogDisabled())
+			ru.disableRefLog();
+		else {
+			ru.setRefLogIdent(refLogIdent);
+			ru.setRefLogMessage(refLogMessage, refLogIncludeResult);
+		}
+		switch (cmd.getType()) {
+		case DELETE:
+			if (!ObjectId.zeroId().equals(cmd.getOldId()))
+				ru.setExpectedOldObjectId(cmd.getOldId());
+			ru.setForceUpdate(true);
+			return ru;
+
+		case CREATE:
+		case UPDATE:
+		case UPDATE_NONFASTFORWARD:
+		default:
+			ru.setForceUpdate(isAllowNonFastForwards());
+			ru.setExpectedOldObjectId(cmd.getOldId());
+			ru.setNewObjectId(cmd.getNewId());
+			return ru;
+		}
+	}
+
