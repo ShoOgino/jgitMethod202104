@@ -1,0 +1,12 @@
+	private Map<String, Ref> localRefs() throws TransportException {
+		if (localRefs == null) {
+			try {
+				localRefs = transport.local.getRefDatabase()
+						.getRefs(RefDatabase.ALL);
+			} catch (IOException err) {
+				throw new TransportException(JGitText.get().cannotListRefs, err);
+			}
+		}
+		return localRefs;
+	}
+

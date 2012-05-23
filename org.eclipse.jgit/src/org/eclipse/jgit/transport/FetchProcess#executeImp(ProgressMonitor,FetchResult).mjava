@@ -60,27 +60,40 @@
 			closeConnection(result);
 		}
 
+		BatchRefUpdate batch = transport.local.getRefDatabase()
+				.newBatchUpdate()
+				.setAllowNonFastForwards(true)
+				.setRefLogMessage("fetch", true);
 		final RevWalk walk = new RevWalk(transport.local);
 		try {
 			if (monitor instanceof BatchingProgressMonitor) {
 				((BatchingProgressMonitor) monitor).setDelayStart(
 						250, TimeUnit.MILLISECONDS);
 			}
-			monitor.beginTask(JGitText.get().updatingReferences, localUpdates.size());
 			if (transport.isRemoveDeletedRefs())
-				deleteStaleTrackingRefs(result, walk);
+				deleteStaleTrackingRefs(result, batch);
 			for (TrackingRefUpdate u : localUpdates) {
-				try {
-					monitor.update(1);
-					u.update(walk);
-					result.add(u);
-				} catch (IOException err) {
-					throw new TransportException(MessageFormat.format(JGitText
-							.get().failureUpdatingTrackingRef,
-							u.getLocalName(), err.getMessage()), err);
-				}
+				result.add(u);
+				batch.addCommand(u.asReceiveCommand());
 			}
-			monitor.endTask();
+			for (ReceiveCommand cmd : batch.getCommands()) {
+				cmd.updateType(walk);
+				if (cmd.getType() == UPDATE_NONFASTFORWARD
+						&& cmd instanceof TrackingRefUpdate.Command
+						&& !((TrackingRefUpdate.Command) cmd).canForceUpdate())
+					cmd.setResult(REJECTED_NONFASTFORWARD);
+			}
+			if (transport.isDryRun()) {
+				for (ReceiveCommand cmd : batch.getCommands()) {
+					if (cmd.getResult() == NOT_ATTEMPTED)
+						cmd.setResult(OK);
+				}
+			} else
+				batch.execute(walk, monitor);
+		} catch (IOException err) {
+			throw new TransportException(MessageFormat.format(
+					JGitText.get().failureUpdatingTrackingRef,
+					getFirstFailedRefName(batch), err.getMessage()), err);
 		} finally {
 			walk.release();
 		}

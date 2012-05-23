@@ -1,13 +1,12 @@
-	private void deleteStaleTrackingRefs(final FetchResult result,
-			final RevWalk walk) throws TransportException {
-		final Repository db = transport.local;
-		for (final Ref ref : db.getAllRefs().values()) {
+	private void deleteStaleTrackingRefs(FetchResult result,
+			BatchRefUpdate batch) throws IOException {
+		for (final Ref ref : localRefs().values()) {
 			final String refname = ref.getName();
 			for (final RefSpec spec : toFetch) {
 				if (spec.matchDestination(refname)) {
 					final RefSpec s = spec.expandFromDestination(refname);
 					if (result.getAdvertisedRef(s.getSource()) == null) {
-						deleteTrackingRef(result, db, walk, s, ref);
+						deleteTrackingRef(result, batch, s, ref);
 					}
 				}
 			}
