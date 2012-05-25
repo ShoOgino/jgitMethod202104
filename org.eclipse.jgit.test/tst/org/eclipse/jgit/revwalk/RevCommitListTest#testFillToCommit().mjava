@@ -1,0 +1,17 @@
+	@Test
+	public void testFillToCommit() throws Exception {
+		setup(3);
+
+		RevWalk w = new RevWalk(db);
+		w.markStart(w.lookupCommit(db.resolve(Constants.HEAD)));
+
+		w.next();
+		RevCommit c = w.next();
+		assertNotNull("should have found 2. commit", c);
+
+		list.fillTo(c, 5);
+		assertEquals(2, list.size());
+		assertEquals("commit 1", list.get(1).getFullMessage());
+		assertNull(list.get(3));
+	}
+
