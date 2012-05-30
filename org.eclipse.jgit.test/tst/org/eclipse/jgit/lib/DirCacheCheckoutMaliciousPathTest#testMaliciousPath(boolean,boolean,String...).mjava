@@ -7,20 +7,11 @@
 	 *            perform the actual test on the second checkout
 	 * @param path
 	 *            to the blob, one or more levels
+	 * @throws GitAPIException
 	 * @throws IOException
-	 * @throws RefAlreadyExistsException
-	 * @throws RefNotFoundException
-	 * @throws InvalidRefNameException
-	 * @throws MissingObjectException
-	 * @throws IncorrectObjectTypeException
-	 * @throws CheckoutConflictException
-	 * @throws JGitInternalException
 	 */
-	private void testMaliciousPath(boolean good, boolean secondCheckout, String... path)
-			throws IOException, RefAlreadyExistsException,
-			RefNotFoundException, InvalidRefNameException,
-			MissingObjectException, IncorrectObjectTypeException,
-			JGitInternalException, CheckoutConflictException {
+	private void testMaliciousPath(boolean good, boolean secondCheckout,
+			String... path) throws GitAPIException, IOException {
 		Git git = new Git(db);
 		ObjectInserter newObjectInserter;
 		newObjectInserter = git.getRepository().newObjectInserter();

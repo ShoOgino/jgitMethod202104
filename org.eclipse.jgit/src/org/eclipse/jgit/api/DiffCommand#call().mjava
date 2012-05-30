@@ -6,7 +6,7 @@
 	 *
 	 * @return a DiffEntry for each path which is different
 	 */
-	public List<DiffEntry> call() throws GitAPIException, IOException {
+	public List<DiffEntry> call() throws GitAPIException {
 		final DiffFormatter diffFmt;
 		if (out != null && !showNameAndStatusOnly)
 			diffFmt = new DiffFormatter(new BufferedOutputStream(out));
@@ -53,6 +53,8 @@
 				diffFmt.flush();
 				return result;
 			}
+		} catch (IOException e) {
+			throw new JGitInternalException(e.getMessage(), e);
 		} finally {
 			diffFmt.release();
 		}

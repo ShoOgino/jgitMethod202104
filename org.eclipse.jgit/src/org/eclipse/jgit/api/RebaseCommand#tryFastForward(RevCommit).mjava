@@ -3,11 +3,11 @@
 	 *
 	 * @param newCommit
 	 * @return the new head, or null
-	 * @throws RefNotFoundException
 	 * @throws IOException
+	 * @throws GitAPIException
 	 */
-	public RevCommit tryFastForward(RevCommit newCommit)
-			throws RefNotFoundException, IOException {
+	public RevCommit tryFastForward(RevCommit newCommit) throws IOException,
+			GitAPIException {
 		Ref head = repo.getRef(Constants.HEAD);
 		if (head == null || head.getObjectId() == null)
 			throw new RefNotFoundException(MessageFormat.format(
