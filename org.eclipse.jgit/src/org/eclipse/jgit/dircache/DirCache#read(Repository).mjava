@@ -5,19 +5,20 @@
 	 * failures are reported as exceptions and therefore prevent the method from
 	 * returning a partially populated index.
 	 *
+	 * @param repository
+	 *            repository containing the index to read
 	 * @return a cache representing the contents of the specified index file (if
 	 *         it exists) or an empty cache if the file does not exist.
-	 * @throws NoWorkTreeException
-	 *             if this is bare, which implies it has no working directory.
-	 *             See {@link #isBare()}.
 	 * @throws IOException
 	 *             the index file is present but could not be read.
 	 * @throws CorruptObjectException
 	 *             the index file is using a format or extension that this
 	 *             library does not support.
 	 */
-	public DirCache readDirCache() throws NoWorkTreeException,
-			CorruptObjectException, IOException {
-		return DirCache.read(this);
+	public static DirCache read(final Repository repository)
+			throws CorruptObjectException, IOException {
+		final DirCache c = read(repository.getIndexFile(), repository.getFS());
+		c.repository = repository;
+		return c;
 	}
 
