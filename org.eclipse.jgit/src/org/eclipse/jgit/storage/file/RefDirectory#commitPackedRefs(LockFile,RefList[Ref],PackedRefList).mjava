@@ -20,8 +20,9 @@
 				if (!lck.commit())
 					throw new ObjectWritingException(MessageFormat.format(JGitText.get().unableToWrite, name));
 
-				packedRefs.compareAndSet(oldPackedList, new PackedRefList(
-						refs, lck.getCommitSnapshot()));
+				byte[] digest = Constants.newMessageDigest().digest(content);
+				packedRefs.compareAndSet(oldPackedList, new PackedRefList(refs,
+						lck.getCommitSnapshot(), ObjectId.fromRaw(digest)));
 			}
 		}.writePackedRefs();
 	}
