@@ -1,3 +1,16 @@
+	/**
+	 * Create a new fail result. If status is {@link Status#CONFLICTS},
+	 * <code>fileList</code> is a list of conflicting files, if status is
+	 * {@link Status#NONDELETED}, <code>fileList</code> is a list of not deleted
+	 * files. All other values ignore <code>fileList</code>. To create a result
+	 * for {@link Status#OK}, see {@link #CheckoutResult(List, List)}.
+	 *
+	 * @param status
+	 *            the failure status
+	 * @param fileList
+	 *            the list of files to store, status has to be either
+	 *            {@link Status#CONFLICTS} or {@link Status#NONDELETED}.
+	 */
 	CheckoutResult(Status status, List<String> fileList) {
 		myStatus = status;
 		if (status == Status.CONFLICTS)
@@ -9,5 +22,7 @@
 		else
 			this.undeletedList = new ArrayList<String>(0);
 
+		this.modifiedList = new ArrayList<String>(0);
+		this.removedList = new ArrayList<String>(0);
 	}
 
