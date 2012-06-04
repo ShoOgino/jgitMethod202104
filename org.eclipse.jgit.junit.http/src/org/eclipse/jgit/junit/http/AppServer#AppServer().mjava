@@ -8,17 +8,6 @@
 			throw new RuntimeException("Cannot find localhost", e);
 		}
 
-		// We need a handful of threads in the thread pool, otherwise
-		// our tests will deadlock when they can't open enough requests.
-		// In theory we only need 1 concurrent connection at a time, but
-		// I suspect the JRE isn't doing request pipelining on existing
-		// connections like we want it to.
-		//
-		final QueuedThreadPool pool = new QueuedThreadPool();
-		pool.setMinThreads(1);
-		pool.setMaxThreads(4);
-		pool.setMaxQueued(8);
-
 		contexts = new ContextHandlerCollection();
 
 		log = new TestRequestLog();
@@ -26,10 +15,6 @@
 
 		server = new Server();
 		server.setConnectors(new Connector[] { connector });
-		server.setThreadPool(pool);
 		server.setHandler(log);
-
-		server.setStopAtShutdown(false);
-		server.setGracefulShutdown(0);
 	}
 

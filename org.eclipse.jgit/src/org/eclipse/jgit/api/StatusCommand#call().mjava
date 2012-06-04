@@ -7,13 +7,16 @@
 	 * @return a {@link Status} object telling about each path where working
 	 *         tree, index or HEAD differ from each other.
 	 */
-	public Status call() throws IOException, NoWorkTreeException {
+	public Status call() throws GitAPIException, NoWorkTreeException {
 		if (workingTreeIt == null)
 			workingTreeIt = new FileTreeIterator(repo);
 
-		IndexDiff diff = new IndexDiff(repo, Constants.HEAD, workingTreeIt);
-		diff.diff();
-
-		return new Status(diff);
+		try {
+			IndexDiff diff = new IndexDiff(repo, Constants.HEAD, workingTreeIt);
+			diff.diff();
+			return new Status(diff);
+		} catch (IOException e) {
+			throw new JGitInternalException(e.getMessage(), e);
+		}
 	}
 

@@ -6,9 +6,10 @@
 	 * method twice on an instance.
 	 *
 	 * @return an iteration over RevCommits
+	 * @throws NoHeadException
+	 *             of the references ref cannot be resolved
 	 */
-	public Iterable<RevCommit> call() throws NoHeadException,
-			JGitInternalException {
+	public Iterable<RevCommit> call() throws GitAPIException, NoHeadException {
 		checkCallable();
 		if (pathFilters.size() > 0)
 			walk.setTreeFilter(AndTreeFilter.create(

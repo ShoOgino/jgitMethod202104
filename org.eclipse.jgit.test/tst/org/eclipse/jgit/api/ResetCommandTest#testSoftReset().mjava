@@ -1,8 +1,6 @@
 	@Test
 	public void testSoftReset() throws JGitInternalException,
-			AmbiguousObjectException, IOException, NoFilepatternException,
-			NoHeadException, NoMessageException, ConcurrentRefUpdateException,
-			WrongRepositoryStateException {
+			AmbiguousObjectException, IOException, GitAPIException {
 		setupRepository();
 		ObjectId prevHead = db.resolve(Constants.HEAD);
 		git.reset().setMode(ResetType.SOFT).setRef(initialCommit.getName())
@@ -18,5 +16,6 @@
 		assertFalse(inHead(fileInIndexPath));
 		assertTrue(inIndex(indexFile.getName()));
 		assertReflog(prevHead, head);
+		assertEquals(prevHead, db.readOrigHead());
 	}
 

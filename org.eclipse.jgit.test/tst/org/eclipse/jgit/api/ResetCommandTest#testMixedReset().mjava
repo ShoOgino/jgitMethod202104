@@ -1,8 +1,6 @@
 	@Test
 	public void testMixedReset() throws JGitInternalException,
-			AmbiguousObjectException, IOException, NoFilepatternException,
-			NoHeadException, NoMessageException, ConcurrentRefUpdateException,
-			WrongRepositoryStateException {
+			AmbiguousObjectException, IOException, GitAPIException {
 		setupRepository();
 		ObjectId prevHead = db.resolve(Constants.HEAD);
 		git.reset().setMode(ResetType.MIXED).setRef(initialCommit.getName())
@@ -19,5 +17,6 @@
 		assertFalse(inIndex(indexFile.getName()));
 
 		assertReflog(prevHead, head);
+		assertEquals(prevHead, db.readOrigHead());
 	}
 

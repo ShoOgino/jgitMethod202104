@@ -1,5 +1,5 @@
-	private RebaseResult initFilesAndRewind() throws RefNotFoundException,
-			IOException, NoHeadException, JGitInternalException {
+	private RebaseResult initFilesAndRewind() throws IOException,
+			GitAPIException {
 		// we need to store everything into files so that we can implement
 		// --skip, --continue, and --abort
 
@@ -57,7 +57,7 @@
 		// create the folder for the meta information
 		FileUtils.mkdir(rebaseDir);
 
-		createFile(repo.getDirectory(), Constants.ORIG_HEAD, headId.name());
+		repo.writeOrigHead(headId);
 		createFile(rebaseDir, REBASE_HEAD, headId.name());
 		createFile(rebaseDir, HEAD_NAME, headName);
 		createFile(rebaseDir, ONTO, upstreamCommit.name());

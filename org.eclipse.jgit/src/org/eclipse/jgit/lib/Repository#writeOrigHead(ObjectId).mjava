@@ -1,0 +1,14 @@
+	/**
+	 * Write original HEAD commit into $GIT_DIR/ORIG_HEAD.
+	 *
+	 * @param head
+	 *            an object id of the original HEAD commit or <code>null</code>
+	 *            to delete the file
+	 * @throws IOException
+	 */
+	public void writeOrigHead(ObjectId head) throws IOException {
+		List<ObjectId> heads = head != null ? Collections.singletonList(head)
+				: null;
+		writeHeadsFile(heads, Constants.ORIG_HEAD);
+	}
+
