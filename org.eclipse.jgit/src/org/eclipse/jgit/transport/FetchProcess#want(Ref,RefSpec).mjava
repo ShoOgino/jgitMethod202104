@@ -2,17 +2,10 @@
 			throws TransportException {
 		final ObjectId newId = src.getObjectId();
 		if (spec.getDestination() != null) {
-			try {
-				final TrackingRefUpdate tru = createUpdate(spec, newId);
-				if (newId.equals(tru.getOldObjectId()))
-					return;
-				localUpdates.add(tru);
-			} catch (IOException err) {
-				// Bad symbolic ref? That is the most likely cause.
-				//
-				throw new TransportException( MessageFormat.format(
-						JGitText.get().cannotResolveLocalTrackingRefForUpdating, spec.getDestination()), err);
-			}
+			final TrackingRefUpdate tru = createUpdate(spec, newId);
+			if (newId.equals(tru.getOldObjectId()))
+				return;
+			localUpdates.add(tru);
 		}
 
 		askFor.put(newId, src);

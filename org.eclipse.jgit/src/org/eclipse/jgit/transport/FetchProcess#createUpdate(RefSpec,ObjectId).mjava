@@ -1,5 +1,14 @@
-	private TrackingRefUpdate createUpdate(final RefSpec spec,
-			final ObjectId newId) throws IOException {
-		return new TrackingRefUpdate(transport.local, spec, newId, "fetch");
+	private TrackingRefUpdate createUpdate(RefSpec spec, ObjectId newId)
+			throws TransportException {
+		Ref ref = localRefs().get(spec.getDestination());
+		ObjectId oldId = ref != null && ref.getObjectId() != null
+				? ref.getObjectId()
+				: ObjectId.zeroId();
+		return new TrackingRefUpdate(
+				spec.isForceUpdate(),
+				spec.getSource(),
+				spec.getDestination(),
+				oldId,
+				newId);
 	}
 
