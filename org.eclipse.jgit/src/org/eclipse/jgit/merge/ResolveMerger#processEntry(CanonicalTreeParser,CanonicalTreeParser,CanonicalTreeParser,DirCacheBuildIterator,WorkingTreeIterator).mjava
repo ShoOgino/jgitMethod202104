@@ -74,7 +74,7 @@
 					else {
 						// the preferred version THEIRS has a different mode
 						// than ours. Check it out!
-						if (isWorktreeDirty())
+						if (isWorktreeDirty(work))
 							return false;
 						DirCacheEntry e = add(tw.getRawPath(), theirs,
 								DirCacheEntry.STAGE_0);
@@ -109,7 +109,7 @@
 			// THEIRS. THEIRS is chosen.
 
 			// Check worktree before checking out THEIRS
-			if (isWorktreeDirty())
+			if (isWorktreeDirty(work))
 				return false;
 			if (nonTree(modeT)) {
 				DirCacheEntry e = add(tw.getRawPath(), theirs,
@@ -160,7 +160,7 @@
 
 		if (nonTree(modeO) && nonTree(modeT)) {
 			// Check worktree before modifying files
-			if (isWorktreeDirty())
+			if (isWorktreeDirty(work))
 				return false;
 
 			MergeResult<RawText> result = contentMerge(base, ours, theirs);
@@ -182,7 +182,7 @@
 				// OURS was deleted checkout THEIRS
 				if (modeO == 0) {
 					// Check worktree before checking out THEIRS
-					if (isWorktreeDirty())
+					if (isWorktreeDirty(work))
 						return false;
 					if (nonTree(modeT)) {
 						if (e != null)
