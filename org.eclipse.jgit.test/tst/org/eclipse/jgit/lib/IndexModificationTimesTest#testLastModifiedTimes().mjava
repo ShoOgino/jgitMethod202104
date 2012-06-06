@@ -1,0 +1,37 @@
+	@Test
+	public void testLastModifiedTimes() throws Exception {
+		Git git = new Git(db);
+		String path = "file";
+		writeTrashFile(path, "content");
+		String path2 = "file2";
+		writeTrashFile(path2, "content2");
+
+		git.add().addFilepattern(path).call();
+		git.add().addFilepattern(path2).call();
+		git.commit().setMessage("commit").call();
+
+		DirCache dc = db.readDirCache();
+		DirCacheEntry entry = dc.getEntry(path);
+		DirCacheEntry entry2 = dc.getEntry(path);
+
+		assertTrue("last modified shall not be zero!",
+				entry.getLastModified() != 0);
+
+		assertTrue("last modified shall not be zero!",
+				entry2.getLastModified() != 0);
+
+		writeTrashFile(path, "new content");
+		git.add().addFilepattern(path).call();
+		git.commit().setMessage("commit2").call();
+
+		dc = db.readDirCache();
+		entry = dc.getEntry(path);
+		entry2 = dc.getEntry(path);
+
+		assertTrue("last modified shall not be zero!",
+				entry.getLastModified() != 0);
+
+		assertTrue("last modified shall not be zero!",
+				entry2.getLastModified() != 0);
+	}
+
