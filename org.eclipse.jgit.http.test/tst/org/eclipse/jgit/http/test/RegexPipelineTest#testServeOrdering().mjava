@@ -1,0 +1,22 @@
+	@Test
+	public void testServeOrdering() throws Exception {
+		MetaServlet s = new MetaServlet();
+		s.serveRegex("^(/a)$").with(new Servlet("test1"));
+		s.serveRegex("^(/a+)$").with(new Servlet("test2"));
+		ctx.addServlet(new ServletHolder(s), "/*");
+		server.setUp();
+
+		final URI uri = server.getURI();
+		HttpURLConnection c;
+		BufferedReader r;
+
+		c = ((HttpURLConnection) uri.resolve("/a").toURL()
+				.openConnection());
+		assertEquals(200, c.getResponseCode());
+		r = new BufferedReader(new InputStreamReader(c.getInputStream()));
+		assertEquals("test1", r.readLine());
+		assertEquals("", r.readLine());
+		assertEquals("/a", r.readLine());
+		assertEquals(null, r.readLine());
+	}
+

@@ -1,0 +1,14 @@
+		@Override
+		protected void doGet(HttpServletRequest req, HttpServletResponse res)
+				throws IOException {
+			res.setStatus(200);
+			PrintWriter out = new PrintWriter(res.getOutputStream());
+			out.write(name);
+			out.write("\n");
+			out.write(String.valueOf(req.getServletPath()));
+			out.write("\n");
+			out.write(String.valueOf(req.getPathInfo()));
+			out.write("\n");
+			out.flush();
+		}
+
