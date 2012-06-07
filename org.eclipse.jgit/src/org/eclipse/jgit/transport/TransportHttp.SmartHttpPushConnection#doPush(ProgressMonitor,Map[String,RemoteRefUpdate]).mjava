@@ -1,8 +1,8 @@
 		protected void doPush(final ProgressMonitor monitor,
 				final Map<String, RemoteRefUpdate> refUpdates)
 				throws TransportException {
-			final Service svc = new Service(SVC_RECEIVE_PACK);
-			init(svc.in, svc.out);
+			final Service svc = new MultiRequestService(SVC_RECEIVE_PACK);
+			init(svc.getInputStream(), svc.getOutputStream());
 			super.doPush(monitor, refUpdates);
 		}
 

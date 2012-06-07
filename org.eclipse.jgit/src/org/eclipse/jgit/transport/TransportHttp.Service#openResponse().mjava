@@ -1,0 +1,14 @@
+		void openResponse() throws IOException {
+			final int status = HttpSupport.response(conn);
+			if (status != HttpURLConnection.HTTP_OK) {
+				throw new TransportException(uri, status + " " //$NON-NLS-1$
+						+ conn.getResponseMessage());
+			}
+
+			final String contentType = conn.getContentType();
+			if (!responseType.equals(contentType)) {
+				conn.getInputStream().close();
+				throw wrongContentType(responseType, contentType);
+			}
+		}
+

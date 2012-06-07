@@ -3,8 +3,8 @@
 				final Collection<Ref> want, final Set<ObjectId> have)
 				throws TransportException {
 			try {
-				svc = new Service(SVC_UPLOAD_PACK);
-				init(svc.in, svc.out);
+				svc = new MultiRequestService(SVC_UPLOAD_PACK);
+				init(svc.getInputStream(), svc.getOutputStream());
 				super.doFetch(monitor, want, have);
 			} finally {
 				svc = null;
