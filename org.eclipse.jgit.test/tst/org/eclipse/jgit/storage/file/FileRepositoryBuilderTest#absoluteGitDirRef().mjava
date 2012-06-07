@@ -1,0 +1,17 @@
+	@Test
+	public void absoluteGitDirRef() throws Exception {
+		FileRepository repo1 = createWorkRepository();
+		File dir = createTempDirectory("dir");
+		File dotGit = new File(dir, Constants.DOT_GIT);
+		new FileWriter(dotGit).append(
+				"gitdir: " + repo1.getDirectory().getAbsolutePath()).close();
+		FileRepositoryBuilder builder = new FileRepositoryBuilder();
+
+		builder.setWorkTree(dir);
+		builder.setMustExist(true);
+		FileRepository repo2 = builder.build();
+
+		assertEquals(repo1.getDirectory(), repo2.getDirectory());
+		assertEquals(dir, repo2.getWorkTree());
+	}
+

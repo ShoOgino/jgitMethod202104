@@ -2,8 +2,12 @@
 	 * Executes the {@code Clone} command.
 	 *
 	 * @return the newly created {@code Git} object with associated repository
+	 * @throws InvalidRemoteException
+	 * @throws org.eclipse.jgit.api.errors.TransportException
+	 * @throws GitAPIException
 	 */
-	public Git call() throws GitAPIException {
+	public Git call() throws GitAPIException, InvalidRemoteException,
+			org.eclipse.jgit.api.errors.TransportException {
 		try {
 			URIish u = new URIish(uri);
 			Repository repository = init(u);
@@ -13,10 +17,9 @@
 			return new Git(repository);
 		} catch (IOException ioe) {
 			throw new JGitInternalException(ioe.getMessage(), ioe);
-		} catch (InvalidRemoteException e) {
-			throw new JGitInternalException(e.getMessage(), e);
 		} catch (URISyntaxException e) {
-			throw new JGitInternalException(e.getMessage(), e);
+			throw new InvalidRemoteException(MessageFormat.format(
+					JGitText.get().invalidRemote, remote));
 		}
 	}
 

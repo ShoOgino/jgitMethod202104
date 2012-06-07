@@ -1,4 +1,22 @@
-	public Collection<String> call() throws GitAPIException {
+	/**
+	 * Execute the SubmoduleUpdateCommand command.
+	 *
+	 * @return a collection of updated submodule paths
+	 * @throws ConcurrentRefUpdateException
+	 * @throws CheckoutConflictException
+	 * @throws InvalidMergeHeadsException
+	 * @throws InvalidConfigurationException
+	 * @throws NoHeadException
+	 * @throws NoMessageException
+	 * @throws RefNotFoundException
+	 * @throws WrongRepositoryStateException
+	 * @throws GitAPIException
+	 */
+	public Collection<String> call() throws InvalidConfigurationException,
+			NoHeadException, ConcurrentRefUpdateException,
+			CheckoutConflictException, InvalidMergeHeadsException,
+			WrongRepositoryStateException, NoMessageException, NoHeadException,
+			RefNotFoundException, GitAPIException {
 		checkCallable();
 
 		try {
@@ -57,9 +75,7 @@
 		} catch (IOException e) {
 			throw new JGitInternalException(e.getMessage(), e);
 		} catch (ConfigInvalidException e) {
-			throw new JGitInternalException(e.getMessage(), e);
-		} catch (GitAPIException e) {
-			throw new JGitInternalException(e.getMessage(), e);
+			throw new InvalidConfigurationException(e.getMessage(), e);
 		}
 	}
 
