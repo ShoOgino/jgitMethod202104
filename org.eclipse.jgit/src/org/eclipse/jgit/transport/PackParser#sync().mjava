@@ -2,7 +2,14 @@
 	private void sync() throws IOException {
 		packDigest.update(buf, 0, bOffset);
 		onStoreStream(buf, 0, bOffset);
-		if (bAvail > 0)
+		if (expectDataAfterPackFooter) {
+			if (bAvail > 0) {
+				in.reset();
+				IO.skipFully(in, bOffset);
+				bAvail = 0;
+			}
+			in.mark(buf.length);
+		} else if (bAvail > 0)
 			System.arraycopy(buf, bOffset, buf, 0, bAvail);
 		bBase += bOffset;
 		bOffset = 0;

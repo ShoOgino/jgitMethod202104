@@ -1,0 +1,30 @@
+	@Test
+	public void testDataAfterPackFooterSplitObjectRead() throws Exception {
+		final byte[] data = Constants.encode("0123456789");
+
+		// Build a pack ~17k
+		int objects = 900;
+		TemporaryBuffer.Heap pack = new TemporaryBuffer.Heap(32 * 1024);
+		packHeader(pack, objects);
+
+		for (int i = 0; i < objects; i++) {
+			pack.write((Constants.OBJ_BLOB) << 4 | 10);
+			deflate(pack, data);
+		}
+		digest(pack);
+
+		byte packData[] = pack.toByteArray();
+		byte streamData[] = new byte[packData.length + 1];
+		System.arraycopy(packData, 0, streamData, 0, packData.length);
+		streamData[packData.length] = 0x7e;
+		InputStream in = new ByteArrayInputStream(streamData);
+		PackParser p = index(in);
+		p.setAllowThin(true);
+		p.setCheckEofAfterPackFooter(false);
+		p.setExpectDataAfterPackFooter(true);
+
+		p.parse(NullProgressMonitor.INSTANCE);
+
+		assertEquals(0x7e, in.read());
+	}
+

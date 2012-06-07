@@ -1,0 +1,38 @@
+	@Test
+	public void testNonMarkingInputStream() throws Exception {
+		TestRepository d = new TestRepository(db);
+		RevBlob a = d.blob("a");
+
+		TemporaryBuffer.Heap pack = new TemporaryBuffer.Heap(1024);
+		packHeader(pack, 1);
+		pack.write((Constants.OBJ_REF_DELTA) << 4 | 4);
+		a.copyRawTo(pack);
+		deflate(pack, new byte[] { 0x1, 0x1, 0x1, 'b' });
+		digest(pack);
+
+		InputStream in = new ByteArrayInputStream(pack.toByteArray()) {
+			@Override
+			public boolean markSupported() {
+				return false;
+			}
+
+			@Override
+			public void mark(int maxlength) {
+				fail("Mark should not be called");
+			}
+		};
+
+		PackParser p = index(in);
+		p.setAllowThin(true);
+		p.setCheckEofAfterPackFooter(false);
+		p.setExpectDataAfterPackFooter(true);
+
+		try {
+			p.parse(NullProgressMonitor.INSTANCE);
+			fail("PackParser should have failed");
+		} catch (IOException e) {
+			assertEquals(e.getMessage(),
+					JGitText.get().inputStreamMustSupportMark);
+		}
+	}
+
