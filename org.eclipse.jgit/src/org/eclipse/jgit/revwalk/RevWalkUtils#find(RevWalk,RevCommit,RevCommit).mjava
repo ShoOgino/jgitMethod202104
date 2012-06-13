@@ -1,0 +1,37 @@
+	/**
+	 * Find commits that are reachable from <code>start</code> until a commit
+	 * that is reachable from <code>end</code> is encountered. In other words,
+	 * Find of commits that are in <code>start</code>, but not in
+	 * <code>end</code>.
+	 * <p>
+	 * Note that this method calls {@link RevWalk#reset()} at the beginning.
+	 * Also note that the existing rev filter on the walk is left as-is, so be
+	 * sure to set the right rev filter before calling this method.
+	 *
+	 * @param walk
+	 *            the rev walk to use
+	 * @param start
+	 *            the commit to start counting from
+	 * @param end
+	 *            the commit where counting should end, or null if counting
+	 *            should be done until there are no more commits
+	 * @return the commits found
+	 * @throws MissingObjectException
+	 * @throws IncorrectObjectTypeException
+	 * @throws IOException
+	 */
+	public static List<RevCommit> find(final RevWalk walk,
+			final RevCommit start, final RevCommit end)
+			throws MissingObjectException, IncorrectObjectTypeException,
+			IOException {
+		walk.reset();
+		walk.markStart(start);
+		if (end != null)
+			walk.markUninteresting(end);
+
+		List<RevCommit> commits = new ArrayList<RevCommit>();
+		for (RevCommit c : walk)
+			commits.add(c);
+		return commits;
+	}
+

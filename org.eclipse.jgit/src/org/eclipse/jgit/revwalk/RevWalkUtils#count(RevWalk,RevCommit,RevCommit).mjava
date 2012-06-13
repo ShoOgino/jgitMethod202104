@@ -24,14 +24,6 @@
 	public static int count(final RevWalk walk, final RevCommit start,
 			final RevCommit end) throws MissingObjectException,
 			IncorrectObjectTypeException, IOException {
-		walk.reset();
-		walk.markStart(start);
-		if (end != null)
-			walk.markUninteresting(end);
-
-		int count = 0;
-		for (RevCommit c = walk.next(); c != null; c = walk.next())
-			count++;
-		return count;
+		return find(walk, start, end).size();
 	}
 

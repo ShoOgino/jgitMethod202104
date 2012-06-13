@@ -11,16 +11,6 @@
 	 *             See {@link #isBare()}.
 	 */
 	public String readMergeCommitMsg() throws IOException, NoWorkTreeException {
-		if (isBare() || getDirectory() == null)
-			throw new NoWorkTreeException();
-
-		File mergeMsgFile = new File(getDirectory(), Constants.MERGE_MSG);
-		try {
-			return RawParseUtils.decode(IO.readFully(mergeMsgFile));
-		} catch (FileNotFoundException e) {
-			// MERGE_MSG file has disappeared in the meantime
-			// ignore it
-			return null;
-		}
+		return readCommitMsgFile(Constants.MERGE_MSG);
 	}
 

@@ -1,0 +1,21 @@
+	@Test
+	public void testReadWriteMergeMsg() throws IOException {
+		assertEquals(db.readSquashCommitMsg(), null);
+		assertFalse(new File(db.getDirectory(), Constants.SQUASH_MSG).exists());
+		db.writeSquashCommitMsg(squashMsg);
+		assertEquals(squashMsg, db.readSquashCommitMsg());
+		assertEquals(read(new File(db.getDirectory(), Constants.SQUASH_MSG)),
+				squashMsg);
+		db.writeSquashCommitMsg(null);
+		assertEquals(db.readSquashCommitMsg(), null);
+		assertFalse(new File(db.getDirectory(), Constants.SQUASH_MSG).exists());
+		FileOutputStream fos = new FileOutputStream(new File(db.getDirectory(),
+				Constants.SQUASH_MSG));
+		try {
+			fos.write(squashMsg.getBytes(Constants.CHARACTER_ENCODING));
+		} finally {
+			fos.close();
+		}
+		assertEquals(db.readSquashCommitMsg(), squashMsg);
+	}
+

@@ -1,0 +1,17 @@
+	/**
+	 * Write new content to the file $GIT_DIR/SQUASH_MSG. In this file
+	 * operations triggering a squashed merge will store a template for the
+	 * commit message of the squash commit. If <code>null</code> is specified as
+	 * message the file will be deleted.
+	 *
+	 * @param msg
+	 *            the message which should be written or <code>null</code> to
+	 *            delete the file
+	 *
+	 * @throws IOException
+	 */
+	public void writeSquashCommitMsg(String msg) throws IOException {
+		File squashMsgFile = new File(gitDir, Constants.SQUASH_MSG);
+		writeCommitMsg(squashMsgFile, msg);
+	}
+
