@@ -4,6 +4,8 @@
 	 *
 	 * @param repository
 	 * @param treeId
+	 *            the root of a tree containing both a submodule at the given path
+	 *            and .gitmodules at the root.
 	 * @param path
 	 * @return generator at given path, null if no submodule at given path
 	 * @throws IOException
@@ -15,6 +17,7 @@
 			generator.setTree(treeId);
 			PathFilter filter = PathFilter.create(path);
 			generator.setFilter(filter);
+			generator.setRootTree(treeId);
 			while (generator.next())
 				if (filter.isDone(generator.walk))
 					return generator;

@@ -1,0 +1,19 @@
+	/**
+	 * Set the tree used by this walk for finding {@code .gitmodules}.
+	 * <p>
+	 * The root tree is not read until the first submodule is encountered by the
+	 * walk.
+	 * <p>
+	 * This method need only be called if constructing a walk manually instead of
+	 * with one of the static factory methods above.
+	 *
+	 * @param tree
+	 *            tree containing .gitmodules
+	 * @return this generator
+	 */
+	public SubmoduleWalk setRootTree(final AbstractTreeIterator tree) {
+		rootTree = tree;
+		modulesConfig = null;
+		return this;
+	}
+

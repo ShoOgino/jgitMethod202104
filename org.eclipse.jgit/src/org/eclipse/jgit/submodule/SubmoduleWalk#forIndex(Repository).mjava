@@ -2,6 +2,8 @@
 	 * Create a generator to walk over the submodule entries currently in the
 	 * index
 	 *
+	 * The {@code .gitmodules} file is read from the index.
+	 *
 	 * @param repository
 	 * @return generator over submodule index entries
 	 * @throws IOException
@@ -9,7 +11,15 @@
 	public static SubmoduleWalk forIndex(Repository repository)
 			throws IOException {
 		SubmoduleWalk generator = new SubmoduleWalk(repository);
-		generator.setTree(new DirCacheIterator(repository.readDirCache()));
+		try {
+			DirCache index = repository.readDirCache();
+			generator.setTree(new DirCacheIterator(index));
+			generator.setRootTree(new DirCacheIterator(index));
+			generator.useWorkingTree = true;
+		} catch (IOException e) {
+			generator.release();
+			throw e;
+		}
 		return generator;
 	}
 

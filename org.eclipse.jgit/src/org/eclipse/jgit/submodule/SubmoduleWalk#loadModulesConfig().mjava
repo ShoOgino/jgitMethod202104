@@ -1,5 +1,54 @@
-	private void loadModulesConfig() throws IOException, ConfigInvalidException {
-		if (modulesConfig == null) {
+	/**
+	 * Load the config for this walk from {@code .gitmodules}.
+	 * <p>
+	 * Uses the root tree if {@link #setRootTree(AbstractTreeIterator)} was
+	 * previously called, otherwise uses the working tree.
+	 * <p>
+	 * If no submodule config is found, loads an empty config.
+	 *
+	 * @return this generator
+	 * @throws IOException if an error occurred, or if the repository is bare
+	 * @throws ConfigInvalidException
+	 */
+	public SubmoduleWalk loadModulesConfig() throws IOException, ConfigInvalidException {
+		if (rootTree != null) {
+			TreeWalk configWalk = new TreeWalk(repository);
+			try {
+				configWalk.addTree(rootTree);
+
+				// The root tree may be part of the submodule walk, so we need to revert
+				// it after this walk.
+				int idx;
+				for (idx = 0; !rootTree.first(); idx++) {
+					rootTree.back(1);
+				}
+
+				try {
+					configWalk.setRecursive(false);
+					PathFilter filter = PathFilter.create(Constants.DOT_GIT_MODULES);
+					configWalk.setFilter(filter);
+					while (configWalk.next()) {
+						if (filter.isDone(configWalk)) {
+							modulesConfig = new BlobBasedConfig(null, repository,
+									configWalk.getObjectId(0));
+							return this;
+						}
+					}
+					if (!useWorkingTree) {
+						modulesConfig = new Config();
+						return this;
+					}
+				} finally {
+					if (idx > 0)
+						rootTree.next(idx);
+				}
+			} finally {
+				configWalk.release();
+			}
+		}
+		if (repository.isBare()) {
+			modulesConfig = new Config();
+		} else {
 			File modulesFile = new File(repository.getWorkTree(),
 					Constants.DOT_GIT_MODULES);
 			FileBasedConfig config = new FileBasedConfig(modulesFile,
@@ -7,5 +56,6 @@
 			config.load();
 			modulesConfig = config;
 		}
+		return this;
 	}
 
