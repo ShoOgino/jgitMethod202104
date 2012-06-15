@@ -21,7 +21,9 @@
 		command.setPath(path2);
 		String url2 = db.getDirectory().toURI().toString();
 		command.setURI(url2);
-		assertNotNull(command.call());
+		Repository r = command.call();
+		assertNotNull(r);
+		addRepoToClose(r);
 
 		modulesConfig.load();
 		assertEquals(path1, modulesConfig.getString(

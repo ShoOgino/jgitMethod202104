@@ -8,7 +8,11 @@
 		Repository subRepo = getRepository();
 		if (subRepo == null)
 			return null;
-		Ref head = subRepo.getRef(Constants.HEAD);
-		return head != null ? head.getLeaf().getName() : null;
+		try {
+			Ref head = subRepo.getRef(Constants.HEAD);
+			return head != null ? head.getLeaf().getName() : null;
+		} finally {
+			subRepo.close();
+		}
 	}
 

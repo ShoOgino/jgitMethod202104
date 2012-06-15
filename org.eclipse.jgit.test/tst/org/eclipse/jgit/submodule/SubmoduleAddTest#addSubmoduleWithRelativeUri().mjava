@@ -12,6 +12,7 @@
 		command.setURI(uri);
 		Repository repo = command.call();
 		assertNotNull(repo);
+		addRepoToClose(repo);
 
 		SubmoduleWalk generator = SubmoduleWalk.forIndex(db);
 		assertTrue(generator.next());
@@ -23,11 +24,12 @@
 		if (File.separatorChar == '\\')
 			fullUri = fullUri.replace('\\', '/');
 		assertEquals(fullUri, generator.getConfigUrl());
-		assertNotNull(generator.getRepository());
+		Repository subModRepo = generator.getRepository();
+		addRepoToClose(subModRepo);
+		assertNotNull(subModRepo);
 		assertEquals(
 				fullUri,
-				generator
-						.getRepository()
+				subModRepo
 						.getConfig()
 						.getString(ConfigConstants.CONFIG_REMOTE_SECTION,
 								Constants.DEFAULT_REMOTE_NAME,

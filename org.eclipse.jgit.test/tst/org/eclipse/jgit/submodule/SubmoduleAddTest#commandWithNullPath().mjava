@@ -1,7 +1,7 @@
 	@Test
 	public void commandWithNullPath() throws GitAPIException {
 		try {
-			new SubmoduleAddCommand(db).setURI("uri").call();
+			new SubmoduleAddCommand(db).setURI("uri").call().close();
 			fail("Exception not thrown");
 		} catch (IllegalArgumentException e) {
 			assertEquals(JGitText.get().pathNotConfigured, e.getMessage());
