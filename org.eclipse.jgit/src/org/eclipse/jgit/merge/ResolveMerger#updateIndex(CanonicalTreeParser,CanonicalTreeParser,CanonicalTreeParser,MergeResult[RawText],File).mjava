@@ -38,7 +38,8 @@
 			dce.setLength((int) of.length());
 			InputStream is = new FileInputStream(of);
 			try {
-				dce.setObjectId(oi.insert(Constants.OBJ_BLOB, of.length(), is));
+				dce.setObjectId(getObjectInserter().insert(
+				    Constants.OBJ_BLOB, of.length(), is));
 			} finally {
 				is.close();
 				if (inCore)
