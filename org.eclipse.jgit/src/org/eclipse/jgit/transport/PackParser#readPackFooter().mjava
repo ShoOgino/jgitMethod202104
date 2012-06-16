@@ -7,23 +7,19 @@
 		System.arraycopy(buf, c, srcHash, 0, 20);
 		use(20);
 
-		// The input stream should be at EOF at this point. We do not support
-		// yielding back any remaining buffered data after the pack footer, so
-		// protocols that embed a pack stream are required to either end their
-		// stream with the pack, or embed the pack with a framing system like
-		// the SideBandInputStream does.
-
-		if (bAvail != 0)
+		if (bAvail != 0 && !expectDataAfterPackFooter)
 			throw new CorruptObjectException(MessageFormat.format(
 					JGitText.get().expectedEOFReceived,
 					"\\x" + Integer.toHexString(buf[bOffset] & 0xff)));
-
 		if (isCheckEofAfterPackFooter()) {
 			int eof = in.read();
 			if (0 <= eof)
 				throw new CorruptObjectException(MessageFormat.format(
 						JGitText.get().expectedEOFReceived,
 						"\\x" + Integer.toHexString(eof)));
+		} else if (bAvail > 0 && expectDataAfterPackFooter) {
+			in.reset();
+			IO.skipFully(in, bOffset);
 		}
 
 		if (!Arrays.equals(actHash, srcHash))
