@@ -1,0 +1,31 @@
+		/** Keep opening send-receive pairs to the given URI. */
+		@Override
+		void execute() throws IOException {
+			out.close();
+
+			if (conn == null) {
+				if (out.length() == 0) {
+					// Request output hasn't started yet, but more data is being
+					// requested. If there is no request data buffered and the
+					// final request was already sent, do nothing to ensure the
+					// caller is shown EOF on the InputStream; otherwise an
+					// programming error has occurred within this module.
+					if (finalRequest)
+						return;
+					throw new TransportException(uri,
+							JGitText.get().startingReadStageWithoutWrittenRequestDataPendingIsNotSupported);
+				}
+
+				sendRequest();
+			}
+
+			out.reset();
+
+			openResponse();
+
+			in.add(openInputStream(conn));
+			if (!finalRequest)
+				in.add(execute);
+			conn = null;
+		}
+

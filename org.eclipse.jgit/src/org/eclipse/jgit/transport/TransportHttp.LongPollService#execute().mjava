@@ -1,0 +1,10 @@
+		/** Only open one send-receive request. */
+		@Override
+		void execute() throws IOException {
+			out.close();
+			if (conn == null)
+				sendRequest();
+			openResponse();
+			in.add(openInputStream(conn));
+		}
+
