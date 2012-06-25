@@ -1,0 +1,30 @@
+	/**
+	 * Whether the mark tree filter with the specified index matched during scan
+	 * or not, see {@link #scan(TreeWalk, boolean, TreeFilter...)}. Example:
+	 * <p>
+	 *
+	 * <pre>
+	 * TreeFilter filterA = ...;
+	 * TreeFilter filterB = ...;
+	 * List<DiffEntry> entries = DiffEntry.scan(walk, false, filterA, filterB);
+	 * DiffEntry entry = entries.get(0);
+	 * boolean filterAMatched = entry.isMarked(0);
+	 * boolean filterBMatched = entry.isMarked(1);
+	 * </pre>
+	 * <p>
+	 * Note that 0 corresponds to filterA because it was the first filter that
+	 * was passed to scan.
+	 * <p>
+	 * To query more than one flag at once, see {@link #getTreeFilterMarks()}.
+	 *
+	 * @param index
+	 *            the index of the tree filter to check for (must be between 0
+	 *            and {@link Integer#SIZE}).
+	 *
+	 * @return true, if the tree filter matched; false if not
+	 * @since 2.3
+	 */
+	public boolean isMarked(int index) {
+		return (treeFilterMarks & (1L << index)) != 0;
+	}
+

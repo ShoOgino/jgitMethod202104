@@ -7,7 +7,7 @@
 	 *            when {@code includeTrees} parameter is {@code true} it can't
 	 *            be recursive.
 	 * @param includeTrees
-	 *            include tree object's.
+	 *            include tree objects.
 	 * @return headers describing the changed files.
 	 * @throws IOException
 	 *             the repository cannot be accessed.
@@ -18,52 +18,6 @@
 	 */
 	public static List<DiffEntry> scan(TreeWalk walk, boolean includeTrees)
 			throws IOException {
-		if (walk.getTreeCount() != 2)
-			throw new IllegalArgumentException(
-					JGitText.get().treeWalkMustHaveExactlyTwoTrees);
-		if (includeTrees && walk.isRecursive())
-			throw new IllegalArgumentException(
-					JGitText.get().cannotBeRecursiveWhenTreesAreIncluded);
-
-		List<DiffEntry> r = new ArrayList<DiffEntry>();
-		MutableObjectId idBuf = new MutableObjectId();
-		while (walk.next()) {
-			DiffEntry entry = new DiffEntry();
-
-			walk.getObjectId(idBuf, 0);
-			entry.oldId = AbbreviatedObjectId.fromObjectId(idBuf);
-
-			walk.getObjectId(idBuf, 1);
-			entry.newId = AbbreviatedObjectId.fromObjectId(idBuf);
-
-			entry.oldMode = walk.getFileMode(0);
-			entry.newMode = walk.getFileMode(1);
-			entry.newPath = entry.oldPath = walk.getPathString();
-
-			if (entry.oldMode == FileMode.MISSING) {
-				entry.oldPath = DiffEntry.DEV_NULL;
-				entry.changeType = ChangeType.ADD;
-				r.add(entry);
-
-			} else if (entry.newMode == FileMode.MISSING) {
-				entry.newPath = DiffEntry.DEV_NULL;
-				entry.changeType = ChangeType.DELETE;
-				r.add(entry);
-
-			} else if (!entry.oldId.equals(entry.newId)) {
-				entry.changeType = ChangeType.MODIFY;
-				if (RenameDetector.sameType(entry.oldMode, entry.newMode))
-					r.add(entry);
-				else
-					r.addAll(breakModify(entry));
-			} else if (entry.oldMode != entry.newMode) {
-				entry.changeType = ChangeType.MODIFY;
-				r.add(entry);
-			}
-
-			if (includeTrees && walk.isSubtree())
-				walk.enterSubtree();
-		}
-		return r;
+		return scan(walk, includeTrees, null);
 	}
 

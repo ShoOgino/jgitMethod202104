@@ -1,0 +1,21 @@
+	/**
+	 * Construct a TreeFilterMarker. Note that it is stateful and can only be
+	 * used for one walk loop.
+	 *
+	 * @param markTreeFilters
+	 *            the filters to use for marking, must not have more elements
+	 *            than {@link Integer#SIZE}.
+	 * @throws IllegalArgumentException
+	 *             if more tree filters are passed than possible
+	 */
+	public TreeFilterMarker(TreeFilter[] markTreeFilters) {
+		if (markTreeFilters.length > Integer.SIZE) {
+			throw new IllegalArgumentException(MessageFormat.format(
+					JGitText.get().treeFilterMarkerTooManyFilters,
+					Integer.valueOf(Integer.SIZE),
+					Integer.valueOf(markTreeFilters.length)));
+		}
+		filters = new TreeFilter[markTreeFilters.length];
+		System.arraycopy(markTreeFilters, 0, filters, 0, markTreeFilters.length);
+	}
+
