@@ -11,7 +11,14 @@
 	 * @throws ConfigInvalidException
 	 */
 	public SubmoduleWalk loadModulesConfig() throws IOException, ConfigInvalidException {
-		if (rootTree != null) {
+		if (rootTree == null) {
+			File modulesFile = new File(repository.getWorkTree(),
+					Constants.DOT_GIT_MODULES);
+			FileBasedConfig config = new FileBasedConfig(modulesFile,
+					repository.getFS());
+			config.load();
+			modulesConfig = config;
+		} else {
 			TreeWalk configWalk = new TreeWalk(repository);
 			try {
 				configWalk.addTree(rootTree);
@@ -34,10 +41,7 @@
 							return this;
 						}
 					}
-					if (!useWorkingTree) {
-						modulesConfig = new Config();
-						return this;
-					}
+					modulesConfig = new Config();
 				} finally {
 					if (idx > 0)
 						rootTree.next(idx);
@@ -45,16 +49,6 @@
 			} finally {
 				configWalk.release();
 			}
-		}
-		if (repository.isBare()) {
-			modulesConfig = new Config();
-		} else {
-			File modulesFile = new File(repository.getWorkTree(),
-					Constants.DOT_GIT_MODULES);
-			FileBasedConfig config = new FileBasedConfig(modulesFile,
-					repository.getFS());
-			config.load();
-			modulesConfig = config;
 		}
 		return this;
 	}
