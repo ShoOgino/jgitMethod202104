@@ -32,9 +32,11 @@
 						public void apply(DirCacheEntry ent) {
 							ent.setObjectId(blobId);
 							ent.setFileMode(mode);
+							File file = new File(workTree, ent.getPathString());
+							File parentDir = file.getParentFile();
 							try {
-								DirCacheCheckout.checkoutEntry(repo, new File(
-										workTree, ent.getPathString()), ent, r);
+								FileUtils.mkdirs(parentDir, true);
+								DirCacheCheckout.checkoutEntry(repo, file, ent, r);
 							} catch (IOException e) {
 								throw new JGitInternalException(
 										MessageFormat.format(
