@@ -1,0 +1,17 @@
+	/**
+	 * Check if a Git client has the known chunked request body encoding bug.
+	 * <p>
+	 * Git 1.7.5 contains a unique bug where chunked requests are malformed.
+	 * This applies to both fetch and push.
+	 *
+	 * @param version
+	 *            parsed version of the Git client software.
+	 * @param request
+	 *            incoming HTTP request.
+	 * @return true if the client has the chunked encoding bug.
+	 */
+	public static boolean hasChunkedEncodingRequestBug(
+			int[] version, HttpServletRequest request) {
+		return compare(version, v1_7_5) == 0 && isChunked(request);
+	}
+

@@ -1,0 +1,14 @@
+	@Test
+	public void testParse() {
+		assertEquals("1.6.5", parseVersion("git/1.6.6-rc0"));
+		assertEquals("1.6.6", parseVersion("git/1.6.6"));
+		assertEquals("1.7.5", parseVersion("git/1.7.5.GIT"));
+		assertEquals("1.7.6.1", parseVersion("git/1.7.6.1.45.gbe0cc"));
+
+		assertEquals("1.5.4.3", parseVersion("git/1.5.4.3,gzip(proxy)"));
+		assertEquals("1.7.0.2", parseVersion("git/1.7.0.2.msysgit.0.14.g956d7,gzip"));
+		assertEquals("1.7.10.2", parseVersion("git/1.7.10.2 (Apple Git-33)"));
+
+		assertEquals(ClientVersionUtil.toString(invalidVersion()), parseVersion("foo"));
+	}
+

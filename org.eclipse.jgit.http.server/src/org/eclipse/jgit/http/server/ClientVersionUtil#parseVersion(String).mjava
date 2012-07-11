@@ -1,0 +1,14 @@
+	/**
+	 * Parse a Git client User-Agent header value.
+	 *
+	 * @param version
+	 *            git client version string, of the form "git/1.7.9".
+	 * @return components of the version string. {@link #invalidVersion()} if
+	 *         the version string cannot be parsed.
+	 */
+	public static int[] parseVersion(String version) {
+		if (version != null && version.startsWith("git/"))
+			return splitVersion(version.substring("git/".length()));
+		return invalidVersion();
+	}
+

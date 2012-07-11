@@ -31,6 +31,19 @@
 			unlockPack();
 
 			if (reportStatus) {
+				if (echoCommandFailures && msgOut != null) {
+					sendStatusReport(false, unpackError, new Reporter() {
+						void sendString(final String s) throws IOException {
+							msgOut.write(Constants.encode(s + "\n"));
+						}
+					});
+					msgOut.flush();
+					try {
+						Thread.sleep(500);
+					} catch (InterruptedException wakeUp) {
+						// Ignore an early wake up.
+					}
+				}
 				sendStatusReport(true, unpackError, new Reporter() {
 					void sendString(final String s) throws IOException {
 						pckOut.writeString(s + "\n");
