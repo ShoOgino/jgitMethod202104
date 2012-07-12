@@ -1,0 +1,27 @@
+	/**
+	 * Simplify an expression, but unlike {@link #resolve(String)} it will not
+	 * resolve a branch passed or resulting from the expression, such as @{-}.
+	 * Thus this method can be used to process an expression to a method that
+	 * expects a branch or revision id.
+	 *
+	 * @param revstr
+	 * @return object id or ref name from resolved expression
+	 * @throws AmbiguousObjectException
+	 * @throws IOException
+	 */
+	public String simplify(final String revstr)
+			throws AmbiguousObjectException, IOException {
+		RevWalk rw = new RevWalk(this);
+		try {
+			Object resolved = resolve(rw, revstr);
+			if (resolved != null)
+				if (resolved instanceof String)
+					return (String) resolved;
+				else
+					return ((AnyObjectId) resolved).getName();
+			return null;
+		} finally {
+			rw.release();
+		}
+	}
+

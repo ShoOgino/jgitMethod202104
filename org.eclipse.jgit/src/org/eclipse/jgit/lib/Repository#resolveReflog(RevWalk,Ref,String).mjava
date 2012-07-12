@@ -7,10 +7,7 @@
 			throw new RevisionSyntaxException(MessageFormat.format(
 					JGitText.get().invalidReflogRevision, time));
 		}
-		if (number < 0)
-			throw new RevisionSyntaxException(MessageFormat.format(
-					JGitText.get().invalidReflogRevision, time));
-
+		assert number >= 0;
 		ReflogReader reader = new ReflogReader(this, ref.getName());
 		ReflogEntry entry = reader.getReverseEntry(number);
 		if (entry == null)
