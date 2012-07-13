@@ -1,5 +1,4 @@
 	@Test
-	@SuppressWarnings("null")
 	public void testRebaseWithUncommittedMasterChange() throws Exception {
 		// create file1, add and commit
 		writeTrashFile(FILE1, "file1");
@@ -26,14 +25,10 @@
 		// do not commit
 
 		// rebase
-		JGitInternalException exception = null;
-		try {
-			git.rebase().setUpstream("refs/heads/master").call();
-		} catch (JGitInternalException e) {
-			exception = e;
-		}
-		assertNotNull(exception);
-		assertEquals("Checkout conflict with files: \nfile1",
-				exception.getMessage());
+		RebaseResult result = git.rebase().setUpstream("refs/heads/master")
+				.call();
+		assertEquals(Status.CONFLICTS, result.getStatus());
+		assertEquals(1, result.getConflicts().size());
+		assertEquals(FILE1, result.getConflicts().get(0));
 	}
 

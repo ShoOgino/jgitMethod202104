@@ -163,6 +163,8 @@
 				return RebaseResult.OK_RESULT;
 			}
 			return RebaseResult.FAST_FORWARD_RESULT;
+		} catch (CheckoutConflictException cce) {
+			return new RebaseResult(cce.getConflictingPaths());
 		} catch (IOException ioe) {
 			throw new JGitInternalException(ioe.getMessage(), ioe);
 		}

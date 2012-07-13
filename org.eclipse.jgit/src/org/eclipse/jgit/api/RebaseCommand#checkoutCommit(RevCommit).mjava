@@ -1,10 +1,15 @@
-	private boolean checkoutCommit(RevCommit commit) throws IOException {
+	private boolean checkoutCommit(RevCommit commit) throws IOException,
+			CheckoutConflictException {
 		try {
 			RevCommit head = walk.parseCommit(repo.resolve(Constants.HEAD));
 			DirCacheCheckout dco = new DirCacheCheckout(repo, head.getTree(),
 					repo.lockDirCache(), commit.getTree());
 			dco.setFailOnConflict(true);
-			dco.checkout();
+			try {
+				dco.checkout();
+			} catch (org.eclipse.jgit.errors.CheckoutConflictException cce) {
+				throw new CheckoutConflictException(dco.getConflicts(), cce);
+			}
 			// update the HEAD
 			RefUpdate refUpdate = repo.updateRef(Constants.HEAD, true);
 			refUpdate.setExpectedOldObjectId(head);
