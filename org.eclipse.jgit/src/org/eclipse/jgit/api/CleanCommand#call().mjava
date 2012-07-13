@@ -13,13 +13,45 @@
 		try {
 			StatusCommand command = new StatusCommand(repo);
 			Status status = command.call();
-			for (String file : status.getUntracked()) {
+
+			Set<String> untrackedAndIgnoredFiles = new TreeSet<String>(
+					status.getUntracked());
+			Set<String> untrackedAndIgnoredDirs = new TreeSet<String>(
+					status.getUntrackedFolders());
+
+			for (String p : status.getIgnoredNotInIndex()) {
+				File f = new File(repo.getWorkTree(), p);
+				if (f.isFile()) {
+					untrackedAndIgnoredFiles.add(p);
+				} else if (f.isDirectory()) {
+					untrackedAndIgnoredDirs.add(p);
+				}
+			}
+
+			Set<String> filtered = filterFolders(untrackedAndIgnoredFiles,
+					untrackedAndIgnoredDirs);
+
+			Set<String> notIgnoredFiles = filterIgnorePaths(filtered,
+					status.getIgnoredNotInIndex(), true);
+			Set<String> notIgnoredDirs = filterIgnorePaths(
+					untrackedAndIgnoredDirs,
+					status.getIgnoredNotInIndex(), false);
+
+			for (String file : notIgnoredFiles)
 				if (paths.isEmpty() || paths.contains(file)) {
 					if (!dryRun)
 						FileUtils.delete(new File(repo.getWorkTree(), file));
 					files.add(file);
 				}
-			}
+
+			if (directories)
+				for (String dir : notIgnoredDirs)
+					if (paths.isEmpty() || paths.contains(dir)) {
+						if (!dryRun)
+							FileUtils.delete(new File(repo.getWorkTree(), dir),
+									FileUtils.RECURSIVE);
+						files.add(dir + "/");
+					}
 		} catch (IOException e) {
 			throw new JGitInternalException(e.getMessage(), e);
 		}

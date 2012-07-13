@@ -1,5 +1,6 @@
 	@Test
-	public void testClean() throws NoWorkTreeException, GitAPIException {
+	public void testCleanDirsWithDryRun() throws NoWorkTreeException,
+			GitAPIException {
 		// create status
 		StatusCommand command = git.status();
 		Status status = command.call();
@@ -7,16 +8,17 @@
 		assertTrue(files.size() > 0);
 
 		// run clean
-		Set<String> cleanedFiles = git.clean().call();
+		Set<String> cleanedFiles = git.clean().setDryRun(true)
+				.setCleanDirectories(true).call();
 
 		status = git.status().call();
 		files = status.getUntracked();
 
-		assertTrue(files.size() == 1); // one remains (directories not cleaned)
+		assertTrue(files.size() == 4);
 		assertTrue(cleanedFiles.contains("File2.txt"));
 		assertTrue(cleanedFiles.contains("File3.txt"));
 		assertTrue(!cleanedFiles.contains("sub-noclean/File1.txt"));
 		assertTrue(cleanedFiles.contains("sub-noclean/File2.txt"));
-		assertTrue(!cleanedFiles.contains("sub-clean/File4.txt"));
+		assertTrue(cleanedFiles.contains("sub-clean/"));
 	}
 

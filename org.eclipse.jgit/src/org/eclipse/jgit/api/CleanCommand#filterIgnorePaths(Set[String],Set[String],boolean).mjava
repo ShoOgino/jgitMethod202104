@@ -1,0 +1,17 @@
+	private Set<String> filterIgnorePaths(Set<String> inputPaths,
+			Set<String> ignoredNotInIndex, boolean exact) {
+		if (ignore) {
+			Set<String> filtered = new TreeSet<String>(inputPaths);
+			for (String path : inputPaths)
+				for (String ignored : ignoredNotInIndex)
+					if ((exact && path.equals(ignored))
+							|| (!exact && path.startsWith(ignored))) {
+						filtered.remove(path);
+						break;
+					}
+
+			return filtered;
+		}
+		return inputPaths;
+	}
+

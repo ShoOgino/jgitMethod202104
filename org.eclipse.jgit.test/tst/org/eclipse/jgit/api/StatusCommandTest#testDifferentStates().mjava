@@ -51,5 +51,9 @@
 		assertEquals(set("a"), stat.getUntracked());
 		git.commit().setMessage("t").call();
 
+		writeTrashFile("sub/a", "sub-file");
+		stat = git.status().call();
+		assertEquals(1, stat.getUntrackedFolders().size());
+		assertTrue(stat.getUntrackedFolders().contains("sub"));
 	}
 

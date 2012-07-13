@@ -8,8 +8,18 @@
 		writeTrashFile("File2.txt", "Delete Me");
 		writeTrashFile("File3.txt", "Delete Me");
 
+		// create files in sub-directories.
+		writeTrashFile("sub-noclean/File1.txt", "Hello world");
+		writeTrashFile("sub-noclean/File2.txt", "Delete Me");
+		writeTrashFile("sub-clean/File4.txt", "Delete Me");
+		writeTrashFile("sub-noclean/Ignored.txt", "Ignored");
+		writeTrashFile(".gitignore", "/ignored-dir\n/sub-noclean/Ignored.txt");
+		writeTrashFile("ignored-dir/Ignored2.txt", "Ignored");
+
 		// add and commit first file
 		git.add().addFilepattern("File1.txt").call();
+		git.add().addFilepattern("sub-noclean/File1.txt").call();
+		git.add().addFilepattern(".gitignore").call();
 		git.commit().setMessage("Initial commit").call();
 	}
 
