@@ -1,0 +1,23 @@
+	// Assert that modification timestamps of working tree files are as
+	// expected. You may specify n files. It is asserted that every file
+	// i+1 is not older than file i. If a path of file i+1 is prefixed with "<"
+	// then this file must be younger then file i. A path "*<modtime>"
+	// represents a file with a modification time of <modtime>
+	// E.g. ("a", "b", "<c", "f/a.txt") means: a<=b<c<=f/a.txt
+	private void checkModificationTimeStampOrder(String... pathes) {
+		long lastMod = Long.MIN_VALUE;
+		for (String p : pathes) {
+			boolean strong = p.startsWith("<");
+			boolean fixed = p.charAt(strong ? 1 : 0) == '*';
+			p = p.substring((strong ? 1 : 0) + (fixed ? 1 : 0));
+			long curMod = fixed ? Long.valueOf(p).longValue() : new File(
+					db.getWorkTree(), p).lastModified();
+			if (strong)
+				assertTrue("path " + p + " is not younger than predecesssor",
+						curMod > lastMod);
+			else
+				assertTrue("path " + p + " is older than predecesssor",
+						curMod >= lastMod);
+		}
+	}
+

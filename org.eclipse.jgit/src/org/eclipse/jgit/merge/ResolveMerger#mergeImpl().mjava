@@ -34,6 +34,13 @@
 			}
 
 			if (!inCore) {
+				// No problem found. The only thing left to be done is to
+				// checkout
+				// all files from "theirs" which have been selected to go into
+				// the
+				// new index.
+				checkout();
+
 				// All content-merges are successfully done. If we can now write the
 				// new index we are on quite safe ground. Even if the checkout of
 				// files coming from "theirs" fails the user can work around such
@@ -44,10 +51,6 @@
 				}
 				builder = null;
 
-				// No problem found. The only thing left to be done is to checkout
-				// all files from "theirs" which have been selected to go into the
-				// new index.
-				checkout();
 			} else {
 				builder.finish();
 				builder = null;
