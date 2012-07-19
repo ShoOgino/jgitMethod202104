@@ -1,0 +1,38 @@
+	@Test
+	public void checkLockedFilesToBeDeleted() throws Exception {
+		Git git = Git.wrap(db);
+
+		writeTrashFile("a.txt", "orig");
+		writeTrashFile("b.txt", "orig");
+		git.add().addFilepattern("a.txt").addFilepattern("b.txt").call();
+		RevCommit first = git.commit().setMessage("added a.txt, b.txt").call();
+
+		// modify and delete files on the master branch
+		writeTrashFile("a.txt", "master");
+		git.rm().addFilepattern("b.txt").call();
+		RevCommit masterCommit = git.commit()
+				.setMessage("modified a.txt, deleted b.txt").setAll(true)
+				.call();
+
+		// switch back to a side branch
+		git.checkout().setCreateBranch(true).setStartPoint(first)
+				.setName("side").call();
+		writeTrashFile("c.txt", "side");
+		git.add().addFilepattern("c.txt").call();
+		git.commit().setMessage("added c.txt").call();
+
+		// Get a handle to the the file so on windows it can't be deleted.
+		FileInputStream fis = new FileInputStream(new File(db.getWorkTree(),
+				"b.txt"));
+		MergeResult mergeRes = git.merge().include(masterCommit).call();
+		if (mergeRes.getMergeStatus().equals(MergeStatus.FAILED)) {
+			// probably windows
+			assertEquals(1, mergeRes.getFailingPaths().size());
+			assertEquals(MergeFailureReason.COULD_NOT_DELETE, mergeRes
+					.getFailingPaths().get("b.txt"));
+		}
+		assertEquals("[a.txt, mode:100644, content:master]"
+				+ "[c.txt, mode:100644, content:side]", indexState(CONTENT));
+		fis.close();
+	}
+
