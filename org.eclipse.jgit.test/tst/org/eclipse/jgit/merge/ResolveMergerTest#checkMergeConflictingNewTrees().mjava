@@ -1,0 +1,34 @@
+	/**
+	 * Merging two conflicting subtrees when the index and HEAD does not contain
+	 * any file in that subtree should lead to a conflicting state.
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void checkMergeConflictingNewTrees() throws Exception {
+		Git git = Git.wrap(db);
+
+		writeTrashFile("2", "orig");
+		git.add().addFilepattern("2").call();
+		RevCommit first = git.commit().setMessage("added 2").call();
+
+		writeTrashFile("d/1", "master");
+		git.add().addFilepattern("d/1").call();
+		RevCommit masterCommit = git.commit().setAll(true)
+				.setMessage("added d/1 on master").call();
+
+		git.checkout().setCreateBranch(true).setStartPoint(first)
+				.setName("side").call();
+		writeTrashFile("d/1", "side");
+		git.add().addFilepattern("d/1").call();
+		git.commit().setAll(true).setMessage("added d/1 on side").call();
+
+		git.rm().addFilepattern("d/1").call();
+		git.rm().addFilepattern("d").call();
+		MergeResult mergeRes = git.merge().include(masterCommit).call();
+		assertTrue(MergeStatus.CONFLICTING.equals(mergeRes.getMergeStatus()));
+		assertEquals(
+				"[2, mode:100644, content:orig][d/1, mode:100644, stage:2, content:side][d/1, mode:100644, stage:3, content:master]",
+				indexState(CONTENT));
+	}
+

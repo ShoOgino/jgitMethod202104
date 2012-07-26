@@ -1,17 +1,14 @@
 	private boolean isWorktreeDirty(WorkingTreeIterator work) {
-		if (inCore)
+		if (inCore || work == null)
 			return false;
 
 		final int modeF = tw.getRawMode(T_FILE);
 		final int modeO = tw.getRawMode(T_OURS);
 
 		// Worktree entry has to match ours to be considered clean
-		final boolean isDirty;
-		if (nonTree(modeF))
-			isDirty = work.isModeDifferent(modeO)
-					|| !tw.idEqual(T_FILE, T_OURS);
-		else
-			isDirty = false;
+		boolean isDirty = work.isModeDifferent(modeO);
+		if (!isDirty && nonTree(modeF))
+			isDirty = !tw.idEqual(T_FILE, T_OURS);
 
 		if (isDirty)
 			failingPaths.put(tw.getPathString(),
