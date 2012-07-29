@@ -1,0 +1,14 @@
+	@Test
+	public void testPackAllObjectsInOnePack() throws Exception {
+		tr.branch("refs/heads/master").commit().add("A", "A").add("B", "B")
+				.create();
+		stats = gc.getStatistics();
+		assertEquals(4, stats.numberOfLooseObjects);
+		assertEquals(0, stats.numberOfPackedObjects);
+		gc.gc();
+		stats = gc.getStatistics();
+		assertEquals(0, stats.numberOfLooseObjects);
+		assertEquals(4, stats.numberOfPackedObjects);
+		assertEquals(1, stats.numberOfPackFiles);
+	}
+

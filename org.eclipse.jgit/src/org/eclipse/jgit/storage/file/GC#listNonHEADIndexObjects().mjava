@@ -1,0 +1,63 @@
+	/**
+	 * Return a list of those objects in the index which differ from whats in
+	 * HEAD
+	 *
+	 * @return a set of ObjectIds of changed objects in the index
+	 * @throws IOException
+	 * @throws CorruptObjectException
+	 * @throws NoWorkTreeException
+	 */
+	private Set<ObjectId> listNonHEADIndexObjects()
+			throws CorruptObjectException, IOException {
+		RevWalk revWalk = null;
+		try {
+			if (repo.getIndexFile() == null)
+				return Collections.emptySet();
+		} catch (NoWorkTreeException e) {
+			return Collections.emptySet();
+		}
+		TreeWalk treeWalk = new TreeWalk(repo);
+		try {
+			treeWalk.addTree(new DirCacheIterator(repo.readDirCache()));
+			ObjectId headID = repo.resolve(Constants.HEAD);
+			if (headID != null) {
+				revWalk = new RevWalk(repo);
+				treeWalk.addTree(revWalk.parseTree(headID));
+				revWalk.dispose();
+				revWalk = null;
+			}
+
+			treeWalk.setFilter(TreeFilter.ANY_DIFF);
+			treeWalk.setRecursive(true);
+			Set<ObjectId> ret = new HashSet<ObjectId>();
+
+			while (treeWalk.next()) {
+				ObjectId objectId = treeWalk.getObjectId(0);
+			    switch (treeWalk.getRawMode(0) & FileMode.TYPE_MASK) {
+			      case FileMode.TYPE_MISSING:
+			      case FileMode.TYPE_GITLINK:
+			        continue;
+			      case FileMode.TYPE_TREE:
+			      case FileMode.TYPE_FILE:
+			      case FileMode.TYPE_SYMLINK:
+			        ret.add(objectId);
+			        continue;
+			      default:
+					throw new IOException(MessageFormat.format(
+							JGitText.get().corruptObjectInvalidMode3, String
+									.format("%o", Integer.valueOf(treeWalk
+											.getRawMode(0)),
+											(objectId == null) ? "null"
+													: objectId.name(), treeWalk
+											.getPathString(), repo
+											.getIndexFile())));
+			    }
+			  }
+			return ret;
+		} finally {
+			if (revWalk != null)
+				revWalk.dispose();
+			treeWalk.release();
+		}
+	}
+

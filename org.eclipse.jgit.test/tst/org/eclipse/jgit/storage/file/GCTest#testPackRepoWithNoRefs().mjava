@@ -1,0 +1,13 @@
+	@Test
+	public void testPackRepoWithNoRefs() throws Exception {
+		tr.commit().add("A", "A").add("B", "B").create();
+		stats = gc.getStatistics();
+		assertEquals(4, stats.numberOfLooseObjects);
+		assertEquals(0, stats.numberOfPackedObjects);
+		gc.gc();
+		stats = gc.getStatistics();
+		assertEquals(4, stats.numberOfLooseObjects);
+		assertEquals(0, stats.numberOfPackedObjects);
+		assertEquals(0, stats.numberOfPackFiles);
+	}
+

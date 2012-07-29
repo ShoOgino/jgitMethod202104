@@ -1,0 +1,32 @@
+	/**
+	 * Returns the number of objects stored in pack files. If an object is
+	 * contained in multiple pack files it is counted as often as it occurs.
+	 *
+	 * @return the number of objects stored in pack files
+	 * @throws IOException
+	 */
+	public RepoStatistics getStatistics() throws IOException {
+		RepoStatistics ret = new RepoStatistics();
+		Collection<PackFile> packs = repo.getObjectDatabase().getPacks();
+		for (PackFile f : packs)
+			ret.numberOfPackedObjects += f.getIndex().getObjectCount();
+		ret.numberOfPackFiles = packs.size();
+		File objDir = repo.getObjectsDirectory();
+		String[] fanout = objDir.list();
+		if (fanout != null && fanout.length > 0) {
+			for (String d : fanout) {
+				if (d.length() != 2)
+					continue;
+				String[] entries = new File(objDir, d).list();
+				if (entries == null)
+					continue;
+				for (String e : entries) {
+					if (e.length() != Constants.OBJECT_ID_STRING_LENGTH - 2)
+						continue;
+					ret.numberOfLooseObjects++;
+				}
+			}
+		}
+		return ret;
+	}
+

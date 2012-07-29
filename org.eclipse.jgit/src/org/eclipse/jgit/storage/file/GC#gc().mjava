@@ -1,0 +1,21 @@
+	/**
+	 * Runs a garbage collector on a {@link FileRepository}. It will
+	 * <ul>
+	 * <li>pack loose references into packed-refs</li>
+	 * <li>repack all reachable objects into new pack files and delete the old
+	 * pack files</li>
+	 * <li>prune all loose objects which are now reachable by packs</li>
+	 * </ul>
+	 *
+	 * @return the collection of {@link PackFile}'s which are newly created
+	 * @throws IOException
+	 */
+	public Collection<PackFile> gc() throws IOException {
+		packRefs();
+		// TODO: implement reflog_expire(pm, repo);
+		Collection<PackFile> newPacks = repack();
+		prune(Collections.<ObjectId> emptySet());
+		// TODO: implement rerere_gc(pm);
+		return newPacks;
+	}
+

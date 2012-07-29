@@ -1,0 +1,68 @@
+	/**
+	 * Packs all objects which reachable from any of the heads into one pack
+	 * file. Additionally all objects which are not reachable from any head but
+	 * which are reachable from any of the other refs (e.g. tags), special refs
+	 * (e.g. FETCH_HEAD) or index are packed into a separate pack file. Objects
+	 * included in pack files which have a .keep file associated are never
+	 * repacked. All old pack files which existed before are deleted.
+	 *
+	 * @return a collection of the newly created pack files
+	 * @throws IOException
+	 *             when during reading of refs, index, packfiles, objects,
+	 *             reflog-entries or during writing to the packfiles
+	 *             {@link IOException} occurs
+	 */
+	public Collection<PackFile> repack() throws IOException {
+		Collection<PackFile> toBeDeleted = repo.getObjectDatabase().getPacks();
+
+		long time = System.currentTimeMillis();
+		Map<String, Ref> refsBefore = getAllRefs();
+
+		Set<ObjectId> allHeads = new HashSet<ObjectId>();
+		Set<ObjectId> nonHeads = new HashSet<ObjectId>();
+		Set<ObjectId> tagTargets = new HashSet<ObjectId>();
+		Set<ObjectId> indexObjects = listNonHEADIndexObjects();
+
+		for (Ref ref : refsBefore.values()) {
+			nonHeads.addAll(listRefLogObjects(ref, 0));
+			if (ref.isSymbolic() || ref.getObjectId() == null)
+				continue;
+			if (ref.getName().startsWith(Constants.R_HEADS))
+				allHeads.add(ref.getObjectId());
+			else
+				nonHeads.add(ref.getObjectId());
+			if (ref.getPeeledObjectId() != null)
+				tagTargets.add(ref.getPeeledObjectId());
+		}
+
+		List<PackIndex> excluded = new LinkedList<PackIndex>();
+		for (PackFile f : repo.getObjectDatabase().getPacks())
+			if (f.shouldBeKept())
+				excluded.add(f.getIndex());
+
+		tagTargets.addAll(allHeads);
+		nonHeads.addAll(indexObjects);
+
+		List<PackFile> ret = new ArrayList<PackFile>(2);
+		PackFile heads = null;
+		if (!allHeads.isEmpty()) {
+			heads = writePack(allHeads, Collections.<ObjectId> emptySet(),
+					tagTargets, excluded);
+			if (heads != null) {
+				ret.add(heads);
+				excluded.add(0, heads.getIndex());
+			}
+		}
+		if (!nonHeads.isEmpty()) {
+			PackFile rest = writePack(nonHeads, allHeads, tagTargets, excluded);
+			if (rest != null)
+				ret.add(rest);
+		}
+		deleteOldPacks(toBeDeleted, ret, true);
+		prunePacked();
+
+		lastPackedRefs = refsBefore;
+		lastRepackTime = time;
+		return ret;
+	}
+

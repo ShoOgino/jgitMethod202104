@@ -1,0 +1,24 @@
+	/**
+	 * Make sure a ref is peeled and has the Storage PACKED. If the given ref
+	 * has this attributes simply return it. Otherwise create a new peeled
+	 * {@link ObjectIdRef} where Storage is set to PACKED.
+	 *
+	 * @param f
+	 * @return a ref for Storage PACKED having the same name, id, peeledId as f
+	 * @throws MissingObjectException
+	 * @throws IOException
+	 */
+	private Ref peeledPackedRef(Ref f)
+			throws MissingObjectException, IOException {
+		if (f.getStorage().isPacked() && f.isPeeled())
+			return f;
+		if (!f.isPeeled())
+			f = peel(f);
+		if (f.getPeeledObjectId() != null)
+			return new ObjectIdRef.PeeledTag(PACKED, f.getName(),
+					f.getObjectId(), f.getPeeledObjectId());
+		else
+			return new ObjectIdRef.PeeledNonTag(PACKED, f.getName(),
+					f.getObjectId());
+	}
+

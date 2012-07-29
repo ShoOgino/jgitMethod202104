@@ -1,0 +1,41 @@
+	/**
+	 * Delete old pack files. What is 'old' is defined by specifying a set of
+	 * old pack files and a set of new pack files. Each pack file contained in
+	 * old pack files but not contained in new pack files will be deleted.
+	 *
+	 * @param oldPacks
+	 * @param newPacks
+	 * @param ignoreErrors
+	 *            <code>true</code> if we should ignore the fact that a certain
+	 *            pack files or index files couldn't be deleted.
+	 *            <code>false</code> if an exception should be thrown in such
+	 *            cases
+	 * @throws IOException
+	 *             if a pack file couldn't be deleted and
+	 *             <code>ignoreErrors</code> is set to <code>false</code>
+	 */
+	private void deleteOldPacks(Collection<PackFile> oldPacks,
+			Collection<PackFile> newPacks, boolean ignoreErrors)
+			throws IOException {
+		int deleteOptions = FileUtils.RETRY | FileUtils.SKIP_MISSING;
+		if (ignoreErrors)
+			deleteOptions |= FileUtils.IGNORE_ERRORS;
+		oldPackLoop: for (PackFile oldPack : oldPacks) {
+			String oldName = oldPack.getPackName();
+			// check whether an old pack file is also among the list of new
+			// pack files. Then we must not delete it.
+			for (PackFile newPack : newPacks)
+				if (oldName.equals(newPack.getPackName()))
+					continue oldPackLoop;
+
+			if (!oldPack.shouldBeKept()) {
+				oldPack.close();
+				FileUtils.delete(nameFor(oldName, ".pack"), deleteOptions);
+				FileUtils.delete(nameFor(oldName, ".idx"), deleteOptions);
+			}
+		}
+		// close the complete object database. Thats my only chance to force
+		// rescanning and to detect that certain pack files are now deleted.
+		repo.getObjectDatabase().close();
+	}
+
