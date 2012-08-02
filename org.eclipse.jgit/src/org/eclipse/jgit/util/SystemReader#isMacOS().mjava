@@ -1,8 +1,11 @@
-	private static boolean isMacOS() {
-		final String osDotName = AccessController
+	/**
+	 * @return true if we are running on Mac OS X
+	 */
+	public boolean isMacOS() {
+		String osDotName = AccessController
 				.doPrivileged(new PrivilegedAction<String>() {
 					public String run() {
-						return System.getProperty("os.name");
+						return getProperty("os.name");
 					}
 				});
 		return "Mac OS X".equals(osDotName) || "Darwin".equals(osDotName);
