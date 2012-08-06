@@ -1,0 +1,18 @@
+	private int nextSelectionDistance(int idx, int cardinality) {
+		if (idx > cardinality)
+			throw new IllegalArgumentException();
+		int idxFromStart = cardinality - idx;
+		int mustRegionEnd = 100;
+		if (idxFromStart <= mustRegionEnd)
+			return 0;
+
+		// Commits more toward the start will have more bitmaps.
+		int minRegionEnd = 20000;
+		if (idxFromStart <= minRegionEnd)
+			return Math.min(idxFromStart - mustRegionEnd, minCommits);
+
+		// Commits more toward the end will have fewer.
+		int next = Math.min(idxFromStart - minRegionEnd, maxCommits);
+		return Math.max(next, minCommits);
+	}
+

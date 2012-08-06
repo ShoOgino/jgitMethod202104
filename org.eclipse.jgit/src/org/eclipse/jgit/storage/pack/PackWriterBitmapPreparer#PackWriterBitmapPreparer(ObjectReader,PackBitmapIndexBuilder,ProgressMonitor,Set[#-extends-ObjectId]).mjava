@@ -1,0 +1,13 @@
+	PackWriterBitmapPreparer(ObjectReader reader,
+			PackBitmapIndexBuilder writeBitmaps, ProgressMonitor pm,
+			Set<? extends ObjectId> want) throws IOException {
+		this.reader = reader;
+		this.writeBitmaps = writeBitmaps;
+		this.pm = pm;
+		this.want = want;
+		this.commitBitmapIndex = new BitmapIndexImpl(writeBitmaps);
+		this.bitmapRemapper = PackBitmapIndexRemapper.newPackBitmapIndex(
+				reader.getBitmapIndex(), writeBitmaps);
+		this.bitmapIndex = new BitmapIndexImpl(bitmapRemapper);
+	}
+

@@ -1,0 +1,38 @@
+	BitmapBuilder findObjects(Set<? extends ObjectId> start, BitmapBuilder seen)
+			throws MissingObjectException, IncorrectObjectTypeException,
+			IOException {
+		final BitmapBuilder bitmapResult = bitmapIndex.newBitmapBuilder();
+
+		for (ObjectId obj : start) {
+			Bitmap bitmap = bitmapIndex.getBitmap(obj);
+			if (bitmap != null)
+				bitmapResult.or(bitmap);
+		}
+
+		boolean marked = false;
+		for (ObjectId obj : start) {
+			if (!bitmapResult.contains(obj)) {
+				walker.markStart(walker.parseAny(obj));
+				marked = true;
+			}
+		}
+
+		if (marked) {
+			walker.setRevFilter(newRevFilter(seen, bitmapResult));
+
+			while (walker.next() != null) {
+				// Iterate through all of the commits. The BitmapRevFilter does
+				// the work.
+				pm.update(1);
+			}
+
+			RevObject ro;
+			while ((ro = walker.nextObject()) != null) {
+				bitmapResult.add(ro, ro.getType());
+				pm.update(1);
+			}
+		}
+
+		return bitmapResult;
+	}
+

@@ -1,0 +1,13 @@
+	private PackBitmapIndexRemapper(
+			BasePackBitmapIndex oldPackIndex, PackBitmapIndex newPackIndex) {
+		this.oldPackIndex = oldPackIndex;
+		this.newPackIndex = newPackIndex;
+		convertedBitmaps = new ObjectIdOwnerMap<StoredBitmap>();
+		inflated = new BitSet(newPackIndex.getObjectCount());
+
+		prevToNewMapping = new int[oldPackIndex.getObjectCount()];
+		for (int pos = 0; pos < prevToNewMapping.length; pos++)
+			prevToNewMapping[pos] = newPackIndex.findPosition(
+					oldPackIndex.getObject(pos));
+	}
+

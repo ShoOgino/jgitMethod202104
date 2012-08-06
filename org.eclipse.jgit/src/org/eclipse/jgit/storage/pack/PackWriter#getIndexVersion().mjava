@@ -1,0 +1,19 @@
+	/**
+	 * Returns the index format version that will be written.
+	 * <p>
+	 * This method can only be invoked after
+	 * {@link #writePack(ProgressMonitor, ProgressMonitor, OutputStream)} has
+	 * been invoked and completed successfully.
+	 *
+	 * @return the index format version.
+	 */
+	public int getIndexVersion() {
+		int indexVersion = config.getIndexVersion();
+		if (indexVersion <= 0) {
+			for (BlockList<ObjectToPack> objs : objectsLists)
+				indexVersion = Math.max(indexVersion,
+						PackIndexWriter.oldestPossibleFormat(objs));
+		}
+		return indexVersion;
+	}
+

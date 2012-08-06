@@ -1,0 +1,25 @@
+	/**
+	 * Create a bitmap index file to match the pack file just written.
+	 * <p>
+	 * This method can only be invoked after
+	 * {@link #prepareBitmapIndex(ProgressMonitor, Set)} has been invoked and
+	 * completed successfully. Writing a corresponding bitmap index is an
+	 * optional feature that not all pack users may require.
+	 *
+	 * @param bitmapIndexStream
+	 *            output for the bitmap index data. Caller is responsible for
+	 *            closing this stream.
+	 * @throws IOException
+	 *             the index data could not be written to the supplied stream.
+	 */
+	public void writeBitmapIndex(final OutputStream bitmapIndexStream)
+			throws IOException {
+		if (writeBitmaps == null)
+			throw new IOException(JGitText.get().bitmapsMustBePrepared);
+
+		long writeStart = System.currentTimeMillis();
+		final PackBitmapIndexWriterV1 iw = new PackBitmapIndexWriterV1(bitmapIndexStream);
+		iw.write(writeBitmaps, packcsum);
+		stats.timeWriting += System.currentTimeMillis() - writeStart;
+	}
+

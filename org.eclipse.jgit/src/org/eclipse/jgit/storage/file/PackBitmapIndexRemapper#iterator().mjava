@@ -1,0 +1,21 @@
+	public Iterator<Entry> iterator() {
+		if (oldPackIndex == null)
+			return Collections.<Entry> emptyList().iterator();
+
+		final Iterator<StoredBitmap> it = oldPackIndex.getBitmaps().iterator();
+		return new Iterator<Entry>() {
+			public boolean hasNext() {
+				return it.hasNext();
+			}
+
+			public Entry next() {
+				StoredBitmap sb = it.next();
+				return new Entry(sb, sb.getFlags());
+			}
+
+			public void remove() {
+				throw new UnsupportedOperationException();
+			}
+		};
+	}
+

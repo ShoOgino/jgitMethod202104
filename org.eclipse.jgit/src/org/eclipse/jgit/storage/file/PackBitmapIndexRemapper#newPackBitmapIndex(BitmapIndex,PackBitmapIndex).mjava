@@ -1,0 +1,24 @@
+	/**
+	 * A PackBitmapIndex that maps the positions in the prevBitmapIndex to the
+	 * ones in the newIndex.
+	 *
+	 * @param prevBitmapIndex
+	 *            the bitmap index with the old mapping.
+	 * @param newIndex
+	 *            the bitmap index with the new mapping.
+	 * @return a bitmap index that attempts to do the mapping between the two.
+	 */
+	public static PackBitmapIndexRemapper newPackBitmapIndex(
+			BitmapIndex prevBitmapIndex, PackBitmapIndex newIndex) {
+		if (!(prevBitmapIndex instanceof BitmapIndexImpl))
+			return new PackBitmapIndexRemapper(newIndex);
+
+		PackBitmapIndex prevIndex = ((BitmapIndexImpl) prevBitmapIndex)
+				.getPackBitmapIndex();
+		if (!(prevIndex instanceof BasePackBitmapIndex))
+			return new PackBitmapIndexRemapper(newIndex);
+
+		return new PackBitmapIndexRemapper(
+				(BasePackBitmapIndex) prevIndex, newIndex);
+	}
+

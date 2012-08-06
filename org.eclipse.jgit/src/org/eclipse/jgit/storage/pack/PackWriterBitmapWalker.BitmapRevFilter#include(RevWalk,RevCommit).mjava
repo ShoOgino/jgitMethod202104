@@ -1,0 +1,9 @@
+		@Override
+		public final boolean include(RevWalk walker, RevCommit cmit) {
+			if (load(cmit))
+				return true;
+			for (RevCommit p : cmit.getParents())
+				p.add(RevFlag.SEEN);
+			return false;
+		}
+

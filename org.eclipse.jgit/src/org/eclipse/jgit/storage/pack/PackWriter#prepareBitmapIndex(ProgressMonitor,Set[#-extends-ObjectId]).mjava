@@ -1,0 +1,64 @@
+	/**
+	 * Prepares the bitmaps to be written to the pack index. Bitmaps can be used
+	 * to speed up fetches and clones by storing the entire object graph at
+	 * selected commits.
+	 *
+	 * This method can only be invoked after
+	 * {@link #writePack(ProgressMonitor, ProgressMonitor, OutputStream)} has
+	 * been invoked and completed successfully. Writing a corresponding bitmap
+	 * index is an optional feature that not all pack users may require.
+	 *
+	 * @param pm
+	 *            progress monitor to report bitmap building work.
+	 * @param want
+	 *            collection of objects to be marked as interesting (start
+	 *            points of graph traversal).
+	 * @return whether a bitmap index may be written.
+	 * @throws IOException
+	 *             when some I/O problem occur during reading objects.
+	 */
+	public boolean prepareBitmapIndex(
+			ProgressMonitor pm, Set<? extends ObjectId> want)
+			throws IOException {
+		if (!canBuildBitmaps || getObjectCount() > Integer.MAX_VALUE
+				|| !cachedPacks.isEmpty())
+			return false;
+
+		if (pm == null)
+			pm = NullProgressMonitor.INSTANCE;
+
+		writeBitmaps = new PackBitmapIndexBuilder(sortByName());
+		PackWriterBitmapPreparer bitmapPreparer =
+				new PackWriterBitmapPreparer(reader, writeBitmaps, pm, want);
+
+		int numCommits = objectsLists[Constants.OBJ_COMMIT].size();
+		Collection<PackWriterBitmapPreparer.BitmapCommit> selectedCommits =
+				bitmapPreparer.doCommitSelection(numCommits);
+
+		beginPhase(PackingPhase.BUILDING_BITMAPS, pm, selectedCommits.size());
+
+		PackWriterBitmapWalker walker = bitmapPreparer.newBitmapWalker();
+		AnyObjectId last = null;
+		for (PackWriterBitmapPreparer.BitmapCommit cmit : selectedCommits) {
+			if (cmit.isReuseWalker())
+				walker.reset();
+			else
+				walker = bitmapPreparer.newBitmapWalker();
+
+			BitmapBuilder bitmap = walker.findObjects(
+					Collections.singleton(cmit), null);
+
+			if (last != null && cmit.isReuseWalker() && !bitmap.contains(last))
+				throw new IllegalStateException(MessageFormat.format(
+						JGitText.get().bitmapMissingObject, cmit.name(),
+						last.name()));
+			last = cmit;
+			writeBitmaps.addBitmap(cmit, bitmap.build(), cmit.getFlags());
+
+			pm.update(1);
+		}
+
+		endPhase(pm);
+		return true;
+	}
+

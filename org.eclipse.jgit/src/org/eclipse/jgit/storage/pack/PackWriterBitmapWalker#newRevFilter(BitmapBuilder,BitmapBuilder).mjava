@@ -1,0 +1,19 @@
+	static RevFilter newRevFilter(
+			final BitmapBuilder seen, final BitmapBuilder bitmapResult) {
+		if (seen != null) {
+			return new BitmapRevFilter() {
+				protected boolean load(RevCommit cmit) {
+					if (seen.contains(cmit))
+						return false;
+					return bitmapResult.add(cmit, Constants.OBJ_COMMIT);
+				}
+			};
+		}
+		return new BitmapRevFilter() {
+			@Override
+			protected boolean load(RevCommit cmit) {
+				return bitmapResult.add(cmit, Constants.OBJ_COMMIT);
+			}
+		};
+	}
+
