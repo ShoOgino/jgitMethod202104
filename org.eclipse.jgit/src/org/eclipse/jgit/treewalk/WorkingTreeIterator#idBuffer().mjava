@@ -12,11 +12,14 @@
 					DirCacheIterator.class);
 			if (i != null) {
 				DirCacheEntry ent = i.getDirCacheEntry();
-				if (ent != null && compareMetadata(ent) == MetadataDiff.EQUAL)
-					return i.idBuffer();
+				if (ent != null && compareMetadata(ent) == MetadataDiff.EQUAL) {
+					contentIdOffset = i.idOffset();
+					contentIdFromPtr = ptr;
+					return contentId = i.idBuffer();
+				}
+				contentIdOffset = 0;
 			}
 		}
-
 		switch (mode & FileMode.TYPE_MASK) {
 		case FileMode.TYPE_FILE:
 			contentIdFromPtr = ptr;
