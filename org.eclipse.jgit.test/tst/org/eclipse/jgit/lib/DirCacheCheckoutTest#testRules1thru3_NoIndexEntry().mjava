@@ -16,10 +16,9 @@
 
 		merge = buildTree(mkmap("foo", "a"));
 		tw = TreeWalk.forPath(db, "foo", merge);
-		ObjectId anotherId = tw.getObjectId(0);
 
 		prescanTwoTrees(head, merge);
 
-		assertEquals(anotherId, getUpdated().get("foo"));
+		assertConflict("foo");
 	}
 
