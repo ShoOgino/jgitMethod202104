@@ -1,0 +1,11 @@
+	@Test
+	public void getTrackingBranchShouldReturnNullWithoutMergeBranchForLocalBranch() {
+		Config c = parse("" //
+				+ "[remote \"origin\"]\n"
+				+ "  fetch = +refs/heads/onlyone:refs/remotes/origin/onlyone\n"
+				+ "[branch \"master\"]\n" //
+				+ "  remote = .\n");
+		BranchConfig branchConfig = new BranchConfig(c, "master");
+		assertNull(branchConfig.getTrackingBranch());
+	}
+

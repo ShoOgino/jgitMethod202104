@@ -1,0 +1,16 @@
+	/**
+	 * @return the full tracking branch name or <code>null</code> if it could
+	 *         not be determined
+	 */
+	public String getTrackingBranch() {
+		String remote = getRemote();
+		String mergeRef = getMergeBranch();
+		if (remote == null || mergeRef == null)
+			return null;
+
+		if (remote.equals("."))
+			return mergeRef;
+
+		return findRemoteTrackingBranch(remote, mergeRef);
+	}
+

@@ -1,6 +1,7 @@
 	/**
-	 * @return the full remote-tracking branch name or <code>null</code> if it
-	 *         could not be determined
+	 * @return the full remote-tracking branch name or {@code null} if it could
+	 *         not be determined. If you also want local tracked branches use
+	 *         {@link #getTrackingBranch()} instead.
 	 */
 	public String getRemoteTrackingBranch() {
 		String remote = getRemote();
@@ -8,18 +9,6 @@
 		if (remote == null || mergeRef == null)
 			return null;
 
-		RemoteConfig remoteConfig;
-		try {
-			remoteConfig = new RemoteConfig(config, remote);
-		} catch (URISyntaxException e) {
-			return null;
-		}
-		for (RefSpec refSpec : remoteConfig.getFetchRefSpecs()) {
-			if (refSpec.matchSource(mergeRef)) {
-				RefSpec expanded = refSpec.expandFromSource(mergeRef);
-				return expanded.getDestination();
-			}
-		}
-		return null;
+		return findRemoteTrackingBranch(remote, mergeRef);
 	}
 
