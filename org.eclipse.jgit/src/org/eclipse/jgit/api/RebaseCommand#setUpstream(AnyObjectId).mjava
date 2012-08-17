@@ -6,6 +6,7 @@
 	public RebaseCommand setUpstream(AnyObjectId upstream) {
 		try {
 			this.upstreamCommit = walk.parseCommit(upstream);
+			this.upstreamCommitName = upstream.name();
 		} catch (IOException e) {
 			throw new JGitInternalException(MessageFormat.format(
 					JGitText.get().couldNotReadObjectWhileParsingCommit,

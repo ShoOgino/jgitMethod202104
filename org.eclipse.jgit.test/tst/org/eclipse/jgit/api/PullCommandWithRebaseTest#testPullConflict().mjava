@@ -19,9 +19,17 @@
 
 		res = target.pull().call();
 
+		String remoteUri = target
+				.getRepository()
+				.getConfig()
+				.getString(ConfigConstants.CONFIG_REMOTE_SECTION, "origin",
+						ConfigConstants.CONFIG_KEY_URL);
+
 		assertFalse(res.getFetchResult().getTrackingRefUpdates().isEmpty());
 		assertTrue(res.getRebaseResult().getStatus().equals(Status.STOPPED));
-		String result = "<<<<<<< OURS\nSource change\n=======\nTarget change\n>>>>>>> THEIRS\n";
+		String result = "<<<<<<< Upstream, based on branch 'master' of "
+				+ remoteUri
+				+ "\nSource change\n=======\nTarget change\n>>>>>>> 42453fd Target change in local\n";
 		assertFileContentsEqual(targetFile, result);
 		assertEquals(RepositoryState.REBASING_INTERACTIVE, target
 				.getRepository().getRepositoryState());

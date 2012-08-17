@@ -1,0 +1,17 @@
+	/**
+	 * Optionally override the name of the upstream. If this is used, it has to
+	 * come after any {@link #setUpstream} call.
+	 *
+	 * @param upstreamName
+	 *            the name which will be used to refer to upstream in conflicts
+	 * @return {@code this}
+	 */
+	public RebaseCommand setUpstreamName(String upstreamName) {
+		if (upstreamCommit == null) {
+			throw new IllegalStateException(
+					"setUpstreamName must be called after setUpstream.");
+		}
+		this.upstreamCommitName = upstreamName;
+		return this;
+	}
+

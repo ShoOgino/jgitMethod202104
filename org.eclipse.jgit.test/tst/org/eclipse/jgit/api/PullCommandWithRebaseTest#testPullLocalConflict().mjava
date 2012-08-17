@@ -36,7 +36,8 @@
 
 		assertNull(res.getFetchResult());
 		assertEquals(Status.STOPPED, res.getRebaseResult().getStatus());
-		String result = "<<<<<<< OURS\nMaster change\n=======\nSlave change\n>>>>>>> THEIRS\n";
+		String result = "<<<<<<< Upstream, based on branch 'master' of local repository\n"
+				+ "Master change\n=======\nSlave change\n>>>>>>> 4049c9e Source change in based on master\n";
 		assertFileContentsEqual(targetFile, result);
 		assertEquals(RepositoryState.REBASING_INTERACTIVE, target
 				.getRepository().getRepositoryState());

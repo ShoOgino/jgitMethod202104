@@ -51,10 +51,16 @@
 				RevCommit srcParent = srcCommit.getParent(0);
 				revWalk.parseHeaders(srcParent);
 
+				String ourName = calculateOurName(headRef);
+				String cherryPickName = srcCommit.getId().abbreviate(7).name()
+						+ " " + srcCommit.getShortMessage();
+
 				ResolveMerger merger = (ResolveMerger) MergeStrategy.RESOLVE
 						.newMerger(repo);
 				merger.setWorkingTreeIterator(new FileTreeIterator(repo));
 				merger.setBase(srcParent.getTree());
+				merger.setCommitNames(new String[] { "BASE", ourName,
+						cherryPickName });
 				if (merger.merge(headCommit, srcCommit)) {
 					if (AnyObjectId.equals(headCommit.getTree().getId(), merger
 							.getResultTreeId()))
