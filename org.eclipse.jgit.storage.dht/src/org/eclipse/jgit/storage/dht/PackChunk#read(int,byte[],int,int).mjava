@@ -1,7 +1,0 @@
-	int read(int ptr, byte[] dst, int dstPos, int cnt) {
-		// Do not allow readers to read the CRC-32 from the tail.
-		int n = Math.min(cnt, (dataLen - TRAILER_SIZE) - ptr);
-		System.arraycopy(dataBuf, dataPtr + ptr, dst, dstPos, n);
-		return n;
-	}
-

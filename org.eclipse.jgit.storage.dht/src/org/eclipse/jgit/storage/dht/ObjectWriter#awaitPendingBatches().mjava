@@ -1,9 +1,0 @@
-	private void awaitPendingBatches() throws InterruptedException,
-			DhtTimeoutException, DhtException {
-		Timeout to = ctx.getOptions().getTimeout();
-		if (!metaBatches.tryAcquire(batchSize, to.getTime(), to.getUnit()))
-			throw new DhtTimeoutException(DhtText.get().timeoutChunkMeta);
-		if (metaError.get() != null)
-			throw metaError.get();
-	}
-

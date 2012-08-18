@@ -1,9 +1,0 @@
-	synchronized ChunkAndOffset find(RepositoryKey repo, AnyObjectId objId) {
-		for (PackChunk c : ready.values()) {
-			int p = c.findOffset(repo, objId);
-			if (0 <= p)
-				return new ChunkAndOffset(useReadyChunk(c.getChunkKey()), p);
-		}
-		return null;
-	}
-
