@@ -1,11 +1,17 @@
-	private ObjectId resolve(final RevWalk rw, final String revstr) throws IOException {
+	private Object resolve(final RevWalk rw, final String revstr)
+			throws IOException {
 		char[] revChars = revstr.toCharArray();
 		RevObject rev = null;
+		String name = null;
+		int done = 0;
 		for (int i = 0; i < revChars.length; ++i) {
 			switch (revChars[i]) {
 			case '^':
 				if (rev == null) {
-					rev = parseSimple(rw, new String(revChars, 0, i));
+					if (name == null)
+						name = new String(revChars, done, i);
+					rev = parseSimple(rw, name);
+					name = null;
 					if (rev == null)
 						return null;
 				}
@@ -45,6 +51,7 @@
 								rev = commit.getParent(pnum - 1);
 						}
 						i = j - 1;
+						done = i;
 						break;
 					case '{':
 						int k;
@@ -72,6 +79,7 @@
 								throw new RevisionSyntaxException(revstr);
 						else
 							throw new RevisionSyntaxException(revstr);
+						done = k;
 						break;
 					default:
 						rev = rw.parseAny(rev);
@@ -101,7 +109,9 @@
 				break;
 			case '~':
 				if (rev == null) {
-					rev = parseSimple(rw, new String(revChars, 0, i));
+					if (name == null)
+						name = new String(revChars, done, i);
+					rev = parseSimple(rw, name);
 					if (rev == null)
 						return null;
 				}
@@ -139,6 +149,8 @@
 				i = l - 1;
 				break;
 			case '@':
+				if (rev != null)
+					throw new RevisionSyntaxException(revstr);
 				int m;
 				String time = null;
 				for (m = i + 2; m < revChars.length; ++m) {
@@ -148,35 +160,86 @@
 					}
 				}
 				if (time != null) {
-					String refName = new String(revChars, 0, i);
-					Ref resolved = getRefDatabase().getRef(refName);
-					if (resolved == null)
-						return null;
-					rev = resolveReflog(rw, resolved, time);
+					if (time.equals("upstream")) {
+						if (name == null)
+							name = new String(revChars, done, i);
+						if (name.equals(""))
+							// Currently checked out branch, HEAD if
+							// detached
+							name = Constants.HEAD;
+						Ref ref = getRef(name);
+						if (ref == null)
+							return null;
+						if (ref.isSymbolic())
+							ref = ref.getLeaf();
+						name = ref.getName();
+
+						RemoteConfig remoteConfig;
+						try {
+							remoteConfig = new RemoteConfig(getConfig(),
+									"origin");
+						} catch (URISyntaxException e) {
+							throw new RevisionSyntaxException(revstr);
+						}
+						String remoteBranchName = getConfig()
+								.getString(
+										ConfigConstants.CONFIG_BRANCH_SECTION,
+								Repository.shortenRefName(ref.getName()),
+										ConfigConstants.CONFIG_KEY_MERGE);
+						List<RefSpec> fetchRefSpecs = remoteConfig
+								.getFetchRefSpecs();
+						for (RefSpec refSpec : fetchRefSpecs) {
+							if (refSpec.matchSource(remoteBranchName)) {
+								RefSpec expandFromSource = refSpec
+										.expandFromSource(remoteBranchName);
+								name = expandFromSource.getDestination();
+								break;
+							}
+						}
+						if (name == null)
+							throw new RevisionSyntaxException(revstr);
+					} else if (time.matches("^-\\d+$")) {
+						if (name != null)
+							throw new RevisionSyntaxException(revstr);
+						else {
+							String previousCheckout = resolveReflogCheckout(-Integer
+									.parseInt(time));
+							if (ObjectId.isId(previousCheckout))
+								rev = parseSimple(rw, previousCheckout);
+							else
+								name = previousCheckout;
+						}
+					} else {
+						if (name == null)
+							name = new String(revChars, done, i);
+						if (name.equals(""))
+							name = Constants.HEAD;
+						Ref ref = getRef(name);
+						if (ref == null)
+							return null;
+						// @{n} means current branch, not HEAD@{1} unless
+						// detached
+						if (ref.isSymbolic())
+							ref = ref.getLeaf();
+						rev = resolveReflog(rw, ref, time);
+						name = null;
+					}
 					i = m;
 				} else
-					i = m - 1;
+					throw new RevisionSyntaxException(revstr);
 				break;
 			case ':': {
 				RevTree tree;
 				if (rev == null) {
-					// We might not yet have parsed the left hand side.
-					ObjectId id;
-					try {
-						if (i == 0)
-							id = resolve(rw, Constants.HEAD);
-						else
-							id = resolve(rw, new String(revChars, 0, i));
-					} catch (RevisionSyntaxException badSyntax) {
-						throw new RevisionSyntaxException(revstr);
-					}
-					if (id == null)
-						return null;
-					tree = rw.parseTree(id);
-				} else {
-					tree = rw.parseTree(rev);
+					if (name == null)
+						name = new String(revChars, done, i);
+					if (name.equals(""))
+						name = Constants.HEAD;
+					rev = parseSimple(rw, name);
 				}
-
+				if (rev == null)
+					return null;
+				tree = rw.parseTree(rev);
 				if (i == revChars.length - 1)
 					return tree.copy();
 
@@ -185,12 +248,18 @@
 						tree);
 				return tw != null ? tw.getObjectId(0) : null;
 			}
-
 			default:
 				if (rev != null)
 					throw new RevisionSyntaxException(revstr);
 			}
 		}
-		return rev != null ? rev.copy() : resolveSimple(revstr);
+		if (rev != null)
+			return rev.copy();
+		if (name != null)
+			return name;
+		name = revstr.substring(done);
+		if (getRef(name) != null)
+			return name;
+		return resolveSimple(name);
 	}
 
