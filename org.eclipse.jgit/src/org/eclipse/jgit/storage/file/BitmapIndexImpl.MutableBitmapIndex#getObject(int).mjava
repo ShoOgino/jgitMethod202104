@@ -1,0 +1,13 @@
+		MutableEntry getObject(int position) {
+			try {
+				MutableEntry entry = revList.get(position);
+				if (entry == null)
+					throw new IllegalArgumentException(MessageFormat.format(
+							JGitText.get().objectNotFound,
+							String.valueOf(position)));
+				return entry;
+			} catch (IndexOutOfBoundsException ex) {
+				throw new IllegalArgumentException(ex);
+			}
+		}
+

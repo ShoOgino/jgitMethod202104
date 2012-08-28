@@ -1,0 +1,14 @@
+		public boolean removeAllOrNone(PackBitmapIndex index) {
+			if (!packIndex.equals(index))
+				return false;
+
+			EWAHCompressedBitmap curr = bitset.combine()
+					.xor(ones(indexObjectCount));
+
+			IntIterator ii = curr.intIterator();
+			if (ii.hasNext() && ii.next() < indexObjectCount)
+				return false;
+			bitset = new ComboBitset(curr);
+			return true;
+		}
+

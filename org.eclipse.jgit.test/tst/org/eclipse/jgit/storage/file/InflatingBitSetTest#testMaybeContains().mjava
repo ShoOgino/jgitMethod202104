@@ -1,0 +1,17 @@
+	@Test
+	public void testMaybeContains() {
+		EWAHCompressedBitmap ecb = new EWAHCompressedBitmap();
+		ecb.set(63);
+		ecb.set(64);
+		ecb.set(128);
+
+		InflatingBitSet ibs = new InflatingBitSet(ecb);
+		assertTrue(ibs.maybeContains(0));
+		assertFalse(ibs.contains(0)); // Advance
+		assertFalse(ibs.maybeContains(0));
+		assertTrue(ibs.maybeContains(63));
+		assertTrue(ibs.maybeContains(64));
+		assertTrue(ibs.maybeContains(65));
+		assertFalse(ibs.maybeContains(129));
+	}
+

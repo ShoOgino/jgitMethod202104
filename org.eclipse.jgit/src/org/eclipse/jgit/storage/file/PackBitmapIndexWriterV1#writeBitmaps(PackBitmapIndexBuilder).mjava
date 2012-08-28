@@ -1,0 +1,16 @@
+	private void writeBitmaps(PackBitmapIndexBuilder bitmaps)
+			throws IOException {
+		int bitmapCount = 0;
+		for (StoredEntry entry : bitmaps.getCompressedBitmaps()) {
+			writeBitmapEntry(entry);
+			bitmapCount++;
+		}
+
+		int expectedBitmapCount = bitmaps.getBitmapCount();
+		if (expectedBitmapCount != bitmapCount)
+			throw new IOException(MessageFormat.format(
+					JGitText.get().expectedGot,
+					String.valueOf(expectedBitmapCount),
+					String.valueOf(bitmapCount)));
+	}
+

@@ -1,0 +1,20 @@
+		EWAHCompressedBitmap combine() {
+			EWAHCompressedBitmap toAddCompressed = null;
+			if (toAdd != null) {
+				toAddCompressed = toAdd.toEWAHCompressedBitmap();
+				toAdd = null;
+			}
+
+			EWAHCompressedBitmap toRemoveCompressed = null;
+			if (toRemove != null) {
+				toRemoveCompressed = toRemove.toEWAHCompressedBitmap();
+				toRemove = null;
+			}
+
+			if (toAddCompressed != null)
+				or(toAddCompressed);
+			if (toRemoveCompressed != null)
+				andNot(toRemoveCompressed);
+			return inflatingBitmap.getBitmap();
+		}
+

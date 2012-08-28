@@ -1,0 +1,16 @@
+	@Test
+	public void testContainsMany() {
+		EWAHCompressedBitmap ecb = new EWAHCompressedBitmap();
+		ecb.set(64);
+		ecb.set(65);
+		ecb.set(1024);
+
+		InflatingBitSet ibs = new InflatingBitSet(ecb);
+		assertFalse(ibs.contains(0));
+		assertTrue(ibs.contains(64));
+		assertTrue(ibs.contains(65));
+		assertFalse(ibs.contains(66));
+		assertTrue(ibs.contains(1024));
+		assertFalse(ibs.contains(1025));
+	}
+

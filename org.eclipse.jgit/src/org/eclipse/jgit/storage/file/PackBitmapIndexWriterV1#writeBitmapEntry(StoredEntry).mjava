@@ -1,0 +1,8 @@
+	private void writeBitmapEntry(StoredEntry entry) throws IOException {
+		// Write object, xor offset, and bitmap
+		dataOutput.writeInt((int) entry.getObjectId());
+		out.write(entry.getXorOffset());
+		out.write(entry.getFlags());
+		writeBitmap(entry.getBitmap());
+	}
+

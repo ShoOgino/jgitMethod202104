@@ -1,0 +1,44 @@
+	final boolean contains(int position) {
+		if (get(position))
+			return true;
+		if (position <= nextPosition || position >= sizeInBits)
+			return position == nextPosition;
+
+		if (iterator == null) {
+			iterator = bitmap.intIterator();
+			if (iterator.hasNext())
+				nextPosition = iterator.next();
+			else
+				return false;
+		} else if (!iterator.hasNext())
+			return false;
+
+		int positionBlock = block(position);
+		if (positionBlock >= inflated.length) {
+			long[] tmp = new long[block(sizeInBits) + 1];
+			System.arraycopy(inflated, 0, tmp, 0, inflated.length);
+			inflated = tmp;
+		}
+
+		int block = block(nextPosition);
+		long word = mask(nextPosition);
+		int end = Math.max(nextPosition, position) | 63;
+		while (iterator.hasNext()) {
+			nextPosition = iterator.next();
+			if (end < nextPosition)
+				break;
+
+			int b = block(nextPosition);
+			long m = mask(nextPosition);
+			if (block == b) {
+				word |= m;
+			} else {
+				inflated[block] = word;
+				block = b;
+				word = m;
+			}
+		}
+		inflated[block] = word;
+		return block == positionBlock && (word & mask(position)) != 0;
+	}
+

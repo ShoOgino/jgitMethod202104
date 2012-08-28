@@ -1,0 +1,23 @@
+	/**
+	 * Stores the bitmap for the objectId.
+	 *
+	 * @param objectId
+	 *            the object id key for the bitmap.
+	 * @param bitmap
+	 *            the bitmap
+	 * @param flags
+	 *            the flags to be stored with the bitmap
+	 */
+	public void addBitmap(AnyObjectId objectId, Bitmap bitmap, int flags) {
+		if (bitmap instanceof BitmapBuilder)
+			bitmap = ((BitmapBuilder) bitmap).build();
+
+		EWAHCompressedBitmap compressed;
+		if (bitmap instanceof CompressedBitmap)
+			compressed = ((CompressedBitmap) bitmap).getEwahCompressedBitmap();
+		else
+			throw new IllegalArgumentException(bitmap.getClass().toString());
+
+		addBitmap(objectId, compressed, flags);
+	}
+

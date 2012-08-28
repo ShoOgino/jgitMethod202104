@@ -1,0 +1,9 @@
+		StoredBitmap(AnyObjectId objectId, EWAHCompressedBitmap bitmap,
+				StoredBitmap xorBitmap, int flags) {
+			super(objectId);
+			this.bitmapContainer = xorBitmap == null
+					? bitmap
+					: new XorCompressedBitmap(bitmap, xorBitmap);
+			this.flags = flags;
+		}
+

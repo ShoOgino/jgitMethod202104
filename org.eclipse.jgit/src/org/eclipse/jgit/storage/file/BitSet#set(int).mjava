@@ -1,0 +1,10 @@
+	final void set(int position) {
+		int block = block(position);
+		if (block >= words.length) {
+			long[] buf = new long[2 * block(position)];
+			System.arraycopy(words, 0, buf, 0, words.length);
+			words = buf;
+		}
+		words[block] |= mask(position);
+	}
+

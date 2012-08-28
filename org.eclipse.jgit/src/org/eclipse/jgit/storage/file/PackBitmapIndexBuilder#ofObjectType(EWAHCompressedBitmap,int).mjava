@@ -1,0 +1,16 @@
+	@Override
+	public EWAHCompressedBitmap ofObjectType(
+			EWAHCompressedBitmap bitmap, int type) {
+		switch (type) {
+		case Constants.OBJ_BLOB:
+			return getBlobs().and(bitmap);
+		case Constants.OBJ_TREE:
+			return getTrees().and(bitmap);
+		case Constants.OBJ_COMMIT:
+			return getCommits().and(bitmap);
+		case Constants.OBJ_TAG:
+			return getTags().and(bitmap);
+		}
+		throw new IllegalArgumentException();
+	}
+

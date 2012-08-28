@@ -1,0 +1,26 @@
+		/**
+		 * Computes and returns the full bitmap.
+		 *
+		 * @return the full bitmap
+		 */
+		EWAHCompressedBitmap getBitmap() {
+			// Fast path to immediately return the expanded result.
+			Object r = bitmapContainer;
+			if (r instanceof EWAHCompressedBitmap)
+				return (EWAHCompressedBitmap) r;
+
+			// Expand the bitmap and cache the result.
+			XorCompressedBitmap xb = (XorCompressedBitmap) r;
+			EWAHCompressedBitmap out = xb.bitmap;
+			for (;;) {
+				r = xb.xorBitmap.bitmapContainer;
+				if (r instanceof EWAHCompressedBitmap) {
+					out = out.xor((EWAHCompressedBitmap) r);
+					bitmapContainer = out;
+					return out;
+				}
+				xb = (XorCompressedBitmap) r;
+				out = out.xor(xb.bitmap);
+			}
+		}
+

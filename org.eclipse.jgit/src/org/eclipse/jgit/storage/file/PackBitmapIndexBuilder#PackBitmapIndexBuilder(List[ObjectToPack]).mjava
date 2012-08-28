@@ -1,0 +1,38 @@
+	/**
+	 * Creates a PackBitmapIndex used for building the contents of an index
+	 * file.
+	 *
+	 * @param byName
+	 *            objects sorted by name.
+	 */
+	public PackBitmapIndexBuilder(List<ObjectToPack> byName) {
+		super(new ObjectIdOwnerMap<StoredBitmap>());
+		byOffset = sortByOffset(byName);
+
+		int sizeInWords = Math.max(byOffset.length / 64, 4);
+		commits = new EWAHCompressedBitmap(sizeInWords);
+		trees = new EWAHCompressedBitmap(sizeInWords);
+		blobs = new EWAHCompressedBitmap(sizeInWords);
+		tags = new EWAHCompressedBitmap(sizeInWords);
+		for (int i = 0; i < byOffset.length; i++) {
+			int type = byOffset[i].getType();
+			switch (type) {
+			case Constants.OBJ_COMMIT:
+				commits.set(i);
+				break;
+			case Constants.OBJ_TREE:
+				trees.set(i);
+				break;
+			case Constants.OBJ_BLOB:
+				blobs.set(i);
+				break;
+			case Constants.OBJ_TAG:
+				tags.set(i);
+				break;
+			default:
+				throw new IllegalArgumentException(MessageFormat.format(
+						JGitText.get().badObjectType, String.valueOf(type)));
+			}
+		}
+	}
+

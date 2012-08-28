@@ -1,0 +1,15 @@
+		public boolean add(AnyObjectId objectId, int type) {
+			int position = addObject(objectId, type);
+			if (bitset.contains(position))
+				return false;
+
+			Bitmap entry = getBitmap(objectId);
+			if (entry != null) {
+				or(entry);
+				return false;
+			}
+
+			bitset.set(position);
+			return true;
+		}
+

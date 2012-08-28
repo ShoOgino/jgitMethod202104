@@ -1,0 +1,27 @@
+	final EWAHCompressedBitmap toEWAHCompressedBitmap() {
+		EWAHCompressedBitmap compressed = new EWAHCompressedBitmap(
+				words.length);
+		int runningEmptyWords = 0;
+		long lastNonEmptyWord = 0;
+		for (long word : words) {
+			if (word == 0) {
+				runningEmptyWords++;
+				continue;
+			}
+
+			if (lastNonEmptyWord != 0)
+				compressed.add(lastNonEmptyWord);
+
+			if (runningEmptyWords > 0) {
+				compressed.addStreamOfEmptyWords(false, runningEmptyWords);
+				runningEmptyWords = 0;
+			}
+
+			lastNonEmptyWord = word;
+		}
+		int bitsThatMatter = 64 - Long.numberOfLeadingZeros(lastNonEmptyWord);
+		if (bitsThatMatter > 0)
+			compressed.add(lastNonEmptyWord, bitsThatMatter);
+		return compressed;
+	}
+
