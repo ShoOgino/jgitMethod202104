@@ -1,0 +1,15 @@
+	@Test
+	public void weeksAgo() throws ParseException {
+		String dateStr = "2007-02-21 15:35:00 +0100";
+		SimpleDateFormat df = SystemReader.getInstance()
+				.getSimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
+		Date refDate = df.parse(dateStr);
+		GregorianCalendar cal = new GregorianCalendar(SystemReader
+				.getInstance().getTimeZone(), SystemReader.getInstance()
+				.getLocale());
+		cal.setTime(refDate);
+
+		Date parse = GitDateParser.parse("2 weeks ago", cal);
+		Assert.assertEquals(df.parse("2007-02-07 15:35:00 +0100"), parse);
+	}
+

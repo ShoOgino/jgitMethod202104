@@ -1,0 +1,9 @@
+	@Test
+	public void local() throws ParseException {
+		String dateStr = "Wed Feb 21 15:35:00 2007";
+		Date exp = SystemReader.getInstance()
+				.getSimpleDateFormat("EEE MMM dd HH:mm:ss yyyy").parse(dateStr);
+		Date parse = GitDateParser.parse(dateStr, null);
+		Assert.assertEquals(exp, parse);
+	}
+

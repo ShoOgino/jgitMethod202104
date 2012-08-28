@@ -1,0 +1,10 @@
+	@Test
+	public void rfc() throws ParseException {
+		String dateStr = "Wed, 21 Feb 2007 15:35:00 +0100";
+		Date exp = SystemReader.getInstance()
+				.getSimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z")
+				.parse(dateStr);
+		Date parse = GitDateParser.parse(dateStr, null);
+		Assert.assertEquals(exp, parse);
+	}
+

@@ -1,0 +1,19 @@
+	@Test
+	public void now() throws ParseException {
+		String dateStr = "2007-02-21 15:35:00 +0100";
+		Date refDate = SystemReader.getInstance()
+				.getSimpleDateFormat("yyyy-MM-dd HH:mm:ss Z").parse(dateStr);
+
+		GregorianCalendar cal = new GregorianCalendar(SystemReader
+				.getInstance().getTimeZone(), SystemReader.getInstance()
+				.getLocale());
+		cal.setTime(refDate);
+
+		Date parse = GitDateParser.parse("now", cal);
+		Assert.assertEquals(refDate, parse);
+		long t1 = SystemReader.getInstance().getCurrentTime();
+		parse = GitDateParser.parse("now", null);
+		long t2 = SystemReader.getInstance().getCurrentTime();
+		Assert.assertTrue(t2 >= parse.getTime() && parse.getTime() >= t1);
+	}
+

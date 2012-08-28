@@ -1,0 +1,11 @@
+	// tries to parse a string with the formats supported by SimpleDateFormat
+	private static Date parse_simple(String dateStr, ParseableSimpleDateFormat f) {
+		SimpleDateFormat dateFormat = getDateFormat(f);
+		try {
+			dateFormat.setLenient(false);
+			return dateFormat.parse(dateStr);
+		} catch (ParseException e) {
+			return null;
+		}
+	}
+

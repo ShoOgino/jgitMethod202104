@@ -1,0 +1,10 @@
+	@Test
+	public void defaultFmt() throws ParseException {
+		String dateStr = "Wed Feb 21 15:35:00 2007 +0100";
+		Date exp = SystemReader.getInstance()
+				.getSimpleDateFormat("EEE MMM dd HH:mm:ss yyyy Z")
+				.parse(dateStr);
+		Date parse = GitDateParser.parse(dateStr, null);
+		Assert.assertEquals(exp, parse);
+	}
+
