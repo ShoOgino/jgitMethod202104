@@ -1,0 +1,38 @@
+	@Override
+	public int read(byte[] bs, int off, int len) throws IOException {
+		if (len == 0)
+			return 0;
+
+		if (cnt == -1)
+			return -1;
+
+		final int startOff = off;
+		final int end = off + len;
+
+		while (off < end) {
+			if (ptr == cnt && !fillBuffer())
+				break;
+
+			byte b = buf[ptr++];
+			if (isBinary || b != '\n') {
+				// Logic for binary files ends here
+				bs[off++] = last = b;
+				continue;
+			}
+
+			if (b == '\n') {
+				if (last == '\r') {
+					bs[off++] = last = b;
+					continue;
+				}
+				bs[off++] = last = '\r';
+				ptr--;
+			} else
+				bs[off++] = last = b;
+		}
+		int n = startOff == off ? -1 : off - startOff;
+		if (n > 0)
+			last = bs[off - 1];
+		return n;
+	}
+
