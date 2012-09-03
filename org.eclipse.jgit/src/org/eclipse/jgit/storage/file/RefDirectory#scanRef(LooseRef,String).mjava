@@ -59,7 +59,11 @@
 			while (0 < n && Character.isWhitespace(buf[n - 1]))
 				n--;
 			String content = RawParseUtils.decode(buf, 0, n);
-			throw new IOException(MessageFormat.format(JGitText.get().notARef, name, content));
+
+			IOException ioException = new IOException(MessageFormat.format(JGitText.get().notARef,
+					name, content));
+			ioException.initCause(notRef);
+			throw ioException;
 		}
 		return new LooseUnpeeled(otherSnapshot, name, id);
 	}
