@@ -1,0 +1,18 @@
+	@Test
+	public void testCheckoutWithStartPointOnlyCertainFiles() throws Exception {
+		File a = writeTrashFile("a.txt", "A");
+		File b = writeTrashFile("b.txt", "B");
+		git.add().addFilepattern("a.txt").addFilepattern("b.txt").call();
+		RevCommit first = git.commit().setMessage("First").call();
+
+		write(a, "other");
+		write(b, "other");
+		git.commit().setAll(true).setMessage("Other").call();
+
+		git.checkout().setCreateBranch(true).setName("a")
+				.setStartPoint(first.getId().getName()).addPath("a.txt").call();
+
+		assertThat(read(a), is("A"));
+		assertThat(read(b), is("other"));
+	}
+
