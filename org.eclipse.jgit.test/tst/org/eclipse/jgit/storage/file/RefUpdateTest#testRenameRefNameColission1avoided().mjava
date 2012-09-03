@@ -8,7 +8,7 @@
 		updateRef.setRefLogMessage("Setup", false);
 		assertEquals(Result.FAST_FORWARD, updateRef.update());
 		ObjectId oldHead = db.resolve(Constants.HEAD);
-		assertTrue(rb.equals(oldHead)); // assumption for this test
+		assertEquals(oldHead, rb); // assumption for this test
 		writeReflog(db, rb, "Just a message", "refs/heads/a");
 		assertTrue("internal check, we have a log", new File(db.getDirectory(),
 				"logs/refs/heads/a").exists());

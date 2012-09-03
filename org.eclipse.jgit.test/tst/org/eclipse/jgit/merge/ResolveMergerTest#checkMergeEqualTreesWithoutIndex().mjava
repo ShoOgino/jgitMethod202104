@@ -24,7 +24,7 @@
 		git.rm().addFilepattern("d/1").call();
 		git.rm().addFilepattern("d").call();
 		MergeResult mergeRes = git.merge().include(masterCommit).call();
-		assertTrue(MergeStatus.MERGED.equals(mergeRes.getMergeStatus()));
+		assertEquals(MergeStatus.MERGED, mergeRes.getMergeStatus());
 		assertEquals("[d/1, mode:100644, content:modified]",
 				indexState(CONTENT));
 	}

@@ -9,7 +9,7 @@
 		updateRef.setForceUpdate(true);
 		assertEquals(Result.FORCED, updateRef.update());
 		ObjectId oldHead = db.resolve(Constants.HEAD);
-		assertTrue(rb.equals(oldHead)); // assumption for this test
+		assertEquals(oldHead, rb); // assumption for this test
 		writeReflog(db, rb, "Just a message", "refs/heads/prefix/a");
 		assertTrue("internal check, we have a log", new File(db.getDirectory(),
 				"logs/refs/heads/prefix/a").exists());
