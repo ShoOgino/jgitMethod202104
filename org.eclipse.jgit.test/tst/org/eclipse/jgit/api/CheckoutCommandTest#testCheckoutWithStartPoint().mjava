@@ -1,0 +1,15 @@
+	@Test
+	public void testCheckoutWithStartPoint() throws Exception {
+		File a = writeTrashFile("a.txt", "A");
+		git.add().addFilepattern("a.txt").call();
+		RevCommit first = git.commit().setMessage("Added a").call();
+
+		write(a, "other");
+		git.commit().setAll(true).setMessage("Other").call();
+
+		git.checkout().setCreateBranch(true).setName("a")
+				.setStartPoint(first.getId().getName()).call();
+
+		assertThat(read(a), is("A"));
+	}
+
