@@ -1,0 +1,8 @@
+	@Test
+	public void testCheckoutBranch() throws Exception {
+		new Git(db).commit().setMessage("initial commit").call();
+		new Git(db).branchCreate().setName("side").call();
+
+		assertEquals("Switched to branch 'side'", execute("git checkout side"));
+	}
+
