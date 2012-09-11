@@ -1,0 +1,14 @@
+	protected int printList(Collection<String> list) {
+		if (!list.isEmpty()) {
+			List<String> sortedList = new ArrayList<String>(list);
+			java.util.Collections.sort(sortedList);
+			for (String filename : sortedList) {
+				out.println(CLIText.formatLine(String.format(
+						statusFileListFormat, filename)));
+			}
+			out.flush();
+			return list.size();
+		} else
+			return 0;
+	}
+

@@ -1,0 +1,22 @@
+	protected int printList(String status1, String status2, String status3,
+			Collection<String> list, Collection<String> set1,
+			Collection<String> set2,
+			@SuppressWarnings("unused") Collection<String> set3) {
+		List<String> sortedList = new ArrayList<String>(list);
+		java.util.Collections.sort(sortedList);
+		for (String filename : sortedList) {
+			String prefix;
+			if (set1.contains(filename))
+				prefix = status1;
+			else if (set2.contains(filename))
+				prefix = status2;
+			else
+				// if (set3.contains(filename))
+				prefix = status3;
+			out.println(CLIText.formatLine(String.format(
+					statusFileListFormatWithPrefix, prefix, filename)));
+			out.flush();
+		}
+		return list.size();
+	}
+
