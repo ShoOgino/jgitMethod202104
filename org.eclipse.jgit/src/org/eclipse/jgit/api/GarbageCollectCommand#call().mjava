@@ -1,0 +1,19 @@
+	@Override
+	public Properties call() throws GitAPIException {
+		checkCallable();
+
+		GC gc = new GC((FileRepository) repo);
+		gc.setProgressMonitor(monitor);
+		if (this.expire != null)
+			gc.setExpire(expire);
+
+		try {
+			gc.gc();
+			return toProperties(gc.getStatistics());
+		} catch (IOException e) {
+			throw new JGitInternalException(JGitText.get().gcFailed, e);
+		} catch (ParseException e) {
+			throw new JGitInternalException(JGitText.get().gcFailed, e);
+		}
+	}
+

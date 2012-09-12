@@ -1,0 +1,15 @@
+	@Test
+	public void testGCmoreCommits() throws Exception {
+		writeTrashFile("a.txt", "a couple of words for gc to pack");
+		writeTrashFile("b.txt", "a couple of words for gc to pack 2");
+		writeTrashFile("c.txt", "a couple of words for gc to pack 3");
+		git.commit().setAll(true).setMessage("commit2").call();
+		writeTrashFile("a.txt", "a couple of words for gc to pack more");
+		writeTrashFile("b.txt", "a couple of words for gc to pack more 2");
+		writeTrashFile("c.txt", "a couple of words for gc to pack more 3");
+		git.commit().setAll(true).setMessage("commit3").call();
+		Properties res = git.gc().setExpire(GitDateParser.parse("now", null))
+				.call();
+		assertTrue(res.size() == 7);
+	}
+

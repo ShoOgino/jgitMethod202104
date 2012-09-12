@@ -1,0 +1,10 @@
+	/**
+	 * @param repo
+	 */
+	protected GarbageCollectCommand(Repository repo) {
+		super(repo);
+		if (!(repo instanceof FileRepository))
+			throw new UnsupportedOperationException(MessageFormat.format(
+					JGitText.get().unsupportedGC, repo.getClass().toString()));
+	}
+
