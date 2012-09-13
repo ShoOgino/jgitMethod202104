@@ -1,0 +1,33 @@
+	/**
+	 * Execute the given commands and print test code comparing expected and
+	 * actual output. Use this function instead of the normal
+	 * {@link #execute(String...)} when preparing a test case: the command is
+	 * executed and test code is generated using the command output as a
+	 * template of what is expected. The code generated is printed on stdout and
+	 * can be pasted in the test case function.
+	 *
+	 * @param cmds
+	 *            The commands to execute
+	 * @return the result of the command, see {@link #execute(String...)}
+	 * @throws Exception
+	 */
+	protected String[] executeAndPrintTestCode(String... cmds) throws Exception {
+		String[] lines = execute(cmds);
+		String cmdString = cmdString(cmds);
+		if (lines.length == 0)
+			System.out.println("\t\tassertTrue(execute(" + cmdString
+					+ ").length == 0);");
+		else {
+			System.out
+					.println("\t\tassertArrayOfLinesEquals(new String[] { //");
+			System.out.print("\t\t\t\t\t\t\"" + escapeJava(lines[0]));
+			for (int i=1; i<lines.length; i++) {
+				System.out.println("\", //");
+				System.out.print("\t\t\t\t\t\t\"" + escapeJava(lines[i]));
+			}
+			System.out.println("\" //");
+			System.out.println("\t\t\t\t}, execute(" + cmdString + ")); //");
+		}
+		return lines;
+	}
+

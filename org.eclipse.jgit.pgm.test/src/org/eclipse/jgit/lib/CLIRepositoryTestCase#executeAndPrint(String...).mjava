@@ -1,0 +1,20 @@
+	/**
+	 * Execute the given commands and print the output to stdout. Use this
+	 * function instead of the normal {@link #execute(String...)} when preparing
+	 * a test case: the command is executed and then its output is printed on
+	 * stdout, thus making it easier to prepare the correct command and expected
+	 * output for the test case.
+	 *
+	 * @param cmds
+	 *            The commands to execute
+	 * @return the result of the command, see {@link #execute(String...)}
+	 * @throws Exception
+	 */
+	protected String[] executeAndPrint(String... cmds) throws Exception {
+		String[] lines = execute(cmds);
+		for (String line : lines) {
+			System.out.println(line);
+		}
+		return lines;
+	}
+
