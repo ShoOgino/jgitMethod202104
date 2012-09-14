@@ -1,0 +1,15 @@
+	/**
+	 * Construct a JGitPrintWriter
+	 *
+	 * @param out
+	 *            the underlying {@link Writer}
+	 */
+	public ThrowingPrintWriter(Writer out) {
+		this.out = out;
+		LF = AccessController.doPrivileged(new PrivilegedAction<String>() {
+			public String run() {
+				return SystemReader.getInstance().getProperty("line.separator");
+			}
+		});
+	}
+

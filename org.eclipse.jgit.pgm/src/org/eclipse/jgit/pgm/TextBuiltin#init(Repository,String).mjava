@@ -12,12 +12,16 @@
 			final String outputEncoding = repository != null ? repository
 					.getConfig()
 					.getString("i18n", null, "logOutputEncoding") : null;
+			if (outs == null)
+				outs = new FileOutputStream(FileDescriptor.out);
+			BufferedWriter bufw;
 			if (outputEncoding != null)
-				out = new PrintWriter(new BufferedWriter(
-						new OutputStreamWriter(System.out, outputEncoding)));
+				bufw = new BufferedWriter(new OutputStreamWriter(outs,
+						outputEncoding));
 			else
-				out = new PrintWriter(new BufferedWriter(
-						new OutputStreamWriter(System.out)));
+				bufw = new BufferedWriter(new OutputStreamWriter(outs));
+			out = new PrintWriter(bufw);
+			outw = new ThrowingPrintWriter(bufw);
 		} catch (IOException e) {
 			throw die(CLIText.get().cannotCreateOutputStream);
 		}

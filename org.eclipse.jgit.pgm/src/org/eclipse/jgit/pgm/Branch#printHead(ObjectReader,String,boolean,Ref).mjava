@@ -1,16 +1,16 @@
 	private void printHead(final ObjectReader reader, final String ref,
 			final boolean isCurrent, final Ref refObj) throws Exception {
-		out.print(isCurrent ? '*' : ' ');
-		out.print(' ');
-		out.print(ref);
+		outw.print(isCurrent ? '*' : ' ');
+		outw.print(' ');
+		outw.print(ref);
 		if (verbose) {
 			final int spaces = maxNameLength - ref.length() + 1;
-			out.format("%" + spaces + "s", "");
+			outw.format("%" + spaces + "s", "");
 			final ObjectId objectId = refObj.getObjectId();
-			out.print(reader.abbreviate(objectId).name());
-			out.print(' ');
-			out.print(rw.parseCommit(objectId).getShortMessage());
+			outw.print(reader.abbreviate(objectId).name());
+			outw.print(' ');
+			outw.print(rw.parseCommit(objectId).getShortMessage());
 		}
-		out.println();
+		outw.println();
 	}
 

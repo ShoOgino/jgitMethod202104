@@ -14,23 +14,23 @@
 		if (blobId == null)
 			return false;
 		if (emptyLine)
-			out.println();
-		out.print("Notes");
+			outw.println();
+		outw.print("Notes");
 		if (label != null) {
-			out.print(" (");
-			out.print(label);
-			out.print(")");
+			outw.print(" (");
+			outw.print(label);
+			outw.print(")");
 		}
-		out.println(":");
+		outw.println(":");
 		try {
 			RawText rawText = new RawText(argWalk.getObjectReader()
 					.open(blobId).getCachedBytes(Integer.MAX_VALUE));
 			for (int i = 0; i < rawText.size(); i++) {
-				out.print("    ");
-				out.println(rawText.getString(i));
+				outw.print("    ");
+				outw.println(rawText.getString(i));
 			}
 		} catch (LargeObjectException e) {
-			out.println(MessageFormat.format(
+			outw.println(MessageFormat.format(
 					CLIText.get().noteObjectTooLargeToPrint, blobId.name()));
 		}
 		return true;

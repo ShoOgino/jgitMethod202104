@@ -1,28 +1,28 @@
-	private void show(RevTag tag) {
-		out.print(CLIText.get().tagLabel);
-		out.print(" ");
-		out.print(tag.getTagName());
-		out.println();
+	private void show(RevTag tag) throws IOException {
+		outw.print(CLIText.get().tagLabel);
+		outw.print(" ");
+		outw.print(tag.getTagName());
+		outw.println();
 
 		final PersonIdent tagger = tag.getTaggerIdent();
 		if (tagger != null) {
-			out.println(MessageFormat.format(CLIText.get().taggerInfo,
+			outw.println(MessageFormat.format(CLIText.get().taggerInfo,
 					tagger.getName(), tagger.getEmailAddress()));
 
 			final TimeZone taggerTZ = tagger.getTimeZone();
 			fmt.setTimeZone(taggerTZ != null ? taggerTZ : myTZ);
-			out.println(MessageFormat.format(CLIText.get().dateInfo,
+			outw.println(MessageFormat.format(CLIText.get().dateInfo,
 					fmt.format(tagger.getWhen())));
 		}
 
-		out.println();
+		outw.println();
 		final String[] lines = tag.getFullMessage().split("\n");
 		for (final String s : lines) {
-			out.print("    ");
-			out.print(s);
-			out.println();
+			outw.print("    ");
+			outw.print(s);
+			outw.println();
 		}
 
-		out.println();
+		outw.println();
 	}
 
