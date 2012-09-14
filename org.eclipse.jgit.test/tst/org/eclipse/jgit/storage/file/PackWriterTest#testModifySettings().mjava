@@ -6,13 +6,13 @@
 		config.setReuseDeltas(false);
 		config.setReuseObjects(false);
 		config.setDeltaBaseAsOffset(false);
-		assertEquals(false, config.isReuseDeltas());
-		assertEquals(false, config.isReuseObjects());
-		assertEquals(false, config.isDeltaBaseAsOffset());
+		assertFalse(config.isReuseDeltas());
+		assertFalse(config.isReuseObjects());
+		assertFalse(config.isDeltaBaseAsOffset());
 
 		writer = new PackWriter(config, db.newObjectReader());
 		writer.setDeltaBaseAsOffset(true);
-		assertEquals(true, writer.isDeltaBaseAsOffset());
-		assertEquals(false, config.isDeltaBaseAsOffset());
+		assertTrue(writer.isDeltaBaseAsOffset());
+		assertFalse(config.isDeltaBaseAsOffset());
 	}
 

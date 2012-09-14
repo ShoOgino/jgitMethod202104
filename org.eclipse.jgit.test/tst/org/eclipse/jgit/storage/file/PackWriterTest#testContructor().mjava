@@ -6,9 +6,9 @@
 	@Test
 	public void testContructor() throws IOException {
 		writer = new PackWriter(config, db.newObjectReader());
-		assertEquals(false, writer.isDeltaBaseAsOffset());
-		assertEquals(true, config.isReuseDeltas());
-		assertEquals(true, config.isReuseObjects());
+		assertFalse(writer.isDeltaBaseAsOffset());
+		assertTrue(config.isReuseDeltas());
+		assertTrue(config.isReuseObjects());
 		assertEquals(0, writer.getObjectCount());
 	}
 
