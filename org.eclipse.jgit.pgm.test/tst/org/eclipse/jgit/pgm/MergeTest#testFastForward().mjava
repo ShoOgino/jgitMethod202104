@@ -1,0 +1,12 @@
+	@Test
+	public void testFastForward() throws Exception {
+		new Git(db).commit().setMessage("initial commit").call();
+		new Git(db).branchCreate().setName("side").call();
+		writeTrashFile("file", "master");
+		new Git(db).add().addFilepattern("file").call();
+		new Git(db).commit().setMessage("commit").call();
+		new Git(db).checkout().setName("side").call();
+
+		assertEquals("Fast-forward", execute("git merge master")[0]);
+	}
+

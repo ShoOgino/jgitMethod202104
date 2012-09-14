@@ -1,0 +1,16 @@
+	@Test
+	public void testMerge() throws Exception {
+		new Git(db).commit().setMessage("initial commit").call();
+		new Git(db).branchCreate().setName("side").call();
+		writeTrashFile("master", "content");
+		new Git(db).add().addFilepattern("master").call();
+		new Git(db).commit().setMessage("master commit").call();
+		new Git(db).checkout().setName("side").call();
+		writeTrashFile("side", "content");
+		new Git(db).add().addFilepattern("side").call();
+		new Git(db).commit().setMessage("side commit").call();
+
+		assertEquals("Merge made by the '" + MergeStrategy.RESOLVE.getName()
+				+ "' strategy.", execute("git merge master")[0]);
+	}
+
