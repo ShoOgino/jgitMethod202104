@@ -1,0 +1,19 @@
+	@Test
+	public void packRefsWhileRefLocked_refNotPackedNoError()
+			throws Exception {
+		RevBlob a = tr.blob("a");
+		tr.lightweightTag("t1", a);
+		tr.lightweightTag("t2", a);
+		LockFile refLock = new LockFile(new File(repo.getDirectory(),
+				"refs/tags/t1"), repo.getFS());
+		try {
+			refLock.lock();
+			gc.packRefs();
+		} finally {
+			refLock.unlock();
+		}
+
+		assertSame(repo.getRef("refs/tags/t1").getStorage(), Storage.LOOSE);
+		assertSame(repo.getRef("refs/tags/t2").getStorage(), Storage.PACKED);
+	}
+

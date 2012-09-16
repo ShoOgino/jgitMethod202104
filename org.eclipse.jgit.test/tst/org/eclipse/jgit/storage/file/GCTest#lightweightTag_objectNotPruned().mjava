@@ -1,0 +1,9 @@
+	@Test
+	public void lightweightTag_objectNotPruned() throws Exception {
+		RevBlob a = tr.blob("a");
+		tr.lightweightTag("t", a);
+		gc.setExpireAgeMillis(0);
+		gc.prune(Collections.<ObjectId> emptySet());
+		assertTrue(repo.hasObject(a));
+	}
+
