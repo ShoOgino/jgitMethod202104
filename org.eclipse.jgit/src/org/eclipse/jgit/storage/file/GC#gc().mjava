@@ -9,8 +9,11 @@
 	 *
 	 * @return the collection of {@link PackFile}'s which are newly created
 	 * @throws IOException
+	 * @throws ParseException
+	 *             If the configuration parameter "gc.pruneexpire" couldn't be
+	 *             parsed
 	 */
-	public Collection<PackFile> gc() throws IOException {
+	public Collection<PackFile> gc() throws IOException, ParseException {
 		pm.start(6 /* tasks */);
 		packRefs();
 		// TODO: implement reflog_expire(pm, repo);
