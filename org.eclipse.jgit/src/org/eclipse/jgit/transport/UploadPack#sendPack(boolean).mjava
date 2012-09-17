@@ -26,6 +26,7 @@
 		} catch (ServiceMayNotContinueException noPack) {
 			if (sideband && noPack.getMessage() != null) {
 				noPack.setOutput();
+				@SuppressWarnings("resource")
 				SideBandOutputStream err = new SideBandOutputStream(
 						SideBandOutputStream.CH_ERROR,
 						SideBandOutputStream.SMALL_BUF, rawOut);
