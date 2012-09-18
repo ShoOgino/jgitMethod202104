@@ -3,6 +3,7 @@
 	 * relative formats (e.g. "yesterday") the caller can specify the reference
 	 * date. These types of strings can be parsed:
 	 * <ul>
+	 * <li>"never"</li>
 	 * <li>"now"</li>
 	 * <li>"yesterday"</li>
 	 * <li>"(x) years|months|weeks|days|hours|minutes|seconds ago"<br>
@@ -36,6 +37,9 @@
 			throws ParseException {
 		dateStr = dateStr.trim();
 		Date ret;
+
+		if ("never".equalsIgnoreCase(dateStr))
+			return NEVER;
 		ret = parse_relative(dateStr, now);
 		if (ret != null)
 			return ret;

@@ -1,0 +1,11 @@
+	@Test
+	public void never() throws ParseException {
+		GregorianCalendar cal = new GregorianCalendar(SystemReader
+				.getInstance().getTimeZone(), SystemReader.getInstance()
+				.getLocale());
+		Date parse = GitDateParser.parse("never", cal);
+		Assert.assertEquals(GitDateParser.NEVER, parse);
+		parse = GitDateParser.parse("never", null);
+		Assert.assertEquals(GitDateParser.NEVER, parse);
+	}
+
