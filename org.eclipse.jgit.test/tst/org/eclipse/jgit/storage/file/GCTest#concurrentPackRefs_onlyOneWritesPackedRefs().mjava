@@ -1,0 +1,31 @@
+	@Test
+	public void concurrentPackRefs_onlyOneWritesPackedRefs() throws Exception {
+		RevBlob a = tr.blob("a");
+		tr.lightweightTag("t", a);
+
+		final CyclicBarrier syncPoint = new CyclicBarrier(2);
+
+		Callable<Integer> packRefs = new Callable<Integer>() {
+
+			/** @return 0 for success, 1 in case of error when writing pack */
+			public Integer call() throws Exception {
+				syncPoint.await();
+				try {
+					gc.packRefs();
+					return 0;
+				} catch (IOException e) {
+					return 1;
+				}
+			}
+		};
+		ExecutorService pool = Executors.newFixedThreadPool(2);
+		try {
+			Future<Integer> p1 = pool.submit(packRefs);
+			Future<Integer> p2 = pool.submit(packRefs);
+			assertTrue(p1.get() + p2.get() == 1);
+		} finally {
+			pool.shutdown();
+			pool.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
+		}
+	}
+

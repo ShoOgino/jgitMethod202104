@@ -1,0 +1,12 @@
+	@Test
+	public void nonReferencedNonExpiredObject_notPruned() throws Exception {
+		long start = now();
+
+		fsTick();
+		RevBlob a = tr.blob("a");
+		long delta = now() - start;
+		gc.setExpireAgeMillis(delta);
+		gc.prune(Collections.<ObjectId> emptySet());
+		assertTrue(repo.hasObject(a));
+	}
+

@@ -1,0 +1,12 @@
+	@Test
+	public void annotatedTag_objectNotPruned() throws Exception {
+		RevBlob a = tr.blob("a");
+		RevTag t = tr.tag("t", a); // this doesn't create the refs/tags/t ref
+		tr.lightweightTag("t", t);
+
+		gc.setExpireAgeMillis(0);
+		gc.prune(Collections.<ObjectId> emptySet());
+		assertTrue(repo.hasObject(t));
+		assertTrue(repo.hasObject(a));
+	}
+

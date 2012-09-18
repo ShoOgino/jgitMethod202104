@@ -1,0 +1,16 @@
+	@Test
+	public void branch_historyNotPruned() throws Exception {
+		RevCommit tip = commitChain(10);
+		tr.branch("b").update(tip);
+		gc.setExpireAgeMillis(0);
+		gc.prune(Collections.<ObjectId> emptySet());
+		do {
+			assertTrue(repo.hasObject(tip));
+			tr.parseBody(tip);
+			RevTree t = tip.getTree();
+			assertTrue(repo.hasObject(t));
+			assertTrue(repo.hasObject(tr.get(t, "a")));
+			tip = tip.getParentCount() > 0 ? tip.getParent(0) : null;
+		} while (tip != null);
+	}
+

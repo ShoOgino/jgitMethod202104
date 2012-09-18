@@ -1,0 +1,17 @@
+	/**
+	 * Tag an object using a lightweight tag.
+	 *
+	 * @param name
+	 *            the tag name. The /refs/tags/ prefix will be added if the name
+	 *            doesn't start with it
+	 * @param obj
+	 *            the object to tag
+	 * @return the tagged object
+	 * @throws Exception
+	 */
+	public ObjectId lightweightTag(String name, ObjectId obj) throws Exception {
+		if (!name.startsWith(Constants.R_TAGS))
+			name = Constants.R_TAGS + name;
+		return update(name, obj);
+	}
+

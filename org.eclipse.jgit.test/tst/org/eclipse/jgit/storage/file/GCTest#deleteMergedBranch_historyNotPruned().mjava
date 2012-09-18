@@ -1,0 +1,28 @@
+	@Test
+	public void deleteMergedBranch_historyNotPruned() throws Exception {
+		RevCommit parent = tr.commit().create();
+		RevCommit b1Tip = tr.branch("b1").commit().parent(parent).add("x", "x")
+				.create();
+		RevCommit b2Tip = tr.branch("b2").commit().parent(parent).add("y", "y")
+				.create();
+
+		// merge b1Tip and b2Tip and update refs/heads/b1 to the merge commit
+		Merger merger = MergeStrategy.SIMPLE_TWO_WAY_IN_CORE.newMerger(repo);
+		merger.merge(b1Tip, b2Tip);
+		CommitBuilder cb = tr.commit();
+		cb.parent(b1Tip).parent(b2Tip);
+		cb.setTopLevelTree(merger.getResultTreeId());
+		RevCommit mergeCommit = cb.create();
+		RefUpdate u = repo.updateRef("refs/heads/b1");
+		u.setNewObjectId(mergeCommit);
+		u.update();
+
+		RefUpdate update = repo.updateRef("refs/heads/b2");
+		update.setForceUpdate(true);
+		update.delete();
+
+		gc.setExpireAgeMillis(0);
+		gc.prune(Collections.<ObjectId> emptySet());
+		assertTrue(repo.hasObject(b2Tip));
+	}
+

@@ -1,0 +1,12 @@
+	@Test
+	public void deleteBranch_historyPruned() throws Exception {
+		RevCommit tip = commitChain(10);
+		tr.branch("b").update(tip);
+		RefUpdate update = repo.updateRef("refs/heads/b");
+		update.setForceUpdate(true);
+		update.delete();
+		gc.setExpireAgeMillis(0);
+		gc.prune(Collections.<ObjectId> emptySet());
+		assertTrue(gc.getStatistics().numberOfLooseObjects == 0);
+	}
+

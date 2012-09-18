@@ -11,7 +11,10 @@
 
 				ObjectId commitId;
 				try {
-					c.setTreeId(tree.writeTree(inserter));
+					if (topLevelTree != null)
+						c.setTreeId(topLevelTree);
+					else
+						c.setTreeId(tree.writeTree(inserter));
 					commitId = inserter.insert(c);
 					inserter.flush();
 				} finally {
