@@ -1,0 +1,20 @@
+	@Test
+	public void testLeadingWhitespaces() throws IOException, ConfigInvalidException {
+		final ByteArrayOutputStream bos1 = new ByteArrayOutputStream();
+		bos1.write(" \n\t".getBytes());
+		bos1.write(CONTENT1.getBytes());
+
+		final File file = createFile(bos1.toByteArray());
+		final FileBasedConfig config = new FileBasedConfig(file, FS.DETECTED);
+		config.load();
+		assertEquals(ALICE, config.getString(USER, null, NAME));
+
+		config.setString(USER, null, NAME, BOB);
+		config.save();
+
+		final ByteArrayOutputStream bos2 = new ByteArrayOutputStream();
+		bos2.write(" \n\t".getBytes());
+		bos2.write(CONTENT2.getBytes());
+		assertArrayEquals(bos2.toByteArray(), IO.readFully(file));
+	}
+

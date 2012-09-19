@@ -1,0 +1,24 @@
+	@Test
+	public void testUTF8withBOM() throws IOException, ConfigInvalidException {
+		final ByteArrayOutputStream bos1 = new ByteArrayOutputStream();
+		bos1.write(0xEF);
+		bos1.write(0xBB);
+		bos1.write(0xBF);
+		bos1.write(CONTENT1.getBytes("UTF-8"));
+
+		final File file = createFile(bos1.toByteArray());
+		final FileBasedConfig config = new FileBasedConfig(file, FS.DETECTED);
+		config.load();
+		assertEquals(ALICE, config.getString(USER, null, NAME));
+
+		config.setString(USER, null, NAME, BOB);
+		config.save();
+
+		final ByteArrayOutputStream bos2 = new ByteArrayOutputStream();
+		bos2.write(0xEF);
+		bos2.write(0xBB);
+		bos2.write(0xBF);
+		bos2.write(CONTENT2.getBytes("UTF-8"));
+		assertArrayEquals(bos2.toByteArray(), IO.readFully(file));
+	}
+

@@ -1,0 +1,12 @@
+	@Test
+	public void testUTF8withoutBOM() throws IOException, ConfigInvalidException {
+		final File file = createFile(CONTENT1.getBytes("UTF-8"));
+		final FileBasedConfig config = new FileBasedConfig(file, FS.DETECTED);
+		config.load();
+		assertEquals(ALICE, config.getString(USER, null, NAME));
+
+		config.setString(USER, null, NAME, BOB);
+		config.save();
+		assertArrayEquals(CONTENT2.getBytes(), IO.readFully(file));
+	}
+
