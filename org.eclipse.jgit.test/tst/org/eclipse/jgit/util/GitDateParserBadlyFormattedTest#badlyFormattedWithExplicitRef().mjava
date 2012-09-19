@@ -1,0 +1,13 @@
+	@Theory
+	public void badlyFormattedWithExplicitRef() {
+		Calendar ref = new GregorianCalendar(SystemReader.getInstance()
+				.getTimeZone(), SystemReader.getInstance().getLocale());
+		try {
+			GitDateParser.parse(dateStr, ref);
+			fail("The expected ParseException while parsing '" + dateStr
+					+ "' did not occur.");
+		} catch (ParseException e) {
+			// expected
+		}
+	}
+

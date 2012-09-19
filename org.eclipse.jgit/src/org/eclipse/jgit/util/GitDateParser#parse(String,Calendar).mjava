@@ -3,6 +3,7 @@
 	 * relative formats (e.g. "yesterday") the caller can specify the reference
 	 * date. These types of strings can be parsed:
 	 * <ul>
+	 * <li>"never"</li>
 	 * <li>"now"</li>
 	 * <li>"yesterday"</li>
 	 * <li>"(x) years|months|weeks|days|hours|minutes|seconds ago"<br>
@@ -28,20 +29,34 @@
 	 *            parser often but wants a consistent starting point for calls.<br>
 	 *            If set to <code>null</code> then the current time will be used
 	 *            instead.
-	 * @return the parsed {@link Date} or <code>null</code> if this string was
-	 *         not parseable.
+	 * @return the parsed {@link Date}
+	 * @throws ParseException
+	 *             if the given dateStr was not recognized
 	 */
-	public static Date parse(String dateStr, Calendar now) {
+	public static Date parse(String dateStr, Calendar now)
+			throws ParseException {
 		dateStr = dateStr.trim();
 		Date ret;
+
+		if ("never".equalsIgnoreCase(dateStr))
+			return NEVER;
 		ret = parse_relative(dateStr, now);
 		if (ret != null)
 			return ret;
 		for (ParseableSimpleDateFormat f : ParseableSimpleDateFormat.values()) {
-			ret = parse_simple(dateStr, f);
-			if (ret != null)
-				return ret;
+			try {
+				return parse_simple(dateStr, f);
+			} catch (ParseException e) {
+				// simply proceed with the next parser
+			}
 		}
-		return null;
+		ParseableSimpleDateFormat[] values = ParseableSimpleDateFormat.values();
+		StringBuilder allFormats = new StringBuilder("\"")
+				.append(values[0].formatStr);
+		for (int i = 1; i < values.length; i++)
+			allFormats.append("\", \"").append(values[i].formatStr);
+		allFormats.append("\"");
+		throw new ParseException(MessageFormat.format(
+				JGitText.get().cannotParseDate, dateStr, allFormats.toString()), 0);
 	}
 
