@@ -5,7 +5,7 @@
 
 		// wait to ensure that modtimes of the file doesn't match last index
 		// file modtime
-		modTimes.add(fsTick(db.getIndexFile()));
+		modTimes.add(valueOf(fsTick(db.getIndexFile())));
 
 		// create two files
 		addToWorkDir("a", "a");
@@ -13,7 +13,7 @@
 
 		// wait to ensure that file-modTimes and therefore index entry modTime
 		// doesn't match the modtime of index-file after next persistance
-		modTimes.add(fsTick(lastFile));
+		modTimes.add(valueOf(fsTick(lastFile)));
 
 		// now add both files to the index. No racy git expected
 		resetIndex(new FileTreeIteratorWithTimeControl(db, modTimes));

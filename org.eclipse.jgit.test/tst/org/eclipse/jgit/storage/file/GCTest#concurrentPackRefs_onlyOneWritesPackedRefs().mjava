@@ -12,9 +12,9 @@
 				syncPoint.await();
 				try {
 					gc.packRefs();
-					return 0;
+					return valueOf(0);
 				} catch (IOException e) {
-					return 1;
+					return valueOf(1);
 				}
 			}
 		};
@@ -22,7 +22,7 @@
 		try {
 			Future<Integer> p1 = pool.submit(packRefs);
 			Future<Integer> p2 = pool.submit(packRefs);
-			assertTrue(p1.get() + p2.get() == 1);
+			assertEquals(1, p1.get().intValue() + p2.get().intValue());
 		} finally {
 			pool.shutdown();
 			pool.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
