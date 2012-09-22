@@ -1,0 +1,10 @@
+	@Test
+	public void testCheckoutOurs() throws Exception {
+		setupConflictingState();
+
+		git.checkout().setStage(Stage.OURS).addPath(FILE1).call();
+
+		assertEquals("3", read(FILE1));
+		assertStageOneToThree(FILE1);
+	}
+

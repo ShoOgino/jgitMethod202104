@@ -1,0 +1,14 @@
+	private void setupConflictingState() throws Exception {
+		git.checkout().setCreateBranch(true).setName("conflict")
+				.setStartPoint(initialCommit).call();
+		writeTrashFile(FILE1, "Conflicting");
+		RevCommit conflict = git.commit().setAll(true)
+				.setMessage("Conflicting change").call();
+
+		git.checkout().setName("master").call();
+
+		git.merge().include(conflict).call();
+		assertEquals(RepositoryState.MERGING, db.getRepositoryState());
+		assertStageOneToThree(FILE1);
+	}
+

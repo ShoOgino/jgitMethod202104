@@ -1,0 +1,12 @@
+	private void assertStageOneToThree(String name) throws Exception {
+		DirCache cache = DirCache.read(db.getIndexFile(), db.getFS());
+		int i = cache.findEntry(name);
+		DirCacheEntry stage1 = cache.getEntry(i);
+		DirCacheEntry stage2 = cache.getEntry(i + 1);
+		DirCacheEntry stage3 = cache.getEntry(i + 2);
+
+		assertEquals(DirCacheEntry.STAGE_1, stage1.getStage());
+		assertEquals(DirCacheEntry.STAGE_2, stage2.getStage());
+		assertEquals(DirCacheEntry.STAGE_3, stage3.getStage());
+	}
+

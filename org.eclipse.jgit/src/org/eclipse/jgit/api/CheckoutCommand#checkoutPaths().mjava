@@ -10,52 +10,19 @@
 		RevWalk revWalk = new RevWalk(repo);
 		DirCache dc = repo.lockDirCache();
 		try {
-			DirCacheEditor editor = dc.editor();
-			TreeWalk startWalk = new TreeWalk(revWalk.getObjectReader());
-			startWalk.setRecursive(true);
+			TreeWalk treeWalk = new TreeWalk(revWalk.getObjectReader());
+			treeWalk.setRecursive(true);
 			if (!checkoutAllPaths)
-				startWalk.setFilter(PathFilterGroup.createFromStrings(paths));
-			final boolean checkoutIndex = startCommit == null
-					&& startPoint == null;
-			if (!checkoutIndex)
-				startWalk.addTree(revWalk.parseCommit(getStartPoint())
-						.getTree());
-			else
-				startWalk.addTree(new DirCacheIterator(dc));
-
-			final File workTree = repo.getWorkTree();
-			final ObjectReader r = repo.getObjectDatabase().newReader();
+				treeWalk.setFilter(PathFilterGroup.createFromStrings(paths));
 			try {
-				while (startWalk.next()) {
-					final ObjectId blobId = startWalk.getObjectId(0);
-					final FileMode mode = startWalk.getFileMode(0);
-					editor.add(new PathEdit(startWalk.getPathString()) {
-						public void apply(DirCacheEntry ent) {
-							if (checkoutIndex
-									&& ent.getStage() > DirCacheEntry.STAGE_0) {
-								UnmergedPathException e = new UnmergedPathException(ent);
-								throw new JGitInternalException(e.getMessage(), e);
-							}
-							ent.setObjectId(blobId);
-							ent.setFileMode(mode);
-							File file = new File(workTree, ent.getPathString());
-							File parentDir = file.getParentFile();
-							try {
-								FileUtils.mkdirs(parentDir, true);
-								DirCacheCheckout.checkoutEntry(repo, file, ent, r);
-							} catch (IOException e) {
-								throw new JGitInternalException(
-										MessageFormat.format(
-												JGitText.get().checkoutConflictWithFile,
-												ent.getPathString()), e);
-							}
-						}
-					});
+				if (isCheckoutIndex())
+					checkoutPathsFromIndex(treeWalk, dc);
+				else {
+					RevCommit commit = revWalk.parseCommit(getStartPoint());
+					checkoutPathsFromCommit(treeWalk, dc, commit);
 				}
-				editor.commit();
 			} finally {
-				startWalk.release();
-				r.release();
+				treeWalk.release();
 			}
 		} finally {
 			dc.unlock();

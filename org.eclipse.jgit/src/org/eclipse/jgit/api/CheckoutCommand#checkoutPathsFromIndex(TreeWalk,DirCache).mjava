@@ -1,0 +1,33 @@
+	private void checkoutPathsFromIndex(TreeWalk treeWalk, DirCache dc)
+			throws IOException {
+		DirCacheIterator dci = new DirCacheIterator(dc);
+		treeWalk.addTree(dci);
+
+		final ObjectReader r = treeWalk.getObjectReader();
+		DirCacheEditor editor = dc.editor();
+		while (treeWalk.next()) {
+			DirCacheEntry entry = dci.getDirCacheEntry();
+			// Only add one edit per path
+			if (entry != null && entry.getStage() > DirCacheEntry.STAGE_1)
+				continue;
+			editor.add(new PathEdit(treeWalk.getPathString()) {
+				public void apply(DirCacheEntry ent) {
+					int stage = ent.getStage();
+					if (stage > DirCacheEntry.STAGE_0) {
+						if (checkoutStage != null) {
+							if (stage == checkoutStage.number)
+								checkoutPath(ent, r);
+						} else {
+							UnmergedPathException e = new UnmergedPathException(
+									ent);
+							throw new JGitInternalException(e.getMessage(), e);
+						}
+					} else {
+						checkoutPath(ent, r);
+					}
+				}
+			});
+		}
+		editor.commit();
+	}
+

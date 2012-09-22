@@ -1,0 +1,19 @@
+	private void checkoutPathsFromCommit(TreeWalk treeWalk, DirCache dc,
+			RevCommit commit) throws IOException {
+		treeWalk.addTree(commit.getTree());
+		final ObjectReader r = treeWalk.getObjectReader();
+		DirCacheEditor editor = dc.editor();
+		while (treeWalk.next()) {
+			final ObjectId blobId = treeWalk.getObjectId(0);
+			final FileMode mode = treeWalk.getFileMode(0);
+			editor.add(new PathEdit(treeWalk.getPathString()) {
+				public void apply(DirCacheEntry ent) {
+					ent.setObjectId(blobId);
+					ent.setFileMode(mode);
+					checkoutPath(ent, r);
+				}
+			});
+		}
+		editor.commit();
+	}
+
