@@ -5,10 +5,10 @@
 		boolean firstHeader = true;
 		if (head != null && head.isSymbolic()) {
 			String branch = Repository.shortenRefName(head.getLeaf().getName());
-			out.println(CLIText.formatLine(
+			outw.println(CLIText.formatLine(
 					MessageFormat.format(CLIText.get().onBranch, branch)));
 		} else
-			out.println(CLIText.formatLine(CLIText.get().notOnAnyBranch));
+			outw.println(CLIText.formatLine(CLIText.get().notOnAnyBranch));
 		// List changes
 		org.eclipse.jgit.api.Status status = new Git(db).status().call();
 		Collection<String> added = status.getAdded();
