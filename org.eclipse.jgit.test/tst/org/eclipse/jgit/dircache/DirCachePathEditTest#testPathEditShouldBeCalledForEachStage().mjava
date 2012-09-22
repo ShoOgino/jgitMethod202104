@@ -1,0 +1,21 @@
+	@Test
+	public void testPathEditShouldBeCalledForEachStage() throws Exception {
+		DirCache dc = DirCache.newInCore();
+		DirCacheBuilder builder = new DirCacheBuilder(dc, 3);
+		builder.add(createEntry("a", DirCacheEntry.STAGE_1));
+		builder.add(createEntry("a", DirCacheEntry.STAGE_2));
+		builder.add(createEntry("a", DirCacheEntry.STAGE_3));
+		builder.finish();
+
+		DirCacheEditor editor = dc.editor();
+		RecordingEdit recorder = new RecordingEdit("a");
+		editor.add(recorder);
+		editor.finish();
+
+		List<DirCacheEntry> entries = recorder.entries;
+		assertEquals(3, entries.size());
+		assertEquals(DirCacheEntry.STAGE_1, entries.get(0).getStage());
+		assertEquals(DirCacheEntry.STAGE_2, entries.get(1).getStage());
+		assertEquals(DirCacheEntry.STAGE_3, entries.get(2).getStage());
+	}
+
