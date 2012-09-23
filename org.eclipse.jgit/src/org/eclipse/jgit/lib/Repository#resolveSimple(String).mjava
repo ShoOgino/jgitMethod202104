@@ -2,9 +2,11 @@
 		if (ObjectId.isId(revstr))
 			return ObjectId.fromString(revstr);
 
-		Ref r = getRefDatabase().getRef(revstr);
-		if (r != null)
-			return r.getObjectId();
+		if (Repository.isValidRefName("x/" + revstr)) {
+			Ref r = getRefDatabase().getRef(revstr);
+			if (r != null)
+				return r.getObjectId();
+		}
 
 		if (AbbreviatedObjectId.isId(revstr))
 			return resolveAbbreviation(revstr);
