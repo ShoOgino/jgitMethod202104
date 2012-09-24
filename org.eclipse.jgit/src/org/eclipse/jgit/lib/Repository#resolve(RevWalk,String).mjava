@@ -9,7 +9,12 @@
 			case '^':
 				if (rev == null) {
 					if (name == null)
-						name = new String(revChars, done, i);
+						if (done == 0)
+							name = new String(revChars, done, i);
+						else {
+							done = i + 1;
+							break;
+						}
 					rev = parseSimple(rw, name);
 					name = null;
 					if (rev == null)
@@ -51,7 +56,7 @@
 								rev = commit.getParent(pnum - 1);
 						}
 						i = j - 1;
-						done = i;
+						done = j;
 						break;
 					case '{':
 						int k;
@@ -92,7 +97,6 @@
 						} else
 							throw new IncorrectObjectTypeException(rev,
 									Constants.TYPE_COMMIT);
-
 					}
 				} else {
 					rev = rw.peel(rev);
@@ -106,11 +110,17 @@
 						throw new IncorrectObjectTypeException(rev,
 								Constants.TYPE_COMMIT);
 				}
+				done = i + 1;
 				break;
 			case '~':
 				if (rev == null) {
 					if (name == null)
-						name = new String(revChars, done, i);
+						if (done == 0)
+							name = new String(revChars, done, i);
+						else {
+							done = i + 1;
+							break;
+						}
 					rev = parseSimple(rw, name);
 					name = null;
 					if (rev == null)
@@ -148,10 +158,13 @@
 					--dist;
 				}
 				i = l - 1;
+				done = l;
 				break;
 			case '@':
 				if (rev != null)
 					throw new RevisionSyntaxException(revstr);
+				if (i + 1 < revChars.length && revChars[i + 1] != '{')
+					continue;
 				int m;
 				String time = null;
 				for (m = i + 2; m < revChars.length; ++m) {
@@ -168,6 +181,8 @@
 							// Currently checked out branch, HEAD if
 							// detached
 							name = Constants.HEAD;
+						if (!Repository.isValidRefName("x/" + name))
+							throw new RevisionSyntaxException(revstr);
 						Ref ref = getRef(name);
 						name = null;
 						if (ref == null)
@@ -216,6 +231,8 @@
 							name = new String(revChars, done, i);
 						if (name.equals(""))
 							name = Constants.HEAD;
+						if (!Repository.isValidRefName("x/" + name))
+							throw new RevisionSyntaxException(revstr);
 						Ref ref = getRef(name);
 						name = null;
 						if (ref == null)
@@ -260,7 +277,11 @@
 			return rev.copy();
 		if (name != null)
 			return name;
+		if (rev == null && done == revstr.length())
+			return null;
 		name = revstr.substring(done);
+		if (!Repository.isValidRefName("x/" + name))
+			throw new RevisionSyntaxException(revstr);
 		if (getRef(name) != null)
 			return name;
 		return resolveSimple(name);
