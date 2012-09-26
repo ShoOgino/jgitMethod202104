@@ -16,8 +16,20 @@
 			CountingOutputStream cnt = new CountingOutputStream(out);
 			pw.writeIndex(cnt);
 			pack.setFileSize(INDEX, cnt.getCount());
+			pack.setIndexVersion(pw.getIndexVersion());
 		} finally {
 			out.close();
+		}
+
+		if (pw.prepareBitmapIndex(pm)) {
+			out = objdb.writeFile(pack, BITMAP_INDEX);
+			try {
+				CountingOutputStream cnt = new CountingOutputStream(out);
+				pw.writeIndex(cnt);
+				pack.setFileSize(BITMAP_INDEX, cnt.getCount());
+			} finally {
+				out.close();
+			}
 		}
 
 		final ObjectIdOwnerMap<ObjectIdOwnerMap.Entry> packedObjs = pw
