@@ -1,0 +1,15 @@
+	@Test
+	public void testParseRewordCommand() throws Exception {
+		String todo = "pick 1111111 Commit 1\n"
+				+ "reword 2222222 Commit 2\n";
+		write(getTodoFile(), todo);
+
+		RebaseCommand rebaseCommand = git.rebase();
+		List<Step> steps = rebaseCommand.loadSteps();
+
+		assertEquals(2, steps.size());
+		assertEquals("1111111", steps.get(0).commit.name());
+		assertEquals("2222222", steps.get(1).commit.name());
+		assertEquals(Action.REWORD, steps.get(1).action);
+	}
+

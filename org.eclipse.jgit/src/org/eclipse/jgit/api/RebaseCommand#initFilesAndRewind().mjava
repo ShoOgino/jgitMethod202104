@@ -20,9 +20,9 @@
 		RevCommit headCommit = walk.lookupCommit(headId);
 		RevCommit upstream = walk.lookupCommit(upstreamCommit.getId());
 
-		if (walk.isMergedInto(upstream, headCommit))
+		if (!isInteractive() && walk.isMergedInto(upstream, headCommit))
 			return RebaseResult.UP_TO_DATE_RESULT;
-		else if (walk.isMergedInto(headCommit, upstream)) {
+		else if (!isInteractive() && walk.isMergedInto(headCommit, upstream)) {
 			// head is already merged into upstream, fast-foward
 			monitor.beginTask(MessageFormat.format(
 					JGitText.get().resettingHead,
