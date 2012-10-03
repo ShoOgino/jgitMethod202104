@@ -1,10 +1,11 @@
 		static Action parse(String token) {
-			if (token.equals(PICK.token) || token.equals(PICK.shortToken))
-				return PICK;
-			if (token.equals(REWORD.token) || token.equals(REWORD.shortToken))
-				return REWORD;
+			for (Action action : Action.values()) {
+				if (action.token.equals(token)
+						|| action.shortToken.equals(token))
+					return action;
+			}
 			throw new JGitInternalException(MessageFormat.format(
 					JGitText.get().unknownOrUnsupportedCommand, token,
-					PICK.toToken()));
+					Action.values()));
 		}
 
