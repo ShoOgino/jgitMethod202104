@@ -1,5 +1,6 @@
 	@Test
 	public void testAutoCloseDuringRead() throws IOException {
+		@SuppressWarnings("resource" /* java 7 */)
 		final UnionInputStream u = new UnionInputStream();
 		final boolean closed[] = new boolean[2];
 		u.add(new ByteArrayInputStream(new byte[] { 1 }) {
