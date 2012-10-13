@@ -6,10 +6,6 @@
 	 * @param repo
 	 */
 	public PersonIdent(final Repository repo) {
-		final UserConfig config = repo.getConfig().get(UserConfig.KEY);
-		name = config.getCommitterName();
-		emailAddress = config.getCommitterEmail();
-		when = SystemReader.getInstance().getCurrentTime();
-		tzOffset = SystemReader.getInstance().getTimezone(when);
+		this(repo.getConfig().get(UserConfig.KEY));
 	}
 
