@@ -19,6 +19,8 @@
 			final boolean cherryPicking = state
 					.equals(RepositoryState.CHERRY_PICKING)
 					|| state.equals(RepositoryState.CHERRY_PICKING_RESOLVED);
+			final boolean reverting = state.equals(RepositoryState.REVERTING)
+					|| state.equals(RepositoryState.REVERTING_RESOLVED);
 
 			// resolve the ref to a commit
 			final ObjectId commitId;
@@ -89,6 +91,8 @@
 					resetMerge();
 				else if (cherryPicking)
 					resetCherryPick();
+				else if (reverting)
+					resetRevert();
 				else if (repo.readSquashCommitMsg() != null)
 					repo.writeSquashCommitMsg(null /* delete */);
 			}

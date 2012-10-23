@@ -1,0 +1,15 @@
+	/**
+	 * Write revert commit into $GIT_DIR/REVERT_HEAD. This is used in case of
+	 * conflicts to store the revert which was tried to be picked.
+	 *
+	 * @param head
+	 *            an object id of the revert commit or <code>null</code> to
+	 *            delete the file
+	 * @throws IOException
+	 */
+	public void writeRevertHead(ObjectId head) throws IOException {
+		List<ObjectId> heads = (head != null) ? Collections.singletonList(head)
+				: null;
+		writeHeadsFile(heads, Constants.REVERT_HEAD);
+	}
+

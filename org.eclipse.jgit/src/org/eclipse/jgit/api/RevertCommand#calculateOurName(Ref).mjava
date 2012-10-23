@@ -1,0 +1,9 @@
+	private String calculateOurName(Ref headRef) {
+		if (ourCommitName != null)
+			return ourCommitName;
+
+		String targetRefName = headRef.getTarget().getName();
+		String headName = Repository.shortenRefName(targetRefName);
+		return headName;
+	}
+

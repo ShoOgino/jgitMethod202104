@@ -1,0 +1,13 @@
+	@Test
+	public void testRevertDirtyWorktree() throws Exception {
+		Git git = new Git(db);
+		RevCommit sideCommit = prepareRevert(git);
+
+		// modify file a
+		writeTrashFile("a", "a(modified)");
+		// do not add and commit
+
+		doRevertAndCheckResult(git, sideCommit,
+				MergeFailureReason.DIRTY_WORKTREE);
+	}
+

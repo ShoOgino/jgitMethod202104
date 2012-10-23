@@ -1,0 +1,21 @@
+	private RevCommit prepareRevert(final Git git) throws Exception {
+		// create, add and commit file a
+		writeTrashFile("a", "a");
+		git.add().addFilepattern("a").call();
+		git.commit().setMessage("first master").call();
+
+		// First commit
+		checkoutBranch("refs/heads/master");
+		// modify, add and commit file a
+		writeTrashFile("a", "a(previous)");
+		git.add().addFilepattern("a").call();
+		RevCommit oldCommit = git.commit().setMessage("second master").call();
+
+		// modify, add and commit file a
+		writeTrashFile("a", "a(latest)");
+		git.add().addFilepattern("a").call();
+		git.commit().setMessage("side").call();
+
+		return oldCommit;
+	}
+

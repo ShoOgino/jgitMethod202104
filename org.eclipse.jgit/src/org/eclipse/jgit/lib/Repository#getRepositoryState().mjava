@@ -56,6 +56,19 @@
 			return RepositoryState.CHERRY_PICKING;
 		}
 
+		if (new File(getDirectory(), Constants.REVERT_HEAD).exists()) {
+			try {
+				if (!readDirCache().hasUnmergedPaths()) {
+					// no unmerged paths
+					return RepositoryState.REVERTING_RESOLVED;
+				}
+			} catch (IOException e) {
+				// fall through to REVERTING
+			}
+
+			return RepositoryState.REVERTING;
+		}
+
 		return RepositoryState.SAFE;
 	}
 

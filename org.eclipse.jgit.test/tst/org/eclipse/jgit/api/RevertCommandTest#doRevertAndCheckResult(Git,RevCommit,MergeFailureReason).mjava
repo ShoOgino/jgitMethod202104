@@ -1,0 +1,30 @@
+	private void doRevertAndCheckResult(final Git git,
+			final RevCommit sideCommit, final MergeFailureReason reason)
+			throws Exception {
+		// get current index state
+		String indexState = indexState(CONTENT);
+
+		// revert
+		RevertCommand revert = git.revert();
+		RevCommit resultCommit = revert.include(sideCommit.getId()).call();
+		assertNull(resultCommit);
+		MergeResult result = revert.getFailingResult();
+		assertEquals(MergeStatus.FAILED, result.getMergeStatus());
+		// staged file a causes DIRTY_INDEX
+		assertEquals(1, result.getFailingPaths().size());
+		assertEquals(reason, result.getFailingPaths().get("a"));
+		assertEquals("a(modified)", read(new File(db.getWorkTree(), "a")));
+		// index shall be unchanged
+		assertEquals(indexState, indexState(CONTENT));
+		assertEquals(RepositoryState.SAFE, db.getRepositoryState());
+
+		if (reason == null) {
+			ReflogReader reader = db.getReflogReader(Constants.HEAD);
+			assertTrue(reader.getLastEntry().getComment()
+					.startsWith("revert: "));
+			reader = db.getReflogReader(db.getBranch());
+			assertTrue(reader.getLastEntry().getComment()
+					.startsWith("revert: "));
+		}
+	}
+
