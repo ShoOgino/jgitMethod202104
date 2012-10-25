@@ -2,10 +2,12 @@
 	 * Merging two equal files when the index contains a tree for that path
 	 * should lead to a failed state.
 	 *
+	 * @param strategy
 	 * @throws Exception
 	 */
-	@Test
-	public void checkMergeMergeableFilesWithTreeInIndex() throws Exception {
+	@Theory
+	public void checkMergeMergeableFilesWithTreeInIndex(MergeStrategy strategy)
+			throws Exception {
 		Git git = Git.wrap(db);
 
 		writeTrashFile("0", "orig");
@@ -26,7 +28,7 @@
 		writeTrashFile("0/0", "modified");
 		git.add().addFilepattern("0/0").call();
 		try {
-			git.merge().include(masterCommit).call();
+			git.merge().setStrategy(strategy).include(masterCommit).call();
 			Assert.fail("Didn't get the expected exception");
 		} catch (CheckoutConflictException e) {
 			assertEquals(1, e.getConflictingPaths().size());

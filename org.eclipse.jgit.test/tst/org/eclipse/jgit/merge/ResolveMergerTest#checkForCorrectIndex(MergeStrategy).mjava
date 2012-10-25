@@ -1,5 +1,5 @@
-	@Test
-	public void checkForCorrectIndex() throws Exception {
+	@Theory
+	public void checkForCorrectIndex(MergeStrategy strategy) throws Exception {
 		File f;
 		long lastTs4, lastTsIndex;
 		Git git = Git.wrap(db);
@@ -78,7 +78,7 @@
 
 		// merge master and side. Should only touch "0," "2" and "3"
 		fsTick(indexFile);
-		git.merge().include(masterCommit).call();
+		git.merge().setStrategy(strategy).include(masterCommit).call();
 		checkConsistentLastModified("0", "1", "2", "4");
 		checkModificationTimeStampOrder("4", "*" + lastTs4, "<1", "<*"
 				+ lastTsIndex, "<0", "2", "3", ".git/index");

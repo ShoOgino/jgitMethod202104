@@ -1,5 +1,6 @@
-	@Test
-	public void checkLockedFilesToBeDeleted() throws Exception {
+	@Theory
+	public void checkLockedFilesToBeDeleted(MergeStrategy strategy)
+			throws Exception {
 		Git git = Git.wrap(db);
 
 		writeTrashFile("a.txt", "orig");
@@ -24,7 +25,8 @@
 		// Get a handle to the the file so on windows it can't be deleted.
 		FileInputStream fis = new FileInputStream(new File(db.getWorkTree(),
 				"b.txt"));
-		MergeResult mergeRes = git.merge().include(masterCommit).call();
+		MergeResult mergeRes = git.merge().setStrategy(strategy)
+				.include(masterCommit).call();
 		if (mergeRes.getMergeStatus().equals(MergeStatus.FAILED)) {
 			// probably windows
 			assertEquals(1, mergeRes.getFailingPaths().size());

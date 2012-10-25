@@ -1,5 +1,6 @@
-	@Test
-	public void failingPathsShouldNotResultInOKReturnValue() throws Exception {
+	@Theory
+	public void failingPathsShouldNotResultInOKReturnValue(
+			MergeStrategy strategy) throws Exception {
 		File folder1 = new File(db.getWorkTree(), "folder1");
 		FileUtils.mkdir(folder1);
 		File file = new File(folder1, "file1.txt");
@@ -29,7 +30,7 @@
 		file = new File(folder1, "file3.txt");
 		write(file, "folder1--file3.txt");
 
-		ResolveMerger merger = new ResolveMerger(db, false);
+		ResolveMerger merger = (ResolveMerger) strategy.newMerger(db, false);
 		merger.setCommitNames(new String[] { "BASE", "HEAD", "other" });
 		merger.setWorkingTreeIterator(new FileTreeIterator(db));
 		boolean ok = merger.merge(head.getId(), other.getId());
