@@ -1,0 +1,30 @@
+	@Test
+	public void testPathsResetWithUnmerged() throws Exception {
+		setupRepository();
+
+		String file = "a.txt";
+		writeTrashFile(file, "data");
+
+		git.add().addFilepattern(file).call();
+		git.commit().setMessage("commit").call();
+
+		DirCache index = db.lockDirCache();
+		DirCacheBuilder builder = index.builder();
+		builder.add(createEntry(file, FileMode.REGULAR_FILE, 1, ""));
+		builder.add(createEntry(file, FileMode.REGULAR_FILE, 2, ""));
+		builder.add(createEntry(file, FileMode.REGULAR_FILE, 3, ""));
+		builder.add(createEntry("b.txt", FileMode.REGULAR_FILE));
+		assertTrue(builder.commit());
+
+		assertEquals("[a.txt, mode:100644, stage:1]"
+				+ "[a.txt, mode:100644, stage:2]"
+				+ "[a.txt, mode:100644, stage:3]"
+				+ "[b.txt, mode:100644]",
+				indexState(0));
+
+		git.reset().addPath(file).call();
+
+		assertEquals("[a.txt, mode:100644]" + "[b.txt, mode:100644]",
+				indexState(0));
+	}
+
