@@ -1,0 +1,40 @@
+	@Test
+	public void testObjectDirectorySnapshot() throws Exception {
+		RevCommit a = commit();
+		RevCommit b = commit(a);
+		RevCommit c = commit(b);
+		RevCommit d = commit(c);
+
+		createShallowFile(d);
+
+		rw.reset();
+		markStart(d);
+		assertCommit(d, rw.next());
+		assertNull(rw.next());
+
+		rw = createRevWalk();
+		a = rw.lookupCommit(a);
+		b = rw.lookupCommit(b);
+		c = rw.lookupCommit(c);
+		d = rw.lookupCommit(d);
+
+		rw.reset();
+		markStart(d);
+		assertCommit(d, rw.next());
+		assertNull(rw.next());
+
+		createShallowFile(c);
+
+		rw = createRevWalk();
+		a = rw.lookupCommit(a);
+		b = rw.lookupCommit(b);
+		c = rw.lookupCommit(c);
+		d = rw.lookupCommit(d);
+
+		rw.reset();
+		markStart(d);
+		assertCommit(d, rw.next());
+		assertCommit(c, rw.next());
+		assertNull(rw.next());
+	}
+

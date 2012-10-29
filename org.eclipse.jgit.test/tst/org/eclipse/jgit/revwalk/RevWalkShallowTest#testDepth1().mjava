@@ -1,0 +1,15 @@
+	@Test
+	public void testDepth1() throws Exception {
+		final RevCommit a = commit();
+		final RevCommit b = commit(a);
+		final RevCommit c = commit(b);
+		final RevCommit d = commit(c);
+
+		createShallowFile(d);
+
+		rw.reset();
+		markStart(d);
+		assertCommit(d, rw.next());
+		assertNull(rw.next());
+	}
+

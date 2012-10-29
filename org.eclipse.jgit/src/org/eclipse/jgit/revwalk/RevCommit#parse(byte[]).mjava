@@ -16,6 +16,10 @@
 	 *         available to the caller.
 	 */
 	public static RevCommit parse(byte[] raw) {
-		return parse(new RevWalk((ObjectReader) null), raw);
+		try {
+			return parse(new RevWalk((ObjectReader) null), raw);
+		} catch (IOException ex) {
+			throw new RuntimeException(ex);
+		}
 	}
 

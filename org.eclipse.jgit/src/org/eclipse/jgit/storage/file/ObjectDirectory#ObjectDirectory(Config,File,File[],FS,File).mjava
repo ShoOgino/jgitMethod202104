@@ -10,11 +10,14 @@
 	 * @param fs
 	 *            the file system abstraction which will be necessary to perform
 	 *            certain file system operations.
+	 * @param shallowFile
+	 *            file which contains IDs of shallow commits, null if shallow
+	 *            commits handling should be turned off
 	 * @throws IOException
 	 *             an alternate object cannot be opened.
 	 */
 	public ObjectDirectory(final Config cfg, final File dir,
-			File[] alternatePaths, FS fs) throws IOException {
+			File[] alternatePaths, FS fs, File shallowFile) throws IOException {
 		config = cfg;
 		objects = dir;
 		infoDirectory = new File(objects, "info");
@@ -25,6 +28,7 @@
 		cachedPacks = new AtomicReference<CachedPackList>();
 		unpackedObjectCache = new UnpackedObjectCache();
 		this.fs = fs;
+		this.shallowFile = shallowFile;
 
 		alternates = new AtomicReference<AlternateHandle[]>();
 		if (alternatePaths != null) {
