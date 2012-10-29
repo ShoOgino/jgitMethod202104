@@ -10,14 +10,7 @@
 			ConcurrentRefUpdateException, CheckoutConflictException,
 			InvalidMergeHeadsException, WrongRepositoryStateException, NoMessageException {
 		checkCallable();
-
-		if (commits.size() != 1)
-			throw new InvalidMergeHeadsException(
-					commits.isEmpty() ? JGitText.get().noMergeHeadSpecified
-							: MessageFormat.format(
-									JGitText.get().mergeStrategyDoesNotSupportHeads,
-									mergeStrategy.getName(),
-									Integer.valueOf(commits.size())));
+		checkParameters();
 
 		RevWalk revWalk = null;
 		DirCacheCheckout dco = null;
@@ -71,7 +64,8 @@
 				return new MergeResult(headCommit, srcCommit, new ObjectId[] {
 						headCommit, srcCommit },
 						MergeStatus.ALREADY_UP_TO_DATE, mergeStrategy, null, null);
-			} else if (revWalk.isMergedInto(headCommit, srcCommit)) {
+			} else if (revWalk.isMergedInto(headCommit, srcCommit)
+					&& fastForwardMode == FastForwardMode.FF) {
 				// FAST_FORWARD detected: skip doing a real merge but only
 				// update HEAD
 				refLogMessage.append(": " + MergeStatus.FAST_FORWARD);
@@ -102,6 +96,11 @@
 						headCommit, srcCommit }, mergeStatus, mergeStrategy,
 						null, msg);
 			} else {
+				if (fastForwardMode == FastForwardMode.FF_ONLY) {
+					return new MergeResult(headCommit, srcCommit,
+							new ObjectId[] { headCommit, srcCommit },
+							MergeStatus.ABORTED, mergeStrategy, null, null);
+				}
 				String mergeMessage = "";
 				if (!squash) {
 					mergeMessage = new MergeMessageFormatter().format(
@@ -133,7 +132,10 @@
 				} else
 					noProblems = merger.merge(headCommit, srcCommit);
 				refLogMessage.append(": Merge made by ");
-				refLogMessage.append(mergeStrategy.getName());
+				if (!revWalk.isMergedInto(headCommit, srcCommit))
+					refLogMessage.append(mergeStrategy.getName());
+				else
+					refLogMessage.append("recursive");
 				refLogMessage.append('.');
 				if (noProblems) {
 					dco = new DirCacheCheckout(repo,

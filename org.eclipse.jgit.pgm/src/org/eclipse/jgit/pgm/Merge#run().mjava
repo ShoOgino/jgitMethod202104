@@ -1,5 +1,7 @@
 	@Override
 	protected void run() throws Exception {
+		if (squash && ff == FastForwardMode.NO_FF)
+			throw die(CLIText.get().cannotCombineSquashWithNoff);
 		// determine the merge strategy
 		if (strategyName != null) {
 			mergeStrategy = MergeStrategy.get(strategyName);
@@ -9,14 +11,21 @@
 		}
 
 		// determine the other revision we want to merge with HEAD
+		final Ref srcRef = db.getRef(ref);
 		final ObjectId src = db.resolve(ref + "^{commit}");
 		if (src == null)
 			throw die(MessageFormat.format(
 					CLIText.get().refDoesNotExistOrNoCommit, ref));
 
+		Ref oldHead = db.getRef(Constants.HEAD);
 		Git git = new Git(db);
-		MergeResult result = git.merge().setStrategy(mergeStrategy)
-				.setSquash(squash).include(src).call();
+		MergeCommand mergeCmd = git.merge().setStrategy(mergeStrategy)
+				.setSquash(squash).setFastForward(ff);
+		if (srcRef != null)
+			mergeCmd.include(srcRef);
+		else
+			mergeCmd.include(src);
+		MergeResult result = mergeCmd.call();
 
 		switch (result.getMergeStatus()) {
 		case ALREADY_UP_TO_DATE:
@@ -25,6 +34,10 @@
 			outw.println(CLIText.get().alreadyUpToDate);
 			break;
 		case FAST_FORWARD:
+			ObjectId oldHeadId = oldHead.getObjectId();
+			outw.println(MessageFormat.format(CLIText.get().updating, oldHeadId
+					.abbreviate(7).name(), result.getNewHead().abbreviate(7)
+					.name()));
 			outw.println(result.getMergeStatus().toString());
 			break;
 		case CONFLICTING:
@@ -49,12 +62,18 @@
 				}
 			break;
 		case MERGED:
-			outw.println(MessageFormat.format(CLIText.get().mergeMadeBy,
-					mergeStrategy.getName()));
+			String name;
+			if (!isMergedInto(oldHead, src))
+				name = mergeStrategy.getName();
+			else
+				name = "recursive";
+			outw.println(MessageFormat.format(CLIText.get().mergeMadeBy, name));
 			break;
 		case MERGED_SQUASHED:
 			outw.println(CLIText.get().mergedSquashed);
 			break;
+		case ABORTED:
+			throw die(CLIText.get().ffNotPossibleAborting);
 		case NOT_SUPPORTED:
 			outw.println(MessageFormat.format(
 					CLIText.get().unsupportedOperation, result.toString()));

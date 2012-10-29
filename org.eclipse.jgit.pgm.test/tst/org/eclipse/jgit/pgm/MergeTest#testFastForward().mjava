@@ -6,6 +6,7 @@
 		git.commit().setMessage("commit").call();
 		git.checkout().setName("side").call();
 
-		assertEquals("Fast-forward", execute("git merge master")[0]);
+		assertArrayEquals(new String[] { "Updating 6fd41be..26a81a1",
+				"Fast-forward", "" }, execute("git merge master"));
 	}
 

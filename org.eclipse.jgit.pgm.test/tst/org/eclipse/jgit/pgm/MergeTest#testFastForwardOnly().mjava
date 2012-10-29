@@ -1,0 +1,15 @@
+	@Test
+	public void testFastForwardOnly() throws Exception {
+		git.branchCreate().setName("side").call();
+		writeTrashFile("file", "master");
+		git.add().addFilepattern("file").call();
+		git.commit().setMessage("commit#1").call();
+		git.checkout().setName("side").call();
+		writeTrashFile("file", "side");
+		git.add().addFilepattern("file").call();
+		git.commit().setMessage("commit#2").call();
+
+		assertEquals("fatal: Not possible to fast-forward, aborting.",
+				execute("git merge master --ff-only")[0]);
+	}
+
