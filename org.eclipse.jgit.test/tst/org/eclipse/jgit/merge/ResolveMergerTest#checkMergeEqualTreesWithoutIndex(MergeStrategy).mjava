@@ -1,11 +1,13 @@
 	/**
-	 * Merging two equal subtrees with an incore merger should lead to a merged
-	 * state (The 'Gerrit' use case).
+	 * Merging two equal subtrees when the index does not contain any file in
+	 * that subtree should lead to a merged state.
 	 *
+	 * @param strategy
 	 * @throws Exception
 	 */
-	@Test
-	public void checkMergeEqualTreesInCore() throws Exception {
+	@Theory
+	public void checkMergeEqualTreesWithoutIndex(MergeStrategy strategy)
+			throws Exception {
 		Git git = Git.wrap(db);
 
 		writeTrashFile("d/1", "orig");
@@ -19,15 +21,14 @@
 		git.checkout().setCreateBranch(true).setStartPoint(first)
 				.setName("side").call();
 		writeTrashFile("d/1", "modified");
-		RevCommit sideCommit = git.commit().setAll(true)
-				.setMessage("modified d/1 on side").call();
+		git.commit().setAll(true).setMessage("modified d/1 on side").call();
 
 		git.rm().addFilepattern("d/1").call();
 		git.rm().addFilepattern("d").call();
-
-		ThreeWayMerger resolveMerger = MergeStrategy.RESOLVE
-				.newMerger(db, true);
-		boolean noProblems = resolveMerger.merge(masterCommit, sideCommit);
-		assertTrue(noProblems);
+		MergeResult mergeRes = git.merge().setStrategy(strategy)
+				.include(masterCommit).call();
+		assertEquals(MergeStatus.MERGED, mergeRes.getMergeStatus());
+		assertEquals("[d/1, mode:100644, content:modified]",
+				indexState(CONTENT));
 	}
 

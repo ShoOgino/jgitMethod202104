@@ -2,10 +2,12 @@
 	 * Merging two conflicting subtrees when the index and HEAD does not contain
 	 * any file in that subtree should lead to a conflicting state.
 	 *
+	 * @param strategy
 	 * @throws Exception
 	 */
-	@Test
-	public void checkMergeConflictingNewTrees() throws Exception {
+	@Theory
+	public void checkMergeConflictingNewTrees(MergeStrategy strategy)
+			throws Exception {
 		Git git = Git.wrap(db);
 
 		writeTrashFile("2", "orig");
@@ -25,7 +27,8 @@
 
 		git.rm().addFilepattern("d/1").call();
 		git.rm().addFilepattern("d").call();
-		MergeResult mergeRes = git.merge().include(masterCommit).call();
+		MergeResult mergeRes = git.merge().setStrategy(strategy)
+				.include(masterCommit).call();
 		assertEquals(MergeStatus.CONFLICTING, mergeRes.getMergeStatus());
 		assertEquals(
 				"[2, mode:100644, content:orig][d/1, mode:100644, stage:2, content:side][d/1, mode:100644, stage:3, content:master]",
