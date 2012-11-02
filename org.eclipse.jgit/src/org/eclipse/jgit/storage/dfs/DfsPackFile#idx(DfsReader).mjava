@@ -9,6 +9,9 @@
 		if (invalid)
 			throw new PackInvalidException(getPackName());
 
+		Repository.getGlobalListenerList()
+				.dispatch(new BeforeDfsPackIndexLoadedEvent(this));
+
 		synchronized (initLock) {
 			idxref = index;
 			if (idxref != null) {
