@@ -1,0 +1,15 @@
+	@Test
+	public void testBranch() throws Exception {
+		Git git = new Git(db);
+		git.commit().setMessage("first commit").call();
+		git.checkout().setCreateBranch(true).setName("side").call();
+		writeTrashFile("file", "side content");
+		git.add().addFilepattern("file").call();
+		git.commit().setMessage("side commit").call();
+
+		assertArrayEquals(new String[] {
+				"38890c7 side@{0}: commit: side commit",
+				"d216986 side@{1}: branch: Created from commit first commit",
+				"" }, execute("git reflog refs/heads/side"));
+	}
+

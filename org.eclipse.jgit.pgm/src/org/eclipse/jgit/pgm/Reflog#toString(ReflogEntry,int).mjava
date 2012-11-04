@@ -1,0 +1,16 @@
+	private String toString(ReflogEntry entry, int i) {
+		final StringBuilder s = new StringBuilder();
+		s.append(entry.getNewId().abbreviate(7).name());
+		s.append(" ");
+		s.append(ref == null ? Constants.HEAD : Repository.shortenRefName(ref));
+		s.append("@{" + i + "}:");
+		s.append(" ");
+		// temporary workaround for bug 393463
+		if (entry.getOldId().equals(ObjectId.zeroId()))
+			s.append(entry.getComment().replaceFirst("^commit:",
+					"commit (initial):"));
+		else
+			s.append(entry.getComment());
+		return s.toString();
+	}
+
