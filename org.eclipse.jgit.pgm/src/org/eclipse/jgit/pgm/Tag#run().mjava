@@ -9,8 +9,12 @@
 				RevWalk walk = new RevWalk(db);
 				command.setObjectId(walk.parseAny(object));
 			}
-
-			command.call();
+			try {
+				command.call();
+			} catch (RefAlreadyExistsException e) {
+				throw die(MessageFormat.format(CLIText.get().tagAlreadyExists,
+						tagName));
+			}
 		} else {
 			ListTagCommand command = git.tagList();
 			List<Ref> list = command.call();

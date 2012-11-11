@@ -57,6 +57,11 @@
 						throw new ConcurrentRefUpdateException(
 								JGitText.get().couldNotLockHEAD,
 								tagRef.getRef(), updateResult);
+					case REJECTED:
+						throw new RefAlreadyExistsException(
+								MessageFormat.format(
+										JGitText.get().tagAlreadyExists,
+										newTag.toString()));
 					default:
 						throw new JGitInternalException(MessageFormat.format(
 								JGitText.get().updatingRefFailed, refName,
