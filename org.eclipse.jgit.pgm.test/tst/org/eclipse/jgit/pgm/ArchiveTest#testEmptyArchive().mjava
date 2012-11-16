@@ -1,0 +1,8 @@
+	@Ignore("Some versions of java.util.zip refuse to write an empty ZIP")
+	@Test
+	public void testEmptyArchive() throws Exception {
+		final byte[] result = CLIGitCommand.rawExecute( //
+				"git archive " + emptyTree, db);
+		assertArrayEquals(new String[0], listZipEntries(result));
+	}
+

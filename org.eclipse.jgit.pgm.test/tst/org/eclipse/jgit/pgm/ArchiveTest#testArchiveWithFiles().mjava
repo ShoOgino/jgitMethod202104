@@ -1,0 +1,15 @@
+	@Test
+	public void testArchiveWithFiles() throws Exception {
+		writeTrashFile("a", "a file with content!");
+		writeTrashFile("c", ""); // empty file
+		writeTrashFile("unrelated", "another file, just for kicks");
+		git.add().addFilepattern("a").call();
+		git.add().addFilepattern("c").call();
+		git.commit().setMessage("populate toplevel").call();
+
+		final byte[] result = CLIGitCommand.rawExecute( //
+				"git archive HEAD", db);
+		assertArrayEquals(new String[] { "a", "c" }, //
+				listZipEntries(result));
+	}
+

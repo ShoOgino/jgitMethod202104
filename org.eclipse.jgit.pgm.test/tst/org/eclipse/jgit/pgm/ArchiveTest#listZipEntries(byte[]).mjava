@@ -1,0 +1,12 @@
+	private static String[] listZipEntries(byte[] zipData) throws IOException {
+		final List<String> l = new ArrayList<String>();
+		final ZipInputStream in = new ZipInputStream( //
+				new ByteArrayInputStream(zipData));
+
+		ZipEntry e;
+		while ((e = in.getNextEntry()) != null)
+			l.add(e.getName());
+		in.close();
+		return l.toArray(new String[l.size()]);
+	}
+
