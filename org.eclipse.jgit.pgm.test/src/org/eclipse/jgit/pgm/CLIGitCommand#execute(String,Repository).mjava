@@ -1,33 +1,10 @@
 	public static List<String> execute(String str, Repository db)
 			throws Exception {
-		String[] args = split(str);
-		if (!args[0].equalsIgnoreCase("git") || args.length < 2)
-			throw new IllegalArgumentException(
-					"Expected 'git <command> [<args>]', was:" + str);
-		String[] argv = new String[args.length - 1];
-		System.arraycopy(args, 1, argv, 0, args.length - 1);
-
-		CLIGitCommand bean = new CLIGitCommand();
-		final CmdLineParser clp = new CmdLineParser(bean);
-		clp.parseArgument(argv);
-
-		final TextBuiltin cmd = bean.getSubcommand();
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		cmd.outs = baos;
-		if (cmd.requiresRepository())
-			cmd.init(db, null);
-		else
-			cmd.init(null, null);
 		try {
-			cmd.execute(bean.getArguments().toArray(
-					new String[bean.getArguments().size()]));
+			return IO.readLines(new String(rawExecute(str, db)));
 		} catch (Die e) {
 			return IO.readLines(MessageFormat.format(CLIText.get().fatalError,
 					e.getMessage()));
-		} finally {
-			if (cmd.outw != null)
-				cmd.outw.flush();
 		}
-		return IO.readLines(baos.toString());
 	}
 
