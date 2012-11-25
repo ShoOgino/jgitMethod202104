@@ -5,28 +5,28 @@
 	private void setup() {
 		int startIndex = 0;
 		int endIndex = pattern.length();
-		if (pattern.startsWith("!")) {
+		if (pattern.startsWith("!")) { //$NON-NLS-1$
 			startIndex++;
 			negation = true;
 		}
 
-		if (pattern.endsWith("/")) {
+		if (pattern.endsWith("/")) { //$NON-NLS-1$
 			endIndex --;
 			dirOnly = true;
 		}
 
 		pattern = pattern.substring(startIndex, endIndex);
-		boolean hasSlash = pattern.contains("/");
+		boolean hasSlash = pattern.contains("/"); //$NON-NLS-1$
 
 		if (!hasSlash)
 			nameOnly = true;
-		else if (!pattern.startsWith("/")) {
+		else if (!pattern.startsWith("/")) { //$NON-NLS-1$
 			//Contains "/" but does not start with one
 			//Adding / to the start should not interfere with matching
-			pattern = "/" + pattern;
+			pattern = "/" + pattern; //$NON-NLS-1$
 		}
 
-		if (pattern.contains("*") || pattern.contains("?") || pattern.contains("[")) {
+		if (pattern.contains("*") || pattern.contains("?") || pattern.contains("[")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			try {
 				matcher = new FileNameMatcher(pattern, Character.valueOf('/'));
 			} catch (InvalidPatternException e) {

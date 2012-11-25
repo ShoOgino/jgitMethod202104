@@ -9,7 +9,7 @@
 	 */
 	public String format(List<Ref> refsToMerge, Ref target) {
 		StringBuilder sb = new StringBuilder();
-		sb.append("Merge ");
+		sb.append("Merge "); //$NON-NLS-1$
 
 		List<String> branches = new ArrayList<String>();
 		List<String> remoteBranches = new ArrayList<String>();
@@ -18,18 +18,18 @@
 		List<String> others = new ArrayList<String>();
 		for (Ref ref : refsToMerge) {
 			if (ref.getName().startsWith(Constants.R_HEADS))
-				branches.add("'" + Repository.shortenRefName(ref.getName())
-						+ "'");
+				branches.add("'" + Repository.shortenRefName(ref.getName()) //$NON-NLS-1$
+						+ "'"); //$NON-NLS-1$
 
 			else if (ref.getName().startsWith(Constants.R_REMOTES))
-				remoteBranches.add("'"
-						+ Repository.shortenRefName(ref.getName()) + "'");
+				remoteBranches.add("'" //$NON-NLS-1$
+						+ Repository.shortenRefName(ref.getName()) + "'"); //$NON-NLS-1$
 
 			else if (ref.getName().startsWith(Constants.R_TAGS))
-				tags.add("'" + Repository.shortenRefName(ref.getName()) + "'");
+				tags.add("'" + Repository.shortenRefName(ref.getName()) + "'"); //$NON-NLS-1$ //$NON-NLS-2$
 
 			else if (ref.getName().equals(ref.getObjectId().getName()))
-				commits.add("'" + ref.getName() + "'");
+				commits.add("'" + ref.getName() + "'"); //$NON-NLS-1$ //$NON-NLS-2$
 
 			else
 				others.add(ref.getName());
@@ -51,9 +51,9 @@
 			listings.add(joinNames(commits, "commit", "commits"));
 
 		if (!others.isEmpty())
-			listings.add(StringUtils.join(others, ", ", " and "));
+			listings.add(StringUtils.join(others, ", ", " and ")); //$NON-NLS-1$
 
-		sb.append(StringUtils.join(listings, ", "));
+		sb.append(StringUtils.join(listings, ", ")); //$NON-NLS-1$
 
 		String targetName = target.getLeaf().getName();
 		if (!targetName.equals(Constants.R_HEADS + Constants.MASTER)) {

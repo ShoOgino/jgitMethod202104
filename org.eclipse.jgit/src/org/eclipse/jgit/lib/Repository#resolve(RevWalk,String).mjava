@@ -69,16 +69,16 @@
 						}
 						i = k;
 						if (item != null)
-							if (item.equals("tree")) {
+							if (item.equals("tree")) { //$NON-NLS-1$
 								rev = rw.parseTree(rev);
-							} else if (item.equals("commit")) {
+							} else if (item.equals("commit")) { //$NON-NLS-1$
 								rev = rw.parseCommit(rev);
-							} else if (item.equals("blob")) {
+							} else if (item.equals("blob")) { //$NON-NLS-1$
 								rev = rw.peel(rev);
 								if (!(rev instanceof RevBlob))
 									throw new IncorrectObjectTypeException(rev,
 											Constants.TYPE_BLOB);
-							} else if (item.equals("")) {
+							} else if (item.equals("")) { //$NON-NLS-1$
 								rev = rw.peel(rev);
 							} else
 								throw new RevisionSyntaxException(revstr);
@@ -174,14 +174,14 @@
 					}
 				}
 				if (time != null) {
-					if (time.equals("upstream")) {
+					if (time.equals("upstream")) { //$NON-NLS-1$
 						if (name == null)
 							name = new String(revChars, done, i);
-						if (name.equals(""))
+						if (name.equals("")) //$NON-NLS-1$
 							// Currently checked out branch, HEAD if
 							// detached
 							name = Constants.HEAD;
-						if (!Repository.isValidRefName("x/" + name))
+						if (!Repository.isValidRefName("x/" + name)) //$NON-NLS-1$
 							throw new RevisionSyntaxException(revstr);
 						Ref ref = getRef(name);
 						name = null;
@@ -194,7 +194,7 @@
 						RemoteConfig remoteConfig;
 						try {
 							remoteConfig = new RemoteConfig(getConfig(),
-									"origin");
+									"origin"); //$NON-NLS-1$
 						} catch (URISyntaxException e) {
 							throw new RevisionSyntaxException(revstr);
 						}
@@ -215,7 +215,7 @@
 						}
 						if (name == null)
 							throw new RevisionSyntaxException(revstr);
-					} else if (time.matches("^-\\d+$")) {
+					} else if (time.matches("^-\\d+$")) { //$NON-NLS-1$
 						if (name != null)
 							throw new RevisionSyntaxException(revstr);
 						else {
@@ -229,9 +229,9 @@
 					} else {
 						if (name == null)
 							name = new String(revChars, done, i);
-						if (name.equals(""))
+						if (name.equals("")) //$NON-NLS-1$
 							name = Constants.HEAD;
-						if (!Repository.isValidRefName("x/" + name))
+						if (!Repository.isValidRefName("x/" + name)) //$NON-NLS-1$
 							throw new RevisionSyntaxException(revstr);
 						Ref ref = getRef(name);
 						name = null;
@@ -252,7 +252,7 @@
 				if (rev == null) {
 					if (name == null)
 						name = new String(revChars, done, i);
-					if (name.equals(""))
+					if (name.equals("")) //$NON-NLS-1$
 						name = Constants.HEAD;
 					rev = parseSimple(rw, name);
 					name = null;
@@ -280,7 +280,7 @@
 		if (done == revstr.length())
 			return null;
 		name = revstr.substring(done);
-		if (!Repository.isValidRefName("x/" + name))
+		if (!Repository.isValidRefName("x/" + name)) //$NON-NLS-1$
 			throw new RevisionSyntaxException(revstr);
 		if (getRef(name) != null)
 			return name;

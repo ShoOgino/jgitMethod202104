@@ -6,7 +6,7 @@
 		final FileMode oldMode = ent.getOldMode();
 		final FileMode newMode = ent.getNewMode();
 
-		o.write(encodeASCII("diff --git "));
+		o.write(encodeASCII("diff --git ")); //$NON-NLS-1$
 		o.write(encode(quotePath(oldPrefix + (type == ADD ? newp : oldp))));
 		o.write(' ');
 		o.write(encode(quotePath(newPrefix + (type == DELETE ? oldp : newp))));
@@ -14,40 +14,40 @@
 
 		switch (type) {
 		case ADD:
-			o.write(encodeASCII("new file mode "));
+			o.write(encodeASCII("new file mode ")); //$NON-NLS-1$
 			newMode.copyTo(o);
 			o.write('\n');
 			break;
 
 		case DELETE:
-			o.write(encodeASCII("deleted file mode "));
+			o.write(encodeASCII("deleted file mode ")); //$NON-NLS-1$
 			oldMode.copyTo(o);
 			o.write('\n');
 			break;
 
 		case RENAME:
-			o.write(encodeASCII("similarity index " + ent.getScore() + "%"));
+			o.write(encodeASCII("similarity index " + ent.getScore() + "%")); //$NON-NLS-1$ //$NON-NLS-2$
 			o.write('\n');
 
-			o.write(encode("rename from " + quotePath(oldp)));
+			o.write(encode("rename from " + quotePath(oldp))); //$NON-NLS-1$
 			o.write('\n');
 
-			o.write(encode("rename to " + quotePath(newp)));
+			o.write(encode("rename to " + quotePath(newp))); //$NON-NLS-1$
 			o.write('\n');
 			break;
 
 		case COPY:
-			o.write(encodeASCII("similarity index " + ent.getScore() + "%"));
+			o.write(encodeASCII("similarity index " + ent.getScore() + "%")); //$NON-NLS-1$ //$NON-NLS-2$
 			o.write('\n');
 
-			o.write(encode("copy from " + quotePath(oldp)));
+			o.write(encode("copy from " + quotePath(oldp))); //$NON-NLS-1$
 			o.write('\n');
 
-			o.write(encode("copy to " + quotePath(newp)));
+			o.write(encode("copy to " + quotePath(newp))); //$NON-NLS-1$
 			o.write('\n');
 
 			if (!oldMode.equals(newMode)) {
-				o.write(encodeASCII("new file mode "));
+				o.write(encodeASCII("new file mode ")); //$NON-NLS-1$
 				newMode.copyTo(o);
 				o.write('\n');
 			}
@@ -55,19 +55,19 @@
 
 		case MODIFY:
 			if (0 < ent.getScore()) {
-				o.write(encodeASCII("dissimilarity index "
-						+ (100 - ent.getScore()) + "%"));
+				o.write(encodeASCII("dissimilarity index " //$NON-NLS-1$
+						+ (100 - ent.getScore()) + "%")); //$NON-NLS-1$
 				o.write('\n');
 			}
 			break;
 		}
 
 		if ((type == MODIFY || type == RENAME) && !oldMode.equals(newMode)) {
-			o.write(encodeASCII("old mode "));
+			o.write(encodeASCII("old mode ")); //$NON-NLS-1$
 			oldMode.copyTo(o);
 			o.write('\n');
 
-			o.write(encodeASCII("new mode "));
+			o.write(encodeASCII("new mode ")); //$NON-NLS-1$
 			newMode.copyTo(o);
 			o.write('\n');
 		}

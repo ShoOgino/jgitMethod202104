@@ -6,22 +6,22 @@
 			return RepositoryState.BARE;
 
 		// Pre Git-1.6 logic
-		if (new File(getWorkTree(), ".dotest").exists())
+		if (new File(getWorkTree(), ".dotest").exists()) //$NON-NLS-1$
 			return RepositoryState.REBASING;
-		if (new File(getDirectory(), ".dotest-merge").exists())
+		if (new File(getDirectory(), ".dotest-merge").exists()) //$NON-NLS-1$
 			return RepositoryState.REBASING_INTERACTIVE;
 
 		// From 1.6 onwards
-		if (new File(getDirectory(),"rebase-apply/rebasing").exists())
+		if (new File(getDirectory(),"rebase-apply/rebasing").exists()) //$NON-NLS-1$
 			return RepositoryState.REBASING_REBASING;
-		if (new File(getDirectory(),"rebase-apply/applying").exists())
+		if (new File(getDirectory(),"rebase-apply/applying").exists()) //$NON-NLS-1$
 			return RepositoryState.APPLY;
-		if (new File(getDirectory(),"rebase-apply").exists())
+		if (new File(getDirectory(),"rebase-apply").exists()) //$NON-NLS-1$
 			return RepositoryState.REBASING;
 
-		if (new File(getDirectory(),"rebase-merge/interactive").exists())
+		if (new File(getDirectory(),"rebase-merge/interactive").exists()) //$NON-NLS-1$
 			return RepositoryState.REBASING_INTERACTIVE;
-		if (new File(getDirectory(),"rebase-merge").exists())
+		if (new File(getDirectory(),"rebase-merge").exists()) //$NON-NLS-1$
 			return RepositoryState.REBASING_MERGE;
 
 		// Both versions
@@ -40,7 +40,7 @@
 			return RepositoryState.MERGING;
 		}
 
-		if (new File(getDirectory(), "BISECT_LOG").exists())
+		if (new File(getDirectory(), "BISECT_LOG").exists()) //$NON-NLS-1$
 			return RepositoryState.BISECTING;
 
 		if (new File(getDirectory(), Constants.CHERRY_PICK_HEAD).exists()) {

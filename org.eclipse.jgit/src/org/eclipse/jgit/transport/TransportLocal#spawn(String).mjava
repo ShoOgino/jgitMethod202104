@@ -1,20 +1,20 @@
 	protected Process spawn(final String cmd)
 			throws TransportException {
 		try {
-			String[] args = { "." };
+			String[] args = { "." }; //$NON-NLS-1$
 			ProcessBuilder proc = local.getFS().runInShell(cmd, args);
 			proc.directory(remoteGitDir);
 
 			// Remove the same variables CGit does.
 			Map<String, String> env = proc.environment();
-			env.remove("GIT_ALTERNATE_OBJECT_DIRECTORIES");
-			env.remove("GIT_CONFIG");
-			env.remove("GIT_CONFIG_PARAMETERS");
-			env.remove("GIT_DIR");
-			env.remove("GIT_WORK_TREE");
-			env.remove("GIT_GRAFT_FILE");
-			env.remove("GIT_INDEX_FILE");
-			env.remove("GIT_NO_REPLACE_OBJECTS");
+			env.remove("GIT_ALTERNATE_OBJECT_DIRECTORIES"); //$NON-NLS-1$
+			env.remove("GIT_CONFIG"); //$NON-NLS-1$
+			env.remove("GIT_CONFIG_PARAMETERS"); //$NON-NLS-1$
+			env.remove("GIT_DIR"); //$NON-NLS-1$
+			env.remove("GIT_WORK_TREE"); //$NON-NLS-1$
+			env.remove("GIT_GRAFT_FILE"); //$NON-NLS-1$
+			env.remove("GIT_INDEX_FILE"); //$NON-NLS-1$
+			env.remove("GIT_NO_REPLACE_OBJECTS"); //$NON-NLS-1$
 
 			return proc.start();
 		} catch (IOException err) {

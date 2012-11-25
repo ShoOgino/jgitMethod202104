@@ -2,7 +2,7 @@
 		if (ObjectId.isId(revstr))
 			return ObjectId.fromString(revstr);
 
-		if (Repository.isValidRefName("x/" + revstr)) {
+		if (Repository.isValidRefName("x/" + revstr)) { //$NON-NLS-1$
 			Ref r = getRefDatabase().getRef(revstr);
 			if (r != null)
 				return r.getObjectId();
@@ -11,7 +11,7 @@
 		if (AbbreviatedObjectId.isId(revstr))
 			return resolveAbbreviation(revstr);
 
-		int dashg = revstr.indexOf("-g");
+		int dashg = revstr.indexOf("-g"); //$NON-NLS-1$
 		if ((dashg + 5) < revstr.length() && 0 <= dashg
 				&& isHex(revstr.charAt(dashg + 2))
 				&& isHex(revstr.charAt(dashg + 3))

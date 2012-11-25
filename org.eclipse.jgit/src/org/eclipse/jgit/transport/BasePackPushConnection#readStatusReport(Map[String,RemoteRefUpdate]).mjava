@@ -1,10 +1,10 @@
 	private void readStatusReport(final Map<String, RemoteRefUpdate> refUpdates)
 			throws IOException {
 		final String unpackLine = readStringLongTimeout();
-		if (!unpackLine.startsWith("unpack "))
+		if (!unpackLine.startsWith("unpack ")) //$NON-NLS-1$
 			throw new PackProtocolException(uri, MessageFormat.format(JGitText.get().unexpectedReportLine, unpackLine));
-		final String unpackStatus = unpackLine.substring("unpack ".length());
-		if (!unpackStatus.equals("ok"))
+		final String unpackStatus = unpackLine.substring("unpack ".length()); //$NON-NLS-1$
+		if (!unpackStatus.equals("ok")) //$NON-NLS-1$
 			throw new TransportException(uri, MessageFormat.format(
 					JGitText.get().errorOccurredDuringUnpackingOnTheRemoteEnd, unpackStatus));
 
@@ -12,12 +12,12 @@
 		while ((refLine = pckIn.readString()) != PacketLineIn.END) {
 			boolean ok = false;
 			int refNameEnd = -1;
-			if (refLine.startsWith("ok ")) {
+			if (refLine.startsWith("ok ")) { //$NON-NLS-1$
 				ok = true;
 				refNameEnd = refLine.length();
-			} else if (refLine.startsWith("ng ")) {
+			} else if (refLine.startsWith("ng ")) { //$NON-NLS-1$
 				ok = false;
-				refNameEnd = refLine.indexOf(" ", 3);
+				refNameEnd = refLine.indexOf(" ", 3); //$NON-NLS-1$
 			}
 			if (refNameEnd == -1)
 				throw new PackProtocolException(MessageFormat.format(JGitText.get().unexpectedReportLine2

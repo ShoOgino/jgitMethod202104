@@ -10,7 +10,7 @@
 		switch (format) {
 		case RAW:
 			int offset = ident.getTimeZoneOffset();
-			String sign = offset < 0 ? "-" : "+";
+			String sign = offset < 0 ? "-" : "+"; //$NON-NLS-1$ //$NON-NLS-2$
 			int offset2;
 			if (offset < 0)
 				offset2 = -offset;
@@ -18,7 +18,7 @@
 				offset2 = offset;
 			int hours = offset2 / 60;
 			int minutes = offset2 % 60;
-			return String.format("%d %s%02d%02d",
+			return String.format("%d %s%02d%02d", //$NON-NLS-1$
 					ident.getWhen().getTime() / 1000, sign, hours, minutes);
 		case RELATIVE:
 			return RelativeDateFormatter.format(ident.getWhen());
@@ -33,7 +33,7 @@
 				tz = SystemReader.getInstance().getTimeZone();
 			dateTimeInstance.setTimeZone(tz);
 			dateTimeInstance2.setTimeZone(tz);
-			return dateTimeInstance.format(ident.getWhen()) + " "
+			return dateTimeInstance.format(ident.getWhen()) + " " //$NON-NLS-1$
 					+ dateTimeInstance2.format(ident.getWhen());
 		default:
 			tz = ident.getTimeZone();

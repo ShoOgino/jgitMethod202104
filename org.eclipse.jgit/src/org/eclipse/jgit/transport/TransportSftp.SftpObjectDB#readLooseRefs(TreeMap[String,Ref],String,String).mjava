@@ -11,12 +11,12 @@
 
 			for (final ChannelSftp.LsEntry ent : list) {
 				final String n = ent.getFilename();
-				if (".".equals(n) || "..".equals(n))
+				if (".".equals(n) || "..".equals(n)) //$NON-NLS-1$ //$NON-NLS-2$
 					continue;
 
-				final String nPath = dir + "/" + n;
+				final String nPath = dir + "/" + n; //$NON-NLS-1$
 				if (ent.getAttrs().isDir())
-					readLooseRefs(avail, nPath, prefix + n + "/");
+					readLooseRefs(avail, nPath, prefix + n + "/"); //$NON-NLS-1$
 				else
 					readRef(avail, nPath, prefix + n);
 			}

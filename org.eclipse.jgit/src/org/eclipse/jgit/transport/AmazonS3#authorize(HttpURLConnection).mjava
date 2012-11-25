@@ -11,13 +11,13 @@
 		s.append(c.getRequestMethod());
 		s.append('\n');
 
-		s.append(remove(sigHdr, "content-md5"));
+		s.append(remove(sigHdr, "content-md5")); //$NON-NLS-1$
 		s.append('\n');
 
-		s.append(remove(sigHdr, "content-type"));
+		s.append(remove(sigHdr, "content-type")); //$NON-NLS-1$
 		s.append('\n');
 
-		s.append(remove(sigHdr, "date"));
+		s.append(remove(sigHdr, "date")); //$NON-NLS-1$
 		s.append('\n');
 
 		for (final Map.Entry<String, String> e : sigHdr.entrySet()) {
@@ -36,12 +36,12 @@
 		try {
 			final Mac m = Mac.getInstance(HMAC);
 			m.init(privateKey);
-			sec = Base64.encodeBytes(m.doFinal(s.toString().getBytes("UTF-8")));
+			sec = Base64.encodeBytes(m.doFinal(s.toString().getBytes("UTF-8"))); //$NON-NLS-1$
 		} catch (NoSuchAlgorithmException e) {
 			throw new IOException(MessageFormat.format(JGitText.get().noHMACsupport, HMAC, e.getMessage()));
 		} catch (InvalidKeyException e) {
 			throw new IOException(MessageFormat.format(JGitText.get().invalidKey, e.getMessage()));
 		}
-		c.setRequestProperty("Authorization", "AWS " + publicKey + ":" + sec);
+		c.setRequestProperty("Authorization", "AWS " + publicKey + ":" + sec); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 

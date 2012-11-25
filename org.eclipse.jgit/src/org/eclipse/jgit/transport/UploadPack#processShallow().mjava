@@ -18,13 +18,13 @@
 			// Commits at the boundary which aren't already shallow in
 			// the client need to be marked as such
 			if (c.getDepth() == depth && !clientShallowCommits.contains(c))
-				pckOut.writeString("shallow " + o.name());
+				pckOut.writeString("shallow " + o.name()); //$NON-NLS-1$
 
 			// Commits not on the boundary which are shallow in the client
 			// need to become unshallowed
 			if (c.getDepth() < depth && clientShallowCommits.contains(c)) {
 				unshallowCommits.add(c.copy());
-				pckOut.writeString("unshallow " + c.name());
+				pckOut.writeString("unshallow " + c.name()); //$NON-NLS-1$
 			}
 		}
 

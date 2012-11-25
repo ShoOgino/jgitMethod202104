@@ -1,17 +1,18 @@
 		RemotePack(final WalkRemoteObjectDatabase c, final String pn) {
 			connection = c;
 			packName = pn;
-			idxName = packName.substring(0, packName.length() - 5) + ".idx";
+			idxName = packName.substring(0, packName.length() - 5) + ".idx"; //$NON-NLS-1$
 
 			String tn = idxName;
-			if (tn.startsWith("pack-"))
+			if (tn.startsWith("pack-")) //$NON-NLS-1$
 				tn = tn.substring(5);
-			if (tn.endsWith(".idx"))
+			if (tn.endsWith(".idx")) //$NON-NLS-1$
 				tn = tn.substring(0, tn.length() - 4);
 
 			if (local.getObjectDatabase() instanceof ObjectDirectory) {
 				tmpIdx = new File(((ObjectDirectory) local.getObjectDatabase())
-						.getDirectory(), "walk-" + tn + ".walkidx");
+								.getDirectory(),
+						"walk-" + tn + ".walkidx"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 

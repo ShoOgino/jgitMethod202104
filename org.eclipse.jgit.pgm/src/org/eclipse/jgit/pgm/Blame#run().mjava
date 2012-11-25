@@ -8,16 +8,16 @@
 		}
 
 		if (abbrev == 0)
-			abbrev = db.getConfig().getInt("core", "abbrev", 7);
+			abbrev = db.getConfig().getInt("core", "abbrev", 7); //$NON-NLS-1$ //$NON-NLS-2$
 		if (!showBlankBoundary)
-			root = db.getConfig().getBoolean("blame", "blankboundary", false);
+			root = db.getConfig().getBoolean("blame", "blankboundary", false); //$NON-NLS-1$ //$NON-NLS-2$
 		if (!root)
-			root = db.getConfig().getBoolean("blame", "showroot", false);
+			root = db.getConfig().getBoolean("blame", "showroot", false); //$NON-NLS-1$ //$NON-NLS-2$
 
 		if (showRawTimestamp)
-			dateFmt = new SimpleDateFormat("ZZZZ");
+			dateFmt = new SimpleDateFormat("ZZZZ"); //$NON-NLS-1$
 		else
-			dateFmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss ZZZZ");
+			dateFmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss ZZZZ"); //$NON-NLS-1$
 
 		BlameGenerator generator = new BlameGenerator(db, file);
 		reader = db.newObjectReader();
@@ -35,7 +35,7 @@
 				}
 				generator.reverse(rangeStart, rangeEnd);
 			} else if (revision != null) {
-				generator.push(null, db.resolve(revision + "^{commit}"));
+				generator.push(null, db.resolve(revision + "^{commit}")); //$NON-NLS-1$
 			} else {
 				generator.push(null, db.resolve(Constants.HEAD));
 				if (!db.isBare()) {
@@ -68,12 +68,12 @@
 				maxSourceLine = Math.max(maxSourceLine, blame.getSourceLine(line));
 			}
 
-			String pathFmt = MessageFormat.format(" %{0}s", valueOf(pathWidth));
-			String numFmt = MessageFormat.format(" %{0}d",
+			String pathFmt = MessageFormat.format(" %{0}s", valueOf(pathWidth)); //$NON-NLS-1$
+			String numFmt = MessageFormat.format(" %{0}d", //$NON-NLS-1$
 					valueOf(1 + (int) Math.log10(maxSourceLine + 1)));
-			String lineFmt = MessageFormat.format(" %{0}d) ",
+			String lineFmt = MessageFormat.format(" %{0}d) ", //$NON-NLS-1$
 					valueOf(1 + (int) Math.log10(end + 1)));
-			String authorFmt = MessageFormat.format(" (%-{0}s %{1}s",
+			String authorFmt = MessageFormat.format(" (%-{0}s %{1}s", //$NON-NLS-1$
 					valueOf(authorWidth), valueOf(dateWidth));
 
 			for (int line = begin; line < end; line++) {

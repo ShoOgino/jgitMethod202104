@@ -33,14 +33,14 @@
 	 * @see #getPath
 	 */
 	public String getHumanishName() throws IllegalArgumentException {
-		if ("".equals(getPath()) || getPath() == null)
+		if ("".equals(getPath()) || getPath() == null) //$NON-NLS-1$
 			throw new IllegalArgumentException();
 		String s = getPath();
 		String[] elements;
-		if ("file".equals(scheme) || LOCAL_FILE.matcher(s).matches())
-			elements = s.split("[\\" + File.separatorChar + "/]");
+		if ("file".equals(scheme) || LOCAL_FILE.matcher(s).matches()) //$NON-NLS-1$
+			elements = s.split("[\\" + File.separatorChar + "/]"); //$NON-NLS-1$ //$NON-NLS-2$
 		else
-			elements = s.split("/");
+			elements = s.split("/"); //$NON-NLS-1$
 		if (elements.length == 0)
 			throw new IllegalArgumentException();
 		String result = elements[elements.length - 1];

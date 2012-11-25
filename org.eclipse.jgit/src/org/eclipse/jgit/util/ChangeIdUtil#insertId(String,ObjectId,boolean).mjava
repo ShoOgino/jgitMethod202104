@@ -24,12 +24,12 @@
 					i++;
 				String oldId = message.length() == (i + 40) ?
 						message.substring(i) : message.substring(i, i + 41);
-				message = message.replace(oldId, "I" + changeId.getName());
+				message = message.replace(oldId, "I" + changeId.getName()); //$NON-NLS-1$
 			}
 			return message;
 		}
 
-		String[] lines = message.split("\n");
+		String[] lines = message.split("\n"); //$NON-NLS-1$
 		int footerFirstLine = lines.length;
 		for (int i = lines.length - 1; i > 1; --i) {
 			if (footerPattern.matcher(lines[i]).matches()) {
@@ -59,17 +59,17 @@
 		int i = 0;
 		for (; i < insertAfter; ++i) {
 			ret.append(lines[i]);
-			ret.append("\n");
+			ret.append("\n"); //$NON-NLS-1$
 		}
 		if (insertAfter == lines.length && insertAfter == footerFirstLine)
-			ret.append("\n");
+			ret.append("\n"); //$NON-NLS-1$
 		ret.append(CHANGE_ID);
-		ret.append(" I");
+		ret.append(" I"); //$NON-NLS-1$
 		ret.append(ObjectId.toString(changeId));
-		ret.append("\n");
+		ret.append("\n"); //$NON-NLS-1$
 		for (; i < lines.length; ++i) {
 			ret.append(lines[i]);
-			ret.append("\n");
+			ret.append("\n"); //$NON-NLS-1$
 		}
 		return ret.toString();
 	}

@@ -1,12 +1,12 @@
 		SftpObjectDB(String path) throws TransportException {
-			if (path.startsWith("/~"))
+			if (path.startsWith("/~")) //$NON-NLS-1$
 				path = path.substring(1);
-			if (path.startsWith("~/"))
+			if (path.startsWith("~/")) //$NON-NLS-1$
 				path = path.substring(2);
 			try {
 				ftp = newSftp();
 				ftp.cd(path);
-				ftp.cd("objects");
+				ftp.cd("objects"); //$NON-NLS-1$
 				objectsPath = ftp.pwd();
 			} catch (TransportException err) {
 				close();

@@ -38,7 +38,7 @@
 		dateStr = dateStr.trim();
 		Date ret;
 
-		if ("never".equalsIgnoreCase(dateStr))
+		if ("never".equalsIgnoreCase(dateStr)) //$NON-NLS-1$
 			return NEVER;
 		ret = parse_relative(dateStr, now);
 		if (ret != null)
@@ -51,11 +51,11 @@
 			}
 		}
 		ParseableSimpleDateFormat[] values = ParseableSimpleDateFormat.values();
-		StringBuilder allFormats = new StringBuilder("\"")
+		StringBuilder allFormats = new StringBuilder("\"") //$NON-NLS-1$
 				.append(values[0].formatStr);
 		for (int i = 1; i < values.length; i++)
-			allFormats.append("\", \"").append(values[i].formatStr);
-		allFormats.append("\"");
+			allFormats.append("\", \"").append(values[i].formatStr); //$NON-NLS-1$
+		allFormats.append("\""); //$NON-NLS-1$
 		throw new ParseException(MessageFormat.format(
 				JGitText.get().cannotParseDate, dateStr, allFormats.toString()), 0);
 	}

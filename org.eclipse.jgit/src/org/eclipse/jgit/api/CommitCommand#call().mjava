@@ -34,7 +34,7 @@
 				Git git = new Git(repo);
 				try {
 					git.add()
-							.addFilepattern(".")
+							.addFilepattern(".") //$NON-NLS-1$
 							.setUpdate(true).call();
 				} catch (NoFilepatternException e) {
 					// should really not happen
@@ -48,7 +48,7 @@
 						JGitText.get().commitOnRepoWithoutHEADCurrentlyNotSupported);
 
 			// determine the current HEAD and the commit it is referring to
-			ObjectId headId = repo.resolve(Constants.HEAD + "^{commit}");
+			ObjectId headId = repo.resolve(Constants.HEAD + "^{commit}"); //$NON-NLS-1$
 			if (headId == null && amend)
 				throw new WrongRepositoryStateException(
 						JGitText.get().commitAmendOnInitialNotPossible);
@@ -101,7 +101,7 @@
 						if (reflogComment != null) {
 							ru.setRefLogMessage(reflogComment, false);
 						} else {
-							String prefix = amend ? "commit (amend): "
+							String prefix = amend ? "commit (amend): " //$NON-NLS-1$
 									: "commit: ";
 							ru.setRefLogMessage(
 									prefix + revCommit.getShortMessage(), false);

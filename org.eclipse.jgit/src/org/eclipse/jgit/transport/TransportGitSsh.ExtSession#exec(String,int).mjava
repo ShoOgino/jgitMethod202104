@@ -1,18 +1,18 @@
 		public Process exec(String command, int timeout)
 				throws TransportException {
-			String ssh = SystemReader.getInstance().getenv("GIT_SSH");
-			boolean putty = ssh.toLowerCase().contains("plink");
+			String ssh = SystemReader.getInstance().getenv("GIT_SSH"); //$NON-NLS-1$
+			boolean putty = ssh.toLowerCase().contains("plink"); //$NON-NLS-1$
 
 			List<String> args = new ArrayList<String>();
 			args.add(ssh);
-			if (putty && !ssh.toLowerCase().contains("tortoiseplink"))
-				args.add("-batch");
+			if (putty && !ssh.toLowerCase().contains("tortoiseplink")) //$NON-NLS-1$
+				args.add("-batch"); //$NON-NLS-1$
 			if (0 < getURI().getPort()) {
-				args.add(putty ? "-P" : "-p");
+				args.add(putty ? "-P" : "-p"); //$NON-NLS-1$ //$NON-NLS-2$
 				args.add(String.valueOf(getURI().getPort()));
 			}
 			if (getURI().getUser() != null)
-				args.add(getURI().getUser() + "@" + getURI().getHost());
+				args.add(getURI().getUser() + "@" + getURI().getHost()); //$NON-NLS-1$
 			else
 				args.add(getURI().getHost());
 			args.add(command);

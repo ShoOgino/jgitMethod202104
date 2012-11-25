@@ -7,7 +7,7 @@
 	 */
 	public Daemon(final InetSocketAddress addr) {
 		myAddress = addr;
-		processors = new ThreadGroup("Git-Daemon");
+		processors = new ThreadGroup("Git-Daemon"); //$NON-NLS-1$
 
 		repositoryResolver = (RepositoryResolver<DaemonClient>) RepositoryResolver.NONE;
 
@@ -32,8 +32,8 @@
 				String host = peer.getCanonicalHostName();
 				if (host == null)
 					host = peer.getHostAddress();
-				String name = "anonymous";
-				String email = name + "@" + host;
+				String name = "anonymous"; //$NON-NLS-1$
+				String email = name + "@" + host; //$NON-NLS-1$
 				rp.setRefLogIdent(new PersonIdent(name, email));
 				rp.setTimeout(getTimeout());
 
@@ -42,7 +42,7 @@
 		};
 
 		services = new DaemonService[] {
-				new DaemonService("upload-pack", "uploadpack") {
+				new DaemonService("upload-pack", "uploadpack") { //$NON-NLS-1$ //$NON-NLS-2$
 					{
 						setEnabled(true);
 					}
@@ -57,7 +57,7 @@
 						OutputStream out = dc.getOutputStream();
 						up.upload(in, out, null);
 					}
-				}, new DaemonService("receive-pack", "receivepack") {
+				}, new DaemonService("receive-pack", "receivepack") { //$NON-NLS-1$ //$NON-NLS-2$
 					{
 						setEnabled(false);
 					}

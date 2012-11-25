@@ -1,15 +1,15 @@
 	private String date(int line) {
 		if (blame.getSourceCommit(line) == null)
-			return "";
+			return ""; //$NON-NLS-1$
 
 		PersonIdent author = blame.getSourceAuthor(line);
 		if (author == null)
-			return "";
+			return ""; //$NON-NLS-1$
 
 		dateFmt.setTimeZone(author.getTimeZone());
 		if (!showRawTimestamp)
 			return dateFmt.format(author.getWhen());
-		return String.format("%d %s",
+		return String.format("%d %s", //$NON-NLS-1$
 				valueOf(author.getWhen().getTime() / 1000L),
 				dateFmt.format(author.getWhen()));
 	}

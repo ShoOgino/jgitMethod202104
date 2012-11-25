@@ -13,18 +13,18 @@
 			if (line == PacketLineIn.END)
 				break;
 
-			if (line.startsWith("deepen ")) {
+			if (line.startsWith("deepen ")) { //$NON-NLS-1$
 				depth = Integer.parseInt(line.substring(7));
 				continue;
 			}
 
-			if (line.startsWith("shallow ")) {
+			if (line.startsWith("shallow ")) { //$NON-NLS-1$
 				clientShallowCommits.add(ObjectId.fromString(line.substring(8)));
 				continue;
 			}
 
-			if (!line.startsWith("want ") || line.length() < 45)
-				throw new PackProtocolException(MessageFormat.format(JGitText.get().expectedGot, "want", line));
+			if (!line.startsWith("want ") || line.length() < 45) //$NON-NLS-1$
+				throw new PackProtocolException(MessageFormat.format(JGitText.get().expectedGot, "want", line)); //$NON-NLS-1$
 
 			if (isFirst && line.length() > 45) {
 				final FirstLine firstLine = new FirstLine(line);

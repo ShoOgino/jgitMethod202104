@@ -10,10 +10,10 @@
 	 */
 	protected static String readPipe(File dir, String[] command, String encoding) {
 		final boolean debug = Boolean.parseBoolean(SystemReader.getInstance()
-				.getProperty("jgit.fs.debug"));
+				.getProperty("jgit.fs.debug")); //$NON-NLS-1$
 		try {
 			if (debug)
-				System.err.println("readpipe " + Arrays.asList(command) + ","
+				System.err.println("readpipe " + Arrays.asList(command) + "," //$NON-NLS-1$ //$NON-NLS-2$
 						+ dir);
 			final Process p = Runtime.getRuntime().exec(command, null, dir);
 			final BufferedReader lineRead = new BufferedReader(
@@ -53,8 +53,8 @@
 			try {
 				r = lineRead.readLine();
 				if (debug) {
-					System.err.println("readpipe may return '" + r + "'");
-					System.err.println("(ignoring remaing output:");
+					System.err.println("readpipe may return '" + r + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+					System.err.println("(ignoring remaing output:"); //$NON-NLS-1$
 				}
 				String l;
 				while ((l = lineRead.readLine()) != null) {
@@ -74,7 +74,7 @@
 							&& !gooblerFail.get())
 						return r;
 					if (debug)
-						System.err.println("readpipe rc=" + rc);
+						System.err.println("readpipe rc=" + rc); //$NON-NLS-1$
 					break;
 				} catch (InterruptedException ie) {
 					// Stop bothering me, I have a zombie to reap.
@@ -86,7 +86,7 @@
 			// Ignore error (but report)
 		}
 		if (debug)
-			System.err.println("readpipe returns null");
+			System.err.println("readpipe returns null"); //$NON-NLS-1$
 		return null;
 	}
 

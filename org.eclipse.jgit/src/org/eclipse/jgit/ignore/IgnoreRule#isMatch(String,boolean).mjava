@@ -15,8 +15,8 @@
 	 * 			  the target is ignored. Call {@link IgnoreRule#getResult() getResult()} for the result.
 	 */
 	public boolean isMatch(String target, boolean isDirectory) {
-		if (!target.startsWith("/"))
-			target = "/" + target;
+		if (!target.startsWith("/")) //$NON-NLS-1$
+			target = "/" + target; //$NON-NLS-1$
 
 		if (matcher == null) {
 			if (target.equals(pattern)) {
@@ -34,12 +34,12 @@
 			 * "/src/new" to /src/newfile" but allows "/src/new" to match
 			 * "/src/new/newfile", as is the git standard
 			 */
-			if ((target).startsWith(pattern + "/"))
+			if ((target).startsWith(pattern + "/")) //$NON-NLS-1$
 				return true;
 
 			if (nameOnly) {
 				//Iterate through each sub-name
-				final String[] segments = target.split("/");
+				final String[] segments = target.split("/"); //$NON-NLS-1$
 				for (int idx = 0; idx < segments.length; idx++) {
 					final String segmentName = segments[idx];
 					if (segmentName.equals(pattern) &&
@@ -53,7 +53,7 @@
 			if (matcher.isMatch())
 				return true;
 
-			final String[] segments = target.split("/");
+			final String[] segments = target.split("/"); //$NON-NLS-1$
 			if (nameOnly) {
 				for (int idx = 0; idx < segments.length; idx++) {
 					final String segmentName = segments[idx];
@@ -71,7 +71,7 @@
 				for (int idx = 0; idx < segments.length; idx++) {
 					final String segmentName = segments[idx];
 					if (segmentName.length() > 0) {
-						matcher.append("/" + segmentName);
+						matcher.append("/" + segmentName); //$NON-NLS-1$
 					}
 
 					if (matcher.isMatch() &&

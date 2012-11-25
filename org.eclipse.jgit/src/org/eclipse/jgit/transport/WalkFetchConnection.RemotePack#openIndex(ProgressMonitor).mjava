@@ -2,7 +2,7 @@
 			if (index != null)
 				return;
 			if (tmpIdx == null)
-				tmpIdx = File.createTempFile("jgit-walk-", ".idx");
+				tmpIdx = File.createTempFile("jgit-walk-", ".idx"); //$NON-NLS-1$ //$NON-NLS-2$
 			else if (tmpIdx.isFile()) {
 				try {
 					index = PackIndex.open(tmpIdx);
@@ -13,8 +13,8 @@
 			}
 
 			final WalkRemoteObjectDatabase.FileStream s;
-			s = connection.open("pack/" + idxName);
-			pm.beginTask("Get " + idxName.substring(0, 12) + "..idx",
+			s = connection.open("pack/" + idxName); //$NON-NLS-1$
+			pm.beginTask("Get " + idxName.substring(0, 12) + "..idx", //$NON-NLS-1$ //$NON-NLS-2$
 					s.length < 0 ? ProgressMonitor.UNKNOWN
 							: (int) (s.length / 1024));
 			try {

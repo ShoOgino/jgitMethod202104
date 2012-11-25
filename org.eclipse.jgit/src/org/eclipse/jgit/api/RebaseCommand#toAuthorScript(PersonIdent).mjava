@@ -1,23 +1,23 @@
 	String toAuthorScript(PersonIdent author) {
 		StringBuilder sb = new StringBuilder(100);
 		sb.append(GIT_AUTHOR_NAME);
-		sb.append("='");
+		sb.append("='"); //$NON-NLS-1$
 		sb.append(author.getName());
-		sb.append("'\n");
+		sb.append("'\n"); //$NON-NLS-1$
 		sb.append(GIT_AUTHOR_EMAIL);
-		sb.append("='");
+		sb.append("='"); //$NON-NLS-1$
 		sb.append(author.getEmailAddress());
-		sb.append("'\n");
+		sb.append("'\n"); //$NON-NLS-1$
 		// the command line uses the "external String"
 		// representation for date and timezone
 		sb.append(GIT_AUTHOR_DATE);
-		sb.append("='");
-		sb.append("@"); // @ for time in seconds since 1970
+		sb.append("='"); //$NON-NLS-1$
+		sb.append("@"); // @ for time in seconds since 1970 //$NON-NLS-1$
 		String externalString = author.toExternalString();
 		sb
 				.append(externalString.substring(externalString
 						.lastIndexOf('>') + 2));
-		sb.append("'\n");
+		sb.append("'\n"); //$NON-NLS-1$
 		return sb.toString();
 	}
 

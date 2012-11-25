@@ -1,12 +1,12 @@
 		void list() throws IOException {
 			final Map<String, String> args = new TreeMap<String, String>();
 			if (prefix.length() > 0)
-				args.put("prefix", prefix);
+				args.put("prefix", prefix); //$NON-NLS-1$
 			if (!entries.isEmpty())
-				args.put("marker", prefix + entries.get(entries.size() - 1));
+				args.put("marker", prefix + entries.get(entries.size() - 1)); //$NON-NLS-1$
 
 			for (int curAttempt = 0; curAttempt < maxAttempts; curAttempt++) {
-				final HttpURLConnection c = open("GET", bucket, "", args);
+				final HttpURLConnection c = open("GET", bucket, "", args); //$NON-NLS-1$ //$NON-NLS-2$
 				authorize(c);
 				switch (HttpSupport.response(c)) {
 				case HttpURLConnection.HTTP_OK:
@@ -37,9 +37,9 @@
 					continue;
 
 				default:
-					throw AmazonS3.this.error("Listing", prefix, c);
+					throw AmazonS3.this.error("Listing", prefix, c); //$NON-NLS-1$
 				}
 			}
-			throw maxAttempts("Listing", prefix);
+			throw maxAttempts("Listing", prefix); //$NON-NLS-1$
 		}
 
