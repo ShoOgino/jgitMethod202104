@@ -1,0 +1,12 @@
+	@Test
+	public void testAddAlreadyAdded() throws Exception {
+		writeTrashFile("greeting", "Hello, world!");
+		git.add().addFilepattern("greeting").call();
+		assertArrayEquals(new String[] { "" }, //
+				execute("git add greeting"));
+
+		DirCache cache = db.readDirCache();
+		assertNotNull(cache.getEntry("greeting"));
+		assertEquals(1, cache.getEntryCount());
+	}
+

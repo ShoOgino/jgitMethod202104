@@ -1,0 +1,11 @@
+	@Test
+	public void testAddAFile() throws Exception {
+		writeTrashFile("greeting", "Hello, world!");
+		assertArrayEquals(new String[] { "" }, //
+				execute("git add greeting"));
+
+		DirCache cache = db.readDirCache();
+		assertNotNull(cache.getEntry("greeting"));
+		assertEquals(1, cache.getEntryCount());
+	}
+

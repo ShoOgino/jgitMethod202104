@@ -1,0 +1,11 @@
+	@Test
+	public void testAddFileTwice() throws Exception {
+		writeTrashFile("greeting", "Hello, world!");
+		assertArrayEquals(new String[] { "" }, //
+				execute("git add greeting greeting"));
+
+		DirCache cache = db.readDirCache();
+		assertNotNull(cache.getEntry("greeting"));
+		assertEquals(1, cache.getEntryCount());
+	}
+
