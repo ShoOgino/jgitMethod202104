@@ -1,0 +1,26 @@
+	@Test
+	public void testArchivePreservesMode() throws Exception {
+		writeTrashFile("plain", "a file with content");
+		writeTrashFile("executable", "an executable file");
+		writeTrashFile("symlink", "plain");
+		git.add().addFilepattern("plain").call();
+		git.add().addFilepattern("executable").call();
+		git.add().addFilepattern("symlink").call();
+
+		DirCache cache = db.lockDirCache();
+		cache.getEntry("executable").setFileMode(FileMode.EXECUTABLE_FILE);
+		cache.getEntry("symlink").setFileMode(FileMode.SYMLINK);
+		cache.write();
+		cache.commit();
+		cache.unlock();
+
+		git.commit().setMessage("three files with different modes").call();
+
+		final byte[] zipData = CLIGitCommand.rawExecute( //
+				"git archive master", db);
+		writeRaw("zip-with-modes.zip", zipData);
+		assertContainsEntryWithMode("zip-with-modes.zip", "-rw-", "plain");
+		assertContainsEntryWithMode("zip-with-modes.zip", "-rwx", "executable");
+		assertContainsEntryWithMode("zip-with-modes.zip", "l", "symlink");
+	}
+
