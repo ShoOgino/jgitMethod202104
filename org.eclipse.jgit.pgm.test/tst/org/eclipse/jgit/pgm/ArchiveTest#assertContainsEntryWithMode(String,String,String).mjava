@@ -1,30 +1,5 @@
 	private void assertContainsEntryWithMode(String zipFilename, String mode, String name) //
 			throws Exception {
-		final File cwd = db.getWorkTree();
-		final ProcessBuilder procBuilder = new ProcessBuilder("zipinfo", zipFilename) //
-				.directory(cwd) //
-				.redirectErrorStream(true);
-		Process proc = null;
-		try {
-			proc = procBuilder.start();
-		} catch (IOException e) {
-			// On machines without a "zipinfo" command, let the test pass.
-			assumeNoException(e);
-		}
-
-		proc.getOutputStream().close();
-		final BufferedReader reader = new BufferedReader( //
-				new InputStreamReader(proc.getInputStream(), "UTF-8"));
-		try {
-			String line;
-			while ((line = reader.readLine()) != null)
-				if (line.startsWith(mode) && line.endsWith(name))
-					// found it!
-					return;
-			fail("expected entry " + name + " with mode " + mode + " but found none");
-		} finally {
-			proc.getOutputStream().close();
-			proc.destroy();
-		}
+		grepForEntry(name, mode, "zipinfo", zipFilename);
 	}
 

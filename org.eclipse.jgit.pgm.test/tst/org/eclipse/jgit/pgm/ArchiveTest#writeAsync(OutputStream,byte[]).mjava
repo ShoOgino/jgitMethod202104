@@ -1,0 +1,15 @@
+	private static Future<Object> writeAsync(final OutputStream stream, final byte[] data) {
+		final ExecutorService executor = Executors.newSingleThreadExecutor();
+
+		return executor.submit(new Callable<Object>() { //
+			public Object call() throws IOException {
+				try {
+					stream.write(data);
+					return null;
+				} finally {
+					stream.close();
+				}
+			}
+		});
+	}
+
