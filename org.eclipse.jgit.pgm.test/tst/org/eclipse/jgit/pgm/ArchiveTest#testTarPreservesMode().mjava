@@ -1,0 +1,26 @@
+	@Test
+	public void testTarPreservesMode() throws Exception {
+		writeTrashFile("plain", "a file with content");
+		writeTrashFile("executable", "an executable file");
+		writeTrashFile("symlink", "plain");
+		git.add().addFilepattern("plain").call();
+		git.add().addFilepattern("executable").call();
+		git.add().addFilepattern("symlink").call();
+
+		DirCache cache = db.lockDirCache();
+		cache.getEntry("executable").setFileMode(FileMode.EXECUTABLE_FILE);
+		cache.getEntry("symlink").setFileMode(FileMode.SYMLINK);
+		cache.write();
+		cache.commit();
+		cache.unlock();
+
+		git.commit().setMessage("three files with different modes").call();
+
+		final byte[] archive = CLIGitCommand.rawExecute( //
+				"git archive --format=tar master", db);
+		writeRaw("with-modes.tar", archive);
+		assertTarContainsEntry("with-modes.tar", "-rw-r--r--", "plain");
+		assertTarContainsEntry("with-modes.tar", "-rwxr-xr-x", "executable");
+		assertTarContainsEntry("with-modes.tar", "l", "symlink -> plain");
+	}
+

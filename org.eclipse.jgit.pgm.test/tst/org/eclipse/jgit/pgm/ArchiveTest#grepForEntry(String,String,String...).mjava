@@ -1,0 +1,18 @@
+	private void grepForEntry(String name, String mode, String... cmdline) //
+			throws Exception {
+		final Process proc = spawnAssumingCommandPresent(cmdline);
+		proc.getOutputStream().close();
+		final BufferedReader reader = readFromProcess(proc);
+		try {
+			String line;
+			while ((line = reader.readLine()) != null)
+				if (line.startsWith(mode) && line.endsWith(name))
+					// found it!
+					return;
+			fail("expected entry " + name + " with mode " + mode + " but found none");
+		} finally {
+			proc.getOutputStream().close();
+			proc.destroy();
+		}
+	}
+
