@@ -1,0 +1,16 @@
+	@Test
+	public void testSetFastForwardMergeoptions() {
+		final Config c = new Config();
+		c.setEnum("branch", "side", "mergeoptions",
+				FastForwardMode.MergeOptions.valueOf(FastForwardMode.FF));
+		assertEquals("[branch \"side\"]\n\tmergeoptions = --ff\n", c.toText());
+		c.setEnum("branch", "side", "mergeoptions",
+				FastForwardMode.MergeOptions.valueOf(FastForwardMode.FF_ONLY));
+		assertEquals("[branch \"side\"]\n\tmergeoptions = --ff-only\n",
+				c.toText());
+		c.setEnum("branch", "side", "mergeoptions",
+				FastForwardMode.MergeOptions.valueOf(FastForwardMode.NO_FF));
+		assertEquals("[branch \"side\"]\n\tmergeoptions = --no-ff\n",
+				c.toText());
+	}
+
