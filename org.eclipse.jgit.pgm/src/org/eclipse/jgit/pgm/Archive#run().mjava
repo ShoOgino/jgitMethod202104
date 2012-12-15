@@ -4,7 +4,7 @@
 		final ObjectReader reader = walk.getObjectReader();
 		final MutableObjectId idBuf = new MutableObjectId();
 		final Archiver fmt = formats.get(format);
-		final ArchiveOutputStream out = fmt.createArchiveOutputStream(outs);
+		final ArchiveOutputStream outa = fmt.createArchiveOutputStream(outs);
 
 		if (tree == null)
 			throw die(CLIText.get().treeIsRequired);
@@ -22,9 +22,9 @@
 				continue;
 
 			walk.getObjectId(idBuf, 0);
-			fmt.putEntry(name, mode, reader.open(idBuf), out);
+			fmt.putEntry(name, mode, reader.open(idBuf), outa);
 		}
 
-		out.close();
+		outa.close();
 	}
 
