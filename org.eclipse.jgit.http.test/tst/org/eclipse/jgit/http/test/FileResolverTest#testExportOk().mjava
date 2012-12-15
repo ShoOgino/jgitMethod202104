@@ -4,10 +4,13 @@
 		final String name = a.getDirectory().getName();
 		final File base = a.getDirectory().getParentFile();
 		final File export = new File(a.getDirectory(), "git-daemon-export-ok");
-		FileResolver resolver;
+		FileResolver<RepositoryResolver> resolver;
 
 		assertFalse("no git-daemon-export-ok", export.exists());
-		resolver = new FileResolver(base, false /* require flag */);
+		resolver = new FileResolver<RepositoryResolver>(base, false /*
+																	 * require
+																	 * flag
+																	 */);
 		try {
 			resolver.open(null, name);
 			fail("opened non-exported repository");
@@ -15,7 +18,10 @@
 			assertEquals("Service not enabled", e.getMessage());
 		}
 
-		resolver = new FileResolver(base, true /* export all */);
+		resolver = new FileResolver<RepositoryResolver>(base, true /*
+																	 * export
+																	 * all
+																	 */);
 		try {
 			resolver.open(null, name).close();
 		} catch (ServiceNotEnabledException e) {
@@ -23,7 +29,10 @@
 		}
 
 		FileUtils.createNewFile(export);
-		resolver = new FileResolver(base, false /* require flag */);
+		resolver = new FileResolver<RepositoryResolver>(base, false /*
+																	 * require
+																	 * flag
+																	 */);
 		try {
 			resolver.open(null, name).close();
 		} catch (ServiceNotEnabledException e) {
