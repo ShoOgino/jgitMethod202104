@@ -1,0 +1,12 @@
+	@Test
+	public void testConcurrentInsertionOfBlobsToTheSameNewFanOutDirectory()
+			throws Exception {
+		ExecutorService e = Executors.newCachedThreadPool();
+		for (int i=0; i < 100; ++i) {
+			ObjectDirectory db = createBareRepository().getObjectDatabase();
+			for (Future f : e.invokeAll(blobInsertersForTheSameFanOutDir(db))) {
+				f.get();
+			}
+		}
+	}
+

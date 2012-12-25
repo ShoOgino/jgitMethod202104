@@ -1,0 +1,10 @@
+	private Collection<Callable<ObjectId>> blobInsertersForTheSameFanOutDir(
+			final ObjectDirectory db) {
+		Callable<ObjectId> callable = new Callable<ObjectId>() {
+			public ObjectId call() throws Exception {
+				return db.newInserter().insert(Constants.OBJ_BLOB, new byte[0]);
+			}
+		};
+		return Collections.nCopies(4, callable);
+	}
+
