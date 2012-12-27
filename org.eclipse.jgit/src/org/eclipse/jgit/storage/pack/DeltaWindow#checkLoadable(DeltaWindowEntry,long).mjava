@@ -1,0 +1,12 @@
+	private void checkLoadable(DeltaWindowEntry ent, long need) {
+		int tail = next(resSlot);
+		while (maxMemory < loaded + need) {
+			DeltaWindowEntry cur = window[tail];
+			clear(cur);
+			if (cur == ent)
+				throw new LargeObjectException.ExceedsLimit(
+						maxMemory, loaded + need);
+			tail = next(tail);
+		}
+	}
+
