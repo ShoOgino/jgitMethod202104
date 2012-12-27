@@ -1,5 +1,8 @@
 	@Override
 	public boolean include(final TreeWalk walker) {
-		return walker.isPathPrefix(pathRaw, pathRaw.length) == 0;
+		int cmp = walker.isPathPrefix(pathRaw, pathRaw.length);
+		if (cmp > 0)
+			throw StopWalkException.INSTANCE;
+		return cmp == 0;
 	}
 
