@@ -11,18 +11,15 @@
 	 * @return the item's index in <code>only</code>; -1 if no item matches
 	 */
 	private int lookupOnly(String pathString) {
-		int i = 0;
-		for (String o : only) {
-			String p = pathString;
-			while (true) {
-				if (p.equals(o))
-					return i;
-				int l = p.lastIndexOf("/"); //$NON-NLS-1$
-				if (l < 1)
-					break;
-				p = p.substring(0, l);
-			}
-			i++;
+		String p = pathString;
+		while (true) {
+			int position = Collections.binarySearch(only, p);
+			if (position >= 0)
+				return position;
+			int l = p.lastIndexOf("/"); //$NON-NLS-1$
+			if (l < 1)
+				break;
+			p = p.substring(0, l);
 		}
 		return -1;
 	}
