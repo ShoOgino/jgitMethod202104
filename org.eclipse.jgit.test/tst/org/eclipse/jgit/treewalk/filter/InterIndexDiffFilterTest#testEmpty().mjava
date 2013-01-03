@@ -1,0 +1,10 @@
+	@Test
+	public void testEmpty() throws IOException {
+		DirCache dc1 = DirCache.newInCore();
+		DirCache dc2 = DirCache.newInCore();
+		TreeWalk tw = new TreeWalk(db);
+		tw.addTree(new DirCacheIterator(dc1));
+		tw.addTree(new DirCacheIterator(dc2));
+		assertFalse(tw.next());
+	}
+

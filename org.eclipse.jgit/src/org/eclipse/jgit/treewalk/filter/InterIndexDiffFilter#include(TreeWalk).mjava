@@ -1,0 +1,28 @@
+	@Override
+	public boolean include(final TreeWalk walker) {
+		final int n = walker.getTreeCount();
+		if (n == 1) // Assume they meant difference to empty tree.
+			return true;
+
+		final int m = walker.getRawMode(baseTree);
+		for (int i = 1; i < n; i++) {
+			DirCacheIterator baseDirCache = walker.getTree(baseTree,
+					DirCacheIterator.class);
+			DirCacheIterator newDirCache = walker.getTree(i,
+					DirCacheIterator.class);
+			if (baseDirCache != null && newDirCache != null) {
+				DirCacheEntry baseDci = baseDirCache.getDirCacheEntry();
+				DirCacheEntry newDci = newDirCache.getDirCacheEntry();
+				if (baseDci != null && newDci != null) {
+					if (baseDci.isAssumeValid() != newDci.isAssumeValid())
+						return true;
+					if (baseDci.isAssumeValid()) // && newDci.isAssumeValid()
+						return false;
+				}
+			}
+			if (walker.getRawMode(i) != m || !walker.idEqual(i, baseTree))
+				return true;
+		}
+		return false;
+	}
+
