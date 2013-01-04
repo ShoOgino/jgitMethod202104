@@ -14,8 +14,9 @@
 			return false;
 
 		// Do not rely on filemode differences in case of symbolic links
-		if (FileMode.SYMLINK.equals(rawMode))
-			return false;
+		if (getOptions().getSymLinks() == SymLinks.FALSE)
+			if (FileMode.SYMLINK.equals(rawMode))
+				return false;
 
 		// Ignore the executable file bits if WorkingTreeOptions tell me to
 		// do so. Ignoring is done by setting the bits representing a

@@ -23,14 +23,10 @@
 			}
 		}
 		switch (mode & FileMode.TYPE_MASK) {
+		case FileMode.TYPE_SYMLINK:
 		case FileMode.TYPE_FILE:
 			contentIdFromPtr = ptr;
 			return contentId = idBufferBlob(entries[ptr]);
-		case FileMode.TYPE_SYMLINK:
-			// Java does not support symbolic links, so we should not
-			// have reached this particular part of the walk code.
-			//
-			return zeroid;
 		case FileMode.TYPE_GITLINK:
 			contentIdFromPtr = ptr;
 			return contentId = idSubmodule(entries[ptr]);

@@ -25,35 +25,45 @@
 		ObjectLoader ol = or.open(entry.getObjectId());
 		File parentDir = f.getParentFile();
 		parentDir.mkdirs();
-		File tmpFile = File.createTempFile("._" + f.getName(), null, parentDir); //$NON-NLS-1$
-		WorkingTreeOptions opt = repo.getConfig().get(WorkingTreeOptions.KEY);
-		FileOutputStream rawChannel = new FileOutputStream(tmpFile);
-		OutputStream channel;
-		if (opt.getAutoCRLF() == AutoCRLF.TRUE)
-			channel = new AutoCRLFOutputStream(rawChannel);
-		else
-			channel = rawChannel;
-		try {
-			ol.copyTo(channel);
-		} finally {
-			channel.close();
-		}
 		FS fs = repo.getFS();
-		if (opt.isFileMode() && fs.supportsExecute()) {
-			if (FileMode.EXECUTABLE_FILE.equals(entry.getRawMode())) {
-				if (!fs.canExecute(tmpFile))
-					fs.setExecute(tmpFile, true);
-			} else {
-				if (fs.canExecute(tmpFile))
-					fs.setExecute(tmpFile, false);
+		WorkingTreeOptions opt = repo.getConfig().get(WorkingTreeOptions.KEY);
+		if (entry.getFileMode() == FileMode.SYMLINK
+				&& opt.getSymLinks() == SymLinks.TRUE) {
+			byte[] bytes = ol.getBytes();
+			String target = RawParseUtils.decode(bytes);
+			fs.createSymLink(f, target);
+			entry.setLength(bytes.length);
+			entry.setLastModified(fs.lastModified(f));
+		} else {
+			File tmpFile = File.createTempFile(
+					"._" + f.getName(), null, parentDir); //$NON-NLS-1$
+			FileOutputStream rawChannel = new FileOutputStream(tmpFile);
+			OutputStream channel;
+			if (opt.getAutoCRLF() == AutoCRLF.TRUE)
+				channel = new AutoCRLFOutputStream(rawChannel);
+			else
+				channel = rawChannel;
+			try {
+				ol.copyTo(channel);
+			} finally {
+				channel.close();
 			}
-		}
-		try {
-			FileUtils.rename(tmpFile, f);
-		} catch (IOException e) {
-			throw new IOException(MessageFormat.format(
-					JGitText.get().couldNotWriteFile, tmpFile.getPath(),
-					f.getPath()));
+			if (opt.isFileMode() && fs.supportsExecute()) {
+				if (FileMode.EXECUTABLE_FILE.equals(entry.getRawMode())) {
+					if (!fs.canExecute(tmpFile))
+						fs.setExecute(tmpFile, true);
+				} else {
+					if (fs.canExecute(tmpFile))
+						fs.setExecute(tmpFile, false);
+				}
+			}
+			try {
+				FileUtils.rename(tmpFile, f);
+			} catch (IOException e) {
+				throw new IOException(MessageFormat.format(
+						JGitText.get().couldNotWriteFile, tmpFile.getPath(),
+						f.getPath()));
+			}
 		}
 		entry.setLastModified(f.lastModified());
 		if (opt.getAutoCRLF() != AutoCRLF.FALSE)

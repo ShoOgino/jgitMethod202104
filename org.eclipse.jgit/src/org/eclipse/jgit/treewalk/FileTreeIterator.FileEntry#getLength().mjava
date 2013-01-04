@@ -1,7 +1,12 @@
 		@Override
 		public long getLength() {
-			if (length < 0)
-				length = file.length();
+			if (length < 0) {
+				try {
+					length = fs.length(file);
+				} catch (IOException e) {
+					length = 0;
+				}
+			}
 			return length;
 		}
 

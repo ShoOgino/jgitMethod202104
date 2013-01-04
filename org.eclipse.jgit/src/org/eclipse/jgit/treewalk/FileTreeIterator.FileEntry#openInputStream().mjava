@@ -1,5 +1,9 @@
 		@Override
 		public InputStream openInputStream() throws IOException {
-			return new FileInputStream(file);
+			if (fs.isSymLink(file))
+				return new ByteArrayInputStream(fs.readSymLink(file).getBytes(
+						Constants.CHARACTER_ENCODING));
+			else
+				return new FileInputStream(file);
 		}
 
