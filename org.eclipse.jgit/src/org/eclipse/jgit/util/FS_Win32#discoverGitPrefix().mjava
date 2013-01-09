@@ -3,7 +3,7 @@
 		String path = SystemReader.getInstance().getenv("PATH"); //$NON-NLS-1$
 		File gitExe = searchPath(path, "git.exe", "git.cmd"); //$NON-NLS-1$ //$NON-NLS-2$
 		if (gitExe != null)
-			return gitExe.getParentFile().getParentFile();
+			return resolveGrandparentFile(gitExe);
 
 		// This isn't likely to work, if bash is in $PATH, git should
 		// also be in $PATH. But its worth trying.
@@ -15,7 +15,7 @@
 			// The path may be in cygwin/msys notation so resolve it right away
 			gitExe = resolve(null, w);
 			if (gitExe != null)
-				return gitExe.getParentFile().getParentFile();
+				return resolveGrandparentFile(gitExe);
 		}
 		return null;
 	}
