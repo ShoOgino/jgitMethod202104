@@ -1,0 +1,23 @@
+	/**
+	 * Find the index in the String {@code} message} where the Change-Id entry
+	 * begins
+	 *
+	 * @param message
+	 * @param delimiter
+	 *            the line delimiter, like "\n" or "\r\n", needed to find the
+	 *            footer
+	 * @return the index of the ChangeId footer in the message, or -1 if no
+	 *         ChangeId footer available
+	 */
+	public static int indexOfChangeId(String message, String delimiter) {
+		String[] lines = message.split(delimiter);
+		int footerFirstLine = indexOfFirstFooterLine(lines);
+		if (footerFirstLine == lines.length)
+			return -1;
+
+		int indexOfFooter = 0;
+		for (int i = 0; i < footerFirstLine; ++i)
+			indexOfFooter += lines[i].length() + delimiter.length();
+		return message.indexOf(CHANGE_ID, indexOfFooter);
+	}
+

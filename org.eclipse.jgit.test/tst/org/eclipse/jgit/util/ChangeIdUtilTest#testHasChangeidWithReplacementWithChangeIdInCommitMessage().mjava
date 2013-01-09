@@ -1,0 +1,15 @@
+	@Test
+	public void testHasChangeidWithReplacementWithChangeIdInCommitMessage()
+			throws Exception {
+		assertEquals(
+				"has changeid\nmore text\n"
+						+ "Change-Id: I0123456789012345678901234567890123456789\n\n"
+						+ "Bug: 33\nSigned-off-by: me@you.too\n"
+						+ "Change-Id: Ie48d10d59ef67995ca89688ac0171b88f10dd520\n",
+				call("has changeid\nmore text\n"
+						+ "Change-Id: I0123456789012345678901234567890123456789\n\n"
+						+ "Bug: 33\nSigned-off-by: me@you.too\n"
+						+ "Change-Id: I0123456789012345678901234567890123456789\n",
+						true));
+	}
+
