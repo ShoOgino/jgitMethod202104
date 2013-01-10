@@ -1,9 +1,9 @@
 	/**
 	 * Initialize a description by pack name and repository.
 	 * <p>
-	 * The corresponding index file is assumed to exist and end with ".idx"
-	 * instead of ".pack". If this is not true implementors must extend the
-	 * class and override {@link #getIndexName()}.
+	 * The corresponding index file is assumed to exist. If this is not true
+	 * implementors must extend the class and override
+	 * {@link #getFileName(String)}.
 	 * <p>
 	 * Callers should also try to fill in other fields if they are reasonably
 	 * free to access at the time this instance is being initialized.
@@ -15,6 +15,7 @@
 	 */
 	public DfsPackDescription(DfsRepositoryDescription repoDesc, String name) {
 		this.repoDesc = repoDesc;
-		this.packName = name;
+		int dot = name.lastIndexOf('.');
+		this.packName = (dot < 0) ? name : name.substring(0, dot);
 	}
 
