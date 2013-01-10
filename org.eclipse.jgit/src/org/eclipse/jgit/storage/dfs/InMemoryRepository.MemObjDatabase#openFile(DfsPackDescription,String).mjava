@@ -1,0 +1,10 @@
+		@Override
+		protected ReadableChannel openFile(DfsPackDescription desc, String ext)
+				throws FileNotFoundException, IOException {
+			MemPack memPack = (MemPack) desc;
+			byte[] file = memPack.fileMap.get(ext);
+			if (file == null)
+				throw new FileNotFoundException(desc.getFileName(ext));
+			return new ByteArrayReadableChannel(file);
+		}
+
