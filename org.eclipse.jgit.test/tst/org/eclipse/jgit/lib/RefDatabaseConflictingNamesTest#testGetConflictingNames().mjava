@@ -1,0 +1,19 @@
+	@Test
+	public void testGetConflictingNames() throws IOException {
+		// new references cannot replace an existing container
+		assertConflictingNames("refs", "refs/heads/a/b", "refs/heads/q");
+		assertConflictingNames("refs/heads", "refs/heads/a/b", "refs/heads/q");
+		assertConflictingNames("refs/heads/a", "refs/heads/a/b");
+
+		// existing reference is not conflicting
+		assertNoConflictingNames("refs/heads/a/b");
+
+		// new references are not conflicting
+		assertNoConflictingNames("refs/heads/a/d");
+		assertNoConflictingNames("refs/heads/master");
+
+		// existing reference must not be used as a container
+		assertConflictingNames("refs/heads/a/b/c", "refs/heads/a/b");
+		assertConflictingNames("refs/heads/q/master", "refs/heads/q");
+	}
+
