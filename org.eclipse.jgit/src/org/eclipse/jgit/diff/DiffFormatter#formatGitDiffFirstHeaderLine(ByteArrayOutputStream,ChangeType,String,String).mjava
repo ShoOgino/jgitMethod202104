@@ -1,0 +1,25 @@
+	/**
+	 * Output the first header line
+	 *
+	 * @param o
+	 *            The stream the formatter will write the first header line to
+	 * @param type
+	 *            The {@link ChangeType}
+	 * @param oldPath
+	 *            old path to the file
+	 * @param newPath
+	 *            new path to the file
+	 * @throws IOException
+	 *             the stream threw an exception while writing to it.
+	 */
+	protected void formatGitDiffFirstHeaderLine(ByteArrayOutputStream o,
+			final ChangeType type, final String oldPath, final String newPath)
+			throws IOException {
+		o.write(encodeASCII("diff --git ")); //$NON-NLS-1$
+		o.write(encode(quotePath(oldPrefix + (type == ADD ? newPath : oldPath))));
+		o.write(' ');
+		o.write(encode(quotePath(newPrefix
+				+ (type == DELETE ? oldPath : newPath))));
+		o.write('\n');
+	}
+
