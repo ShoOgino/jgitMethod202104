@@ -22,6 +22,13 @@
 		if (value == null)
 			return defaultValue;
 
+		if (all[0] instanceof ConfigEnum) {
+			for (T t : all) {
+				if (((ConfigEnum) t).matchConfigValue(value))
+					return t;
+			}
+		}
+
 		String n = value.replace(' ', '_');
 
 		// Because of c98abc9c0586c73ef7df4172644b7dd21c979e9d being used in
