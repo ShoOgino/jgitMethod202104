@@ -22,7 +22,7 @@
 
 			PackIndex idx;
 			try {
-				ReadableChannel rc = ctx.db.openFile(packDesc, PACK_INDEX_EXT);
+				ReadableChannel rc = ctx.db.openFile(packDesc, INDEX);
 				try {
 					InputStream in = Channels.newInputStream(rc);
 					int wantSize = 8192;
@@ -40,14 +40,14 @@
 				invalid = true;
 				IOException e2 = new IOException(MessageFormat.format(
 						DfsText.get().shortReadOfIndex,
-						packDesc.getFileName(PACK_INDEX_EXT)));
+						packDesc.getFileName(INDEX)));
 				e2.initCause(e);
 				throw e2;
 			} catch (IOException e) {
 				invalid = true;
 				IOException e2 = new IOException(MessageFormat.format(
 						DfsText.get().cannotReadIndex,
-						packDesc.getFileName(PACK_INDEX_EXT)));
+						packDesc.getFileName(INDEX)));
 				e2.initCause(e);
 				throw e2;
 			}

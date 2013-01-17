@@ -1,11 +1,11 @@
 	private void writePack(DfsObjDatabase objdb, DfsPackDescription pack,
 			PackWriter pw, ProgressMonitor pm) throws IOException {
-		DfsOutputStream out = objdb.writeFile(pack, PACK_EXT);
+		DfsOutputStream out = objdb.writeFile(pack, PACK);
 		try {
 			CountingOutputStream cnt = new CountingOutputStream(out);
 			pw.writePack(pm, pm, cnt);
 			pack.setObjectCount(pw.getObjectCount());
-			pack.setFileSize(PACK_EXT, cnt.getCount());
+			pack.setFileSize(PACK, cnt.getCount());
 		} finally {
 			out.close();
 		}
