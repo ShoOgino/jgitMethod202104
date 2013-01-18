@@ -20,7 +20,11 @@
 	 */
 	public <T extends Enum<?>> void setEnum(final String section,
 			final String subsection, final String name, final T value) {
-		String n = value.name().toLowerCase().replace('_', ' ');
+		String n;
+		if (value instanceof ConfigEnum)
+			n = ((ConfigEnum) value).toConfigValue();
+		else
+			n = value.name().toLowerCase().replace('_', ' ');
 		setString(section, subsection, name, n);
 	}
 
