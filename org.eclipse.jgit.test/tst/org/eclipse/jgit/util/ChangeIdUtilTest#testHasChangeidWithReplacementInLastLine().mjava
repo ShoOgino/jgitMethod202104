@@ -1,0 +1,10 @@
+	@Test
+	public void testHasChangeidWithReplacementInLastLine() throws Exception {
+		assertEquals(
+				"has changeid\nmore text\n\nBug: 33\nSigned-off-by: me@you.too\n"
+						+ "Change-Id: I1d6578f4c96e3db4dd707705fe3d17bf658c4758\n",
+				call("has changeid\nmore text\n\nBug: 33\nSigned-off-by: me@you.too\n"
+						+ "Change-Id: I0123456789012345678901234567890123456789\n",
+						true));
+	}
+

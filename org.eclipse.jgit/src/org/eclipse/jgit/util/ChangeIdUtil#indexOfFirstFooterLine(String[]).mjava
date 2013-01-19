@@ -1,0 +1,30 @@
+	/**
+	 * Find the index of the first line of the footer paragraph in an array of
+	 * the lines, or lines.length if no footer is available
+	 *
+	 * @param lines
+	 *            the commit message split into lines and the line delimiters
+	 *            stripped off
+	 * @return the index of the first line of the footer paragraph, or
+	 *         lines.length if no footer is available
+	 */
+	public static int indexOfFirstFooterLine(String[] lines) {
+		int footerFirstLine = lines.length;
+		for (int i = lines.length - 1; i > 1; --i) {
+			if (footerPattern.matcher(lines[i]).matches()) {
+				footerFirstLine = i;
+				continue;
+			}
+			if (footerFirstLine != lines.length && lines[i].length() == 0)
+				break;
+			if (footerFirstLine != lines.length
+					&& includeInFooterPattern.matcher(lines[i]).matches()) {
+				footerFirstLine = i + 1;
+				continue;
+			}
+			footerFirstLine = lines.length;
+			break;
+		}
+		return footerFirstLine;
+	}
+

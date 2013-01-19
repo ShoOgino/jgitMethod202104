@@ -1,0 +1,10 @@
+	@Test
+	public void testHasChangeidWithSpacesBeforeId() throws Exception {
+		assertEquals(
+				"has changeid\nmore text\n\nBug: 33\nSigned-off-by: me@you.too\n"
+						+ "Change-Id: Ie7575eaf450fdd0002df2e642426faf251de3ad9\n",
+				call("has changeid\nmore text\n\nBug: 33\nSigned-off-by: me@you.too\n"
+						+ "Change-Id:    I0123456789012345678901234567890123456789\n",
+						true));
+	}
+

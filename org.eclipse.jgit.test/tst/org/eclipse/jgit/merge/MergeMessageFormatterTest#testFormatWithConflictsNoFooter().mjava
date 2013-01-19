@@ -1,0 +1,9 @@
+	@Test
+	public void testFormatWithConflictsNoFooter() {
+		String originalMessage = "Header Line\n\nCommit body\n";
+		String message = formatter.formatWithConflicts(originalMessage,
+				Arrays.asList(new String[] { "path1" }));
+		assertEquals("Header Line\n\nCommit body\n\nConflicts:\n\tpath1\n",
+				message);
+	}
+
