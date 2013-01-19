@@ -35,10 +35,10 @@
 				tagTargets.add(ref.getPeeledObjectId());
 		}
 
-		List<PackIndex> excluded = new LinkedList<PackIndex>();
-		for (PackFile f : repo.getObjectDatabase().getPacks())
+		List<ObjectIdSet> excluded = new LinkedList<ObjectIdSet>();
+		for (final PackFile f : repo.getObjectDatabase().getPacks())
 			if (f.shouldBeKept())
-				excluded.add(f.getIndex());
+				excluded.add(objectIdSet(f.getIndex()));
 
 		tagTargets.addAll(allHeads);
 		nonHeads.addAll(indexObjects);
@@ -50,7 +50,7 @@
 					tagTargets, excluded);
 			if (heads != null) {
 				ret.add(heads);
-				excluded.add(0, heads.getIndex());
+				excluded.add(0, objectIdSet(heads.getIndex()));
 			}
 		}
 		if (!nonHeads.isEmpty()) {

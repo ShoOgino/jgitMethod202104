@@ -1,10 +1,10 @@
 	private static PackIndex writePack(FileRepository repo,
-			Set<? extends ObjectId> want, Set<PackIndex> excludeObjects)
+			Set<? extends ObjectId> want, Set<ObjectIdSet> excludeObjects)
 			throws IOException {
 		PackWriter pw = new PackWriter(repo);
 		pw.setDeltaBaseAsOffset(true);
 		pw.setReuseDeltaCommits(false);
-		for (PackIndex idx : excludeObjects)
+		for (ObjectIdSet idx : excludeObjects)
 			pw.excludeObjects(idx);
 		pw.preparePack(NullProgressMonitor.INSTANCE, want,
 				Collections.<ObjectId> emptySet());

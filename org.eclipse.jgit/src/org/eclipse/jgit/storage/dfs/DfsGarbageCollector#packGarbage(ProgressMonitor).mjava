@@ -3,10 +3,6 @@
 			return;
 
 		// TODO(sop) This is ugly. The garbage pack needs to be deleted.
-		List<PackIndex> newIdx = new ArrayList<PackIndex>(newPackList.size());
-		for (DfsPackFile pack : newPackList)
-			newIdx.add(pack.getPackIndex(ctx));
-
 		PackWriter pw = newPackWriter();
 		try {
 			RevWalk pool = new RevWalk(ctx);
@@ -16,7 +12,7 @@
 				for (PackIndex.MutableEntry ent : oldIdx) {
 					pm.update(1);
 					ObjectId id = ent.toObjectId();
-					if (pool.lookupOrNull(id) != null || anyIndexHas(newIdx, id))
+					if (pool.lookupOrNull(id) != null || anyPackHas(id))
 						continue;
 
 					int type = oldPack.getObjectType(ctx, ent.getOffset());

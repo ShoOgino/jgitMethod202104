@@ -4,13 +4,13 @@
 	 * @param idx
 	 *            objects in this index will not be in the output pack.
 	 */
-	public void excludeObjects(PackIndex idx) {
+	public void excludeObjects(ObjectIdSet idx) {
 		if (excludeInPacks == null) {
-			excludeInPacks = new PackIndex[] { idx };
+			excludeInPacks = new ObjectIdSet[] { idx };
 			excludeInPackLast = idx;
 		} else {
 			int cnt = excludeInPacks.length;
-			PackIndex[] newList = new PackIndex[cnt + 1];
+			ObjectIdSet[] newList = new ObjectIdSet[cnt + 1];
 			System.arraycopy(excludeInPacks, 0, newList, 0, cnt);
 			newList[cnt] = idx;
 			excludeInPacks = newList;
