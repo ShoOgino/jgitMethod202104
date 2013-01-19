@@ -4,8 +4,8 @@
 
 		PackWriter pw = newPackWriter();
 		try {
-			for (DfsPackFile pack : newPackList)
-				pw.excludeObjects(pack.getPackIndex(ctx));
+			for (PackWriter.ObjectIdSet packedObjs : newPackObj)
+				pw.excludeObjects(packedObjs);
 			pw.preparePack(pm, nonHeads, allHeads);
 			if (0 < pw.getObjectCount())
 				writePack(GC, pw, pm);

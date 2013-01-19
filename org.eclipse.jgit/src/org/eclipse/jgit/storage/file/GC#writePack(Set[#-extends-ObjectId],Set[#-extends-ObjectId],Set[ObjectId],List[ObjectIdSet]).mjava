@@ -1,6 +1,6 @@
 	private PackFile writePack(Set<? extends ObjectId> want,
 			Set<? extends ObjectId> have, Set<ObjectId> tagTargets,
-			List<PackIndex> excludeObjects) throws IOException {
+			List<ObjectIdSet> excludeObjects) throws IOException {
 		File tmpPack = null;
 		File tmpIdx = null;
 		PackWriter pw = new PackWriter(repo);
@@ -11,7 +11,7 @@
 			if (tagTargets != null)
 				pw.setTagTargets(tagTargets);
 			if (excludeObjects != null)
-				for (PackIndex idx : excludeObjects)
+				for (ObjectIdSet idx : excludeObjects)
 					pw.excludeObjects(idx);
 			pw.preparePack(pm, want, have);
 			if (pw.getObjectCount() == 0)
