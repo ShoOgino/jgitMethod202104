@@ -19,14 +19,13 @@
 		File theFile = writeTrashFile(FILE1, "dirty the file");
 
 		// and attempt to rebase
-		try {
-			RebaseResult rebaseResult = git.rebase()
+		RebaseResult rebaseResult = git.rebase()
 					.setUpstream("refs/heads/master").call();
-			fail("Checkout with conflict should have occured, not "
-					+ rebaseResult.getStatus());
-		} catch (JGitInternalException e) {
-			checkFile(theFile, "dirty the file");
-		}
+		assertEquals(Status.CONFLICTS, rebaseResult.getStatus());
+		assertEquals(1, rebaseResult.getConflicts().size());
+		assertEquals(FILE1, rebaseResult.getConflicts().get(0));
+
+		checkFile(theFile, "dirty the file");
 
 		assertEquals(RepositoryState.SAFE, git.getRepository()
 				.getRepositoryState());

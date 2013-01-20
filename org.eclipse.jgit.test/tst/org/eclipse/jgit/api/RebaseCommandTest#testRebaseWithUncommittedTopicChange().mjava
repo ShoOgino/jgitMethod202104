@@ -1,5 +1,4 @@
 	@Test
-	@SuppressWarnings("null")
 	public void testRebaseWithUncommittedTopicChange() throws Exception {
 		// create file1, add and commit
 		writeTrashFile(FILE1, "file1");
@@ -25,16 +24,11 @@
 		git.add().addFilepattern("file2").call();
 		// do not commit
 
-		// rebase
-		JGitInternalException exception = null;
-		try {
-			git.rebase().setUpstream("refs/heads/master").call();
-		} catch (JGitInternalException e) {
-			exception = e;
-		}
-		assertNotNull(exception);
-		assertEquals("Checkout conflict with files: \nfile2",
-				exception.getMessage());
+		RebaseResult result = git.rebase().setUpstream("refs/heads/master")
+				.call();
+		assertEquals(Status.CONFLICTS, result.getStatus());
+		assertEquals(1, result.getConflicts().size());
+		assertEquals("file2", result.getConflicts().get(0));
 
 		checkFile(uncommittedFile, "uncommitted file2");
 		assertEquals(RepositoryState.SAFE, git.getRepository().getRepositoryState());
