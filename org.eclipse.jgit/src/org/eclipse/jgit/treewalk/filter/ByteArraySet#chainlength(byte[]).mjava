@@ -1,0 +1,18 @@
+	private int chainlength(byte[] b) {
+		Hasher h = new Hasher(b, b.length);
+		int hash = h.hash();
+		final int msk = mask;
+		int i = hash & msk;
+		final byte[][] tbl = table;
+		byte[] obj;
+
+		int n = 0;
+		while ((obj = tbl[i]) != null) {
+			if (equals(obj, b, b.length))
+				return n;
+			i = (i + 1) & msk;
+			++n;
+		}
+		return -1;
+	}
+

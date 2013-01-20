@@ -1,0 +1,9 @@
+	private void insert(final byte[] newValue, int hash) {
+		final int msk = mask;
+		int j = hash & msk;
+		final byte[][] tbl = table;
+		while (tbl[j] != null)
+			j = (j + 1) & msk;
+		tbl[j] = newValue;
+	}
+
