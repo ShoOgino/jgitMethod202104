@@ -20,10 +20,11 @@
 			out.close();
 		}
 
-		final List<ObjectId> packedObjs = pw.getObjectList();
+		final ObjectIdOwnerMap<ObjectIdOwnerMap.Entry> packedObjs = pw
+				.getObjectSet();
 		newPackObj.add(new PackWriter.ObjectIdSet() {
 			public boolean contains(AnyObjectId objectId) {
-				return 0 <= Collections.binarySearch(packedObjs, objectId);
+				return packedObjs.contains(objectId);
 			}
 		});
 
