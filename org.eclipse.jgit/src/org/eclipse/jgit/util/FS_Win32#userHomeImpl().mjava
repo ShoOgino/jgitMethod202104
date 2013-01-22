@@ -6,7 +6,8 @@
 		String homeDrive = SystemReader.getInstance().getenv("HOMEDRIVE"); //$NON-NLS-1$
 		if (homeDrive != null) {
 			String homePath = SystemReader.getInstance().getenv("HOMEPATH"); //$NON-NLS-1$
-			return new File(homeDrive, homePath);
+			if (homePath != null)
+				return new File(homeDrive, homePath);
 		}
 
 		String homeShare = SystemReader.getInstance().getenv("HOMESHARE"); //$NON-NLS-1$
