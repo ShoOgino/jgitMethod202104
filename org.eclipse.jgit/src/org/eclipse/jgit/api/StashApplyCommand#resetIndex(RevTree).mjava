@@ -1,0 +1,42 @@
+	private void resetIndex(RevTree tree) throws IOException {
+		DirCache dc = repo.lockDirCache();
+		TreeWalk walk = null;
+		try {
+			DirCacheBuilder builder = dc.builder();
+
+			walk = new TreeWalk(repo);
+			walk.addTree(tree);
+			walk.addTree(new DirCacheIterator(dc));
+			walk.setRecursive(true);
+
+			while (walk.next()) {
+				AbstractTreeIterator cIter = walk.getTree(0,
+						AbstractTreeIterator.class);
+				if (cIter == null) {
+					// Not in commit, don't add to new index
+					continue;
+				}
+
+				final DirCacheEntry entry = new DirCacheEntry(walk.getRawPath());
+				entry.setFileMode(cIter.getEntryFileMode());
+				entry.setObjectIdFromRaw(cIter.idBuffer(), cIter.idOffset());
+
+				DirCacheIterator dcIter = walk.getTree(1,
+						DirCacheIterator.class);
+				if (dcIter != null && dcIter.idEqual(cIter)) {
+					DirCacheEntry indexEntry = dcIter.getDirCacheEntry();
+					entry.setLastModified(indexEntry.getLastModified());
+					entry.setLength(indexEntry.getLength());
+				}
+
+				builder.add(entry);
+			}
+
+			builder.commit();
+		} finally {
+			dc.unlock();
+			if (walk != null)
+				walk.release();
+		}
+	}
+

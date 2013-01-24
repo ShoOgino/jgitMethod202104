@@ -1,0 +1,23 @@
+	@Test
+	public void workingDirectoryContentMerge() throws Exception {
+		writeTrashFile(PATH, "content\nmore content\n");
+		git.add().addFilepattern(PATH).call();
+		git.commit().setMessage("more content").call();
+
+		writeTrashFile(PATH, "content\nstashed change\nmore content\n");
+
+		RevCommit stashed = git.stashCreate().call();
+		assertNotNull(stashed);
+		assertEquals("content\nmore content\n", read(committedFile));
+		assertTrue(git.status().call().isClean());
+
+		writeTrashFile(PATH, "content\nmore content\ncommitted change\n");
+		git.add().addFilepattern(PATH).call();
+		git.commit().setMessage("committed change").call();
+
+		git.stashApply().call();
+		assertEquals(
+				"content\nstashed change\nmore content\ncommitted change\n",
+				read(committedFile));
+	}
+

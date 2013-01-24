@@ -1,12 +1,16 @@
 	/**
 	 * Apply the changes in a stashed commit to the working directory and index
 	 *
-	 * @return id of stashed commit that was applied
+	 * @return id of stashed commit that was applied TODO: Does anyone depend on
+	 *         this, or could we make it more like Merge/CherryPick/Revert?
 	 * @throws GitAPIException
 	 * @throws WrongRepositoryStateException
+	 * @throws NoHeadException
+	 * @throws StashApplyFailureException
 	 */
 	public ObjectId call() throws GitAPIException,
-			WrongRepositoryStateException {
+			WrongRepositoryStateException, NoHeadException,
+			StashApplyFailureException {
 		checkCallable();
 
 		if (repo.getRepositoryState() != RepositoryState.SAFE)
@@ -14,66 +18,58 @@
 					JGitText.get().stashApplyOnUnsafeRepository,
 					repo.getRepositoryState()));
 
-		final ObjectId headTree = getHeadTree();
-		final ObjectId stashId = getStashId();
-
 		ObjectReader reader = repo.newObjectReader();
 		try {
 			RevWalk revWalk = new RevWalk(reader);
+
+			ObjectId headCommit = repo.resolve(Constants.HEAD);
+			if (headCommit == null)
+				throw new NoHeadException(JGitText.get().stashApplyWithoutHead);
+
+			final ObjectId stashId = getStashId();
 			RevCommit stashCommit = revWalk.parseCommit(stashId);
 			if (stashCommit.getParentCount() != 2)
 				throw new JGitInternalException(MessageFormat.format(
 						JGitText.get().stashCommitMissingTwoParents,
 						stashId.name()));
 
-			RevTree stashWorkingTree = stashCommit.getTree();
-			RevTree stashIndexTree = revWalk.parseCommit(
-					stashCommit.getParent(1)).getTree();
-			RevTree stashHeadTree = revWalk.parseCommit(
-					stashCommit.getParent(0)).getTree();
+			ObjectId headTree = repo.resolve(Constants.HEAD + "^{tree}");
+			ObjectId stashIndexCommit = revWalk.parseCommit(stashCommit
+					.getParent(1));
+			ObjectId stashHeadCommit = stashCommit.getParent(0);
 
-			CanonicalTreeParser stashWorkingIter = new CanonicalTreeParser();
-			stashWorkingIter.reset(reader, stashWorkingTree);
-			CanonicalTreeParser stashIndexIter = new CanonicalTreeParser();
-			stashIndexIter.reset(reader, stashIndexTree);
-			CanonicalTreeParser stashHeadIter = new CanonicalTreeParser();
-			stashHeadIter.reset(reader, stashHeadTree);
-			CanonicalTreeParser headIter = new CanonicalTreeParser();
-			headIter.reset(reader, headTree);
-
-			DirCache cache = repo.lockDirCache();
-			DirCacheEditor editor = cache.editor();
-			try {
-				DirCacheIterator indexIter = new DirCacheIterator(cache);
-				FileTreeIterator workingIter = new FileTreeIterator(repo);
-
-				TreeWalk treeWalk = new TreeWalk(reader);
-				treeWalk.setRecursive(true);
-				treeWalk.setFilter(new StashDiffFilter());
-
-				treeWalk.addTree(stashHeadIter);
-				treeWalk.addTree(stashIndexIter);
-				treeWalk.addTree(stashWorkingIter);
-				treeWalk.addTree(headIter);
-				treeWalk.addTree(indexIter);
-				treeWalk.addTree(workingIter);
-
-				scanForConflicts(treeWalk);
-
-				// Reset trees and walk
-				treeWalk.reset();
-				stashWorkingIter.reset(reader, stashWorkingTree);
-				stashIndexIter.reset(reader, stashIndexTree);
-				stashHeadIter.reset(reader, stashHeadTree);
-				treeWalk.addTree(stashHeadIter);
-				treeWalk.addTree(stashIndexIter);
-				treeWalk.addTree(stashWorkingIter);
-
-				applyChanges(treeWalk, cache, editor);
-			} finally {
-				editor.commit();
-				cache.unlock();
+			ResolveMerger merger = (ResolveMerger) MergeStrategy.RESOLVE
+					.newMerger(repo);
+			merger.setCommitNames(new String[] { "stashed HEAD", "HEAD",
+					"stash" });
+			merger.setBase(stashHeadCommit);
+			merger.setWorkingTreeIterator(new FileTreeIterator(repo));
+			if (merger.merge(headCommit, stashCommit)) {
+				DirCache dc = repo.lockDirCache();
+				DirCacheCheckout dco = new DirCacheCheckout(repo, headTree,
+						dc, merger.getResultTreeId());
+				dco.setFailOnConflict(true);
+				dco.checkout(); // Ignoring failed deletes....
+				if (applyIndex) {
+					ResolveMerger ixMerger = (ResolveMerger) MergeStrategy.RESOLVE
+							.newMerger(repo, true);
+					ixMerger.setCommitNames(new String[] { "stashed HEAD",
+							"HEAD", "stashed index" });
+					boolean ok = ixMerger.merge(headCommit, stashIndexCommit);
+					if (ok) {
+						resetIndex(revWalk
+								.parseTree(ixMerger.getResultTreeId()));
+					} else {
+						throw new StashApplyFailureException(
+								JGitText.get().stashApplyConflict);
+					}
+				}
+			} else {
+				throw new StashApplyFailureException(
+						JGitText.get().stashApplyConflict);
 			}
+			return stashId;
+
 		} catch (JGitInternalException e) {
 			throw e;
 		} catch (IOException e) {
@@ -81,6 +77,5 @@
 		} finally {
 			reader.release();
 		}
-		return stashId;
 	}
 

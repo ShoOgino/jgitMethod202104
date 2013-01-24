@@ -12,8 +12,8 @@
 		try {
 			git.stashApply().call();
 			fail("Exception not thrown");
-		} catch (JGitInternalException e) {
-			assertTrue(e.getCause() instanceof CheckoutConflictException);
-		}
+		} catch (StashApplyFailureException e) {
+ 		}
+		assertEquals("content3", read(PATH));
 	}
 
