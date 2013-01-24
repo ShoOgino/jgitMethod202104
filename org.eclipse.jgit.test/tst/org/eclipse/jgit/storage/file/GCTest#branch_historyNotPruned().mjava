@@ -3,6 +3,7 @@
 		RevCommit tip = commitChain(10);
 		tr.branch("b").update(tip);
 		gc.setExpireAgeMillis(0);
+		fsTick();
 		gc.prune(Collections.<ObjectId> emptySet());
 		do {
 			assertTrue(repo.hasObject(tip));

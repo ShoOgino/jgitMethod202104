@@ -2,6 +2,7 @@
 	public void nonReferencedExpiredObject_pruned() throws Exception {
 		RevBlob a = tr.blob("a");
 		gc.setExpireAgeMillis(0);
+		fsTick();
 		gc.prune(Collections.<ObjectId> emptySet());
 		assertFalse(repo.hasObject(a));
 	}

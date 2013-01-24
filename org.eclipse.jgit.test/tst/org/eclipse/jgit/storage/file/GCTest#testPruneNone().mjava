@@ -8,6 +8,7 @@
 		stats = gc.getStatistics();
 		assertEquals(8, stats.numberOfLooseObjects);
 		gc.setExpireAgeMillis(0);
+		fsTick();
 		gc.prune(Collections.<ObjectId> emptySet());
 		stats = gc.getStatistics();
 		assertEquals(8, stats.numberOfLooseObjects);
