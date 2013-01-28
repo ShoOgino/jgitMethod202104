@@ -10,9 +10,14 @@
 			if (indexName.length() != 49 || !indexName.endsWith(".idx")) //$NON-NLS-1$
 				continue;
 
-			final String base = indexName.substring(0, indexName.length() - 4);
-			final String packName = base + ".pack"; //$NON-NLS-1$
-			if (!names.contains(packName)) {
+			final String base = indexName.substring(0, indexName.length() - 3);
+			int extensions = 0;
+			for (PackExt ext : PackExt.values()) {
+				if (names.contains(base + ext.getExtension()))
+					extensions |= ext.getBit();
+			}
+
+			if ((extensions & PACK.getBit()) == 0) {
 				// Sometimes C Git's HTTP fetch transport leaves a
 				// .idx file behind and does not download the .pack.
 				// We have to skip over such useless indexes.
@@ -20,6 +25,7 @@
 				continue;
 			}
 
+			final String packName = base + PACK.getExtension();
 			final PackFile oldPack = forReuse.remove(packName);
 			if (oldPack != null) {
 				list.add(oldPack);
@@ -27,7 +33,7 @@
 			}
 
 			final File packFile = new File(packDirectory, packName);
-			list.add(new PackFile(packFile));
+			list.add(new PackFile(packFile, extensions));
 			foundNew = true;
 		}
 

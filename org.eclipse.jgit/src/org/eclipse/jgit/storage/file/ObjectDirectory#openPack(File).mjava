@@ -11,10 +11,23 @@
 	public PackFile openPack(final File pack)
 			throws IOException {
 		final String p = pack.getName();
-		if (p.length() != 50 || !p.startsWith("pack-") || !p.endsWith(".pack")) //$NON-NLS-1$
+		if (p.length() != 50 || !p.startsWith("pack-") || !p.endsWith(".pack")) //$NON-NLS-1$ //$NON-NLS-2$
 			throw new IOException(MessageFormat.format(JGitText.get().notAValidPack, pack));
 
-		PackFile res = new PackFile(pack);
+		// The pack and index are assumed to exist. The existence of other
+		// extensions needs to be explicitly checked.
+		//
+		int extensions = PACK.getBit() | INDEX.getBit();
+		final String base = p.substring(0, p.length() - 4);
+		for (PackExt ext : PackExt.values()) {
+			if ((extensions & ext.getBit()) == 0) {
+				final String name = base + ext.getExtension();
+				if (new File(pack.getParentFile(), name).exists())
+					extensions |= ext.getBit();
+			}
+		}
+
+		PackFile res = new PackFile(pack, extensions);
 		insertPack(res);
 		return res;
 	}
