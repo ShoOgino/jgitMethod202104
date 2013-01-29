@@ -1,0 +1,14 @@
+	private void grow() {
+		final byte[][] oldTable = table;
+		final int oldSize = table.length;
+
+		initTable(oldSize << 1);
+		for (int i = 0; i < oldSize; i++) {
+			final byte[] obj = oldTable[i];
+			if (obj != null) {
+				hasher.init(obj, obj.length);
+				insert(obj, hasher.hash());
+			}
+		}
+	}
+

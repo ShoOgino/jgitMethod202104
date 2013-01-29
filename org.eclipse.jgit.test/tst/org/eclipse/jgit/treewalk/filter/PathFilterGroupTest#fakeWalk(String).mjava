@@ -1,0 +1,19 @@
+	TreeWalk fakeWalk(final String path) throws IOException {
+		DirCache dc = DirCache.newInCore();
+		DirCacheEditor dce = dc.editor();
+		dce.add(new DirCacheEditor.PathEdit(path) {
+
+			public void apply(DirCacheEntry ent) {
+				ent.setFileMode(FileMode.REGULAR_FILE);
+			}
+		});
+		dce.finish();
+
+		TreeWalk ret = new TreeWalk((ObjectReader) null);
+		ret.reset();
+		ret.setRecursive(true);
+		ret.addTree(new DirCacheIterator(dc));
+		ret.next();
+		return ret;
+	}
+

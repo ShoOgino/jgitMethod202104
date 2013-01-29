@@ -1,0 +1,20 @@
+	public void test(int pathSize, int filterSize)
+			throws MissingObjectException, IncorrectObjectTypeException,
+			IOException {
+		setup(pathSize, filterSize, null);
+		data += pathSize + "\t" + filterSize + "\t";
+		long t1 = System.nanoTime();
+		TreeWalk tw = new TreeWalk((ObjectReader) null);
+		tw.reset();
+		tw.addTree(new DirCacheIterator(dc));
+		tw.setFilter(pf);
+		tw.setRecursive(true);
+		int n = 0;
+		while (tw.next())
+			n++;
+		long t2 = System.nanoTime();
+		data += (t2 - t1) / 1E9;
+		System.out.println(data);
+		assertEquals(filterSize, n);
+	}
+

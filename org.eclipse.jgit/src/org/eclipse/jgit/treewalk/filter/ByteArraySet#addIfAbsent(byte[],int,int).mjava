@@ -1,0 +1,43 @@
+	/**
+	 * Store a byte array for future lookup.
+	 * <p>
+	 * Stores {@code newValue}, but only if it does not already exist in the
+	 * set. Callers can tell if the value is new by checking the return value
+	 * with reference equality:
+	 *
+	 * <pre>
+	 * byte[] obj = ...;
+	 * boolean wasNew = map.addIfAbsent(array, length, hash) == array;
+	 * </pre>
+	 *
+	 * @param newValue
+	 *            the array to store.
+	 * @param length
+	 *            The number of bytes in newValue that are used
+	 * @param hash
+	 *            pre-computed hash of toFind
+	 * @return {@code newValue} if stored, or the prior value already stored and
+	 *         that would have been returned had the caller used
+	 *         {@code get(newValue)} first.
+	 */
+	byte[] addIfAbsent(final byte[] newValue, int length, int hash) {
+		final int msk = mask;
+		int i = hash & msk;
+		final byte[][] tbl = table;
+		byte[] obj;
+
+		while ((obj = tbl[i]) != null) {
+			if (equals(obj, newValue, length))
+				return obj;
+			i = (i + 1) & msk;
+		}
+
+		byte[] valueToInsert = copyIfNotSameSize(newValue, length);
+		if (++size == grow) {
+			grow();
+			insert(valueToInsert, hash);
+		} else
+			tbl[i] = valueToInsert;
+		return valueToInsert;
+	}
+
