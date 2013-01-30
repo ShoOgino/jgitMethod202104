@@ -22,15 +22,23 @@
 
 		// Git under windows only stores seconds so we round the timestamp
 		// Java gives us if it looks like the timestamp in index is seconds
-		// only. Otherwise we compare the timestamp at millisecond precision.
+		// only. Otherwise we compare the timestamp at millisecond precision,
+		// unless core.checkstat is set to "minimal", in which case we only
+		// compare the whole second part.
 		long cacheLastModified = entry.getLastModified();
 		long fileLastModified = getEntryLastModified();
-		if (cacheLastModified % 1000 == 0)
-			fileLastModified = fileLastModified - fileLastModified % 1000;
+		long lastModifiedMillis = fileLastModified % 1000;
+		long cacheMillis = cacheLastModified % 1000;
+		if (getOptions().getCheckStat() == CheckStat.MINIMAL) {
+			fileLastModified = fileLastModified - lastModifiedMillis;
+			cacheLastModified = cacheLastModified - cacheMillis;
+		} else if (cacheMillis == 0)
+			fileLastModified = fileLastModified - lastModifiedMillis;
 		// Some Java version on Linux return whole seconds only even when
 		// the file systems supports more precision.
-		else if (fileLastModified % 1000 == 0)
-			cacheLastModified = cacheLastModified - cacheLastModified % 1000;
+		else if (lastModifiedMillis == 0)
+			cacheLastModified = cacheLastModified - cacheMillis;
+
 		if (fileLastModified != cacheLastModified)
 			return MetadataDiff.DIFFER_BY_TIMESTAMP;
 		else if (!entry.isSmudged())
