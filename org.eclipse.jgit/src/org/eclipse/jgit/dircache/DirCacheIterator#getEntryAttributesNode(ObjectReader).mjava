@@ -1,0 +1,17 @@
+	/**
+	 * Retrieves the {@link AttributesNode} for the current entry.
+	 *
+	 * @param reader
+	 *            {@link ObjectReader} used to parse the .gitattributes entry.
+	 * @return {@link AttributesNode} for the current entry.
+	 * @throws IOException
+	 * @since 3.7
+	 */
+	public AttributesNode getEntryAttributesNode(ObjectReader reader)
+			throws IOException {
+		if (attributesNode instanceof LazyLoadingAttributesNode)
+			attributesNode = ((LazyLoadingAttributesNode) attributesNode)
+					.load(reader);
+		return attributesNode;
+	}
+

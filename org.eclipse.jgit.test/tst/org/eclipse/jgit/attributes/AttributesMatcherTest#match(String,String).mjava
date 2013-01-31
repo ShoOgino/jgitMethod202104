@@ -1,0 +1,17 @@
+	/**
+	 * Check for a match. If target ends with "/", match will assume that the
+	 * target is meant to be a directory.
+	 *
+	 * @param pattern
+	 *            Pattern as it would appear in a .gitattributes file
+	 * @param target
+	 *            Target file path relative to repository's GIT_DIR
+	 * @return Result of {@link AttributesRule#isMatch(String, boolean)}
+	 */
+	private static boolean match(String pattern, String target) {
+		AttributesRule r = new AttributesRule(pattern, "");
+		//If speed of this test is ever an issue, we can use a presetRule field
+		//to avoid recompiling a pattern each time.
+		return r.isMatch(target, target.endsWith("/"));
+	}
+

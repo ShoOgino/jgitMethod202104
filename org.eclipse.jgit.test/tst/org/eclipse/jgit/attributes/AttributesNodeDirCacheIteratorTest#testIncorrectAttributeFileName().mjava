@@ -1,0 +1,23 @@
+	@Test
+	public void testIncorrectAttributeFileName() throws Exception {
+		writeAttributesFile("levelA/file.gitattributes", "*.txt -delta");
+		writeAttributesFile("gitattributes", "*.txt eol=lf");
+
+		writeTrashFile("l0.txt", "");
+		writeTrashFile("levelA/lA.txt", "");
+
+		// Adds file to index
+		git.add().addFilepattern(".").call();
+		walk = beginWalk();
+
+		assertIteration(F, "gitattributes");
+
+		assertIteration(F, "l0.txt");
+
+		assertIteration(D, "levelA");
+		assertIteration(F, "levelA/file.gitattributes");
+		assertIteration(F, "levelA/lA.txt");
+
+		endWalk();
+	}
+

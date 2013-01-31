@@ -1,0 +1,36 @@
+	@Test
+	public void testRules() throws Exception {
+		writeAttributesFile(".git/info/attributes", "windows* eol=crlf");
+
+		writeAttributesFile(".gitattributes", "*.txt eol=lf");
+		writeTrashFile("windows.file", "");
+		writeTrashFile("windows.txt", "");
+		writeTrashFile("readme.txt", "");
+
+		writeAttributesFile("src/config/.gitattributes", "*.txt -delta");
+		writeTrashFile("src/config/readme.txt", "");
+		writeTrashFile("src/config/windows.file", "");
+		writeTrashFile("src/config/windows.txt", "");
+
+		// Adds file to index
+		git.add().addFilepattern(".").call();
+
+		walk = beginWalk();
+
+		assertIteration(F, ".gitattributes");
+		assertIteration(F, "readme.txt", asList(EOL_LF));
+
+		assertIteration(D, "src");
+
+		assertIteration(D, "src/config");
+		assertIteration(F, "src/config/.gitattributes");
+		assertIteration(F, "src/config/readme.txt", asList(DELTA_UNSET));
+		assertIteration(F, "src/config/windows.file", null);
+		assertIteration(F, "src/config/windows.txt", asList(DELTA_UNSET));
+
+		assertIteration(F, "windows.file", null);
+		assertIteration(F, "windows.txt", asList(EOL_LF));
+
+		endWalk();
+	}
+

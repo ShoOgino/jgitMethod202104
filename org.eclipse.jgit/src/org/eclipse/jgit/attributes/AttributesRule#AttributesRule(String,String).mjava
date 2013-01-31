@@ -1,0 +1,42 @@
+	/**
+	 * Create a new attribute rule with the given pattern. Assumes that the
+	 * pattern is already trimmed.
+	 *
+	 * @param pattern
+	 *            Base pattern for the attributes rule. This pattern will be
+	 *            parsed to generate rule parameters. It can not be
+	 *            <code>null</code>.
+	 * @param attributes
+	 *            the rule attributes. This string will be parsed to read the
+	 *            attributes.
+	 */
+	public AttributesRule(String pattern, String attributes) {
+		this.attributes = parseAttributes(attributes);
+		nameOnly = false;
+		dirOnly = false;
+
+		if (pattern.endsWith("/")) { //$NON-NLS-1$
+			pattern = pattern.substring(0, pattern.length() - 1);
+			dirOnly = true;
+		}
+
+		boolean hasSlash = pattern.contains("/"); //$NON-NLS-1$
+
+		if (!hasSlash)
+			nameOnly = true;
+		else if (!pattern.startsWith("/")) { //$NON-NLS-1$
+			// Contains "/" but does not start with one
+			// Adding / to the start should not interfere with matching
+			pattern = "/" + pattern; //$NON-NLS-1$
+		}
+
+		try {
+			matcher = PathMatcher.createPathMatcher(pattern,
+					Character.valueOf(FastIgnoreRule.PATH_SEPARATOR), dirOnly);
+		} catch (InvalidPatternException e) {
+			matcher = NO_MATCH;
+		}
+
+		this.pattern = pattern;
+	}
+

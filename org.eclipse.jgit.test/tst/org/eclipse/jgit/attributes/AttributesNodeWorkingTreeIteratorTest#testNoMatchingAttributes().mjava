@@ -1,0 +1,23 @@
+	@Test
+	public void testNoMatchingAttributes() throws Exception {
+		writeAttributesFile(".git/info/attributes", "*.java delta");
+		writeAttributesFile(".gitattributes", "*.java -delta");
+		writeAttributesFile("levelA/.gitattributes", "*.java eol=lf");
+		writeAttributesFile("levelB/.gitattributes", "*.txt eol=lf");
+
+		writeTrashFile("levelA/lA.txt", "");
+
+		walk = beginWalk();
+
+		assertIteration(F, ".gitattributes");
+
+		assertIteration(D, "levelA");
+		assertIteration(F, "levelA/.gitattributes");
+		assertIteration(F, "levelA/lA.txt");
+
+		assertIteration(D, "levelB");
+		assertIteration(F, "levelB/.gitattributes");
+
+		endWalk();
+	}
+

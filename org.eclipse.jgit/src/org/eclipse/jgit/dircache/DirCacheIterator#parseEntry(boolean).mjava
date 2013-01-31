@@ -36,5 +36,9 @@
 		path = cep;
 		pathLen = cep.length;
 		currentSubtree = null;
+		// Checks if this entry is a .gitattributes file
+		if (RawParseUtils.match(path, pathOffset, DOT_GIT_ATTRIBUTES_BYTES) == path.length)
+			attributesNode = new LazyLoadingAttributesNode(
+					currentEntry.getObjectId());
 	}
 

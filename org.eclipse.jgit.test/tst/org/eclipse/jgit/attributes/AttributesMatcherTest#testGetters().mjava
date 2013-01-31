@@ -1,0 +1,71 @@
+	@Test
+	public void testGetters() {
+		AttributesRule r = new AttributesRule("/pattern/", "");
+		assertFalse(r.isNameOnly());
+		assertTrue(r.dirOnly());
+		assertNotNull(r.getAttributes());
+		assertTrue(r.getAttributes().isEmpty());
+		assertEquals(r.getPattern(), "/pattern");
+
+		r = new AttributesRule("/patter?/", "");
+		assertFalse(r.isNameOnly());
+		assertTrue(r.dirOnly());
+		assertNotNull(r.getAttributes());
+		assertTrue(r.getAttributes().isEmpty());
+		assertEquals(r.getPattern(), "/patter?");
+
+		r = new AttributesRule("patt*", "");
+		assertTrue(r.isNameOnly());
+		assertFalse(r.dirOnly());
+		assertNotNull(r.getAttributes());
+		assertTrue(r.getAttributes().isEmpty());
+		assertEquals(r.getPattern(), "patt*");
+
+		r = new AttributesRule("pattern", "attribute1");
+		assertTrue(r.isNameOnly());
+		assertFalse(r.dirOnly());
+		assertNotNull(r.getAttributes());
+		assertFalse(r.getAttributes().isEmpty());
+		assertEquals(r.getAttributes().size(), 1);
+		assertEquals(r.getPattern(), "pattern");
+
+		r = new AttributesRule("pattern", "attribute1 -attribute2");
+		assertTrue(r.isNameOnly());
+		assertFalse(r.dirOnly());
+		assertNotNull(r.getAttributes());
+		assertEquals(r.getAttributes().size(), 2);
+		assertEquals(r.getPattern(), "pattern");
+
+		r = new AttributesRule("pattern", "attribute1 \t-attribute2 \t");
+		assertTrue(r.isNameOnly());
+		assertFalse(r.dirOnly());
+		assertNotNull(r.getAttributes());
+		assertEquals(r.getAttributes().size(), 2);
+		assertEquals(r.getPattern(), "pattern");
+
+		r = new AttributesRule("pattern", "attribute1\t-attribute2\t");
+		assertTrue(r.isNameOnly());
+		assertFalse(r.dirOnly());
+		assertNotNull(r.getAttributes());
+		assertEquals(r.getAttributes().size(), 2);
+		assertEquals(r.getPattern(), "pattern");
+
+		r = new AttributesRule("pattern", "attribute1\t -attribute2\t ");
+		assertTrue(r.isNameOnly());
+		assertFalse(r.dirOnly());
+		assertNotNull(r.getAttributes());
+		assertEquals(r.getAttributes().size(), 2);
+		assertEquals(r.getPattern(), "pattern");
+
+		r = new AttributesRule("pattern",
+				"attribute1 -attribute2  attribute3=value ");
+		assertTrue(r.isNameOnly());
+		assertFalse(r.dirOnly());
+		assertNotNull(r.getAttributes());
+		assertEquals(r.getAttributes().size(), 3);
+		assertEquals(r.getPattern(), "pattern");
+		assertEquals(r.getAttributes().get(0).toString(), "attribute1");
+		assertEquals(r.getAttributes().get(1).toString(), "-attribute2");
+		assertEquals(r.getAttributes().get(2).toString(), "attribute3=value");
+	}
+

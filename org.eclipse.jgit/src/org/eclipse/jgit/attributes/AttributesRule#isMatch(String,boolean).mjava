@@ -1,0 +1,19 @@
+	/**
+	 * Returns <code>true</code> if a match was made.
+	 *
+	 * @param relativeTarget
+	 *            Name pattern of the file, relative to the base directory of
+	 *            this rule
+	 * @param isDirectory
+	 *            Whether the target file is a directory or not
+	 * @return True if a match was made.
+	 */
+	public boolean isMatch(String relativeTarget, boolean isDirectory) {
+		if (relativeTarget == null)
+			return false;
+		if (relativeTarget.length() == 0)
+			return false;
+		boolean match = matcher.matches(relativeTarget, isDirectory);
+		return match;
+	}
+

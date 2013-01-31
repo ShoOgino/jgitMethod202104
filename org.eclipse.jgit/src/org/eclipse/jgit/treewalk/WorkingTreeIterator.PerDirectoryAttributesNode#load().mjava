@@ -1,0 +1,11 @@
+		AttributesNode load() throws IOException {
+			AttributesNode r = new AttributesNode();
+			InputStream in = entry.openInputStream();
+			try {
+				r.parse(in);
+			} finally {
+				in.close();
+			}
+			return r.getRules().isEmpty() ? null : r;
+		}
+

@@ -1,0 +1,11 @@
+	@Test
+	public void testEmptyNegativeAttributeKey() throws IOException {
+		String attributeFileContent = "*.type1 - \n" //
+				+ "*.type2 -   -A";
+		is = new ByteArrayInputStream(attributeFileContent.getBytes());
+		AttributesNode node = new AttributesNode();
+		node.parse(is);
+		assertAttribute("file.type1", node, Collections.<Attribute> emptySet());
+		assertAttribute("file.type2", node, asSet(A_UNSET_ATTR));
+	}
+

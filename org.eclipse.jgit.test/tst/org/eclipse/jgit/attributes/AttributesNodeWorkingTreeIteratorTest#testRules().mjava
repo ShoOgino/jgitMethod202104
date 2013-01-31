@@ -1,0 +1,49 @@
+	@Test
+	public void testRules() throws Exception {
+
+		File customAttributeFile = File.createTempFile("tmp_",
+				"customAttributeFile", null);
+		customAttributeFile.deleteOnExit();
+
+		JGitTestUtil.write(customAttributeFile, "*.txt custom=value");
+		db.getConfig().setString("core", null, "attributesfile",
+				customAttributeFile.getAbsolutePath());
+		writeAttributesFile(".git/info/attributes", "windows* eol=crlf");
+
+		writeAttributesFile(".gitattributes", "*.txt eol=lf");
+		writeTrashFile("windows.file", "");
+		writeTrashFile("windows.txt", "");
+		writeTrashFile("global.txt", "");
+		writeTrashFile("readme.txt", "");
+
+		writeAttributesFile("src/config/.gitattributes", "*.txt -delta");
+		writeTrashFile("src/config/readme.txt", "");
+		writeTrashFile("src/config/windows.file", "");
+		writeTrashFile("src/config/windows.txt", "");
+
+		walk = beginWalk();
+
+		assertIteration(F, ".gitattributes");
+		assertIteration(F, "global.txt", asList(EOL_LF), null,
+				asList(CUSTOM_VALUE));
+		assertIteration(F, "readme.txt", asList(EOL_LF), null,
+				asList(CUSTOM_VALUE));
+
+		assertIteration(D, "src");
+
+		assertIteration(D, "src/config");
+		assertIteration(F, "src/config/.gitattributes");
+		assertIteration(F, "src/config/readme.txt", asList(DELTA_UNSET), null,
+				asList(CUSTOM_VALUE));
+		assertIteration(F, "src/config/windows.file", null, asList(EOL_CRLF),
+				null);
+		assertIteration(F, "src/config/windows.txt", asList(DELTA_UNSET),
+				asList(EOL_CRLF), asList(CUSTOM_VALUE));
+
+		assertIteration(F, "windows.file", null, asList(EOL_CRLF), null);
+		assertIteration(F, "windows.txt", asList(EOL_LF), asList(EOL_CRLF),
+				asList(CUSTOM_VALUE));
+
+		endWalk();
+	}
+
