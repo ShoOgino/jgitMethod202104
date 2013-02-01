@@ -5,14 +5,17 @@
 	 *            progress monitor to receive status updates.
 	 * @param refUpdates
 	 *            update commands to be applied to the remote repository.
+	 * @param outputStream
+	 *            output stream to write sideband messages to
 	 * @throws TransportException
 	 *             if any exception occurs.
+	 * @since 3.0
 	 */
 	protected void doPush(final ProgressMonitor monitor,
-			final Map<String, RemoteRefUpdate> refUpdates)
-			throws TransportException {
+			final Map<String, RemoteRefUpdate> refUpdates,
+			OutputStream outputStream) throws TransportException {
 		try {
-			writeCommands(refUpdates.values(), monitor);
+			writeCommands(refUpdates.values(), monitor, outputStream);
 			if (writePack)
 				writePack(refUpdates, monitor);
 			if (sentCommand) {

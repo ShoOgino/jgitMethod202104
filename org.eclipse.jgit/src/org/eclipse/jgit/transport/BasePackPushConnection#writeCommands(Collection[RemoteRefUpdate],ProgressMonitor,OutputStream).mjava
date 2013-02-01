@@ -1,6 +1,6 @@
 	private void writeCommands(final Collection<RemoteRefUpdate> refUpdates,
-			final ProgressMonitor monitor) throws IOException {
-		final String capabilities = enableCapabilities(monitor);
+			final ProgressMonitor monitor, OutputStream outputStream) throws IOException {
+		final String capabilities = enableCapabilities(monitor, outputStream);
 		for (final RemoteRefUpdate rru : refUpdates) {
 			if (!capableDeleteRefs && rru.isDelete()) {
 				rru.setStatus(Status.REJECTED_NODELETE);

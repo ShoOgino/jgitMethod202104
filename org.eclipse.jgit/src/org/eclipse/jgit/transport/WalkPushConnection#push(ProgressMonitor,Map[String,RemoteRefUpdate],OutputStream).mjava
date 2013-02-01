@@ -1,0 +1,70 @@
+	public void push(final ProgressMonitor monitor,
+			final Map<String, RemoteRefUpdate> refUpdates, OutputStream out)
+			throws TransportException {
+		markStartedOperation();
+		packNames = null;
+		newRefs = new TreeMap<String, Ref>(getRefsMap());
+		packedRefUpdates = new ArrayList<RemoteRefUpdate>(refUpdates.size());
+
+		// Filter the commands and issue all deletes first. This way we
+		// can correctly handle a directory being cleared out and a new
+		// ref using the directory name being created.
+		//
+		final List<RemoteRefUpdate> updates = new ArrayList<RemoteRefUpdate>();
+		for (final RemoteRefUpdate u : refUpdates.values()) {
+			final String n = u.getRemoteName();
+			if (!n.startsWith("refs/") || !Repository.isValidRefName(n)) { //$NON-NLS-1$
+				u.setStatus(Status.REJECTED_OTHER_REASON);
+				u.setMessage(JGitText.get().funnyRefname);
+				continue;
+			}
+
+			if (AnyObjectId.equals(ObjectId.zeroId(), u.getNewObjectId()))
+				deleteCommand(u);
+			else
+				updates.add(u);
+		}
+
+		// If we have any updates we need to upload the objects first, to
+		// prevent creating refs pointing at non-existent data. Then we
+		// can update the refs, and the info-refs file for dumb transports.
+		//
+		if (!updates.isEmpty())
+			sendpack(updates, monitor);
+		for (final RemoteRefUpdate u : updates)
+			updateCommand(u);
+
+		// Is this a new repository? If so we should create additional
+		// metadata files so it is properly initialized during the push.
+		//
+		if (!updates.isEmpty() && isNewRepository())
+			createNewRepository(updates);
+
+		RefWriter refWriter = new RefWriter(newRefs.values()) {
+			@Override
+			protected void writeFile(String file, byte[] content)
+					throws IOException {
+				dest.writeFile(ROOT_DIR + file, content);
+			}
+		};
+		if (!packedRefUpdates.isEmpty()) {
+			try {
+				refWriter.writePackedRefs();
+				for (final RemoteRefUpdate u : packedRefUpdates)
+					u.setStatus(Status.OK);
+			} catch (IOException err) {
+				for (final RemoteRefUpdate u : packedRefUpdates) {
+					u.setStatus(Status.REJECTED_OTHER_REASON);
+					u.setMessage(err.getMessage());
+				}
+				throw new TransportException(uri, JGitText.get().failedUpdatingRefs, err);
+			}
+		}
+
+		try {
+			refWriter.writeInfoRefs();
+		} catch (IOException err) {
+			throw new TransportException(uri, JGitText.get().failedUpdatingRefs, err);
+		}
+	}
+

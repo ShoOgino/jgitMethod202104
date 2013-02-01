@@ -1,0 +1,26 @@
+	/**
+	 * Create process for specified transport and refs updates specification.
+	 * 
+	 * @param transport
+	 *            transport between remote and local repository, used to create
+	 *            connection.
+	 * @param toPush
+	 *            specification of refs updates (and local tracking branches).
+	 * @param out
+	 *            OutputStream to write messages to
+	 * @throws TransportException
+	 */
+	PushProcess(final Transport transport,
+			final Collection<RemoteRefUpdate> toPush, OutputStream out)
+			throws TransportException {
+		this.walker = new RevWalk(transport.local);
+		this.transport = transport;
+		this.toPush = new HashMap<String, RemoteRefUpdate>();
+		this.out = out;
+		for (final RemoteRefUpdate rru : toPush) {
+			if (this.toPush.put(rru.getRemoteName(), rru) != null)
+				throw new TransportException(MessageFormat.format(
+						JGitText.get().duplicateRemoteRefUpdateIsIllegal, rru.getRemoteName()));
+		}
+	}
+

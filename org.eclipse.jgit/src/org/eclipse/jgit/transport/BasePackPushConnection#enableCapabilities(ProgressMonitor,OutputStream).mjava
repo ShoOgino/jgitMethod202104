@@ -1,4 +1,5 @@
-	private String enableCapabilities(final ProgressMonitor monitor) {
+	private String enableCapabilities(final ProgressMonitor monitor,
+			OutputStream outputStream) {
 		final StringBuilder line = new StringBuilder();
 		capableReport = wantCapability(line, CAPABILITY_REPORT_STATUS);
 		capableDeleteRefs = wantCapability(line, CAPABILITY_DELETE_REFS);
@@ -6,7 +7,8 @@
 
 		capableSideBand = wantCapability(line, CAPABILITY_SIDE_BAND_64K);
 		if (capableSideBand) {
-			in = new SideBandInputStream(in, monitor, getMessageWriter());
+			in = new SideBandInputStream(in, monitor, getMessageWriter(),
+					outputStream);
 			pckIn = new PacketLineIn(in);
 		}
 

@@ -9,12 +9,15 @@
 	 *            additional objects to assume that already exist locally. This
 	 *            will be added to the set of objects reachable from the
 	 *            destination repository's references.
+	 * @param outputStream
+	 *            ouputStream to write sideband messages to
 	 * @throws TransportException
 	 *             if any exception occurs.
+	 * @since 3.0
 	 */
 	protected void doFetch(final ProgressMonitor monitor,
-			final Collection<Ref> want, final Set<ObjectId> have)
-			throws TransportException {
+			final Collection<Ref> want, final Set<ObjectId> have,
+			OutputStream outputStream) throws TransportException {
 		try {
 			markRefsAdvertised();
 			markReachable(have, maxTimeWanted(want));
@@ -32,7 +35,7 @@
 				state = null;
 				pckState = null;
 
-				receivePack(monitor);
+				receivePack(monitor, outputStream);
 			}
 		} catch (CancelledException ce) {
 			close();

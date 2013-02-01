@@ -2,9 +2,9 @@
 	 * Push objects and refs from the local repository to the remote one.
 	 * <p>
 	 * This is a utility function providing standard push behavior. It updates
-	 * remote refs and sends necessary objects according to remote ref update
-	 * specification. After successful remote ref update, associated locally
-	 * stored tracking branch is updated if set up accordingly. Detailed
+	 * remote refs and send there necessary objects according to remote ref
+	 * update specification. After successful remote ref update, associated
+	 * locally stored tracking branch is updated if set up accordingly. Detailed
 	 * operation result is provided after execution.
 	 * <p>
 	 * For setting up remote ref update specification from ref spec, see helper
@@ -27,7 +27,8 @@
 	 *            converted by {@link #findRemoteRefUpdatesFor(Collection)}. No
 	 *            more than 1 RemoteRefUpdate with the same remoteName is
 	 *            allowed. These objects are modified during this call.
-	 *
+	 * @param out
+	 *            output stream to write messages to
 	 * @return information about results of remote refs updates, tracking refs
 	 *         updates and refs advertised by remote repository.
 	 * @throws NotSupportedException
@@ -37,10 +38,24 @@
 	 *             the remote connection could not be established or object
 	 *             copying (if necessary) failed at I/O or protocol level or
 	 *             update specification was incorrect.
+	 * @since 3.0
 	 */
 	public PushResult push(final ProgressMonitor monitor,
-			Collection<RemoteRefUpdate> toPush) throws NotSupportedException,
+			Collection<RemoteRefUpdate> toPush, OutputStream out)
+			throws NotSupportedException,
 			TransportException {
-		return push(monitor, toPush, null);
+		if (toPush == null || toPush.isEmpty()) {
+			// If the caller did not ask for anything use the defaults.
+			try {
+				toPush = findRemoteRefUpdatesFor(push);
+			} catch (final IOException e) {
+				throw new TransportException(MessageFormat.format(
+						JGitText.get().problemWithResolvingPushRefSpecsLocally, e.getMessage()), e);
+			}
+			if (toPush.isEmpty())
+				throw new TransportException(JGitText.get().nothingToPush);
+		}
+		final PushProcess pushProcess = new PushProcess(this, toPush, out);
+		return pushProcess.execute(monitor);
 	}
 

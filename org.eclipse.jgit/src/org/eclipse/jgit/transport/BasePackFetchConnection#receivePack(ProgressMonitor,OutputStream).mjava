@@ -1,8 +1,10 @@
-	private void receivePack(final ProgressMonitor monitor) throws IOException {
+	private void receivePack(final ProgressMonitor monitor,
+			OutputStream outputStream) throws IOException {
 		onReceivePack();
 		InputStream input = in;
 		if (sideband)
-			input = new SideBandInputStream(input, monitor, getMessageWriter());
+			input = new SideBandInputStream(input, monitor, getMessageWriter(),
+					outputStream);
 
 		ObjectInserter ins = local.newObjectInserter();
 		try {
