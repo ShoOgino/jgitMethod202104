@@ -6,11 +6,7 @@
 		final FileMode oldMode = ent.getOldMode();
 		final FileMode newMode = ent.getNewMode();
 
-		o.write(encodeASCII("diff --git ")); //$NON-NLS-1$
-		o.write(encode(quotePath(oldPrefix + (type == ADD ? newp : oldp))));
-		o.write(' ');
-		o.write(encode(quotePath(newPrefix + (type == DELETE ? oldp : newp))));
-		o.write('\n');
+		formatGitDiffFirstHeaderLine(o, type, oldp, newp);
 
 		switch (type) {
 		case ADD:
