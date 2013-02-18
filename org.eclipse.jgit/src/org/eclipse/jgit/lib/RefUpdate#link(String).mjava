@@ -13,7 +13,7 @@
 	public Result link(String target) throws IOException {
 		if (!target.startsWith(Constants.R_REFS))
 			throw new IllegalArgumentException(MessageFormat.format(JGitText.get().illegalArgumentNotA, Constants.R_REFS));
-		if (getRefDatabase().isNameConflicting(getName()))
+		if (checkConflicting && getRefDatabase().isNameConflicting(getName()))
 			return Result.LOCK_FAILURE;
 		try {
 			if (!tryLock(false))

@@ -4,7 +4,7 @@
 		RevObject oldObj;
 
 		// don't make expensive conflict check if this is an existing Ref
-		if (oldValue == null && getRefDatabase().isNameConflicting(getName()))
+		if (oldValue == null && checkConflicting && getRefDatabase().isNameConflicting(getName()))
 			return Result.LOCK_FAILURE;
 		try {
 			if (!tryLock(true))
