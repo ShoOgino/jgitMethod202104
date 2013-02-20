@@ -1,0 +1,17 @@
+	@Test
+	public void testDeleteNotEmptyTreeNotOkButIgnoreFail() throws IOException {
+		File t = new File(trash, "t");
+		FileUtils.mkdir(t);
+		FileUtils.mkdir(new File(t, "d"));
+		File f = new File(new File(t, "d"), "f");
+		FileUtils.createNewFile(f);
+		File e = new File(new File(t, "d"), "e");
+		FileUtils.mkdir(e);
+		FileUtils.delete(t, FileUtils.EMPTY_DIRECTORIES_ONLY | FileUtils.RECURSIVE
+				| FileUtils.IGNORE_ERRORS);
+		// Should have deleted as much as possible, but not all
+		assertTrue(t.exists());
+		assertTrue(f.exists());
+		assertFalse(e.exists());
+	}
+

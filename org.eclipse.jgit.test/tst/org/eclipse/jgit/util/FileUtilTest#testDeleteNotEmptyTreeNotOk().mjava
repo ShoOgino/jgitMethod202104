@@ -1,0 +1,17 @@
+	@Test
+	public void testDeleteNotEmptyTreeNotOk() throws IOException {
+		File t = new File(trash, "t");
+		FileUtils.mkdir(t);
+		FileUtils.mkdir(new File(t, "d"));
+		File f = new File(new File(t, "d"), "f");
+		FileUtils.createNewFile(f);
+		FileUtils.mkdir(new File(new File(t, "d"), "e"));
+		try {
+			FileUtils.delete(t, FileUtils.EMPTY_DIRECTORIES_ONLY | FileUtils.RECURSIVE);
+			fail("expected failure to delete f");
+		} catch (IOException e) {
+			assertThat(e.getMessage(), endsWith(f.getAbsolutePath()));
+		}
+		assertTrue(t.exists());
+	}
+

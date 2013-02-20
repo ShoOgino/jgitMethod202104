@@ -1,0 +1,10 @@
+	@Test
+	public void testDeleteEmptyTreeOk() throws IOException {
+		File t = new File(trash, "t");
+		FileUtils.mkdir(t);
+		FileUtils.mkdir(new File(t, "d"));
+		FileUtils.mkdir(new File(new File(t, "d"), "e"));
+		FileUtils.delete(t, FileUtils.EMPTY_DIRECTORIES_ONLY | FileUtils.RECURSIVE);
+		assertFalse(t.exists());
+	}
+
