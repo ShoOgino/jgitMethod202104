@@ -1,0 +1,90 @@
+	/**
+	 * Get a single base commit for two given commits. If the two source commits
+	 * have more than one base commit recursively merge the base commits
+	 * together until a virtual common base commit has been found.
+	 *
+	 * @param a
+	 *            the first commit to be merged
+	 * @param b
+	 *            the second commit to be merged
+	 * @param callDepth
+	 *            the callDepth when this method is called recursively
+	 * @return the merge base of two commits
+	 * @throws IOException
+	 * @throws IncorrectObjectTypeException
+	 *             one of the input objects is not a commit.
+	 * @throws NoMergeBaseException
+	 *             too many merge bases are found or the computation of a common
+	 *             merge base failed (e.g. because of a conflict).
+	 */
+	protected RevCommit getBaseCommit(RevCommit a, RevCommit b, int callDepth)
+			throws IOException {
+		ArrayList<RevCommit> baseCommits = new ArrayList<RevCommit>();
+		walk.reset();
+		walk.setRevFilter(RevFilter.MERGE_BASE);
+		walk.markStart(a);
+		walk.markStart(b);
+		RevCommit c;
+		while ((c = walk.next()) != null)
+			baseCommits.add(c);
+
+		if (baseCommits.isEmpty())
+			return null;
+		if (baseCommits.size() == 1)
+			return baseCommits.get(0);
+		if (baseCommits.size() >= MAX_BASES)
+			throw new NoMergeBaseException(NoMergeBaseException.MergeBaseFailureReason.TOO_MANY_MERGE_BASES, MessageFormat.format(
+					JGitText.get().mergeRecursiveTooManyMergeBasesFor,
+					Integer.valueOf(MAX_BASES), a.name(), b.name(),
+							Integer.valueOf(baseCommits.size())));
+
+		// We know we have more than one base commit. We have to do merges now
+		// to determine a single base commit. We don't want to spoil the current
+		// dircache and working tree with the results of this intermediate
+		// merges. Therefore set the dircache to a new in-memory dircache and
+		// disable that we update the working-tree. We set this back to the
+		// original values once a single base commit is created.
+		RevCommit currentBase = baseCommits.get(0);
+		DirCache oldDircache = dircache;
+		boolean oldIncore = inCore;
+		WorkingTreeIterator oldWTreeIt = workingTreeIterator;
+		workingTreeIterator = null;
+		try {
+			dircache = dircacheFromTree(currentBase.getTree());
+			inCore = true;
+
+			List<RevCommit> parents = new ArrayList<RevCommit>();
+			parents.add(currentBase);
+			for (int commitIdx = 1; commitIdx < baseCommits.size(); commitIdx++) {
+				RevCommit nextBase = baseCommits.get(commitIdx);
+				if (commitIdx >= MAX_BASES)
+					throw new NoMergeBaseException(
+							NoMergeBaseException.MergeBaseFailureReason.TOO_MANY_MERGE_BASES,
+							MessageFormat.format(
+							JGitText.get().mergeRecursiveTooManyMergeBasesFor,
+							Integer.valueOf(MAX_BASES), a.name(), b.name(),
+									Integer.valueOf(baseCommits.size())));
+				parents.add(nextBase);
+				if (mergeTrees(
+						openTree(getBaseCommit(currentBase, nextBase,
+								callDepth + 1).getTree()),
+						currentBase.getTree(),
+						nextBase.getTree()))
+					currentBase = createCommitForTree(resultTree, parents);
+				else
+					throw new NoMergeBaseException(
+							NoMergeBaseException.MergeBaseFailureReason.CONFLICTS_DURING_MERGE_BASE_CALCULATION,
+							MessageFormat.format(
+									JGitText.get().mergeRecursiveTooManyMergeBasesFor,
+									Integer.valueOf(MAX_BASES), a.name(),
+									b.name(),
+									Integer.valueOf(baseCommits.size())));
+			}
+		} finally {
+			inCore = oldIncore;
+			dircache = oldDircache;
+			workingTreeIterator = oldWTreeIt;
+		}
+		return currentBase;
+	}
+

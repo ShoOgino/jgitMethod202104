@@ -1,19 +1,19 @@
 	/**
 	 * Create an iterator to walk the merge base of two commits.
 	 *
-	 * @param aIdx
-	 *            index of the first commit in {@link #sourceObjects}.
-	 * @param bIdx
-	 *            index of the second commit in {@link #sourceObjects}.
+	 * @param a
+	 *            the first commit in {@link #sourceObjects}.
+	 * @param b
+	 *            the second commit in {@link #sourceObjects}.
 	 * @return the new iterator
 	 * @throws IncorrectObjectTypeException
 	 *             one of the input objects is not a commit.
 	 * @throws IOException
 	 *             objects are missing or multiple merge bases were found.
 	 */
-	protected AbstractTreeIterator mergeBase(final int aIdx, final int bIdx)
+	protected AbstractTreeIterator mergeBase(RevCommit a, RevCommit b)
 			throws IOException {
-		RevCommit base = getBaseCommit(aIdx, bIdx);
+		RevCommit base = getBaseCommit(a, b);
 		return (base == null) ? new EmptyTreeIterator() : openTree(base.getTree());
 	}
 

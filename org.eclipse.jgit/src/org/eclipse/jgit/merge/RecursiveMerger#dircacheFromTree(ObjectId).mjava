@@ -1,0 +1,25 @@
+	/**
+	 * Create a new in memory dircache which has the same content as a given
+	 * tree.
+	 *
+	 * @param treeId
+	 *            the tree which should be used to fill the dircache
+	 * @return a new in memory dircache
+	 * @throws IOException
+	 */
+	private DirCache dircacheFromTree(ObjectId treeId) throws IOException {
+		DirCache ret = DirCache.newInCore();
+		DirCacheBuilder builder = ret.builder();
+		TreeWalk tw = new TreeWalk(db);
+		tw.addTree(treeId);
+		tw.setRecursive(true);
+		while (tw.next()) {
+			DirCacheEntry e = new DirCacheEntry(tw.getRawPath());
+			e.setFileMode(tw.getFileMode(0));
+			e.setObjectId(tw.getObjectId(0));
+			builder.add(e);
+		}
+		builder.finish();
+		return ret;
+	}
+

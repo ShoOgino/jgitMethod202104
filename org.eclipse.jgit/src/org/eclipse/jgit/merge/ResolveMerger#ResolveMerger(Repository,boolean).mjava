@@ -9,11 +9,14 @@
 				ConfigConstants.CONFIG_KEY_ALGORITHM,
 				SupportedAlgorithm.HISTOGRAM);
 		mergeAlgorithm = new MergeAlgorithm(DiffAlgorithm.getAlgorithm(diffAlg));
-		commitNames = new String[] { "BASE", "OURS", "THEIRS" };
+		commitNames = new String[] { "BASE", "OURS", "THEIRS" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		this.inCore = inCore;
 
 		if (inCore) {
+			implicitDirCache = false;
 			dircache = DirCache.newInCore();
+		} else {
+			implicitDirCache = true;
 		}
 	}
 

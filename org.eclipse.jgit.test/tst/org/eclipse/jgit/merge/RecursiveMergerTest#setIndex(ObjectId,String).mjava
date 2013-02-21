@@ -1,0 +1,25 @@
+	private void setIndex(final ObjectId id, String path)
+			throws MissingObjectException, IOException {
+		DirCache lockedDircache;
+		DirCacheEditor dcedit;
+
+		lockedDircache = db.lockDirCache();
+		dcedit = lockedDircache.editor();
+		try {
+			if (id != null) {
+				final ObjectLoader contLoader = db.newObjectReader().open(id);
+				dcedit.add(new DirCacheEditor.PathEdit(path) {
+					@Override
+					public void apply(DirCacheEntry ent) {
+						ent.setFileMode(FileMode.REGULAR_FILE);
+						ent.setLength(contLoader.getSize());
+						ent.setObjectId(id);
+					}
+				});
+			} else
+				dcedit.add(new DirCacheEditor.DeletePath(path));
+		} finally {
+			dcedit.commit();
+		}
+	}
+

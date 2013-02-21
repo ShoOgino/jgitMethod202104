@@ -1,0 +1,16 @@
+	private boolean validateStates(IndexState indexState,
+			WorktreeState worktreeState) {
+		if (worktreeState == WorktreeState.Bare
+				&& indexState != IndexState.Bare)
+			return false;
+		if (worktreeState != WorktreeState.Bare
+				&& indexState == IndexState.Bare)
+			return false;
+		if (worktreeState != WorktreeState.DifferentFromHeadAndOther
+				&& indexState == IndexState.SameAsWorkTree)
+			// would be a duplicate: the combination WorktreeState.X and
+			// IndexState.X already covered this
+			return false;
+		return true;
+	}
+

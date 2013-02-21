@@ -1,0 +1,7 @@
+	private ObjectId contentId(String revName, String path) throws Exception {
+		RevCommit headCommit = db_t.getRevWalk().parseCommit(
+				db.resolve(revName));
+		db_t.parseBody(headCommit);
+		return db_t.get(headCommit.getTree(), path).getId();
+	}
+

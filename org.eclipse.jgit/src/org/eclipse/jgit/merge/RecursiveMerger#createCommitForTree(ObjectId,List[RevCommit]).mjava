@@ -1,0 +1,27 @@
+	/**
+	 * Create a new commit by explicitly specifying the content tree and the
+	 * parents. The commit message is not set and author/committer are set to
+	 * the current user.
+	 *
+	 * @param tree
+	 *            the tree this commit should capture
+	 * @param parents
+	 *            the list of parent commits
+	 * @return a new (persisted) commit
+	 * @throws IOException
+	 */
+	private RevCommit createCommitForTree(ObjectId tree, List<RevCommit> parents)
+			throws IOException {
+		CommitBuilder c = new CommitBuilder();
+		c.setParentIds(parents);
+		c.setTreeId(tree);
+		c.setAuthor(ident);
+		c.setCommitter(ident);
+		ObjectInserter odi = db.newObjectInserter();
+		ObjectId newCommitId = odi.insert(c);
+		odi.flush();
+		RevCommit ret = walk.lookupCommit(newCommitId);
+		walk.parseHeaders(ret);
+		return ret;
+	}
+

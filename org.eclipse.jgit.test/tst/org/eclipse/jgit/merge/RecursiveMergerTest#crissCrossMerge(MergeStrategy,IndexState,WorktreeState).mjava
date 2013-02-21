@@ -1,0 +1,63 @@
+	@Theory
+	/**
+	 * Merging m2,s2 from the following topology. In master and side different
+	 * files are touched. No need to do a real content merge.
+	 *
+	 * <pre>
+	 * m0--m1--m2
+	 *   \   \/
+	 *    \  /\
+	 *     s1--s2
+	 * </pre>
+	 */
+	public void crissCrossMerge(MergeStrategy strategy, IndexState indexState,
+			WorktreeState worktreeState) throws Exception {
+		if (!validateStates(indexState, worktreeState))
+			return;
+		// fill the repo
+		BranchBuilder master = db_t.branch("master");
+		RevCommit m0 = master.commit().add("m", ",m0").message("m0").create();
+		RevCommit m1 = master.commit().add("m", "m1").message("m1").create();
+		db_t.getRevWalk().parseCommit(m1);
+
+		BranchBuilder side = db_t.branch("side");
+		RevCommit s1 = side.commit().parent(m0).add("s", "s1").message("s1")
+				.create();
+		RevCommit s2 = side.commit().parent(m1).add("m", "m1")
+				.message("s2(merge)").create();
+		RevCommit m2 = master.commit().parent(s1).add("s", "s1")
+				.message("m2(merge)").create();
+
+		Git git = Git.wrap(db);
+		git.checkout().setName("master").call();
+		modifyWorktree(worktreeState, "m", "side");
+		modifyWorktree(worktreeState, "s", "side");
+		modifyIndex(indexState, "m", "side");
+		modifyIndex(indexState, "s", "side");
+
+		ResolveMerger merger = (ResolveMerger) strategy.newMerger(db,
+				worktreeState == WorktreeState.Bare);
+		if (worktreeState != WorktreeState.Bare)
+			merger.setWorkingTreeIterator(new FileTreeIterator(db));
+		try {
+			boolean expectSuccess = true;
+			if (!(indexState == IndexState.Bare
+					|| indexState == IndexState.Missing
+					|| indexState == IndexState.SameAsHead || indexState == IndexState.SameAsOther))
+				// index is dirty
+				expectSuccess = false;
+
+			assertEquals(Boolean.valueOf(expectSuccess),
+					Boolean.valueOf(merger.merge(new RevCommit[] { m2, s2 })));
+			assertEquals(MergeStrategy.RECURSIVE, strategy);
+			assertEquals("m1",
+					contentAsString(db, merger.getResultTreeId(), "m"));
+			assertEquals("s1",
+					contentAsString(db, merger.getResultTreeId(), "s"));
+		} catch (NoMergeBaseException e) {
+			assertEquals(MergeStrategy.RESOLVE, strategy);
+			assertEquals(e.getReason(),
+					MergeBaseFailureReason.MULTIPLE_MERGE_BASES_NOT_SUPPORTED);
+		}
+	}
+

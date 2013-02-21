@@ -1,0 +1,33 @@
+	void modifyIndex(IndexState indexState, String path, String other)
+			throws Exception {
+		RevBlob blob;
+		switch (indexState) {
+		case Missing:
+			setIndex(null, path);
+			break;
+		case SameAsHead:
+			setIndex(contentId(Constants.HEAD, path), path);
+			break;
+		case SameAsOther:
+			setIndex(contentId(other, path), path);
+			break;
+		case SameAsWorkTree:
+			blob = db_t.blob(read(path));
+			setIndex(blob, path);
+			break;
+		case DifferentFromHeadAndOtherAndWorktree:
+			blob = db_t.blob(Integer.toString(counter++));
+			setIndex(blob, path);
+			break;
+		case Bare:
+			File file = new File(db.getDirectory(), "index");
+			if (!file.exists())
+				return;
+			db.close();
+			file.delete();
+			db = new FileRepository(db.getDirectory());
+			db_t = new TestRepository<FileRepository>(db);
+			break;
+		}
+	}
+

@@ -1,0 +1,33 @@
+	/**
+	 * Return the merge base of two commits.
+	 *
+	 * @param a
+	 *            the first commit in {@link #sourceObjects}.
+	 * @param b
+	 *            the second commit in {@link #sourceObjects}.
+	 * @return the merge base of two commits
+	 * @throws IncorrectObjectTypeException
+	 *             one of the input objects is not a commit.
+	 * @throws IOException
+	 *             objects are missing or multiple merge bases were found.
+	 */
+	protected RevCommit getBaseCommit(RevCommit a, RevCommit b)
+			throws IncorrectObjectTypeException, IOException {
+		walk.reset();
+		walk.setRevFilter(RevFilter.MERGE_BASE);
+		walk.markStart(a);
+		walk.markStart(b);
+		final RevCommit base = walk.next();
+		if (base == null)
+			return null;
+		final RevCommit base2 = walk.next();
+		if (base2 != null) {
+			throw new NoMergeBaseException(
+					MergeBaseFailureReason.MULTIPLE_MERGE_BASES_NOT_SUPPORTED,
+					MessageFormat.format(
+					JGitText.get().multipleMergeBasesFor, a.name(), b.name(),
+					base.name(), base2.name()));
+		}
+		return base;
+	}
+
