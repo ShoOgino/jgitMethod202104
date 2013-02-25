@@ -2,6 +2,11 @@
 		final Entry q = head;
 		if (q == null)
 			return null;
+
+		if (index != null && q == index[first])
+			index[first++] = null;
+		inQueue--;
+
 		head = q.next;
 		freeEntry(q);
 		return q.commit;
