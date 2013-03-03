@@ -6,6 +6,7 @@
 			ctx.init(null, trustAllCerts, null);
 			final HttpsURLConnection sslConn = (HttpsURLConnection) conn;
 			sslConn.setSSLSocketFactory(ctx.getSocketFactory());
+			sslConn.setHostnameVerifier(new DummyHostnameVerifier());
 		} catch (KeyManagementException e) {
 			throw new IOException(e.getMessage());
 		} catch (NoSuchAlgorithmException e) {
