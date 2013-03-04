@@ -1,0 +1,14 @@
+	@Test
+	public void testBareCloneRepository() throws IOException,
+			JGitInternalException, GitAPIException, URISyntaxException {
+		File directory = createTempDirectory("testCloneRepository_bare");
+		CloneCommand command = Git.cloneRepository();
+		command.setBare(true);
+		command.setDirectory(directory);
+		command.setURI("file://" + git.getRepository().getWorkTree().getPath());
+		Git git2 = command.call();
+		addRepoToClose(git2.getRepository());
+		assertEquals(new RefSpec("+refs/heads/*:refs/heads/*"),
+				fetchRefSpec(git2.getRepository()));
+	}
+
