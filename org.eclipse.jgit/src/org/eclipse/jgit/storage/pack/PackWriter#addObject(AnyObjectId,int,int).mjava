@@ -1,0 +1,12 @@
+	private void addObject(
+			final AnyObjectId src, final int type, final int pathHashCode) {
+		final ObjectToPack otp;
+		if (reuseSupport != null)
+			otp = reuseSupport.newObjectToPack(src, type);
+		else
+			otp = new ObjectToPack(src, type);
+		otp.setPathHash(pathHashCode);
+		objectsLists[type].add(otp);
+		objectsMap.add(otp);
+	}
+
