@@ -1,7 +1,7 @@
 	public Collection<CachedPack> getCachedPacksAndUpdate(
 		BitmapBuilder needBitmap) throws IOException {
 		for (DfsPackFile pack : db.getPacks()) {
-			PackBitmapIndex bitmapIndex = pack.getPackBitmapIndex(this);
+			PackBitmapIndex bitmapIndex = pack.getBitmapIndex(this);
 			if (needBitmap.removeAllOrNone(bitmapIndex))
 				return Collections.<CachedPack> singletonList(
 						new DfsCachedPack(pack));
