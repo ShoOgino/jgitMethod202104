@@ -1,0 +1,18 @@
+		private void parseHeaders(String[] headers) {
+			for (String header : headers) {
+				int i = header.indexOf(':');
+
+				if (i < 0)
+					continue;
+
+				String key = header.substring(0, i);
+				String value = header.substring(i + 1).trim();
+
+				if (!headerFields.containsKey(key))
+					headerFields.put(key, new ArrayList<String>());
+
+				List<String> values = headerFields.get(key);
+				values.add(value);
+			}
+		}
+
