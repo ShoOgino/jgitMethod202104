@@ -1,0 +1,12 @@
+	private static void checkResponse(String[] headers,
+			String expectedAuthMethod) throws MalformedURLException {
+
+		AuthHeadersResponse responce = new AuthHeadersResponse(headers);
+		HttpAuthMethod authMethod = HttpAuthMethod.scanResponse(responce);
+
+		if (!expectedAuthMethod.equals(getAuthMethodName(authMethod))) {
+			fail("Wrong authentication method: expected " + expectedAuthMethod
+					+ ", but received " + getAuthMethodName(authMethod));
+		}
+	}
+
