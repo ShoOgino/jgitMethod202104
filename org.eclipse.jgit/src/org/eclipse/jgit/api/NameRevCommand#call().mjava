@@ -1,0 +1,56 @@
+	@Override
+	public Map<ObjectId, String> call() throws GitAPIException {
+		try {
+			Map<ObjectId, String> nonCommits = new HashMap<ObjectId, String>();
+			FIFORevQueue pending = new FIFORevQueue();
+			addPrefixes(nonCommits, pending);
+			int cutoff = minCommitTime() - COMMIT_TIME_SLOP;
+
+			while (true) {
+				NameRevCommit c = (NameRevCommit) pending.next();
+				if (c == null)
+					break;
+				if (c.getCommitTime() < cutoff)
+					continue;
+				boolean merge = c.getParentCount() > 1;
+				long cost = c.cost + (merge ? MERGE_COST : 1);
+				for (int i = 0; i < c.getParentCount(); i++) {
+					NameRevCommit p = (NameRevCommit) walk.parseCommit(c.getParent(i));
+					if (p.tip == null || compare(c.tip, cost, p.tip, p.cost) < 0) {
+						if (merge) {
+							p.tip = c.format().append('^').append(i + 1).toString();
+							p.distance = 0;
+						} else {
+							p.tip = c.tip;
+							p.distance = c.distance + 1;
+						}
+						p.cost = cost;
+						pending.add(p);
+					}
+				}
+			}
+
+			Map<ObjectId, String> result =
+				new LinkedHashMap<ObjectId, String>(revs.size());
+			for (ObjectId id : revs) {
+				RevObject o = walk.parseAny(id);
+				if (o instanceof NameRevCommit) {
+					NameRevCommit c = (NameRevCommit) o;
+					if (c.tip != null)
+						result.put(id, simplify(c.format().toString()));
+				} else {
+					String name = nonCommits.get(id);
+					if (name != null)
+						result.put(id, simplify(name));
+				}
+			}
+
+			setCallable(false);
+			walk.release();
+			return result;
+		} catch (IOException e) {
+			walk.reset();
+			throw new JGitInternalException(e.getMessage(), e);
+		}
+	}
+

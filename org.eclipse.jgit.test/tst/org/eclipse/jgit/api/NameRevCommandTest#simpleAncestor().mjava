@@ -1,0 +1,14 @@
+	@Test
+	public void simpleAncestor() throws Exception {
+		// 0--1--2
+		RevCommit c0 = tr.commit().create();
+		RevCommit c1 = tr.commit().parent(c0).create();
+		RevCommit c2 = tr.commit().parent(c1).create();
+		tr.update("master", c2);
+		Map<ObjectId, String> result = git.nameRev().add(c0).add(c1).add(c2).call();
+		assertEquals(3, result.size());
+		assertEquals("master~2", result.get(c0));
+		assertEquals("master~1", result.get(c1));
+		assertEquals("master", result.get(c2));
+	}
+

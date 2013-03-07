@@ -1,0 +1,21 @@
+	/**
+	 * Add multiple objects to search for.
+	 *
+	 * @param ids
+	 *            object IDs to add.
+	 * @return {@code this}
+	 * @throws MissingObjectException
+	 *             the object supplied is not available from the object
+	 *             database.
+	 * @throws JGitInternalException
+	 *             a low-level exception of JGit has occurred. The original
+	 *             exception can be retrieved by calling
+	 *             {@link Exception#getCause()}.
+	 */
+	public NameRevCommand add(Iterable<ObjectId> ids)
+			throws MissingObjectException, JGitInternalException {
+		for (ObjectId id : ids)
+			add(id);
+		return this;
+	}
+

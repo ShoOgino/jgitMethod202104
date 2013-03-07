@@ -1,0 +1,13 @@
+	@Test
+	public void multiplePathsNoMerge() throws Exception {
+		// 0--1    <- master
+		//  \-2--3 <- branch
+		RevCommit c0 = tr.commit().create();
+		RevCommit c1 = tr.commit().parent(c0).create();
+		RevCommit c2 = tr.commit().parent(c0).create();
+		RevCommit c3 = tr.commit().parent(c2).create();
+		tr.update("master", c1);
+		tr.update("branch", c3);
+		assertOneResult("master~1", c0);
+	}
+
