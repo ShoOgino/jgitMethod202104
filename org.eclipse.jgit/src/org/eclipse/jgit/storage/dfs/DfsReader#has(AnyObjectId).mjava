@@ -2,8 +2,9 @@
 	public boolean has(AnyObjectId objectId) throws IOException {
 		if (last != null && last.hasObject(this, objectId))
 			return true;
+		boolean noGarbage = avoidUnreachable;
 		for (DfsPackFile pack : db.getPacks()) {
-			if (last == pack)
+			if (pack == last || (noGarbage && pack.isGarbage()))
 				continue;
 			if (pack.hasObject(this, objectId)) {
 				last = pack;
