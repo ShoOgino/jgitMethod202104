@@ -1,15 +1,17 @@
 	private RebaseResult stop(RevCommit commitToPick) throws IOException {
 		PersonIdent author = commitToPick.getAuthorIdent();
 		String authorScript = toAuthorScript(author);
-		createFile(rebaseDir, AUTHOR_SCRIPT, authorScript);
-		createFile(rebaseDir, MESSAGE, commitToPick.getFullMessage());
+		rebaseState.createFile(AUTHOR_SCRIPT, authorScript);
+		rebaseState.createFile(MESSAGE, commitToPick.getFullMessage());
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		DiffFormatter df = new DiffFormatter(bos);
 		df.setRepository(repo);
 		df.format(commitToPick.getParent(0), commitToPick);
-		createFile(rebaseDir, PATCH, new String(bos.toByteArray(),
+		rebaseState.createFile(PATCH, new String(bos.toByteArray(),
 				Constants.CHARACTER_ENCODING));
-		createFile(rebaseDir, STOPPED_SHA, repo.newObjectReader().abbreviate(
+		rebaseState.createFile(STOPPED_SHA,
+				repo.newObjectReader()
+				.abbreviate(
 				commitToPick).name());
 		// Remove cherry pick state file created by CherryPickCommand, it's not
 		// needed for rebase

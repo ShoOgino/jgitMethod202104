@@ -1,0 +1,13 @@
+		public File getDir() {
+			if (dir == null) {
+				File rebaseApply = new File(repoDirectory, REBASE_APPLY);
+				if (rebaseApply.exists()) {
+					dir = rebaseApply;
+				} else {
+					File rebaseMerge = new File(repoDirectory, REBASE_MERGE);
+					dir = rebaseMerge;
+				}
+			}
+			return dir;
+		}
+

@@ -51,16 +51,16 @@
 
 		Collections.reverse(cherryPickList);
 		// create the folder for the meta information
-		FileUtils.mkdir(rebaseDir);
+		FileUtils.mkdir(rebaseState.getDir());
 
 		repo.writeOrigHead(headId);
-		createFile(rebaseDir, REBASE_HEAD, headId.name());
-		createFile(rebaseDir, HEAD_NAME, headName);
-		createFile(rebaseDir, ONTO, upstreamCommit.name());
-		createFile(rebaseDir, ONTO_NAME, upstreamCommitName);
-		createFile(rebaseDir, INTERACTIVE, ""); //$NON-NLS-1$
+		rebaseState.createFile(REBASE_HEAD, headId.name());
+		rebaseState.createFile(HEAD_NAME, headName);
+		rebaseState.createFile(ONTO, upstreamCommit.name());
+		rebaseState.createFile(ONTO_NAME, upstreamCommitName);
+		rebaseState.createFile(INTERACTIVE, ""); //$NON-NLS-1$
 		BufferedWriter fw = new BufferedWriter(new OutputStreamWriter(
-				new FileOutputStream(new File(rebaseDir, GIT_REBASE_TODO)),
+				new FileOutputStream(rebaseState.getFile(GIT_REBASE_TODO)),
 				Constants.CHARACTER_ENCODING));
 		fw.write("# Created by EGit: rebasing " + upstreamCommit.name()
 				+ " onto " + headId.name());
@@ -92,7 +92,7 @@
 			checkoutOk = checkoutCommit(upstreamCommit);
 		} finally {
 			if (!checkoutOk)
-				FileUtils.delete(rebaseDir, FileUtils.RECURSIVE);
+				FileUtils.delete(rebaseState.getDir(), FileUtils.RECURSIVE);
 		}
 		monitor.endTask();
 

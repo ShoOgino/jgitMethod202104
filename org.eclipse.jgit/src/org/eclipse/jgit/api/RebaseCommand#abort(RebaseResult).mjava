@@ -27,7 +27,7 @@
 			monitor.endTask();
 		}
 		try {
-			String headName = readFile(rebaseDir, HEAD_NAME);
+			String headName = rebaseState.readFile(HEAD_NAME);
 			if (headName.startsWith(Constants.R_REFS)) {
 				monitor.beginTask(MessageFormat.format(
 						JGitText.get().resettingHead, headName),
@@ -47,7 +47,7 @@
 				}
 			}
 			// cleanup the files
-			FileUtils.delete(rebaseDir, FileUtils.RECURSIVE);
+			FileUtils.delete(rebaseState.getDir(), FileUtils.RECURSIVE);
 			repo.writeCherryPickHead(null);
 			return result;
 

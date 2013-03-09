@@ -27,9 +27,9 @@
 			case SKIP:
 				// fall through
 			case CONTINUE:
-				String upstreamCommitId = readFile(rebaseDir, ONTO);
+				String upstreamCommitId = rebaseState.readFile(ONTO);
 				try {
-					upstreamCommitName = readFile(rebaseDir, ONTO_NAME);
+					upstreamCommitName = rebaseState.readFile(ONTO_NAME);
 				} catch (FileNotFoundException e) {
 					// Fall back to commit ID if file doesn't exist (e.g. rebase
 					// was started by C Git)
@@ -50,7 +50,7 @@
 			if (operation == Operation.CONTINUE) {
 				newHead = continueRebase();
 
-				File amendFile = new File(rebaseDir, AMEND);
+				File amendFile = rebaseState.getFile(AMEND);
 				boolean amendExists = amendFile.exists();
 				if (amendExists) {
 					FileUtils.delete(amendFile);
@@ -73,9 +73,9 @@
 			List<Step> steps = loadSteps();
 			if (isInteractive()) {
 				interactiveHandler.prepareSteps(steps);
-				BufferedWriter fw = new BufferedWriter(
-						new OutputStreamWriter(new FileOutputStream(new File(
-								rebaseDir, GIT_REBASE_TODO)),
+				BufferedWriter fw = new BufferedWriter(new OutputStreamWriter(
+						new FileOutputStream(
+								rebaseState.getFile(GIT_REBASE_TODO)),
 								Constants.CHARACTER_ENCODING));
 				fw.newLine();
 				try {
@@ -147,7 +147,7 @@
 								.setAmend(true).call();
 						continue;
 					case EDIT:
-						createFile(rebaseDir, AMEND, commitToPick.name());
+						rebaseState.createFile(AMEND, commitToPick.name());
 						return stop(commitToPick);
 					}
 				} finally {
@@ -155,9 +155,9 @@
 				}
 			}
 			if (newHead != null) {
-				String headName = readFile(rebaseDir, HEAD_NAME);
+				String headName = rebaseState.readFile(HEAD_NAME);
 				updateHead(headName, newHead);
-				FileUtils.delete(rebaseDir, FileUtils.RECURSIVE);
+				FileUtils.delete(rebaseState.getDir(), FileUtils.RECURSIVE);
 				if (lastStepWasForward)
 					return RebaseResult.FAST_FORWARD_RESULT;
 				return RebaseResult.OK_RESULT;
