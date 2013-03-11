@@ -1,0 +1,17 @@
+	/**
+	 * Create a new name-rev command.
+	 *
+	 * @param repo
+	 */
+	protected NameRevCommand(Repository repo) {
+		super(repo);
+		prefixes = new ArrayList<String>(2);
+		revs = new ArrayList<ObjectId>(2);
+		walk = new RevWalk(repo) {
+			@Override
+			public NameRevCommit createCommit(AnyObjectId id) {
+				return new NameRevCommit(id);
+			}
+		};
+	}
+

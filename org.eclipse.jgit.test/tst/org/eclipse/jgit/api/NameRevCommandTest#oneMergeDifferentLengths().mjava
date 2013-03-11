@@ -1,0 +1,13 @@
+	@Test
+	public void oneMergeDifferentLengths() throws Exception {
+		// 0--1--2--4
+		//  \--3---/
+		RevCommit c0 = tr.commit().create();
+		RevCommit c1 = tr.commit().parent(c0).create();
+		RevCommit c2 = tr.commit().parent(c1).create();
+		RevCommit c3 = tr.commit().parent(c0).create();
+		RevCommit c4 = tr.commit().parent(c2).parent(c3).create();
+		tr.update("master", c4);
+		assertOneResult("master^2~1", c0);
+	}
+

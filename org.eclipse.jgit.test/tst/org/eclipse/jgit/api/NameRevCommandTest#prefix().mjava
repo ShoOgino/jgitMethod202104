@@ -1,0 +1,14 @@
+	@Test
+	public void prefix() throws Exception {
+		RevCommit c = tr.commit().create();
+		tr.update("refs/heads/master", c);
+		tr.update("refs/tags/tag", c);
+		assertOneResult("master", c);
+		assertOneResult("master",
+				git.nameRev().addPrefix("refs/heads/").addPrefix("refs/tags/"),
+				c);
+		assertOneResult("tag",
+				git.nameRev().addPrefix("refs/tags/").addPrefix("refs/heads/"),
+				c);
+	}
+
