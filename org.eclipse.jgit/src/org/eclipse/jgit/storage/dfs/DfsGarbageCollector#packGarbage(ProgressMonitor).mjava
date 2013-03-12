@@ -6,9 +6,9 @@
 		PackWriter pw = newPackWriter();
 		try {
 			RevWalk pool = new RevWalk(ctx);
+			pm.beginTask("Finding garbage", (int) getObjectsBefore());
 			for (DfsPackFile oldPack : packsBefore) {
 				PackIndex oldIdx = oldPack.getPackIndex(ctx);
-				pm.beginTask("Finding garbage", (int) oldIdx.getObjectCount());
 				for (PackIndex.MutableEntry ent : oldIdx) {
 					pm.update(1);
 					ObjectId id = ent.toObjectId();
@@ -18,8 +18,8 @@
 					int type = oldPack.getObjectType(ctx, ent.getOffset());
 					pw.addObject(pool.lookupAny(id, type));
 				}
-				pm.endTask();
 			}
+			pm.endTask();
 			if (0 < pw.getObjectCount())
 				writePack(UNREACHABLE_GARBAGE, pw, pm);
 		} finally {
