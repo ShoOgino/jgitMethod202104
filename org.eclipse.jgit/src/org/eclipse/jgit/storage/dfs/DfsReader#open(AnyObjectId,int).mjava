@@ -8,8 +8,9 @@
 				return ldr;
 		}
 
+		boolean noGarbage = avoidUnreachable;
 		for (DfsPackFile pack : db.getPacks()) {
-			if (pack == last)
+			if (pack == last || (noGarbage && pack.isGarbage()))
 				continue;
 			ObjectLoader ldr = pack.get(this, objectId);
 			if (ldr != null) {
