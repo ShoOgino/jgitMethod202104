@@ -1,0 +1,27 @@
+	/**
+	 * Add all annotated tags under {@code refs/tags/} to the set that all results
+	 * must match.
+	 * <p>
+	 * Calls {@link #addRef(Ref)}; see that method for a note on matching
+	 * priority.
+	 *
+	 * @return {@code this}
+	 * @throws JGitInternalException
+	 *             a low-level exception of JGit has occurred. The original
+	 *             exception can be retrieved by calling
+	 *             {@link Exception#getCause()}.
+	 */
+	public NameRevCommand addAnnotatedTags() {
+		checkCallable();
+		try {
+			for (Ref ref : repo.getRefDatabase().getRefs(Constants.R_TAGS).values()) {
+				ObjectId id = ref.getObjectId();
+				if (id != null && (walk.parseAny(id) instanceof RevTag))
+					addRef(ref);
+			}
+		} catch (IOException e) {
+			throw new JGitInternalException(e.getMessage(), e);
+		}
+		return this;
+	}
+

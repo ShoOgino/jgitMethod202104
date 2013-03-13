@@ -3,6 +3,8 @@
 		try {
 			Map<ObjectId, String> nonCommits = new HashMap<ObjectId, String>();
 			FIFORevQueue pending = new FIFORevQueue();
+			for (Ref ref : refs)
+				addRef(ref, nonCommits, pending);
 			addPrefixes(nonCommits, pending);
 			int cutoff = minCommitTime() - COMMIT_TIME_SLOP;
 
