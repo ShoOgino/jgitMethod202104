@@ -1,5 +1,5 @@
 	@Test
-	public void oneMergeDifferentLengths() throws Exception {
+	public void onePathMergeLongerFirstParentPath() throws Exception {
 		// 0--1--2--4
 		//  \--3---/
 		RevCommit c0 = tr.commit().create();
@@ -8,6 +8,7 @@
 		RevCommit c3 = tr.commit().parent(c0).create();
 		RevCommit c4 = tr.commit().parent(c2).parent(c3).create();
 		tr.update("master", c4);
-		assertOneResult("master^2~1", c0);
+		assertOneResult("master^2", c3);
+		assertOneResult("master~3", c0);
 	}
 

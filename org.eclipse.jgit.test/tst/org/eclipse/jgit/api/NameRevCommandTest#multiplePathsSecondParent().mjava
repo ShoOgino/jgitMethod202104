@@ -1,0 +1,16 @@
+	@Test
+	public void multiplePathsSecondParent() throws Exception {
+		// 0--...--2
+		//  \--1--/
+		RevCommit c0 = tr.commit().create();
+		RevCommit c1 = tr.commit().parent(c0).create();
+		RevCommit c = c0;
+		int mergeCost = 5;
+		for (int i = 0; i < mergeCost; i++) {
+			c = tr.commit().parent(c).create();
+		}
+		RevCommit c2 = tr.commit().parent(c).parent(c1).create();
+		tr.update("master", c2);
+		assertOneResult("master^2~1", git.nameRev().setMergeCost(mergeCost), c0);
+	}
+
