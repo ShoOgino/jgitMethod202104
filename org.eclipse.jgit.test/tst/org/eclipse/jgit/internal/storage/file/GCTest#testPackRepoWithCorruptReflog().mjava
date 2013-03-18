@@ -1,0 +1,14 @@
+	@Test
+	public void testPackRepoWithCorruptReflog() throws Exception {
+		// create a reflog entry "0000... 0000... foobar" by doing an initial
+		// refupdate for HEAD which points to a non-existing ref. The
+		// All-Projects repo of gerrit instances had such entries
+		RefUpdate ru = repo.updateRef(Constants.HEAD);
+		ru.link("refs/to/garbage");
+		tr.branch("refs/heads/master").commit().add("A", "A").add("B", "B")
+				.create();
+		// make sure HEAD exists
+		Git.wrap(repo).checkout().setName("refs/heads/master").call();
+		gc.gc();
+	}
+
