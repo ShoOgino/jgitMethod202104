@@ -1,27 +1,27 @@
 	/**
-	 * Update the HEAD ref when the referenced branch is unborn
+	 * Update the HEAD ref. Only it should be changed, not what it points to.
 	 *
 	 * @throws Exception
 	 */
 	@Test
-	public void testUpdateRefDetachedUnbornHead() throws Exception {
+	public void testUpdateRefDetached() throws Exception {
+		ObjectId pid = db.resolve("refs/heads/master");
 		ObjectId ppid = db.resolve("refs/heads/master^");
-		writeSymref("HEAD", "refs/heads/unborn");
 		RefUpdate updateRef = db.updateRef("HEAD", true);
 		updateRef.setForceUpdate(true);
 		updateRef.setNewObjectId(ppid);
 		Result update = updateRef.update();
-		assertEquals(Result.NEW, update);
+		assertEquals(Result.FORCED, update);
 		assertEquals(ppid, db.resolve("HEAD"));
 		Ref ref = db.getRef("HEAD");
 		assertEquals("HEAD", ref.getName());
 		assertTrue("is detached", !ref.isSymbolic());
 
 		// the branch HEAD referred to is left untouched
-		assertNull(db.resolve("refs/heads/unborn"));
+		assertEquals(pid, db.resolve("refs/heads/master"));
 		ReflogReader reflogReader = new  ReflogReader(db, "HEAD");
-		org.eclipse.jgit.storage.file.ReflogEntry e = reflogReader.getReverseEntries().get(0);
-		assertEquals(ObjectId.zeroId(), e.getOldId());
+		org.eclipse.jgit.internal.storage.file.ReflogEntry e = reflogReader.getReverseEntries().get(0);
+		assertEquals(pid, e.getOldId());
 		assertEquals(ppid, e.getNewId());
 		assertEquals("GIT_COMMITTER_EMAIL", e.getWho().getEmailAddress());
 		assertEquals("GIT_COMMITTER_NAME", e.getWho().getName());

@@ -11,11 +11,7 @@
 
 			FileBasedConfig cfg = new FileBasedConfig(configFile, FS.DETECTED);
 			cfg.load();
-
-			WindowCacheConfig wcc = new WindowCacheConfig();
-			wcc.fromConfig(cfg);
-			WindowCache.reconfigure(wcc);
-
+			new WindowCacheConfig().fromConfig(cfg).install();
 			packConfig.fromConfig(cfg);
 		}
 

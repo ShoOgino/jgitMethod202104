@@ -4,7 +4,7 @@
 			final WindowCacheConfig cfg = new WindowCacheConfig();
 			cfg.setPackedGitLimit(1024);
 			cfg.setPackedGitWindowSize(8192);
-			WindowCache.reconfigure(cfg);
+			cfg.install();
 			fail("incorrectly permitted PackedGitWindowSize > PackedGitLimit");
 		} catch (IllegalArgumentException e) {
 			assertEquals("Window size must be < limit", e.getMessage());

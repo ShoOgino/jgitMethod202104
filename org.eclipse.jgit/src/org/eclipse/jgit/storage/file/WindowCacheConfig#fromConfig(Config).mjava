@@ -4,9 +4,11 @@
 	 * If a property is not defined in the configuration, then it is left
 	 * unmodified.
 	 *
-	 * @param rc configuration to read properties from.
+	 * @param rc
+	 *            configuration to read properties from.
+	 * @return {@code this}.
 	 */
-	public void fromConfig(final Config rc) {
+	public WindowCacheConfig fromConfig(final Config rc) {
 		setPackedGitOpenFiles(rc.getInt(
 				"core", null, "packedgitopenfiles", getPackedGitOpenFiles())); //$NON-NLS-1$ //$NON-NLS-2$
 		setPackedGitLimit(rc.getLong(
@@ -24,5 +26,6 @@
 		sft = Math.min(sft, maxMem / 4); // don't use more than 1/4 of the heap
 		sft = Math.min(sft, Integer.MAX_VALUE); // cannot exceed array length
 		setStreamFileThreshold((int) sft);
+		return this;
 	}
 
