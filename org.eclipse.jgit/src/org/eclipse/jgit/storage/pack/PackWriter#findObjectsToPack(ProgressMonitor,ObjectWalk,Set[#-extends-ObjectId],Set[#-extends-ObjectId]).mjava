@@ -34,46 +34,14 @@
 		all.addAll(want);
 		all.addAll(have);
 
-		final Map<ObjectId, CachedPack> tipToPack = new HashMap<ObjectId, CachedPack>();
-		final RevFlag inCachedPack = walker.newFlag("inCachedPack"); //$NON-NLS-1$
 		final RevFlag include = walker.newFlag("include"); //$NON-NLS-1$
 		final RevFlag added = walker.newFlag("added"); //$NON-NLS-1$
-
-		final RevFlagSet keepOnRestart = new RevFlagSet();
-		keepOnRestart.add(inCachedPack);
 
 		walker.carry(include);
 
 		int haveEst = have.size();
 		if (have.isEmpty()) {
 			walker.sort(RevSort.COMMIT_TIME_DESC);
-			if (useCachedPacks && reuseSupport != null) {
-				Set<ObjectId> need = new HashSet<ObjectId>(want);
-				List<CachedPack> shortCircuit = new LinkedList<CachedPack>();
-
-				for (CachedPack pack : reuseSupport.getCachedPacks()) {
-					if (need.containsAll(pack.getTips())) {
-						need.removeAll(pack.getTips());
-						shortCircuit.add(pack);
-					}
-
-					for (ObjectId id : pack.getTips()) {
-						tipToPack.put(id, pack);
-						all.add(id);
-					}
-				}
-
-				if (need.isEmpty() && !shortCircuit.isEmpty()) {
-					cachedPacks.addAll(shortCircuit);
-					for (CachedPack pack : shortCircuit)
-						countingMonitor.update((int) pack.getObjectCount());
-					endPhase(countingMonitor);
-					stats.timeCounting = System.currentTimeMillis() - countingStart;
-					return;
-				}
-
-				haveEst += tipToPack.size();
-			}
 		} else {
 			walker.sort(RevSort.TOPO);
 			if (thin)
@@ -91,10 +59,6 @@
 					RevObject o = q.next();
 					if (o == null)
 						break;
-
-					if (tipToPack.containsKey(o))
-						o.add(inCachedPack);
-
 					if (have.contains(o))
 						haveObjs.add(o);
 					if (want.contains(o)) {
@@ -150,20 +114,6 @@
 		while ((c = walker.next()) != null) {
 			if (exclude(c))
 				continue;
-			if (c.has(inCachedPack)) {
-				CachedPack pack = tipToPack.get(c);
-				if (includesAllTips(pack, include, walker)) {
-					useCachedPack(walker, keepOnRestart, //
-							wantObjs, haveObjs, pack);
-					commits = new BlockList<RevCommit>();
-
-					endPhase(countingMonitor);
-					beginPhase(PackingPhase.COUNTING, countingMonitor,
-							ProgressMonitor.UNKNOWN);
-					continue;
-				}
-			}
-
 			if (c.has(RevFlag.UNINTERESTING)) {
 				if (baseTrees.size() <= maxBases)
 					baseTrees.add(c.getTree());
