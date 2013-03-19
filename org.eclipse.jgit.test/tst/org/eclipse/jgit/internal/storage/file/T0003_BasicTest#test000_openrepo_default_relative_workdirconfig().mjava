@@ -18,8 +18,8 @@
 		repo1initial.close();
 
 		File theDir = new File(repo1Parent, Constants.DOT_GIT);
-		FileRepository r = new FileRepositoryBuilder().setGitDir(theDir)
-				.build();
+		FileRepository r = (FileRepository) new FileRepositoryBuilder()
+				.setGitDir(theDir).build();
 		assertEqualsPath(theDir, r.getDirectory());
 		assertEqualsPath(workdir, r.getWorkTree());
 		assertEqualsPath(new File(theDir, "index"), r.getIndexFile());
