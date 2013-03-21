@@ -1,0 +1,19 @@
+	private void verifyStageState(StageState expected, int... stages)
+			throws IOException {
+		DirCacheBuilder builder = db.lockDirCache().builder();
+		for (int stage : stages) {
+			DirCacheEntry entry = createEntry("a", FileMode.REGULAR_FILE,
+					stage, "content");
+			builder.add(entry);
+		}
+		builder.commit();
+
+		IndexDiff diff = new IndexDiff(db, Constants.HEAD,
+				new FileTreeIterator(db));
+		diff.diff();
+
+		assertEquals(
+				"Conflict for entries in stages " + Arrays.toString(stages),
+				expected, diff.getConflictingStageStates().get("a"));
+	}
+

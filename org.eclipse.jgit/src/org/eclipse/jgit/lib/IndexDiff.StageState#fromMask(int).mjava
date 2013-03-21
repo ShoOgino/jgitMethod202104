@@ -1,0 +1,22 @@
+		static StageState fromMask(int stageMask) {
+			// bits represent: theirs, ours, base
+			switch (stageMask) {
+			case 1: // 0b001
+				return BOTH_DELETED;
+			case 2: // 0b010
+				return ADDED_BY_US;
+			case 3: // 0b011
+				return DELETED_BY_THEM;
+			case 4: // 0b100
+				return ADDED_BY_THEM;
+			case 5: // 0b101
+				return DELETED_BY_US;
+			case 6: // 0b110
+				return BOTH_ADDED;
+			case 7: // 0b111
+				return BOTH_MODIFIED;
+			default:
+				return null;
+			}
+		}
+
