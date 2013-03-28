@@ -5,7 +5,7 @@
 		int currentIndex = 0;
 		List<AbstractHead> heads = new ArrayList<AbstractHead>();
 		while (currentIndex < pattern.length()) {
-			final int groupStart = pattern.indexOf('[', currentIndex);
+			final int groupStart = indexOfUnescaped(pattern, '[', currentIndex);
 			if (groupStart == -1) {
 				final String patternPart = pattern.substring(currentIndex);
 				heads.addAll(createSimpleHeads(patternPart,
