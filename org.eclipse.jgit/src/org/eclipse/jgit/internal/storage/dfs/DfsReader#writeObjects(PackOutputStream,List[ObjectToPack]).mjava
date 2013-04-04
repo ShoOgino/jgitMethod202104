@@ -22,13 +22,7 @@
 		case OBJ_BLOB:
 			Collections.sort(list, WRITE_SORT);
 		}
-
-		try {
-			wantReadAhead = true;
-			for (ObjectToPack otp : list)
-				out.writeObject(otp);
-		} finally {
-			cancelReadAhead();
-		}
+		for (ObjectToPack otp : list)
+			out.writeObject(otp);
 	}
 

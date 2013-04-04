@@ -1,8 +1,6 @@
 	@Override
 	public <T extends ObjectId> AsyncObjectLoaderQueue<T> open(
 			Iterable<T> objectIds, final boolean reportMissing) {
-		wantReadAhead = true;
-
 		Iterable<FoundObject<T>> order;
 		IOException error = null;
 		try {
@@ -24,7 +22,6 @@
 				} else if (findAllError != null) {
 					throw findAllError;
 				} else {
-					cancelReadAhead();
 					return false;
 				}
 			}
@@ -44,12 +41,11 @@
 			}
 
 			public boolean cancel(boolean mayInterruptIfRunning) {
-				cancelReadAhead();
 				return true;
 			}
 
 			public void release() {
-				cancelReadAhead();
+				// Nothing to clean up.
 			}
 		};
 	}

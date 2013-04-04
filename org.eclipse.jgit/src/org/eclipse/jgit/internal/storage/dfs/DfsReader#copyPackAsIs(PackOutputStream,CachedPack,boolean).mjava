@@ -1,10 +1,5 @@
 	public void copyPackAsIs(PackOutputStream out, CachedPack pack,
 			boolean validate) throws IOException {
-		try {
-			wantReadAhead = true;
-			((DfsCachedPack) pack).copyAsIs(out, validate, this);
-		} finally {
-			cancelReadAhead();
-		}
+		((DfsCachedPack) pack).copyAsIs(out, validate, this);
 	}
 
