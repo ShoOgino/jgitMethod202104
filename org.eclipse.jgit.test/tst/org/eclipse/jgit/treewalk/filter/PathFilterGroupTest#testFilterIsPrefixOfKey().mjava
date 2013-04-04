@@ -6,5 +6,10 @@
 		assertTrue(filter.include(fakeWalk("c/d/e/f")));
 		assertTrue(filter.include(fakeWalk("c/d/f/g")));
 		assertTrue(filter.include(fakeWalk("d/e/f/g/h")));
+		assertTrue(filter.include(fakeWalk("d/e/f/g/y")));
+		assertTrue(filter.include(fakeWalk("d/e/f/g.x/h")));
+		// listed before g/y, so can't StopWalk here, but it's not included
+		// either
+		assertFalse(filter.include(fakeWalk("d/e/f/g.y")));
 	}
 
