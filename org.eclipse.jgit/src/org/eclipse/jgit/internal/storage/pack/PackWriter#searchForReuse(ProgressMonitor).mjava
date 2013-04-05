@@ -1,36 +1,33 @@
 	private void searchForReuse(ProgressMonitor monitor) throws IOException {
 		long cnt = 0;
-		cnt += objectsLists[Constants.OBJ_COMMIT].size();
-		cnt += objectsLists[Constants.OBJ_TREE].size();
-		cnt += objectsLists[Constants.OBJ_BLOB].size();
-		cnt += objectsLists[Constants.OBJ_TAG].size();
+		cnt += objectsLists[OBJ_COMMIT].size();
+		cnt += objectsLists[OBJ_TREE].size();
+		cnt += objectsLists[OBJ_BLOB].size();
+		cnt += objectsLists[OBJ_TAG].size();
 
 		long start = System.currentTimeMillis();
 		beginPhase(PackingPhase.FINDING_SOURCES, monitor, cnt);
-
 		if (cnt <= 4096) {
 			// For small object counts, do everything as one list.
 			BlockList<ObjectToPack> tmp = new BlockList<ObjectToPack>((int) cnt);
-			tmp.addAll(objectsLists[Constants.OBJ_TAG]);
-			tmp.addAll(objectsLists[Constants.OBJ_COMMIT]);
-			tmp.addAll(objectsLists[Constants.OBJ_TREE]);
-			tmp.addAll(objectsLists[Constants.OBJ_BLOB]);
+			tmp.addAll(objectsLists[OBJ_TAG]);
+			tmp.addAll(objectsLists[OBJ_COMMIT]);
+			tmp.addAll(objectsLists[OBJ_TREE]);
+			tmp.addAll(objectsLists[OBJ_BLOB]);
 			searchForReuse(monitor, tmp);
 			if (pruneCurrentObjectList) {
 				// If the list was pruned, we need to re-prune the main lists.
-				pruneEdgesFromObjectList(objectsLists[Constants.OBJ_COMMIT]);
-				pruneEdgesFromObjectList(objectsLists[Constants.OBJ_TREE]);
-				pruneEdgesFromObjectList(objectsLists[Constants.OBJ_BLOB]);
-				pruneEdgesFromObjectList(objectsLists[Constants.OBJ_TAG]);
+				pruneEdgesFromObjectList(objectsLists[OBJ_COMMIT]);
+				pruneEdgesFromObjectList(objectsLists[OBJ_TREE]);
+				pruneEdgesFromObjectList(objectsLists[OBJ_BLOB]);
+				pruneEdgesFromObjectList(objectsLists[OBJ_TAG]);
 			}
-
 		} else {
-			searchForReuse(monitor, objectsLists[Constants.OBJ_TAG]);
-			searchForReuse(monitor, objectsLists[Constants.OBJ_COMMIT]);
-			searchForReuse(monitor, objectsLists[Constants.OBJ_TREE]);
-			searchForReuse(monitor, objectsLists[Constants.OBJ_BLOB]);
+			searchForReuse(monitor, objectsLists[OBJ_TAG]);
+			searchForReuse(monitor, objectsLists[OBJ_COMMIT]);
+			searchForReuse(monitor, objectsLists[OBJ_TREE]);
+			searchForReuse(monitor, objectsLists[OBJ_BLOB]);
 		}
-
 		endPhase(monitor);
 		stats.timeSearchingForReuse = System.currentTimeMillis() - start;
 	}

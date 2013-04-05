@@ -5,11 +5,11 @@
 	 * @return ObjectId representing SHA-1 name of a pack that was created.
 	 */
 	public ObjectId computeName() {
-		final byte[] buf = new byte[Constants.OBJECT_ID_LENGTH];
+		final byte[] buf = new byte[OBJECT_ID_LENGTH];
 		final MessageDigest md = Constants.newMessageDigest();
 		for (ObjectToPack otp : sortByName()) {
 			otp.copyRawTo(buf, 0);
-			md.update(buf, 0, Constants.OBJECT_ID_LENGTH);
+			md.update(buf, 0, OBJECT_ID_LENGTH);
 		}
 		return ObjectId.fromRaw(md.digest());
 	}
