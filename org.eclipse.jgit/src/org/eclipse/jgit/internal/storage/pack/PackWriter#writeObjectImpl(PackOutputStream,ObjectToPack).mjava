@@ -6,13 +6,7 @@
 			// (for example due to a concurrent repack) and a different base
 			// was chosen, forcing a cycle. Select something other than a
 			// delta, and write this object.
-			//
-			reuseDeltas = false;
-			otp.clearDeltaBase();
-			otp.clearReuseAsIs();
-			reuseSupport.selectObjectRepresentation(this,
-					NullProgressMonitor.INSTANCE,
-					Collections.singleton(otp));
+			reselectNonDelta(otp);
 		}
 		otp.markWantWrite();
 

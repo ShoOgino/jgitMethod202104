@@ -30,5 +30,10 @@
 		}
 		endPhase(monitor);
 		stats.timeSearchingForReuse = System.currentTimeMillis() - start;
+
+		if (config.isReuseDeltas() && config.getCutDeltaChains()) {
+			cutDeltaChains(objectsLists[OBJ_TREE]);
+			cutDeltaChains(objectsLists[OBJ_BLOB]);
+		}
 	}
 
