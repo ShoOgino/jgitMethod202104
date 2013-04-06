@@ -25,7 +25,12 @@
 			mergeCmd.include(srcRef);
 		else
 			mergeCmd.include(src);
-		MergeResult result = mergeCmd.call();
+		MergeResult result;
+		try {
+			result = mergeCmd.call();
+		} catch (CheckoutConflictException e) {
+			result = new MergeResult(e.getConflictingPaths()); // CHECKOUT_CONFLICT
+		}
 
 		switch (result.getMergeStatus()) {
 		case ALREADY_UP_TO_DATE:
@@ -39,6 +44,12 @@
 					.abbreviate(7).name(), result.getNewHead().abbreviate(7)
 					.name()));
 			outw.println(result.getMergeStatus().toString());
+			break;
+		case CHECKOUT_CONFLICT:
+			outw.println(CLIText.get().mergeCheckoutConflict);
+			for (String collidingPath : result.getCheckoutConflicts())
+				outw.println("\t" + collidingPath); //$NON-NLS-1$
+			outw.println(CLIText.get().mergeCheckoutFailed);
 			break;
 		case CONFLICTING:
 			for (String collidingPath : result.getConflicts().keySet())
