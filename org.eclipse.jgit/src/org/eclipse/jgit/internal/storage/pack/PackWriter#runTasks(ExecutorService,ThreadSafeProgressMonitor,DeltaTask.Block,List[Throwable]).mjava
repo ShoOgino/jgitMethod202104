@@ -1,8 +1,8 @@
 	private static void runTasks(ExecutorService pool,
 			ThreadSafeProgressMonitor pm,
-			List<DeltaTask> tasks, List<Throwable> errors) throws IOException {
-		List<Future<?>> futures = new ArrayList<Future<?>>(tasks.size());
-		for (DeltaTask task : tasks)
+			DeltaTask.Block tb, List<Throwable> errors) throws IOException {
+		List<Future<?>> futures = new ArrayList<Future<?>>(tb.tasks.size());
+		for (DeltaTask task : tb.tasks)
 			futures.add(pool.submit(task));
 
 		try {
