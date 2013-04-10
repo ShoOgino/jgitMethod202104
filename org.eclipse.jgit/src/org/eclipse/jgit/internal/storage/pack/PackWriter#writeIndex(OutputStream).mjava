@@ -13,7 +13,7 @@
 	 *             the index data could not be written to the supplied stream.
 	 */
 	public void writeIndex(final OutputStream indexStream) throws IOException {
-		if (!cachedPacks.isEmpty())
+		if (isIndexDisabled())
 			throw new IOException(JGitText.get().cachedPacksPreventsIndexCreation);
 
 		long writeStart = System.currentTimeMillis();

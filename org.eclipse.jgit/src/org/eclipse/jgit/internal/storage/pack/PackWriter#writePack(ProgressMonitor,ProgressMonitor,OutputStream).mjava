@@ -52,8 +52,13 @@
 		if (config.isDeltaCompress())
 			searchForDeltas(compressMonitor);
 
-		final PackOutputStream out = new PackOutputStream(writeMonitor,
-				packStream, this);
+		crc32 = new CRC32();
+		final PackOutputStream out = new PackOutputStream(
+			writeMonitor,
+			isIndexDisabled()
+				? packStream
+				: new CheckedOutputStream(packStream, crc32),
+			this);
 
 		long objCnt = getObjectCount();
 		stats.totalObjects = objCnt;

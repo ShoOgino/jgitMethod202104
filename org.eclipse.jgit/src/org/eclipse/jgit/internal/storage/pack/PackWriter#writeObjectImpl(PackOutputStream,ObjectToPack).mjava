@@ -15,12 +15,12 @@
 			if (otp.isWritten())
 				return; // Delta chain cycle caused this to write already.
 
-			out.resetCRC32();
+			crc32.reset();
 			otp.setOffset(out.length());
 			try {
 				reuseSupport.copyObjectAsIs(out, otp, reuseValidate);
 				out.endObject();
-				otp.setCRC(out.getCRC32());
+				otp.setCRC((int) crc32.getValue());
 				typeStats.reusedObjects++;
 				if (otp.isDeltaRepresentation()) {
 					typeStats.reusedDeltas++;
@@ -54,6 +54,6 @@
 		else
 			writeWholeObjectDeflate(out, otp);
 		out.endObject();
-		otp.setCRC(out.getCRC32());
+		otp.setCRC((int) crc32.getValue());
 	}
 
