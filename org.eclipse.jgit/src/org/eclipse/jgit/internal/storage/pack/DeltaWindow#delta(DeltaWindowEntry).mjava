@@ -1,30 +1,21 @@
 	private boolean delta(final DeltaWindowEntry src)
 			throws IOException {
 		// Objects must use only the same type as their delta base.
-		// If we are looking at something where that isn't true we
-		// have exhausted everything of the correct type and should
-		// move on to the next thing to examine.
-		//
 		if (src.type() != res.type()) {
 			keepInWindow();
 			return NEXT_RES;
 		}
 
-		// Only consider a source with a short enough delta chain.
-		if (src.depth() > resMaxDepth)
+		// If the sizes are radically different, this is a bad pairing.
+		if (res.size() < src.size() >>> 4)
 			return NEXT_SRC;
 
-		// Estimate a reasonable upper limit on delta size.
-		int msz = deltaSizeLimit(res, resMaxDepth, src);
-		if (msz <= 8)
+		int msz = deltaSizeLimit(src);
+		if (msz <= 8) // Nearly impossible to fit useful delta.
 			return NEXT_SRC;
 
 		// If we have to insert a lot to make this work, find another.
 		if (res.size() - src.size() > msz)
-			return NEXT_SRC;
-
-		// If the sizes are radically different, this is a bad pairing.
-		if (res.size() < src.size() / 16)
 			return NEXT_SRC;
 
 		DeltaIndex srcIndex;
@@ -32,16 +23,11 @@
 			srcIndex = index(src);
 		} catch (LargeObjectException tooBig) {
 			// If the source is too big to work on, skip it.
-			dropFromWindow(src);
 			return NEXT_SRC;
 		} catch (IOException notAvailable) {
-			if (src.object.isEdge()) {
-				// This is an edge that is suddenly not available.
-				dropFromWindow(src);
+			if (src.object.isEdge()) // Missing edges are OK.
 				return NEXT_SRC;
-			} else {
-				throw notAvailable;
-			}
+			throw notAvailable;
 		}
 
 		byte[] resBuf;
@@ -52,25 +38,15 @@
 			return NEXT_RES;
 		}
 
-		// If we already have a delta for the current object, abort
-		// encoding early if this new pairing produces a larger delta.
-		if (bestDelta != null && bestDelta.length() < msz)
-			msz = (int) bestDelta.length();
-
-		TemporaryBuffer.Heap delta = new TemporaryBuffer.Heap(msz);
 		try {
-			if (!srcIndex.encode(delta, resBuf, msz))
-				return NEXT_SRC;
+			TemporaryBuffer.Heap delta = new TemporaryBuffer.Heap(msz);
+			if (srcIndex.encode(delta, resBuf, msz)) {
+				bestBase = src;
+				bestDelta = delta;
+			}
 		} catch (IOException deltaTooBig) {
-			// This only happens when the heap overflows our limit.
-			return NEXT_SRC;
+			// Unlikely, encoder should see limit and return false.
 		}
-
-		if (isBetterDelta(src, delta)) {
-			bestDelta = delta;
-			bestBase = src;
-		}
-
 		return NEXT_SRC;
 	}
 

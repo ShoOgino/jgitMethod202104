@@ -1,0 +1,25 @@
+	private int deltaSizeLimit(DeltaWindowEntry src) {
+		if (bestBase == null) {
+			// Any delta should be no more than 50% of the original size
+			// (for text files deflate of whole form should shrink 50%).
+			int n = res.size() >>> 1;
+
+			// Evenly distribute delta size limits over allowed depth.
+			// If src is non-delta (depth = 0), delta <= 50% of original.
+			// If src is almost at limit (9/10), delta <= 10% of original.
+			return n * (maxDepth - src.depth()) / maxDepth;
+		}
+
+		// With a delta base chosen any new delta must be "better".
+		// Retain the distribution described above.
+		int d = bestBase.depth();
+		int n = (int) bestDelta.length();
+
+		// If src is whole (depth=0) and base is near limit (depth=9/10)
+		// any delta using src can be 10x larger and still be better.
+		//
+		// If src is near limit (depth=9/10) and base is whole (depth=0)
+		// a new delta dependent on src must be 1/10th the size.
+		return n * (maxDepth - src.depth()) / (maxDepth - d);
+	}
+
