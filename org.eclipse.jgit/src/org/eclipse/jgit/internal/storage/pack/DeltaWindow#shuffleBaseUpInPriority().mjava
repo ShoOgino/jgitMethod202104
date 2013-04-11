@@ -1,17 +1,7 @@
 	private void shuffleBaseUpInPriority() {
-		// Shuffle the entire window so that the best match we just used
-		// is at our current index, and our current object is at the index
-		// before it. Slide any entries in between to make space.
-		//
-		window[resSlot] = window[bestSlot];
-
-		DeltaWindowEntry next = res;
-		int slot = prior(resSlot);
-		for (; slot != bestSlot; slot = prior(slot)) {
-			DeltaWindowEntry e = window[slot];
-			window[slot] = next;
-			next = e;
-		}
-		window[slot] = next;
+		// Reorder the window so that the best match we just used
+		// is the current one, and the now current object is before.
+		res.makeNext(bestBase);
+		res = bestBase;
 	}
 

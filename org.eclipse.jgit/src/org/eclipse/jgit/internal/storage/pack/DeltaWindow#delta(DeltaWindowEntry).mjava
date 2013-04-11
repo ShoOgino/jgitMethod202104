@@ -1,4 +1,4 @@
-	private boolean delta(final DeltaWindowEntry src, final int srcSlot)
+	private boolean delta(final DeltaWindowEntry src)
 			throws IOException {
 		// Objects must use only the same type as their delta base.
 		// If we are looking at something where that isn't true we
@@ -32,12 +32,12 @@
 			srcIndex = index(src);
 		} catch (LargeObjectException tooBig) {
 			// If the source is too big to work on, skip it.
-			dropFromWindow(srcSlot);
+			dropFromWindow(src);
 			return NEXT_SRC;
 		} catch (IOException notAvailable) {
 			if (src.object.isEdge()) {
 				// This is an edge that is suddenly not available.
-				dropFromWindow(srcSlot);
+				dropFromWindow(src);
 				return NEXT_SRC;
 			} else {
 				throw notAvailable;
@@ -68,7 +68,7 @@
 
 		if (isBetterDelta(src, delta)) {
 			bestDelta = delta;
-			bestSlot = srcSlot;
+			bestBase = src;
 		}
 
 		return NEXT_SRC;

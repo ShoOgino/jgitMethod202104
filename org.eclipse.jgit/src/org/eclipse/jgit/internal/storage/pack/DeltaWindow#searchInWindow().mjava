@@ -11,11 +11,10 @@
 		// Loop through the window backwards, considering every entry.
 		// This lets us look at the bigger objects that came before.
 		//
-		for (int srcSlot = prior(resSlot); srcSlot != resSlot; srcSlot = prior(srcSlot)) {
-			DeltaWindowEntry src = window[srcSlot];
+		for (DeltaWindowEntry src = res.prev; src != res; src = src.prev) {
 			if (src.empty())
 				break;
-			if (delta(src, srcSlot) /* == NEXT_SRC */)
+			if (delta(src) /* == NEXT_SRC */)
 				continue;
 			bestDelta = null;
 			return;
@@ -31,7 +30,7 @@
 
 		// Select this best matching delta as the base for the object.
 		//
-		ObjectToPack srcObj = window[bestSlot].object;
+		ObjectToPack srcObj = bestBase.object;
 		ObjectToPack resObj = res.object;
 		if (srcObj.isEdge()) {
 			// The source (the delta base) is an edge object outside of the
