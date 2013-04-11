@@ -1,23 +1,21 @@
 	private void cacheDelta(ObjectToPack srcObj, ObjectToPack resObj) {
-		if (Integer.MAX_VALUE < bestDelta.length())
-			return;
-
-		int rawsz = (int) bestDelta.length();
-		if (deltaCache.canCache(rawsz, srcObj, resObj)) {
+		if (deltaCache.canCache(deltaLen, srcObj, resObj)) {
 			try {
-				byte[] zbuf = new byte[deflateBound(rawsz)];
-
+				byte[] zbuf = new byte[deflateBound(deltaLen)];
 				ZipStream zs = new ZipStream(deflater(), zbuf);
-				bestDelta.writeTo(zs, null);
-				bestDelta = null;
+				if (deltaBuf instanceof byte[])
+					zs.write((byte[]) deltaBuf, 0, deltaLen);
+				else
+					((TemporaryBuffer.Heap) deltaBuf).writeTo(zs, null);
+				deltaBuf = null;
 				int len = zs.finish();
 
-				resObj.setCachedDelta(deltaCache.cache(zbuf, len, rawsz));
-				resObj.setCachedSize(rawsz);
+				resObj.setCachedDelta(deltaCache.cache(zbuf, len, deltaLen));
+				resObj.setCachedSize(deltaLen);
 			} catch (IOException err) {
-				deltaCache.credit(rawsz);
+				deltaCache.credit(deltaLen);
 			} catch (OutOfMemoryError err) {
-				deltaCache.credit(rawsz);
+				deltaCache.credit(deltaLen);
 			}
 		}
 	}

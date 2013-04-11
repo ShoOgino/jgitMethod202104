@@ -39,11 +39,11 @@
 		}
 
 		try {
-			TemporaryBuffer.Heap delta = new TemporaryBuffer.Heap(msz);
-			if (srcIndex.encode(delta, resBuf, msz)) {
-				bestBase = src;
-				bestDelta = delta;
-			}
+			OutputStream delta = msz <= (8 << 10)
+				? new ArrayStream(msz)
+				: new TemporaryBuffer.Heap(msz);
+			if (srcIndex.encode(delta, resBuf, msz))
+				selectDeltaBase(src, delta);
 		} catch (IOException deltaTooBig) {
 			// Unlikely, encoder should see limit and return false.
 		}
