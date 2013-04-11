@@ -1,5 +1,5 @@
 	@Override
-	public void write(final byte[] b, int off, int len)
+	public final void write(final byte[] b, int off, int len)
 			throws IOException {
 		while (0 < len) {
 			final int n = Math.min(len, BYTES_TO_WRITE_BEFORE_CANCEL_CHECK);
@@ -14,7 +14,6 @@
 			}
 
 			out.write(b, off, n);
-			crc.update(b, off, n);
 			md.update(b, off, n);
 
 			off += n;

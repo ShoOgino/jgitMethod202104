@@ -2,7 +2,7 @@
 			final ObjectToPack otp) throws IOException {
 		writeBase(out, otp.getDeltaBase());
 
-		out.resetCRC32();
+		crc32.reset();
 		otp.setOffset(out.length());
 
 		DeltaCache.Ref ref = otp.popCachedDelta();

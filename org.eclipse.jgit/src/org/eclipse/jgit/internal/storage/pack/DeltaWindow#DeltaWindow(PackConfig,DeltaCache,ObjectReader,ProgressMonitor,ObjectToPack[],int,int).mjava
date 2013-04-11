@@ -1,7 +1,13 @@
-	DeltaWindow(PackConfig pc, DeltaCache dc, ObjectReader or) {
+	DeltaWindow(PackConfig pc, DeltaCache dc, ObjectReader or,
+			ProgressMonitor pm,
+			ObjectToPack[] in, int beginIndex, int endIndex) {
 		config = pc;
 		deltaCache = dc;
 		reader = or;
+		monitor = pm;
+		toSearch = in;
+		cur = beginIndex;
+		end = endIndex;
 
 		// C Git increases the window size supplied by the user by 1.
 		// We don't know why it does this, but if the user asks for
