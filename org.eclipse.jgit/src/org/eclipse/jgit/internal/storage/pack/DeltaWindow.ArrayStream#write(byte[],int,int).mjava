@@ -1,0 +1,8 @@
+		@Override
+		public void write(byte[] b, int off, int len) throws IOException {
+			if (len > buf.length - cnt)
+				throw new IOException();
+			System.arraycopy(b, off, buf, cnt, len);
+			cnt += len;
+		}
+

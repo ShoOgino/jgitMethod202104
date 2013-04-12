@@ -1,36 +1,37 @@
 	private int encodeCopy(int p, long offset, int cnt) {
 		int cmd = 0x80;
 		final int cmdPtr = p++; // save room for the command
+		byte b;
 
-		if ((offset & 0xff) != 0) {
+		if ((b = (byte) (offset & 0xff)) != 0) {
 			cmd |= 0x01;
-			buf[p++] = (byte) (offset & 0xff);
+			buf[p++] = b;
 		}
-		if ((offset & (0xff << 8)) != 0) {
+		if ((b = (byte) ((offset >>> 8) & 0xff)) != 0) {
 			cmd |= 0x02;
-			buf[p++] = (byte) ((offset >>> 8) & 0xff);
+			buf[p++] = b;
 		}
-		if ((offset & (0xff << 16)) != 0) {
+		if ((b = (byte) ((offset >>> 16) & 0xff)) != 0) {
 			cmd |= 0x04;
-			buf[p++] = (byte) ((offset >>> 16) & 0xff);
+			buf[p++] = b;
 		}
-		if ((offset & (0xff << 24)) != 0) {
+		if ((b = (byte) ((offset >>> 24) & 0xff)) != 0) {
 			cmd |= 0x08;
-			buf[p++] = (byte) ((offset >>> 24) & 0xff);
+			buf[p++] = b;
 		}
 
 		if (cnt != MAX_V2_COPY) {
-			if ((cnt & 0xff) != 0) {
+			if ((b = (byte) (cnt & 0xff)) != 0) {
 				cmd |= 0x10;
-				buf[p++] = (byte) (cnt & 0xff);
+				buf[p++] = b;
 			}
-			if ((cnt & (0xff << 8)) != 0) {
+			if ((b = (byte) ((cnt >>> 8) & 0xff)) != 0) {
 				cmd |= 0x20;
-				buf[p++] = (byte) ((cnt >>> 8) & 0xff);
+				buf[p++] = b;
 			}
-			if ((cnt & (0xff << 16)) != 0) {
+			if ((b = (byte) ((cnt >>> 16) & 0xff)) != 0) {
 				cmd |= 0x40;
-				buf[p++] = (byte) ((cnt >>> 16) & 0xff);
+				buf[p++] = b;
 			}
 		}
 

@@ -27,7 +27,7 @@
 			cnt -= MAX_V2_COPY;
 
 			if (buf.length < p + MAX_COPY_CMD_SIZE) {
-				if (0 < limit && limit < size + p)
+				if (limit != 0 && limit < size + p)
 					return false;
 				out.write(buf, 0, p);
 				size += p;
@@ -36,7 +36,7 @@
 		}
 
 		p = encodeCopy(p, offset, cnt);
-		if (0 < limit && limit < size + p)
+		if (limit != 0 && limit < size + p)
 			return false;
 		out.write(buf, 0, p);
 		size += p;

@@ -1,0 +1,52 @@
+	private boolean delta(final DeltaWindowEntry src)
+			throws IOException {
+		// Objects must use only the same type as their delta base.
+		if (src.type() != res.type()) {
+			keepInWindow();
+			return NEXT_RES;
+		}
+
+		// If the sizes are radically different, this is a bad pairing.
+		if (res.size() < src.size() >>> 4)
+			return NEXT_SRC;
+
+		int msz = deltaSizeLimit(src);
+		if (msz <= 8) // Nearly impossible to fit useful delta.
+			return NEXT_SRC;
+
+		// If we have to insert a lot to make this work, find another.
+		if (res.size() - src.size() > msz)
+			return NEXT_SRC;
+
+		DeltaIndex srcIndex;
+		try {
+			srcIndex = index(src);
+		} catch (LargeObjectException tooBig) {
+			// If the source is too big to work on, skip it.
+			return NEXT_SRC;
+		} catch (IOException notAvailable) {
+			if (src.object.isEdge()) // Missing edges are OK.
+				return NEXT_SRC;
+			throw notAvailable;
+		}
+
+		byte[] resBuf;
+		try {
+			resBuf = buffer(res);
+		} catch (LargeObjectException tooBig) {
+			// If its too big, move on to another item.
+			return NEXT_RES;
+		}
+
+		try {
+			OutputStream delta = msz <= (8 << 10)
+				? new ArrayStream(msz)
+				: new TemporaryBuffer.Heap(msz);
+			if (srcIndex.encode(delta, resBuf, msz))
+				selectDeltaBase(src, delta);
+		} catch (IOException deltaTooBig) {
+			// Unlikely, encoder should see limit and return false.
+		}
+		return NEXT_SRC;
+	}
+

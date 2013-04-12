@@ -1,20 +1,21 @@
 		synchronized Slice stealWork() {
-			for (int attempts = 0; attempts < 2; attempts++) {
+			for (;;) {
 				DeltaTask maxTask = null;
+				Slice maxSlice = null;
 				int maxWork = 0;
+
 				for (DeltaTask task : tasks) {
-					int r = task.remaining();
-					if (maxWork < r) {
+					Slice s = task.remaining();
+					if (s != null && maxWork < s.size()) {
 						maxTask = task;
-						maxWork = r;
+						maxSlice = s;
+						maxWork = s.size();
 					}
 				}
 				if (maxTask == null)
 					return null;
-				Slice s = maxTask.stealWork();
-				if (s != null)
-					return s;
+				if (maxTask.tryStealWork(maxSlice))
+					return maxSlice;
 			}
-			return null;
 		}
 

@@ -7,15 +7,12 @@
 						break;
 					next = toSearch[cur++];
 				}
-				res = window[resSlot];
-				if (0 < maxMemory) {
+				if (maxMemory != 0) {
 					clear(res);
-					int tail = next(resSlot);
 					final long need = estimateSize(next);
-					while (maxMemory < loaded + need && tail != resSlot) {
-						clear(window[tail]);
-						tail = next(tail);
-					}
+					DeltaWindowEntry n = res.next;
+					for (; maxMemory < loaded + need && n != res; n = n.next)
+						clear(n);
 				}
 				res.set(next);
 

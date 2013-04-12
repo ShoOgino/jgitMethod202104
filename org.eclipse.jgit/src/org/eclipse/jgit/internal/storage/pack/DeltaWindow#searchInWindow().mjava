@@ -1,37 +1,26 @@
 	private void searchInWindow() throws IOException {
-		// TODO(spearce) If the object is used as a base for other
-		// objects in this pack we should limit the depth we create
-		// for ourselves to be the remainder of our longest dependent
-		// chain and the configured maximum depth. This can happen
-		// when the dependents are being reused out a pack, but we
-		// cannot be because we are near the edge of a thin pack.
-		//
-		resMaxDepth = maxDepth;
-
 		// Loop through the window backwards, considering every entry.
 		// This lets us look at the bigger objects that came before.
-		//
-		for (int srcSlot = prior(resSlot); srcSlot != resSlot; srcSlot = prior(srcSlot)) {
-			DeltaWindowEntry src = window[srcSlot];
+		for (DeltaWindowEntry src = res.prev; src != res; src = src.prev) {
 			if (src.empty())
 				break;
-			if (delta(src, srcSlot) == NEXT_RES) {
-				bestDelta = null;
-				return;
-			}
+			if (delta(src) /* == NEXT_SRC */)
+				continue;
+			bestBase = null;
+			deltaBuf = null;
+			return;
 		}
 
 		// We couldn't find a suitable delta for this object, but it may
 		// still be able to act as a base for another one.
-		//
-		if (bestDelta == null) {
+		if (bestBase == null) {
 			keepInWindow();
 			return;
 		}
 
 		// Select this best matching delta as the base for the object.
 		//
-		ObjectToPack srcObj = window[bestSlot].object;
+		ObjectToPack srcObj = bestBase.object;
 		ObjectToPack resObj = res.object;
 		if (srcObj.isEdge()) {
 			// The source (the delta base) is an edge object outside of the
@@ -39,29 +28,27 @@
 			// has on hand, so we don't want to send it. We have to store
 			// an ObjectId and *NOT* an ObjectToPack for the base to ensure
 			// the base isn't included in the outgoing pack file.
-			//
 			resObj.setDeltaBase(srcObj.copy());
 		} else {
 			// The base is part of the pack we are sending, so it should be
 			// a direct pointer to the base.
-			//
 			resObj.setDeltaBase(srcObj);
 		}
-		resObj.setDeltaDepth(srcObj.getDeltaDepth() + 1);
+
+		int depth = srcObj.getDeltaDepth() + 1;
+		resObj.setDeltaDepth(depth);
 		resObj.clearReuseAsIs();
 		cacheDelta(srcObj, resObj);
 
-		// Discard the cached best result, otherwise it leaks.
-		//
-		bestDelta = null;
+		if (depth < maxDepth) {
+			// Reorder the window so that the best base will be tested
+			// first for the next object, and the current object will
+			// be the second candidate to consider before any others.
+			res.makeNext(bestBase);
+			res = bestBase.next;
+		}
 
-		// If this should be the end of a chain, don't keep
-		// it in the window. Just move on to the next object.
-		//
-		if (resObj.getDeltaDepth() == maxDepth)
-			return;
-
-		shuffleBaseUpInPriority();
-		keepInWindow();
+		bestBase = null;
+		deltaBuf = null;
 	}
 
