@@ -1,17 +1,13 @@
 	public void selectObjectRepresentation(PackWriter packer,
 			ProgressMonitor monitor, Iterable<ObjectToPack> objects)
 			throws IOException, MissingObjectException {
-		DfsPackFile[] packList = db.getPacks();
-		for (int packIndex = 0; packIndex < packList.length; packIndex++) {
-			DfsPackFile pack = packList[packIndex];
+		for (DfsPackFile pack : db.getPacks()) {
 			List<DfsObjectToPack> tmp = findAllFromPack(pack, objects);
 			if (tmp.isEmpty())
 				continue;
 			Collections.sort(tmp, OFFSET_SORT);
 			PackReverseIndex rev = pack.getReverseIdx(this);
-			DfsObjectRepresentation rep = new DfsObjectRepresentation(
-					pack,
-					packIndex);
+			DfsObjectRepresentation rep = new DfsObjectRepresentation(pack);
 			for (DfsObjectToPack otp : tmp) {
 				pack.representation(rep, otp.getOffset(), this, rev);
 				otp.setOffset(0);
