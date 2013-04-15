@@ -2,7 +2,7 @@
 	public void setUp() throws Exception {
 		super.setUp();
 
-		final TestRepository<FileRepository> src = createTestRepository();
+		final TestRepository<Repository> src = createTestRepository();
 		final String srcName = src.getRepository().getDirectory().getName();
 
 		ServletContextHandler app = server.addContext("/git");
@@ -43,7 +43,7 @@
 		remoteRepository = src.getRepository();
 		remoteURI = toURIish(app, srcName);
 
-		FileBasedConfig cfg = remoteRepository.getConfig();
+		StoredConfig cfg = remoteRepository.getConfig();
 		cfg.setBoolean("http", null, "receivepack", true);
 		cfg.save();
 	}

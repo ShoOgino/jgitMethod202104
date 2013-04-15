@@ -3,7 +3,7 @@
 
 			final Repository dst;
 			try {
-				dst = new FileRepository(remoteGitDir);
+				dst = new RepositoryBuilder().setGitDir(remoteGitDir).build();
 			} catch (IOException err) {
 				throw new TransportException(uri, JGitText.get().notAGitDirectory);
 			}
