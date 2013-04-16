@@ -23,7 +23,7 @@
 		assertNotNull(stashRef);
 		assertEquals(firstStash, stashRef.getObjectId());
 
-		ReflogReader reader = new ReflogReader(git.getRepository(),
+		ReflogReader reader = git.getRepository().getReflogReader(
 				Constants.R_STASH);
 		List<ReflogEntry> entries = reader.getReverseEntries();
 		assertEquals(1, entries.size());

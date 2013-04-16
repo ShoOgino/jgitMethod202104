@@ -5,9 +5,9 @@
 		ObjectId oldfromId = db.resolve(fromName);
 		ObjectId oldHeadId = db.resolve(Constants.HEAD);
 		writeReflog(db, oldfromId, "Just a message", fromName);
-		List<org.eclipse.jgit.internal.storage.file.ReflogEntry> oldFromLog = db
+		List<ReflogEntry> oldFromLog = db
 				.getReflogReader(fromName).getReverseEntries();
-		List<org.eclipse.jgit.internal.storage.file.ReflogEntry> oldHeadLog = oldHeadId != null ? db
+		List<ReflogEntry> oldHeadLog = oldHeadId != null ? db
 				.getReflogReader(Constants.HEAD).getReverseEntries() : null;
 
 		assertTrue("internal check, we have a log", new File(db.getDirectory(),

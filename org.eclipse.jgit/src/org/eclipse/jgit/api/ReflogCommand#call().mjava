@@ -9,7 +9,7 @@
 		checkCallable();
 
 		try {
-			ReflogReader reader = new ReflogReader(repo, ref);
+			ReflogReader reader = repo.getReflogReader(ref);
 			return reader.getReverseEntries();
 		} catch (IOException e) {
 			throw new InvalidRefNameException(MessageFormat.format(

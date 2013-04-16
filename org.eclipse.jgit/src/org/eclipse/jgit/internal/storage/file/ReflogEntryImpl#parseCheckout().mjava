@@ -1,0 +1,10 @@
+	/* (non-Javadoc)
+	 * @see org.eclipse.jgit.internal.storage.file.ReflogEntry#parseCheckout()
+	 */
+	public CheckoutEntry parseCheckout() {
+		if (getComment().startsWith(CheckoutEntryImpl.CHECKOUT_MOVING_FROM))
+			return new CheckoutEntryImpl(this);
+		else
+			return null;
+	}
+
