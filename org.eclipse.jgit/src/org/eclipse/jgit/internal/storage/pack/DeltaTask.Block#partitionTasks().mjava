@@ -1,0 +1,52 @@
+		void partitionTasks() {
+			ArrayList<WeightedPath> topPaths = computeTopPaths();
+			Iterator<WeightedPath> topPathItr = topPaths.iterator();
+			int nextTop = 0;
+			long weightPerThread = totalWeight / threads;
+			for (int i = beginIndex; i < endIndex;) {
+				DeltaTask task = new DeltaTask(this);
+				long w = 0;
+
+				// Assign the thread one top path.
+				if (topPathItr.hasNext()) {
+					WeightedPath p = topPathItr.next();
+					w += p.weight;
+					task.add(p.slice);
+				}
+
+				// Assign the task thread ~average weight.
+				int s = i;
+				for (; w < weightPerThread && i < endIndex;) {
+					if (nextTop < topPaths.size()
+							&& i == topPaths.get(nextTop).slice.beginIndex) {
+						if (s < i)
+							task.add(new Slice(s, i));
+						s = i = topPaths.get(nextTop++).slice.endIndex;
+					} else
+						w += list[i++].getWeight();
+				}
+
+				// Round up the slice to the end of a path.
+				if (s < i) {
+					int h = list[i - 1].getPathHash();
+					while (i < endIndex) {
+						if (h == list[i].getPathHash())
+							i++;
+						else
+							break;
+					}
+					task.add(new Slice(s, i));
+				}
+				if (!task.slices.isEmpty())
+					tasks.add(task);
+			}
+			while (topPathItr.hasNext()) {
+				WeightedPath p = topPathItr.next();
+				DeltaTask task = new DeltaTask(this);
+				task.add(p.slice);
+				tasks.add(task);
+			}
+
+			topPaths = null;
+		}
+
