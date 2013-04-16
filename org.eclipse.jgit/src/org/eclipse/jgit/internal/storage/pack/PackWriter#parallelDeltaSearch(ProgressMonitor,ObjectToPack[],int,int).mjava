@@ -1,0 +1,80 @@
+	private void parallelDeltaSearch(ProgressMonitor monitor,
+			ObjectToPack[] list, int cnt, int threads) throws IOException {
+		DeltaCache dc = new ThreadSafeDeltaCache(config);
+		ThreadSafeProgressMonitor pm = new ThreadSafeProgressMonitor(monitor);
+		DeltaTask.Block taskBlock = new DeltaTask.Block(threads, config,
+				reader, dc, pm,
+				list, 0, cnt);
+		taskBlock.partitionTasks();
+		beginPhase(PackingPhase.COMPRESSING, monitor, taskBlock.cost());
+		pm.startWorkers(taskBlock.tasks.size());
+
+		Executor executor = config.getExecutor();
+		final List<Throwable> errors =
+				Collections.synchronizedList(new ArrayList<Throwable>(threads));
+		if (executor instanceof ExecutorService) {
+			// Caller supplied us a service, use it directly.
+			runTasks((ExecutorService) executor, pm, taskBlock, errors);
+		} else if (executor == null) {
+			// Caller didn't give us a way to run the tasks, spawn up a
+			// temporary thread pool and make sure it tears down cleanly.
+			ExecutorService pool = Executors.newFixedThreadPool(threads);
+			try {
+				runTasks(pool, pm, taskBlock, errors);
+			} finally {
+				pool.shutdown();
+				for (;;) {
+					try {
+						if (pool.awaitTermination(60, TimeUnit.SECONDS))
+							break;
+					} catch (InterruptedException e) {
+						throw new IOException(
+								JGitText.get().packingCancelledDuringObjectsWriting);
+					}
+				}
+			}
+		} else {
+			// The caller gave us an executor, but it might not do
+			// asynchronous execution.  Wrap everything and hope it
+			// can schedule these for us.
+			for (final DeltaTask task : taskBlock.tasks) {
+				executor.execute(new Runnable() {
+					public void run() {
+						try {
+							task.call();
+						} catch (Throwable failure) {
+							errors.add(failure);
+						}
+					}
+				});
+			}
+			try {
+				pm.waitForCompletion();
+			} catch (InterruptedException ie) {
+				// We can't abort the other tasks as we have no handle.
+				// Cross our fingers and just break out anyway.
+				//
+				throw new IOException(
+						JGitText.get().packingCancelledDuringObjectsWriting);
+			}
+		}
+
+		// If any task threw an error, try to report it back as
+		// though we weren't using a threaded search algorithm.
+		//
+		if (!errors.isEmpty()) {
+			Throwable err = errors.get(0);
+			if (err instanceof Error)
+				throw (Error) err;
+			if (err instanceof RuntimeException)
+				throw (RuntimeException) err;
+			if (err instanceof IOException)
+				throw (IOException) err;
+
+			IOException fail = new IOException(err.getMessage());
+			fail.initCause(err);
+			throw fail;
+		}
+		endPhase(monitor);
+	}
+

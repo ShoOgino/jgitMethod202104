@@ -1,0 +1,23 @@
+	private void singleThreadDeltaSearch(ProgressMonitor monitor,
+			ObjectToPack[] list, int cnt) throws IOException {
+		long totalWeight = 0;
+		for (int i = 0; i < cnt; i++) {
+			ObjectToPack o = list[i];
+			if (!o.isEdge() && !o.doNotAttemptDelta())
+				totalWeight += o.getWeight();
+		}
+
+		long bytesPerUnit = 1;
+		while (DeltaTask.MAX_METER <= (totalWeight / bytesPerUnit))
+			bytesPerUnit <<= 10;
+		int cost = (int) (totalWeight / bytesPerUnit);
+		if (totalWeight % bytesPerUnit != 0)
+			cost++;
+
+		beginPhase(PackingPhase.COMPRESSING, monitor, cost);
+		new DeltaWindow(config, new DeltaCache(config), reader,
+				monitor, bytesPerUnit,
+				list, 0, cnt).search();
+		endPhase(monitor);
+	}
+
