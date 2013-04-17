@@ -1,0 +1,24 @@
+	/**
+	 * Exclude objects from the compacted pack.
+	 *
+	 * @param pack
+	 *            objects to not include.
+	 * @return {@code this}.
+	 * @throws IOException
+	 *             pack index cannot be loaded.
+	 */
+	public DfsPackCompactor exclude(DfsPackFile pack) throws IOException {
+		final PackIndex idx;
+		DfsReader ctx = (DfsReader) repo.newObjectReader();
+		try {
+			idx = pack.getPackIndex(ctx);
+		} finally {
+			ctx.release();
+		}
+		return exclude(new PackWriter.ObjectIdSet() {
+			public boolean contains(AnyObjectId id) {
+				return idx.hasObject(id);
+			}
+		});
+	}
+
