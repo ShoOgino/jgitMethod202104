@@ -1,0 +1,23 @@
+	private List<ObjectIdWithOffset> toInclude(DfsPackFile src, DfsReader ctx)
+			throws IOException {
+		PackIndex srcIdx = src.getPackIndex(ctx);
+		List<ObjectIdWithOffset> want = new BlockList<ObjectIdWithOffset>(
+				(int) srcIdx.getObjectCount());
+		SCAN: for (PackIndex.MutableEntry ent : srcIdx) {
+			ObjectId id = ent.toObjectId();
+			RevObject obj = rw.lookupOrNull(id);
+			if (obj != null && (obj.has(added) || obj.has(isBase)))
+				continue;
+			for (PackWriter.ObjectIdSet e : exclude)
+				if (e.contains(id))
+					continue SCAN;
+			want.add(new ObjectIdWithOffset(id, ent.getOffset()));
+		}
+		Collections.sort(want, new Comparator<ObjectIdWithOffset>() {
+			public int compare(ObjectIdWithOffset a, ObjectIdWithOffset b) {
+				return Long.signum(a.offset - b.offset);
+			}
+		});
+		return want;
+	}
+
