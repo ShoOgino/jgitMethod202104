@@ -20,12 +20,14 @@
 					// We don't actually want to make a delta for
 					// them, just need to push them into the window
 					// so they can be read by other objects.
-					//
 					keepInWindow();
 				} else {
 					// Search for a delta for the current window slot.
-					//
-					monitor.update(1);
+					if (bytesPerUnit <= (bytesProcessed += next.getWeight())) {
+						int d = (int) (bytesProcessed / bytesPerUnit);
+						monitor.update(d);
+						bytesProcessed -= d * bytesPerUnit;
+					}
 					searchInWindow();
 				}
 			}

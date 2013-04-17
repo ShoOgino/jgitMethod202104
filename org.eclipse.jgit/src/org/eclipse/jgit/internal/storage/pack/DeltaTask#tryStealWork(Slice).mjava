@@ -1,4 +1,8 @@
-	boolean tryStealWork(Slice s) {
+	synchronized boolean tryStealWork(Slice s) {
+		if (!slices.isEmpty() && slices.getLast().beginIndex == s.beginIndex) {
+			slices.removeLast();
+			return true;
+		}
 		DeltaWindow d = dw;
 		return d != null ? d.tryStealWork(s) : false;
 	}

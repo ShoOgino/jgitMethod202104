@@ -1,0 +1,48 @@
+		private ArrayList<WeightedPath> computeTopPaths() {
+			ArrayList<WeightedPath> topPaths = new ArrayList<WeightedPath>(
+					threads);
+			int cp = beginIndex;
+			int ch = list[cp].getPathHash();
+			long cw = list[cp].getWeight();
+			totalWeight = list[cp].getWeight();
+
+			for (int i = cp + 1; i < endIndex; i++) {
+				ObjectToPack o = list[i];
+				if (ch != o.getPathHash()) {
+					if (MIN_TOP_PATH < cw) {
+						if (topPaths.size() < threads) {
+							Slice s = new Slice(cp, i);
+							topPaths.add(new WeightedPath(cw, s));
+							if (topPaths.size() == threads)
+								Collections.sort(topPaths);
+						} else if (topPaths.get(0).weight < cw) {
+							Slice s = new Slice(cp, i);
+							WeightedPath p = new WeightedPath(cw, s);
+							topPaths.set(0, p);
+							if (p.compareTo(topPaths.get(1)) > 0)
+								Collections.sort(topPaths);
+						}
+					}
+					cp = i;
+					ch = o.getPathHash();
+					cw = 0;
+				}
+				if (o.isEdge() || o.doNotAttemptDelta())
+					continue;
+				cw += o.getWeight();
+				totalWeight += o.getWeight();
+			}
+
+			// Sort by starting index to identify gaps later.
+			Collections.sort(topPaths, new Comparator<WeightedPath>() {
+				public int compare(WeightedPath a, WeightedPath b) {
+					return a.slice.beginIndex - b.slice.beginIndex;
+				}
+			});
+
+			bytesPerUnit = 1;
+			while (MAX_METER <= (totalWeight / bytesPerUnit))
+				bytesPerUnit <<= 10;
+			return topPaths;
+		}
+

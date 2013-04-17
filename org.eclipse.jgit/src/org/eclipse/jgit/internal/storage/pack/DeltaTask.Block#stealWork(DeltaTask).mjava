@@ -1,4 +1,4 @@
-		synchronized Slice stealWork() {
+		synchronized DeltaWindow stealWork(DeltaTask forThread) {
 			for (;;) {
 				DeltaTask maxTask = null;
 				Slice maxSlice = null;
@@ -15,7 +15,7 @@
 				if (maxTask == null)
 					return null;
 				if (maxTask.tryStealWork(maxSlice))
-					return maxSlice;
+					return forThread.initWindow(maxSlice);
 			}
 		}
 

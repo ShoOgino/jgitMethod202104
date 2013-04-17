@@ -1,15 +1,21 @@
 	public Object call() throws Exception {
-		ObjectReader or = block.templateReader.newReader();
+		or = block.templateReader.newReader();
 		try {
-			for (Slice s = firstSlice; s != null; s = block.stealWork()) {
-				dw = new DeltaWindow(block.config, block.dc, or, block.pm,
-						block.list, s.beginIndex, s.endIndex);
-				dw.search();
-				dw = null;
+			DeltaWindow w;
+			for (;;) {
+				synchronized (this) {
+					if (slices.isEmpty())
+						break;
+					w = initWindow(slices.removeFirst());
+				}
+				runWindow(w);
 			}
+			while ((w = block.stealWork(this)) != null)
+				runWindow(w);
 		} finally {
-			or.release();
 			block.pm.endWorker();
+			or.release();
+			or = null;
 		}
 		return null;
 	}
