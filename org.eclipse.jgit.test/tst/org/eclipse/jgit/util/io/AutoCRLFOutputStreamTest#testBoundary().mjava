@@ -1,15 +1,10 @@
 	@Test
 	public void testBoundary() throws IOException {
-		assertBoundaryCorrect(AutoCRLFOutputStream.BUFFER_SIZE - 5);
-		assertBoundaryCorrect(AutoCRLFOutputStream.BUFFER_SIZE - 4);
-		assertBoundaryCorrect(AutoCRLFOutputStream.BUFFER_SIZE - 3);
-		assertBoundaryCorrect(AutoCRLFOutputStream.BUFFER_SIZE - 2);
-		assertBoundaryCorrect(AutoCRLFOutputStream.BUFFER_SIZE - 1);
-		assertBoundaryCorrect(AutoCRLFOutputStream.BUFFER_SIZE);
-		assertBoundaryCorrect(AutoCRLFOutputStream.BUFFER_SIZE + 1);
-		assertBoundaryCorrect(AutoCRLFOutputStream.BUFFER_SIZE + 2);
-		assertBoundaryCorrect(AutoCRLFOutputStream.BUFFER_SIZE + 3);
-		assertBoundaryCorrect(AutoCRLFOutputStream.BUFFER_SIZE + 4);
-		assertBoundaryCorrect(AutoCRLFOutputStream.BUFFER_SIZE + 5);
+		for (int i = AutoCRLFOutputStream.BUFFER_SIZE - 10; i < AutoCRLFOutputStream.BUFFER_SIZE + 10; i++) {
+			String s1 = repeat("a", i);
+			assertNoCrLf(s1, s1);
+			String s2 = repeat("\0", i);
+			assertNoCrLf(s2, s2);
+		}
 	}
 
