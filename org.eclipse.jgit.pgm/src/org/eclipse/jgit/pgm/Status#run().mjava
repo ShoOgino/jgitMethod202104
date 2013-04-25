@@ -17,7 +17,8 @@
 		Collection<String> modified = status.getModified();
 		Collection<String> missing = status.getMissing();
 		Collection<String> untracked = status.getUntracked();
-		Collection<String> unmerged = status.getConflicting();
+		Map<String, StageState> unmergedStates = status
+				.getConflictingStageState();
 		Collection<String> toBeCommitted = new ArrayList<String>(added);
 		toBeCommitted.addAll(changed);
 		toBeCommitted.addAll(removed);
@@ -41,12 +42,12 @@
 					modified, missing, null);
 			firstHeader = false;
 		}
-		int nbUnmerged = unmerged.size();
+		int nbUnmerged = unmergedStates.size();
 		if (nbUnmerged > 0) {
 			if (!firstHeader)
 				printSectionHeader(""); //$NON-NLS-1$
 			printSectionHeader(CLIText.get().unmergedPaths);
-			printList(unmerged);
+			printUnmerged(unmergedStates);
 			firstHeader = false;
 		}
 		int nbUntracked = untracked.size();

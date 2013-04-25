@@ -1,0 +1,13 @@
+	private void printUnmerged(Map<String, StageState> unmergedStates)
+			throws IOException {
+		List<String> paths = new ArrayList<String>(unmergedStates.keySet());
+		Collections.sort(paths);
+		for (String path : paths) {
+			StageState state = unmergedStates.get(path);
+			String stateDescription = getStageStateDescription(state);
+			outw.println(CLIText.formatLine(String.format(
+					statusFileListFormatUnmerged, stateDescription, path)));
+			outw.flush();
+		}
+	}
+
