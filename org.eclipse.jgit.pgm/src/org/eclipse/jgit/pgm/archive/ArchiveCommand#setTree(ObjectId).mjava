@@ -1,0 +1,11 @@
+	/**
+	 * @param tree
+	 *	      the tag, commit, or tree object to produce an archive for
+	 * @return this
+	 */
+	public ArchiveCommand setTree(ObjectId tree) throws IOException {
+		final RevWalk rw = new RevWalk(walk.getObjectReader());
+		walk.reset(rw.parseTree(tree));
+		return this;
+	}
+

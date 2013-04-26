@@ -1,34 +1,15 @@
 	@Override
 	protected void run() throws Exception {
-		final MutableObjectId idBuf = new MutableObjectId();
-		final Archiver fmt = formats.get(format);
-
 		if (tree == null)
 			throw die(CLIText.get().treeIsRequired);
 
-		final ArchiveOutputStream outa = fmt.createArchiveOutputStream(outs);
-		final TreeWalk walk = new TreeWalk(db);
-		final ObjectReader reader = walk.getObjectReader();
-
+		final ArchiveCommand cmd = new ArchiveCommand(db);
 		try {
-			walk.reset();
-			walk.addTree(tree);
-			walk.setRecursive(true);
-			while (walk.next()) {
-				final String name = walk.getPathString();
-				final FileMode mode = walk.getFileMode(0);
-
-				if (mode == FileMode.TREE)
-					// ZIP entries for directories are optional.
-					// Leave them out, mimicking "git archive".
-					continue;
-
-				walk.getObjectId(idBuf, 0);
-				fmt.putEntry(name, mode, reader.open(idBuf), outa);
-			}
+			cmd.setTree(tree)
+					.setFormat(format)
+					.setOutputStream(outs).call();
 		} finally {
-			reader.release();
-			outa.close();
+			cmd.release();
 		}
 	}
 
