@@ -19,8 +19,8 @@
 
 		// the branch HEAD referred to is left untouched
 		assertEquals(pid, db.resolve("refs/heads/master"));
-		ReflogReader reflogReader = new  ReflogReader(db, "HEAD");
-		org.eclipse.jgit.internal.storage.file.ReflogEntry e = reflogReader.getReverseEntries().get(0);
+		ReflogReader reflogReader = db.getReflogReader("HEAD");
+		ReflogEntry e = reflogReader.getReverseEntries().get(0);
 		assertEquals(pid, e.getOldId());
 		assertEquals(ppid, e.getNewId());
 		assertEquals("GIT_COMMITTER_EMAIL", e.getWho().getEmailAddress());

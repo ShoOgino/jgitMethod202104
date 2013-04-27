@@ -1,7 +1,7 @@
 	@Test
 	public void testReadWhileAppendIsInProgress() throws Exception {
 		setupReflog("logs/refs/heads/master", twoLineWithAppendInProgress);
-		ReflogReader reader = new ReflogReader(db, "refs/heads/master");
+		ReflogReader reader = new ReflogReaderImpl(db, "refs/heads/master");
 		List<ReflogEntry> reverseEntries = reader.getReverseEntries();
 		assertEquals(2, reverseEntries.size());
 		ReflogEntry e = reverseEntries.get(0);

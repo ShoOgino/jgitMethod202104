@@ -12,8 +12,8 @@
 		stashRef = git.getRepository().getRef(Constants.R_STASH);
 		assertNull(stashRef);
 
-		ReflogReader reader = new ReflogReader(git.getRepository(),
+		ReflogReader reader = git.getRepository().getReflogReader(
 				Constants.R_STASH);
-		assertTrue(reader.getReverseEntries().isEmpty());
+		assertNull(reader);
 	}
 

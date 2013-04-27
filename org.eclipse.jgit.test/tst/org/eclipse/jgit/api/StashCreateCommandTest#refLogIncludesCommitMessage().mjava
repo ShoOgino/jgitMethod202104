@@ -7,7 +7,7 @@
 		assertEquals("content", read(committedFile));
 		validateStashedCommit(stashed);
 
-		ReflogReader reader = new ReflogReader(git.getRepository(),
+		ReflogReader reader = git.getRepository().getReflogReader(
 				Constants.R_STASH);
 		ReflogEntry entry = reader.getLastEntry();
 		assertNotNull(entry);

@@ -17,9 +17,9 @@
 			return null;
 		}
 
-		ReflogReader reader = new ReflogReader(repo, R_STASH);
 		List<ReflogEntry> entries;
 		try {
+			ReflogReader reader = repo.getReflogReader(R_STASH);
 			entries = reader.getReverseEntries();
 		} catch (IOException e) {
 			throw new JGitInternalException(JGitText.get().stashDropFailed, e);

@@ -31,7 +31,7 @@
 		assertNotNull(stashRef);
 		assertEquals(thirdStash, stashRef.getObjectId());
 
-		ReflogReader reader = new ReflogReader(git.getRepository(),
+		ReflogReader reader = git.getRepository().getReflogReader(
 				Constants.R_STASH);
 		List<ReflogEntry> entries = reader.getReverseEntries();
 		assertEquals(2, entries.size());
