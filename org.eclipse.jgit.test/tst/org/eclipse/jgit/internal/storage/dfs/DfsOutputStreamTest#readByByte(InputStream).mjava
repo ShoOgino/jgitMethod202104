@@ -1,0 +1,11 @@
+	private static String readByByte(InputStream is) throws IOException {
+		StringBuilder out = new StringBuilder();
+		while (true) {
+			int c = is.read();
+			if (c < 0)
+				break;
+			out.append(RawParseUtils.decode(new byte[] {(byte) c}));
+		}
+		return out.toString();
+	}
+

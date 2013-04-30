@@ -1,0 +1,13 @@
+	private static String readBuffered(InputStream is, int bufsize)
+			throws IOException {
+		StringBuilder out = new StringBuilder();
+		byte[] buf = new byte[bufsize];
+		while (true) {
+			int n = is.read(buf, 0, buf.length);
+			if (n < 0)
+				break;
+			out.append(RawParseUtils.decode(buf, 0, n));
+		}
+		return out.toString();
+	}
+

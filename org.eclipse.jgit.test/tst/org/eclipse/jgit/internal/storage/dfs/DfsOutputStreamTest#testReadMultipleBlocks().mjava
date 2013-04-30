@@ -1,0 +1,18 @@
+	@Test
+	public void testReadMultipleBlocks() throws IOException {
+		DfsOutputStream os = newDfsOutputStream(2);
+		os.write(Constants.encode("data"));
+		assertEquals("data", readBuffered(os.openInputStream(0)));
+		assertEquals("data", readByByte(os.openInputStream(0)));
+		assertEquals("ata", readBuffered(os.openInputStream(1)));
+		assertEquals("ata", readByByte(os.openInputStream(1)));
+		assertEquals("ta", readBuffered(os.openInputStream(2)));
+		assertEquals("ta", readByByte(os.openInputStream(2)));
+		assertEquals("a", readBuffered(os.openInputStream(3)));
+		assertEquals("a", readByByte(os.openInputStream(3)));
+		assertEquals("", readBuffered(os.openInputStream(4)));
+		assertEquals("", readByByte(os.openInputStream(4)));
+		assertEquals("", readBuffered(os.openInputStream(5)));
+		assertEquals("", readByByte(os.openInputStream(5)));
+	}
+

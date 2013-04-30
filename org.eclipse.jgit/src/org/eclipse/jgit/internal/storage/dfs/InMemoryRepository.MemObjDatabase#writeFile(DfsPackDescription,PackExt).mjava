@@ -2,7 +2,7 @@
 		protected DfsOutputStream writeFile(
 				DfsPackDescription desc, final PackExt ext) throws IOException {
 			final MemPack memPack = (MemPack) desc;
-			return new Out() {
+			return new InMemoryOutputStream() {
 				@Override
 				public void flush() {
 					memPack.fileMap.put(ext, getData());

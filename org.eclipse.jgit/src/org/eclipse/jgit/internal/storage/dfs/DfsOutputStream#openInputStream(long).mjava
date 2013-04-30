@@ -1,0 +1,15 @@
+	/**
+	 * Open a stream to read back a portion of already written data.
+	 * <p>
+	 * The writing position of the output stream is not affected by a read. The
+	 * input stream can be read up to the current writing position. Closing the
+	 * returned stream has no effect on the underlying {@link DfsOutputStream}.
+	 *
+	 * @param position
+	 *            offset to read from.
+	 * @return new input stream
+	 */
+	public InputStream openInputStream(final long position) {
+		return new ReadBackStream(position);
+	}
+
