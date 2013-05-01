@@ -1,15 +1,16 @@
 	@Override
-	public long skip(long len) throws IOException {
-		long cnt = 0;
-		while (0 < len) {
+	public long skip(final long count) throws IOException {
+		long skipped = 0;
+		long cnt = count;
+		while (0 < cnt) {
 			final InputStream in = head();
-			final long n = in.skip(len);
+			final long n = in.skip(cnt);
 			if (0 < n) {
-				cnt += n;
-				len -= n;
+				skipped += n;
+				cnt -= n;
 
 			} else if (in == EOF) {
-				return cnt;
+				return skipped;
 
 			} else {
 				// Is this stream at EOF? We can't tell from skip alone.
@@ -19,14 +20,14 @@
 				final int r = in.read();
 				if (r < 0) {
 					pop();
-					if (0 < cnt)
+					if (0 < skipped)
 						break;
 				} else {
-					cnt += 1;
-					len -= 1;
+					skipped += 1;
+					cnt -= 1;
 				}
 			}
 		}
-		return cnt;
+		return skipped;
 	}
 
