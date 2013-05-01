@@ -18,7 +18,6 @@
 		}
 
 		DirCache dc = db.readDirCache();
-		ObjectReader or = db.getObjectDatabase().newReader();
 		Iterator<String> mpathsIt=modifiedFiles.iterator();
 		while(mpathsIt.hasNext()) {
 			String mpath=mpathsIt.next();
@@ -28,7 +27,7 @@
 			FileOutputStream fos = new FileOutputStream(new File(
 					db.getWorkTree(), mpath));
 			try {
-				or.open(entry.getObjectId()).copyTo(fos);
+				reader.open(entry.getObjectId()).copyTo(fos);
 			} finally {
 				fos.close();
 			}
