@@ -1,0 +1,27 @@
+		byte[] inflate(DfsReader ctx, long pos, int len) throws IOException,
+				DataFormatException {
+			byte[] dstbuf;
+			try {
+				dstbuf = new byte[len];
+			} catch (OutOfMemoryError noMemory) {
+				return null; // Caller will switch to large object streaming.
+			}
+
+			Inflater inf = ctx.inflater();
+			DfsBlock b = setInput(inf, pos);
+			for (int dstoff = 0;;) {
+				int n = inf.inflate(dstbuf, dstoff, dstbuf.length - dstoff);
+				if (n > 0)
+					dstoff += n;
+				else if (inf.needsInput() && b != null) {
+					pos += b.remaining(pos);
+					b = setInput(inf, pos);
+				} else if (inf.needsInput())
+					throw new EOFException(DfsText.get().unexpectedEofInPack);
+				else if (inf.finished())
+					return dstbuf;
+				else
+					throw new DataFormatException();
+			}
+		}
+

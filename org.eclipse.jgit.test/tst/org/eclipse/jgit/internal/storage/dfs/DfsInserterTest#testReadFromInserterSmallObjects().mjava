@@ -1,0 +1,15 @@
+	@Test
+	public void testReadFromInserterSmallObjects() throws IOException {
+		ObjectInserter ins = db.newObjectInserter();
+		ObjectId id1 = ins.insert(Constants.OBJ_BLOB, Constants.encode("foo"));
+		ObjectId id2 = ins.insert(Constants.OBJ_BLOB, Constants.encode("bar"));
+		assertEquals(0, db.getObjectDatabase().listPacks().size());
+
+		ObjectReader reader = ins.newReader();
+		assertEquals("foo", readString(reader.open(id1)));
+		assertEquals("bar", readString(reader.open(id2)));
+		assertEquals(0, db.getObjectDatabase().listPacks().size());
+		ins.flush();
+		assertEquals(1, db.getObjectDatabase().listPacks().size());
+	}
+

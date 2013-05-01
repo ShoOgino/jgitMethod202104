@@ -1,0 +1,17 @@
+		int read(long pos, byte[] dst, int ptr, int cnt) throws IOException {
+			int r = 0;
+			while (pos < currPos && r < cnt) {
+				DfsBlock b = getOrLoadBlock(pos);
+				int n = b.copy(pos, dst, ptr + r, cnt - r);
+				pos += n;
+				r += n;
+			}
+			if (currPos <= pos && r < cnt) {
+				int s = (int) (pos - currPos);
+				int n = Math.min(currPtr - s, cnt - r);
+				System.arraycopy(currBuf, s, dst, ptr + r, n);
+				r += n;
+			}
+			return r;
+		}
+

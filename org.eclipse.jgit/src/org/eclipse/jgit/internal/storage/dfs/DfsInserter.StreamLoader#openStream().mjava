@@ -1,0 +1,26 @@
+		@Override
+		public ObjectStream openStream() throws IOException {
+			final DfsReader ctx = new DfsReader(db);
+			if (srcPack != packKey) {
+				try {
+					// Post DfsInserter.flush() use the normal code path.
+					// The newly created pack is registered in the cache.
+					return ctx.open(id, type).openStream();
+				} finally {
+					ctx.release();
+				}
+			}
+
+			int bufsz = 8192;
+			final Inflater inf = ctx.inflater();
+			return new ObjectStream.Filter(type,
+					size, new BufferedInputStream(new InflaterInputStream(
+							new ReadBackStream(pos), inf, bufsz), bufsz)) {
+				@Override
+				public void close() throws IOException {
+					ctx.release();
+					super.close();
+				}
+			};
+		}
+
