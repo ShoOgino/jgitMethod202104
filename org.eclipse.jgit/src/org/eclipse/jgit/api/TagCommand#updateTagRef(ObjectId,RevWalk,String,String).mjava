@@ -1,0 +1,27 @@
+	private Ref updateTagRef(ObjectId tagId, RevWalk revWalk,
+			String tagName, String newTagToString) throws IOException,
+			ConcurrentRefUpdateException, RefAlreadyExistsException {
+		String refName = Constants.R_TAGS + tagName;
+		RefUpdate tagRef = repo.updateRef(refName);
+		tagRef.setNewObjectId(tagId);
+		tagRef.setForceUpdate(forceUpdate);
+		tagRef.setRefLogMessage("tagged " + name, false); //$NON-NLS-1$
+		Result updateResult = tagRef.update(revWalk);
+		switch (updateResult) {
+		case NEW:
+		case FORCED:
+			return repo.getRef(refName);
+		case LOCK_FAILURE:
+			throw new ConcurrentRefUpdateException(
+					JGitText.get().couldNotLockHEAD, tagRef.getRef(),
+					updateResult);
+		case REJECTED:
+			throw new RefAlreadyExistsException(MessageFormat.format(
+					JGitText.get().tagAlreadyExists, newTagToString));
+		default:
+			throw new JGitInternalException(MessageFormat.format(
+					JGitText.get().updatingRefFailed, refName, newTagToString,
+					updateResult));
+		}
+	}
+
