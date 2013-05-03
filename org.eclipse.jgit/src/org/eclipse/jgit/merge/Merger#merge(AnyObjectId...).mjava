@@ -18,31 +18,6 @@
 	 *             be written to the Repository.
 	 */
 	public boolean merge(final AnyObjectId... tips) throws IOException {
-		sourceObjects = new RevObject[tips.length];
-		for (int i = 0; i < tips.length; i++)
-			sourceObjects[i] = walk.parseAny(tips[i]);
-
-		sourceCommits = new RevCommit[sourceObjects.length];
-		for (int i = 0; i < sourceObjects.length; i++) {
-			try {
-				sourceCommits[i] = walk.parseCommit(sourceObjects[i]);
-			} catch (IncorrectObjectTypeException err) {
-				sourceCommits[i] = null;
-			}
-		}
-
-		sourceTrees = new RevTree[sourceObjects.length];
-		for (int i = 0; i < sourceObjects.length; i++)
-			sourceTrees[i] = walk.parseTree(sourceObjects[i]);
-
-		try {
-			boolean ok = mergeImpl();
-			if (ok)
-				inserter.flush();
-			return ok;
-		} finally {
-			inserter.release();
-			reader.release();
-		}
+		return merge(true, tips);
 	}
 
