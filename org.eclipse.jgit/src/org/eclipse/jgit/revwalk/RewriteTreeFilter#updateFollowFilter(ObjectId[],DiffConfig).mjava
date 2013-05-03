@@ -1,4 +1,4 @@
-	private void updateFollowFilter(ObjectId[] trees)
+	private void updateFollowFilter(ObjectId[] trees, DiffConfig cfg)
 			throws MissingObjectException, IncorrectObjectTypeException,
 			CorruptObjectException, IOException {
 		TreeWalk tw = pathFilter;
@@ -7,14 +7,14 @@
 		tw.reset(trees);
 
 		List<DiffEntry> files = DiffEntry.scan(tw);
-		RenameDetector rd = new RenameDetector(repository);
+		RenameDetector rd = new RenameDetector(tw.getObjectReader(), cfg);
 		rd.addAll(files);
 		files = rd.compute();
 
 		TreeFilter newFilter = oldFilter;
 		for (DiffEntry ent : files) {
 			if (isRename(ent) && ent.getNewPath().equals(oldFilter.getPath())) {
-				newFilter = FollowFilter.create(ent.getOldPath());
+				newFilter = FollowFilter.create(ent.getOldPath(), cfg);
 				RenameCallback callback = oldFilter.getRenameCallback();
 				if (callback != null) {
 					callback.renamed(ent);

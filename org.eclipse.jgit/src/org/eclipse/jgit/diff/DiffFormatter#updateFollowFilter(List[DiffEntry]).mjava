@@ -2,7 +2,7 @@
 		String oldPath = ((FollowFilter) pathFilter).getPath();
 		for (DiffEntry ent : files) {
 			if (isRename(ent) && ent.getNewPath().equals(oldPath)) {
-				pathFilter = FollowFilter.create(ent.getOldPath());
+				pathFilter = FollowFilter.create(ent.getOldPath(), diffCfg);
 				return Collections.singletonList(ent);
 			}
 		}

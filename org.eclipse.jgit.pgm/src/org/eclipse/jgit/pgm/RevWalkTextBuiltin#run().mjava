@@ -4,11 +4,14 @@
 		for (final RevSort s : sorting)
 			walk.sort(s, true);
 
-		if (pathFilter instanceof FollowFilter)
-			walk.setTreeFilter(pathFilter);
-		else if (pathFilter != TreeFilter.ALL)
+		if (pathFilter == TreeFilter.ALL) {
+			if (followPath != null)
+				walk.setTreeFilter(FollowFilter.create(followPath,
+						db.getConfig().get(DiffConfig.KEY)));
+		} else if (pathFilter != TreeFilter.ALL) {
 			walk.setTreeFilter(AndTreeFilter.create(pathFilter,
 					TreeFilter.ANY_DIFF));
+		}
 
 		if (revLimiter.size() == 1)
 			walk.setRevFilter(revLimiter.get(0));
