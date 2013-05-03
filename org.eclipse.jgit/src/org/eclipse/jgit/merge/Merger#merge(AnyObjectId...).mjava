@@ -37,12 +37,11 @@
 
 		try {
 			boolean ok = mergeImpl();
-			if (ok && inserter != null)
+			if (ok)
 				inserter.flush();
 			return ok;
 		} finally {
-			if (inserter != null)
-				inserter.release();
+			inserter.release();
 			reader.release();
 		}
 	}

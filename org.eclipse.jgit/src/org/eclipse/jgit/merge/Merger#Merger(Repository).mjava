@@ -6,7 +6,8 @@
 	 */
 	protected Merger(final Repository local) {
 		db = local;
-		reader = db.newObjectReader();
+		inserter = db.newObjectInserter();
+		reader = inserter.newReader();
 		walk = new RevWalk(reader);
 	}
 

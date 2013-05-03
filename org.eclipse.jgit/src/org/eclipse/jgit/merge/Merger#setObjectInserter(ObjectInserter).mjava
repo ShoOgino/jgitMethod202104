@@ -2,16 +2,19 @@
 	 * Set the inserter this merger will use to create objects.
 	 * <p>
 	 * If an inserter was already set on this instance (such as by a prior set,
-	 * or a prior call to {@link #getObjectInserter()}), the prior inserter will
-	 * be released first.
+	 * or a prior call to {@link #getObjectInserter()}), the prior inserter as
+	 * well as the in-progress walk will be released.
 	 *
 	 * @param oi
 	 *            the inserter instance to use. Must be associated with the
 	 *            repository instance returned by {@link #getRepository()}.
 	 */
 	public void setObjectInserter(ObjectInserter oi) {
-		if (inserter != null)
-			inserter.release();
+		walk.release();
+		reader.release();
+		inserter.release();
 		inserter = oi;
+		reader = oi.newReader();
+		walk = new RevWalk(reader);
 	}
 
