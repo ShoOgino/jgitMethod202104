@@ -7,6 +7,15 @@
 	 *            required.
 	 */
 	public RevWalk(ObjectReader or) {
-		this(null, or);
+		reader = or;
+		idBuffer = new MutableObjectId();
+		objects = new ObjectIdOwnerMap<RevObject>();
+		roots = new ArrayList<RevCommit>();
+		queue = new DateRevQueue();
+		pending = new StartGenerator(this);
+		sorting = EnumSet.of(RevSort.NONE);
+		filter = RevFilter.ALL;
+		treeFilter = TreeFilter.ALL;
+		retainBody = true;
 	}
 
