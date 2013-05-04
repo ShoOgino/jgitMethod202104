@@ -1,0 +1,18 @@
+	@Test
+	public void testWildcardInMiddleOfSource() {
+		RefSpec a = new RefSpec("+refs/pull/*/head:refs/remotes/origin/pr/*");
+		assertTrue(a.isWildcard());
+		assertTrue(a.matchSource("refs/pull/a/head"));
+		assertTrue(a.matchSource("refs/pull/foo/head"));
+		assertTrue(a.matchSource("refs/pull/foo/bar/head"));
+		assertFalse(a.matchSource("refs/pull/foo"));
+		assertFalse(a.matchSource("refs/pull/head"));
+		assertFalse(a.matchSource("refs/pull/foo/head/more"));
+		assertFalse(a.matchSource("refs/pullx/head"));
+
+		RefSpec b = a.expandFromSource("refs/pull/foo/head");
+		assertEquals("refs/remotes/origin/pr/foo", b.getDestination());
+		RefSpec c = a.expandFromDestination("refs/remotes/origin/pr/foo");
+		assertEquals("refs/pull/foo/head", c.getSource());
+	}
+

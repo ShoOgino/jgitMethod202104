@@ -11,7 +11,7 @@
 	 */
 	public RefSpec setDestination(final String destination) {
 		final RefSpec r = new RefSpec(this);
-		r.dstName = destination;
+		r.dstName = checkValid(destination);
 		if (isWildcard(r.dstName) && r.srcName == null)
 			throw new IllegalStateException(JGitText.get().sourceIsNotAWildcard);
 		if (isWildcard(r.srcName) != isWildcard(r.dstName))

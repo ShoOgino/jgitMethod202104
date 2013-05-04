@@ -1,0 +1,17 @@
+	@Test
+	public void testWildcardMirror() {
+		RefSpec a = new RefSpec("*:*");
+		assertTrue(a.isWildcard());
+		assertTrue(a.matchSource("a"));
+		assertTrue(a.matchSource("foo"));
+		assertTrue(a.matchSource("foo/bar"));
+		assertTrue(a.matchDestination("a"));
+		assertTrue(a.matchDestination("foo"));
+		assertTrue(a.matchDestination("foo/bar"));
+
+		RefSpec b = a.expandFromSource("refs/heads/foo");
+		assertEquals("refs/heads/foo", b.getDestination());
+		RefSpec c = a.expandFromDestination("refs/heads/foo");
+		assertEquals("refs/heads/foo", c.getSource());
+	}
+

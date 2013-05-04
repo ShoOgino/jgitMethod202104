@@ -1,0 +1,18 @@
+	@Test
+	public void testWildcardInMiddleOfDestionation() {
+		RefSpec a = new RefSpec("+refs/heads/*:refs/remotes/origin/*/head");
+		assertTrue(a.isWildcard());
+		assertTrue(a.matchDestination("refs/remotes/origin/a/head"));
+		assertTrue(a.matchDestination("refs/remotes/origin/foo/head"));
+		assertTrue(a.matchDestination("refs/remotes/origin/foo/bar/head"));
+		assertFalse(a.matchDestination("refs/remotes/origin/foo"));
+		assertFalse(a.matchDestination("refs/remotes/origin/head"));
+		assertFalse(a.matchDestination("refs/remotes/origin/foo/head/more"));
+		assertFalse(a.matchDestination("refs/remotes/originx/head"));
+
+		RefSpec b = a.expandFromSource("refs/heads/foo");
+		assertEquals("refs/remotes/origin/foo/head", b.getDestination());
+		RefSpec c = a.expandFromDestination("refs/remotes/origin/foo/head");
+		assertEquals("refs/heads/foo", c.getSource());
+	}
+

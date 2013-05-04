@@ -1,0 +1,16 @@
+	@Test
+	public void testWildcardAtStart() {
+		RefSpec a = new RefSpec("*/head:refs/heads/*");
+		assertTrue(a.isWildcard());
+		assertTrue(a.matchSource("a/head"));
+		assertTrue(a.matchSource("foo/head"));
+		assertTrue(a.matchSource("foo/bar/head"));
+		assertFalse(a.matchSource("/head"));
+		assertFalse(a.matchSource("a/head/extra"));
+
+		RefSpec b = a.expandFromSource("foo/head");
+		assertEquals("refs/heads/foo", b.getDestination());
+		RefSpec c = a.expandFromDestination("refs/heads/foo");
+		assertEquals("foo/head", c.getSource());
+	}
+

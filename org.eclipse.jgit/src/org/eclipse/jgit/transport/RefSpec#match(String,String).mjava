@@ -1,8 +1,13 @@
-	private boolean match(final String refName, final String s) {
+	private boolean match(final String name, final String s) {
 		if (s == null)
 			return false;
-		if (isWildcard())
-			return refName.startsWith(s.substring(0, s.length() - 1));
-		return refName.equals(s);
+		if (isWildcard()) {
+			int wildcardIndex = s.indexOf('*');
+			String prefix = s.substring(0, wildcardIndex);
+			String suffix = s.substring(wildcardIndex + 1);
+			return name.length() > prefix.length() + suffix.length()
+					&& name.startsWith(prefix) && name.endsWith(suffix);
+		}
+		return name.equals(s);
 	}
 
