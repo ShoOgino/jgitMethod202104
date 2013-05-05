@@ -10,5 +10,10 @@
 
 		RebaseResult result = git.rebase().setUpstream(parent).call();
 		assertEquals(Status.UP_TO_DATE, result.getStatus());
+
+		assertEquals(2, db.getReflogReader(Constants.HEAD).getReverseEntries()
+				.size());
+		assertEquals(2, db.getReflogReader("refs/heads/master")
+				.getReverseEntries().size());
 	}
 

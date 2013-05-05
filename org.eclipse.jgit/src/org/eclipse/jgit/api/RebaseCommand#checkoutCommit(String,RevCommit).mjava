@@ -1,4 +1,5 @@
-	private boolean checkoutCommit(RevCommit commit) throws IOException,
+	private boolean checkoutCommit(String headName, RevCommit commit)
+			throws IOException,
 			CheckoutConflictException {
 		try {
 			RevCommit head = walk.parseCommit(repo.resolve(Constants.HEAD));
@@ -14,6 +15,10 @@
 			RefUpdate refUpdate = repo.updateRef(Constants.HEAD, true);
 			refUpdate.setExpectedOldObjectId(head);
 			refUpdate.setNewObjectId(commit);
+			refUpdate.setRefLogMessage(
+					"checkout: moving from " //$NON-NLS-1$
+							+ Repository.shortenRefName(headName)
+							+ " to " + commit.getName(), false); //$NON-NLS-1$
 			Result res = refUpdate.forceUpdate();
 			switch (res) {
 			case FAST_FORWARD:

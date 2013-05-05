@@ -122,7 +122,8 @@
 						String ourCommitName = getOurCommitName();
 						CherryPickResult cherryPickResult = new Git(repo)
 								.cherryPick().include(commitToPick)
-								.setOurCommitName(ourCommitName).call();
+								.setOurCommitName(ourCommitName)
+								.setReflogPrefix("rebase:").call(); //$NON-NLS-1$
 						switch (cherryPickResult.getStatus()) {
 						case FAILED:
 							if (operation == Operation.BEGIN)
@@ -156,7 +157,7 @@
 			}
 			if (newHead != null) {
 				String headName = rebaseState.readFile(HEAD_NAME);
-				updateHead(headName, newHead);
+				updateHead(headName, newHead, upstreamCommit);
 				FileUtils.delete(rebaseState.getDir(), FileUtils.RECURSIVE);
 				if (lastStepWasForward)
 					return RebaseResult.FAST_FORWARD_RESULT;

@@ -71,9 +71,8 @@
 					dco.checkout();
 					newHead = new Git(getRepository()).commit()
 							.setMessage(srcCommit.getFullMessage())
-							.setReflogComment(
-									"cherry-pick: " //$NON-NLS-1$
-											+ srcCommit.getShortMessage())
+							.setReflogComment(reflogPrefix + " " //$NON-NLS-1$
+									+ srcCommit.getShortMessage())
 							.setAuthor(srcCommit.getAuthorIdent()).call();
 					cherryPickedRefs.add(src);
 				} else {
