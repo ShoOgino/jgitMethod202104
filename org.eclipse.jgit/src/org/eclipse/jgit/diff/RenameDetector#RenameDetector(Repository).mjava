@@ -5,11 +5,6 @@
 	 *            the repository to use for rename detection
 	 */
 	public RenameDetector(Repository repo) {
-		this.repo = repo;
-
-		DiffConfig cfg = repo.getConfig().get(DiffConfig.KEY);
-		renameLimit = cfg.getRenameLimit();
-
-		reset();
+		this(repo.newObjectReader(), repo.getConfig().get(DiffConfig.KEY));
 	}
 

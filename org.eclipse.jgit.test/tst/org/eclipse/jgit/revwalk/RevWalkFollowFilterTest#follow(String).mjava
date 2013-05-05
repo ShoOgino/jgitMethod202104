@@ -1,5 +1,6 @@
 	protected FollowFilter follow(final String followPath) {
-		FollowFilter followFilter = FollowFilter.create(followPath);
+		FollowFilter followFilter =
+			FollowFilter.create(followPath, new Config().get(DiffConfig.KEY));
 		followFilter.setRenameCallback(diffCollector);
 		rw.setTreeFilter(followFilter);
 		return followFilter;

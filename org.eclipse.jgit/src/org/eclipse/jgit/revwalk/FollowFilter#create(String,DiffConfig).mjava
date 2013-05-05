@@ -11,11 +11,14 @@
 	 *            the path to filter on. Must not be the empty string. All
 	 *            trailing '/' characters will be trimmed before string's length
 	 *            is checked or is used as part of the constructed filter.
+	 * @param cfg
+	 *            diff config specifying rename detection options.
 	 * @return a new filter for the requested path.
 	 * @throws IllegalArgumentException
 	 *             the path supplied was the empty string.
+	 * @since 3.0
 	 */
-	public static FollowFilter create(String path) {
-		return new FollowFilter(PathFilter.create(path));
+	public static FollowFilter create(String path, DiffConfig cfg) {
+		return new FollowFilter(PathFilter.create(path), cfg);
 	}
 

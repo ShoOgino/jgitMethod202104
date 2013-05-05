@@ -10,11 +10,10 @@
 	 */
 	public List<DiffEntry> compute(ProgressMonitor pm) throws IOException {
 		if (!done) {
-			ObjectReader reader = repo.newObjectReader();
 			try {
-				return compute(reader, pm);
+				return compute(objectReader, pm);
 			} finally {
-				reader.release();
+				objectReader.release();
 			}
 		}
 		return Collections.unmodifiableList(entries);
