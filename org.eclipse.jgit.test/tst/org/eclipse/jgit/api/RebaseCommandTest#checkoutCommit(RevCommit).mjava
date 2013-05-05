@@ -10,6 +10,8 @@
 		// update the HEAD
 		RefUpdate refUpdate = db.updateRef(Constants.HEAD, true);
 		refUpdate.setNewObjectId(commit);
+		refUpdate.setRefLogMessage("checkout: moving to " + head.getName(),
+				false);
 		refUpdate.forceUpdate();
 	}
 

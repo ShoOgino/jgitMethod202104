@@ -34,5 +34,12 @@
 		assertEquals(lastMasterChange, new RevWalk(db).parseCommit(
 				db.resolve(Constants.HEAD)).getParent(0));
 
+		List<ReflogEntry> headLog = db.getReflogReader(Constants.HEAD)
+				.getReverseEntries();
+		assertEquals(8, headLog.size());
+		assertEquals("rebase: change file1 in topic", headLog.get(0)
+				.getComment());
+		assertEquals("checkout: moving from " + topicCommit.getName() + " to "
+				+ lastMasterChange.getName(), headLog.get(1).getComment());
 	}
 

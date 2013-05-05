@@ -1,10 +1,12 @@
-	private void updateHead(String headName, RevCommit newHead)
+	private void updateHead(String headName, RevCommit newHead, RevCommit onto)
 			throws IOException {
 		// point the previous head (if any) to the new commit
 
 		if (headName.startsWith(Constants.R_REFS)) {
 			RefUpdate rup = repo.updateRef(headName);
 			rup.setNewObjectId(newHead);
+			rup.setRefLogMessage("rebase finished: " + headName + " onto " //$NON-NLS-1$
+					+ onto.getName(), false);
 			Result res = rup.forceUpdate();
 			switch (res) {
 			case FAST_FORWARD:
@@ -15,6 +17,8 @@
 				throw new JGitInternalException("Updating HEAD failed");
 			}
 			rup = repo.updateRef(Constants.HEAD);
+			rup.setRefLogMessage("rebase finished: returning to " + headName, //$NON-NLS-1$
+					false);
 			res = rup.link(headName);
 			switch (res) {
 			case FAST_FORWARD:

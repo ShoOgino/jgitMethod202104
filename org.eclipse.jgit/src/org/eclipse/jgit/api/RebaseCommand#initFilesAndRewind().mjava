@@ -12,7 +12,7 @@
 		if (head.isSymbolic())
 			headName = head.getTarget().getName();
 		else
-			headName = "detached HEAD";
+			headName = head.getObjectId().getName();
 		ObjectId headId = head.getObjectId();
 		if (headId == null)
 			throw new RefNotFoundException(MessageFormat.format(
@@ -27,10 +27,10 @@
 			monitor.beginTask(MessageFormat.format(
 					JGitText.get().resettingHead,
 					upstreamCommit.getShortMessage()), ProgressMonitor.UNKNOWN);
-			checkoutCommit(upstreamCommit);
+			checkoutCommit(headName, upstreamCommit);
 			monitor.endTask();
 
-			updateHead(headName, upstreamCommit);
+			updateHead(headName, upstreamCommit, upstream);
 			return RebaseResult.FAST_FORWARD_RESULT;
 		}
 
@@ -89,7 +89,7 @@
 				upstreamCommit.getShortMessage()), ProgressMonitor.UNKNOWN);
 		boolean checkoutOk = false;
 		try {
-			checkoutOk = checkoutCommit(upstreamCommit);
+			checkoutOk = checkoutCommit(headName, upstreamCommit);
 		} finally {
 			if (!checkoutOk)
 				FileUtils.delete(rebaseState.getDir(), FileUtils.RECURSIVE);
