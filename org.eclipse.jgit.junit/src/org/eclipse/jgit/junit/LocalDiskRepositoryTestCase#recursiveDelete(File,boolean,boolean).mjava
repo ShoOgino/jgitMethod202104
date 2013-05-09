@@ -1,5 +1,5 @@
-	private static boolean recursiveDelete(final String testName,
-			final File dir, boolean silent, boolean failOnError) {
+	private static boolean recursiveDelete(final File dir,
+			boolean silent, boolean failOnError) {
 		assert !(silent && failOnError);
 		if (!dir.exists())
 			return silent;
@@ -8,16 +8,16 @@
 			for (int k = 0; k < ls.length; k++) {
 				final File e = ls[k];
 				if (e.isDirectory())
-					silent = recursiveDelete(testName, e, silent, failOnError);
+					silent = recursiveDelete(e, silent, failOnError);
 				else if (!e.delete()) {
 					if (!silent)
-						reportDeleteFailure(testName, failOnError, e);
+						reportDeleteFailure(failOnError, e);
 					silent = !failOnError;
 				}
 			}
 		if (!dir.delete()) {
 			if (!silent)
-				reportDeleteFailure(testName, failOnError, dir);
+				reportDeleteFailure(failOnError, dir);
 			silent = !failOnError;
 		}
 		return silent;

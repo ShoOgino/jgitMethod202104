@@ -1,4 +1,21 @@
+	/**
+	 * Allocates a new unique file path that does not exist.
+	 * <p>
+	 * Unlike the standard {@code File.createTempFile} the returned path does
+	 * not exist, but may be created by another thread in a race with the
+	 * caller. Good luck.
+	 * <p>
+	 * This method is inherently unsafe due to a race condition between creating
+	 * the name and the first use that reserves it.
+	 *
+	 * @return a unique path that does not exist.
+	 * @throws IOException
+	 */
 	protected File createTempFile() throws IOException {
-		return new File(trash, "tmp-" + UUID.randomUUID()).getCanonicalFile();
+		File p = File.createTempFile("tmp_", "", tmp);
+		if (!p.delete()) {
+			throw new IOException("Cannot obtain unique path " + tmp);
+		}
+		return p;
 	}
 

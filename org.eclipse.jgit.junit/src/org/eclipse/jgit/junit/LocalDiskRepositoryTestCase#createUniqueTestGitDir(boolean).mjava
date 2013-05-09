@@ -8,11 +8,9 @@
 	 * @throws IOException
 	 */
 	protected File createUniqueTestGitDir(boolean bare) throws IOException {
-		String gitdirName = createUniqueTestFolderPrefix();
+		String gitdirName = createTempFile().getPath();
 		if (!bare)
 			gitdirName += "/";
-		gitdirName += Constants.DOT_GIT;
-		File gitdir = new File(trash, gitdirName);
-		return gitdir.getCanonicalFile();
+		return new File(gitdirName + Constants.DOT_GIT);
 	}
 

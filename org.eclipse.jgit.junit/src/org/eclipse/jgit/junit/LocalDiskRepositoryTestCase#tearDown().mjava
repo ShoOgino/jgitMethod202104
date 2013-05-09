@@ -11,7 +11,9 @@
 		//
 		if (useMMAP)
 			System.gc();
-
-		recursiveDelete(testId(), trash, false, true);
+		if (tmp != null)
+			recursiveDelete(tmp, false, true);
+		if (tmp != null && !tmp.exists())
+			CleanupThread.removed(tmp);
 	}
 
