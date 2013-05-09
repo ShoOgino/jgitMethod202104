@@ -1,4 +1,5 @@
-	private DirCache createTemporaryIndex(ObjectId headId, DirCache index)
+	private DirCache createTemporaryIndex(ObjectId headId, DirCache index,
+			RevWalk rw)
 			throws IOException {
 		ObjectInserter inserter = null;
 
@@ -18,7 +19,7 @@
 		int fIdx = treeWalk.addTree(new FileTreeIterator(repo));
 		int hIdx = -1;
 		if (headId != null)
-			hIdx = treeWalk.addTree(new RevWalk(repo).parseTree(headId));
+			hIdx = treeWalk.addTree(rw.parseTree(headId));
 		treeWalk.setRecursive(true);
 
 		String lastAddedFile = null;

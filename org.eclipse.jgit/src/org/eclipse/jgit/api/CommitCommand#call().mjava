@@ -24,13 +24,16 @@
 		checkCallable();
 		Collections.sort(only);
 
-		RepositoryState state = repo.getRepositoryState();
-		if (!state.canCommit())
-			throw new WrongRepositoryStateException(MessageFormat.format(
-					JGitText.get().cannotCommitOnARepoWithState, state.name()));
-		processOptions(state);
+		RevWalk rw = new RevWalk(repo);
 
 		try {
+			RepositoryState state = repo.getRepositoryState();
+			if (!state.canCommit())
+				throw new WrongRepositoryStateException(MessageFormat.format(
+						JGitText.get().cannotCommitOnARepoWithState,
+						state.name()));
+			processOptions(state, rw);
+
 			if (all && !repo.isBare() && repo.getWorkTree() != null) {
 				Git git = new Git(repo);
 				try {
@@ -56,8 +59,7 @@
 
 			if (headId != null)
 				if (amend) {
-					RevCommit previousCommit = new RevWalk(repo)
-							.parseCommit(headId);
+					RevCommit previousCommit = rw.parseCommit(headId);
 					for (RevCommit p : previousCommit.getParents())
 						parents.add(p.getId());
 					if (author == null)
@@ -70,7 +72,7 @@
 			DirCache index = repo.lockDirCache();
 			try {
 				if (!only.isEmpty())
-					index = createTemporaryIndex(headId, index);
+					index = createTemporaryIndex(headId, index, rw);
 
 				ObjectInserter odi = repo.newObjectInserter();
 				try {
@@ -93,56 +95,51 @@
 					ObjectId commitId = odi.insert(commit);
 					odi.flush();
 
-					RevWalk revWalk = new RevWalk(repo);
-					try {
-						RevCommit revCommit = revWalk.parseCommit(commitId);
-						RefUpdate ru = repo.updateRef(Constants.HEAD);
-						ru.setNewObjectId(commitId);
-						if (reflogComment != null) {
-							ru.setRefLogMessage(reflogComment, false);
-						} else {
-							String prefix = amend ? "commit (amend): " //$NON-NLS-1$
-									: parents.size() == 0 ? "commit (initial): "
-											: "commit: ";
-							ru.setRefLogMessage(
-									prefix + revCommit.getShortMessage(), false);
+					RevCommit revCommit = rw.parseCommit(commitId);
+					RefUpdate ru = repo.updateRef(Constants.HEAD);
+					ru.setNewObjectId(commitId);
+					if (reflogComment != null) {
+						ru.setRefLogMessage(reflogComment, false);
+					} else {
+						String prefix = amend ? "commit (amend): " //$NON-NLS-1$
+								: parents.size() == 0 ? "commit (initial): "
+										: "commit: ";
+						ru.setRefLogMessage(
+								prefix + revCommit.getShortMessage(), false);
+					}
+					if (headId != null)
+						ru.setExpectedOldObjectId(headId);
+					else
+						ru.setExpectedOldObjectId(ObjectId.zeroId());
+					Result rc = ru.forceUpdate();
+					switch (rc) {
+					case NEW:
+					case FORCED:
+					case FAST_FORWARD: {
+						setCallable(false);
+						if (state == RepositoryState.MERGING_RESOLVED) {
+							// Commit was successful. Now delete the files
+							// used for merge commits
+							repo.writeMergeCommitMsg(null);
+							repo.writeMergeHeads(null);
+						} else if (state == RepositoryState.CHERRY_PICKING_RESOLVED) {
+							repo.writeMergeCommitMsg(null);
+							repo.writeCherryPickHead(null);
+						} else if (state == RepositoryState.REVERTING_RESOLVED) {
+							repo.writeMergeCommitMsg(null);
+							repo.writeRevertHead(null);
 						}
-						if (headId != null)
-							ru.setExpectedOldObjectId(headId);
-						else
-							ru.setExpectedOldObjectId(ObjectId.zeroId());
-						Result rc = ru.forceUpdate();
-						switch (rc) {
-						case NEW:
-						case FORCED:
-						case FAST_FORWARD: {
-							setCallable(false);
-							if (state == RepositoryState.MERGING_RESOLVED) {
-								// Commit was successful. Now delete the files
-								// used for merge commits
-								repo.writeMergeCommitMsg(null);
-								repo.writeMergeHeads(null);
-							} else if (state == RepositoryState.CHERRY_PICKING_RESOLVED) {
-								repo.writeMergeCommitMsg(null);
-								repo.writeCherryPickHead(null);
-							} else if (state == RepositoryState.REVERTING_RESOLVED) {
-								repo.writeMergeCommitMsg(null);
-								repo.writeRevertHead(null);
-							}
-							return revCommit;
-						}
-						case REJECTED:
-						case LOCK_FAILURE:
-							throw new ConcurrentRefUpdateException(JGitText
-									.get().couldNotLockHEAD, ru.getRef(), rc);
-						default:
-							throw new JGitInternalException(MessageFormat
-									.format(JGitText.get().updatingRefFailed,
-											Constants.HEAD,
-											commitId.toString(), rc));
-						}
-					} finally {
-						revWalk.release();
+						return revCommit;
+					}
+					case REJECTED:
+					case LOCK_FAILURE:
+						throw new ConcurrentRefUpdateException(
+								JGitText.get().couldNotLockHEAD, ru.getRef(),
+								rc);
+					default:
+						throw new JGitInternalException(MessageFormat.format(
+								JGitText.get().updatingRefFailed,
+								Constants.HEAD, commitId.toString(), rc));
 					}
 				} finally {
 					odi.release();
@@ -155,6 +152,8 @@
 		} catch (IOException e) {
 			throw new JGitInternalException(
 					JGitText.get().exceptionCaughtDuringExecutionOfCommitCommand, e);
+		} finally {
+			rw.dispose();
 		}
 	}
 
