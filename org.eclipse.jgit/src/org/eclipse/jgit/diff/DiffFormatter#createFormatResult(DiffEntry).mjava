@@ -13,6 +13,11 @@
 			editList = new EditList();
 			type = PatchType.UNIFIED;
 
+		} else if (ent.getOldId() == null || ent.getNewId() == null) {
+			// Content not changed (e.g. only mode, pure rename)
+			editList = new EditList();
+			type = PatchType.UNIFIED;
+
 		} else {
 			assertHaveRepository();
 
