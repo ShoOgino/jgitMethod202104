@@ -20,6 +20,8 @@
 		try {
 			rawIn = input;
 			rawOut = output;
+			if (messages != null)
+				msgOut = messages;
 
 			if (timeout > 0) {
 				final Thread caller = Thread.currentThread();
@@ -36,6 +38,7 @@
 			pckOut = new PacketLineOut(rawOut);
 			service();
 		} finally {
+			msgOut = DisabledOutputStream.INSTANCE;
 			walk.release();
 			if (timer != null) {
 				try {

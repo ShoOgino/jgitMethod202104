@@ -1,7 +1,6 @@
 	private void sendPack(final boolean sideband) throws IOException {
 		ProgressMonitor pm = NullProgressMonitor.INSTANCE;
 		OutputStream packOut = rawOut;
-		SideBandOutputStream msgOut = null;
 
 		if (sideband) {
 			int bufsz = SideBandOutputStream.SMALL_BUF;
@@ -106,7 +105,7 @@
 			pw.writePack(pm, NullProgressMonitor.INSTANCE, packOut);
 			statistics = pw.getStatistics();
 
-			if (msgOut != null) {
+			if (msgOut != DisabledOutputStream.INSTANCE) {
 				String msg = pw.getStatistics().getMessage() + '\n';
 				msgOut.write(Constants.encode(msg));
 				msgOut.flush();
