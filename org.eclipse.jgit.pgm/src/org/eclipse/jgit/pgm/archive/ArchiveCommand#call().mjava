@@ -3,35 +3,7 @@
 	 */
 	@Override
 	public OutputStream call() throws GitAPIException {
-		final MutableObjectId idBuf = new MutableObjectId();
-		final Format fmt = lookupFormat(format);
-		final ArchiveOutputStream outa = fmt.createArchiveOutputStream(out);
-		final ObjectReader reader = walk.getObjectReader();
-
-		try {
-			try {
-				walk.setRecursive(true);
-				while (walk.next()) {
-					final String name = walk.getPathString();
-					final FileMode mode = walk.getFileMode(0);
-
-					if (mode == FileMode.TREE)
-						// ZIP entries for directories are optional.
-						// Leave them out, mimicking "git archive".
-						continue;
-
-					walk.getObjectId(idBuf, 0);
-					fmt.putEntry(outa, name, mode, reader.open(idBuf));
-				}
-			} finally {
-				outa.close();
-			}
-		} catch (IOException e) {
-			// TODO(jrn): Throw finer-grained errors.
-			throw new JGitInternalException(
-					CLIText.get().exceptionCaughtDuringExecutionOfArchiveCommand, e);
-		}
-
-		return out;
+		final Format<?> fmt = lookupFormat(format);
+		return writeArchive(fmt);
 	}
 
