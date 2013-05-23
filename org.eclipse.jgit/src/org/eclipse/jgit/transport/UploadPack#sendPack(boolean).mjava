@@ -22,6 +22,7 @@
 			} else {
 				preUploadHook.onSendPack(this, wantAll, commonBase);
 			}
+			msgOut.flush();
 		} catch (ServiceMayNotContinueException noPack) {
 			if (sideband && noPack.getMessage() != null) {
 				noPack.setOutput();
@@ -105,7 +106,7 @@
 			pw.writePack(pm, NullProgressMonitor.INSTANCE, packOut);
 			statistics = pw.getStatistics();
 
-			if (msgOut != DisabledOutputStream.INSTANCE) {
+			if (msgOut != NullOutputStream.INSTANCE) {
 				String msg = pw.getStatistics().getMessage() + '\n';
 				msgOut.write(Constants.encode(msg));
 				msgOut.flush();
