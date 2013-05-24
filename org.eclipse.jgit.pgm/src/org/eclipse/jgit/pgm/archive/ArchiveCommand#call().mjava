@@ -4,7 +4,7 @@
 	@Override
 	public OutputStream call() throws GitAPIException {
 		final MutableObjectId idBuf = new MutableObjectId();
-		final Archiver fmt = formats.get(format);
+		final Format fmt = lookupFormat(format);
 		final ArchiveOutputStream outa = fmt.createArchiveOutputStream(out);
 		final ObjectReader reader = walk.getObjectReader();
 

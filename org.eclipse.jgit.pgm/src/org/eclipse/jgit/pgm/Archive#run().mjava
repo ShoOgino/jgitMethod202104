@@ -8,6 +8,8 @@
 			cmd.setTree(tree)
 					.setFormat(format)
 					.setOutputStream(outs).call();
+		} catch (GitAPIException e) {
+			throw die(e.getMessage());
 		} finally {
 			cmd.release();
 		}
