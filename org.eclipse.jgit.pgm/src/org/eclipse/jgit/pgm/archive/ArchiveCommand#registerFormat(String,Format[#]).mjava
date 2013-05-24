@@ -1,0 +1,20 @@
+	/**
+	 * Adds support for an additional archival format.  To avoid
+	 * unnecessary dependencies, ArchiveCommand does not have support
+	 * for any formats built in; use this function to add them.
+	 *
+	 * OSGi plugins providing formats should call this function at
+	 * bundle activation time.
+	 *
+	 * @param name name of a format (e.g., "tar" or "zip").
+	 * @param fmt archiver for that format
+	 * @throws JGitInternalException
+	 *              An archival format with that name was already registered.
+	 */
+	public static void registerFormat(String name, Format<?> fmt) {
+		if (formats.putIfAbsent(name, fmt) != null)
+			throw new JGitInternalException(MessageFormat.format(
+					CLIText.get().archiveFormatAlreadyRegistered,
+					name));
+	}
+

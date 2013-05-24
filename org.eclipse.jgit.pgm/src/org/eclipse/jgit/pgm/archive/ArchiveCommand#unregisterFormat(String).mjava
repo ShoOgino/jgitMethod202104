@@ -1,0 +1,15 @@
+	/**
+	 * Removes support for an archival format so its Format can be
+	 * garbage collected.
+	 *
+	 * @param name name of format (e.g., "tar" or "zip").
+	 * @throws JGitInternalException
+	 *              No such archival format was registered.
+	 */
+	public static void unregisterFormat(String name) {
+		if (formats.remove(name) == null)
+			throw new JGitInternalException(MessageFormat.format(
+					CLIText.get().archiveFormatAlreadyAbsent,
+					name));
+	}
+
