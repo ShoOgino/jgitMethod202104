@@ -2,11 +2,13 @@
 	 * @param tree
 	 *            the tag, commit, or tree object to produce an archive for
 	 * @return this
-	 * @throws IOException
 	 */
-	public ArchiveCommand setTree(ObjectId tree) throws IOException {
-		final RevWalk rw = new RevWalk(walk.getObjectReader());
-		walk.reset(rw.parseTree(tree));
+	public ArchiveCommand setTree(ObjectId tree) {
+		if (tree == null)
+			throw new IllegalArgumentException();
+
+		this.tree = tree;
+		setCallable(true);
 		return this;
 	}
 

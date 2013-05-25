@@ -1,11 +1,14 @@
 	private <T extends Closeable>
 	OutputStream writeArchive(Format<T> fmt) throws GitAPIException {
-		final MutableObjectId idBuf = new MutableObjectId();
-		final T outa = fmt.createArchiveOutputStream(out);
-		final ObjectReader reader = walk.getObjectReader();
-
+		final TreeWalk walk = new TreeWalk(repo);
 		try {
+			final T outa = fmt.createArchiveOutputStream(out);
 			try {
+				final MutableObjectId idBuf = new MutableObjectId();
+				final ObjectReader reader = walk.getObjectReader();
+				final RevWalk rw = new RevWalk(walk.getObjectReader());
+
+				walk.reset(rw.parseTree(tree));
 				walk.setRecursive(true);
 				while (walk.next()) {
 					final String name = walk.getPathString();
@@ -22,12 +25,13 @@
 			} finally {
 				outa.close();
 			}
+			return out;
 		} catch (IOException e) {
 			// TODO(jrn): Throw finer-grained errors.
 			throw new JGitInternalException(
 					JGitText.get().exceptionCaughtDuringExecutionOfArchiveCommand, e);
+		} finally {
+			walk.release();
 		}
-
-		return out;
 	}
 
