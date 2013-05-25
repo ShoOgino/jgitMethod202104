@@ -2,11 +2,18 @@
 			throws MissingObjectException, IncorrectObjectTypeException,
 			IOException, GitAPIException {
 
-		Ref head = result.getAdvertisedRef(branch);
+		Ref head = null;
 		if (branch.equals(Constants.HEAD)) {
 			Ref foundBranch = findBranchToCheckout(result);
 			if (foundBranch != null)
 				head = foundBranch;
+		}
+		if (head == null) {
+			head = result.getAdvertisedRef(branch);
+			if (head == null)
+				head = result.getAdvertisedRef(Constants.R_HEADS + branch);
+			if (head == null)
+				head = result.getAdvertisedRef(Constants.R_TAGS + branch);
 		}
 
 		if (head == null || head.getObjectId() == null)
