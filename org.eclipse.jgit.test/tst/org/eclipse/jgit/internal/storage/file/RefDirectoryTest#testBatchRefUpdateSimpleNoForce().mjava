@@ -9,8 +9,7 @@
 						ReceiveCommand.Type.UPDATE_NONFASTFORWARD));
 		BatchRefUpdate batchUpdate = refdir.newBatchUpdate();
 		batchUpdate.addCommand(commands);
-		batchUpdate
-				.execute(new RevWalk(diskRepo), NullProgressMonitor.INSTANCE);
+		batchUpdate.execute(new RevWalk(diskRepo), new StrictWorkMonitor());
 		Map<String, Ref> refs = refdir.getRefs(RefDatabase.ALL);
 		assertEquals(ReceiveCommand.Result.OK, commands.get(0).getResult());
 		assertEquals(ReceiveCommand.Result.REJECTED_NONFASTFORWARD, commands

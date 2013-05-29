@@ -4,11 +4,14 @@
 	 *
 	 * @param state
 	 *            the state of the repository we are working on
+	 * @param rw
+	 *            the RevWalk to use
 	 *
 	 * @throws NoMessageException
 	 *             if the commit message has not been specified
 	 */
-	private void processOptions(RepositoryState state) throws NoMessageException {
+	private void processOptions(RepositoryState state, RevWalk rw)
+			throws NoMessageException {
 		if (committer == null)
 			committer = new PersonIdent(repo);
 		if (author == null && !amend)
@@ -18,6 +21,12 @@
 		if (state == RepositoryState.MERGING_RESOLVED) {
 			try {
 				parents = repo.readMergeHeads();
+				if (parents != null)
+					for (int i = 0; i < parents.size(); i++) {
+						RevObject ro = rw.parseAny(parents.get(i));
+						if (ro instanceof RevTag)
+							parents.set(i, rw.peel(ro));
+					}
 			} catch (IOException e) {
 				throw new JGitInternalException(MessageFormat.format(
 						JGitText.get().exceptionOccurredDuringReadingOfGIT_DIR,

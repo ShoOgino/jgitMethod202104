@@ -1,0 +1,9 @@
+	private static String expandWildcard(String name, String patternA,
+			String patternB) {
+		int a = patternA.indexOf('*');
+		int trailingA = patternA.length() - (a + 1);
+		int b = patternB.indexOf('*');
+		String match = name.substring(a, name.length() - trailingA);
+		return patternB.substring(0, b) + match + patternB.substring(b + 1);
+	}
+

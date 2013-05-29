@@ -9,6 +9,7 @@
 	 * <li><code>+refs/heads/master</code></li>
 	 * <li><code>+refs/heads/master:refs/remotes/origin/master</code></li>
 	 * <li><code>+refs/heads/*:refs/remotes/origin/*</code></li>
+	 * <li><code>+refs/pull/&#42;/head:refs/remotes/origin/pr/*</code></li>
 	 * <li><code>:refs/heads/master</code></li>
 	 * </ul>
 	 *
@@ -29,18 +30,24 @@
 			s = s.substring(1);
 			if (isWildcard(s))
 				throw new IllegalArgumentException(MessageFormat.format(JGitText.get().invalidWildcards, spec));
-			dstName = s;
+			dstName = checkValid(s);
 		} else if (c > 0) {
-			srcName = s.substring(0, c);
-			dstName = s.substring(c + 1);
-			if (isWildcard(srcName) && isWildcard(dstName))
+			String src = s.substring(0, c);
+			String dst = s.substring(c + 1);
+			if (isWildcard(src) && isWildcard(dst)) {
+				// Both contain wildcard
 				wildcard = true;
-			else if (isWildcard(srcName) || isWildcard(dstName))
+			} else if (isWildcard(src) || isWildcard(dst)) {
+				// If either source or destination has wildcard, the other one
+				// must have as well.
 				throw new IllegalArgumentException(MessageFormat.format(JGitText.get().invalidWildcards, spec));
+			}
+			srcName = checkValid(src);
+			dstName = checkValid(dst);
 		} else {
 			if (isWildcard(s))
 				throw new IllegalArgumentException(MessageFormat.format(JGitText.get().invalidWildcards, spec));
-			srcName = s;
+			srcName = checkValid(s);
 		}
 	}
 

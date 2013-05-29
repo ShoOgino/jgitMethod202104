@@ -7,11 +7,10 @@
 		writeTrashFile("Test.txt", "Hello world");
 		git.add().addFilepattern("Test.txt").call();
 		git.commit().setMessage("Initial commit").call();
+		git.tag().setName("tag-initial").setMessage("Tag initial").call();
 
-		// create a master branch and switch to it
-		git.branchCreate().setName("test").call();
-		RefUpdate rup = db.updateRef(Constants.HEAD);
-		rup.link("refs/heads/test");
+		// create a test branch and switch to it
+		git.checkout().setCreateBranch(true).setName("test").call();
 
 		// commit something on the test branch
 		writeTrashFile("Test.txt", "Some change");
