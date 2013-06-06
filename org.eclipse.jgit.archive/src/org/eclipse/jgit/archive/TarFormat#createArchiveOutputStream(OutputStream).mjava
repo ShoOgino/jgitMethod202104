@@ -1,4 +1,7 @@
 	public ArchiveOutputStream createArchiveOutputStream(OutputStream s) {
-		return new TarArchiveOutputStream(s);
+		TarArchiveOutputStream out = new TarArchiveOutputStream(s, "UTF-8"); //$NON-NLS-1$
+		out.setLongFileMode(TarArchiveOutputStream.LONGFILE_POSIX);
+		out.setBigNumberMode(TarArchiveOutputStream.BIGNUMBER_POSIX);
+		return out;
 	}
 
