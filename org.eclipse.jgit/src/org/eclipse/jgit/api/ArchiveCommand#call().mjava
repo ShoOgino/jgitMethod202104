@@ -5,7 +5,11 @@
 	public OutputStream call() throws GitAPIException {
 		checkCallable();
 
-		final Format<?> fmt = lookupFormat(format);
+		final Format<?> fmt;
+		if (format == null)
+			fmt = formatBySuffix(suffix);
+		else
+			fmt = lookupFormat(format);
 		return writeArchive(fmt);
 	}
 

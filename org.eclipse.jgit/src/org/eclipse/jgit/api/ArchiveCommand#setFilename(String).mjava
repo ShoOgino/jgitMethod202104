@@ -1,0 +1,20 @@
+	/**
+	 * Set the intended filename for the produced archive.
+	 * Currently the only effect is to determine the default
+	 * archive format when none is specified with
+	 * {@link #setFormat(String)}.
+	 *
+	 * @param filename
+	 *		intended filename for the archive
+	 */
+	public ArchiveCommand setFilename(String filename) {
+		int slash = filename.lastIndexOf('/');
+		int dot = filename.indexOf('.', slash + 1);
+
+		if (dot == -1)
+			this.suffix = "";
+		else
+			this.suffix = filename.substring(dot);
+		return this;
+	}
+

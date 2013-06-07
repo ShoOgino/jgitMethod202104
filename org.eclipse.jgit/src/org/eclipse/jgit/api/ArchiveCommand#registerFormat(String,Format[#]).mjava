@@ -12,6 +12,8 @@
 	 *              An archival format with that name was already registered.
 	 */
 	public static void registerFormat(String name, Format<?> fmt) {
+		// TODO(jrn): Check that suffixes don't overlap.
+
 		if (formats.putIfAbsent(name, fmt) != null)
 			throw new JGitInternalException(MessageFormat.format(
 					JGitText.get().archiveFormatAlreadyRegistered,
