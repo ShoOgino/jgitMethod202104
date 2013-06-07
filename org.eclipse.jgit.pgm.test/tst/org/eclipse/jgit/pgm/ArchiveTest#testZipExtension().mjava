@@ -1,0 +1,16 @@
+	@Test
+	public void testZipExtension() throws Exception {
+		final File archiveWithDot = new File(db.getWorkTree(), "greeting.zip");
+		final File archiveNoDot = new File(db.getWorkTree(), "greetingzip");
+
+		commitGreeting();
+		execute("git archive " +
+			shellQuote("--output=" + archiveWithDot.getAbsolutePath()) + " " +
+			"HEAD");
+		execute("git archive " +
+			shellQuote("--output=" + archiveNoDot.getAbsolutePath()) + " " +
+			"HEAD");
+		assertIsZip(archiveWithDot);
+		assertIsTar(archiveNoDot);
+	}
+

@@ -1,0 +1,14 @@
+	private void assertMagic(long offset, byte[] magicBytes, File file) throws Exception {
+		BufferedInputStream in = new BufferedInputStream(
+				new FileInputStream(file));
+		try {
+			in.skip(offset);
+
+			byte[] actual = new byte[magicBytes.length];
+			in.read(actual);
+			assertArrayEquals(magicBytes, actual);
+		} finally {
+			in.close();
+		}
+	}
+

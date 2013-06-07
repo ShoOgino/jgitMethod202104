@@ -1,0 +1,13 @@
+	@Test
+	public void testExtensionMatchIsAnchored() throws Exception {
+		final File archive = new File(db.getWorkTree(), "two-extensions.zip.bak");
+		final String path = archive.getAbsolutePath();
+
+		commitGreeting();
+		assertArrayEquals(new String[] { "" },
+				execute("git archive " +
+					shellQuote("--output=" + path) + " " +
+					"HEAD"));
+		assertIsTar(archive);
+	}
+

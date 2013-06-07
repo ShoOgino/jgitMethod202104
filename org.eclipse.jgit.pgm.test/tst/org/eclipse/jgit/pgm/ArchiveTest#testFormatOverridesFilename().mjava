@@ -1,0 +1,15 @@
+	@Test
+	public void testFormatOverridesFilename() throws Exception {
+		final File archive = new File(db.getWorkTree(), "format-overrides-name.tar");
+		final String path = archive.getAbsolutePath();
+
+		commitGreeting();
+		assertArrayEquals(new String[] { "" },
+				execute("git archive " +
+					"--format=zip " +
+					shellQuote("--output=" + path) + " " +
+					"HEAD"));
+		assertContainsEntryWithMode(path, "", "greeting");
+		assertIsZip(archive);
+	}
+

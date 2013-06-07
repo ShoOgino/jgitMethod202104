@@ -17,7 +17,7 @@
 		git.commit().setMessage("three files with different modes").call();
 
 		final byte[] zipData = CLIGitCommand.rawExecute( //
-				"git archive master", db);
+				"git archive --format=zip master", db);
 		writeRaw("zip-with-modes.zip", zipData);
 		assertContainsEntryWithMode("zip-with-modes.zip", "-rw-", "plain");
 		assertContainsEntryWithMode("zip-with-modes.zip", "-rwx", "executable");

@@ -8,7 +8,7 @@
 		git.commit().setMessage("file with long name").call();
 
 		final byte[] result = CLIGitCommand.rawExecute( //
-				"git archive HEAD", db);
+				"git archive --format=zip HEAD", db);
 		assertArrayEquals(new String[] { filename },
 				listZipEntries(result));
 	}

@@ -1,0 +1,14 @@
+	@Test
+	public void testUnrecognizedExtensionMeansTar() throws Exception {
+		final File archive = new File(db.getWorkTree(), "example.txt");
+		final String path = archive.getAbsolutePath();
+
+		commitGreeting();
+		assertArrayEquals(new String[] { "" },
+				execute("git archive " +
+					shellQuote("--output=" + path) + " " +
+					"HEAD"));
+		assertTarContainsEntry(path, "", "greeting");
+		assertIsTar(archive);
+	}
+
