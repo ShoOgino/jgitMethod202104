@@ -10,7 +10,7 @@
 			FileUtils.delete(t, FileUtils.EMPTY_DIRECTORIES_ONLY | FileUtils.RECURSIVE);
 			fail("expected failure to delete f");
 		} catch (IOException e) {
-			assertThat(e.getMessage(), endsWith(f.getAbsolutePath()));
+			assertTrue(e.getMessage().endsWith(f.getAbsolutePath()));
 		}
 		assertTrue(t.exists());
 	}
