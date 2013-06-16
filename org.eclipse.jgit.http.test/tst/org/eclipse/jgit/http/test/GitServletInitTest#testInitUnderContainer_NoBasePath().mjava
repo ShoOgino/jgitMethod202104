@@ -6,6 +6,8 @@
 		ServletHolder s = app.addServlet(GitServlet.class, "/git");
 		s.setInitOrder(1);
 		s.getServletHandler().setStartWithUnavailable(false);
+		// The tmp directory is symlinked on OS X
+		s.setInitParameter("aliases", "true");
 
 		try {
 			server.setUp();
