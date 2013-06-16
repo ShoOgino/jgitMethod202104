@@ -8,8 +8,9 @@
 
 		ServletContextHandler app = server.addContext("/git");
 		app.setResourceBase(base.toString());
-		app.addServlet(DefaultServlet.class, "/");
-
+		ServletHolder holder = app.addServlet(DefaultServlet.class, "/");
+		// The tmp directory is symlinked on OS X
+		holder.setInitParameter("aliases", "true");
 		server.setUp();
 
 		remoteRepository = src.getRepository();
