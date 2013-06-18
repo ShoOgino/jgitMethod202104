@@ -1,4 +1,6 @@
 	private void service() throws IOException {
+		requestPolicy = getEffectiveRequestPolicy();
+
 		if (biDirectionalPipe)
 			sendAdvertisedRefs(new PacketLineOutRefAdvertiser(pckOut));
 		else if (requestPolicy == RequestPolicy.ANY)
