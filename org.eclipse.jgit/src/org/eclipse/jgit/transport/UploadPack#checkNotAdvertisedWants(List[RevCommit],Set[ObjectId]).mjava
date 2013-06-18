@@ -1,0 +1,28 @@
+	private void checkNotAdvertisedWants(List<RevCommit> notAdvertisedWants,
+			Set<ObjectId> reachableFrom)
+			throws MissingObjectException, IncorrectObjectTypeException, IOException {
+		// Walk the requested commits back to the provided set of commits. If any
+		// commit exists, a branch was deleted or rewound and the repository owner
+		// no longer exports that requested item. If the requested commit is merged
+		// into an advertised branch it will be marked UNINTERESTING and no commits
+		// return.
+
+		for (RevCommit c : notAdvertisedWants)
+			walk.markStart(c);
+		for (ObjectId id : reachableFrom) {
+			try {
+				walk.markUninteresting(walk.parseCommit(id));
+			} catch (IncorrectObjectTypeException notCommit) {
+				continue;
+			}
+		}
+
+		RevCommit bad = walk.next();
+		if (bad != null) {
+			throw new PackProtocolException(MessageFormat.format(
+					JGitText.get().wantNotValid,
+					bad.name()));
+		}
+		walk.reset();
+	}
+
