@@ -1,7 +1,7 @@
 	private void service() throws IOException {
 		if (biDirectionalPipe)
 			sendAdvertisedRefs(new PacketLineOutRefAdvertiser(pckOut));
-		else if (requestPolicy == RequestPolicy.ANY)
+		else if (requestValidator instanceof AnyRequestValidator)
 			advertised = Collections.emptySet();
 		else
 			advertised = refIdSet(getAdvertisedOrDefaultRefs().values());
