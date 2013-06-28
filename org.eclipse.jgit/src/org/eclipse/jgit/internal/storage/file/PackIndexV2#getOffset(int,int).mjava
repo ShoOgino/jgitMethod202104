@@ -1,0 +1,7 @@
+	private long getOffset(final int levelOne, final int levelTwo) {
+		final long p = NB.decodeUInt32(offset32[levelOne], levelTwo << 2);
+		if ((p & IS_O64) != 0)
+			return NB.decodeUInt64(offset64, (8 * (int) (p & ~IS_O64)));
+		return p;
+	}
+
