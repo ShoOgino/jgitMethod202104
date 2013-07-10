@@ -4,10 +4,29 @@
 	 *            By default the policy is {@link RequestPolicy#ADVERTISED},
 	 *            which is the Git default requiring clients to only ask for an
 	 *            object that a reference directly points to. This may be relaxed
-	 *            to {@link RequestPolicy#REACHABLE_COMMIT} when callers
-	 *            have {@link #setBiDirectionalPipe(boolean)} set to false.
+	 *            to {@link RequestPolicy#REACHABLE_COMMIT} or
+	 *            {@link RequestPolicy#REACHABLE_COMMIT_TIP} when callers have
+	 *            {@link #setBiDirectionalPipe(boolean)} set to false.
+	 *            Overrides any policy specified in a {@link TransferConfig}.
 	 */
 	public void setRequestPolicy(RequestPolicy policy) {
-		requestPolicy = policy != null ? policy : RequestPolicy.ADVERTISED;
+		switch (policy) {
+			case ADVERTISED:
+			default:
+				requestValidator = new AdvertisedRequestValidator();
+				break;
+			case REACHABLE_COMMIT:
+				requestValidator = new ReachableCommitRequestValidator();
+				break;
+			case TIP:
+				requestValidator = new TipRequestValidator();
+				break;
+			case REACHABLE_COMMIT_TIP:
+				requestValidator = new ReachableCommitTipRequestValidator();
+				break;
+			case ANY:
+				requestValidator = new AnyRequestValidator();
+				break;
+		}
 	}
 

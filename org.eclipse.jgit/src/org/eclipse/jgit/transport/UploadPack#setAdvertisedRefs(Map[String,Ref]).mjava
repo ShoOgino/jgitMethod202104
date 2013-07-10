@@ -15,6 +15,9 @@
 			refs = allRefs;
 		else
 			refs = db.getAllRefs();
-		refs = refFilter.filter(refs);
+		if (refFilter == RefFilter.DEFAULT)
+			refs = transferConfig.getRefFilter().filter(refs);
+		else
+			refs = refFilter.filter(refs);
 	}
 

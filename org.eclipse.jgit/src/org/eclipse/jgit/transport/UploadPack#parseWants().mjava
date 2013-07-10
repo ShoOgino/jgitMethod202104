@@ -1,27 +1,13 @@
 	private void parseWants() throws IOException {
 		AsyncRevObjectQueue q = walk.parseAny(wantIds, true);
 		try {
-			List<RevCommit> checkReachable = null;
+			List<RevObject> notAdvertisedWants = null;
 			RevObject obj;
 			while ((obj = q.next()) != null) {
 				if (!advertised.contains(obj)) {
-					switch (requestPolicy) {
-					case ADVERTISED:
-					default:
-						throw new PackProtocolException(MessageFormat.format(
-								JGitText.get().wantNotValid, obj));
-					case REACHABLE_COMMIT:
-						if (!(obj instanceof RevCommit)) {
-							throw new PackProtocolException(MessageFormat.format(
-								JGitText.get().wantNotValid, obj));
-						}
-						if (checkReachable == null)
-							checkReachable = new ArrayList<RevCommit>();
-						checkReachable.add((RevCommit) obj);
-						break;
-					case ANY:
-						break;
-					}
+					if (notAdvertisedWants == null)
+						notAdvertisedWants = new ArrayList<RevObject>();
+					notAdvertisedWants.add(obj);
 				}
 				want(obj);
 
@@ -33,8 +19,8 @@
 						want(obj);
 				}
 			}
-			if (checkReachable != null)
-				checkNotAdvertisedWants(checkReachable);
+			if (notAdvertisedWants != null)
+				requestValidator.checkWants(this, notAdvertisedWants);
 			wantIds.clear();
 		} catch (MissingObjectException notFound) {
 			ObjectId id = notFound.getObjectId();

@@ -1,0 +1,9 @@
+		public void checkWants(UploadPack up, List<RevObject> wants)
+				throws PackProtocolException, IOException {
+			if (!up.isBiDirectionalPipe())
+				new ReachableCommitRequestValidator().checkWants(up, wants);
+			else if (!wants.isEmpty())
+				throw new PackProtocolException(MessageFormat.format(
+						JGitText.get().wantNotValid, wants.iterator().next().name()));
+		}
+

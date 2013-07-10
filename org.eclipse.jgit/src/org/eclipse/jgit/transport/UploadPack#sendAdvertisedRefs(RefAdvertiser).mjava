@@ -32,6 +32,11 @@
 		adv.advertiseCapability(OPTION_SHALLOW);
 		if (!biDirectionalPipe)
 			adv.advertiseCapability(OPTION_NO_DONE);
+		RequestPolicy policy = getRequestPolicy();
+		if (policy == RequestPolicy.TIP
+				|| policy == RequestPolicy.REACHABLE_COMMIT_TIP
+				|| policy == null)
+			adv.advertiseCapability(OPTION_ALLOW_TIP_SHA1_IN_WANT);
 		adv.setDerefTags(true);
 		advertised = adv.send(getAdvertisedOrDefaultRefs());
 		adv.end();

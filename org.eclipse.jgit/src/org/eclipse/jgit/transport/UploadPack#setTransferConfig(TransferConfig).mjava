@@ -1,0 +1,11 @@
+	/**
+	 * @param tc
+	 *            configuration controlling transfer options. If null the source
+	 *            repository's settings will be used.
+	 */
+	public void setTransferConfig(TransferConfig tc) {
+		this.transferConfig = tc != null ? tc : new TransferConfig(db);
+		setRequestPolicy(transferConfig.isAllowTipSha1InWant()
+				? RequestPolicy.TIP : RequestPolicy.ADVERTISED);
+	}
+
