@@ -1,0 +1,8 @@
+	private static String readContentAsString(Entry entry) throws IOException {
+		long length = entry.getLength();
+		byte[] content = new byte[(int) length];
+		InputStream is = entry.openInputStream();
+		IO.readFully(is, content, 0, (int) length);
+		return RawParseUtils.decode(content);
+	}
+

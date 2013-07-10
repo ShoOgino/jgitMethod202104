@@ -14,10 +14,11 @@
 	 * @param reader
 	 *            access to repository objects if necessary. Should not be null.
 	 * @return true if content is most likely different.
+	 * @throws IOException
 	 * @since 3.3
 	 */
 	public boolean isModified(DirCacheEntry entry, boolean forceContentCheck,
-			ObjectReader reader) {
+			ObjectReader reader) throws IOException {
 		MetadataDiff diff = compareMetadata(entry);
 		switch (diff) {
 		case DIFFER_BY_TIMESTAMP:
@@ -35,6 +36,8 @@
 		case EQUAL:
 			return false;
 		case DIFFER_BY_METADATA:
+			if (mode == FileMode.SYMLINK.getBits())
+				return contentCheck(entry, reader);
 			return true;
 		default:
 			throw new IllegalStateException(MessageFormat.format(

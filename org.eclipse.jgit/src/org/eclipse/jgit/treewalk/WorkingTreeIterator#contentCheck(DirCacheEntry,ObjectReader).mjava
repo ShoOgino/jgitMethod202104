@@ -8,8 +8,10 @@
 	 *            acccess to repository data if necessary
 	 * @return <code>true</code> if the content doesn't match,
 	 *         <code>false</code> if it matches
+	 * @throws IOException
 	 */
-	private boolean contentCheck(DirCacheEntry entry, ObjectReader reader) {
+	private boolean contentCheck(DirCacheEntry entry, ObjectReader reader)
+			throws IOException {
 		if (getEntryObjectId().equals(entry.getObjectId())) {
 			// Content has not changed
 
@@ -25,6 +27,9 @@
 
 			return false;
 		} else {
+			if (mode == FileMode.SYMLINK.getBits())
+				return !new File(readContentAsString(current()))
+						.equals(new File(readContentAsString(entry)));
 			// Content differs: that's a real change, perhaps
 			if (reader == null) // deprecated use, do no further checks
 				return true;
