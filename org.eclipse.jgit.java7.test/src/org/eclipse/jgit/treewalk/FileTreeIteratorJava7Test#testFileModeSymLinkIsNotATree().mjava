@@ -1,0 +1,18 @@
+	@Test
+	public void testFileModeSymLinkIsNotATree() throws IOException {
+		FS fs = db.getFS();
+		// mål = target in swedish, just to get som unicode in here
+		writeTrashFile("mål/data", "targetdata");
+		fs.createSymLink(new File(trash, "länk"), "mål");
+		FileTreeIterator fti = new FileTreeIterator(db);
+		assertFalse(fti.eof());
+		assertEquals("länk", fti.getEntryPathString());
+		assertEquals(FileMode.SYMLINK, fti.getEntryFileMode());
+		fti.next(1);
+		assertFalse(fti.eof());
+		assertEquals("mål", fti.getEntryPathString());
+		assertEquals(FileMode.TREE, fti.getEntryFileMode());
+		fti.next(1);
+		assertTrue(fti.eof());
+	}
+

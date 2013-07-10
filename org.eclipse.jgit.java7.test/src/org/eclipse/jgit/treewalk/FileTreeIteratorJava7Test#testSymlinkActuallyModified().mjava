@@ -1,0 +1,42 @@
+	/**
+	 * Like #testSymlinkNotModifiedThoughNormalized but here the link is
+	 * modified.
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void testSymlinkActuallyModified() throws Exception {
+		final String NORMALIZED = "target";
+		final byte[] NORMALIZED_BYTES = Constants.encode(NORMALIZED);
+		ObjectInserter oi = db.newObjectInserter();
+		final ObjectId linkid = oi.insert(Constants.OBJ_BLOB, NORMALIZED_BYTES,
+				0, NORMALIZED_BYTES.length);
+		oi.release();
+		DirCache dc = db.lockDirCache();
+		DirCacheEditor dce = dc.editor();
+		dce.add(new DirCacheEditor.PathEdit("link") {
+			@Override
+			public void apply(DirCacheEntry ent) {
+				ent.setFileMode(FileMode.SYMLINK);
+				ent.setObjectId(linkid);
+				ent.setLength(NORMALIZED_BYTES.length);
+			}
+		});
+		assertTrue(dce.commit());
+		new Git(db).commit().setMessage("Adding link").call();
+		new Git(db).reset().setMode(ResetType.HARD).call();
+
+		FileUtils.delete(new File(trash, "link"), FileUtils.NONE);
+		FS.DETECTED.createSymLink(new File(trash, "link"), "newtarget");
+		DirCacheIterator dci = new DirCacheIterator(db.readDirCache());
+		FileTreeIterator fti = new FileTreeIterator(db);
+		fti.next(1); // Skips .git
+
+		// self-check
+		assertEquals("link", fti.getEntryPathString());
+		assertEquals("link", dci.getEntryPathString());
+
+		// test
+		assertTrue(fti.isModified(dci.getDirCacheEntry(), true));
+	}
+
