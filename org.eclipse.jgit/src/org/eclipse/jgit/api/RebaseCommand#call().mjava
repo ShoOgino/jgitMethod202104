@@ -24,6 +24,8 @@
 				} catch (IOException ioe) {
 					throw new JGitInternalException(ioe.getMessage(), ioe);
 				}
+			case PROCESS_STEPS:
+				// fall through
 			case SKIP:
 				// fall through
 			case CONTINUE:
@@ -40,6 +42,8 @@
 				break;
 			case BEGIN:
 				RebaseResult res = initFilesAndRewind();
+				if (stopAfterInitialization)
+					return RebaseResult.INTERACTIVE_PREPARED_RESULT;
 				if (res != null)
 					return res;
 			}

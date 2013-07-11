@@ -1,4 +1,10 @@
 	private void checkParameters() throws WrongRepositoryStateException {
+		if (this.operation == Operation.PROCESS_STEPS) {
+			if (rebaseState.getFile(DONE).exists())
+				throw new WrongRepositoryStateException(MessageFormat.format(
+						JGitText.get().wrongRepositoryState, repo
+								.getRepositoryState().name()));
+		}
 		if (this.operation != Operation.BEGIN) {
 			// these operations are only possible while in a rebasing state
 			switch (repo.getRepositoryState()) {
