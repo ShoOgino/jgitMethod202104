@@ -21,7 +21,10 @@
 		}
 		entry.setSize(loader.getSize());
 		out.putArchiveEntry(entry);
-		loader.copyTo(out);
-		out.closeArchiveEntry();
+                try {
+			loader.copyTo(out);
+		} finally {
+			out.closeArchiveEntry();
+		}
 	}
 
