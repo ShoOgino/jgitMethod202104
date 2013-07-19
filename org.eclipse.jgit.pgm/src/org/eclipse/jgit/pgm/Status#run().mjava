@@ -10,7 +10,11 @@
 		} else
 			outw.println(CLIText.formatLine(CLIText.get().notOnAnyBranch));
 		// List changes
-		org.eclipse.jgit.api.Status status = new Git(db).status().call();
+		StatusCommand statusCommand = new Git(db).status();
+		if (filterPaths != null && filterPaths.size() > 0)
+			for (String path : filterPaths)
+				statusCommand.addPath(path);
+		org.eclipse.jgit.api.Status status = statusCommand.call();
 		Collection<String> added = status.getAdded();
 		Collection<String> changed = status.getChanged();
 		Collection<String> removed = status.getRemoved();

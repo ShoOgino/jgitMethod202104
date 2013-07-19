@@ -13,6 +13,8 @@
 
 		try {
 			IndexDiff diff = new IndexDiff(repo, Constants.HEAD, workingTreeIt);
+			if (paths != null)
+				diff.setFilter(PathFilterGroup.createFromStrings(paths));
 			diff.diff();
 			return new Status(diff);
 		} catch (IOException e) {
