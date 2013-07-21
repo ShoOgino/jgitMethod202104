@@ -18,7 +18,10 @@
 		Transport transport = null;
 		FetchConnection fc = null;
 		try {
-			transport = Transport.open(repo, remote);
+			if (repo != null)
+				transport = Transport.open(repo, remote);
+			else
+				transport = Transport.open(new URIish(remote));
 			transport.setOptionUploadPack(uploadPack);
 			configure(transport);
 			Collection<RefSpec> refSpecs = new ArrayList<RefSpec>(1);
