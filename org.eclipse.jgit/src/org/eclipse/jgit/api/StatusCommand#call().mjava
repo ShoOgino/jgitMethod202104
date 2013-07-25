@@ -15,7 +15,11 @@
 			IndexDiff diff = new IndexDiff(repo, Constants.HEAD, workingTreeIt);
 			if (paths != null)
 				diff.setFilter(PathFilterGroup.createFromStrings(paths));
-			diff.diff();
+			if (progressMonitor == null)
+				diff.diff();
+			else
+				diff.diff(progressMonitor, ProgressMonitor.UNKNOWN,
+						ProgressMonitor.UNKNOWN, ""); //$NON-NLS-1$
 			return new Status(diff);
 		} catch (IOException e) {
 			throw new JGitInternalException(e.getMessage(), e);
