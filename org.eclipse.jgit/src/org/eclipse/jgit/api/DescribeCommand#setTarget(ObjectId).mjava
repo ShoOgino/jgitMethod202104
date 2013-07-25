@@ -1,0 +1,18 @@
+	/**
+	 * Sets the commit to be described.
+	 *
+	 * @param target
+	 * 		A non-null object ID to be described.
+	 * @return {@code this}
+	 * @throws MissingObjectException
+	 *             the supplied commit does not exist.
+	 * @throws IncorrectObjectTypeException
+	 *             the supplied id is not a commit or an annotated tag.
+	 * @throws IOException
+	 *             a pack file or loose object could not be read.
+	 */
+	DescribeCommand setTarget(ObjectId target) throws IOException {
+		this.target = w.parseCommit(target);
+		return this;
+	}
+

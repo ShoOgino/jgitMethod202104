@@ -1,0 +1,32 @@
+	/**
+	 * When t2 dominates t1, it's clearly preferable to describe by using t2.
+	 *
+	 * <pre>
+	 * t1 -+-> t2  -
+	 *     |       |
+	 *     +-> c3 -+-> c4
+	 * </pre>
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void t1DominatesT2() throws Exception {
+		ObjectId c1 = modify("aaa");
+		tag("t1");
+
+		ObjectId c2 = modify("bbb");
+		tag("t2");
+
+		branch("b", c1);
+
+		ObjectId c3 = modify("ccc");
+
+		ObjectId c4 = merge(c2);
+
+		assertNameStartsWith(c4, "119892b");
+		assertEquals("t2-2-g119892b", describe(c4)); // 2 commits: c4 and c3
+
+		assertNameStartsWith(c3, "0244e7f");
+		assertEquals("t1-1-g0244e7f", describe(c3));
+	}
+
