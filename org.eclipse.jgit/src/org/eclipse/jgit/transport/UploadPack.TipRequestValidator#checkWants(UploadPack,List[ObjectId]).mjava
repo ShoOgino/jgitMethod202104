@@ -1,11 +1,11 @@
-		public void checkWants(UploadPack up, List<RevObject> wants)
+		public void checkWants(UploadPack up, List<ObjectId> wants)
 				throws PackProtocolException, IOException {
 			if (!up.isBiDirectionalPipe())
 				new ReachableCommitTipRequestValidator().checkWants(up, wants);
 			else if (!wants.isEmpty()) {
 				Set<ObjectId> refIds =
 					refIdSet(up.getRepository().getAllRefs().values());
-				for (RevObject obj : wants) {
+				for (ObjectId obj : wants) {
 					if (!refIds.contains(obj))
 						throw new PackProtocolException(MessageFormat.format(
 								JGitText.get().wantNotValid, obj.name()));
