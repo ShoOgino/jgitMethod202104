@@ -6,15 +6,18 @@
 		try {
 			String line = br.readLine();
 			while (line != null) {
-				String actionToken = line.substring(0, line.indexOf(' '));
-				Action action = null;
-				try {
-					action = Action.parse(actionToken);
-				} catch (Exception e) {
-					// ignore
+				int firstBlank = line.indexOf(' ');
+				if (firstBlank != -1) {
+					String actionToken = line.substring(0, firstBlank);
+					Action action = null;
+					try {
+						action = Action.parse(actionToken);
+					} catch (Exception e) {
+						// ignore
+					}
+					if (Action.PICK.equals(action))
+						count++;
 				}
-				if (action != null)
-					count++;
 				line = br.readLine();
 			}
 			return count;

@@ -23,8 +23,8 @@
 
 		RebaseResult res = git.rebase().setUpstream("HEAD~2")
 				.runInteractively(new InteractiveHandler() {
-					public void prepareSteps(List<Step> steps) {
-						steps.get(0).action = Action.REWORD;
+					public void prepareSteps(List<RebaseTodoLine> steps) {
+						steps.get(0).setAction(Action.REWORD);
 					}
 					public String modifyCommitMessage(String commit) {
 						return "rewritten commit message";

@@ -1,15 +1,15 @@
 	@Test
-	public void testRebaseShouldBeAbleToHandleEmptyLinesInRebaseTodoFile()
-			throws IOException {
-		String emptyLine = "\n";
-		String todo = "pick 1111111 Commit 1\n" + emptyLine
-				+ "pick 2222222 Commit 2\n" + emptyLine
-				+ "# Comment line at end\n";
+	public void testLeadingSpacesRebaseTodo() throws Exception {
+		String todo =	"  \t\t pick 1111111 Commit 1\n"
+					+ "\t\n"
+					+ "\treword 2222222 Commit 2\n";
 		write(getTodoFile(), todo);
 
 		List<RebaseTodoLine> steps = db.readRebaseTodo(GIT_REBASE_TODO, false);
+
 		assertEquals(2, steps.size());
 		assertEquals("1111111", steps.get(0).getCommit().name());
 		assertEquals("2222222", steps.get(1).getCommit().name());
+		assertEquals(Action.REWORD, steps.get(1).getAction());
 	}
 

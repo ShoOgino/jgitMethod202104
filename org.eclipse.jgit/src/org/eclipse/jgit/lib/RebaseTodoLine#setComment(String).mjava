@@ -1,0 +1,32 @@
+	/**
+	 * <p>
+	 * Set a comment for this line that is used if this line's
+	 * {@link RebaseTodoLine#action} is a {@link Action#COMMENT}
+	 * </p>
+	 * It's allowed to unset the comment by calling
+	 * <code>setComment(null)</code> <br>
+	 * A valid comment either starts with a hash (i.e. <code>'#'</code>), is an
+	 * empty string, or consists of only spaces and tabs.<br>
+	 * If the argument <code>newComment</code> doesn't match these requirements
+	 * an Exception is thrown.
+	 *
+	 * @param newComment
+	 *            the comment
+	 */
+	public void setComment(String newComment) {
+		if (newComment == null) {
+			this.comment = null;
+			return;
+		}
+
+		if (newComment.contains("\n") || newComment.contains("\r")) //$NON-NLS-1$ //$NON-NLS-2$
+			throw createInvalidCommentException(newComment);
+
+		if (newComment.trim().length() == 0 || newComment.startsWith("#")) { //$NON-NLS-1$
+			this.comment = newComment;
+			return;
+		}
+
+		throw createInvalidCommentException(newComment);
+	}
+

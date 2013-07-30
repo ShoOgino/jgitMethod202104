@@ -9,67 +9,23 @@
 	private void popSteps(int numSteps) throws IOException {
 		if (numSteps == 0)
 			return;
-		List<String> todoLines = new ArrayList<String>();
-		List<String> poppedLines = new ArrayList<String>();
-		File todoFile = rebaseState.getFile(GIT_REBASE_TODO);
-		File doneFile = rebaseState.getFile(DONE);
-		BufferedReader br = new BufferedReader(new InputStreamReader(
-				new FileInputStream(todoFile), Constants.CHARACTER_ENCODING));
-		try {
-			// check if the line starts with a action tag (pick, skip...)
-			while (poppedLines.size() < numSteps) {
-				String popCandidate = br.readLine();
-				if (popCandidate == null)
-					break;
-				if (popCandidate.length() == 0)
-					continue;
-				if (popCandidate.charAt(0) == '#')
-					continue;
-				int spaceIndex = popCandidate.indexOf(' ');
-				boolean pop = false;
-				if (spaceIndex >= 0) {
-					String actionToken = popCandidate.substring(0, spaceIndex);
-					pop = Action.parse(actionToken) != null;
-				}
-				if (pop)
-					poppedLines.add(popCandidate);
-				else
-					todoLines.add(popCandidate);
-			}
-			String readLine = br.readLine();
-			while (readLine != null) {
-				todoLines.add(readLine);
-				readLine = br.readLine();
-			}
-		} finally {
-			br.close();
+		List<RebaseTodoLine> todoLines = new LinkedList<RebaseTodoLine>();
+		List<RebaseTodoLine> poppedLines = new LinkedList<RebaseTodoLine>();
+
+		for (RebaseTodoLine line : repo.readRebaseTodo(
+				rebaseState.getPath(GIT_REBASE_TODO), true)) {
+			if (poppedLines.size() >= numSteps
+					|| RebaseTodoLine.Action.COMMENT.equals(line.getAction()))
+				todoLines.add(line);
+			else
+				poppedLines.add(line);
 		}
 
-		BufferedWriter todoWriter = new BufferedWriter(new OutputStreamWriter(
-				new FileOutputStream(todoFile), Constants.CHARACTER_ENCODING));
-		try {
-			for (String writeLine : todoLines) {
-				todoWriter.write(writeLine);
-				todoWriter.newLine();
-			}
-		} finally {
-			todoWriter.close();
-		}
-
+		repo.writeRebaseTodoFile(rebaseState.getPath(GIT_REBASE_TODO),
+				todoLines, false);
 		if (poppedLines.size() > 0) {
-			// append here
-			BufferedWriter doneWriter = new BufferedWriter(
-					new OutputStreamWriter(
-							new FileOutputStream(doneFile, true),
-							Constants.CHARACTER_ENCODING));
-			try {
-				for (String writeLine : poppedLines) {
-					doneWriter.write(writeLine);
-					doneWriter.newLine();
-				}
-			} finally {
-				doneWriter.close();
-			}
+			repo.writeRebaseTodoFile(rebaseState.getPath(DONE), poppedLines,
+					true);
 		}
 	}
 

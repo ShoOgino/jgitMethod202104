@@ -70,34 +70,18 @@
 
 			ObjectReader or = repo.newObjectReader();
 
-			List<Step> steps = loadSteps();
+			List<RebaseTodoLine> steps = repo.readRebaseTodo(
+					rebaseState.getPath(GIT_REBASE_TODO), false);
 			if (isInteractive()) {
 				interactiveHandler.prepareSteps(steps);
-				BufferedWriter fw = new BufferedWriter(new OutputStreamWriter(
-						new FileOutputStream(
-								rebaseState.getFile(GIT_REBASE_TODO)),
-								Constants.CHARACTER_ENCODING));
-				fw.newLine();
-				try {
-					StringBuilder sb = new StringBuilder();
-					for (Step step : steps) {
-						sb.setLength(0);
-						sb.append(step.action.token);
-						sb.append(" "); //$NON-NLS-1$
-						sb.append(step.commit.name());
-						sb.append(" "); //$NON-NLS-1$
-						sb.append(RawParseUtils.decode(step.shortMessage)
-								.trim());
-						fw.write(sb.toString());
-						fw.newLine();
-					}
-				} finally {
-					fw.close();
-				}
+				repo.writeRebaseTodoFile(rebaseState.getPath(GIT_REBASE_TODO),
+						steps, false);
 			}
-			for (Step step : steps) {
+			for (RebaseTodoLine step : steps) {
 				popSteps(1);
-				Collection<ObjectId> ids = or.resolve(step.commit);
+				if (Action.COMMENT.equals(step.getAction()))
+					continue;
+				Collection<ObjectId> ids = or.resolve(step.getCommit());
 				if (ids.size() != 1)
 					throw new JGitInternalException(
 							"Could not resolve uniquely the abbreviated object ID");
@@ -137,7 +121,7 @@
 							newHead = cherryPickResult.getNewHead();
 						}
 					}
-					switch (step.action) {
+					switch (step.getAction()) {
 					case PICK:
 						continue; // continue rebase process on pick command
 					case REWORD:
@@ -150,6 +134,8 @@
 					case EDIT:
 						rebaseState.createFile(AMEND, commitToPick.name());
 						return stop(commitToPick);
+					case COMMENT:
+						break;
 					}
 				} finally {
 					monitor.endTask();

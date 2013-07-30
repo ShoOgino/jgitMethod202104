@@ -59,28 +59,16 @@
 		rebaseState.createFile(ONTO, upstreamCommit.name());
 		rebaseState.createFile(ONTO_NAME, upstreamCommitName);
 		rebaseState.createFile(INTERACTIVE, ""); //$NON-NLS-1$
-		BufferedWriter fw = new BufferedWriter(new OutputStreamWriter(
-				new FileOutputStream(rebaseState.getFile(GIT_REBASE_TODO)),
-				Constants.CHARACTER_ENCODING));
-		fw.write("# Created by EGit: rebasing " + headId.name() + " onto "
-				+ upstreamCommit.name());
-		fw.newLine();
-		try {
-			StringBuilder sb = new StringBuilder();
-			ObjectReader reader = walk.getObjectReader();
-			for (RevCommit commit : cherryPickList) {
-				sb.setLength(0);
-				sb.append(Action.PICK.toToken());
-				sb.append(" "); //$NON-NLS-1$
-				sb.append(reader.abbreviate(commit).name());
-				sb.append(" "); //$NON-NLS-1$
-				sb.append(commit.getShortMessage());
-				fw.write(sb.toString());
-				fw.newLine();
-			}
-		} finally {
-			fw.close();
-		}
+
+		ArrayList<RebaseTodoLine> toDoSteps = new ArrayList<RebaseTodoLine>();
+		toDoSteps.add(new RebaseTodoLine("# Created by EGit: rebasing " + headId.name() //$NON-NLS-1$
+						+ " onto " + upstreamCommit.name())); //$NON-NLS-1$
+		ObjectReader reader = walk.getObjectReader();
+		for (RevCommit commit : cherryPickList)
+			toDoSteps.add(new RebaseTodoLine(Action.PICK, reader
+					.abbreviate(commit), commit.getShortMessage()));
+		repo.writeRebaseTodoFile(rebaseState.getPath(GIT_REBASE_TODO),
+				toDoSteps, false);
 
 		monitor.endTask();
 

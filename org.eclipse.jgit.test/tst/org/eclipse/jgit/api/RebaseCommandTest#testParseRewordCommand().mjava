@@ -4,12 +4,11 @@
 				+ "reword 2222222 Commit 2\n";
 		write(getTodoFile(), todo);
 
-		RebaseCommand rebaseCommand = git.rebase();
-		List<Step> steps = rebaseCommand.loadSteps();
+		List<RebaseTodoLine> steps = db.readRebaseTodo(GIT_REBASE_TODO, false);
 
 		assertEquals(2, steps.size());
-		assertEquals("1111111", steps.get(0).commit.name());
-		assertEquals("2222222", steps.get(1).commit.name());
-		assertEquals(Action.REWORD, steps.get(1).action);
+		assertEquals("1111111", steps.get(0).getCommit().name());
+		assertEquals("2222222", steps.get(1).getCommit().name());
+		assertEquals(Action.REWORD, steps.get(1).getAction());
 	}
 

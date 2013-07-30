@@ -1,0 +1,22 @@
+	@Test
+	public void testOnlyCommentRebaseTodo() throws Exception {
+		write(getTodoFile(), "# a b c d e\n# e f");
+		assertEquals(0, db.readRebaseTodo(GIT_REBASE_TODO, false).size());
+		List<RebaseTodoLine> lines = db.readRebaseTodo(GIT_REBASE_TODO, true);
+		assertEquals(2, lines.size());
+		for (RebaseTodoLine line : lines)
+			assertEquals(Action.COMMENT, line.getAction());
+		write(getTodoFile(), "# a b c d e\n# e f\n");
+		assertEquals(0, db.readRebaseTodo(GIT_REBASE_TODO, false).size());
+		lines = db.readRebaseTodo(GIT_REBASE_TODO, true);
+		assertEquals(2, lines.size());
+		for (RebaseTodoLine line : lines)
+			assertEquals(Action.COMMENT, line.getAction());
+		write(getTodoFile(), " 	 \r\n# a b c d e\r\n# e f\r\n#");
+		assertEquals(0, db.readRebaseTodo(GIT_REBASE_TODO, false).size());
+		lines = db.readRebaseTodo(GIT_REBASE_TODO, true);
+		assertEquals(4, lines.size());
+		for (RebaseTodoLine line : lines)
+			assertEquals(Action.COMMENT, line.getAction());
+	}
+

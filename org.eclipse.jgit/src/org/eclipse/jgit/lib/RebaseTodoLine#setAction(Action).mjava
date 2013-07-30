@@ -1,0 +1,27 @@
+	/**
+	 * Set the action. It's not allowed to set a non-comment action on a line
+	 * which was a comment line before. But you are allowed to set the comment
+	 * action on a non-comment line and afterwards change the action back to
+	 * non-comment.
+	 *
+	 * @param newAction
+	 */
+	public void setAction(Action newAction) {
+		if (!Action.COMMENT.equals(action) && Action.COMMENT.equals(newAction)) {
+			// transforming from non-comment to comment
+			if (comment == null)
+				// no comment was explicitly set. Take the old line as comment
+				// text
+				comment = "# " + action.token + " " //$NON-NLS-1$ //$NON-NLS-2$
+						+ ((commit == null) ? "null" : commit.name()) + " " //$NON-NLS-1$ //$NON-NLS-2$
+						+ ((shortMessage == null) ? "null" : shortMessage); //$NON-NLS-1$
+		} else if (Action.COMMENT.equals(action) && !Action.COMMENT.equals(newAction)) {
+			// transforming from comment to non-comment
+			if (commit == null)
+				throw new JGitInternalException(MessageFormat.format(
+						JGitText.get().cannotChangeActionOnComment, action,
+						newAction));
+		}
+		this.action = newAction;
+	}
+

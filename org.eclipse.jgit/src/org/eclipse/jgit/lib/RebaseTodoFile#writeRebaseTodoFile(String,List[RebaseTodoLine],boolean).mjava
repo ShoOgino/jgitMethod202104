@@ -1,0 +1,38 @@
+	/**
+	 * Write a file formatted like a git-rebase-todo file.
+	 *
+	 * @param path
+	 *            path to the file relative to the repository's git-dir. E.g.
+	 *            "rebase-merge/git-rebase-todo" or "rebase-append/done"
+	 * @param steps
+	 *            the steps to be written
+	 * @param append
+	 *            whether to append to an existing file or to write a new file
+	 * @throws IOException
+	 */
+	public void writeRebaseTodoFile(String path, List<RebaseTodoLine> steps,
+			boolean append) throws IOException {
+		BufferedWriter fw = new BufferedWriter(new OutputStreamWriter(
+				new FileOutputStream(new File(repo.getDirectory(), path),
+						append), Constants.CHARACTER_ENCODING));
+		try {
+			StringBuilder sb = new StringBuilder();
+			for (RebaseTodoLine step : steps) {
+				sb.setLength(0);
+				if (RebaseTodoLine.Action.COMMENT.equals(step.action))
+					sb.append(step.getComment());
+				else {
+					sb.append(step.getAction().toToken());
+					sb.append(" "); //$NON-NLS-1$
+					sb.append(step.getCommit().name());
+					sb.append(" "); //$NON-NLS-1$
+					sb.append(step.getShortMessage().trim());
+				}
+				fw.write(sb.toString());
+				fw.newLine();
+			}
+		} finally {
+			fw.close();
+		}
+	}
+
