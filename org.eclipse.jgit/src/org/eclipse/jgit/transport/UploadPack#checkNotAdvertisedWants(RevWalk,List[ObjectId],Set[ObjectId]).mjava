@@ -1,5 +1,5 @@
 	private static void checkNotAdvertisedWants(RevWalk walk,
-			List<RevObject> notAdvertisedWants, Set<ObjectId> reachableFrom)
+			List<ObjectId> notAdvertisedWants, Set<ObjectId> reachableFrom)
 			throws MissingObjectException, IncorrectObjectTypeException, IOException {
 		// Walk the requested commits back to the provided set of commits. If any
 		// commit exists, a branch was deleted or rewound and the repository owner
@@ -7,11 +7,21 @@
 		// into an advertised branch it will be marked UNINTERESTING and no commits
 		// return.
 
-		for (RevObject obj : notAdvertisedWants) {
-			if (!(obj instanceof RevCommit))
-				throw new PackProtocolException(MessageFormat.format(
-					JGitText.get().wantNotValid, obj.name()));
-			walk.markStart((RevCommit) obj);
+		AsyncRevObjectQueue q = walk.parseAny(notAdvertisedWants, true);
+		try {
+			RevObject obj;
+			while ((obj = q.next()) != null) {
+				if (!(obj instanceof RevCommit))
+					throw new PackProtocolException(MessageFormat.format(
+						JGitText.get().wantNotValid, obj.name()));
+				walk.markStart((RevCommit) obj);
+			}
+		} catch (MissingObjectException notFound) {
+			ObjectId id = notFound.getObjectId();
+			throw new PackProtocolException(MessageFormat.format(
+					JGitText.get().wantNotValid, id.name()), notFound);
+		} finally {
+			q.release();
 		}
 		for (ObjectId id : reachableFrom) {
 			try {
