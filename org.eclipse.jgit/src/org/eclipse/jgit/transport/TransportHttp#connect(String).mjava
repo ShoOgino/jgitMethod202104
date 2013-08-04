@@ -1,4 +1,4 @@
-	private HttpURLConnection connect(final String service)
+	private HttpConnection connect(final String service)
 			throws TransportException, NotSupportedException {
 		final URL u;
 		try {
@@ -23,7 +23,7 @@
 		try {
 			int authAttempts = 1;
 			for (;;) {
-				final HttpURLConnection conn = httpOpen(u);
+				final HttpConnection conn = httpOpen(u);
 				if (useSmartHttp) {
 					String exp = "application/x-" + service + "-advertisement"; //$NON-NLS-1$ //$NON-NLS-2$
 					conn.setRequestProperty(HDR_ACCEPT, exp + ", */*"); //$NON-NLS-1$
@@ -32,14 +32,14 @@
 				}
 				final int status = HttpSupport.response(conn);
 				switch (status) {
-				case HttpURLConnection.HTTP_OK:
+				case HttpConnection.HTTP_OK:
 					return conn;
 
-				case HttpURLConnection.HTTP_NOT_FOUND:
+				case HttpConnection.HTTP_NOT_FOUND:
 					throw new NoRemoteRepositoryException(uri,
 							MessageFormat.format(JGitText.get().uriNotFound, u));
 
-				case HttpURLConnection.HTTP_UNAUTHORIZED:
+				case HttpConnection.HTTP_UNAUTHORIZED:
 					authMethod = HttpAuthMethod.scanResponse(conn);
 					if (authMethod == HttpAuthMethod.NONE)
 						throw new TransportException(uri, MessageFormat.format(
@@ -53,7 +53,7 @@
 					authAttempts++;
 					continue;
 
-				case HttpURLConnection.HTTP_FORBIDDEN:
+				case HttpConnection.HTTP_FORBIDDEN:
 					throw new TransportException(uri, MessageFormat.format(
 							JGitText.get().serviceNotPermitted, service));
 

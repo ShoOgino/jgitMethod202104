@@ -14,10 +14,10 @@
 			// is not there) download HEAD by itself as a loose file and do
 			// the resolution by hand.
 			//
-			HttpURLConnection conn = httpOpen(new URL(baseUrl, Constants.HEAD));
+			HttpConnection conn = httpOpen(new URL(baseUrl, Constants.HEAD));
 			int status = HttpSupport.response(conn);
 			switch (status) {
-			case HttpURLConnection.HTTP_OK: {
+			case HttpConnection.HTTP_OK: {
 				br = toBufferedReader(openInputStream(conn));
 				try {
 					String line = br.readLine();
@@ -39,7 +39,7 @@
 				break;
 			}
 
-			case HttpURLConnection.HTTP_NOT_FOUND:
+			case HttpConnection.HTTP_NOT_FOUND:
 				break;
 
 			default:
