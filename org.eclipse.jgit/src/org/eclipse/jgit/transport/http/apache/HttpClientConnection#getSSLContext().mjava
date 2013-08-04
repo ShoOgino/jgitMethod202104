@@ -1,0 +1,12 @@
+	private SSLContext getSSLContext() {
+		if (ctx == null) {
+			try {
+				ctx = SSLContext.getInstance("TLS"); //$NON-NLS-1$
+			} catch (NoSuchAlgorithmException e) {
+				throw new IllegalStateException(
+						JGitText.get().unexpectedSSLContextException, e);
+			}
+		}
+		return ctx;
+	}
+
