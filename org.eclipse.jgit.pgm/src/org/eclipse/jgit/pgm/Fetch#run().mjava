@@ -14,7 +14,8 @@
 		fetch.setRemote(remote);
 		if (thin != null)
 			fetch.setThin(thin.booleanValue());
-		fetch.setProgressMonitor(new TextProgressMonitor());
+		if (quiet == null || !quiet.booleanValue())
+			fetch.setProgressMonitor(new TextProgressMonitor());
 
 		FetchResult result = fetch.call();
 		if (result.getTrackingRefUpdates().isEmpty())
