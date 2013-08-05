@@ -1,0 +1,27 @@
+	private static void parseComments(byte[] buf, int tokenBegin,
+			List<RebaseTodoLine> r, int lineEnd) {
+		RebaseTodoLine line = null;
+		String commentString = RawParseUtils.decode(buf,
+				tokenBegin, lineEnd + 1);
+		try {
+			int skip = tokenBegin + 1; // skip '#'
+			skip = nextParsableToken(buf, skip, lineEnd);
+			if (skip != -1) {
+				// try to parse the line as non-comment
+				line = parseLine(buf, skip, lineEnd);
+				// successfully parsed as non-comment line
+				// mark this line as a comment explicitly
+				line.setAction(Action.COMMENT);
+				// use the read line as comment string
+				line.setComment(commentString);
+			}
+		} catch (Exception e) {
+			// parsing as non-comment line failed
+			line = null;
+		} finally {
+			if (line == null)
+				line = new RebaseTodoLine(commentString);
+			r.add(line);
+		}
+	}
+

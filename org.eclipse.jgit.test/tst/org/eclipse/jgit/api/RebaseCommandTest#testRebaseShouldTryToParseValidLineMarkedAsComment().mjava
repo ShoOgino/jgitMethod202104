@@ -1,0 +1,43 @@
+	@Test
+	public void testRebaseShouldTryToParseValidLineMarkedAsComment()
+			throws IOException {
+		String todo = "# pick 1111111 Valid line commented out with space\n"
+				+ "#edit 2222222 Valid line commented out without space\n"
+				+ "# pick invalidLine Comment line at end\n";
+		write(getTodoFile(), todo);
+
+		List<RebaseTodoLine> steps = db.readRebaseTodo(GIT_REBASE_TODO, true);
+		assertEquals(3, steps.size());
+
+		RebaseTodoLine firstLine = steps.get(0);
+
+		assertEquals("1111111", firstLine.getCommit().name());
+		assertEquals("Valid line commented out with space",
+				firstLine.getShortMessage());
+		assertEquals("comment", firstLine.getAction().toToken());
+
+		try {
+			firstLine.setAction(Action.PICK);
+			assertEquals("1111111", firstLine.getCommit().name());
+			assertEquals("pick", firstLine.getAction().toToken());
+		} catch (Exception e) {
+			fail("Valid parsable RebaseTodoLine that has been commented out should allow to change the action, but failed");
+		}
+
+		assertEquals("2222222", steps.get(1).getCommit().name());
+		assertEquals("comment", steps.get(1).getAction().toToken());
+
+		assertEquals(null, steps.get(2).getCommit());
+		assertEquals(null, steps.get(2).getShortMessage());
+		assertEquals("comment", steps.get(2).getAction().toToken());
+		assertEquals("# pick invalidLine Comment line at end", steps.get(2)
+				.getComment());
+		try {
+			steps.get(2).setAction(Action.PICK);
+			fail("A comment RebaseTodoLine that doesn't contain a valid parsable line should fail, but doesn't");
+		} catch (Exception e) {
+			// expected
+		}
+
+	}
+

@@ -1,0 +1,74 @@
+	@SuppressWarnings("unused")
+	@Test
+	public void testRebaseTodoLineSetComment() throws Exception {
+		try {
+			new RebaseTodoLine("This is a invalid comment");
+			fail("Constructing a comment line with invalid comment string should fail, but doesn't");
+		} catch (JGitInternalException e) {
+			// expected
+		}
+		RebaseTodoLine validCommentLine = new RebaseTodoLine(
+				"# This is a comment");
+		assertEquals(Action.COMMENT, validCommentLine.getAction());
+		assertEquals("# This is a comment", validCommentLine.getComment());
+
+		RebaseTodoLine actionLineToBeChanged = new RebaseTodoLine(Action.EDIT,
+				AbbreviatedObjectId.fromString("1111111"), "short Message");
+		assertEquals(null, actionLineToBeChanged.getComment());
+
+		try {
+			actionLineToBeChanged.setComment("invalid comment");
+			fail("Setting a invalid comment string should fail but doesn't");
+		} catch (JGitInternalException e) {
+			assertEquals(null, actionLineToBeChanged.getComment());
+		}
+
+		actionLineToBeChanged.setComment("# valid comment");
+		assertEquals("# valid comment", actionLineToBeChanged.getComment());
+		try {
+			actionLineToBeChanged.setComment("invalid comment");
+			fail("Setting a invalid comment string should fail but doesn't");
+		} catch (JGitInternalException e) {
+			// expected
+			// setting comment failed, but was successfully set before,
+			// therefore it may not be altered since then
+			assertEquals("# valid comment", actionLineToBeChanged.getComment());
+		}
+		try {
+			actionLineToBeChanged.setComment("# line1 \n line2");
+			actionLineToBeChanged.setComment("line1 \n line2");
+			actionLineToBeChanged.setComment("\n");
+			actionLineToBeChanged.setComment("# line1 \r line2");
+			actionLineToBeChanged.setComment("line1 \r line2");
+			actionLineToBeChanged.setComment("\r");
+			actionLineToBeChanged.setComment("# line1 \n\r line2");
+			actionLineToBeChanged.setComment("line1 \n\r line2");
+			actionLineToBeChanged.setComment("\n\r");
+			fail("Setting a multiline comment string should fail but doesn't");
+		} catch (JGitInternalException e) {
+			// expected
+		}
+		// Try setting valid comments
+		actionLineToBeChanged.setComment("# valid comment");
+		assertEquals("# valid comment", actionLineToBeChanged.getComment());
+
+		actionLineToBeChanged.setComment("# \t \t valid comment");
+		assertEquals("# \t \t valid comment",
+				actionLineToBeChanged.getComment());
+
+		actionLineToBeChanged.setComment("#       ");
+		assertEquals("#       ", actionLineToBeChanged.getComment());
+
+		actionLineToBeChanged.setComment("");
+		assertEquals("", actionLineToBeChanged.getComment());
+
+		actionLineToBeChanged.setComment("  ");
+		assertEquals("  ", actionLineToBeChanged.getComment());
+
+		actionLineToBeChanged.setComment("\t\t");
+		assertEquals("\t\t", actionLineToBeChanged.getComment());
+
+		actionLineToBeChanged.setComment(null);
+		assertEquals(null, actionLineToBeChanged.getComment());
+	}
+
