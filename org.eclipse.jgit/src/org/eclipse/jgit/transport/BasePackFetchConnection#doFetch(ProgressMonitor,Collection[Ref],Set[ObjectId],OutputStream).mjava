@@ -2,7 +2,9 @@
 	 * Execute common ancestor negotiation and fetch the objects.
 	 *
 	 * @param monitor
-	 *            progress monitor to receive status updates.
+	 *            progress monitor to receive status updates. If the monitor is
+	 *            the {@link NullProgressMonitor#INSTANCE}, then the no-progress
+	 *            option enabled.
 	 * @param want
 	 *            the advertised remote references the caller wants to fetch.
 	 * @param have
@@ -19,6 +21,8 @@
 			final Collection<Ref> want, final Set<ObjectId> have,
 			OutputStream outputStream) throws TransportException {
 		try {
+			noProgress = monitor == NullProgressMonitor.INSTANCE;
+
 			markRefsAdvertised();
 			markReachable(have, maxTimeWanted(want));
 
