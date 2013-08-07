@@ -1,0 +1,16 @@
+	private void checkSteps(List<RebaseTodoLine> steps)
+			throws InvalidRebaseStepException, IOException {
+		if (steps.isEmpty())
+			return;
+		if (RebaseTodoLine.Action.SQUASH.equals(steps.get(0).getAction())
+				|| RebaseTodoLine.Action.FIXUP.equals(steps.get(0).getAction())) {
+			if (!rebaseState.getFile(DONE).exists()
+					|| rebaseState.readFile(DONE).trim().length() == 0) {
+				throw new InvalidRebaseStepException(MessageFormat.format(
+						JGitText.get().cannotSquashFixupWithoutPreviousCommit,
+						steps.get(0).getAction().name()));
+			}
+		}
+
+	}
+

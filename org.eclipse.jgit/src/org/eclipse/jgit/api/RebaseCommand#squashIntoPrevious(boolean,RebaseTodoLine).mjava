@@ -1,0 +1,30 @@
+	private RevCommit squashIntoPrevious(boolean sequenceContainsSquash,
+			RebaseTodoLine nextStep)
+			throws IOException, GitAPIException {
+		RevCommit newHead;
+		String commitMessage = rebaseState
+				.readFile(MESSAGE_SQUASH);
+
+		if (nextStep == null
+				|| ((nextStep.getAction() != Action.FIXUP) && (nextStep
+						.getAction() != Action.SQUASH))) {
+			// this is the last step in this sequence
+			if (sequenceContainsSquash) {
+				commitMessage = interactiveHandler
+						.modifyCommitMessage(commitMessage);
+			}
+			newHead = new Git(repo).commit()
+					.setMessage(stripCommentLines(commitMessage))
+					.setAmend(true).call();
+			rebaseState.getFile(MESSAGE_SQUASH).delete();
+			rebaseState.getFile(MESSAGE_FIXUP).delete();
+
+		} else {
+			// Next step is either Squash or Fixup
+			newHead = new Git(repo).commit()
+					.setMessage(commitMessage).setAmend(true)
+					.call();
+		}
+		return newHead;
+	}
+

@@ -81,7 +81,9 @@
 				repo.writeRebaseTodoFile(rebaseState.getPath(GIT_REBASE_TODO),
 						steps, false);
 			}
-			for (RebaseTodoLine step : steps) {
+			checkSteps(steps);
+			for (int i = 0; i < steps.size(); i++) {
+				RebaseTodoLine step = steps.get(i);
 				popSteps(1);
 				if (Action.COMMENT.equals(step.getAction()))
 					continue;
@@ -125,6 +127,7 @@
 							newHead = cherryPickResult.getNewHead();
 						}
 					}
+					boolean isSquash = false;
 					switch (step.getAction()) {
 					case PICK:
 						continue; // continue rebase process on pick command
@@ -140,6 +143,20 @@
 						return stop(commitToPick);
 					case COMMENT:
 						break;
+					case SQUASH:
+						isSquash = true;
+						//$FALL-THROUGH$
+					case FIXUP:
+						resetSoftToParent();
+						RebaseTodoLine nextStep = (i >= steps.size() - 1 ? null
+								: steps.get(i + 1));
+						File messageFixupFile = rebaseState.getFile(MESSAGE_FIXUP);
+						File messageSquashFile = rebaseState
+								.getFile(MESSAGE_SQUASH);
+						if (isSquash && messageFixupFile.exists())
+								messageFixupFile.delete();
+						newHead = doSquashFixup(isSquash, commitToPick,
+								nextStep, messageFixupFile, messageSquashFile);
 					}
 				} finally {
 					monitor.endTask();

@@ -1,0 +1,11 @@
+	private static String stripCommentLines(String commitMessage) {
+		StringBuilder result = new StringBuilder();
+		for (String line : commitMessage.split("\n")) { //$NON-NLS-1$
+			if (!line.trim().startsWith("#")) //$NON-NLS-1$
+				result.append(line).append("\n"); //$NON-NLS-1$
+		}
+		if (!commitMessage.endsWith("\n")) //$NON-NLS-1$
+			result.deleteCharAt(result.length() - 1);
+		return result.toString();
+	}
+

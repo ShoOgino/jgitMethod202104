@@ -1,0 +1,24 @@
+	@SuppressWarnings("nls")
+	private static String composeSquashMessage(boolean isSquash,
+			RevCommit commitToPick, String currSquashMessage, int count) {
+		StringBuilder sb = new StringBuilder();
+		String ordinal = getOrdinal(count);
+		sb.setLength(0);
+		sb.append("# This is a combination of ").append(count)
+				.append(" commits.\n");
+		if (isSquash) {
+			sb.append("# This is the ").append(count).append(ordinal)
+					.append(" commit message:\n");
+			sb.append(commitToPick.getFullMessage());
+		} else {
+			sb.append("# The ").append(count).append(ordinal)
+					.append(" commit message will be skipped:\n# ");
+			sb.append(commitToPick.getFullMessage().replaceAll("([\n\r]+)",
+					"$1# "));
+		}
+		// Add the previous message without header (i.e first line)
+		sb.append("\n");
+		sb.append(currSquashMessage.substring(currSquashMessage.indexOf("\n") + 1));
+		return sb.toString();
+	}
+

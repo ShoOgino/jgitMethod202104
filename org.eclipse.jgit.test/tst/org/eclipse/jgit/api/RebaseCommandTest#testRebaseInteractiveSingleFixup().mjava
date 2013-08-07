@@ -1,0 +1,48 @@
+	@Test
+	public void testRebaseInteractiveSingleFixup() throws Exception {
+		// create file1 on master
+		writeTrashFile(FILE1, FILE1);
+		git.add().addFilepattern(FILE1).call();
+		git.commit().setMessage("Add file1\nnew line").call();
+		assertTrue(new File(db.getWorkTree(), FILE1).exists());
+
+		// create file2 on master
+		writeTrashFile("file2", "file2");
+		git.add().addFilepattern("file2").call();
+		git.commit().setMessage("Add file2\nnew line").call();
+		assertTrue(new File(db.getWorkTree(), "file2").exists());
+
+		// update FILE1 on master
+		writeTrashFile(FILE1, "blah");
+		git.add().addFilepattern(FILE1).call();
+		git.commit().setMessage("updated file1 on master\nnew line").call();
+
+		writeTrashFile("file2", "more change");
+		git.add().addFilepattern("file2").call();
+		git.commit().setMessage("update file2 on master\nnew line").call();
+
+		git.rebase().setUpstream("HEAD~3")
+				.runInteractively(new InteractiveHandler() {
+
+					public void prepareSteps(List<RebaseTodoLine> steps) {
+						steps.get(1).setAction(Action.FIXUP);
+					}
+
+					public String modifyCommitMessage(String commit) {
+						fail("No callback to modify commit message expected for single fixup");
+						return commit;
+					}
+				}).call();
+
+		RevWalk walk = new RevWalk(db);
+		ObjectId headId = db.resolve(Constants.HEAD);
+		RevCommit headCommit = walk.parseCommit(headId);
+		assertEquals("update file2 on master\nnew line",
+				headCommit.getFullMessage());
+
+		ObjectId head1Id = db.resolve(Constants.HEAD + "^1");
+		RevCommit head1Commit = walk.parseCommit(head1Id);
+		assertEquals("Add file2\nnew line",
+				head1Commit.getFullMessage());
+	}
+

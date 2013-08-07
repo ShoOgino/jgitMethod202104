@@ -1,0 +1,31 @@
+	private RevCommit doSquashFixup(boolean isSquash, RevCommit commitToPick,
+			RebaseTodoLine nextStep, File messageFixup, File messageSquash)
+			throws IOException, GitAPIException {
+
+		if (!messageSquash.exists()) {
+			// init squash/fixup sequence
+			ObjectId headId = repo.resolve(Constants.HEAD);
+			RevCommit previousCommit = walk.parseCommit(headId);
+
+			initializeSquashFixupFile(MESSAGE_SQUASH,
+					previousCommit.getFullMessage());
+			if (!isSquash)
+				initializeSquashFixupFile(MESSAGE_FIXUP,
+					previousCommit.getFullMessage());
+		}
+		String currSquashMessage = rebaseState
+				.readFile(MESSAGE_SQUASH);
+
+		int count = parseSquashFixupSequenceCount(currSquashMessage) + 1;
+
+		String content = composeSquashMessage(isSquash,
+				commitToPick, currSquashMessage, count);
+		rebaseState.createFile(MESSAGE_SQUASH, content);
+		if (messageFixup.exists())
+			rebaseState.createFile(MESSAGE_FIXUP, content);
+
+		return squashIntoPrevious(
+				!messageFixup.exists(),
+				nextStep);
+	}
+

@@ -1,0 +1,18 @@
+	/**
+	 * Parse the count from squashed commit messages
+	 *
+	 * @param currSquashMessage
+	 *            the squashed commit message to be parsed
+	 * @return the count of squashed messages in the given string
+	 */
+	static int parseSquashFixupSequenceCount(String currSquashMessage) {
+		String regex = "This is a combination of (.*) commits"; //$NON-NLS-1$
+		String firstLine = currSquashMessage.substring(0,
+				currSquashMessage.indexOf("\n")); //$NON-NLS-1$
+		Pattern pattern = Pattern.compile(regex);
+		Matcher matcher = pattern.matcher(firstLine);
+		if (!matcher.find())
+			throw new IllegalArgumentException();
+		return Integer.parseInt(matcher.group(1));
+	}
+
