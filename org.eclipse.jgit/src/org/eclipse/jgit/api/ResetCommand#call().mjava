@@ -9,9 +9,6 @@
 	public Ref call() throws GitAPIException, CheckoutConflictException {
 		checkCallable();
 
-		Ref r;
-		RevCommit commit;
-
 		try {
 			RepositoryState state = repo.getRepositoryState();
 			final boolean merging = state.equals(RepositoryState.MERGING)
@@ -22,61 +19,55 @@
 			final boolean reverting = state.equals(RepositoryState.REVERTING)
 					|| state.equals(RepositoryState.REVERTING_RESOLVED);
 
-			// resolve the ref to a commit
-			final ObjectId commitId;
-			try {
-				commitId = repo.resolve(ref + "^{commit}"); //$NON-NLS-1$
-				if (commitId == null) {
-					// @TODO throw an InvalidRefNameException. We can't do that
-					// now because this would break the API
-					throw new JGitInternalException("Invalid ref " + ref
-							+ " specified");
-				}
-			} catch (IOException e) {
-				throw new JGitInternalException(
-						MessageFormat.format(JGitText.get().cannotRead, ref),
-						e);
+			final ObjectId commitId = resolveRefToCommitId();
+			// When ref is explicitly specified, it has to resolve
+			if (ref != null && commitId == null) {
+				// @TODO throw an InvalidRefNameException. We can't do that
+				// now because this would break the API
+				throw new JGitInternalException("Invalid ref " + ref
+						+ " specified");
 			}
-			RevWalk rw = new RevWalk(repo);
-			try {
-				commit = rw.parseCommit(commitId);
-			} catch (IOException e) {
-				throw new JGitInternalException(
-						MessageFormat.format(
-						JGitText.get().cannotReadCommit, commitId.toString()),
-						e);
-			} finally {
-				rw.release();
-			}
+
+			final ObjectId commitTree;
+			if (commitId != null)
+				commitTree = parseCommit(commitId).getTree();
+			else
+				commitTree = null;
 
 			if (!filepaths.isEmpty()) {
 				// reset [commit] -- paths
-				resetIndexForPaths(commit);
+				resetIndexForPaths(commitTree);
 				setCallable(false);
 				return repo.getRef(Constants.HEAD);
 			}
 
-			// write the ref
-			final RefUpdate ru = repo.updateRef(Constants.HEAD);
-			ru.setNewObjectId(commitId);
+			final Ref result;
+			if (commitId != null) {
+				// write the ref
+				final RefUpdate ru = repo.updateRef(Constants.HEAD);
+				ru.setNewObjectId(commitId);
 
-			String refName = Repository.shortenRefName(ref);
-			String message = refName + ": updating " + Constants.HEAD; //$NON-NLS-1$
-			ru.setRefLogMessage(message, false);
-			if (ru.forceUpdate() == RefUpdate.Result.LOCK_FAILURE)
-				throw new JGitInternalException(MessageFormat.format(
-						JGitText.get().cannotLock, ru.getName()));
+				String refName = Repository.shortenRefName(getRefOrHEAD());
+				String message = refName + ": updating " + Constants.HEAD; //$NON-NLS-1$
+				ru.setRefLogMessage(message, false);
+				if (ru.forceUpdate() == RefUpdate.Result.LOCK_FAILURE)
+					throw new JGitInternalException(MessageFormat.format(
+							JGitText.get().cannotLock, ru.getName()));
 
-			ObjectId origHead = ru.getOldObjectId();
-			if (origHead != null)
-				repo.writeOrigHead(origHead);
+				ObjectId origHead = ru.getOldObjectId();
+				if (origHead != null)
+					repo.writeOrigHead(origHead);
+				result = ru.getRef();
+			} else {
+				result = repo.getRef(Constants.HEAD);
+			}
 
 			switch (mode) {
 				case HARD:
-					checkoutIndex(commit);
+					checkoutIndex(commitTree);
 					break;
 				case MIXED:
-					resetIndex(commit);
+					resetIndex(commitTree);
 					break;
 				case SOFT: // do nothing, only the ref was changed
 					break;
@@ -98,13 +89,11 @@
 			}
 
 			setCallable(false);
-			r = ru.getRef();
+			return result;
 		} catch (IOException e) {
 			throw new JGitInternalException(
 					JGitText.get().exceptionCaughtDuringExecutionOfResetCommand,
 					e);
 		}
-
-		return r;
 	}
 

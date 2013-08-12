@@ -1,4 +1,4 @@
-	private void resetIndexForPaths(RevCommit commit) {
+	private void resetIndexForPaths(ObjectId commitTree) {
 		DirCache dc = null;
 		try {
 			dc = repo.lockDirCache();
@@ -6,7 +6,10 @@
 
 			final TreeWalk tw = new TreeWalk(repo);
 			tw.addTree(new DirCacheBuildIterator(builder));
-			tw.addTree(commit.getTree());
+			if (commitTree != null)
+				tw.addTree(commitTree);
+			else
+				tw.addTree(new EmptyTreeIterator());
 			tw.setFilter(PathFilterGroup.createFromStrings(filepaths));
 			tw.setRecursive(true);
 

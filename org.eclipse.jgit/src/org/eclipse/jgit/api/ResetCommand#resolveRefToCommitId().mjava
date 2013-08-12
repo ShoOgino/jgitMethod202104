@@ -1,0 +1,10 @@
+	private ObjectId resolveRefToCommitId() {
+		try {
+			return repo.resolve(getRefOrHEAD() + "^{commit}"); //$NON-NLS-1$
+		} catch (IOException e) {
+			throw new JGitInternalException(
+					MessageFormat.format(JGitText.get().cannotRead, getRefOrHEAD()),
+					e);
+		}
+	}
+
