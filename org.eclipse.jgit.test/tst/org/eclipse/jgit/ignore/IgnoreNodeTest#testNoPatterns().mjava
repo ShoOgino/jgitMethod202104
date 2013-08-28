@@ -1,0 +1,11 @@
+	@Test
+	public void testNoPatterns() throws IOException {
+		writeIgnoreFile(".gitignore", "", " ", "# comment", "/");
+		writeTrashFile("a/a", "");
+
+		beginWalk();
+		assertEntry(F, tracked, ".gitignore");
+		assertEntry(D, tracked, "a");
+		assertEntry(F, tracked, "a/a");
+	}
+
