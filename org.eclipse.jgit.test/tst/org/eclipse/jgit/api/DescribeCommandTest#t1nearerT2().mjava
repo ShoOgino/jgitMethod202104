@@ -1,0 +1,28 @@
+	/**
+	 * When t1 is nearer than t2, t2 should be found
+	 *
+	 * <pre>
+	 * c1 -+-> c2 -> t1 -+
+	 *     |             |
+	 *     +-> t2 -> c3 -+-> c4
+	 * </pre>
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void t1nearerT2() throws Exception {
+		ObjectId c1 = modify("aaa");
+		modify("bbb");
+		ObjectId t1 = modify("ccc");
+		tag("t1");
+
+		branch("b", c1);
+		modify("ddd");
+		tag("t2");
+		modify("eee");
+		ObjectId c4 = merge(t1);
+
+		assertNameStartsWith(c4, "bb389a4");
+		assertEquals("t1-3-gbb389a4", describe(c4));
+	}
+

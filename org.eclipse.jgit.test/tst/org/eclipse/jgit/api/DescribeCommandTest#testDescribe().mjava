@@ -1,0 +1,21 @@
+	@Test
+	public void testDescribe() throws Exception {
+		ObjectId c1 = modify("aaa");
+
+		ObjectId c2 = modify("bbb");
+		tag("t1");
+
+		ObjectId c3 = modify("ccc");
+		tag("t2");
+
+		ObjectId c4 = modify("ddd");
+
+		assertNull(describe(c1));
+		assertEquals("t1", describe(c2));
+		assertEquals("t2", describe(c3));
+
+		assertNameStartsWith(c4, "3e563c5");
+		// the value verified with git-describe(1)
+		assertEquals("t2-1-g3e563c5", describe(c4));
+	}
+

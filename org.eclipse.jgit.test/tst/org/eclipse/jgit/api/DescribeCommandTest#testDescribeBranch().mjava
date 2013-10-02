@@ -1,0 +1,29 @@
+	/**
+	 * Make sure it finds a tag when not all ancestries include a tag.
+	 *
+	 * <pre>
+	 * c1 -+-> T  -
+	 *     |       |
+	 *     +-> c3 -+-> c4
+	 * </pre>
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void testDescribeBranch() throws Exception {
+		ObjectId c1 = modify("aaa");
+
+		ObjectId c2 = modify("bbb");
+		tag("t");
+
+		branch("b", c1);
+
+		ObjectId c3 = modify("ccc");
+
+		ObjectId c4 = merge(c2);
+
+		assertNameStartsWith(c4, "119892b");
+		assertEquals("t-2-g119892b", describe(c4)); // 2 commits: c4 and c3
+		assertNull(describe(c3));
+	}
+

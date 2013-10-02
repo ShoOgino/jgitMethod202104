@@ -1,0 +1,29 @@
+	/**
+	 * When t1 and t2 have same depth native git seems to add the depths of both
+	 * paths
+	 *
+	 * <pre>
+	 * c1 -+-> t1 -> c2 -+
+	 *     |             |
+	 *     +-> t2 -> c3 -+-> c4
+	 * </pre>
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void t1sameDepthT2() throws Exception {
+		ObjectId c1 = modify("aaa");
+		modify("bbb");
+		tag("t1");
+		ObjectId c2 = modify("ccc");
+
+		branch("b", c1);
+		modify("ddd");
+		tag("t2");
+		modify("eee");
+		ObjectId c4 = merge(c2);
+
+		assertNameStartsWith(c4, "bb389a4");
+		assertEquals("t2-4-gbb389a4", describe(c4));
+	}
+
