@@ -6,7 +6,7 @@
 	 * @throws IOException
 	 */
 	private Map<String, Ref> getAllRefs() throws IOException {
-		Map<String, Ref> ret = repo.getAllRefs();
+		Map<String, Ref> ret = repo.getRefDatabase().getRefs(ALL);
 		for (Ref ref : repo.getRefDatabase().getAdditionalRefs())
 			ret.put(ref.getName(), ref);
 		return ret;

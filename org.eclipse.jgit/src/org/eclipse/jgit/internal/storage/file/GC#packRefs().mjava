@@ -4,7 +4,7 @@
 	 * @throws IOException
 	 */
 	public void packRefs() throws IOException {
-		Collection<Ref> refs = repo.getAllRefs().values();
+		Collection<Ref> refs = repo.getRefDatabase().getRefs(ALL).values();
 		List<String> refsToBePacked = new ArrayList<String>(refs.size());
 		pm.beginTask(JGitText.get().packRefs, refs.size());
 		try {

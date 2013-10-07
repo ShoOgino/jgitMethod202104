@@ -1,6 +1,7 @@
 	private static Collection<RefSpec> expandPushWildcardsFor(
-			final Repository db, final Collection<RefSpec> specs) {
-		final Map<String, Ref> localRefs = db.getAllRefs();
+			final Repository db, final Collection<RefSpec> specs)
+			throws IOException {
+		final Map<String, Ref> localRefs = db.getRefDatabase().getRefs(ALL);
 		final Collection<RefSpec> procRefs = new HashSet<RefSpec>();
 
 		for (final RefSpec spec : specs) {
