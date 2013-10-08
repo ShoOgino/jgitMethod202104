@@ -10,12 +10,13 @@
 			new FileKey(gitdir, db.getFS()).open(true);
 			fail("incorrectly opened a non existant repository");
 		} catch (RepositoryNotFoundException e) {
-			assertEquals("repository not found: " + gitdir, e.getMessage());
+			assertEquals("repository not found: " + gitdir.getCanonicalPath(),
+					e.getMessage());
 		}
 
 		final Repository o = new FileKey(gitdir, db.getFS()).open(false);
 		assertNotNull(o);
-		assertEquals(gitdir, o.getDirectory());
+		assertEqualsFile(gitdir, o.getDirectory());
 		assertFalse(gitdir.exists());
 	}
 
