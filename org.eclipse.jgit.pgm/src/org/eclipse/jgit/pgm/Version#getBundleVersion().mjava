@@ -1,0 +1,10 @@
+	private String getBundleVersion() {
+		ClassLoader cl = getClass().getClassLoader();
+		if (cl instanceof URLClassLoader) {
+			URL url = ((URLClassLoader) cl).findResource(JarFile.MANIFEST_NAME);
+			if (url != null)
+				return getBundleVersion(url);
+		}
+		return null;
+	}
+

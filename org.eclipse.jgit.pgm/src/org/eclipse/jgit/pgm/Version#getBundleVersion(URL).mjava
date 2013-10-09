@@ -1,0 +1,15 @@
+	private static String getBundleVersion(URL url) {
+		try {
+			InputStream is = url.openStream();
+			try {
+				Manifest manifest = new Manifest(is);
+				return manifest.getMainAttributes().getValue("Bundle-Version"); //$NON-NLS-1$
+			} finally {
+				is.close();
+			}
+		} catch (IOException e) {
+			// do nothing - will return null
+		}
+		return null;
+	}
+
