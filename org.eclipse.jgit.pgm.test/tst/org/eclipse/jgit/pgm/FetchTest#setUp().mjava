@@ -1,0 +1,25 @@
+	@Override
+	@Before
+	public void setUp() throws Exception {
+		super.setUp();
+		git = new Git(db);
+		git.commit().setMessage("initial commit").call();
+
+		Repository remoteRepository = createWorkRepository();
+		remoteGit = new Git(remoteRepository);
+
+		// setup the first repository to fetch from the second repository
+		final StoredConfig config = db.getConfig();
+		RemoteConfig remoteConfig = new RemoteConfig(config, "test");
+		URIish uri = new URIish(remoteRepository.getDirectory().toURI().toURL());
+		remoteConfig.addURI(uri);
+		remoteConfig.update(config);
+		config.save();
+
+		remoteGit.commit().setMessage("initial commit").call();
+		remoteGit.tag().setName("tag").call();
+		remoteGit.checkout().setName("other").setCreateBranch(true).call();
+		remoteGit.commit().setMessage("commit2").call();
+		remoteGit.tag().setName("foo").call();
+	}
+

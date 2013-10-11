@@ -1,0 +1,9 @@
+	@Test
+	public void testFetchAllTags() throws Exception {
+		String[] result = execute("git fetch --tags test refs/heads/master:refs/remotes/origin/master");
+		assertEquals(" * [new branch]      master     -> origin/master",
+				result[1]);
+		assertEquals(" * [new tag]         foo        -> foo", result[2]);
+		assertEquals(" * [new tag]         tag        -> tag", result[3]);
+	}
+
