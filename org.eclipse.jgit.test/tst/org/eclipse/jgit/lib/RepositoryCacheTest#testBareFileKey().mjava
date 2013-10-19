@@ -7,9 +7,10 @@
 		assertTrue(name.endsWith(".git"));
 		name = name.substring(0, name.length() - 4);
 
-		assertEquals(gitdir, FileKey.exact(gitdir, db.getFS()).getFile());
+		assertEqualsFile(gitdir, FileKey.exact(gitdir, db.getFS()).getFile());
 
-		assertEquals(gitdir, FileKey.lenient(gitdir, db.getFS()).getFile());
-		assertEquals(gitdir, FileKey.lenient(new File(parent, name), db.getFS()).getFile());
+		assertEqualsFile(gitdir, FileKey.lenient(gitdir, db.getFS()).getFile());
+		assertEqualsFile(gitdir,
+				FileKey.lenient(new File(parent, name), db.getFS()).getFile());
 	}
 
