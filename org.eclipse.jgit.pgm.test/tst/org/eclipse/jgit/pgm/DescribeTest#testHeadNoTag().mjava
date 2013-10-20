@@ -1,0 +1,8 @@
+	@Test
+	public void testHeadNoTag() throws Exception {
+		git.commit().setMessage("initial commit").call();
+		assertArrayEquals(
+				new String[] { "fatal: No names found, cannot describe anything." },
+				execute("git describe"));
+	}
+
