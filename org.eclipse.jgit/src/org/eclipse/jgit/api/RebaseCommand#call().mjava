@@ -94,7 +94,7 @@
 				RevCommit commitToPick = walk
 						.parseCommit(ids.iterator().next());
 				if (monitor.isCancelled())
-					return new RebaseResult(commitToPick);
+					return new RebaseResult(commitToPick, Status.STOPPED);
 				try {
 					monitor.beginTask(MessageFormat.format(
 							JGitText.get().applyingCommit,
@@ -120,9 +120,9 @@
 								return abort(new RebaseResult(
 										cherryPickResult.getFailingPaths()));
 							else
-								return stop(commitToPick);
+								return stop(commitToPick, Status.STOPPED);
 						case CONFLICTING:
-							return stop(commitToPick);
+							return stop(commitToPick, Status.STOPPED);
 						case OK:
 							newHead = cherryPickResult.getNewHead();
 						}
@@ -140,7 +140,7 @@
 						continue;
 					case EDIT:
 						rebaseState.createFile(AMEND, commitToPick.name());
-						return stop(commitToPick);
+						return stop(commitToPick, Status.EDIT);
 					case COMMENT:
 						break;
 					case SQUASH:
