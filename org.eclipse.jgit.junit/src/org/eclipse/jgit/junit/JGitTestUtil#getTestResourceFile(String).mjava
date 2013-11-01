@@ -8,9 +8,20 @@
 			// loaded previously
 			return new File("tst", fileName);
 		}
+		if ("jar".equals(url.getProtocol())) {
+			try {
+				File tmp = File.createTempFile("tmp_", "_" + fileName);
+				copyTestResource(fileName, tmp);
+				return tmp;
+			} catch (IOException err) {
+				throw new RuntimeException("Cannot create temporary file", err);
+			}
+		}
 		try {
 			return new File(url.toURI());
-		} catch(URISyntaxException e) {
+		} catch (IllegalArgumentException e) {
+			throw new IllegalArgumentException(e.getMessage() + " " + url);
+		} catch (URISyntaxException e) {
 			return new File(url.getPath());
 		}
 	}
