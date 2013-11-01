@@ -3,7 +3,7 @@
 		File directory = createTempDirectory("testRepository");
 		CloneCommand command = Git.cloneRepository();
 		command.setDirectory(directory);
-		command.setURI("file://" + git.getRepository().getWorkTree().getPath());
+		command.setURI(fileUri());
 		command.setCloneAllBranches(true);
 		Git git2 = command.call();
 		addRepoToClose(git2.getRepository());

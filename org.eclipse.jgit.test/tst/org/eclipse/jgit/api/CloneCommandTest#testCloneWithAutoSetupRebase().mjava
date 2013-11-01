@@ -3,7 +3,7 @@
 		File directory = createTempDirectory("testCloneRepository1");
 		CloneCommand command = Git.cloneRepository();
 		command.setDirectory(directory);
-		command.setURI("file://" + git.getRepository().getWorkTree().getPath());
+		command.setURI(fileUri());
 		Git git2 = command.call();
 		addRepoToClose(git2.getRepository());
 		assertFalse(git2
@@ -21,7 +21,7 @@
 		directory = createTempDirectory("testCloneRepository2");
 		command = Git.cloneRepository();
 		command.setDirectory(directory);
-		command.setURI("file://" + git.getRepository().getWorkTree().getPath());
+		command.setURI(fileUri());
 		git2 = command.call();
 		addRepoToClose(git2.getRepository());
 		assertTrue(git2
@@ -37,7 +37,7 @@
 		directory = createTempDirectory("testCloneRepository2");
 		command = Git.cloneRepository();
 		command.setDirectory(directory);
-		command.setURI("file://" + git.getRepository().getWorkTree().getPath());
+		command.setURI(fileUri());
 		git2 = command.call();
 		addRepoToClose(git2.getRepository());
 		assertTrue(git2

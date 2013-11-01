@@ -5,7 +5,7 @@
 		CloneCommand command = Git.cloneRepository();
 		command.setBranch("refs/heads/master");
 		command.setDirectory(directory);
-		command.setURI("file://" + git.getRepository().getWorkTree().getPath());
+		command.setURI(fileUri());
 		Git git2 = command.call();
 		addRepoToClose(git2.getRepository());
 
@@ -20,7 +20,7 @@
 		command = Git.cloneRepository();
 		command.setBranch("refs/heads/master");
 		command.setDirectory(directory);
-		command.setURI("file://" + git.getRepository().getWorkTree().getPath());
+		command.setURI(fileUri());
 		command.setNoCheckout(true);
 		git2 = command.call();
 		addRepoToClose(git2.getRepository());
@@ -35,7 +35,7 @@
 		command = Git.cloneRepository();
 		command.setBranch("refs/heads/master");
 		command.setDirectory(directory);
-		command.setURI("file://" + git.getRepository().getWorkTree().getPath());
+		command.setURI(fileUri());
 		command.setBare(true);
 		git2 = command.call();
 		addRepoToClose(git2.getRepository());
