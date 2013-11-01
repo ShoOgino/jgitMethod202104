@@ -1,11 +1,18 @@
 	@Test
 	public void test003_lookupCompressedObject() throws IOException {
-		final PackFile pr;
 		final ObjectId id;
 		final ObjectLoader or;
 
+		PackFile pr = null;
+		for (PackFile p : db.getObjectDatabase().getPacks()) {
+			if (PACK_NAME.equals(p.getPackName())) {
+				pr = p;
+				break;
+			}
+		}
+		assertNotNull("have pack-" + PACK_NAME, pr);
+
 		id = ObjectId.fromString("902d5476fa249b7abc9d84c611577a81381f0327");
-		pr = new PackFile(TEST_PACK, PACK.getBit() | INDEX.getBit());
 		or = pr.get(new WindowCursor(null), id);
 		assertNotNull(or);
 		assertEquals(Constants.OBJ_TREE, or.getType());
