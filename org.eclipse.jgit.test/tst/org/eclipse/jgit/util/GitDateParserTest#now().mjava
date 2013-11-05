@@ -9,7 +9,8 @@
 				.getLocale());
 		cal.setTime(refDate);
 
-		Date parse = GitDateParser.parse("now", cal);
+		Date parse = GitDateParser.parse("now", cal, SystemReader.getInstance()
+				.getLocale());
 		Assert.assertEquals(refDate, parse);
 		long t1 = SystemReader.getInstance().getCurrentTime();
 		parse = GitDateParser.parse("now", null);
