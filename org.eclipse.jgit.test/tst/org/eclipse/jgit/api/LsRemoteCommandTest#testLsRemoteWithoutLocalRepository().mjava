@@ -1,6 +1,6 @@
 	@Test
 	public void testLsRemoteWithoutLocalRepository() throws Exception {
-		String uri = "file://" + git.getRepository().getWorkTree().getPath();
+		String uri = fileUri();
 		Collection<Ref> refs = Git.lsRemoteRepository().setRemote(uri).setHeads(true).call();
 		assertNotNull(refs);
 		assertEquals(2, refs.size());

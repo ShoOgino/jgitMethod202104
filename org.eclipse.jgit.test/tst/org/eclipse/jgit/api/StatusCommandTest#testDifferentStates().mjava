@@ -7,12 +7,12 @@
 		writeTrashFile("c", "content of c");
 		git.add().addFilepattern("a").addFilepattern("b").call();
 		Status stat = git.status().call();
-		assertEquals(set("a", "b"), stat.getAdded());
+		assertEquals(Sets.of("a", "b"), stat.getAdded());
 		assertEquals(0, stat.getChanged().size());
 		assertEquals(0, stat.getMissing().size());
 		assertEquals(0, stat.getModified().size());
 		assertEquals(0, stat.getRemoved().size());
-		assertEquals(set("c"), stat.getUntracked());
+		assertEquals(Sets.of("c"), stat.getUntracked());
 		git.commit().setMessage("initial").call();
 
 		writeTrashFile("a", "modified content of a");
@@ -21,12 +21,12 @@
 		git.add().addFilepattern("a").addFilepattern("d").call();
 		writeTrashFile("a", "again modified content of a");
 		stat = git.status().call();
-		assertEquals(set("d"), stat.getAdded());
-		assertEquals(set("a"), stat.getChanged());
+		assertEquals(Sets.of("d"), stat.getAdded());
+		assertEquals(Sets.of("a"), stat.getChanged());
 		assertEquals(0, stat.getMissing().size());
-		assertEquals(set("b", "a"), stat.getModified());
+		assertEquals(Sets.of("b", "a"), stat.getModified());
 		assertEquals(0, stat.getRemoved().size());
-		assertEquals(set("c"), stat.getUntracked());
+		assertEquals(Sets.of("c"), stat.getUntracked());
 		git.add().addFilepattern(".").call();
 		git.commit().setMessage("second").call();
 
@@ -47,8 +47,8 @@
 		assertEquals(0, stat.getChanged().size());
 		assertEquals(0, stat.getMissing().size());
 		assertEquals(0, stat.getModified().size());
-		assertEquals(set("a"), stat.getRemoved());
-		assertEquals(set("a"), stat.getUntracked());
+		assertEquals(Sets.of("a"), stat.getRemoved());
+		assertEquals(Sets.of("a"), stat.getUntracked());
 		git.commit().setMessage("t").call();
 
 		writeTrashFile("sub/a", "sub-file");

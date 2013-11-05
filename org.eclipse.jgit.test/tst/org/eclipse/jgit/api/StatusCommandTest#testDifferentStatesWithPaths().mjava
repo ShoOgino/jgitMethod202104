@@ -19,18 +19,18 @@
 
 		// filter on an existing file
 		stat = git.status().addPath("a").call();
-		assertEquals(set("a"), stat.getModified());
+		assertEquals(Sets.of("a"), stat.getModified());
 
 		// filter on an existing folder
 		stat = git.status().addPath("D").call();
-		assertEquals(set("D/b", "D/D/d"), stat.getModified());
+		assertEquals(Sets.of("D/b", "D/D/d"), stat.getModified());
 
 		// filter on an existing folder and file
 		stat = git.status().addPath("D/D").addPath("a").call();
-		assertEquals(set("a", "D/D/d"), stat.getModified());
+		assertEquals(Sets.of("a", "D/D/d"), stat.getModified());
 
 		// do not filter at all
 		stat = git.status().call();
-		assertEquals(set("a", "D/b", "D/D/d"), stat.getModified());
+		assertEquals(Sets.of("a", "D/b", "D/D/d"), stat.getModified());
 	}
 

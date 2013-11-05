@@ -6,7 +6,7 @@
 		File directory = createTempDirectory("testCloneRepositoryWithMultipleHeadBranches");
 		CloneCommand clone = Git.cloneRepository();
 		clone.setDirectory(directory);
-		clone.setURI("file://" + git.getRepository().getWorkTree().getPath());
+		clone.setURI(fileUri());
 		Git git2 = clone.call();
 		addRepoToClose(git2.getRepository());
 		assertNotNull(git2);
