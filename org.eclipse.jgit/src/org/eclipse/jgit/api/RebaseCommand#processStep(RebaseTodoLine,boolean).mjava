@@ -1,0 +1,52 @@
+	private RebaseResult processStep(RebaseTodoLine step, boolean shouldPick)
+			throws IOException, GitAPIException {
+		if (Action.COMMENT.equals(step.getAction()))
+			return null;
+		ObjectReader or = repo.newObjectReader();
+
+		Collection<ObjectId> ids = or.resolve(step.getCommit());
+		if (ids.size() != 1)
+			throw new JGitInternalException(
+					"Could not resolve uniquely the abbreviated object ID");
+		RevCommit commitToPick = walk.parseCommit(ids.iterator().next());
+		if (shouldPick) {
+			if (monitor.isCancelled())
+				return new RebaseResult(commitToPick, Status.STOPPED);
+			RebaseResult result = cherryPickCommit(commitToPick);
+			if (result != null)
+				return result;
+		}
+		boolean isSquash = false;
+		switch (step.getAction()) {
+		case PICK:
+			return null; // continue rebase process on pick command
+		case REWORD:
+			String oldMessage = commitToPick.getFullMessage();
+			String newMessage = interactiveHandler
+					.modifyCommitMessage(oldMessage);
+			newHead = new Git(repo).commit().setMessage(newMessage)
+					.setAmend(true).call();
+			return null;
+		case EDIT:
+			rebaseState.createFile(AMEND, commitToPick.name());
+			return stop(commitToPick, Status.EDIT);
+		case COMMENT:
+			break;
+		case SQUASH:
+			isSquash = true;
+			//$FALL-THROUGH$
+		case FIXUP:
+			resetSoftToParent();
+			List<RebaseTodoLine> steps = repo.readRebaseTodo(
+					rebaseState.getPath(GIT_REBASE_TODO), false);
+			RebaseTodoLine nextStep = steps.size() > 0 ? steps.get(0) : null;
+			File messageFixupFile = rebaseState.getFile(MESSAGE_FIXUP);
+			File messageSquashFile = rebaseState.getFile(MESSAGE_SQUASH);
+			if (isSquash && messageFixupFile.exists())
+				messageFixupFile.delete();
+			newHead = doSquashFixup(isSquash, commitToPick, nextStep,
+					messageFixupFile, messageSquashFile);
+		}
+		return null;
+	}
+

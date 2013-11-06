@@ -1,0 +1,62 @@
+	@Test
+	public void testRebaseShouldFixupInCaseOfConflict() throws Exception {
+		// create file1 on master
+		writeTrashFile(FILE1, FILE1);
+		git.add().addFilepattern(FILE1).call();
+		git.commit().setMessage("Add file1").call();
+		assertTrue(new File(db.getWorkTree(), FILE1).exists());
+
+		// change file2
+		writeTrashFile("file2", "file2");
+		git.add().addFilepattern("file2").call();
+		git.commit().setMessage("Change file2").call();
+
+		// change file1
+		writeTrashFile(FILE1, FILE1 + "a");
+		git.add().addFilepattern(FILE1).call();
+		git.commit().setMessage("Change file1").call();
+
+		// change file1, add file3
+		writeTrashFile(FILE1, FILE1 + "b");
+		writeTrashFile("file3", "file3");
+		git.add().addFilepattern(FILE1).call();
+		git.add().addFilepattern("file3").call();
+		git.commit().setMessage("Change file1, add file3").call();
+
+		RebaseResult result = git.rebase().setUpstream("HEAD~3")
+				.runInteractively(new InteractiveHandler() {
+
+					public void prepareSteps(List<RebaseTodoLine> steps) {
+						steps.get(0).setAction(Action.PICK);
+						steps.remove(1);
+						steps.get(1).setAction(Action.FIXUP);
+					}
+
+					public String modifyCommitMessage(String commit) {
+						return commit;
+					}
+				}).call();
+		assertEquals(Status.STOPPED, result.getStatus());
+		git.add().addFilepattern(FILE1).call();
+		result = git.rebase().runInteractively(new InteractiveHandler() {
+
+			public void prepareSteps(List<RebaseTodoLine> steps) {
+				steps.get(0).setAction(Action.PICK);
+				steps.remove(1);
+				steps.get(1).setAction(Action.FIXUP);
+			}
+
+			public String modifyCommitMessage(String commit) {
+				return "commit";
+			}
+		}).setOperation(Operation.CONTINUE).call();
+		assertEquals(Status.OK, result.getStatus());
+		Iterator<RevCommit> logIterator = git.log().all().call().iterator();
+		String actualCommitMsg = logIterator.next().getShortMessage();
+		assertEquals("Change file2", actualCommitMsg);
+		actualCommitMsg = logIterator.next().getShortMessage();
+		assertEquals("Add file1", actualCommitMsg);
+		assertTrue(new File(db.getWorkTree(), "file3").exists());
+
+	}
+
