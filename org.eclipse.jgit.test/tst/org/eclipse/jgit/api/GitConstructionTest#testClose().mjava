@@ -1,0 +1,26 @@
+	@Test
+	/**
+	 * Tests that a repository with packfiles can be deleted after calling
+	 * Git.close(). On Windows the first try to delete the worktree will fail
+	 * (because file handles on packfiles are still open) but the second
+	 * attempt after a close will succeed.
+	 *
+	 * @throws IOException
+	 * @throws JGitInternalException
+	 * @throws GitAPIException
+	 */
+	public void testClose() throws IOException, JGitInternalException,
+			GitAPIException {
+		File workTree = db.getWorkTree();
+		Git git = Git.wrap(db);
+		git.gc().setExpire(null).call();
+		git.checkout().setName(git.getRepository().resolve("HEAD^").getName())
+				.call();
+		try {
+			FileUtils.delete(workTree, FileUtils.RECURSIVE);
+		} catch (IOException e) {
+			git.close();
+			FileUtils.delete(workTree, FileUtils.RECURSIVE);
+		}
+	}
+
