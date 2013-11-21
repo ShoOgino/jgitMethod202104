@@ -1,0 +1,93 @@
+	/**
+	 * Compares the entries content with the content in the filesystem.
+	 * Unsmudges the entry when it is detected that it is clean.
+	 *
+	 * @param entry
+	 *            the entry to be checked
+	 * @param reader
+	 *            acccess to repository data if necessary
+	 * @return <code>true</code> if the content doesn't match,
+	 *         <code>false</code> if it matches
+	 */
+	private boolean contentCheck(DirCacheEntry entry, ObjectReader reader) {
+		if (getEntryObjectId().equals(entry.getObjectId())) {
+			// Content has not changed
+
+			// We know the entry can't be racily clean because it's still clean.
+			// Therefore we unsmudge the entry!
+			// If by any chance we now unsmudge although we are still in the
+			// same time-slot as the last modification to the index file the
+			// next index write operation will smudge again.
+			// Caution: we are unsmudging just by setting the length of the
+			// in-memory entry object. It's the callers task to detect that we
+			// have modified the entry and to persist the modified index.
+			entry.setLength((int) getEntryLength());
+
+			return false;
+		} else {
+			// Content differs: that's a real change, perhaps
+			if (reader == null) // deprecated use, do no further checks
+				return true;
+			switch (getOptions().getAutoCRLF()) {
+			case INPUT:
+			case TRUE:
+				InputStream dcIn = null;
+				try {
+					ObjectLoader loader = reader.open(entry.getObjectId());
+					if (loader == null)
+						return true;
+
+					// We need to compute the length, but only if it is not
+					// a binary stream.
+					dcIn = new EolCanonicalizingInputStream(
+							loader.openStream(), true, true /* abort if binary */);
+					long dcInLen;
+					try {
+						dcInLen = computeLength(dcIn);
+					} catch (EolCanonicalizingInputStream.IsBinaryException e) {
+						// ok, we know it's different so unsmudge the entry
+						entry.setLength(entry.getLength());
+						return true;
+					} finally {
+						dcIn.close();
+					}
+
+					dcIn = new EolCanonicalizingInputStream(
+							loader.openStream(), true);
+					byte[] autoCrLfHash = computeHash(dcIn, dcInLen);
+					boolean changed = getEntryObjectId().compareTo(
+							autoCrLfHash, 0) != 0;
+					if (!changed) {
+						// Update the index with the eol'ed hash, so we can
+						// detect the no-change faster next time
+						entry.setObjectIdFromRaw(autoCrLfHash, 0);
+					}
+					// Ok, we know whether it has changed, so unsmudge the
+					// dirache entry
+					entry.setLength(loader.getSize());
+					return changed;
+				} catch (IOException e) {
+					return true;
+				} finally {
+					if (dcIn != null)
+						try {
+							dcIn.close();
+						} catch (IOException e) {
+							// empty
+						}
+				}
+			case FALSE:
+				// Ok, we know it's different so unsmudge the dircache entry
+				try {
+					ObjectLoader loader = reader.open(entry.getObjectId());
+					if (loader != null)
+						entry.setLength((int) loader.getSize());
+				} catch (IOException e) {
+					// panic, no, but don't unsmudge
+				}
+				break;
+			}
+			return true;
+		}
+	}
+

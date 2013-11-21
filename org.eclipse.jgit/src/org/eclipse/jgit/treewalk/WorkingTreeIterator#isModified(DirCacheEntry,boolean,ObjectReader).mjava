@@ -1,0 +1,44 @@
+	/**
+	 * Checks whether this entry differs from a given entry from the
+	 * {@link DirCache}.
+	 *
+	 * File status information is used and if status is same we consider the
+	 * file identical to the state in the working directory. Native git uses
+	 * more stat fields than we have accessible in Java.
+	 *
+	 * @param entry
+	 *            the entry from the dircache we want to compare against
+	 * @param forceContentCheck
+	 *            True if the actual file content should be checked if
+	 *            modification time differs.
+	 * @param reader
+	 *            access to repository objects if necessary.
+	 * @return true if content is most likely different.
+	 * @since 3.2
+	 */
+	public boolean isModified(DirCacheEntry entry, boolean forceContentCheck,
+			ObjectReader reader) {
+		MetadataDiff diff = compareMetadata(entry);
+		switch (diff) {
+		case DIFFER_BY_TIMESTAMP:
+			if (forceContentCheck)
+				// But we are told to look at content even though timestamps
+				// tell us about modification
+				return contentCheck(entry, reader);
+			else
+				// We are told to assume a modification if timestamps differs
+				return true;
+		case SMUDGED:
+			// The file is clean by timestamps but the entry was smudged.
+			// Lets do a content check
+			return contentCheck(entry, reader);
+		case EQUAL:
+			return false;
+		case DIFFER_BY_METADATA:
+			return true;
+		default:
+			throw new IllegalStateException(MessageFormat.format(
+					JGitText.get().unexpectedCompareResult, diff.name()));
+		}
+	}
+
