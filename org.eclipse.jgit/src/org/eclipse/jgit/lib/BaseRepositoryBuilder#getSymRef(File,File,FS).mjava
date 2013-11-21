@@ -1,4 +1,4 @@
-	private static File getSymRef(File workTree, File dotGit)
+	private static File getSymRef(File workTree, File dotGit, FS fs)
 			throws IOException {
 		byte[] content = IO.readFully(dotGit);
 		if (!isSymRef(content))
@@ -14,7 +14,7 @@
 					JGitText.get().invalidGitdirRef, dotGit.getAbsolutePath()));
 
 		String gitdirPath = RawParseUtils.decode(content, pathStart, lineEnd);
-		File gitdirFile = new File(gitdirPath);
+		File gitdirFile = fs.resolve(workTree, gitdirPath);
 		if (gitdirFile.isAbsolute())
 			return gitdirFile;
 		else
