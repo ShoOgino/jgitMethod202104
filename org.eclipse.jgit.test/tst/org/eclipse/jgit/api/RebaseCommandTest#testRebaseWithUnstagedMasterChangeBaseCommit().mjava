@@ -24,7 +24,8 @@
 		writeTrashFile("file0", "unstaged modified file0");
 
 		// rebase
-		assertEquals(Status.OK, git.rebase().setUpstream("refs/heads/master")
+		assertEquals(Status.UNCOMMITTED_CHANGES,
+				git.rebase().setUpstream("refs/heads/master")
 				.call().getStatus());
 	}
 
