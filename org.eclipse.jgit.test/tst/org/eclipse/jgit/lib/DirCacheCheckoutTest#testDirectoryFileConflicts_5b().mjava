@@ -1,0 +1,9 @@
+	@Test
+	public void testDirectoryFileConflicts_5b() throws Exception {
+		// 5
+		doit(mk("DF/DF"), mkmap("DF", "different"), mk("DF"));
+		assertRemoved("DF/DF");
+		assertConflict("DF");
+		assertEquals(0, dco.getUpdated().size());
+	}
+
