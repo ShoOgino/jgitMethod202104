@@ -11,7 +11,7 @@
 		RevCommit commitToPick = walk.parseCommit(ids.iterator().next());
 		if (shouldPick) {
 			if (monitor.isCancelled())
-				return new RebaseResult(commitToPick, Status.STOPPED);
+				return RebaseResult.result(Status.STOPPED, commitToPick);
 			RebaseResult result = cherryPickCommit(commitToPick);
 			if (result != null)
 				return result;

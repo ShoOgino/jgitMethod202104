@@ -105,7 +105,7 @@
 			}
 			return finishRebase(newHead, lastStepWasForward);
 		} catch (CheckoutConflictException cce) {
-			return new RebaseResult(cce.getConflictingPaths());
+			return RebaseResult.conflicts(cce.getConflictingPaths());
 		} catch (IOException ioe) {
 			throw new JGitInternalException(ioe.getMessage(), ioe);
 		}
