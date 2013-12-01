@@ -1,20 +1,4 @@
 	Set<String> getNames(String section, String subsection) {
-		List<ConfigLine> s = sorted();
-		int idx = find(s, section, subsection, ""); //$NON-NLS-1$
-		if (idx < 0)
-			idx = -(idx + 1);
-
-		Map<String, String> m = new LinkedHashMap<String, String>();
-		while (idx < s.size()) {
-			ConfigLine e = s.get(idx++);
-			if (!e.match(section, subsection))
-				break;
-			if (e.name == null)
-				continue;
-			String l = toLowerCase(e.name);
-			if (!m.containsKey(l))
-				m.put(l, e.name);
-		}
-		return new CaseFoldingSet(m);
+		return getNames(section, subsection, false);
 	}
 
