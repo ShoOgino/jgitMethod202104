@@ -41,6 +41,7 @@
 						.resolve(upstreamCommitId));
 				break;
 			case BEGIN:
+				autoStash();
 				if (stopAfterInitialization
 						|| !walk.isMergedInto(
 								walk.parseCommit(repo.resolve(Constants.HEAD)),
@@ -56,8 +57,10 @@
 				RebaseResult res = initFilesAndRewind();
 				if (stopAfterInitialization)
 					return RebaseResult.INTERACTIVE_PREPARED_RESULT;
-				if (res != null)
+				if (res != null) {
+					autoStashApply();
 					return res;
+				}
 			}
 
 			if (monitor.isCancelled())

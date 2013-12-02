@@ -13,7 +13,8 @@
 			StashApplyFailureException {
 		checkCallable();
 
-		if (repo.getRepositoryState() != RepositoryState.SAFE)
+		if (!ignoreRepositoryState
+				&& repo.getRepositoryState() != RepositoryState.SAFE)
 			throw new WrongRepositoryStateException(MessageFormat.format(
 					JGitText.get().stashApplyOnUnsafeRepository,
 					repo.getRepositoryState()));

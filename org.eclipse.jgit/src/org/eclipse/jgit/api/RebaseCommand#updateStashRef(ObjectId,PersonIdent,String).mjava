@@ -1,9 +1,7 @@
 	private void updateStashRef(ObjectId commitId, PersonIdent refLogIdent,
 			String refLogMessage) throws IOException {
-		if (ref == null)
-			return;
-		Ref currentRef = repo.getRef(ref);
-		RefUpdate refUpdate = repo.updateRef(ref);
+		Ref currentRef = repo.getRef(Constants.R_STASH);
+		RefUpdate refUpdate = repo.updateRef(Constants.R_STASH);
 		refUpdate.setNewObjectId(commitId);
 		refUpdate.setRefLogIdent(refLogIdent);
 		refUpdate.setRefLogMessage(refLogMessage, false);
