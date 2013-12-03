@@ -1,0 +1,34 @@
+	/**
+	 * Steps: 1.Add symlink 'a' 2.Commit 3.Create branch '1' 4.Replace symlink
+	 * 'a' by folder 'a' 5.Commit 6.Checkout branch '1'
+	 *
+	 * The working tree should contain 'a' with FileMode.SYMLINK after the
+	 * checkout.
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void fileModeTestSymlinkThenFolder() throws Exception {
+		Git git = new Git(db);
+		writeTrashFile("c", "Hello world c");
+		FileUtils.createSymLink(new File(db.getWorkTree(), "a"), "c");
+		git.add().addFilepattern(".").call();
+		git.commit().setMessage("add symlink a").call();
+		Ref branch_1 = git.branchCreate().setName("branch_1").call();
+		git.rm().addFilepattern("a").call();
+		FileUtils.mkdirs(new File(db.getWorkTree(), "a"));
+		writeTrashFile("a/b", "Hello world b");
+		git.add().addFilepattern("a").call();
+		git.commit().setMessage("add folder a").call();
+
+		FileEntry entry = new FileTreeIterator.FileEntry(new File(
+				db.getWorkTree(), "a"), db.getFS());
+		assertEquals(FileMode.TREE, entry.getMode());
+
+		git.checkout().setName(branch_1.getName()).call();
+
+		entry = new FileTreeIterator.FileEntry(new File(db.getWorkTree(), "a"),
+				db.getFS());
+		assertEquals(FileMode.SYMLINK, entry.getMode());
+	}
+
