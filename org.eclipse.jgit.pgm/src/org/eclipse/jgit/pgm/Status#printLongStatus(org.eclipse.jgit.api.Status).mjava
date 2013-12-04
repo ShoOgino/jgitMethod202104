@@ -1,0 +1,62 @@
+	private void printLongStatus(org.eclipse.jgit.api.Status status)
+			throws IOException {
+		// Print current branch name
+		final Ref head = db.getRef(Constants.HEAD);
+		if (head != null && head.isSymbolic()) {
+			String branch = Repository.shortenRefName(head.getLeaf().getName());
+			outw.println(CLIText.formatLine(MessageFormat.format(
+					CLIText.get().onBranch, branch)));
+		} else
+			outw.println(CLIText.formatLine(CLIText.get().notOnAnyBranch));
+
+		// List changes
+		boolean firstHeader = true;
+
+		Collection<String> added = status.getAdded();
+		Collection<String> changed = status.getChanged();
+		Collection<String> removed = status.getRemoved();
+		Collection<String> modified = status.getModified();
+		Collection<String> missing = status.getMissing();
+		Collection<String> untracked = status.getUntracked();
+		Map<String, StageState> unmergedStates = status
+				.getConflictingStageState();
+		Collection<String> toBeCommitted = new ArrayList<String>(added);
+		toBeCommitted.addAll(changed);
+		toBeCommitted.addAll(removed);
+		int nbToBeCommitted = toBeCommitted.size();
+		if (nbToBeCommitted > 0) {
+			printSectionHeader(CLIText.get().changesToBeCommitted);
+			printList(CLIText.get().statusNewFile,
+					CLIText.get().statusModified, CLIText.get().statusRemoved,
+					toBeCommitted, added, changed, removed);
+			firstHeader = false;
+		}
+		Collection<String> notStagedForCommit = new ArrayList<String>(modified);
+		notStagedForCommit.addAll(missing);
+		int nbNotStagedForCommit = notStagedForCommit.size();
+		if (nbNotStagedForCommit > 0) {
+			if (!firstHeader)
+				printSectionHeader(""); //$NON-NLS-1$
+			printSectionHeader(CLIText.get().changesNotStagedForCommit);
+			printList(CLIText.get().statusModified,
+					CLIText.get().statusRemoved, null, notStagedForCommit,
+					modified, missing, null);
+			firstHeader = false;
+		}
+		int nbUnmerged = unmergedStates.size();
+		if (nbUnmerged > 0) {
+			if (!firstHeader)
+				printSectionHeader(""); //$NON-NLS-1$
+			printSectionHeader(CLIText.get().unmergedPaths);
+			printUnmerged(unmergedStates);
+			firstHeader = false;
+		}
+		int nbUntracked = untracked.size();
+		if (nbUntracked > 0) {
+			if (!firstHeader)
+				printSectionHeader(""); //$NON-NLS-1$
+			printSectionHeader(CLIText.get().untrackedFiles);
+			printList(untracked);
+		}
+	}
+
