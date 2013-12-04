@@ -1,0 +1,14 @@
+	private List<DiffEntry> diffWorkingAgainstHead(final RevCommit commit,
+			RevWalk revWalk)
+			throws IOException {
+		TreeWalk walk = createTreeWalk();
+		RevCommit parentCommit = revWalk.parseCommit(commit.getParent(0));
+		try {
+			walk.addTree(parentCommit.getTree());
+			walk.addTree(commit.getTree());
+			return DiffEntry.scan(walk);
+		} finally {
+			walk.release();
+		}
+	}
+

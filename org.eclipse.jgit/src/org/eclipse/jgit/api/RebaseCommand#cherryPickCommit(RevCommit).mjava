@@ -22,8 +22,8 @@
 				switch (cherryPickResult.getStatus()) {
 				case FAILED:
 					if (operation == Operation.BEGIN)
-						return abort(new RebaseResult(
-								cherryPickResult.getFailingPaths()));
+						return abort(RebaseResult.failed(cherryPickResult
+								.getFailingPaths()));
 					else
 						return stop(commitToPick, Status.STOPPED);
 				case CONFLICTING:

@@ -1,0 +1,19 @@
+	private boolean autoStashApply() throws IOException, GitAPIException {
+		boolean conflicts = false;
+		if (rebaseState.getFile(AUTOSTASH).exists()) {
+			String stash = rebaseState.readFile(AUTOSTASH);
+			try {
+				Git.wrap(repo).stashApply().setStashRef(stash)
+						.ignoreRepositoryState(true).call();
+			} catch (StashApplyFailureException e) {
+				conflicts = true;
+				RevWalk rw = new RevWalk(repo);
+				ObjectId stashId = repo.resolve(stash);
+				RevCommit commit = rw.parseCommit(stashId);
+				updateStashRef(commit, commit.getAuthorIdent(),
+						commit.getShortMessage());
+			}
+		}
+		return conflicts;
+	}
+

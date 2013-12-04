@@ -1,0 +1,35 @@
+	@Test
+	public void testFastForwardRebaseWithModification() throws Exception {
+		// create file0 + file1, add and commit
+		writeTrashFile("file0", "file0");
+		writeTrashFile(FILE1, "file1");
+		git.add().addFilepattern("file0").addFilepattern(FILE1).call();
+		RevCommit commit = git.commit().setMessage("commit1").call();
+
+		// create topic branch
+		createBranch(commit, "refs/heads/topic");
+
+		// still on master / modify file1, add and commit
+		writeTrashFile(FILE1, "modified file1");
+		git.add().addFilepattern(FILE1).call();
+		git.commit().setMessage("commit2").call();
+
+		// checkout topic branch / modify file0 and add to index
+		checkoutBranch("refs/heads/topic");
+		writeTrashFile("file0", "modified file0 in index");
+		git.add().addFilepattern("file0").addFilepattern(FILE1).call();
+		// modify once more
+		writeTrashFile("file0", "modified file0");
+
+		// rebase
+		RebaseResult result = git.rebase().setUpstream("refs/heads/master")
+				.call();
+		assertEquals(Status.FAST_FORWARD, result.getStatus());
+		checkFile(new File(db.getWorkTree(), "file0"), "modified file0");
+		checkFile(new File(db.getWorkTree(), FILE1), "modified file1");
+		assertEquals("[file0, mode:100644, content:modified file0 in index]"
+				+ "[file1, mode:100644, content:modified file1]",
+				indexState(CONTENT));
+		assertEquals(RepositoryState.SAFE, db.getRepositoryState());
+	}
+

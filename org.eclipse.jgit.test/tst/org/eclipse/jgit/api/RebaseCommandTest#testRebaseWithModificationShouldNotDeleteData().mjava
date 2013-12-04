@@ -1,0 +1,41 @@
+	@Test
+	public void testRebaseWithModificationShouldNotDeleteData()
+			throws Exception {
+		// create file0 + file1, add and commit
+		writeTrashFile("file0", "file0");
+		writeTrashFile(FILE1, "file1");
+		git.add().addFilepattern("file0").addFilepattern(FILE1).call();
+		RevCommit commit = git.commit().setMessage("commit1").call();
+
+		// create topic branch
+		createBranch(commit, "refs/heads/topic");
+
+		// still on master / modify file1, add and commit
+		writeTrashFile(FILE1, "modified file1");
+		git.add().addFilepattern(FILE1).call();
+		git.commit().setMessage("commit2").call();
+
+		// checkout topic branch / modify file1, add and commit
+		checkoutBranch("refs/heads/topic");
+		writeTrashFile(FILE1, "modified file1 on topic");
+		git.add().addFilepattern(FILE1).call();
+		git.commit().setMessage("commit3").call();
+
+		writeTrashFile("file0", "modified file0");
+
+		RebaseResult result = git.rebase().setUpstream("refs/heads/master")
+				.call();
+		// the following condition was true before commit 83b6ab233:
+		// jgit started the rebase and deleted the change on abort
+		// This test should verify that content was deleted
+		if (result.getStatus() == Status.STOPPED)
+			git.rebase().setOperation(Operation.ABORT).call();
+
+		checkFile(new File(db.getWorkTree(), "file0"), "modified file0");
+		checkFile(new File(db.getWorkTree(), FILE1),
+				"modified file1 on topic");
+		assertEquals("[file0, mode:100644, content:file0]"
+				+ "[file1, mode:100644, content:modified file1 on topic]",
+				indexState(CONTENT));
+	}
+

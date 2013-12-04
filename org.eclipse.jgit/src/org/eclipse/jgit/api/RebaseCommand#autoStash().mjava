@@ -1,0 +1,18 @@
+	private void autoStash() throws GitAPIException, IOException {
+		if (repo.getConfig().getBoolean(ConfigConstants.CONFIG_REBASE_SECTION,
+				ConfigConstants.CONFIG_KEY_AUTOSTASH, false)) {
+			String message = MessageFormat.format(
+							AUTOSTASH_MSG,
+							Repository
+									.shortenRefName(getHeadName(getHead())));
+			RevCommit stashCommit = Git.wrap(repo).stashCreate().setRef(null)
+					.setWorkingDirectoryMessage(
+							message)
+					.call();
+			if (stashCommit != null) {
+				FileUtils.mkdir(rebaseState.getDir());
+				rebaseState.createFile(AUTOSTASH, stashCommit.getName());
+			}
+		}
+	}
+

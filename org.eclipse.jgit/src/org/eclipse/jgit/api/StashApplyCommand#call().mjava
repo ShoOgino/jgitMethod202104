@@ -13,7 +13,8 @@
 			StashApplyFailureException {
 		checkCallable();
 
-		if (repo.getRepositoryState() != RepositoryState.SAFE)
+		if (!ignoreRepositoryState
+				&& repo.getRepositoryState() != RepositoryState.SAFE)
 			throw new WrongRepositoryStateException(MessageFormat.format(
 					JGitText.get().stashApplyOnUnsafeRepository,
 					repo.getRepositoryState()));
@@ -55,6 +56,7 @@
 							.newMerger(repo, true);
 					ixMerger.setCommitNames(new String[] { "stashed HEAD",
 							"HEAD", "stashed index" });
+					ixMerger.setBase(stashHeadCommit);
 					boolean ok = ixMerger.merge(headCommit, stashIndexCommit);
 					if (ok) {
 						resetIndex(revWalk

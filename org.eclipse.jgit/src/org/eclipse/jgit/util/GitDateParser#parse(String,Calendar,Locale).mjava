@@ -1,0 +1,65 @@
+	/**
+	 * Parses a string into a {@link Date} using the given locale. Since this
+	 * parser also supports relative formats (e.g. "yesterday") the caller can
+	 * specify the reference date. These types of strings can be parsed:
+	 * <ul>
+	 * <li>"never"</li>
+	 * <li>"now"</li>
+	 * <li>"yesterday"</li>
+	 * <li>"(x) years|months|weeks|days|hours|minutes|seconds ago"<br>
+	 * Multiple specs can be combined like in "2 weeks 3 days ago". Instead of
+	 * ' ' one can use '.' to seperate the words</li>
+	 * <li>"yyyy-MM-dd HH:mm:ss Z" (ISO)</li>
+	 * <li>"EEE, dd MMM yyyy HH:mm:ss Z" (RFC)</li>
+	 * <li>"yyyy-MM-dd"</li>
+	 * <li>"yyyy.MM.dd"</li>
+	 * <li>"MM/dd/yyyy",</li>
+	 * <li>"dd.MM.yyyy"</li>
+	 * <li>"EEE MMM dd HH:mm:ss yyyy Z" (DEFAULT)</li>
+	 * <li>"EEE MMM dd HH:mm:ss yyyy" (LOCAL)</li>
+	 * </ul>
+	 *
+	 * @param dateStr
+	 *            the string to be parsed
+	 * @param now
+	 *            the base date which is used for the calculation of relative
+	 *            formats. E.g. if baseDate is "25.8.2012" then parsing of the
+	 *            string "1 week ago" would result in a date corresponding to
+	 *            "18.8.2012". This is used when a JGit command calls this
+	 *            parser often but wants a consistent starting point for calls.<br>
+	 *            If set to <code>null</code> then the current time will be used
+	 *            instead.
+	 * @param locale
+	 *            locale to be used to parse the date string
+	 * @return the parsed {@link Date}
+	 * @throws ParseException
+	 *             if the given dateStr was not recognized
+	 * @since 3.2
+	 */
+	public static Date parse(String dateStr, Calendar now, Locale locale)
+			throws ParseException {
+		dateStr = dateStr.trim();
+		Date ret;
+
+		if ("never".equalsIgnoreCase(dateStr)) //$NON-NLS-1$
+			return NEVER;
+		ret = parse_relative(dateStr, now);
+		if (ret != null)
+			return ret;
+		for (ParseableSimpleDateFormat f : ParseableSimpleDateFormat.values()) {
+			try {
+				return parse_simple(dateStr, f, locale);
+			} catch (ParseException e) {
+				// simply proceed with the next parser
+			}
+		}
+		ParseableSimpleDateFormat[] values = ParseableSimpleDateFormat.values();
+		StringBuilder allFormats = new StringBuilder("\"") //$NON-NLS-1$
+				.append(values[0].formatStr);
+		for (int i = 1; i < values.length; i++)
+			allFormats.append("\", \"").append(values[i].formatStr); //$NON-NLS-1$
+		allFormats.append("\""); //$NON-NLS-1$
+		throw new ParseException(MessageFormat.format(
+				JGitText.get().cannotParseDate, dateStr, allFormats.toString()), 0);
+	}
+

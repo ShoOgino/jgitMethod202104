@@ -1,0 +1,29 @@
+	/**
+	 * Create a chain of commits of given depth.
+	 * <p>
+	 * Each commit contains one file named "a" containing the index of the
+	 * commit in the chain as its content. The created commit chain is
+	 * referenced from any ref.
+	 * <p>
+	 * A chain of depth = N will create 3*N objects in Gits object database. For
+	 * each depth level three objects are created: the commit object, the
+	 * top-level tree object and a blob for the content of the file "a".
+	 *
+	 * @param depth
+	 *            the depth of the commit chain.
+	 * @return the commit that is the tip of the commit chain
+	 * @throws Exception
+	 */
+	protected RevCommit commitChain(int depth) throws Exception {
+		if (depth <= 0)
+			throw new IllegalArgumentException("Chain depth must be > 0");
+		CommitBuilder cb = tr.commit();
+		RevCommit tip;
+		do {
+			--depth;
+			tip = cb.add("a", "" + depth).message("" + depth).create();
+			cb = cb.child();
+		} while (depth > 0);
+		return tip;
+	}
+

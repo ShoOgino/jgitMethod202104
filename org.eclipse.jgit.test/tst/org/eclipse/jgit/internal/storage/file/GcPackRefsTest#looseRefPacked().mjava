@@ -1,0 +1,9 @@
+	@Test
+	public void looseRefPacked() throws Exception {
+		RevBlob a = tr.blob("a");
+		tr.lightweightTag("t", a);
+
+		gc.packRefs();
+		assertSame(repo.getRef("t").getStorage(), Storage.PACKED);
+	}
+

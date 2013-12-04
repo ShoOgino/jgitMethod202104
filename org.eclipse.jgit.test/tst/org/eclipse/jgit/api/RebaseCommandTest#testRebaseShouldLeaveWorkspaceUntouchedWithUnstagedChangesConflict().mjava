@@ -21,9 +21,9 @@
 		// and attempt to rebase
 		RebaseResult rebaseResult = git.rebase()
 					.setUpstream("refs/heads/master").call();
-		assertEquals(Status.CONFLICTS, rebaseResult.getStatus());
-		assertEquals(1, rebaseResult.getConflicts().size());
-		assertEquals(FILE1, rebaseResult.getConflicts().get(0));
+		assertEquals(Status.UNCOMMITTED_CHANGES, rebaseResult.getStatus());
+		assertEquals(1, rebaseResult.getUncommittedChanges().size());
+		assertEquals(FILE1, rebaseResult.getUncommittedChanges().get(0));
 
 		checkFile(theFile, "dirty the file");
 

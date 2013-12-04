@@ -8,10 +8,7 @@
 	 */
 	public RevCommit tryFastForward(RevCommit newCommit) throws IOException,
 			GitAPIException {
-		Ref head = repo.getRef(Constants.HEAD);
-		if (head == null || head.getObjectId() == null)
-			throw new RefNotFoundException(MessageFormat.format(
-					JGitText.get().refNotResolved, Constants.HEAD));
+		Ref head = getHead();
 
 		ObjectId headId = head.getObjectId();
 		if (headId == null)
@@ -21,11 +18,7 @@
 		if (walk.isMergedInto(newCommit, headCommit))
 			return newCommit;
 
-		String headName;
-		if (head.isSymbolic())
-			headName = head.getTarget().getName();
-		else
-			headName = head.getObjectId().getName();
+		String headName = getHeadName(head);
 		return tryFastForward(headName, headCommit, newCommit);
 	}
 

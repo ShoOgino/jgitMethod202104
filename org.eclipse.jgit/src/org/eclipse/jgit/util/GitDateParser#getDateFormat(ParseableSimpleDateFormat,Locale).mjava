@@ -1,0 +1,21 @@
+	// Gets an instance of a SimpleDateFormat for the specified locale. If there
+	// is not already an appropriate instance in the (ThreadLocal) cache then
+	// create one and put it into the cache.
+	private static SimpleDateFormat getDateFormat(ParseableSimpleDateFormat f,
+			Locale locale) {
+		Map<Locale, Map<ParseableSimpleDateFormat, SimpleDateFormat>> cache = formatCache
+				.get();
+		Map<ParseableSimpleDateFormat, SimpleDateFormat> map = cache
+				.get(locale);
+		if (map == null) {
+			map = new HashMap<ParseableSimpleDateFormat, SimpleDateFormat>();
+			cache.put(locale, map);
+			return getNewSimpleDateFormat(f, locale, map);
+		}
+		SimpleDateFormat dateFormat = map.get(f);
+		if (dateFormat != null)
+			return dateFormat;
+		SimpleDateFormat df = getNewSimpleDateFormat(f, locale, map);
+		return df;
+	}
+

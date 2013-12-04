@@ -1,0 +1,11 @@
+	@Test
+	public void testDirectoryFileConflicts_6b() throws Exception {
+		// 6
+		setupCase(mk("DF/DF"), mk("DF"), mkmap("DF", "different"));
+		writeTrashFile("DF", "again different");
+		go();
+		assertRemoved("DF/DF");
+		assertConflict("DF");
+		assertEquals(0, dco.getUpdated().size());
+	}
+

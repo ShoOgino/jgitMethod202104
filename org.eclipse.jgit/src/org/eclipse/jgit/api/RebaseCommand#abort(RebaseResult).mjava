@@ -1,4 +1,5 @@
-	private RebaseResult abort(RebaseResult result) throws IOException {
+	private RebaseResult abort(RebaseResult result) throws IOException,
+			GitAPIException {
 		try {
 			ObjectId origHead = repo.readOrigHead();
 			String commitId = origHead != null ? origHead.name() : null;
@@ -47,9 +48,12 @@
 							JGitText.get().abortingRebaseFailed);
 				}
 			}
+			boolean stashConflicts = autoStashApply();
 			// cleanup the files
 			FileUtils.delete(rebaseState.getDir(), FileUtils.RECURSIVE);
 			repo.writeCherryPickHead(null);
+			if (stashConflicts)
+				return RebaseResult.STASH_APPLY_CONFLICTS_RESULT;
 			return result;
 
 		} finally {

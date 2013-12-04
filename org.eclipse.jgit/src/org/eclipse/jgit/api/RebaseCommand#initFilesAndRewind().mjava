@@ -3,16 +3,9 @@
 		// we need to store everything into files so that we can implement
 		// --skip, --continue, and --abort
 
-		Ref head = repo.getRef(Constants.HEAD);
-		if (head == null || head.getObjectId() == null)
-			throw new RefNotFoundException(MessageFormat.format(
-					JGitText.get().refNotResolved, Constants.HEAD));
+		Ref head = getHead();
 
-		String headName;
-		if (head.isSymbolic())
-			headName = head.getTarget().getName();
-		else
-			headName = head.getObjectId().getName();
+		String headName = getHeadName(head);
 		ObjectId headId = head.getObjectId();
 		if (headId == null)
 			throw new RefNotFoundException(MessageFormat.format(
@@ -51,7 +44,7 @@
 
 		Collections.reverse(cherryPickList);
 		// create the folder for the meta information
-		FileUtils.mkdir(rebaseState.getDir());
+		FileUtils.mkdir(rebaseState.getDir(), true);
 
 		repo.writeOrigHead(headId);
 		rebaseState.createFile(REBASE_HEAD, headId.name());

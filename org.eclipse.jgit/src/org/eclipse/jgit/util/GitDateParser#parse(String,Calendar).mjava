@@ -1,7 +1,7 @@
 	/**
-	 * Parses a string into a {@link Date}. Since this parser also supports
-	 * relative formats (e.g. "yesterday") the caller can specify the reference
-	 * date. These types of strings can be parsed:
+	 * Parses a string into a {@link Date} using the default locale. Since this
+	 * parser also supports relative formats (e.g. "yesterday") the caller can
+	 * specify the reference date. These types of strings can be parsed:
 	 * <ul>
 	 * <li>"never"</li>
 	 * <li>"now"</li>
@@ -35,28 +35,6 @@
 	 */
 	public static Date parse(String dateStr, Calendar now)
 			throws ParseException {
-		dateStr = dateStr.trim();
-		Date ret;
-
-		if ("never".equalsIgnoreCase(dateStr)) //$NON-NLS-1$
-			return NEVER;
-		ret = parse_relative(dateStr, now);
-		if (ret != null)
-			return ret;
-		for (ParseableSimpleDateFormat f : ParseableSimpleDateFormat.values()) {
-			try {
-				return parse_simple(dateStr, f);
-			} catch (ParseException e) {
-				// simply proceed with the next parser
-			}
-		}
-		ParseableSimpleDateFormat[] values = ParseableSimpleDateFormat.values();
-		StringBuilder allFormats = new StringBuilder("\"") //$NON-NLS-1$
-				.append(values[0].formatStr);
-		for (int i = 1; i < values.length; i++)
-			allFormats.append("\", \"").append(values[i].formatStr); //$NON-NLS-1$
-		allFormats.append("\""); //$NON-NLS-1$
-		throw new ParseException(MessageFormat.format(
-				JGitText.get().cannotParseDate, dateStr, allFormats.toString()), 0);
+		return parse(dateStr, now, Locale.getDefault());
 	}
 

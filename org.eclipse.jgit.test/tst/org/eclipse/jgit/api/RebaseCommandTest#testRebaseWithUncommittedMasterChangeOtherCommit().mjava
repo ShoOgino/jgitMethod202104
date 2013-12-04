@@ -35,11 +35,9 @@
 		// rebase
 		RebaseResult result = git.rebase().setUpstream("refs/heads/master")
 				.call();
-		assertEquals(Status.FAILED, result.getStatus());
+		assertEquals(Status.UNCOMMITTED_CHANGES, result.getStatus());
 		// staged file0 causes DIRTY_INDEX
-		assertEquals(1, result.getFailingPaths().size());
-		assertEquals(MergeFailureReason.DIRTY_INDEX, result.getFailingPaths()
-				.get("file0"));
+		assertEquals(1, result.getUncommittedChanges().size());
 		assertEquals("unstaged modified file0", read(file0));
 		// index shall be unchanged
 		assertEquals(indexState, indexState(CONTENT));
