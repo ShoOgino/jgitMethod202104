@@ -5,8 +5,11 @@
 	 * non-comment.
 	 *
 	 * @param newAction
+	 * @throws IllegalTodoFileModification
+	 *             on attempt to set a non-comment action on a line which was a
+	 *             comment line before.
 	 */
-	public void setAction(Action newAction) {
+	public void setAction(Action newAction) throws IllegalTodoFileModification {
 		if (!Action.COMMENT.equals(action) && Action.COMMENT.equals(newAction)) {
 			// transforming from non-comment to comment
 			if (comment == null)
@@ -18,7 +21,7 @@
 		} else if (Action.COMMENT.equals(action) && !Action.COMMENT.equals(newAction)) {
 			// transforming from comment to non-comment
 			if (commit == null)
-				throw new JGitInternalException(MessageFormat.format(
+				throw new IllegalTodoFileModification(MessageFormat.format(
 						JGitText.get().cannotChangeActionOnComment, action,
 						newAction));
 		}

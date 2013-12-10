@@ -24,7 +24,11 @@
 		RebaseResult res = git.rebase().setUpstream("HEAD~2")
 				.runInteractively(new InteractiveHandler() {
 					public void prepareSteps(List<RebaseTodoLine> steps) {
-						steps.get(0).setAction(Action.EDIT);
+						try {
+							steps.get(0).setAction(Action.EDIT);
+						} catch (IllegalTodoFileModification e) {
+							fail("unexpected exception: " + e);
+						}
 					}
 
 					public String modifyCommitMessage(String commit) {

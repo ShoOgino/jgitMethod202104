@@ -4,7 +4,7 @@
 		try {
 			new RebaseTodoLine("This is a invalid comment");
 			fail("Constructing a comment line with invalid comment string should fail, but doesn't");
-		} catch (JGitInternalException e) {
+		} catch (IllegalArgumentException e) {
 			// expected
 		}
 		RebaseTodoLine validCommentLine = new RebaseTodoLine(
@@ -19,7 +19,7 @@
 		try {
 			actionLineToBeChanged.setComment("invalid comment");
 			fail("Setting a invalid comment string should fail but doesn't");
-		} catch (JGitInternalException e) {
+		} catch (IllegalArgumentException e) {
 			assertEquals(null, actionLineToBeChanged.getComment());
 		}
 
@@ -28,7 +28,7 @@
 		try {
 			actionLineToBeChanged.setComment("invalid comment");
 			fail("Setting a invalid comment string should fail but doesn't");
-		} catch (JGitInternalException e) {
+		} catch (IllegalArgumentException e) {
 			// expected
 			// setting comment failed, but was successfully set before,
 			// therefore it may not be altered since then
@@ -45,7 +45,7 @@
 			actionLineToBeChanged.setComment("line1 \n\r line2");
 			actionLineToBeChanged.setComment("\n\r");
 			fail("Setting a multiline comment string should fail but doesn't");
-		} catch (JGitInternalException e) {
+		} catch (IllegalArgumentException e) {
 			// expected
 		}
 		// Try setting valid comments

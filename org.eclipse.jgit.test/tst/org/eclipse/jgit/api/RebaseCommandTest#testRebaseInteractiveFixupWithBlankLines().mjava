@@ -21,7 +21,11 @@
 				.runInteractively(new InteractiveHandler() {
 
 					public void prepareSteps(List<RebaseTodoLine> steps) {
-						steps.get(1).setAction(Action.FIXUP);
+						try {
+							steps.get(1).setAction(Action.FIXUP);
+						} catch (IllegalTodoFileModification e) {
+							fail("unexpected exception: " + e);
+						}
 					}
 
 					public String modifyCommitMessage(String commit) {
