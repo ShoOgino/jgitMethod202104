@@ -22,7 +22,11 @@
 
 					public void prepareSteps(List<RebaseTodoLine> steps) {
 						steps.remove(0);
-						steps.get(0).setAction(Action.REWORD);
+						try {
+							steps.get(0).setAction(Action.REWORD);
+						} catch (IllegalTodoFileModification e) {
+							fail("unexpected exception: " + e);
+						}
 					}
 
 					public String modifyCommitMessage(String commit) {
@@ -35,7 +39,11 @@
 
 			public void prepareSteps(List<RebaseTodoLine> steps) {
 				steps.remove(0);
-				steps.get(0).setAction(Action.REWORD);
+				try {
+					steps.get(0).setAction(Action.REWORD);
+				} catch (IllegalTodoFileModification e) {
+					fail("unexpected exception: " + e);
+				}
 			}
 
 			public String modifyCommitMessage(String commit) {

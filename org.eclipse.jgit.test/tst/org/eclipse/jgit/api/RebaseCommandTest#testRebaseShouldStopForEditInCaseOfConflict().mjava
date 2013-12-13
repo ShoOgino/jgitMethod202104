@@ -22,7 +22,11 @@
 
 					public void prepareSteps(List<RebaseTodoLine> steps) {
 						steps.remove(0);
-						steps.get(0).setAction(Action.EDIT);
+						try {
+							steps.get(0).setAction(Action.EDIT);
+						} catch (IllegalTodoFileModification e) {
+							fail("unexpected exception: " + e);
+						}
 					}
 
 					public String modifyCommitMessage(String commit) {
