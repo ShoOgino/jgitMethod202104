@@ -89,7 +89,7 @@
 					else {
 						// the preferred version THEIRS has a different mode
 						// than ours. Check it out!
-						if (isWorktreeDirty(work))
+						if (isWorktreeDirty(work, ourDce))
 							return false;
 						// we know about length and lastMod only after we have written the new content.
 						// This will happen later. Set these values to 0 for know.
@@ -127,7 +127,7 @@
 			// THEIRS. THEIRS is chosen.
 
 			// Check worktree before checking out THEIRS
-			if (isWorktreeDirty(work))
+			if (isWorktreeDirty(work, ourDce))
 				return false;
 			if (nonTree(modeT)) {
 				// we know about length and lastMod only after we have written
@@ -185,7 +185,7 @@
 
 		if (nonTree(modeO) && nonTree(modeT)) {
 			// Check worktree before modifying files
-			if (isWorktreeDirty(work))
+			if (isWorktreeDirty(work, ourDce))
 				return false;
 
 			// Don't attempt to resolve submodule link conflicts
@@ -216,7 +216,7 @@
 				// OURS was deleted checkout THEIRS
 				if (modeO == 0) {
 					// Check worktree before checking out THEIRS
-					if (isWorktreeDirty(work))
+					if (isWorktreeDirty(work, ourDce))
 						return false;
 					if (nonTree(modeT)) {
 						if (e != null)
