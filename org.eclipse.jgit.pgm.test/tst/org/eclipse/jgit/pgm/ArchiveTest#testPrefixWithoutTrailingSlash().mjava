@@ -1,0 +1,22 @@
+	/**
+	 * The prefix passed to "git archive" need not end with '/'.
+	 * In practice it is not very common to have a nonempty prefix
+	 * that does not name a directory (and hence end with /), but
+	 * since git has historically supported other prefixes, we do,
+	 * too.
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void testPrefixWithoutTrailingSlash() throws Exception {
+		commitBazAndFooSlashBar();
+		byte[] result = CLIGitCommand.rawExecute(
+				"git archive --prefix=my- --format=zip master", db);
+		String[] expect = { "my-baz", "my-foo/bar" };
+		String[] actual = listZipEntries(result);
+
+		Arrays.sort(expect);
+		Arrays.sort(actual);
+		assertArrayEquals(expect, actual);
+	}
+

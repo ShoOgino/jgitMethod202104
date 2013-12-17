@@ -1,0 +1,9 @@
+	@Test
+	public void testPrefixDoesNotNormalizeDoubleSlash() throws Exception {
+		commitFoo();
+		byte[] result = CLIGitCommand.rawExecute(
+				"git archive --prefix=x// --format=zip master", db);
+		String[] expect = { "x//foo" };
+		assertArrayEquals(expect, listZipEntries(result));
+	}
+

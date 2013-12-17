@@ -1,4 +1,5 @@
 	private <T extends Closeable> OutputStream writeArchive(Format<T> fmt) {
+		final String pfx = prefix == null ? "" : prefix;
 		final TreeWalk walk = new TreeWalk(repo);
 		try {
 			final T outa = fmt.createArchiveOutputStream(out);
@@ -10,7 +11,7 @@
 				walk.reset(rw.parseTree(tree));
 				walk.setRecursive(true);
 				while (walk.next()) {
-					final String name = walk.getPathString();
+					final String name = pfx + walk.getPathString();
 					final FileMode mode = walk.getFileMode(0);
 
 					if (mode == FileMode.TREE)

@@ -1,0 +1,9 @@
+	@Test
+	public void testPrefixDoesNotNormalizeDoubleSlashInTar() throws Exception {
+		commitFoo();
+		final byte[] result = CLIGitCommand.rawExecute( //
+				"git archive --prefix=x// --format=tar master", db);
+		String[] expect = { "x//foo" };
+		assertArrayEquals(expect, listTarEntries(result));
+	}
+
