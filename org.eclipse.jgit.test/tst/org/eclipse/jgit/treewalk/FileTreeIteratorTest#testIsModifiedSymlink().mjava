@@ -14,8 +14,6 @@
 				.getConfig().get(WorkingTreeOptions.KEY));
 		while (!fti.getEntryPathString().equals("symlink"))
 			fti.next(1);
-		ObjectReader objectReader = db.newObjectReader();
-		assertFalse(fti.isModified(dce, false, objectReader));
-		objectReader.release();
+		assertFalse(fti.isModified(dce, false));
 	}
 

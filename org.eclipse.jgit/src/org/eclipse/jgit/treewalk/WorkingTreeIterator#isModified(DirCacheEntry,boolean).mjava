@@ -12,9 +12,29 @@
 	 *            True if the actual file content should be checked if
 	 *            modification time differs.
 	 * @return true if content is most likely different.
-	 * @deprecated Use {@link #isModified(DirCacheEntry, boolean, ObjectReader)}
 	 */
 	public boolean isModified(DirCacheEntry entry, boolean forceContentCheck) {
-		return isModified(entry, false, null);
+		MetadataDiff diff = compareMetadata(entry);
+		switch (diff) {
+		case DIFFER_BY_TIMESTAMP:
+			if (forceContentCheck)
+				// But we are told to look at content even though timestamps
+				// tell us about modification
+				return contentCheck(entry);
+			else
+				// We are told to assume a modification if timestamps differs
+				return true;
+		case SMUDGED:
+			// The file is clean by timestamps but the entry was smudged.
+			// Lets do a content check
+			return contentCheck(entry);
+		case EQUAL:
+			return false;
+		case DIFFER_BY_METADATA:
+			return true;
+		default:
+			throw new IllegalStateException(MessageFormat.format(
+					JGitText.get().unexpectedCompareResult, diff.name()));
+		}
 	}
 
