@@ -5,6 +5,8 @@
 		if (detectBinary) {
 			isBinary = RawText.isBinary(buf, cnt);
 			detectBinary = false;
+			if (isBinary && abortIfBinary)
+				throw new IsBinaryException();
 		}
 		ptr = 0;
 		return true;

@@ -159,7 +159,9 @@
 				break;
 			case 0xFFD: // 12 13 14
 				if (equalIdAndMode(hId, hMode, iId, iMode))
-					if (f == null || f.isModified(dce, true))
+					if (f == null
+							|| f.isModified(dce, true,
+									this.walk.getObjectReader()))
 						conflict(name, dce, h, m);
 					else
 						remove(name);
@@ -273,7 +275,8 @@
 						// Nothing in Head
 						// Something in Index
 						if (dce != null
-								&& (f == null || f.isModified(dce, true)))
+								&& (f == null || f.isModified(dce, true,
+										this.walk.getObjectReader())))
 							// No file or file is dirty
 							// Nothing in Merge and current path is part of
 							// File/Folder conflict
@@ -340,7 +343,9 @@
 						// Something different from a submodule in Index
 						// Nothing in Merge
 						// Something in Head
-						if (f == null || f.isModified(dce, true))
+						if (f == null
+								|| f.isModified(dce, true,
+										this.walk.getObjectReader()))
 							// file is dirty
 							// Index contains the same as Head
 							// Something different from a submodule in Index
@@ -403,7 +408,8 @@
 						// file content
 						update(name, mId, mMode);
 					} else if (dce != null
-							&& (f == null || f.isModified(dce, true))) {
+							&& (f == null || f.isModified(dce, true,
+									this.walk.getObjectReader()))) {
 						// File doesn't exist or is dirty
 						// Head and Index don't contain a submodule
 						// Head contains the same as Index. Merge differs
