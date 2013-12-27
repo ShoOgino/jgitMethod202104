@@ -16,6 +16,14 @@
 		if (refName.endsWith(".lock")) //$NON-NLS-1$
 			return false;
 
+		// Borrow logic for filterig out invalid paths. These
+		// are also invalid ref
+		try {
+			DirCacheCheckout.checkValidPath(refName);
+		} catch (InvalidPathException e) {
+			return false;
+		}
+
 		int components = 1;
 		char p = '\0';
 		for (int i = 0; i < len; i++) {
