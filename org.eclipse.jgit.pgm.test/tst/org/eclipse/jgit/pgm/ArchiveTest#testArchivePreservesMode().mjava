@@ -3,9 +3,11 @@
 		writeTrashFile("plain", "a file with content");
 		writeTrashFile("executable", "an executable file");
 		writeTrashFile("symlink", "plain");
+		writeTrashFile("dir/content", "clutter in a subdir");
 		git.add().addFilepattern("plain").call();
 		git.add().addFilepattern("executable").call();
 		git.add().addFilepattern("symlink").call();
+		git.add().addFilepattern("dir").call();
 
 		DirCache cache = db.lockDirCache();
 		cache.getEntry("executable").setFileMode(FileMode.EXECUTABLE_FILE);
@@ -22,5 +24,6 @@
 		assertContainsEntryWithMode("zip-with-modes.zip", "-rw-", "plain");
 		assertContainsEntryWithMode("zip-with-modes.zip", "-rwx", "executable");
 		assertContainsEntryWithMode("zip-with-modes.zip", "l", "symlink");
+		assertContainsEntryWithMode("zip-with-modes.zip", "-rw-", "dir/");
 	}
 
