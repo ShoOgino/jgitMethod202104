@@ -12,7 +12,7 @@
 		commitBazAndFooSlashBar();
 		byte[] result = CLIGitCommand.rawExecute(
 				"git archive --prefix=my- --format=zip master", db);
-		String[] expect = { "my-baz", "my-foo/bar" };
+		String[] expect = { "my-baz", "my-foo/", "my-foo/bar" };
 		String[] actual = listZipEntries(result);
 
 		Arrays.sort(expect);
