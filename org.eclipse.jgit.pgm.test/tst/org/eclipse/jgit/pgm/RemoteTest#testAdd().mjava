@@ -1,0 +1,11 @@
+	@Test
+	public void testAdd() throws Exception {
+		assertArrayEquals(new String[] { "" },
+				execute("git remote add second git://test.com/second"));
+
+		List<RemoteConfig> remotes = RemoteConfig.getAllRemoteConfigs(config);
+		assertEquals(2, remotes.size());
+		assertEquals("second", remotes.get(0).getName());
+		assertEquals("test", remotes.get(1).getName());
+	}
+

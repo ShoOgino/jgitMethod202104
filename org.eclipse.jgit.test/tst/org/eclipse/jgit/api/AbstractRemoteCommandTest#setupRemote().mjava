@@ -1,0 +1,25 @@
+	protected RemoteConfig setupRemote()
+			throws IOException, URISyntaxException {
+		// create another repository
+		Repository remoteRepository = createWorkRepository();
+
+		// set it up as a remote to this repository
+		final StoredConfig config = db.getConfig();
+		RemoteConfig remoteConfig = new RemoteConfig(config, REMOTE_NAME);
+
+		RefSpec refSpec = new RefSpec();
+		refSpec = refSpec.setForceUpdate(true);
+		refSpec = refSpec.setSourceDestination(Constants.R_HEADS + "*",
+				Constants.R_REMOTES + REMOTE_NAME + "/*");
+		remoteConfig.addFetchRefSpec(refSpec);
+
+		URIish uri = new URIish(
+				remoteRepository.getDirectory().toURI().toURL());
+		remoteConfig.addURI(uri);
+
+		remoteConfig.update(config);
+		config.save();
+
+		return remoteConfig;
+	}
+
