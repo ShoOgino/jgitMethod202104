@@ -28,8 +28,10 @@
 						gen.push(null, dc.getEntry(entry).getObjectId());
 
 					File inTree = new File(repo.getWorkTree(), path);
-					if (repo.getFS().isFile(inTree))
-						gen.push(null, new RawText(inTree));
+					if (repo.getFS().isFile(inTree)) {
+						RawText rawText = getRawText(inTree);
+						gen.push(null, rawText);
+					}
 				}
 			}
 			return gen.computeBlameResult();
