@@ -1,0 +1,13 @@
+	@Test
+	public void withMerge() throws Exception {
+		RevCommit a = commit();
+		RevCommit b = commit();
+		RevCommit c = commit(a, b);
+		Ref branchA = branch("a", a);
+		Ref branchB = branch("b", b);
+		Ref branchC = branch("c", c);
+
+		assertContains(a, asList(branchA, branchC));
+		assertContains(b, asList(branchB, branchC));
+	}
+

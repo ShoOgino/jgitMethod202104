@@ -1,0 +1,14 @@
+	@Test
+	public void withCommitLoadedByDifferentRevWalk() throws Exception {
+		RevCommit a = commit();
+		Ref branchA = branch("a", a);
+
+		RevWalk walk = new RevWalk(db);
+		try {
+			RevCommit parsedCommit = walk.parseCommit(a.getId());
+			assertContains(parsedCommit, asList(branchA));
+		} finally {
+			walk.release();
+		}
+	}
+

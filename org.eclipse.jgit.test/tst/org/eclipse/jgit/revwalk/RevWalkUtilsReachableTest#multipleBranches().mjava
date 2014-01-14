@@ -1,0 +1,11 @@
+	@Test
+	public void multipleBranches() throws Exception {
+		RevCommit a = commit();
+		RevCommit b = commit(a);
+		branch("a", a);
+		Ref branchB = branch("b", b);
+		Ref branchB2 = branch("b2", b);
+
+		assertContains(b, asList(branchB, branchB2));
+	}
+

@@ -1,0 +1,10 @@
+	@Test
+	public void twoCommits() throws Exception {
+		RevCommit a = commit();
+		RevCommit b = commit(a);
+		branch("a", a);
+		Ref branchB = branch("b", b);
+
+		assertContains(b, asList(branchB));
+	}
+
