@@ -1,13 +1,25 @@
 	private void list() throws Exception {
-		Map<String, Ref> refs = db.getRefDatabase().getRefs(ALL);
-		Ref head = refs.get(Constants.HEAD);
+		Ref head = db.getRef(Constants.HEAD);
 		// This can happen if HEAD is stillborn
 		if (head != null) {
 			String current = head.getLeaf().getName();
-			if (current.equals(Constants.HEAD))
-				addRef("(no branch)", head); //$NON-NLS-1$
-			addRefs(refs, Constants.R_HEADS, !remote);
-			addRefs(refs, Constants.R_REMOTES, remote);
+			ListBranchCommand command = new Git(db).branchList();
+			if (all)
+				command.setListMode(ListMode.ALL);
+			else if (remote)
+				command.setListMode(ListMode.REMOTE);
+
+			if (containsCommitish != null)
+				command.setContains(containsCommitish);
+
+			List<Ref> refs = command.call();
+			for (Ref ref : refs) {
+				if (ref.getName().equals(Constants.HEAD))
+					addRef("(no branch)", head); //$NON-NLS-1$
+			}
+
+			addRefs(refs, Constants.R_HEADS);
+			addRefs(refs, Constants.R_REMOTES);
 
 			ObjectReader reader = db.newObjectReader();
 			try {
