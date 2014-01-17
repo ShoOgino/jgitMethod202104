@@ -1,0 +1,11 @@
+	@Test
+	public void testCreateOrphanBranchWithStartPoint() throws Exception {
+		CheckoutCommand co = newOrphanBranchCommand();
+		Ref ref = co.setStartPoint("HEAD^").call();
+		assertCheckoutRef(ref);
+
+		assertEquals(2, trash.list().length);
+		this.assertNoHead();
+		this.assertRepositoryCondition(1);
+	}
+

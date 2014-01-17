@@ -1,0 +1,6 @@
+	private void assertRepositoryCondition(int files) throws GitAPIException {
+		org.eclipse.jgit.api.Status status = this.git.status().call();
+		assertFalse(status.isClean());
+		assertEquals(files, status.getAdded().size());
+	}
+

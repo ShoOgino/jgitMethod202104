@@ -1,0 +1,10 @@
+	@Test
+	public void testInvalidRefName() throws Exception {
+		try {
+			git.checkout().setOrphan(true).setName("../invalidname").call();
+			fail("Should have failed");
+		} catch (InvalidRefNameException e) {
+			// except to hit here
+		}
+	}
+

@@ -1,0 +1,18 @@
+	@Test
+	public void testCheckoutOrphanBranch() throws Exception {
+		CheckoutCommand co = newOrphanBranchCommand();
+		assertCheckoutRef(co.call());
+
+		File HEAD = new File(trash, ".git/HEAD");
+		String headRef = read(HEAD);
+		assertEquals("ref: refs/heads/orphanbranch\n", headRef);
+		assertEquals(2, trash.list().length);
+
+		File heads = new File(trash, ".git/refs/heads");
+		assertEquals(2, heads.listFiles().length);
+
+		this.assertNoHead();
+		this.assertRepositoryCondition(1);
+		assertEquals(CheckoutResult.NOT_TRIED_RESULT, co.getResult());
+	}
+

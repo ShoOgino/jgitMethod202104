@@ -1,0 +1,14 @@
+	@Test
+	public void testAlreadyExists() throws Exception {
+		this.git.checkout().setCreateBranch(true).setName("orphanbranch")
+				.call();
+		this.git.checkout().setName("master").call();
+
+		try {
+			newOrphanBranchCommand().call();
+			fail("Should have failed");
+		} catch (RefAlreadyExistsException e) {
+			// except to hit here
+		}
+	}
+
