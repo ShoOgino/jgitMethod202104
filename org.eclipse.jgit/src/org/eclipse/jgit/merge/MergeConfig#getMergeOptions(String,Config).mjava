@@ -1,0 +1,10 @@
+	private static String[] getMergeOptions(String branch, Config config) {
+		String mergeOptions = config.getString(
+				ConfigConstants.CONFIG_BRANCH_SECTION, branch,
+				ConfigConstants.CONFIG_KEY_MERGEOPTIONS);
+		if (mergeOptions != null)
+			return mergeOptions.split("\\s"); //$NON-NLS-1$
+		else
+			return new String[0];
+	}
+

@@ -1,0 +1,14 @@
+	/**
+	 * Use values from the configuation if they have not been explicitly defined
+	 * via the setters
+	 */
+	private void fallBackToConfiguration() {
+		MergeConfig config = MergeConfig.getConfigForCurrentBranch(repo);
+		if (squash == null)
+			squash = Boolean.valueOf(config.isSquash());
+		if (commit == null)
+			commit = Boolean.valueOf(config.isCommit());
+		if (fastForwardMode == null)
+			fastForwardMode = config.getFastForwardMode();
+	}
+

@@ -1,0 +1,7 @@
+	private MergeConfig(String branch, Config config) {
+		String[] mergeOptions = getMergeOptions(branch, config);
+		fastForwardMode = getFastForwardMode(config, mergeOptions);
+		squash = isMergeConfigOptionSet("--squash", mergeOptions); //$NON-NLS-1$
+		commit = !isMergeConfigOptionSet("--no-commit", mergeOptions); //$NON-NLS-1$
+	}
+

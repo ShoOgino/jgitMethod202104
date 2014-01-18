@@ -4,17 +4,25 @@
 		assertSame(FastForwardMode.Merge.TRUE, c.getEnum(
 				ConfigConstants.CONFIG_KEY_MERGE, null,
 				ConfigConstants.CONFIG_KEY_FF, FastForwardMode.Merge.TRUE));
+		MergeConfig mergeConfig = c.get(MergeConfig.getParser("side"));
+		assertSame(FastForwardMode.FF, mergeConfig.getFastForwardMode());
 		c = parse("[merge]\n\tff = only\n");
 		assertSame(FastForwardMode.Merge.ONLY, c.getEnum(
 				ConfigConstants.CONFIG_KEY_MERGE, null,
 				ConfigConstants.CONFIG_KEY_FF, FastForwardMode.Merge.ONLY));
+		mergeConfig = c.get(MergeConfig.getParser("side"));
+		assertSame(FastForwardMode.FF_ONLY, mergeConfig.getFastForwardMode());
 		c = parse("[merge]\n\tff = true\n");
 		assertSame(FastForwardMode.Merge.TRUE, c.getEnum(
 				ConfigConstants.CONFIG_KEY_MERGE, null,
 				ConfigConstants.CONFIG_KEY_FF, FastForwardMode.Merge.TRUE));
+		mergeConfig = c.get(MergeConfig.getParser("side"));
+		assertSame(FastForwardMode.FF, mergeConfig.getFastForwardMode());
 		c = parse("[merge]\n\tff = false\n");
 		assertSame(FastForwardMode.Merge.FALSE, c.getEnum(
 				ConfigConstants.CONFIG_KEY_MERGE, null,
 				ConfigConstants.CONFIG_KEY_FF, FastForwardMode.Merge.FALSE));
+		mergeConfig = c.get(MergeConfig.getParser("side"));
+		assertSame(FastForwardMode.NO_FF, mergeConfig.getFastForwardMode());
 	}
 

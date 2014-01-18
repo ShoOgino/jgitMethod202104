@@ -1,0 +1,13 @@
+	private static FastForwardMode getFastForwardMode(Config config,
+			String[] mergeOptions) {
+		for (String option : mergeOptions) {
+			for (FastForwardMode mode : FastForwardMode.values())
+				if (mode.matchConfigValue(option))
+					return mode;
+		}
+		FastForwardMode ffmode = FastForwardMode.valueOf(config.getEnum(
+				ConfigConstants.CONFIG_KEY_MERGE, null,
+				ConfigConstants.CONFIG_KEY_FF, FastForwardMode.Merge.TRUE));
+		return ffmode;
+	}
+

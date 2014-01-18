@@ -1,0 +1,30 @@
+	@Test
+	public void testCombinedMergeOptions() throws ConfigInvalidException {
+		Config c = new Config(null); // not set
+		MergeConfig mergeConfig = c.get(MergeConfig.getParser("side"));
+		assertSame(FastForwardMode.FF, mergeConfig.getFastForwardMode());
+		assertTrue(mergeConfig.isCommit());
+		assertFalse(mergeConfig.isSquash());
+		// branch..mergeoptions should win over merge.ff
+		c = parse("[merge]\n\tff = false\n"
+				+ "[branch \"side\"]\n\tmergeoptions = --ff-only\n");
+		mergeConfig = c.get(MergeConfig.getParser("side"));
+		assertSame(FastForwardMode.FF_ONLY, mergeConfig.getFastForwardMode());
+		assertTrue(mergeConfig.isCommit());
+		assertFalse(mergeConfig.isSquash());
+		// merge.ff used for ff setting if not set via mergeoptions
+		c = parse("[merge]\n\tff = only\n"
+				+ "[branch \"side\"]\n\tmergeoptions = --squash\n");
+		mergeConfig = c.get(MergeConfig.getParser("side"));
+		assertSame(FastForwardMode.FF_ONLY, mergeConfig.getFastForwardMode());
+		assertTrue(mergeConfig.isCommit());
+		assertTrue(mergeConfig.isSquash());
+		// mergeoptions wins if it has ff options amongst other options
+		c = parse("[merge]\n\tff = false\n"
+				+ "[branch \"side\"]\n\tmergeoptions = --ff-only --no-commit\n");
+		mergeConfig = c.get(MergeConfig.getParser("side"));
+		assertSame(FastForwardMode.FF_ONLY, mergeConfig.getFastForwardMode());
+		assertFalse(mergeConfig.isCommit());
+		assertFalse(mergeConfig.isSquash());
+	}
+

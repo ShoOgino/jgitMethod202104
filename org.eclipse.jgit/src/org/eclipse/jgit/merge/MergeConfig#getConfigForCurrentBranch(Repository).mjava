@@ -1,0 +1,16 @@
+	/**
+	 * @param repo
+	 * @return merge configuration for the current branch of the repository
+	 */
+	public static MergeConfig getConfigForCurrentBranch(Repository repo) {
+		try {
+			String branch = repo.getBranch();
+			if (branch != null)
+				return repo.getConfig().get(getParser(branch));
+		} catch (IOException e) {
+			// ignore
+		}
+		// use defaults if branch can't be determined
+		return new MergeConfig();
+	}
+

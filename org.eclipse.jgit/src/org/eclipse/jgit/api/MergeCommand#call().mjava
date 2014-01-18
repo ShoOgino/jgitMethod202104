@@ -6,10 +6,12 @@
 	 *
 	 * @return the result of the merge
 	 */
+	@SuppressWarnings("boxing")
 	public MergeResult call() throws GitAPIException, NoHeadException,
 			ConcurrentRefUpdateException, CheckoutConflictException,
 			InvalidMergeHeadsException, WrongRepositoryStateException, NoMessageException {
 		checkCallable();
+		fallBackToConfiguration();
 		checkParameters();
 
 		RevWalk revWalk = null;

@@ -4,18 +4,26 @@
 		assertSame(FastForwardMode.FF, c.getEnum(
 				ConfigConstants.CONFIG_BRANCH_SECTION, "side",
 				ConfigConstants.CONFIG_KEY_MERGEOPTIONS, FastForwardMode.FF));
+		MergeConfig mergeConfig = c.get(MergeConfig.getParser("side"));
+		assertSame(FastForwardMode.FF, mergeConfig.getFastForwardMode());
 		c = parse("[branch \"side\"]\n\tmergeoptions = --ff-only\n");
 		assertSame(FastForwardMode.FF_ONLY, c.getEnum(
 				ConfigConstants.CONFIG_BRANCH_SECTION, "side",
 				ConfigConstants.CONFIG_KEY_MERGEOPTIONS,
 				FastForwardMode.FF_ONLY));
+		mergeConfig = c.get(MergeConfig.getParser("side"));
+		assertSame(FastForwardMode.FF_ONLY, mergeConfig.getFastForwardMode());
 		c = parse("[branch \"side\"]\n\tmergeoptions = --ff\n");
 		assertSame(FastForwardMode.FF, c.getEnum(
 				ConfigConstants.CONFIG_BRANCH_SECTION, "side",
 				ConfigConstants.CONFIG_KEY_MERGEOPTIONS, FastForwardMode.FF));
+		mergeConfig = c.get(MergeConfig.getParser("side"));
+		assertSame(FastForwardMode.FF, mergeConfig.getFastForwardMode());
 		c = parse("[branch \"side\"]\n\tmergeoptions = --no-ff\n");
 		assertSame(FastForwardMode.NO_FF, c.getEnum(
 				ConfigConstants.CONFIG_BRANCH_SECTION, "side",
 				ConfigConstants.CONFIG_KEY_MERGEOPTIONS, FastForwardMode.NO_FF));
+		mergeConfig = c.get(MergeConfig.getParser("side"));
+		assertSame(FastForwardMode.NO_FF, mergeConfig.getFastForwardMode());
 	}
 
