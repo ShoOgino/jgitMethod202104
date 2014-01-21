@@ -18,7 +18,7 @@
 				String ourCommitName = getOurCommitName();
 				CherryPickResult cherryPickResult = new Git(repo).cherryPick()
 						.include(commitToPick).setOurCommitName(ourCommitName)
-						.setReflogPrefix("rebase:").call(); //$NON-NLS-1$
+						.setReflogPrefix("rebase:").setStrategy(strategy).call(); //$NON-NLS-1$
 				switch (cherryPickResult.getStatus()) {
 				case FAILED:
 					if (operation == Operation.BEGIN)

@@ -4,7 +4,8 @@
 			String stash = rebaseState.readFile(AUTOSTASH);
 			try {
 				Git.wrap(repo).stashApply().setStashRef(stash)
-						.ignoreRepositoryState(true).call();
+						.ignoreRepositoryState(true).setStrategy(strategy)
+						.call();
 			} catch (StashApplyFailureException e) {
 				conflicts = true;
 				RevWalk rw = new RevWalk(repo);

@@ -164,13 +164,14 @@
 		if (doRebase) {
 			RebaseCommand rebase = new RebaseCommand(repo);
 			RebaseResult rebaseRes = rebase.setUpstream(commitToMerge)
-					.setUpstreamName(upstreamName)
-					.setProgressMonitor(monitor).setOperation(Operation.BEGIN)
+					.setUpstreamName(upstreamName).setProgressMonitor(monitor)
+					.setOperation(Operation.BEGIN).setStrategy(strategy)
 					.call();
 			result = new PullResult(fetchRes, remote, rebaseRes);
 		} else {
 			MergeCommand merge = new MergeCommand(repo);
 			merge.include(upstreamName, commitToMerge);
+			merge.setStrategy(strategy);
 			MergeResult mergeRes = merge.call();
 			monitor.update(1);
 			result = new PullResult(fetchRes, remote, mergeRes);

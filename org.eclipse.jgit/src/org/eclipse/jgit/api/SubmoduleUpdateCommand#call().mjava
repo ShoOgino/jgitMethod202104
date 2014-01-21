@@ -54,10 +54,12 @@
 					if (ConfigConstants.CONFIG_KEY_MERGE.equals(update)) {
 						MergeCommand merge = new MergeCommand(submoduleRepo);
 						merge.include(commit);
+						merge.setStrategy(strategy);
 						merge.call();
 					} else if (ConfigConstants.CONFIG_KEY_REBASE.equals(update)) {
 						RebaseCommand rebase = new RebaseCommand(submoduleRepo);
 						rebase.setUpstream(commit);
+						rebase.setStrategy(strategy);
 						rebase.call();
 					} else {
 						// Checkout commit referenced in parent repository's
