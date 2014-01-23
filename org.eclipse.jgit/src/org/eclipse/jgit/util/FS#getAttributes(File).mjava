@@ -1,0 +1,18 @@
+	/**
+	 * @param path
+	 * @return the file attributes we care for
+	 * @since 3.3
+	 */
+	public Attributes getAttributes(File path) {
+		boolean isDirectory = isDirectory(path);
+		boolean isFile = !isDirectory && path.isFile();
+		assert path.exists() == isDirectory || isFile;
+		boolean exists = isDirectory || isFile;
+		boolean canExecute = exists && !isDirectory && canExecute(path);
+		boolean isSymlink = false;
+		long lastModified = exists ? path.lastModified() : 0L;
+		long createTime = 0L;
+		return new Attributes(this, path, exists, isDirectory, canExecute,
+				isSymlink, isFile, createTime, lastModified, -1);
+	}
+
