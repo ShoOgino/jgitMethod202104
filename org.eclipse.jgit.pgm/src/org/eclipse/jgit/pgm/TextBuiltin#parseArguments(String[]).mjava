@@ -7,14 +7,15 @@
 	 *
 	 * @param args
 	 *            the arguments supplied on the command line, if any.
+	 * @throws IOException
 	 */
-	protected void parseArguments(final String[] args) {
+	protected void parseArguments(final String[] args) throws IOException {
 		final CmdLineParser clp = new CmdLineParser(this);
 		try {
 			clp.parseArgument(args);
 		} catch (CmdLineException err) {
 			if (!help) {
-				System.err.println(MessageFormat.format(CLIText.get().fatalError, err.getMessage()));
+				this.errw.println(MessageFormat.format(CLIText.get().fatalError, err.getMessage()));
 				System.exit(1);
 			}
 		}

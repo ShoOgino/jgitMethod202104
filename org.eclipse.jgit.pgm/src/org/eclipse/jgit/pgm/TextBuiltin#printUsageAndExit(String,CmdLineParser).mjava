@@ -3,20 +3,20 @@
 	 *
 	 * @param message
 	 * @param clp
+	 * @throws IOException
 	 */
-	public void printUsageAndExit(final String message, final CmdLineParser clp) {
-		PrintWriter writer = new PrintWriter(System.err);
-		writer.println(message);
-		writer.print("jgit "); //$NON-NLS-1$
-		writer.print(commandName);
-		clp.printSingleLineUsage(writer, getResourceBundle());
-		writer.println();
+	public void printUsageAndExit(final String message, final CmdLineParser clp) throws IOException {
+		errw.println(message);
+		errw.print("jgit "); //$NON-NLS-1$
+		errw.print(commandName);
+		clp.printSingleLineUsage(errw, getResourceBundle());
+		errw.println();
 
-		writer.println();
-		clp.printUsage(writer, getResourceBundle());
-		writer.println();
+		errw.println();
+		clp.printUsage(errw, getResourceBundle());
+		errw.println();
 
-		writer.flush();
+		errw.flush();
 		System.exit(1);
 	}
 
