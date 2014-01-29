@@ -25,6 +25,8 @@
 
 			if (depth != 0)
 				processShallow();
+			if (!clientShallowCommits.isEmpty())
+				walk.assumeShallow(clientShallowCommits);
 			sendPack = negotiate();
 		} catch (PackProtocolException err) {
 			reportErrorDuringNegotiate(err.getMessage());
