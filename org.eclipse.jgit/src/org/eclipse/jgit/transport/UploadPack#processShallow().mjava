@@ -22,7 +22,7 @@
 
 			// Commits not on the boundary which are shallow in the client
 			// need to become unshallowed
-			if (c.getDepth() < depth && clientShallowCommits.contains(c)) {
+			if (c.getDepth() < depth && clientShallowCommits.remove(c)) {
 				unshallowCommits.add(c.copy());
 				pckOut.writeString("unshallow " + c.name()); //$NON-NLS-1$
 			}
