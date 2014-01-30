@@ -1,0 +1,17 @@
+	/**
+	 * Set the maximum allowed pack size.
+	 * <p>
+	 * A pack exceeding this size will be rejected.
+	 *
+	 * @param limit
+	 *            the pack size limit, in bytes
+	 *
+	 * @since 3.3
+	 */
+	public void setMaxPackSizeLimit(final long limit) {
+		if (limit < 0)
+			throw new IllegalArgumentException(MessageFormat.format(
+					JGitText.get().receivePackInvalidLimit, Long.valueOf(limit)));
+		maxPackSizeLimit = limit;
+	}
+
