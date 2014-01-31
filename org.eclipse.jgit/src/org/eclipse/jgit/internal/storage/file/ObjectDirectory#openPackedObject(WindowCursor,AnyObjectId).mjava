@@ -1,0 +1,25 @@
+	ObjectLoader openPackedObject(WindowCursor curs, AnyObjectId objectId) {
+		PackList pList;
+		do {
+			SEARCH: for (;;) {
+				pList = packList.get();
+				for (PackFile p : pList.packs) {
+					try {
+						ObjectLoader ldr = p.get(curs, objectId);
+						if (ldr != null)
+							return ldr;
+					} catch (PackMismatchException e) {
+						// Pack was modified; refresh the entire pack list.
+						if (searchPacksAgain(pList))
+							continue SEARCH;
+					} catch (IOException e) {
+						// Assume the pack is corrupted.
+						removePack(p);
+					}
+				}
+				break SEARCH;
+			}
+		} while (searchPacksAgain(pList));
+		return null;
+	}
+

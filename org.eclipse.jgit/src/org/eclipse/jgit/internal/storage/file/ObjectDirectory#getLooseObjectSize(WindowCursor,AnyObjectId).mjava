@@ -1,0 +1,16 @@
+	private long getLooseObjectSize(WindowCursor curs, AnyObjectId id)
+			throws IOException {
+		try {
+			FileInputStream in = new FileInputStream(fileFor(id));
+			try {
+				unpackedObjectCache.add(id);
+				return UnpackedObject.getSize(in, id, curs);
+			} finally {
+				in.close();
+			}
+		} catch (FileNotFoundException noFile) {
+			unpackedObjectCache.remove(id);
+			return -1;
+		}
+	}
+

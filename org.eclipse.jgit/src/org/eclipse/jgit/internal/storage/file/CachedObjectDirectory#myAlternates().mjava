@@ -1,12 +1,9 @@
-	@Override
-	AlternateHandle[] myAlternates() {
+	private CachedObjectDirectory[] myAlternates() {
 		if (alts == null) {
-			AlternateHandle[] src = wrapped.myAlternates();
-			alts = new AlternateHandle[src.length];
-			for (int i = 0; i < alts.length; i++) {
-				FileObjectDatabase s = src[i].db;
-				alts[i] = new AlternateHandle(s.newCachedFileObjectDatabase());
-			}
+			ObjectDirectory.AlternateHandle[] src = wrapped.myAlternates();
+			alts = new CachedObjectDirectory[src.length];
+			for (int i = 0; i < alts.length; i++)
+				alts[i] = src[i].db.newCachedFileObjectDatabase();
 		}
 		return alts;
 	}

@@ -3,14 +3,14 @@
 		unpackedObjectCache.clear();
 
 		final PackList packs = packList.get();
-		packList.set(NO_PACKS);
-		for (final PackFile p : packs.packs)
-			p.close();
+		if (packs != NO_PACKS && packList.compareAndSet(packs, NO_PACKS)) {
+			for (PackFile p : packs.packs)
+				p.close();
+		}
 
 		// Fully close all loaded alternates and clear the alternate list.
 		AlternateHandle[] alt = alternates.get();
-		if (alt != null) {
-			alternates.set(null);
+		if (alt != null && alternates.compareAndSet(alt, null)) {
 			for(final AlternateHandle od : alt)
 				od.close();
 		}

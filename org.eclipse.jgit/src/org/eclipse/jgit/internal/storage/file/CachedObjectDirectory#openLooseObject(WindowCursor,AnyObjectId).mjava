@@ -1,0 +1,12 @@
+	@Override
+	ObjectLoader openLooseObject(WindowCursor curs, AnyObjectId id)
+			throws IOException {
+		if (unpackedObjects.contains(id)) {
+			ObjectLoader ldr = wrapped.openLooseObject(curs, id);
+			if (ldr != null)
+				return ldr;
+			unpackedObjects = scanLoose();
+		}
+		return null;
+	}
+
