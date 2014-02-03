@@ -1,0 +1,13 @@
+	long getObjectSize(WindowCursor curs, AnyObjectId id)
+			throws IOException {
+		if (unpackedObjectCache.isUnpacked(id)) {
+			long len = getLooseObjectSize(curs, id);
+			if (0 <= len)
+				return len;
+		}
+		long len = getPackedSizeFromSelfOrAlternate(curs, id);
+		if (0 <= len)
+			return len;
+		return getLooseSizeFromSelfOrAlternate(curs, id);
+	}
+

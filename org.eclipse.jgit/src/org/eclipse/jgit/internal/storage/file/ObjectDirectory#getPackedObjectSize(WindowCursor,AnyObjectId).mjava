@@ -1,0 +1,25 @@
+	private long getPackedObjectSize(WindowCursor curs, AnyObjectId id) {
+		PackList pList;
+		do {
+			SEARCH: for (;;) {
+				pList = packList.get();
+				for (PackFile p : pList.packs) {
+					try {
+						long len = p.getObjectSize(curs, id);
+						if (0 <= len)
+							return len;
+					} catch (PackMismatchException e) {
+						// Pack was modified; refresh the entire pack list.
+						if (searchPacksAgain(pList))
+							continue SEARCH;
+					} catch (IOException e) {
+						// Assume the pack is corrupted.
+						removePack(p);
+					}
+				}
+				break SEARCH;
+			}
+		} while (searchPacksAgain(pList));
+		return -1;
+	}
+

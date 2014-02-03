@@ -1,0 +1,10 @@
+	private boolean hasPackedInSelfOrAlternate(AnyObjectId objectId) {
+		if (hasPackedObject(objectId))
+			return true;
+		for (AlternateHandle alt : myAlternates()) {
+			if (alt.db.hasPackedInSelfOrAlternate(objectId))
+				return true;
+		}
+		return false;
+	}
+

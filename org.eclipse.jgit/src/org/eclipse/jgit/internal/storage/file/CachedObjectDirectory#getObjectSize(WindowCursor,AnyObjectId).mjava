@@ -1,0 +1,8 @@
+	@Override
+	long getObjectSize(WindowCursor curs, AnyObjectId objectId)
+			throws IOException {
+		// Object size is unlikely to be requested from contexts using
+		// this type. Don't bother trying to accelerate the lookup.
+		return wrapped.getObjectSize(curs, objectId);
+	}
+

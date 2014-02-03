@@ -1,11 +1,12 @@
+	@Override
 	void resolve(Set<ObjectId> matches, AbbreviatedObjectId id)
 			throws IOException {
 		// Go through the packs once. If we didn't find any resolutions
 		// scan for new packs and check once more.
-		//
 		int oldSize = matches.size();
-		PackList pList = packList.get();
-		for (;;) {
+		PackList pList;
+		do {
+			pList = packList.get();
 			for (PackFile p : pList.packs) {
 				try {
 					p.resolve(matches, id, RESOLVE_ABBREV_LIMIT);
@@ -17,15 +18,7 @@
 				if (matches.size() > RESOLVE_ABBREV_LIMIT)
 					return;
 			}
-			if (matches.size() == oldSize) {
-				PackList nList = scanPacks(pList);
-				if (nList == pList || nList.packs.length == 0)
-					break;
-				pList = nList;
-				continue;
-			}
-			break;
-		}
+		} while (matches.size() == oldSize && searchPacksAgain(pList));
 
 		String fanOut = id.name().substring(0, 2);
 		String[] entries = new File(getDirectory(), fanOut).list();

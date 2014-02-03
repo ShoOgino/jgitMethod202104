@@ -1,0 +1,26 @@
+	private ObjectIdOwnerMap<UnpackedObjectId> scanLoose() {
+		ObjectIdOwnerMap<UnpackedObjectId> m = new ObjectIdOwnerMap<UnpackedObjectId>();
+		File objects = wrapped.getDirectory();
+		String[] fanout = objects.list();
+		if (fanout == null)
+			return m;
+		for (String d : fanout) {
+			if (d.length() != 2)
+				continue;
+			String[] entries = new File(objects, d).list();
+			if (entries == null)
+				continue;
+			for (String e : entries) {
+				if (e.length() != Constants.OBJECT_ID_STRING_LENGTH - 2)
+					continue;
+				try {
+					ObjectId id = ObjectId.fromString(d + e);
+					m.add(new UnpackedObjectId(id));
+				} catch (IllegalArgumentException notAnObject) {
+					// ignoring the file that does not represent loose object
+				}
+			}
+		}
+		return m;
+	}
+
