@@ -1,5 +1,5 @@
 	@Theory
-	public void failingPathsShouldNotResultInOKReturnValue(
+	public void failingDeleteOfDirectoryWithUntrackedContent(
 			MergeStrategy strategy) throws Exception {
 		File folder1 = new File(db.getWorkTree(), "folder1");
 		FileUtils.mkdir(folder1);
@@ -27,6 +27,7 @@
 		RevCommit head = git.commit().setMessage("Adding another file").call();
 
 		// Untracked file to cause failing path for delete() of folder1
+		// but that's ok.
 		file = new File(folder1, "file3.txt");
 		write(file, "folder1--file3.txt");
 
@@ -34,8 +35,7 @@
 		merger.setCommitNames(new String[] { "BASE", "HEAD", "other" });
 		merger.setWorkingTreeIterator(new FileTreeIterator(db));
 		boolean ok = merger.merge(head.getId(), other.getId());
-
-		assertFalse(merger.getFailingPaths().isEmpty());
-		assertFalse(ok);
+		assertTrue(ok);
+		assertTrue(file.exists());
 	}
 
