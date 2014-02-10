@@ -7,9 +7,15 @@
 		}
 
 		CheckoutCommand command = new Git(db).checkout();
-		command.setCreateBranch(createBranch);
-		command.setName(name);
-		command.setForce(force);
+		if (paths.size() > 0) {
+			command.setStartPoint(name);
+			for (String path : paths)
+				command.addPath(path);
+		} else {
+			command.setCreateBranch(createBranch);
+			command.setName(name);
+			command.setForce(force);
+		}
 		try {
 			String oldBranch = db.getBranch();
 			Ref ref = command.call();
