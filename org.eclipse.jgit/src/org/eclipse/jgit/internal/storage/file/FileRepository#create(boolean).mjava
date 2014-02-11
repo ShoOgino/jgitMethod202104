@@ -15,6 +15,12 @@
 					JGitText.get().repositoryAlreadyExists, getDirectory()));
 		}
 		FileUtils.mkdirs(getDirectory(), true);
+		HideDotFiles hideDotFiles = getConfig().getEnum(
+				ConfigConstants.CONFIG_CORE_SECTION, null,
+				ConfigConstants.CONFIG_KEY_HIDEDOTFILES,
+				HideDotFiles.DOTGITONLY);
+		if (hideDotFiles != HideDotFiles.FALSE)
+			getFS().setHidden(getDirectory(), true);
 		refs.create();
 		objectDatabase.create();
 
