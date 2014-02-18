@@ -1,0 +1,118 @@
+	private void parse() {
+		this.hosts.clear();
+		this.lastModified = this.netrc.lastModified();
+
+		BufferedReader r = null;
+		try {
+			r = new BufferedReader(new FileReader(netrc));
+			String line = null;
+
+			NetRCEntry entry = new NetRCEntry();
+
+			State state = State.COMMAND;
+
+			String macbody = ""; //$NON-NLS-1$
+
+			Matcher matcher = NETRC.matcher(""); //$NON-NLS-1$
+			while ((line = r.readLine()) != null) {
+
+				// reading macbody
+				if (entry.macdef != null && entry.macbody == null) {
+					if (line.length() == 0) {
+						entry.macbody = macbody;
+						macbody = ""; //$NON-NLS-1$
+						continue;
+					}
+					macbody += line + "\n"; //$NON-NLS-1$;
+					continue;
+				}
+
+				matcher.reset(line);
+				while (matcher.find()) {
+					String command = matcher.group().toLowerCase();
+					if (command.startsWith("#")) { //$NON-NLS-1$
+						matcher.reset(""); //$NON-NLS-1$
+						continue;
+					}
+					state = STATE.get(command);
+					if (state == null)
+						state = State.COMMAND;
+
+					switch (state) {
+					case COMMAND:
+						break;
+					case ACCOUNT:
+						if (entry.account != null && entry.complete()) {
+							hosts.put(entry.machine, entry);
+							entry = new NetRCEntry();
+						}
+						if (matcher.find())
+							entry.account = matcher.group();
+						state = State.COMMAND;
+						break;
+					case LOGIN:
+						if (entry.login != null && entry.complete()) {
+							hosts.put(entry.machine, entry);
+							entry = new NetRCEntry();
+						}
+						if (matcher.find())
+							entry.login = matcher.group();
+						state = State.COMMAND;
+						break;
+					case PASSWORD:
+						if (entry.password != null && entry.complete()) {
+							hosts.put(entry.machine, entry);
+							entry = new NetRCEntry();
+						}
+						if (matcher.find())
+							entry.password = matcher.group().toCharArray();
+						state = State.COMMAND;
+						break;
+					case DEFAULT:
+						if (entry.machine != null && entry.complete()) {
+							hosts.put(entry.machine, entry);
+							entry = new NetRCEntry();
+						}
+						entry.machine = DEFAULT_ENTRY;
+						state = State.COMMAND;
+						break;
+					case MACDEF:
+						if (entry.macdef != null && entry.complete()) {
+							hosts.put(entry.machine, entry);
+							entry = new NetRCEntry();
+						}
+						if (matcher.find())
+							entry.macdef = matcher.group();
+						state = State.COMMAND;
+						break;
+					case MACHINE:
+						if (entry.machine != null && entry.complete()) {
+							hosts.put(entry.machine, entry);
+							entry = new NetRCEntry();
+						}
+						if (matcher.find())
+							entry.machine = matcher.group();
+						state = State.COMMAND;
+						break;
+					}
+				}
+			}
+
+			// reading macbody on EOF
+			if (entry.macdef != null && entry.macbody == null)
+				entry.macbody = macbody;
+
+			if (entry.complete())
+				hosts.put(entry.machine, entry);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		} finally {
+			try {
+				if (r != null)
+					r.close();
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
+	}
+

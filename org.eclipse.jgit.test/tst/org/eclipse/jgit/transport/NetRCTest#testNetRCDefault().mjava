@@ -1,0 +1,64 @@
+	@Test
+	public void testNetRCDefault() throws Exception {
+		config("machine my.host login test password 2222"
+				+ "\n"
+
+				+ "#machine ignore.host.example login ignoreuser password 5555"
+				+ "\n"
+
+				+ "machine twolinehost.example #login kuznetsov.alexey password 5555"
+				+ "\n"
+
+				+ "login twologin password 6666"
+				+ "\n"
+
+				+ "machine afterlinehost.example login test1 password 8888"
+				+ "\n"
+
+				+ "machine macdef.example login test7 password 7777 macdef mac1"
+				+ "\n"
+
+				+ "init +apc 1" + "\n"
+
+				+ "init2 +apc 2" + "\n"
+
+				+ "\n"
+
+				+ "default login test5 password 3333" + "\n"
+
+		);
+
+		netrc = new NetRC(configFile);
+
+		// default test
+		assertEquals("test5", netrc.getEntry("ignore.host.example").login);
+		assertEquals("3333", new String(
+				netrc.getEntry("ignore.host.example").password));
+
+		// default test
+		assertEquals("test5", new String(
+				netrc.getEntry("ignore.host.example").login));
+		assertEquals("3333", new String(
+				netrc.getEntry("ignore.host.example").password));
+
+		// default test
+		assertEquals("test5", netrc.getEntry("cignore.host.example").login);
+		assertEquals("3333", new String(
+				netrc.getEntry("cignore.host.example").password));
+
+		assertEquals("twologin", netrc.getEntry("twolinehost.example").login);
+		assertEquals("6666", new String(
+				netrc.getEntry("twolinehost.example").password));
+
+		assertEquals("test1", netrc.getEntry("afterlinehost.example").login);
+		assertEquals("8888", new String(
+				netrc.getEntry("afterlinehost.example").password));
+
+		// macdef test
+		assertEquals("test7", netrc.getEntry("macdef.example").login);
+		assertEquals("7777", new String(
+				netrc.getEntry("macdef.example").password));
+		assertEquals("init +apc 1" + "\n" + "init2 +apc 2" + "\n",
+				netrc.getEntry("macdef.example").macbody);
+	}
+

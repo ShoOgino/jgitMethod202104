@@ -1,0 +1,21 @@
+	/**
+	 * Get entry by host name
+	 *
+	 * @param host
+	 * @return entry associated with host name or null
+	 */
+	public NetRCEntry getEntry(String host) {
+		if (netrc == null)
+			return null;
+
+		if (this.lastModified != this.netrc.lastModified())
+			parse();
+
+		NetRCEntry entry = this.hosts.get(host);
+
+		if (entry == null)
+			entry = this.hosts.get(DEFAULT_ENTRY);
+
+		return entry;
+	}
+

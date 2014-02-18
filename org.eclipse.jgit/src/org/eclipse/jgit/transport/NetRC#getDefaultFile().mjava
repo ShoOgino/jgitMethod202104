@@ -1,0 +1,13 @@
+	private static File getDefaultFile() {
+		File home = FS.DETECTED.userHome();
+		File netrc = new File(home, ".netrc"); //$NON-NLS-1$
+		if (netrc.exists())
+			return netrc;
+
+		netrc = new File(home, "_netrc"); //$NON-NLS-1$
+		if (netrc.exists())
+			return netrc;
+
+		return null;
+	}
+
