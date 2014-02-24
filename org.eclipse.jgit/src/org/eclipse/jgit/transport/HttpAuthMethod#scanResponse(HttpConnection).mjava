@@ -7,7 +7,7 @@
 	 */
 	static HttpAuthMethod scanResponse(final HttpConnection conn) {
 		final Map<String, List<String>> headers = conn.getHeaderFields();
-		HttpAuthMethod authentication = NONE;
+		HttpAuthMethod authentication = Type.NONE.method(EMPTY_STRING);
 
 		for (final Entry<String, List<String>> entry : headers.entrySet()) {
 			if (HDR_WWW_AUTHENTICATE.equalsIgnoreCase(entry.getKey())) {
@@ -17,19 +17,23 @@
 							final String[] valuePart = value.split(
 									SCHEMA_NAME_SEPARATOR, 2);
 
-							if (Digest.NAME.equalsIgnoreCase(valuePart[0])) {
+							try {
+								Type methodType = Type.valueOf(valuePart[0].toUpperCase());
+								if (authentication.getType().compareTo(methodType) >= 0) {
+									continue;
+								}
+
 								final String param;
 								if (valuePart.length == 1)
 									param = EMPTY_STRING;
 								else
 									param = valuePart[1];
 
-								authentication = new Digest(param);
-								break;
+								authentication = methodType
+										.method(param);
+							} catch (IllegalArgumentException e) {
+								// This auth method is not supported
 							}
-
-							if (Basic.NAME.equalsIgnoreCase(valuePart[0]))
-								authentication = new Basic();
 						}
 					}
 				}
