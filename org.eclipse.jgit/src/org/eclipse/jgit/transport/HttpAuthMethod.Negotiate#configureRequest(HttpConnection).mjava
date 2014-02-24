@@ -1,0 +1,24 @@
+		@Override
+		void configureRequest(HttpConnection conn) throws IOException {
+			GSSManager gssManager = GSS_MANAGER_FACTORY.newInstance(conn
+					.getURL());
+			String host = conn.getURL().getHost();
+			String peerName = "HTTP@" + host.toLowerCase(); //$NON-NLS-1$
+			try {
+				GSSName gssName = gssManager.createName(peerName,
+						GSSName.NT_HOSTBASED_SERVICE);
+				GSSContext context = gssManager.createContext(gssName, OID,
+						null, GSSContext.DEFAULT_LIFETIME);
+				// Respect delegation policy in HTTP/SPNEGO.
+				context.requestCredDeleg(true);
+
+				byte[] token = context.initSecContext(prevToken, 0,
+						prevToken.length);
+
+				conn.setRequestProperty(HDR_AUTHORIZATION, getType().name()
+						+ " " + Base64.encodeBytes(token)); //$NON-NLS-1$
+			} catch (GSSException e) {
+				throw new IOException(e);
+			}
+		}
+
