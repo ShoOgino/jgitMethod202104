@@ -1,13 +1,19 @@
 	/**
 	 * Unlock the pack written by this object.
 	 *
+	 * @return the pack file that was unlocked, {@code null} if there was no
+	 *         lock
 	 * @throws IOException
 	 *             the pack could not be unlocked.
+	 * @since 3.3
 	 */
-	protected void unlockPack() throws IOException {
+	protected File unlockPack() throws IOException {
 		if (packLock != null) {
+			File packFile = packLock.getPackFile();
 			packLock.unlock();
 			packLock = null;
+			return packFile;
 		}
+		return null;
 	}
 
