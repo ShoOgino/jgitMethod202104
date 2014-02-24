@@ -1,0 +1,21 @@
+		private static void init() throws ClassNotFoundException,
+				NoSuchMethodException {
+			Class<?> httpCallerInfoClazz = Class
+					.forName("sun.net.www.protocol.http.HttpCallerInfo"); //$NON-NLS-1$
+			HTTP_CALLER_INFO_CONSTRUCTOR = httpCallerInfoClazz
+					.getConstructor(URL.class);
+
+			Class<?> httpCallerClazz = Class
+					.forName("sun.security.jgss.HttpCaller"); //$NON-NLS-1$
+			HTTP_CALLER_CONSTRUCTOR = httpCallerClazz
+					.getConstructor(httpCallerInfoClazz);
+
+			Class<?> gssCallerClazz = Class
+					.forName("sun.security.jgss.GSSCaller"); //$NON-NLS-1$
+			Class<?> gssManagerImplClazz = Class
+					.forName("sun.security.jgss.GSSManagerImpl"); //$NON-NLS-1$
+			GSS_MANAGER_IMPL_CONSTRUCTOR = gssManagerImplClazz
+					.getConstructor(gssCallerClazz);
+
+		}
+

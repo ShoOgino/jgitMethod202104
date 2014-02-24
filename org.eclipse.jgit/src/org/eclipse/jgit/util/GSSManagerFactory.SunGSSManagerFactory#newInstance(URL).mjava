@@ -1,0 +1,21 @@
+		@Override
+		public GSSManager newInstance(URL url) {
+			try {
+				Object httpCallerInfo = HTTP_CALLER_INFO_CONSTRUCTOR
+						.newInstance(url);
+				Object httpCaller = HTTP_CALLER_CONSTRUCTOR
+						.newInstance(httpCallerInfo);
+
+				return (GSSManager) GSS_MANAGER_IMPL_CONSTRUCTOR
+						.newInstance(httpCaller);
+			} catch (InstantiationException e) {
+				throw new Error(e);
+			} catch (IllegalAccessException e) {
+				throw new Error(e);
+			} catch (IllegalArgumentException e) {
+				throw new Error(e);
+			} catch (InvocationTargetException e) {
+				throw new Error(e);
+			}
+		}
+
