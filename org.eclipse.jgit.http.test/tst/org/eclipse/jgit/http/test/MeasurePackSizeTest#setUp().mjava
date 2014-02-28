@@ -1,0 +1,49 @@
+	@Before
+	public void setUp() throws Exception {
+		super.setUp();
+
+		final TestRepository<Repository> src = createTestRepository();
+		final String srcName = src.getRepository().getDirectory().getName();
+
+		ServletContextHandler app = server.addContext("/git");
+		GitServlet gs = new GitServlet();
+		gs.setRepositoryResolver(new RepositoryResolver<HttpServletRequest>() {
+			public Repository open(HttpServletRequest req, String name)
+					throws RepositoryNotFoundException,
+					ServiceNotEnabledException {
+				if (!name.equals(srcName))
+					throw new RepositoryNotFoundException(name);
+
+				final Repository db = src.getRepository();
+				db.incrementOpen();
+				return db;
+			}
+		});
+		gs.setReceivePackFactory(new DefaultReceivePackFactory() {
+			public ReceivePack create(HttpServletRequest req, Repository db)
+					throws ServiceNotEnabledException,
+					ServiceNotAuthorizedException {
+				ReceivePack recv = super.create(req, db);
+				recv.setPostReceiveHook(new PostReceiveHook() {
+
+					public void onPostReceive(ReceivePack rp,
+							Collection<ReceiveCommand> commands) {
+						packSize = rp.getPackSize();
+					}
+				});
+				return recv;
+			}
+
+		});
+		app.addServlet(new ServletHolder(gs), "/*");
+
+		server.setUp();
+
+		remoteRepository = src.getRepository();
+		remoteURI = toURIish(app, srcName);
+
+		StoredConfig cfg = remoteRepository.getConfig();
+		cfg.setBoolean("http", null, "receivepack", true);
+		cfg.save();
+	}
+
