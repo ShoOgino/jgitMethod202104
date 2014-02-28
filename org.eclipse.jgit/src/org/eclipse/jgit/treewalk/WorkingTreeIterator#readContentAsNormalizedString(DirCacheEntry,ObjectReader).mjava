@@ -1,0 +1,7 @@
+	private static String readContentAsNormalizedString(DirCacheEntry entry,
+			ObjectReader reader) throws MissingObjectException, IOException {
+		ObjectLoader open = reader.open(entry.getObjectId());
+		byte[] cachedBytes = open.getCachedBytes();
+		return FS.detect().normalize(RawParseUtils.decode(cachedBytes));
+	}
+
