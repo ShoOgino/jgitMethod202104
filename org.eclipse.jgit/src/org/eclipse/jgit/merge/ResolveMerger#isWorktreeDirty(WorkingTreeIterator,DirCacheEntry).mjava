@@ -1,4 +1,5 @@
-	private boolean isWorktreeDirty(WorkingTreeIterator work) {
+	private boolean isWorktreeDirty(WorkingTreeIterator work,
+			DirCacheEntry ourDce) throws IOException {
 		if (work == null)
 			return false;
 
@@ -6,9 +7,15 @@
 		final int modeO = tw.getRawMode(T_OURS);
 
 		// Worktree entry has to match ours to be considered clean
-		boolean isDirty = work.isModeDifferent(modeO);
-		if (!isDirty && nonTree(modeF))
-			isDirty = !tw.idEqual(T_FILE, T_OURS);
+		boolean isDirty;
+		if (ourDce != null)
+			isDirty = work.isModified(ourDce, true, reader);
+		else {
+			isDirty = work.isModeDifferent(modeO);
+			if (!isDirty && nonTree(modeF))
+				isDirty = !tw.idEqual(T_FILE, T_OURS);
+		}
+
 		// Ignore existing empty directories
 		if (isDirty && modeF == FileMode.TYPE_TREE
 				&& modeO == FileMode.TYPE_MISSING)
