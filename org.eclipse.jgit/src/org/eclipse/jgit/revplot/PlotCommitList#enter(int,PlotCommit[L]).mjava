@@ -5,63 +5,73 @@
 		final int nChildren = currCommit.getChildCount();
 		if (nChildren == 0) {
 			currCommit.lane = nextFreeLane();
-			closeLane(currCommit.lane);
+			continueActiveLanes(currCommit);
 			return;
 		}
 
 		if (nChildren == 1 && currCommit.children[0].getParentCount() < 2) {
 			// Only one child, child has only us as their parent.
 			// Stay in the same lane as the child.
-			//
-			final PlotCommit c = currCommit.children[0];
-			for (int r = index - 1; r >= 0; r--) {
-				final PlotCommit rObj = get(r);
-				if (rObj == c)
-					break;
-				rObj.addPassingLane(c.lane);
-			}
 
+			@SuppressWarnings("unchecked")
+			final PlotCommit<L> c = currCommit.children[0];
 			currCommit.lane = c.lane;
-			handleBlockedLanes(index, currCommit, nChildren);
+			Integer len = laneLength.get(currCommit.lane);
+			len = Integer.valueOf(len.intValue() + 1);
+			laneLength.put(currCommit.lane, len);
 		} else {
 			// More than one child, or our child is a merge.
-			// Use a different lane.
-			//
 
-			// Process all our children. Especially important when there is more
-			// than one child (e.g. a commit is processed where other branches
-			// fork out). For each child the following is done
-			// 1. If no lane was assigned to the child a new lane is created and
-			// assigned
-			// 2. The lane of the child is closed. If this frees a position,
-			// this position will be added freePositions list.
-			// If we have multiple children which where previously not on a lane
-			// each such child will get his own new lane but all those new lanes
-			// will be on the same position. We have to take care that not
-			// multiple newly created (in step 1) lanes occupy that position on
-			// which the
-			// parent's lane will be on. Therefore we delay closing the lane
-			// with the parents position until all children are processed.
+			// We look for the child lane the current commit should continue.
+			// Candidate lanes for this are those with children, that have the
+			// current commit as their first parent.
+			// There can be multiple candidate lanes. In that case the longest
+			// lane is chosen, as this is usually the lane representing the
+			// branch the commit actually was made on.
 
-			// The lane on that position the current commit will be on
+			// When there are no candidate lanes (i.e. the current commit has
+			// only children whose non-first parent it is) we place the current
+			// commit on a new lane.
+
+			// The lane the current commit will be placed on:
 			PlotLane reservedLane = null;
+			PlotCommit childOnReservedLane = null;
+			int lengthOfReservedLane = -1;
 
 			for (int i = 0; i < nChildren; i++) {
-				final PlotCommit c = currCommit.children[i];
-				if (reservedLane == null && activeLanes.contains(c.lane))
-					reservedLane = c.lane;
-				else
-					closeLane(c.lane);
+				@SuppressWarnings("unchecked")
+				final PlotCommit<L> c = currCommit.children[i];
+				if (c.getParent(0) == currCommit) {
+					Integer len = laneLength.get(c.lane);
+					// we may be the first parent for multiple lines of
+					// development, try to continue the longest one
+					if (len.intValue() > lengthOfReservedLane) {
+						reservedLane = c.lane;
+						childOnReservedLane = c;
+						lengthOfReservedLane = len.intValue();
+					}
+				}
 			}
 
-			// finally all children are processed. We can close the lane on that
-			// position our current commit will be on.
-			if (reservedLane != null)
-				closeLane(reservedLane);
+			if (reservedLane != null) {
+				currCommit.lane = reservedLane;
+				laneLength.put(reservedLane,
+						Integer.valueOf(lengthOfReservedLane + 1));
+				handleBlockedLanes(index, currCommit, childOnReservedLane);
+			} else {
+				currCommit.lane = nextFreeLane();
+				handleBlockedLanes(index, currCommit, null);
+			}
 
-			currCommit.lane = nextFreeLane();
-
-			handleBlockedLanes(index, currCommit, nChildren);
+			// close lanes of children, if there are no first parents that might
+			// want to continue the child lanes
+			for (int i = 0; i < nChildren; i++) {
+				final PlotCommit c = currCommit.children[i];
+				PlotCommit firstParent = (PlotCommit) c.getParent(0);
+				if (firstParent.lane != null && firstParent.lane != c.lane)
+					closeLane(c.lane);
+			}
 		}
+		continueActiveLanes(currCommit);
 	}
 

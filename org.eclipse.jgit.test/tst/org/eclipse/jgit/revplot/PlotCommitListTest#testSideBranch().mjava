@@ -12,10 +12,11 @@
 		pcl.source(pw);
 		pcl.fillTo(Integer.MAX_VALUE);
 
+		Set<Integer> childPositions = asSet(0, 1);
 		CommitListAssert test = new CommitListAssert(pcl);
-		test.commit(c).lanePos(0).parents(a);
-		test.commit(b).lanePos(0).parents(a);
-		test.commit(a).lanePos(1).parents();
+		test.commit(c).lanePos(childPositions).parents(a);
+		test.commit(b).lanePos(childPositions).parents(a);
+		test.commit(a).lanePos(0).parents();
 		test.noMoreCommits();
 	}
 

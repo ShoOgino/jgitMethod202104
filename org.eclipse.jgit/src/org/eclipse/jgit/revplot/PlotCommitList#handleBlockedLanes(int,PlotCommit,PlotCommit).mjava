@@ -1,0 +1,37 @@
+	/**
+	 * Sets up fork and merge information in the involved PlotCommits.
+	 * Recognizes and handles blockades that involve forking or merging arcs.
+	 *
+	 * @param index
+	 *            the index of <code>currCommit</code> in the list
+	 * @param currCommit
+	 * @param childOnLane
+	 *            the direct child on the same lane as <code>currCommit</code>,
+	 *            may be null if <code>currCommit</code> is the first commit on
+	 *            the lane
+	 */
+	private void handleBlockedLanes(final int index, final PlotCommit currCommit,
+			final PlotCommit childOnLane) {
+		for (PlotCommit child : currCommit.children) {
+			if (child == childOnLane)
+				continue; // simple continuations of lanes are handled by
+							// continueActiveLanes() calls in enter()
+
+			// Is the child a merge or is it forking off?
+			boolean childIsMerge = child.getParent(0) != currCommit;
+			if (childIsMerge) {
+				PlotLane laneToUse = currCommit.lane;
+				laneToUse = handleMerge(index, currCommit, childOnLane, child,
+						laneToUse);
+				child.addMergingLane(laneToUse);
+			} else {
+				// We want to draw a forking arc in the child's lane.
+				// As an active lane, the child lane already continues
+				// (unblocked) up to this commit, we only need to mark it as
+				// forking off from the current commit.
+				PlotLane laneToUse = child.lane;
+				currCommit.addForkingOffLane(laneToUse);
+			}
+		}
+	}
+

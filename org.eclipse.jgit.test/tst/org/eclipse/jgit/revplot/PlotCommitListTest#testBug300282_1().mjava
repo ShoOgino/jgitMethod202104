@@ -24,14 +24,17 @@
 		pcl.source(pw);
 		pcl.fillTo(Integer.MAX_VALUE);
 
+		Set<Integer> childPositions = asSet(0, 1, 2, 3, 4);
 		CommitListAssert test = new CommitListAssert(pcl);
-		test.commit(g).lanePos(0).parents(f);
-		test.commit(f).lanePos(0).parents(a);
-		test.commit(e).lanePos(0).parents(a);
-		test.commit(d).lanePos(0).parents(a);
-		test.commit(c).lanePos(0).parents(a);
-		test.commit(b).lanePos(0).parents(a);
-		test.commit(a).lanePos(1).parents();
+		int posG = test.commit(g).lanePos(childPositions).parents(f)
+				.getLanePos();
+		test.commit(f).lanePos(posG).parents(a);
+
+		test.commit(e).lanePos(childPositions).parents(a);
+		test.commit(d).lanePos(childPositions).parents(a);
+		test.commit(c).lanePos(childPositions).parents(a);
+		test.commit(b).lanePos(childPositions).parents(a);
+		test.commit(a).lanePos(0).parents();
 		test.noMoreCommits();
 	}
 

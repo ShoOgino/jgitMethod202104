@@ -1,0 +1,66 @@
+	// Handles the case where currCommit is a non-first parent of the child
+	private PlotLane handleMerge(final int index, final PlotCommit currCommit,
+			final PlotCommit childOnLane, PlotCommit child, PlotLane laneToUse) {
+
+		// find all blocked positions between currCommit and this child
+
+		int childIndex = index; // useless initialization, should
+								// always be set in the loop below
+		BitSet blockedPositions = new BitSet();
+		for (int r = index - 1; r >= 0; r--) {
+			final PlotCommit rObj = get(r);
+			if (rObj == child) {
+				childIndex = r;
+				break;
+			}
+			addBlockedPosition(blockedPositions, rObj);
+		}
+
+		// handle blockades
+
+		if (blockedPositions.get(laneToUse.getPosition())) {
+			// We want to draw a merging arc in our lane to the child,
+			// which is on another lane, but our lane is blocked.
+
+			// Check if childOnLane is beetween commit and the child we
+			// are currently processing
+			boolean needDetour = false;
+			if (childOnLane != null) {
+				for (int r = index - 1; r > childIndex; r--) {
+					final PlotCommit rObj = get(r);
+					if (rObj == childOnLane) {
+						needDetour = true;
+						break;
+					}
+				}
+			}
+
+			if (needDetour) {
+				// It is childOnLane which is blocking us. Repositioning
+				// our lane would not help, because this repositions the
+				// child too, keeping the blockade.
+				// Instead, we create a "detour lane" which gets us
+				// around the blockade. That lane has no commits on it.
+				laneToUse = nextFreeLane(blockedPositions);
+				currCommit.addForkingOffLane(laneToUse);
+				closeLane(laneToUse);
+			} else {
+				// The blockade is (only) due to other (already closed)
+				// lanes at the current lane's position. In this case we
+				// reposition the current lane.
+				// We are the first commit on this lane, because
+				// otherwise the child commit on this lane would have
+				// kept other lanes from blocking us. Since we are the
+				// first commit, we can freely reposition.
+				int newPos = getFreePosition(blockedPositions);
+				freePositions.add(Integer.valueOf(laneToUse
+						.getPosition()));
+				laneToUse.position = newPos;
+			}
+		}
+
+		// Actually connect currCommit to the merge child
+		drawLaneToChild(index, child, laneToUse);
+		return laneToUse;
+	}
+

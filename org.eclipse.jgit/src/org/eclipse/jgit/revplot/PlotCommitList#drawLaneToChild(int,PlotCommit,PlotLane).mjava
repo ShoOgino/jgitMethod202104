@@ -1,0 +1,19 @@
+	/**
+	 * Connects the commit at commitIndex to the child, using the given lane.
+	 * All blockades on the lane must be resolved before calling this method.
+	 *
+	 * @param commitIndex
+	 * @param child
+	 * @param laneToContinue
+	 */
+	private void drawLaneToChild(final int commitIndex, PlotCommit child,
+			PlotLane laneToContinue) {
+		for (int r = commitIndex - 1; r >= 0; r--) {
+			final PlotCommit rObj = get(r);
+			if (rObj == child)
+				break;
+			if (rObj != null)
+				rObj.addPassingLane(laneToContinue);
+		}
+	}
+

@@ -5,6 +5,13 @@
 			// Positions may be blocked by a commit on a lane.
 			if (lane != null)
 				blockedPositions.set(lane.getPosition());
+			// Positions may also be blocked by forking off and merging lanes.
+			// We don't consider passing lanes, because every passing lane forks
+			// off and merges at it ends.
+			for (PlotLane l : rObj.forkingOffLanes)
+				blockedPositions.set(l.getPosition());
+			for (PlotLane l : rObj.mergingLanes)
+				blockedPositions.set(l.getPosition());
 		}
 	}
 

@@ -1,0 +1,72 @@
+	/**
+	 * The graph shows the problematic original positioning. Due to this some
+	 * lanes are no straight lines here, but they are with the new layout code)
+	 *
+	 * <pre>
+	 * a5
+	 * | \
+	 * |  a4
+	 * | /
+	 * a3
+	 * |
+	 * |  e
+	 * |    \
+	 * |     |
+	 * |  b3 |
+	 * |  |  d
+	 * |  |/
+	 * | /|
+	 * |/ |
+	 * a2 |
+	 * |  b2
+	 * |    \
+	 * |  c |
+	 * | /  /
+	 * |/ b1
+	 * a1
+	 * </pre>
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void testBug419359() throws Exception {
+		// this may not be the exact situation of bug 419359 but it shows
+		// similar behavior
+		final RevCommit a1 = commit();
+		final RevCommit b1 = commit();
+		final RevCommit c = commit(a1);
+		final RevCommit b2 = commit(b1);
+		final RevCommit a2 = commit(a1);
+		final RevCommit d = commit(a2);
+		final RevCommit b3 = commit(b2);
+		final RevCommit e = commit(d);
+		final RevCommit a3 = commit(a2);
+		final RevCommit a4 = commit(a3);
+		final RevCommit a5 = commit(a3, a4);
+
+		PlotWalk pw = new PlotWalk(db);
+		pw.markStart(pw.lookupCommit(b3.getId()));
+		pw.markStart(pw.lookupCommit(c.getId()));
+		pw.markStart(pw.lookupCommit(e.getId()));
+		pw.markStart(pw.lookupCommit(a5.getId()));
+
+		PlotCommitList<PlotLane> pcl = new PlotCommitList<PlotLane>();
+		pcl.source(pw);
+		pcl.fillTo(Integer.MAX_VALUE);
+
+		// test that the commits b1, b2 and b3 are on the same position
+		int bPos = pcl.get(9).lane.position; // b1
+		assertEquals("b2 is an a different position", bPos,
+				pcl.get(7).lane.position);
+		assertEquals("b3 is on a different position", bPos,
+				pcl.get(4).lane.position);
+
+		// test that nothing blocks the connections between b1, b2 and b3
+		assertNotEquals("b lane is blocked by c", bPos,
+				pcl.get(8).lane.position);
+		assertNotEquals("b lane is blocked by a2", bPos,
+				pcl.get(6).lane.position);
+		assertNotEquals("b lane is blocked by d", bPos,
+				pcl.get(5).lane.position);
+	}
+
