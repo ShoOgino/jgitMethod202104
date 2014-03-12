@@ -18,9 +18,13 @@
 			}
 		}
 
-		// Windows ignores space and dot at end of file name.
-		if (windows && (raw[end - 1] == ' ' || raw[end - 1] == '.'))
-			throw new CorruptObjectException("invalid name ends with '"
-					+ ((char) raw[end - 1]) + "'");
+		if (windows) {
+			// Windows ignores space and dot at end of file name.
+			if (raw[end - 1] == ' ' || raw[end - 1] == '.')
+				throw new CorruptObjectException("invalid name ends with '"
+						+ ((char) raw[end - 1]) + "'");
+			if (end - ptr >= 3)
+				checkNotWindowsDevice(raw, ptr, end);
+		}
 	}
 
