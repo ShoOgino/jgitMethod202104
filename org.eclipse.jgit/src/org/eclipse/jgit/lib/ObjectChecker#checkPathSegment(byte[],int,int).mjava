@@ -1,30 +1,17 @@
-	private void checkPathSegment(byte[] raw, int ptr, int end)
+	/**
+	 * Check tree path entry for validity.
+	 *
+	 * @param raw buffer to scan.
+	 * @param ptr offset to first byte of the name.
+	 * @param end offset to one past last byte of name.
+	 * @throws CorruptObjectException name is invalid.
+	 * @since 3.4
+	 */
+	public void checkPathSegment(byte[] raw, int ptr, int end)
 			throws CorruptObjectException {
-		if (ptr == end)
-			throw new CorruptObjectException("zero length name");
-		if (raw[ptr] == '.') {
-			switch (end - ptr) {
-			case 1:
-				throw new CorruptObjectException("invalid name '.'");
-			case 2:
-				if (raw[ptr + 1] == '.')
-					throw new CorruptObjectException("invalid name '..'");
-				break;
-			case 4:
-				if (isDotGit(raw, ptr + 1))
-					throw new CorruptObjectException(String.format(
-							"invalid name '%s'",
-							RawParseUtils.decode(raw, ptr, end)));
-			}
-		}
-
-		if (windows) {
-			// Windows ignores space and dot at end of file name.
-			if (raw[end - 1] == ' ' || raw[end - 1] == '.')
-				throw new CorruptObjectException("invalid name ends with '"
-						+ ((char) raw[end - 1]) + "'");
-			if (end - ptr >= 3)
-				checkNotWindowsDevice(raw, ptr, end);
-		}
+		int e = scanPathSegment(raw, ptr, end);
+		if (e < end && raw[e] == 0)
+			throw new CorruptObjectException("name contains byte 0x00");
+		checkPathSegment2(raw, ptr, end);
 	}
 

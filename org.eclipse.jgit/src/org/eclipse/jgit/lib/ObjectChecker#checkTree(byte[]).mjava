@@ -31,38 +31,25 @@
 				throw new CorruptObjectException("invalid mode " + thisMode);
 
 			final int thisNameB = ptr;
-			for (;;) {
-				if (ptr == sz)
-					throw new CorruptObjectException("truncated in name");
-				final byte c = raw[ptr++];
-				if (c == 0)
-					break;
-				if (c == '/')
-					throw new CorruptObjectException("name contains '/'");
-				if (windows && isInvalidOnWindows(c)) {
-					if (c > 31)
-						throw new CorruptObjectException(String.format(
-								"name contains '%c'", c));
-					throw new CorruptObjectException(String.format(
-							"name contains byte 0x%x", c & 0xff));
-				}
-			}
-			checkPathSegment(raw, thisNameB, ptr - 1);
-			if (duplicateName(raw, thisNameB, ptr - 1))
+			ptr = scanPathSegment(raw, ptr, sz);
+			if (ptr == sz || raw[ptr] != 0)
+				throw new CorruptObjectException("truncated in name");
+			checkPathSegment2(raw, thisNameB, ptr);
+			if (duplicateName(raw, thisNameB, ptr))
 				throw new CorruptObjectException("duplicate entry names");
 
 			if (lastNameB != 0) {
 				final int cmp = pathCompare(raw, lastNameB, lastNameE,
-						lastMode, thisNameB, ptr - 1, thisMode);
+						lastMode, thisNameB, ptr, thisMode);
 				if (cmp > 0)
 					throw new CorruptObjectException("incorrectly sorted");
 			}
 
 			lastNameB = thisNameB;
-			lastNameE = ptr - 1;
+			lastNameE = ptr;
 			lastMode = thisMode;
 
-			ptr += Constants.OBJECT_ID_LENGTH;
+			ptr += 1 + Constants.OBJECT_ID_LENGTH;
 			if (ptr > sz)
 				throw new CorruptObjectException("truncated in object id");
 		}

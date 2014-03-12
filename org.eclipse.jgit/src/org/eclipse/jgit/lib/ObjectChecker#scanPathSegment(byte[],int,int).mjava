@@ -1,0 +1,19 @@
+	private int scanPathSegment(byte[] raw, int ptr, int end)
+			throws CorruptObjectException {
+		for (; ptr < end; ptr++) {
+			byte c = raw[ptr];
+			if (c == 0)
+				return ptr;
+			if (c == '/')
+				throw new CorruptObjectException("name contains '/'");
+			if (windows && isInvalidOnWindows(c)) {
+				if (c > 31)
+					throw new CorruptObjectException(String.format(
+							"name contains '%c'", c));
+				throw new CorruptObjectException(String.format(
+						"name contains byte 0x%x", c & 0xff));
+			}
+		}
+		return ptr;
+	}
+
