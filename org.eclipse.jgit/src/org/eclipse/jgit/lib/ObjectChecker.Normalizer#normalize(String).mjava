@@ -1,0 +1,16 @@
+		static String normalize(String in) {
+			if (normalize == null)
+				return in;
+			try {
+				return (String) normalize.invoke(null, in, nfc);
+			} catch (IllegalAccessException e) {
+				return in;
+			} catch (InvocationTargetException e) {
+				if (e.getCause() instanceof RuntimeException)
+					throw (RuntimeException) e.getCause();
+				if (e.getCause() instanceof Error)
+					throw (Error) e.getCause();
+				return in;
+			}
+		}
+

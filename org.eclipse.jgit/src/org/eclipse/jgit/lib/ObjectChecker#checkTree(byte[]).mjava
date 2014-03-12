@@ -10,6 +10,9 @@
 		final int sz = raw.length;
 		int ptr = 0;
 		int lastNameB = 0, lastNameE = 0, lastMode = 0;
+		Set<String> normalized = windows || macosx
+				? new HashSet<String>()
+				: null;
 
 		while (ptr < sz) {
 			int thisMode = 0;
@@ -35,7 +38,10 @@
 			if (ptr == sz || raw[ptr] != 0)
 				throw new CorruptObjectException("truncated in name");
 			checkPathSegment2(raw, thisNameB, ptr);
-			if (duplicateName(raw, thisNameB, ptr))
+			if (normalized != null) {
+				if (normalized.add(normalize(raw, thisNameB, ptr)))
+					throw new CorruptObjectException("duplicate entry names");
+			} else if (duplicateName(raw, thisNameB, ptr))
 				throw new CorruptObjectException("duplicate entry names");
 
 			if (lastNameB != 0) {
