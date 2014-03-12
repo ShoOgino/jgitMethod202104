@@ -9,7 +9,7 @@
 		walk = new RevWalk(db);
 
 		final ReceiveConfig cfg = db.getConfig().get(ReceiveConfig.KEY);
-		checkReceivedObjects = cfg.checkReceivedObjects;
+		objectChecker = cfg.checkReceivedObjects ? new ObjectChecker() : null;
 		allowCreates = cfg.allowCreates;
 		allowDeletes = cfg.allowDeletes;
 		allowNonFastForwards = cfg.allowNonFastForwards;
