@@ -1,0 +1,11 @@
+	@Test
+	public void testRejectSpaceAtEndOnWindows() {
+		checker.setSafeForWindows(true);
+		try {
+			checkOneName("test ");
+			fail("incorrectly accepted space at end");
+		} catch (CorruptObjectException e) {
+			assertEquals("invalid name ends with ' '", e.getMessage());
+		}
+	}
+

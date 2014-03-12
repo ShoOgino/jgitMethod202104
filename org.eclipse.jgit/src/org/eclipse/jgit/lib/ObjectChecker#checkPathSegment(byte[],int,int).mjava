@@ -1,4 +1,4 @@
-	private static void checkPathSegment(byte[] raw, int ptr, int end)
+	private void checkPathSegment(byte[] raw, int ptr, int end)
 			throws CorruptObjectException {
 		if (ptr == end)
 			throw new CorruptObjectException("zero length name");
@@ -17,5 +17,10 @@
 							RawParseUtils.decode(raw, ptr, end)));
 			}
 		}
+
+		// Windows ignores space and dot at end of file name.
+		if (windows && (raw[end - 1] == ' ' || raw[end - 1] == '.'))
+			throw new CorruptObjectException("invalid name ends with '"
+					+ ((char) raw[end - 1]) + "'");
 	}
 
