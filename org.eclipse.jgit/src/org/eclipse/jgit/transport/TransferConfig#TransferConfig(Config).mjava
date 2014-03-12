@@ -1,5 +1,8 @@
 	private TransferConfig(final Config rc) {
-		fsckObjects = rc.getBoolean("receive", "fsckobjects", false); //$NON-NLS-1$ //$NON-NLS-2$
+		fetchFsck = rc.getBoolean(
+				"fetch", "fsckobjects", //$NON-NLS-1$ //$NON-NLS-2$
+				rc.getBoolean("transfer", "fsckobjects", false)); //$NON-NLS-1$ //$NON-NLS-2$
+
 		allowTipSha1InWant = rc.getBoolean(
 				"uploadpack", "allowtipsha1inwant", false); //$NON-NLS-1$ //$NON-NLS-2$
 		hideRefs = rc.getStringList("uploadpack", null, "hiderefs"); //$NON-NLS-1$ //$NON-NLS-2$
