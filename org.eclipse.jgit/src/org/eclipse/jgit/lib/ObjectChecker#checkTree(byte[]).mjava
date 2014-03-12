@@ -21,7 +21,7 @@
 					break;
 				if (c < '0' || c > '7')
 					throw new CorruptObjectException("invalid mode character");
-				if (thisMode == 0 && c == '0')
+				if (thisMode == 0 && c == '0' && !allowZeroMode)
 					throw new CorruptObjectException("mode starts with '0'");
 				thisMode <<= 3;
 				thisMode += c - '0';
