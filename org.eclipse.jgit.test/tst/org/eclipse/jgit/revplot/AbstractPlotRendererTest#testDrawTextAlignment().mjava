@@ -1,0 +1,20 @@
+	@Test
+	public void testDrawTextAlignment() throws Exception {
+		git.commit().setMessage("initial commit").call();
+		git.branchCreate().setName("topic").call();
+		git.checkout().setName("topic").call();
+		git.commit().setMessage("commit 1 on topic").call();
+		git.commit().setMessage("commit 2 on topic").call();
+		git.checkout().setName("master").call();
+		git.commit().setMessage("commit on master").call();
+		MergeResult mergeCall = merge(db.resolve("topic"));
+		ObjectId start = mergeCall.getNewHead();
+		PlotCommitList<PlotLane> commitList = createCommitList(start);
+
+		for (int i = 0; i < commitList.size(); i++)
+			plotRenderer.paintCommit(commitList.get(i), 30);
+
+		List<Integer> indentations = plotRenderer.indentations;
+		assertEquals(indentations.get(2), indentations.get(3));
+	}
+
