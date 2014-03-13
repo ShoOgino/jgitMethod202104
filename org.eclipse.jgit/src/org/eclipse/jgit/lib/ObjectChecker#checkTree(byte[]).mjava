@@ -10,6 +10,9 @@
 		final int sz = raw.length;
 		int ptr = 0;
 		int lastNameB = 0, lastNameE = 0, lastMode = 0;
+		Set<String> normalized = windows || macosx
+				? new HashSet<String>()
+				: null;
 
 		while (ptr < sz) {
 			int thisMode = 0;
@@ -21,7 +24,7 @@
 					break;
 				if (c < '0' || c > '7')
 					throw new CorruptObjectException("invalid mode character");
-				if (thisMode == 0 && c == '0')
+				if (thisMode == 0 && c == '0' && !allowZeroMode)
 					throw new CorruptObjectException("mode starts with '0'");
 				thisMode <<= 3;
 				thisMode += c - '0';
@@ -31,39 +34,28 @@
 				throw new CorruptObjectException("invalid mode " + thisMode);
 
 			final int thisNameB = ptr;
-			for (;;) {
-				if (ptr == sz)
-					throw new CorruptObjectException("truncated in name");
-				final byte c = raw[ptr++];
-				if (c == 0)
-					break;
-				if (c == '/')
-					throw new CorruptObjectException("name contains '/'");
-			}
-			if (thisNameB + 1 == ptr)
-				throw new CorruptObjectException("zero length name");
-			if (raw[thisNameB] == '.') {
-				final int nameLen = (ptr - 1) - thisNameB;
-				if (nameLen == 1)
-					throw new CorruptObjectException("invalid name '.'");
-				if (nameLen == 2 && raw[thisNameB + 1] == '.')
-					throw new CorruptObjectException("invalid name '..'");
-			}
-			if (duplicateName(raw, thisNameB, ptr - 1))
+			ptr = scanPathSegment(raw, ptr, sz);
+			if (ptr == sz || raw[ptr] != 0)
+				throw new CorruptObjectException("truncated in name");
+			checkPathSegment2(raw, thisNameB, ptr);
+			if (normalized != null) {
+				if (normalized.add(normalize(raw, thisNameB, ptr)))
+					throw new CorruptObjectException("duplicate entry names");
+			} else if (duplicateName(raw, thisNameB, ptr))
 				throw new CorruptObjectException("duplicate entry names");
 
 			if (lastNameB != 0) {
 				final int cmp = pathCompare(raw, lastNameB, lastNameE,
-						lastMode, thisNameB, ptr - 1, thisMode);
+						lastMode, thisNameB, ptr, thisMode);
 				if (cmp > 0)
 					throw new CorruptObjectException("incorrectly sorted");
 			}
 
 			lastNameB = thisNameB;
-			lastNameE = ptr - 1;
+			lastNameE = ptr;
 			lastMode = thisMode;
 
-			ptr += Constants.OBJECT_ID_LENGTH;
+			ptr += 1 + Constants.OBJECT_ID_LENGTH;
 			if (ptr > sz)
 				throw new CorruptObjectException("truncated in object id");
 		}

@@ -1,0 +1,16 @@
+	private static boolean isInvalidOnWindows(byte c) {
+		// Windows disallows "special" characters in a path component.
+		switch (c) {
+		case '"':
+		case '*':
+		case ':':
+		case '<':
+		case '>':
+		case '?':
+		case '\\':
+		case '|':
+			return true;
+		}
+		return 1 <= c && c <= 31;
+	}
+

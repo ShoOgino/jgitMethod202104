@@ -1,6 +1,9 @@
 	private static void checkValidPath(CanonicalTreeParser t)
 			throws InvalidPathException {
+		ObjectChecker chk = new ObjectChecker()
+			.setSafeForWindows(SystemReader.getInstance().isWindows())
+			.setSafeForMacOS(SystemReader.getInstance().isMacOS());
 		for (CanonicalTreeParser i = t; i != null; i = i.getParent())
-			checkValidPathSegment(i);
+			checkValidPathSegment(chk, i);
 	}
 

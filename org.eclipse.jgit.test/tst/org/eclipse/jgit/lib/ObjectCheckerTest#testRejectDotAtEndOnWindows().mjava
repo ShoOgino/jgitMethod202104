@@ -1,0 +1,11 @@
+	@Test
+	public void testRejectDotAtEndOnWindows() {
+		checker.setSafeForWindows(true);
+		try {
+			checkOneName("test.");
+			fail("incorrectly accepted dot at end");
+		} catch (CorruptObjectException e) {
+			assertEquals("invalid name ends with '.'", e.getMessage());
+		}
+	}
+

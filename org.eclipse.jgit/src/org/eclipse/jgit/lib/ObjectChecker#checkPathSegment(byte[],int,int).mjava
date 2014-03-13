@@ -1,0 +1,17 @@
+	/**
+	 * Check tree path entry for validity.
+	 *
+	 * @param raw buffer to scan.
+	 * @param ptr offset to first byte of the name.
+	 * @param end offset to one past last byte of name.
+	 * @throws CorruptObjectException name is invalid.
+	 * @since 3.4
+	 */
+	public void checkPathSegment(byte[] raw, int ptr, int end)
+			throws CorruptObjectException {
+		int e = scanPathSegment(raw, ptr, end);
+		if (e < end && raw[e] == 0)
+			throw new CorruptObjectException("name contains byte 0x00");
+		checkPathSegment2(raw, ptr, end);
+	}
+

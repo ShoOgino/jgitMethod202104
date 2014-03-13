@@ -1,0 +1,17 @@
+	@Test
+	public void testRejectInvalidWindowsCharacters() {
+		checker.setSafeForWindows(true);
+		rejectName('<');
+		rejectName('>');
+		rejectName(':');
+		rejectName('"');
+		rejectName('/');
+		rejectName('\\');
+		rejectName('|');
+		rejectName('?');
+		rejectName('*');
+
+		for (int i = 1; i <= 31; i++)
+			rejectName((byte) i);
+	}
+

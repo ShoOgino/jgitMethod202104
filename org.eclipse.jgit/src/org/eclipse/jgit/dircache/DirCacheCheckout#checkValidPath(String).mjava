@@ -7,21 +7,22 @@
 	 * @since 3.3
 	 */
 	public static void checkValidPath(String path) throws InvalidPathException {
-		boolean isWindows = SystemReader.getInstance().isWindows();
-		boolean isOSX = SystemReader.getInstance().isMacOS();
-		boolean ignCase = isOSX || isWindows;
+		ObjectChecker chk = new ObjectChecker()
+			.setSafeForWindows(SystemReader.getInstance().isWindows())
+			.setSafeForMacOS(SystemReader.getInstance().isMacOS());
 
 		byte[] bytes = Constants.encode(path);
 		int segmentStart = 0;
-		for (int i = 0; i < bytes.length; i++) {
-			if (bytes[i] == '/') {
-				checkValidPathSegment(isWindows, ignCase, bytes, segmentStart,
-						i, path);
-				segmentStart = i + 1;
+		try {
+			for (int i = 0; i < bytes.length; i++) {
+				if (bytes[i] == '/') {
+					chk.checkPathSegment(bytes, segmentStart, i);
+					segmentStart = i + 1;
+				}
 			}
+			chk.checkPathSegment(bytes, segmentStart, bytes.length);
+		} catch (CorruptObjectException e) {
+			throw new InvalidPathException(e.getMessage());
 		}
-		if (segmentStart < bytes.length)
-			checkValidPathSegment(isWindows, ignCase, bytes, segmentStart,
-					bytes.length, path);
 	}
 

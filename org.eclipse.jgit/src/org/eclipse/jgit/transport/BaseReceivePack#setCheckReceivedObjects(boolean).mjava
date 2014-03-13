@@ -2,8 +2,12 @@
 	 * @param check
 	 *            true to enable checking received objects; false to assume all
 	 *            received objects are valid.
+	 * @see #setObjectChecker(ObjectChecker)
 	 */
 	public void setCheckReceivedObjects(final boolean check) {
-		checkReceivedObjects = check;
+		if (check && objectChecker == null)
+			setObjectChecker(new ObjectChecker());
+		else if (!check && objectChecker != null)
+			setObjectChecker(null);
 	}
 
