@@ -1,0 +1,9 @@
+	private static void slowCarryFlags(FIFORevQueue q, int carry) {
+		// Commits in q have non-null parent arrays and have set all
+		// flags in carry. This loop finishes copying over the graph.
+		for (RevCommit c; (c = q.next()) != null;) {
+			for (RevCommit p : c.parents)
+				carryOneStep(q, carry, p);
+		}
+	}
+

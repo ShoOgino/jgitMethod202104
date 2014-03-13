@@ -1,0 +1,26 @@
+	private static FIFORevQueue carryFlags1(RevCommit c, int carry, int depth) {
+		for(;;) {
+			RevCommit[] pList = c.parents;
+			if (pList == null || pList.length == 0)
+				return null;
+			if (pList.length != 1) {
+				if (depth == STACK_DEPTH)
+					return defer(c);
+				for (int i = 1; i < pList.length; i++) {
+					RevCommit p = pList[i];
+					if ((p.flags & carry) == carry)
+						continue;
+					p.flags |= carry;
+					FIFORevQueue q = carryFlags1(c, carry, depth + 1);
+					if (q != null)
+						return defer(q, carry, pList, i + 1);
+				}
+			}
+
+			c = pList[0];
+			if ((c.flags & carry) == carry)
+				return null;
+			c.flags |= carry;
+		}
+	}
+

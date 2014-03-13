@@ -1,0 +1,8 @@
+	private static void carryOneStep(FIFORevQueue q, int carry, RevCommit c) {
+		if ((c.flags & carry) != carry) {
+			c.flags |= carry;
+			if (c.parents != null)
+				q.add(c);
+		}
+	}
+
