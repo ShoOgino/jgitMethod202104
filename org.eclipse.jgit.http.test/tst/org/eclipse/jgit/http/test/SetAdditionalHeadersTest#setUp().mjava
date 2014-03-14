@@ -1,0 +1,23 @@
+	@Before
+	public void setUp() throws Exception {
+		super.setUp();
+
+		final TestRepository<Repository> src = createTestRepository();
+		final File srcGit = src.getRepository().getDirectory();
+		final URI base = srcGit.getParentFile().toURI();
+
+		ServletContextHandler app = server.addContext("/git");
+		app.setResourceBase(base.toString());
+		ServletHolder holder = app.addServlet(DefaultServlet.class, "/");
+		// The tmp directory is symlinked on OS X
+		holder.setInitParameter("aliases", "true");
+		server.setUp();
+
+		remoteURI = toURIish(app, srcGit.getName());
+
+		A_txt = src.blob("A");
+		A = src.commit().add("A_txt", A_txt).create();
+		B = src.commit().parent(A).add("A_txt", "C").add("B", "B").create();
+		src.update(master, B);
+	}
+

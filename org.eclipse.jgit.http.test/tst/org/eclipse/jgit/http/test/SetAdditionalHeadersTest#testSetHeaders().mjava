@@ -1,0 +1,36 @@
+	@Test
+	public void testSetHeaders() throws IOException {
+		Repository dst = createBareRepository();
+
+		assertEquals("http", remoteURI.getScheme());
+
+		Transport t = Transport.open(dst, remoteURI);
+		try {
+			assertTrue("isa TransportHttp", t instanceof TransportHttp);
+			assertTrue("isa HttpTransport", t instanceof HttpTransport);
+
+			HashMap<String, String> headers = new HashMap<String, String>();
+			headers.put("Cookie", "someTokenValue=23gBog34");
+			headers.put("AnotherKey", "someValue");
+			((TransportHttp) t).setAdditionalHeaders(headers);
+			t.openFetch();
+		} finally {
+			t.close();
+		}
+
+		List<AccessEvent> requests = getRequests();
+		assertEquals(2, requests.size());
+
+		AccessEvent info = requests.get(0);
+		assertEquals("GET", info.getMethod());
+		assertEquals(info.getRequestHeader("Cookie"), "someTokenValue=23gBog34");
+		assertEquals(info.getRequestHeader("AnotherKey"), "someValue");
+		assertEquals(200, info.getStatus());
+
+		info = requests.get(1);
+		assertEquals("GET", info.getMethod());
+		assertEquals(info.getRequestHeader("Cookie"), "someTokenValue=23gBog34");
+		assertEquals(info.getRequestHeader("AnotherKey"), "someValue");
+		assertEquals(200, info.getStatus());
+	}
+
