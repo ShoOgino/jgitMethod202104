@@ -1,0 +1,55 @@
+	@Test
+	public void testRepoManifestGroups() throws Exception {
+		StringBuilder xmlContent = new StringBuilder();
+		xmlContent.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
+			.append("<manifest>")
+			.append("<remote name=\"remote1\" fetch=\".\" />")
+			.append("<default revision=\"master\" remote=\"remote1\" />")
+			.append("<project path=\"foo\" name=\"")
+			.append(defaultUri)
+			.append("\" groups=\"a,test\" />")
+			.append("<project path=\"bar\" name=\"")
+			.append(notDefaultUri)
+			.append("\" groups=\"notdefault\" />")
+			.append("<project path=\"a\" name=\"")
+			.append(groupAUri)
+			.append("\" groups=\"a\" />")
+			.append("<project path=\"b\" name=\"")
+			.append(groupBUri)
+			.append("\" groups=\"b\" />")
+			.append("</manifest>");
+
+		// default should have foo, a & b
+		Repository localDb = createWorkRepository();
+		JGitTestUtil.writeTrashFile(localDb, "manifest.xml", xmlContent.toString());
+		RepoCommand command = new RepoCommand(localDb);
+		command.setPath(localDb.getWorkTree().getAbsolutePath() + "/manifest.xml")
+			.setURI(rootUri)
+			.call();
+		File file = new File(localDb.getWorkTree(), "foo/hello.txt");
+		assertTrue("default has foo", file.exists());
+		file = new File(localDb.getWorkTree(), "bar/world.txt");
+		assertFalse("default doesn't have bar", file.exists());
+		file = new File(localDb.getWorkTree(), "a/a.txt");
+		assertTrue("default has a", file.exists());
+		file = new File(localDb.getWorkTree(), "b/b.txt");
+		assertTrue("default has b", file.exists());
+
+		// all,-a should have bar & b
+		localDb = createWorkRepository();
+		JGitTestUtil.writeTrashFile(localDb, "manifest.xml", xmlContent.toString());
+		command = new RepoCommand(localDb);
+		command.setPath(localDb.getWorkTree().getAbsolutePath() + "/manifest.xml")
+			.setURI(rootUri)
+			.setGroups("all,-a")
+			.call();
+		file = new File(localDb.getWorkTree(), "foo/hello.txt");
+		assertFalse("\"all,-a\" doesn't have foo", file.exists());
+		file = new File(localDb.getWorkTree(), "bar/world.txt");
+		assertTrue("\"all,-a\" has bar", file.exists());
+		file = new File(localDb.getWorkTree(), "a/a.txt");
+		assertFalse("\"all,-a\" doesn't have a", file.exists());
+		file = new File(localDb.getWorkTree(), "b/b.txt");
+		assertTrue("\"all,-a\" has have b", file.exists());
+	}
+

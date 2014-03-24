@@ -5,20 +5,34 @@
 			.append("<manifest>")
 			.append("<remote name=\"remote1\" fetch=\".\" />")
 			.append("<default revision=\"master\" remote=\"remote1\" />")
-			.append("<project path=\"foo\" name=\".\" />")
+			.append("<project path=\"foo\" name=\"")
+			.append(defaultUri)
+			.append("\" groups=\"a,test\" />")
+			.append("<project path=\"bar\" name=\"")
+			.append(notDefaultUri)
+			.append("\" groups=\"notdefault\" />")
+			.append("<project path=\"a\" name=\"")
+			.append(groupAUri)
+			.append("\" groups=\"a\" />")
+			.append("<project path=\"b\" name=\"")
+			.append(groupBUri)
+			.append("\" groups=\"b\" />")
 			.append("</manifest>");
 		writeTrashFile("manifest.xml", xmlContent.toString());
 		StringBuilder cmd = new StringBuilder("git repo --base-uri=\"")
-			.append(remoteDb.getDirectory().toURI().toString())
-			.append("\" \"")
+			.append(rootUri)
+			.append("\" --groups=\"all,-a\" \"")
 			.append(db.getWorkTree().getAbsolutePath())
 			.append("/manifest.xml\"");
 		execute(cmd.toString());
-		File hello = new File(db.getWorkTree(), "foo/hello.txt");
-		assertTrue("submodule was checked out.", hello.exists());
-		BufferedReader reader = new BufferedReader(new FileReader(hello));
-		String content = reader.readLine();
-		reader.close();
-		assertEquals("submodule content is as expected.", "world", content);
+
+		File file = new File(db.getWorkTree(), "foo/hello.txt");
+		assertFalse("\"all,-a\" doesn't have foo", file.exists());
+		file = new File(db.getWorkTree(), "bar/world.txt");
+		assertTrue("\"all,-a\" has bar", file.exists());
+		file = new File(db.getWorkTree(), "a/a.txt");
+		assertFalse("\"all,-a\" doesn't have a", file.exists());
+		file = new File(db.getWorkTree(), "b/b.txt");
+		assertTrue("\"all,-a\" has have b", file.exists());
 	}
 

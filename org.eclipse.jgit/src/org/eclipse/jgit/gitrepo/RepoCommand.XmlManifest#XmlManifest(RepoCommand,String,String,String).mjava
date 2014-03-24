@@ -1,0 +1,21 @@
+		XmlManifest(RepoCommand command, String filename, String baseUrl, String groups) {
+			this.command = command;
+			this.filename = filename;
+			this.baseUrl = baseUrl;
+			remotes = new HashMap<String, String>();
+			projects = new ArrayList<Project>();
+			plusGroups = new HashSet<String>();
+			minusGroups = new HashSet<String>();
+			if (groups == null || groups.length() == 0 || groups.equals("default")) { //$NON-NLS-1$
+				// default means "all,-notdefault"
+				minusGroups.add("notdefault"); //$NON-NLS-1$
+			} else {
+				for (String group : groups.split(",")) { //$NON-NLS-1$
+					if (group.startsWith("-")) //$NON-NLS-1$
+						minusGroups.add(group.substring(1));
+					else
+						plusGroups.add(group);
+				}
+			}
+		}
+

@@ -12,8 +12,10 @@
 				throw new SAXException(e);
 			}
 			for (Project proj : projects) {
-				String url = remoteUrl + proj.name;
-				command.addSubmodule(url, proj.path);
+				if (inGroups(proj)) {
+					String url = remoteUrl + proj.name;
+					command.addSubmodule(url, proj.path);
+				}
 			}
 		}
 

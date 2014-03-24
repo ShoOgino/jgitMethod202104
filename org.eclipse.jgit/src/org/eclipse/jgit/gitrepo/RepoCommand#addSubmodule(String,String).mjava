@@ -1,9 +1,11 @@
 	private void addSubmodule(String url, String name) throws SAXException {
-		SubmoduleAddCommand add = new SubmoduleAddCommand(repo);
+		SubmoduleAddCommand add = new SubmoduleAddCommand(repo)
+			.setPath(name)
+			.setURI(url);
 		if (monitor != null)
 			add.setProgressMonitor(monitor);
 		try {
-			add.setPath(name).setURI(url).call();
+			add.call();
 		} catch (GitAPIException e) {
 			throw new SAXException(e);
 		}

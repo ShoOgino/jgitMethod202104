@@ -1,0 +1,25 @@
+	private void resolveRelativeUris() {
+		// Find the longest common prefix ends with "/" as rootUri.
+		defaultUri = defaultDb.getDirectory().toURI().toString();
+		notDefaultUri = notDefaultDb.getDirectory().toURI().toString();
+		groupAUri = groupADb.getDirectory().toURI().toString();
+		groupBUri = groupBDb.getDirectory().toURI().toString();
+		int start = 0;
+		while (start <= defaultUri.length()) {
+			int newStart = defaultUri.indexOf('/', start + 1);
+			String prefix = defaultUri.substring(0, newStart);
+			if (!notDefaultUri.startsWith(prefix) ||
+					!groupAUri.startsWith(prefix) ||
+					!groupBUri.startsWith(prefix)) {
+				start++;
+				rootUri = defaultUri.substring(0, start);
+				defaultUri = defaultUri.substring(start);
+				notDefaultUri = notDefaultUri.substring(start);
+				groupAUri = groupAUri.substring(start);
+				groupBUri = groupBUri.substring(start);
+				return;
+			}
+			start = newStart;
+		}
+	}
+

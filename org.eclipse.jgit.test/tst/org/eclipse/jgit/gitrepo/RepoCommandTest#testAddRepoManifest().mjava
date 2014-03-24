@@ -5,12 +5,14 @@
 			.append("<manifest>")
 			.append("<remote name=\"remote1\" fetch=\".\" />")
 			.append("<default revision=\"master\" remote=\"remote1\" />")
-			.append("<project path=\"foo\" name=\".\" />")
+			.append("<project path=\"foo\" name=\"")
+			.append(defaultUri)
+			.append("\" />")
 			.append("</manifest>");
 		writeTrashFile("manifest.xml", xmlContent.toString());
 		RepoCommand command = new RepoCommand(db);
 		command.setPath(db.getWorkTree().getAbsolutePath() + "/manifest.xml")
-			.setURI(remoteDb.getDirectory().toURI().toString())
+			.setURI(rootUri)
 			.call();
 		File hello = new File(db.getWorkTree(), "foo/hello.txt");
 		assertTrue("submodule was checked out", hello.exists());
