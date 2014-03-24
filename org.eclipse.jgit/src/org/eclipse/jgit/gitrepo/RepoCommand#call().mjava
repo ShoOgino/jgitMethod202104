@@ -1,0 +1,18 @@
+	@Override
+	public Void call() throws GitAPIException {
+		checkCallable();
+		if (path == null || path.length() == 0)
+			throw new IllegalArgumentException(JGitText.get().pathNotConfigured);
+		if (uri == null || uri.length() == 0)
+			throw new IllegalArgumentException(JGitText.get().uriNotConfigured);
+
+		XmlManifest manifest = new XmlManifest(this, path, uri);
+		try {
+			manifest.read();
+		} catch (IOException e) {
+			throw new ManifestErrorException(e);
+		}
+
+		return null;
+	}
+

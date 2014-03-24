@@ -1,0 +1,10 @@
+	public void setUp() throws Exception {
+		super.setUp();
+
+		remoteDb = createWorkRepository();
+		Git git = new Git(remoteDb);
+		JGitTestUtil.writeTrashFile(remoteDb, "hello.txt", "world");
+		git.add().addFilepattern("hello.txt").call();
+		git.commit().setMessage("Initial commit").call();
+	}
+
