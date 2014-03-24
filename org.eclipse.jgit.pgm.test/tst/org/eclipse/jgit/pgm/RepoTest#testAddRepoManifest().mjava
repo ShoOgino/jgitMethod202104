@@ -1,0 +1,24 @@
+	@Test
+	public void testAddRepoManifest() throws Exception {
+		StringBuilder xmlContent = new StringBuilder();
+		xmlContent.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
+			.append("<manifest>")
+			.append("<remote name=\"remote1\" fetch=\".\" />")
+			.append("<default revision=\"master\" remote=\"remote1\" />")
+			.append("<project path=\"foo\" name=\".\" />")
+			.append("</manifest>");
+		writeTrashFile("manifest.xml", xmlContent.toString());
+		StringBuilder cmd = new StringBuilder("git repo --base-uri=\"")
+			.append(remoteDb.getDirectory().toURI().toString())
+			.append("\" \"")
+			.append(db.getWorkTree().getAbsolutePath())
+			.append("/manifest.xml\"");
+		execute(cmd.toString());
+		File hello = new File(db.getWorkTree(), "foo/hello.txt");
+		assertTrue("submodule was checked out.", hello.exists());
+		BufferedReader reader = new BufferedReader(new FileReader(hello));
+		String content = reader.readLine();
+		reader.close();
+		assertEquals("submodule content is as expected.", "world", content);
+	}
+
