@@ -40,7 +40,11 @@
 			treeFilter = TreeFilter.ALL;
 			markStart(tip);
 			markStart(base);
-			return next() == base;
+			RevCommit mergeBase;
+			while ((mergeBase = next()) != null)
+				if (mergeBase == base)
+					return true;
+			return false;
 		} finally {
 			filter = oldRF;
 			treeFilter = oldTF;
