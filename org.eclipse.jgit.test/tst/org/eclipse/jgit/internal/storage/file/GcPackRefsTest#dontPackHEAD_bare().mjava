@@ -1,0 +1,33 @@
+	@Test
+	public void dontPackHEAD_bare() throws Exception {
+		BranchBuilder bb = tr.branch("refs/heads/side");
+		bb.commit().add("A", "A").add("B", "B").create();
+		RevCommit second = bb.commit().add("A", "A2").add("B", "B2").create();
+
+		// Convert the repo to be bare
+		FileBasedConfig cfg = repo.getConfig();
+		cfg.setBoolean(ConfigConstants.CONFIG_CORE_SECTION, null,
+				ConfigConstants.CONFIG_KEY_BARE, true);
+		cfg.save();
+		Git git = Git.open(repo.getDirectory());
+		repo = (FileRepository) git.getRepository();
+
+		// check for the unborn branch master. HEAD should point to master and
+		// master doesn't exist.
+		assertEquals(repo.getRef("HEAD").getTarget().getName(),
+				"refs/heads/master");
+		assertNull(repo.getRef("HEAD").getTarget().getObjectId());
+		gc.packRefs();
+		assertSame(repo.getRef("HEAD").getStorage(), Storage.LOOSE);
+		assertEquals(repo.getRef("HEAD").getTarget().getName(),
+				"refs/heads/master");
+		assertNull(repo.getRef("HEAD").getTarget().getObjectId());
+
+		// check for non-detached HEAD
+		repo.updateRef(Constants.HEAD).link("refs/heads/side");
+		gc.packRefs();
+		assertSame(repo.getRef("HEAD").getStorage(), Storage.LOOSE);
+		assertEquals(repo.getRef("HEAD").getTarget().getObjectId(),
+				second.getId());
+	}
+
