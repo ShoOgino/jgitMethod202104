@@ -13,6 +13,8 @@
 	 */
 	public NameRevCommand addAnnotatedTags() {
 		checkCallable();
+		if (refs == null)
+			refs = new ArrayList<Ref>();
 		try {
 			for (Ref ref : repo.getRefDatabase().getRefs(Constants.R_TAGS).values()) {
 				ObjectId id = ref.getObjectId();
