@@ -1,11 +1,11 @@
-	private static void assertValid(final boolean exp, final String name) {
+	private static void assertInvalidOnWindows(final String name) {
 		SystemReader instance = SystemReader.getInstance();
 		try {
 			setUnixSystemReader();
-			assertEquals("\"" + name + "\"", exp,
+			assertEquals("\"" + name + "\"", true,
 					Repository.isValidRefName(name));
 			setWindowsSystemReader();
-			assertEquals("\"" + name + "\"", exp,
+			assertEquals("\"" + name + "\"", false,
 					Repository.isValidRefName(name));
 		} finally {
 			SystemReader.setInstance(instance);
