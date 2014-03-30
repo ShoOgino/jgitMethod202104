@@ -1,0 +1,47 @@
+	/**
+	 * Steps:
+	 * <ol>
+	 * <li>Add file 'a'
+	 * <li>Commit
+	 * <li>Create branch '1'
+	 * <li>Delete file 'a'
+	 * <li>Commit
+	 * <li>Add folder 'a' in the working tree
+	 * <li>Checkout branch '1'
+	 * </ol>
+	 * <p>
+	 * The checkout command should raise an error. The conflicting paths are 'a'
+	 * and 'a/c'.
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void fileModeTestMissingWithFolderInWorkingTree() throws Exception {
+		Git git = new Git(db);
+		writeTrashFile("b", "Hello world b");
+		writeTrashFile("a", "b");
+		git.add().addFilepattern(".").call();
+		git.commit().setMessage("add file b & file a").call();
+		Ref branch_1 = git.branchCreate().setName("branch_1").call();
+		git.rm().addFilepattern("a").call();
+		git.commit().setMessage("delete file a").call();
+
+		FileUtils.mkdirs(new File(db.getWorkTree(), "a"));
+		writeTrashFile("a/c", "Hello world c");
+
+		FileEntry entry = new FileTreeIterator.FileEntry(new File(
+				db.getWorkTree(), "a"), db.getFS());
+		assertEquals(FileMode.TREE, entry.getMode());
+
+		CheckoutConflictException exception = null;
+		try {
+			git.checkout().setName(branch_1.getName()).call();
+		} catch (CheckoutConflictException e) {
+			exception = e;
+		}
+		assertNotNull(exception);
+		assertEquals(2, exception.getConflictingPaths().size());
+		assertEquals("a", exception.getConflictingPaths().get(0));
+		assertEquals("a/c", exception.getConflictingPaths().get(1));
+	}
+

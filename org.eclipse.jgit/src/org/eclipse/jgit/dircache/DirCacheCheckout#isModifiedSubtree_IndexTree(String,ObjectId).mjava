@@ -1,0 +1,37 @@
+	/**
+	 * Checks whether the subtree starting at a given path differs between Index and
+	 * some tree.
+	 *
+	 * @param path
+	 * @param tree
+	 *            the tree to compare
+	 * @return true if the subtrees differ
+	 * @throws CorruptObjectException
+	 * @throws IOException
+	 */
+	private boolean isModifiedSubtree_IndexTree(String path, ObjectId tree)
+			throws CorruptObjectException, IOException {
+		NameConflictTreeWalk tw = new NameConflictTreeWalk(repo);
+		try {
+			tw.addTree(new DirCacheIterator(dc));
+			tw.addTree(tree);
+			tw.setRecursive(true);
+			tw.setFilter(PathFilter.create(path));
+			while (tw.next()) {
+				AbstractTreeIterator dcIt = tw.getTree(0,
+						DirCacheIterator.class);
+				AbstractTreeIterator treeIt = tw.getTree(1,
+						AbstractTreeIterator.class);
+				if (dcIt == null || treeIt == null)
+					return true;
+				if (dcIt.getEntryRawMode() != treeIt.getEntryRawMode())
+					return true;
+				if (!dcIt.getEntryObjectId().equals(treeIt.getEntryObjectId()))
+					return true;
+			}
+			return false;
+		} finally {
+			tw.release();
+		}
+	}
+
