@@ -2,8 +2,6 @@
 		RevCommit parent = n.getParent(0);
 		if (parent == null)
 			return split(n.getNextCandidate(0), n);
-		if (parent.has(SEEN))
-			return false;
 		revPool.parseHeaders(parent);
 
 		if (find(parent, n.sourcePath)) {

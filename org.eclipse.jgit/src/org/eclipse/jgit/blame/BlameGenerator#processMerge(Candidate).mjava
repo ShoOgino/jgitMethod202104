@@ -1,20 +1,12 @@
 	private boolean processMerge(Candidate n) throws IOException {
 		int pCnt = n.getParentCount();
 
-		for (int pIdx = 0; pIdx < pCnt; pIdx++) {
-			RevCommit parent = n.getParent(pIdx);
-			if (parent.has(SEEN))
-				continue;
-			revPool.parseHeaders(parent);
-		}
-
 		// If any single parent exactly matches the merge, follow only
 		// that one parent through history.
 		ObjectId[] ids = null;
 		for (int pIdx = 0; pIdx < pCnt; pIdx++) {
 			RevCommit parent = n.getParent(pIdx);
-			if (parent.has(SEEN))
-				continue;
+			revPool.parseHeaders(parent);
 			if (!find(parent, n.sourcePath))
 				continue;
 			if (!(n instanceof ReverseCandidate) && idBuf.equals(n.sourceBlob)) {
@@ -33,8 +25,6 @@
 			renames = new DiffEntry[pCnt];
 			for (int pIdx = 0; pIdx < pCnt; pIdx++) {
 				RevCommit parent = n.getParent(pIdx);
-				if (parent.has(SEEN))
-					continue;
 				if (ids != null && ids[pIdx] != null)
 					continue;
 
@@ -67,8 +57,6 @@
 		Candidate[] parents = new Candidate[pCnt];
 		for (int pIdx = 0; pIdx < pCnt; pIdx++) {
 			RevCommit parent = n.getParent(pIdx);
-			if (parent.has(SEEN))
-				continue;
 
 			Candidate p;
 			if (renames != null && renames[pIdx] != null) {
