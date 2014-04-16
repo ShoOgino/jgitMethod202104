@@ -1,15 +1,28 @@
 	/**
-	 * Removes support for an archival format so its Format can be
-	 * garbage collected.
+	 * Marks support for an archival format as no longer needed so its
+	 * Format can be garbage collected if no one else is using it either.
+	 * <p>
+	 * In other words, this decrements the reference count for an
+	 * archival format.  If the reference count becomes zero, removes
+	 * support for that format.
 	 *
 	 * @param name name of format (e.g., "tar" or "zip").
 	 * @throws JGitInternalException
 	 *              No such archival format was registered.
 	 */
 	public static void unregisterFormat(String name) {
-		if (formats.remove(name) == null)
-			throw new JGitInternalException(MessageFormat.format(
-					JGitText.get().archiveFormatAlreadyAbsent,
-					name));
+		FormatEntry old, entry;
+		do {
+			old = formats.get(name);
+			if (old == null)
+				throw new JGitInternalException(MessageFormat.format(
+						JGitText.get().archiveFormatAlreadyAbsent,
+						name));
+			if (old.refcnt == 1) {
+				entry = null;
+				continue;
+			}
+			entry = new FormatEntry(old.format, old.refcnt - 1);
+		} while (!replace(formats, name, old, entry));
 	}
 

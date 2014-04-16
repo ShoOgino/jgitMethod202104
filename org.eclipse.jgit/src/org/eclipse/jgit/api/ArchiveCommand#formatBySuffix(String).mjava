@@ -1,10 +1,12 @@
 	private static Format<?> formatBySuffix(String filenameSuffix)
 			throws UnsupportedFormatException {
 		if (filenameSuffix != null)
-			for (Format<?> fmt : formats.values())
+			for (FormatEntry entry : formats.values()) {
+				Format<?> fmt = entry.format;
 				for (String sfx : fmt.suffixes())
 					if (filenameSuffix.endsWith(sfx))
 						return fmt;
+			}
 		return lookupFormat("tar"); //$NON-NLS-1$
 	}
 

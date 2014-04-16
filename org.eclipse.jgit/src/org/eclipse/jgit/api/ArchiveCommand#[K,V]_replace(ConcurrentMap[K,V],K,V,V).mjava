@@ -1,0 +1,23 @@
+	/**
+	 * Replaces the entry for a key only if currently mapped to a given
+	 * value.
+	 *
+	 * @param map a map
+	 * @param key key with which the specified value is associated
+	 * @param oldValue expected value for the key (null if should be absent).
+	 * @param newValue value to be associated with the key (null to remove).
+	 * @return true if the value was replaced
+	 */
+	private static <K, V> boolean replace(ConcurrentMap<K, V> map,
+			K key, V oldValue, V newValue) {
+		if (oldValue == null && newValue == null) // Nothing to do.
+			return true;
+
+		if (oldValue == null)
+			return map.putIfAbsent(key, newValue) == null;
+		else if (newValue == null)
+			return map.remove(key, oldValue);
+		else
+			return map.replace(key, oldValue, newValue);
+	}
+
