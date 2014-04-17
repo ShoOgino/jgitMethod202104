@@ -10,9 +10,7 @@
 			if (!find(parent, n.sourcePath))
 				continue;
 			if (!(n instanceof ReverseCandidate) && idBuf.equals(n.sourceBlob)) {
-				n.sourceCommit = parent;
-				push(n);
-				return false;
+				return blameEntireRegionOnParent(n, parent);
 			}
 			if (ids == null)
 				ids = new ObjectId[pCnt];
@@ -44,7 +42,7 @@
 					// we choose to follow the one parent over trying to do
 					// possibly both parents.
 					n.sourceCommit = parent;
-					n.sourcePath = PathFilter.create(r.getOldPath());
+					n.setSourcePath(PathFilter.create(r.getOldPath()));
 					push(n);
 					return false;
 				}
