@@ -22,7 +22,8 @@
 							throw new SAXException(
 									RepoText.get().copyFileFailed, e);
 						}
-						AddCommand add = new AddCommand(command.repo)
+						AddCommand add = command.git
+							.add()
 							.addFilepattern(copyfile.relativeDest);
 						try {
 							add.call();
