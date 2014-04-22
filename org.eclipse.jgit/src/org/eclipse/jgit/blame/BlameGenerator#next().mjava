@@ -10,19 +10,19 @@
 	 */
 	public boolean next() throws IOException {
 		// If there is a source still pending, produce the next region.
-		if (currentSource != null) {
-			Region r = currentSource.regionList;
-			Region n = r.next;
+		if (outRegion != null) {
+			Region r = outRegion;
 			remaining -= r.length;
-			if (n != null) {
-				currentSource.regionList = n;
+			if (r.next != null) {
+				outRegion = r.next;
 				return true;
 			}
 
-			if (currentSource.queueNext != null)
-				return result(currentSource.queueNext);
+			if (outCandidate.queueNext != null)
+				return result(outCandidate.queueNext);
 
-			currentSource = null;
+			outCandidate = null;
+			outRegion = null;
 		}
 
 		// If there are no lines remaining, the entire result is done,

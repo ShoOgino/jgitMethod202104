@@ -9,9 +9,8 @@
 			revPool.parseHeaders(parent);
 			if (!find(parent, n.sourcePath))
 				continue;
-			if (!(n instanceof ReverseCandidate) && idBuf.equals(n.sourceBlob)) {
+			if (!(n instanceof ReverseCandidate) && idBuf.equals(n.sourceBlob))
 				return blameEntireRegionOnParent(n, parent);
-			}
 			if (ids == null)
 				ids = new ObjectId[pCnt];
 			ids[pIdx] = idBuf.toObjectId();
@@ -41,10 +40,8 @@
 					// have an exact content match. For performance reasons
 					// we choose to follow the one parent over trying to do
 					// possibly both parents.
-					n.sourceCommit = parent;
 					n.setSourcePath(PathFilter.create(r.getOldPath()));
-					push(n);
-					return false;
+					return blameEntireRegionOnParent(n, parent);
 				}
 
 				renames[pIdx] = r;
