@@ -1,5 +1,5 @@
 	ObjectLoader load(final WindowCursor curs, long pos)
-			throws IOException {
+			throws IOException, LargeObjectException {
 		try {
 			final byte[] ib = curs.tempId;
 			Delta delta = null;
@@ -25,7 +25,7 @@
 				case Constants.OBJ_TREE:
 				case Constants.OBJ_BLOB:
 				case Constants.OBJ_TAG: {
-					if (sz < curs.getStreamFileThreshold())
+					if (delta != null || sz < curs.getStreamFileThreshold())
 						data = decompress(pos + p, (int) sz, curs);
 
 					if (delta != null) {
@@ -94,7 +94,7 @@
 			// (Whole objects with no deltas to apply return early above.)
 
 			if (data == null)
-				return delta.large(this, curs);
+				throw new IOException(JGitText.get().inMemoryBufferLimitExceeded);
 
 			do {
 				// Cache only the base immediately before desired object.
@@ -109,19 +109,19 @@
 						delta.deltaSize, curs);
 				if (cmds == null) {
 					data = null; // Discard base in case of OutOfMemoryError
-					return delta.large(this, curs);
+					throw new LargeObjectException.OutOfMemory(new OutOfMemoryError());
 				}
 
 				final long sz = BinaryDelta.getResultSize(cmds);
 				if (Integer.MAX_VALUE <= sz)
-					return delta.large(this, curs);
+					throw new LargeObjectException.ExceedsByteArrayLimit();
 
 				final byte[] result;
 				try {
 					result = new byte[(int) sz];
 				} catch (OutOfMemoryError tooBig) {
 					data = null; // Discard base in case of OutOfMemoryError
-					return delta.large(this, curs);
+					throw new LargeObjectException.OutOfMemory(tooBig);
 				}
 
 				BinaryDelta.apply(data, cmds, result);
