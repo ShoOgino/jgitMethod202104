@@ -1,0 +1,15 @@
+		void copy() throws IOException {
+			FileInputStream input = new FileInputStream(src);
+			try {
+				FileOutputStream output = new FileOutputStream(dest);
+				try {
+					FileChannel channel = input.getChannel();
+					output.getChannel().transferFrom(channel, 0, channel.size());
+				} finally {
+					output.close();
+				}
+			} finally {
+				input.close();
+			}
+		}
+

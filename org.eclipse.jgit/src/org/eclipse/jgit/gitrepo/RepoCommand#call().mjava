@@ -1,0 +1,22 @@
+	@Override
+	public RevCommit call() throws GitAPIException {
+		checkCallable();
+		if (path == null || path.length() == 0)
+			throw new IllegalArgumentException(JGitText.get().pathNotConfigured);
+		if (uri == null || uri.length() == 0)
+			throw new IllegalArgumentException(JGitText.get().uriNotConfigured);
+
+		git = new Git(repo);
+		XmlManifest manifest = new XmlManifest(this, path, uri, groups);
+		try {
+			manifest.read();
+		} catch (IOException e) {
+			throw new ManifestErrorException(e);
+		}
+
+		return git
+			.commit()
+			.setMessage(RepoText.get().repoCommitMessage)
+			.call();
+	}
+

@@ -1,0 +1,38 @@
+	@Test
+	public void testAddRepoManifest() throws Exception {
+		StringBuilder xmlContent = new StringBuilder();
+		xmlContent.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
+			.append("<manifest>")
+			.append("<remote name=\"remote1\" fetch=\".\" />")
+			.append("<default revision=\"master\" remote=\"remote1\" />")
+			.append("<project path=\"foo\" name=\"")
+			.append(defaultUri)
+			.append("\" groups=\"a,test\" />")
+			.append("<project path=\"bar\" name=\"")
+			.append(notDefaultUri)
+			.append("\" groups=\"notdefault\" />")
+			.append("<project path=\"a\" name=\"")
+			.append(groupAUri)
+			.append("\" groups=\"a\" />")
+			.append("<project path=\"b\" name=\"")
+			.append(groupBUri)
+			.append("\" groups=\"b\" />")
+			.append("</manifest>");
+		writeTrashFile("manifest.xml", xmlContent.toString());
+		StringBuilder cmd = new StringBuilder("git repo --base-uri=\"")
+			.append(rootUri)
+			.append("\" --groups=\"all,-a\" \"")
+			.append(db.getWorkTree().getAbsolutePath())
+			.append("/manifest.xml\"");
+		execute(cmd.toString());
+
+		File file = new File(db.getWorkTree(), "foo/hello.txt");
+		assertFalse("\"all,-a\" doesn't have foo", file.exists());
+		file = new File(db.getWorkTree(), "bar/world.txt");
+		assertTrue("\"all,-a\" has bar", file.exists());
+		file = new File(db.getWorkTree(), "a/a.txt");
+		assertFalse("\"all,-a\" doesn't have a", file.exists());
+		file = new File(db.getWorkTree(), "b/b.txt");
+		assertTrue("\"all,-a\" has have b", file.exists());
+	}
+

@@ -1,0 +1,21 @@
+		void read() throws IOException {
+			final XMLReader xr;
+			try {
+				xr = XMLReaderFactory.createXMLReader();
+			} catch (SAXException e) {
+				throw new IOException(JGitText.get().noXMLParserAvailable);
+			}
+			xr.setContentHandler(this);
+			final FileInputStream in = new FileInputStream(filename);
+			try {
+				xr.parse(new InputSource(in));
+			} catch (SAXException e) {
+				IOException error = new IOException(MessageFormat.format(
+							RepoText.get().errorParsingManifestFile, filename));
+				error.initCause(e);
+				throw error;
+			} finally {
+				in.close();
+			}
+		}
+

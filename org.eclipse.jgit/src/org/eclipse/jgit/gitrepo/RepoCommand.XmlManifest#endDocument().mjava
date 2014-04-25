@@ -1,0 +1,37 @@
+		@Override
+		public void endDocument() throws SAXException {
+			if (defaultRemote == null) {
+				throw new SAXException(MessageFormat.format(
+						RepoText.get().errorNoDefault, filename));
+			}
+			final String remoteUrl;
+			try {
+				URI uri = new URI(String.format("%s/%s/", baseUrl, remotes.get(defaultRemote))); //$NON-NLS-1$
+				remoteUrl = uri.normalize().toString();
+			} catch (URISyntaxException e) {
+				throw new SAXException(e);
+			}
+			for (Project proj : projects) {
+				if (inGroups(proj)) {
+					String url = remoteUrl + proj.name;
+					command.addSubmodule(url, proj.path);
+					for (CopyFile copyfile : proj.copyfiles) {
+						try {
+							copyfile.copy();
+						} catch (IOException e) {
+							throw new SAXException(
+									RepoText.get().copyFileFailed, e);
+						}
+						AddCommand add = command.git
+							.add()
+							.addFilepattern(copyfile.relativeDest);
+						try {
+							add.call();
+						} catch (GitAPIException e) {
+							throw new SAXException(e);
+						}
+					}
+				}
+			}
+		}
+
