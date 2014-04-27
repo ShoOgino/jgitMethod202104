@@ -1,0 +1,23 @@
+	/**
+	 * @param blockedPositions
+	 *            may be null
+	 * @return a free lane position
+	 */
+	private int getFreePosition(BitSet blockedPositions) {
+		if (freePositions.isEmpty())
+			return positionsAllocated++;
+
+		if (blockedPositions != null) {
+			for (Integer pos : freePositions)
+				if (!blockedPositions.get(pos.intValue())) {
+					freePositions.remove(pos);
+					return pos.intValue();
+				}
+			return positionsAllocated++;
+		} else {
+			final Integer min = freePositions.first();
+			freePositions.remove(min);
+			return min.intValue();
+		}
+	}
+

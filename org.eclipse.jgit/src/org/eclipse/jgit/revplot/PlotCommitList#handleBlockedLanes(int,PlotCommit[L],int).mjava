@@ -18,23 +18,14 @@
 				if (--remaining == 0)
 					break;
 			}
+			addBlockedPosition(blockedPositions, rObj);
 			if (rObj != null) {
-				PlotLane lane = rObj.getLane();
-				if (lane != null)
-					blockedPositions.set(lane.getPosition());
 				rObj.addPassingLane(commit.lane);
 			}
 		}
 		// Now let's check whether we have to reposition the lane
 		if (blockedPositions.get(commit.lane.getPosition())) {
-			int newPos = -1;
-			for (Integer pos : freePositions)
-				if (!blockedPositions.get(pos.intValue())) {
-					newPos = pos.intValue();
-					break;
-				}
-			if (newPos == -1)
-				newPos = positionsAllocated++;
+			int newPos = getFreePosition(blockedPositions);
 			freePositions.add(Integer.valueOf(commit.lane.getPosition()));
 			commit.lane.position = newPos;
 			activeLanes.add(commit.lane);
