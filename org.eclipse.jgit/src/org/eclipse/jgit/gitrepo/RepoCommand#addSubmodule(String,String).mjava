@@ -1,14 +1,19 @@
 	private void addSubmodule(String url, String name) throws SAXException {
-		SubmoduleAddCommand add = git
-			.submoduleAdd()
-			.setPath(name)
-			.setURI(url);
-		if (monitor != null)
-			add.setProgressMonitor(monitor);
-		try {
-			add.call();
-		} catch (GitAPIException e) {
-			throw new SAXException(e);
+		if (repo.isBare()) {
+			Project proj = new Project(url, name, null);
+			bareProjects.add(proj);
+		} else {
+			SubmoduleAddCommand add = git
+				.submoduleAdd()
+				.setPath(name)
+				.setURI(url);
+			if (monitor != null)
+				add.setProgressMonitor(monitor);
+			try {
+				add.call();
+			} catch (GitAPIException e) {
+				throw new SAXException(e);
+			}
 		}
 	}
 
