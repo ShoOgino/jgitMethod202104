@@ -1,0 +1,27 @@
+	private void addSubmodule(String url, String name, String revision) throws SAXException {
+		if (repo.isBare()) {
+			Project proj = new Project(url, name, revision, null);
+			bareProjects.add(proj);
+		} else {
+			SubmoduleAddCommand add = git
+				.submoduleAdd()
+				.setPath(name)
+				.setURI(url);
+			if (monitor != null)
+				add.setProgressMonitor(monitor);
+
+			try {
+				Repository subRepo = add.call();
+				if (revision != null) {
+					Git sub = new Git(subRepo);
+					sub.checkout().setName(findRef(revision, subRepo)).call();
+					git.add().addFilepattern(name).call();
+				}
+			} catch (GitAPIException e) {
+				throw new SAXException(e);
+			} catch (IOException e) {
+				throw new SAXException(e);
+			}
+		}
+	}
+

@@ -1,10 +1,12 @@
 	@Test
-	public void testAddRepoManifest() throws Exception {
+	public void testRevisionBranch() throws Exception {
 		StringBuilder xmlContent = new StringBuilder();
 		xmlContent.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
 			.append("<manifest>")
 			.append("<remote name=\"remote1\" fetch=\".\" />")
-			.append("<default revision=\"master\" remote=\"remote1\" />")
+			.append("<default revision=\"")
+			.append(BRANCH)
+			.append("\" remote=\"remote1\" />")
 			.append("<project path=\"foo\" name=\"")
 			.append(defaultUri)
 			.append("\" />")
@@ -15,10 +17,9 @@
 			.setURI(rootUri)
 			.call();
 		File hello = new File(db.getWorkTree(), "foo/hello.txt");
-		assertTrue("submodule was checked out", hello.exists());
 		BufferedReader reader = new BufferedReader(new FileReader(hello));
 		String content = reader.readLine();
 		reader.close();
-		assertEquals("submodule content is as expected.", "master world", content);
+		assertEquals("submodule content is as expected.", "branch world", content);
 	}
 

@@ -8,12 +8,16 @@
 				currentProject = new Project( //$NON-NLS-1$
 						attributes.getValue("name"), //$NON-NLS-1$
 						attributes.getValue("path"), //$NON-NLS-1$
+						attributes.getValue("revision"), //$NON-NLS-1$
 						attributes.getValue("groups")); //$NON-NLS-1$
 			} else if ("remote".equals(qName)) { //$NON-NLS-1$
 				remotes.put(attributes.getValue("name"), //$NON-NLS-1$
 						attributes.getValue("fetch")); //$NON-NLS-1$
 			} else if ("default".equals(qName)) { //$NON-NLS-1$
 				defaultRemote = attributes.getValue("remote"); //$NON-NLS-1$
+				defaultRevision = attributes.getValue("revision"); //$NON-NLS-1$
+				if (defaultRevision == null)
+					defaultRevision = command.branch;
 			} else if ("copyfile".equals(qName)) { //$NON-NLS-1$
 				if (currentProject == null)
 					throw new SAXException(RepoText.get().invalidManifest);

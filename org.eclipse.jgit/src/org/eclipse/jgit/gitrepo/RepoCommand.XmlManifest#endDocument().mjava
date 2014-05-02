@@ -13,8 +13,10 @@
 			}
 			for (Project proj : projects) {
 				if (inGroups(proj)) {
+					if (proj.revision == null)
+						proj.revision = defaultRevision;
 					String url = remoteUrl + proj.name;
-					command.addSubmodule(url, proj.path);
+					command.addSubmodule(url, proj.path, proj.revision);
 					for (CopyFile copyfile : proj.copyfiles) {
 						try {
 							copyfile.copy();

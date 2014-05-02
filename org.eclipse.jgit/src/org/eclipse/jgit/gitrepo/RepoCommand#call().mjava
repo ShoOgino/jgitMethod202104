@@ -38,17 +38,13 @@
 					// create gitlink
 					final DirCacheEntry dcEntry = new DirCacheEntry(name);
 					ObjectId objectId;
-					try {
-						objectId = callback.sha1(uri);
-					} catch (GitAPIException e) {
-						// Something wrong getting the head sha1
-						throw new RemoteUnavailableException(uri, e);
-					} catch (IllegalArgumentException e) {
-						// The revision from the manifest is malformed.
-						throw new ManifestErrorException(e);
+					if (ObjectId.isId(proj.revision))
+						objectId = ObjectId.fromString(proj.revision);
+					else {
+						objectId = callback.sha1(uri, proj.revision);
 					}
 					if (objectId == null)
-						throw new RemoteUnavailableException(uri, null);
+						throw new RemoteUnavailableException(uri);
 					dcEntry.setObjectId(objectId);
 					dcEntry.setFileMode(FileMode.GITLINK);
 					builder.add(dcEntry);
