@@ -1,0 +1,28 @@
+	/**
+	 * Process the given TreeWalk's entries.
+	 *
+	 * @param treeWalk
+	 *            The walk to iterate over.
+	 * @return Whether the trees merged cleanly.
+	 * @throws IOException
+	 * @since 3.4
+	 */
+	protected boolean mergeTreeWalk(TreeWalk treeWalk) throws IOException {
+		boolean hasWorkingTreeIterator = tw.getTreeCount() > T_FILE;
+		while (treeWalk.next()) {
+			if (!processEntry(
+					treeWalk.getTree(T_BASE, CanonicalTreeParser.class),
+					treeWalk.getTree(T_OURS, CanonicalTreeParser.class),
+					treeWalk.getTree(T_THEIRS, CanonicalTreeParser.class),
+					treeWalk.getTree(T_INDEX, DirCacheBuildIterator.class),
+					hasWorkingTreeIterator ? treeWalk.getTree(T_FILE,
+							WorkingTreeIterator.class) : null)) {
+				cleanUp();
+				return false;
+			}
+			if (treeWalk.isSubtree() && enterSubtree)
+				treeWalk.enterSubtree();
+		}
+		return true;
+	}
+
