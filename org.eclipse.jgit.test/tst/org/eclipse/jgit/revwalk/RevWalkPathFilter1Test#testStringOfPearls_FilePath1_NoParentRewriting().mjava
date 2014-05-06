@@ -1,0 +1,19 @@
+	@Test
+	public void testStringOfPearls_FilePath1_NoParentRewriting()
+			throws Exception {
+		final RevCommit a = commit(tree(file("d/f", blob("a"))));
+		final RevCommit b = commit(tree(file("d/f", blob("a"))), a);
+		final RevCommit c = commit(tree(file("d/f", blob("b"))), b);
+		filter("d/f");
+		markStart(c);
+		rw.setRewriteParents(false);
+
+		assertCommit(c, rw.next());
+		assertEquals(1, c.getParentCount());
+		assertCommit(b, c.getParent(0));
+
+		assertCommit(a, rw.next()); // b was skipped
+		assertEquals(0, a.getParentCount());
+		assertNull(rw.next());
+	}
+
