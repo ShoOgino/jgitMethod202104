@@ -1,7 +1,10 @@
 		void copy() throws IOException {
-			FileInputStream input = new FileInputStream(src);
+			File srcFile = new File(repo.getWorkTree(),
+					path + "/" + src); //$NON-NLS-1$
+			File destFile = new File(repo.getWorkTree(), dest);
+			FileInputStream input = new FileInputStream(srcFile);
 			try {
-				FileOutputStream output = new FileOutputStream(dest);
+				FileOutputStream output = new FileOutputStream(destFile);
 				try {
 					FileChannel channel = input.getChannel();
 					output.getChannel().transferFrom(channel, 0, channel.size());

@@ -13,26 +13,11 @@
 			}
 			for (Project proj : projects) {
 				if (inGroups(proj)) {
-					if (proj.revision == null)
-						proj.revision = defaultRevision;
-					String url = remoteUrl + proj.name;
-					command.addSubmodule(url, proj.path, proj.revision);
-					for (CopyFile copyfile : proj.copyfiles) {
-						try {
-							copyfile.copy();
-						} catch (IOException e) {
-							throw new SAXException(
-									RepoText.get().copyFileFailed, e);
-						}
-						AddCommand add = command.git
-							.add()
-							.addFilepattern(copyfile.relativeDest);
-						try {
-							add.call();
-						} catch (GitAPIException e) {
-							throw new SAXException(e);
-						}
-					}
+					command.addSubmodule(remoteUrl + proj.name,
+							proj.path,
+							proj.revision == null ?
+									defaultRevision : proj.revision,
+							proj.copyfiles);
 				}
 			}
 		}

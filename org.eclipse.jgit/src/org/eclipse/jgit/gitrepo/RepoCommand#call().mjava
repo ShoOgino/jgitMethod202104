@@ -36,7 +36,7 @@
 					cfg.setString("submodule", name, "path", name); //$NON-NLS-1$ //$NON-NLS-2$
 					cfg.setString("submodule", name, "url", uri); //$NON-NLS-1$ //$NON-NLS-2$
 					// create gitlink
-					final DirCacheEntry dcEntry = new DirCacheEntry(name);
+					DirCacheEntry dcEntry = new DirCacheEntry(name);
 					ObjectId objectId;
 					if (ObjectId.isId(proj.revision))
 						objectId = ObjectId.fromString(proj.revision);
@@ -48,6 +48,16 @@
 					dcEntry.setObjectId(objectId);
 					dcEntry.setFileMode(FileMode.GITLINK);
 					builder.add(dcEntry);
+
+					for (CopyFile copyfile : proj.copyfiles) {
+						byte[] src = callback.readFile(
+								uri, proj.revision, copyfile.src);
+						objectId = inserter.insert(Constants.OBJ_BLOB, src);
+						dcEntry = new DirCacheEntry(copyfile.dest);
+						dcEntry.setObjectId(objectId);
+						dcEntry.setFileMode(FileMode.REGULAR_FILE);
+						builder.add(dcEntry);
+					}
 				}
 				String content = cfg.toText();
 

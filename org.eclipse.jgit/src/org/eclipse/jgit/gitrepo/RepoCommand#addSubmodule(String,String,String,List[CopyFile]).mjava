@@ -1,6 +1,8 @@
-	private void addSubmodule(String url, String name, String revision) throws SAXException {
+	private void addSubmodule(String url, String name, String revision,
+			List<CopyFile> copyfiles) throws SAXException {
 		if (repo.isBare()) {
 			Project proj = new Project(url, name, revision, null);
+			proj.copyfiles.addAll(copyfiles);
 			bareProjects.add(proj);
 		} else {
 			SubmoduleAddCommand add = git
@@ -16,6 +18,10 @@
 					Git sub = new Git(subRepo);
 					sub.checkout().setName(findRef(revision, subRepo)).call();
 					git.add().addFilepattern(name).call();
+				}
+				for (CopyFile copyfile : copyfiles) {
+					copyfile.copy();
+					git.add().addFilepattern(copyfile.dest).call();
 				}
 			} catch (GitAPIException e) {
 				throw new SAXException(e);
