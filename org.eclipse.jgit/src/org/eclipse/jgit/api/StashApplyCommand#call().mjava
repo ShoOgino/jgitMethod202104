@@ -29,15 +29,20 @@
 
 			final ObjectId stashId = getStashId();
 			RevCommit stashCommit = revWalk.parseCommit(stashId);
-			if (stashCommit.getParentCount() != 2)
+			if (stashCommit.getParentCount() < 2
+					|| stashCommit.getParentCount() > 3)
 				throw new JGitInternalException(MessageFormat.format(
-						JGitText.get().stashCommitMissingTwoParents,
-						stashId.name()));
+						JGitText.get().stashCommitIncorrectNumberOfParents,
+						stashId.name(),
+						Integer.valueOf(stashCommit.getParentCount())));
 
 			ObjectId headTree = repo.resolve(Constants.HEAD + "^{tree}"); //$NON-NLS-1$
 			ObjectId stashIndexCommit = revWalk.parseCommit(stashCommit
 					.getParent(1));
 			ObjectId stashHeadCommit = stashCommit.getParent(0);
+			ObjectId untrackedCommit = null;
+			if (applyUntracked && stashCommit.getParentCount() == 3)
+				untrackedCommit = revWalk.parseCommit(stashCommit.getParent(2));
 
 			ResolveMerger merger = (ResolveMerger) strategy.newMerger(repo);
 			merger.setCommitNames(new String[] { "stashed HEAD", "HEAD",
@@ -64,6 +69,29 @@
 						throw new StashApplyFailureException(
 								JGitText.get().stashApplyConflict);
 					}
+				}
+
+				if (untrackedCommit != null) {
+					ResolveMerger untrackedMerger = (ResolveMerger) strategy
+							.newMerger(repo, true);
+					untrackedMerger.setCommitNames(new String[] {
+							"stashed HEAD", "HEAD", "untracked files" }); //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
+					untrackedMerger.setBase(stashHeadCommit);
+					boolean ok = untrackedMerger.merge(headCommit,
+							untrackedCommit);
+					if (ok)
+						try {
+							RevTree untrackedTree = revWalk
+									.parseTree(untrackedMerger
+											.getResultTreeId());
+							resetUntracked(untrackedTree);
+						} catch (CheckoutConflictException e) {
+							throw new StashApplyFailureException(
+									JGitText.get().stashApplyConflict);
+						}
+					else
+						throw new StashApplyFailureException(
+								JGitText.get().stashApplyConflict);
 				}
 			} else {
 				throw new StashApplyFailureException(

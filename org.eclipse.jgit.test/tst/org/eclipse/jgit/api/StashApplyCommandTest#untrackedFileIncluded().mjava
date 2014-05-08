@@ -1,0 +1,25 @@
+	@Test
+	public void untrackedFileIncluded() throws Exception {
+		String path = "a/b/untracked.txt";
+		File untrackedFile = writeTrashFile(path, "content");
+		RevCommit stashedCommit = git.stashCreate().setIncludeUntracked(true)
+				.call();
+		assertNotNull(stashedCommit);
+		assertFalse(untrackedFile.exists());
+		deleteTrashFile("a/b"); // checkout should create parent dirs
+
+		git.stashApply().setStashRef("stash@{0}").call();
+		assertTrue(untrackedFile.exists());
+		assertEquals("content", read(path));
+
+		Status status = git.status().call();
+		assertEquals(1, status.getUntracked().size());
+		assertTrue(status.getAdded().isEmpty());
+		assertTrue(status.getChanged().isEmpty());
+		assertTrue(status.getConflicting().isEmpty());
+		assertTrue(status.getMissing().isEmpty());
+		assertTrue(status.getRemoved().isEmpty());
+		assertTrue(status.getModified().isEmpty());
+		assertTrue(status.getUntracked().contains(path));
+	}
+

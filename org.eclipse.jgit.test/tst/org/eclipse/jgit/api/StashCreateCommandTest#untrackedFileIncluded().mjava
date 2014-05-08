@@ -1,0 +1,16 @@
+	@Test
+	public void untrackedFileIncluded() throws Exception {
+		String trackedPath = "tracked.txt";
+		writeTrashFile(trackedPath, "content2");
+		git.add().addFilepattern(trackedPath).call();
+
+		RevCommit stashed = git.stashCreate()
+				.setIncludeUntracked(true).call();
+		validateStashedCommit(stashed, 3);
+
+		assertEquals(
+				"Expected commits for workingDir,stashedIndex and untrackedFiles.",
+				3, stashed.getParentCount());
+		assertFalse("untracked file should be deleted.", untrackedFile.exists());
+	}
+

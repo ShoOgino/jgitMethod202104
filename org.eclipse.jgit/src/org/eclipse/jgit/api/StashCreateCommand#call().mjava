@@ -31,6 +31,7 @@
 				MutableObjectId id = new MutableObjectId();
 				List<PathEdit> wtEdits = new ArrayList<PathEdit>();
 				List<String> wtDeletes = new ArrayList<String>();
+				List<DirCacheEntry> untracked = new ArrayList<DirCacheEntry>();
 				boolean hasChanges = false;
 				do {
 					AbstractTreeIterator headIter = treeWalk.getTree(0,
@@ -45,7 +46,8 @@
 								new UnmergedPathException(
 										indexIter.getDirCacheEntry()));
 					if (wtIter != null) {
-						if (indexIter == null && headIter == null)
+						if (indexIter == null && headIter == null
+								&& !includeUntracked)
 							continue;
 						hasChanges = true;
 						if (indexIter != null && wtIter.idEqual(indexIter))
@@ -66,11 +68,15 @@
 						} finally {
 							in.close();
 						}
-						wtEdits.add(new PathEdit(entry) {
-							public void apply(DirCacheEntry ent) {
-								ent.copyMetaData(entry);
-							}
-						});
+
+						if (indexIter == null && headIter == null)
+							untracked.add(entry);
+						else
+							wtEdits.add(new PathEdit(entry) {
+								public void apply(DirCacheEntry ent) {
+									ent.copyMetaData(entry);
+								}
+							});
 					}
 					hasChanges = true;
 					if (wtIter == null && headIter != null)
@@ -84,12 +90,31 @@
 						.getName());
 
 				// Commit index changes
-				CommitBuilder builder = createBuilder(headCommit);
+				CommitBuilder builder = createBuilder();
+				builder.setParentId(headCommit);
 				builder.setTreeId(cache.writeTree(inserter));
 				builder.setMessage(MessageFormat.format(indexMessage, branch,
 						headCommit.abbreviate(7).name(),
 						headCommit.getShortMessage()));
 				ObjectId indexCommit = inserter.insert(builder);
+
+				// Commit untracked changes
+				ObjectId untrackedCommit = null;
+				if (!untracked.isEmpty()) {
+					DirCache untrackedDirCache = DirCache.newInCore();
+					DirCacheBuilder untrackedBuilder = untrackedDirCache
+							.builder();
+					for (DirCacheEntry entry : untracked)
+						untrackedBuilder.add(entry);
+					untrackedBuilder.finish();
+
+					builder.setParentIds(new ObjectId[0]);
+					builder.setTreeId(untrackedDirCache.writeTree(inserter));
+					builder.setMessage(MessageFormat.format(MSG_UNTRACKED,
+							branch, headCommit.abbreviate(7).name(),
+							headCommit.getShortMessage()));
+					untrackedCommit = inserter.insert(builder);
+				}
 
 				// Commit working tree changes
 				if (!wtEdits.isEmpty() || !wtDeletes.isEmpty()) {
@@ -100,7 +125,10 @@
 						editor.add(new DeletePath(path));
 					editor.finish();
 				}
+				builder.setParentId(headCommit);
 				builder.addParentId(indexCommit);
+				if (untrackedCommit != null)
+					builder.addParentId(untrackedCommit);
 				builder.setMessage(MessageFormat.format(
 						workingDirectoryMessage, branch,
 						headCommit.abbreviate(7).name(),
@@ -111,6 +139,16 @@
 
 				updateStashRef(commitId, builder.getAuthor(),
 						builder.getMessage());
+
+				// Remove untracked files
+				if (includeUntracked) {
+					for (DirCacheEntry entry : untracked) {
+						File file = new File(repo.getWorkTree(),
+								entry.getPathString());
+						FileUtils.delete(file);
+					}
+				}
+
 			} finally {
 				inserter.release();
 				cache.unlock();

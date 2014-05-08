@@ -1,0 +1,15 @@
+	@Test
+	public void untrackedFileNotIncluded() throws Exception {
+		String trackedPath = "tracked.txt";
+		// at least one modification needed
+		writeTrashFile(trackedPath, "content2");
+		git.add().addFilepattern(trackedPath).call();
+
+		RevCommit stashed = git.stashCreate().call();
+		validateStashedCommit(stashed);
+
+		assertTrue("untracked file should be left untouched.",
+				untrackedFile.exists());
+		assertEquals("content", read(untrackedFile));
+	}
+

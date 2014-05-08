@@ -1,0 +1,25 @@
+	@Test
+	public void untrackedFileNotIncluded() throws Exception {
+		String untrackedPath = "untracked.txt";
+		File untrackedFile = writeTrashFile(untrackedPath, "content");
+		// at least one modification needed
+		writeTrashFile(PATH, "content2");
+		git.add().addFilepattern(PATH).call();
+		git.stashCreate().call();
+		assertTrue(untrackedFile.exists());
+
+		git.stashApply().setStashRef("stash@{0}").call();
+		assertTrue(untrackedFile.exists());
+
+		Status status = git.status().call();
+		assertEquals(1, status.getUntracked().size());
+		assertTrue(status.getUntracked().contains(untrackedPath));
+		assertEquals(1, status.getChanged().size());
+		assertTrue(status.getChanged().contains(PATH));
+		assertTrue(status.getAdded().isEmpty());
+		assertTrue(status.getConflicting().isEmpty());
+		assertTrue(status.getMissing().isEmpty());
+		assertTrue(status.getRemoved().isEmpty());
+		assertTrue(status.getModified().isEmpty());
+	}
+

@@ -1,34 +1,5 @@
-	/**
-	 * Core validation to be performed on all stashed commits
-	 *
-	 * @param commit
-	 * @throws IOException
-	 */
 	private void validateStashedCommit(final RevCommit commit)
 			throws IOException {
-		assertNotNull(commit);
-		Ref stashRef = db.getRef(Constants.R_STASH);
-		assertNotNull(stashRef);
-		assertEquals(commit, stashRef.getObjectId());
-		assertNotNull(commit.getAuthorIdent());
-		assertEquals(commit.getAuthorIdent(), commit.getCommitterIdent());
-		assertEquals(2, commit.getParentCount());
-
-		// Load parents
-		RevWalk walk = new RevWalk(db);
-		try {
-			for (RevCommit parent : commit.getParents())
-				walk.parseBody(parent);
-		} finally {
-			walk.release();
-		}
-
-		assertEquals(1, commit.getParent(1).getParentCount());
-		assertEquals(head, commit.getParent(1).getParent(0));
-		assertFalse("Head tree matches stashed commit tree", commit.getTree()
-				.equals(head.getTree()));
-		assertEquals(head, commit.getParent(0));
-		assertFalse(commit.getFullMessage().equals(
-				commit.getParent(1).getFullMessage()));
+		validateStashedCommit(commit, 2);
 	}
 

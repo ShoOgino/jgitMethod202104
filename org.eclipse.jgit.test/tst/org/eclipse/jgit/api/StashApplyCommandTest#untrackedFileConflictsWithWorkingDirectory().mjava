@@ -1,0 +1,17 @@
+	@Test
+	public void untrackedFileConflictsWithWorkingDirectory()
+			throws Exception {
+		String path = "untracked.txt";
+		writeTrashFile(path, "untracked");
+		git.stashCreate().setIncludeUntracked(true).call();
+
+		writeTrashFile(path, "working-directory");
+		try {
+			git.stashApply().setStashRef("stash@{0}").call();
+			fail("StashApplyFailureException should be thrown.");
+		} catch (StashApplyFailureException e) {
+			assertEquals(e.getMessage(), JGitText.get().stashApplyConflict);
+		}
+		assertEquals("working-directory", read(path));
+	}
+

@@ -1,0 +1,20 @@
+	@Test
+	public void untrackedFileConflictsWithCommit() throws Exception {
+		String path = "untracked.txt";
+		writeTrashFile(path, "untracked");
+		git.stashCreate().setIncludeUntracked(true).call();
+
+		writeTrashFile(path, "committed");
+		head = git.commit().setMessage("add file").call();
+		git.add().addFilepattern(path).call();
+		git.commit().setMessage("conflicting commit").call();
+
+		try {
+			git.stashApply().setStashRef("stash@{0}").call();
+			fail("StashApplyFailureException should be thrown.");
+		} catch (StashApplyFailureException e) {
+			assertEquals(e.getMessage(), JGitText.get().stashApplyConflict);
+		}
+		assertEquals("committed", read(path));
+	}
+
