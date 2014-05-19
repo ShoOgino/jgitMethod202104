@@ -1,0 +1,29 @@
+	@Test
+	public void testCherryPickConflictResolutionNoCOmmit() throws Exception {
+		Git git = new Git(db);
+		RevCommit sideCommit = prepareCherryPick(git);
+
+		CherryPickResult result = git.cherryPick().include(sideCommit.getId())
+				.setNoCommit(true).call();
+
+		assertEquals(CherryPickStatus.CONFLICTING, result.getStatus());
+		assertTrue(db.readDirCache().hasUnmergedPaths());
+		String expected = "<<<<<<< master\na(master)\n=======\na(side)\n>>>>>>> 527460a side\n";
+		assertEquals(expected, read("a"));
+		assertTrue(new File(db.getDirectory(), Constants.MERGE_MSG).exists());
+		assertEquals("side\n\nConflicts:\n\ta\n", db.readMergeCommitMsg());
+		assertFalse(new File(db.getDirectory(), Constants.CHERRY_PICK_HEAD)
+				.exists());
+		assertEquals(RepositoryState.SAFE, db.getRepositoryState());
+
+		// Resolve
+		writeTrashFile("a", "a");
+		git.add().addFilepattern("a").call();
+
+		assertEquals(RepositoryState.SAFE, db.getRepositoryState());
+
+		git.commit().setOnly("a").setMessage("resolve").call();
+
+		assertEquals(RepositoryState.SAFE, db.getRepositoryState());
+	}
+

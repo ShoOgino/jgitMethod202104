@@ -60,11 +60,12 @@
 							merger.getResultTreeId());
 					dco.setFailOnConflict(true);
 					dco.checkout();
-					newHead = new Git(getRepository()).commit()
-							.setMessage(srcCommit.getFullMessage())
-							.setReflogComment(reflogPrefix + " " //$NON-NLS-1$
-									+ srcCommit.getShortMessage())
-							.setAuthor(srcCommit.getAuthorIdent()).call();
+					if (!noCommit)
+						newHead = new Git(getRepository()).commit()
+								.setMessage(srcCommit.getFullMessage())
+								.setReflogComment(reflogPrefix + " " //$NON-NLS-1$
+										+ srcCommit.getShortMessage())
+								.setAuthor(srcCommit.getAuthorIdent()).call();
 					cherryPickedRefs.add(src);
 				} else {
 					if (merger.failed())
@@ -76,7 +77,8 @@
 							.formatWithConflicts(srcCommit.getFullMessage(),
 									merger.getUnmergedPaths());
 
-					repo.writeCherryPickHead(srcCommit.getId());
+					if (!noCommit)
+						repo.writeCherryPickHead(srcCommit.getId());
 					repo.writeMergeCommitMsg(message);
 
 					return CherryPickResult.CONFLICT;
