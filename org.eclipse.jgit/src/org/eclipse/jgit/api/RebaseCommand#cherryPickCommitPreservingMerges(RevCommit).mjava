@@ -1,0 +1,87 @@
+	private RebaseResult cherryPickCommitPreservingMerges(RevCommit commitToPick)
+			throws IOException, GitAPIException, NoMessageException,
+			UnmergedPathsException, ConcurrentRefUpdateException,
+			WrongRepositoryStateException, NoHeadException {
+
+		writeCurrentCommit(commitToPick);
+
+		List<RevCommit> newParents = getNewParents(commitToPick);
+		boolean otherParentsUnchanged = true;
+		for (int i = 1; i < commitToPick.getParentCount(); i++)
+			otherParentsUnchanged &= newParents.get(i).equals(
+					commitToPick.getParent(i));
+		// If the first parent of commitToPick is the current HEAD,
+		// we do a fast-forward instead of cherry-pick to avoid
+		// unnecessary object rewriting
+		newHead = otherParentsUnchanged ? tryFastForward(commitToPick) : null;
+		lastStepWasForward = newHead != null;
+		if (!lastStepWasForward) {
+			ObjectId headId = getHead().getObjectId();
+			if (!AnyObjectId.equals(headId, newParents.get(0)))
+				checkoutCommit(headId.getName(), newParents.get(0));
+
+			// Use the cherry-pick strategy if all non-first parents did not
+			// change. This is different from C Git, which always uses the merge
+			// strategy (see below).
+			if (otherParentsUnchanged) {
+				boolean isMerge = commitToPick.getParentCount() > 1;
+				String ourCommitName = getOurCommitName();
+				CherryPickCommand pickCommand = new Git(repo).cherryPick()
+						.include(commitToPick).setOurCommitName(ourCommitName)
+						.setReflogPrefix(REFLOG_PREFIX).setStrategy(strategy);
+				if (isMerge) {
+					pickCommand.setMainlineParentNumber(1);
+					// We write a MERGE_HEAD and later commit explicitly
+					pickCommand.setNoCommit(true);
+					writeMergeInfo(commitToPick, newParents);
+				}
+				CherryPickResult cherryPickResult = pickCommand.call();
+				switch (cherryPickResult.getStatus()) {
+				case FAILED:
+					if (operation == Operation.BEGIN)
+						return abort(RebaseResult.failed(cherryPickResult
+								.getFailingPaths()));
+					else
+						return stop(commitToPick, Status.STOPPED);
+				case CONFLICTING:
+					return stop(commitToPick, Status.STOPPED);
+				case OK:
+					if (isMerge) {
+						// Commit the merge (setup above using writeMergeInfo())
+						CommitCommand commit = new Git(repo).commit();
+						commit.setAuthor(commitToPick.getAuthorIdent());
+						commit.setReflogComment(REFLOG_PREFIX + " " //$NON-NLS-1$
+								+ commitToPick.getShortMessage());
+						newHead = commit.call();
+					} else
+						newHead = cherryPickResult.getNewHead();
+					break;
+				}
+			} else {
+				// Use the merge strategy to redo merges, which had some of
+				// their non-first parents rewritten
+				MergeCommand merge = new Git(repo).merge()
+						.setFastForward(MergeCommand.FastForwardMode.NO_FF)
+						.setCommit(false);
+				for (int i = 1; i < commitToPick.getParentCount(); i++)
+					merge.include(newParents.get(i));
+				MergeResult mergeResult = merge.call();
+				if (mergeResult.getMergeStatus().isSuccessful()) {
+					CommitCommand commit = new Git(repo).commit();
+					commit.setAuthor(commitToPick.getAuthorIdent());
+					commit.setMessage(commitToPick.getFullMessage());
+					commit.setReflogComment(REFLOG_PREFIX + " " //$NON-NLS-1$
+							+ commitToPick.getShortMessage());
+					newHead = commit.call();
+				} else {
+					if (operation == Operation.BEGIN
+							&& mergeResult.getMergeStatus() == MergeResult.MergeStatus.FAILED)
+						return abort(RebaseResult.failed(mergeResult
+								.getFailingPaths()));
+					return stop(commitToPick, Status.STOPPED);
+				}
+			}
+		}
+		return null;
+	}
+

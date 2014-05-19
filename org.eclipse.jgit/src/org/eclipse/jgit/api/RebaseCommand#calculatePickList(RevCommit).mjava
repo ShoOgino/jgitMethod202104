@@ -1,0 +1,44 @@
+	private List<RevCommit> calculatePickList(RevCommit headCommit)
+			throws GitAPIException, NoHeadException, IOException {
+		LogCommand cmd = new Git(repo).log().addRange(upstreamCommit,
+				headCommit);
+		Iterable<RevCommit> commitsToUse = cmd.call();
+		List<RevCommit> cherryPickList = new ArrayList<RevCommit>();
+		for (RevCommit commit : commitsToUse) {
+			if (preserveMerges || commit.getParentCount() == 1)
+				cherryPickList.add(commit);
+		}
+		Collections.reverse(cherryPickList);
+
+		if (preserveMerges) {
+			// When preserving merges we only rewrite commits which have at
+			// least one parent that is itself rewritten (or a merge base)
+			File rewrittenDir = rebaseState.getRewrittenDir();
+			FileUtils.mkdir(rewrittenDir, false);
+			walk.reset();
+			walk.setRevFilter(RevFilter.MERGE_BASE);
+			walk.markStart(upstreamCommit);
+			walk.markStart(headCommit);
+			RevCommit base;
+			while ((base = walk.next()) != null)
+				RebaseState.createFile(rewrittenDir, base.getName(),
+						upstreamCommit.getName());
+
+			Iterator<RevCommit> iterator = cherryPickList.iterator();
+			pickLoop: while(iterator.hasNext()){
+				RevCommit commit = iterator.next();
+				for (int i = 0; i < commit.getParentCount(); i++) {
+					boolean parentRewritten = new File(rewrittenDir, commit
+							.getParent(i).getName()).exists();
+					if (parentRewritten) {
+						new File(rewrittenDir, commit.getName()).createNewFile();
+						continue pickLoop;
+					}
+				}
+				// commit is only merged in, needs not be rewritten
+				iterator.remove();
+			}
+		}
+		return cherryPickList;
+	}
+

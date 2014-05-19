@@ -117,7 +117,8 @@
 					case FORCED:
 					case FAST_FORWARD: {
 						setCallable(false);
-						if (state == RepositoryState.MERGING_RESOLVED) {
+						if (state == RepositoryState.MERGING_RESOLVED
+								|| isMergeDuringRebase(state)) {
 							// Commit was successful. Now delete the files
 							// used for merge commits
 							repo.writeMergeCommitMsg(null);

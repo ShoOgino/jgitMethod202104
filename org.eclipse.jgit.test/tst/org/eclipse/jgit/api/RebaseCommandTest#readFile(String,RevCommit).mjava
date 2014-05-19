@@ -1,0 +1,8 @@
+	private String readFile(String path, RevCommit commit) throws IOException {
+		TreeWalk walk = TreeWalk.forPath(db, path, commit.getTree());
+		ObjectLoader loader = db.open(walk.getObjectId(0), Constants.OBJ_BLOB);
+		String result = RawParseUtils.decode(loader.getCachedBytes());
+		walk.release();
+		return result;
+	}
+

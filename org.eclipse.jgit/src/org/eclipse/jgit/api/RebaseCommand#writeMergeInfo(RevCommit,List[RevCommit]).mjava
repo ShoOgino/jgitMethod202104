@@ -1,0 +1,7 @@
+	// Prepare MERGE_HEAD and message for the next commit
+	private void writeMergeInfo(RevCommit commitToPick,
+			List<RevCommit> newParents) throws IOException {
+		repo.writeMergeHeads(newParents.subList(1, newParents.size()));
+		repo.writeMergeCommitMsg(commitToPick.getFullMessage());
+	}
+

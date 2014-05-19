@@ -1,0 +1,14 @@
+	private void writeRewrittenHashes() throws RevisionSyntaxException,
+			IOException {
+		File currentCommitFile = rebaseState.getFile(CURRENT_COMMIT);
+		if (!currentCommitFile.exists())
+			return;
+
+		String head = repo.resolve(Constants.HEAD).getName();
+		String currentCommits = rebaseState.readFile(CURRENT_COMMIT);
+		for (String current : currentCommits.split("\n")) //$NON-NLS-1$
+			RebaseState
+					.createFile(rebaseState.getRewrittenDir(), current, head);
+		FileUtils.delete(currentCommitFile);
+	}
+

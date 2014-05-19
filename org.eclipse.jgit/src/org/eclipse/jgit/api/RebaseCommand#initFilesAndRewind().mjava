@@ -30,19 +30,6 @@
 		monitor.beginTask(JGitText.get().obtainingCommitsForCherryPick,
 				ProgressMonitor.UNKNOWN);
 
-		// determine the commits to be applied
-		LogCommand cmd = new Git(repo).log().addRange(upstreamCommit,
-				headCommit);
-		Iterable<RevCommit> commitsToUse = cmd.call();
-
-		List<RevCommit> cherryPickList = new ArrayList<RevCommit>();
-		for (RevCommit commit : commitsToUse) {
-			if (commit.getParentCount() != 1)
-				continue;
-			cherryPickList.add(commit);
-		}
-
-		Collections.reverse(cherryPickList);
 		// create the folder for the meta information
 		FileUtils.mkdir(rebaseState.getDir(), true);
 
@@ -57,6 +44,8 @@
 		ArrayList<RebaseTodoLine> toDoSteps = new ArrayList<RebaseTodoLine>();
 		toDoSteps.add(new RebaseTodoLine("# Created by EGit: rebasing " + headId.name() //$NON-NLS-1$
 						+ " onto " + upstreamCommit.name())); //$NON-NLS-1$
+		// determine the commits to be applied
+		List<RevCommit> cherryPickList = calculatePickList(headCommit);
 		ObjectReader reader = walk.getObjectReader();
 		for (RevCommit commit : cherryPickList)
 			toDoSteps.add(new RebaseTodoLine(Action.PICK, reader

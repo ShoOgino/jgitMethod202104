@@ -18,7 +18,8 @@
 			author = committer;
 
 		// when doing a merge commit parse MERGE_HEAD and MERGE_MSG files
-		if (state == RepositoryState.MERGING_RESOLVED) {
+		if (state == RepositoryState.MERGING_RESOLVED
+				|| isMergeDuringRebase(state)) {
 			try {
 				parents = repo.readMergeHeads();
 				if (parents != null)
