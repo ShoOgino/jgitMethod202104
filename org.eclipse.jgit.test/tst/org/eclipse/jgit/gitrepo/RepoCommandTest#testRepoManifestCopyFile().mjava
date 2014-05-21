@@ -12,24 +12,28 @@
 			.append("<copyfile src=\"hello.txt\" dest=\"Hello\" />")
 			.append("</project>")
 			.append("</manifest>");
-		JGitTestUtil.writeTrashFile(localDb, "manifest.xml", xmlContent.toString());
+		JGitTestUtil.writeTrashFile(
+				localDb, "manifest.xml", xmlContent.toString());
 		RepoCommand command = new RepoCommand(localDb);
-		command.setPath(localDb.getWorkTree().getAbsolutePath() + "/manifest.xml")
+		command
+			.setPath(localDb.getWorkTree().getAbsolutePath() + "/manifest.xml")
 			.setURI(rootUri)
 			.call();
 		// The original file should exist
 		File hello = new File(localDb.getWorkTree(), "foo/hello.txt");
-		assertTrue("The original file exists", hello.exists());
+		assertTrue("The original file should exist", hello.exists());
 		BufferedReader reader = new BufferedReader(new FileReader(hello));
 		String content = reader.readLine();
 		reader.close();
-		assertEquals("The original file has expected content", "master world", content);
+		assertEquals("The original file should have expected content",
+				"master world", content);
 		// The dest file should also exist
 		hello = new File(localDb.getWorkTree(), "Hello");
-		assertTrue("The destination file exists", hello.exists());
+		assertTrue("The destination file should exist", hello.exists());
 		reader = new BufferedReader(new FileReader(hello));
 		content = reader.readLine();
 		reader.close();
-		assertEquals("The destination file has expected content", "master world", content);
+		assertEquals("The destination file should have expected content",
+				"master world", content);
 	}
 
