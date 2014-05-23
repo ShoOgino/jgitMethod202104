@@ -67,23 +67,10 @@
 					ConfigConstants.CONFIG_BRANCH_SECTION, branchName,
 					ConfigConstants.CONFIG_KEY_MERGE);
 
-        // determines whether rebase should be used after fetching
-        boolean doRebase = false;
-        switch (pullRebaseMode) {
-            case REBASE:
-                doRebase = true;
-                break;
-            case NO_REBASE:
-                doRebase = false;
-                break;
-            case USE_CONFIG:
-            default:
-                // check if the branch is configured for pull-rebase
-                doRebase = repoConfig.getBoolean(
-                        ConfigConstants.CONFIG_BRANCH_SECTION, branchName,
-                        ConfigConstants.CONFIG_KEY_REBASE, false);
-                break;
-        }
+		// determines whether rebase should be used after fetching
+		if (pullRebaseMode == null) {
+			pullRebaseMode = getRebaseMode(branchName, repoConfig);
+		}
 
 		if (remoteBranchName == null)
 			remoteBranchName = branchName;
@@ -161,11 +148,12 @@
 				+ remoteUri;
 
 		PullResult result;
-		if (doRebase) {
+		if (pullRebaseMode.rebase) {
 			RebaseCommand rebase = new RebaseCommand(repo);
 			RebaseResult rebaseRes = rebase.setUpstream(commitToMerge)
 					.setUpstreamName(upstreamName).setProgressMonitor(monitor)
 					.setOperation(Operation.BEGIN).setStrategy(strategy)
+					.setPreserveMerges(pullRebaseMode.preserveMerges)
 					.call();
 			result = new PullResult(fetchRes, remote, rebaseRes);
 		} else {

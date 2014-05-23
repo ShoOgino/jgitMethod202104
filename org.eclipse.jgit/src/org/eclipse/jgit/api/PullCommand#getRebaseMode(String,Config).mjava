@@ -1,0 +1,10 @@
+	private static PullRebaseMode getRebaseMode(String branchName, Config config) {
+		PullRebaseMode mode = config.getEnum(PullRebaseMode.values(),
+				ConfigConstants.CONFIG_PULL_SECTION, null,
+				ConfigConstants.CONFIG_KEY_REBASE, PullRebaseMode.NO_REBASE);
+		mode = config.getEnum(PullRebaseMode.values(),
+				ConfigConstants.CONFIG_BRANCH_SECTION,
+				branchName, ConfigConstants.CONFIG_KEY_REBASE, mode);
+		return mode;
+	}
+

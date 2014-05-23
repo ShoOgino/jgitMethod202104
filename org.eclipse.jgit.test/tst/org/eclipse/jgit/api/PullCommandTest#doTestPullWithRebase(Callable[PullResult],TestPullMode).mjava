@@ -1,0 +1,74 @@
+	private void doTestPullWithRebase(Callable<PullResult> pullSetup,
+			TestPullMode expectedPullMode) throws Exception {
+		// simple upstream change
+		writeToFile(sourceFile, "content");
+		source.add().addFilepattern(sourceFile.getName()).call();
+		RevCommit sourceCommit = source.commit().setMessage("source commit")
+				.call();
+
+		// create a merge commit in target
+		File loxalFile = new File(dbTarget.getWorkTree(), "local.txt");
+		writeToFile(loxalFile, "initial\n");
+		target.add().addFilepattern("local.txt").call();
+		RevCommit t1 = target.commit().setMessage("target commit 1").call();
+
+		target.checkout().setCreateBranch(true).setName("side").call();
+
+		String newContent = "initial\n" + "and more\n";
+		writeToFile(loxalFile, newContent);
+		target.add().addFilepattern("local.txt").call();
+		RevCommit t2 = target.commit().setMessage("target commit 2").call();
+
+		target.checkout().setName("master").call();
+
+		MergeResult mergeResult = target.merge()
+				.setFastForward(MergeCommand.FastForwardMode.NO_FF).include(t2)
+				.call();
+		assertEquals(MergeStatus.MERGED, mergeResult.getMergeStatus());
+		assertFileContentsEqual(loxalFile, newContent);
+		ObjectId merge = mergeResult.getNewHead();
+
+		// pull
+		PullResult res = pullSetup.call();
+		assertNotNull(res.getFetchResult());
+
+		if (expectedPullMode == TestPullMode.MERGE) {
+			assertEquals(MergeStatus.MERGED, res.getMergeResult()
+					.getMergeStatus());
+			assertNull(res.getRebaseResult());
+		} else {
+			assertNull(res.getMergeResult());
+			assertEquals(RebaseResult.OK_RESULT, res.getRebaseResult());
+		}
+		assertFileContentsEqual(sourceFile, "content");
+
+		RevWalk rw = new RevWalk(dbTarget);
+		rw.sort(RevSort.TOPO);
+		rw.markStart(rw.parseCommit(dbTarget.resolve("refs/heads/master")));
+
+		RevCommit next;
+		if (expectedPullMode == TestPullMode.MERGE) {
+			next = rw.next();
+			assertEquals(2, next.getParentCount());
+			assertEquals(merge, next.getParent(0));
+			assertEquals(sourceCommit, next.getParent(1));
+			// since both parents are known do no further checks here
+		} else {
+			if (expectedPullMode == TestPullMode.REBASE_PREASERVE) {
+				next = rw.next();
+				assertEquals(2, next.getParentCount());
+			}
+			next = rw.next();
+			assertEquals(t2.getShortMessage(), next.getShortMessage());
+			next = rw.next();
+			assertEquals(t1.getShortMessage(), next.getShortMessage());
+			next = rw.next();
+			assertEquals(sourceCommit, next);
+			next = rw.next();
+			assertEquals("Initial commit for source", next.getShortMessage());
+			next = rw.next();
+			assertNull(next);
+		}
+		rw.release();
+	}
+
