@@ -13,17 +13,21 @@
 			.append(defaultUri)
 			.append("\" />")
 			.append("</manifest>");
-		JGitTestUtil.writeTrashFile(tempDb, "manifest.xml", xmlContent.toString());
+		JGitTestUtil.writeTrashFile(
+				tempDb, "manifest.xml", xmlContent.toString());
 		RepoCommand command = new RepoCommand(remoteDb);
-		command.setPath(tempDb.getWorkTree().getAbsolutePath() + "/manifest.xml")
+		command
+			.setPath(tempDb.getWorkTree().getAbsolutePath() + "/manifest.xml")
 			.setURI(rootUri)
 			.call();
 		// Clone it
 		File directory = createTempDirectory("testRevisionBare");
-		CloneCommand clone = Git.cloneRepository();
-		clone.setDirectory(directory);
-		clone.setURI(remoteDb.getDirectory().toURI().toString());
-		Repository localDb = clone.call().getRepository();
+		Repository localDb = Git
+			.cloneRepository()
+			.setDirectory(directory)
+			.setURI(remoteDb.getDirectory().toURI().toString())
+			.call()
+			.getRepository();
 		// The gitlink should be the same as oldCommitId
 		String gitlink = localDb.resolve(Constants.HEAD + ":foo").name();
 		assertEquals("The gitlink is same as remote head",

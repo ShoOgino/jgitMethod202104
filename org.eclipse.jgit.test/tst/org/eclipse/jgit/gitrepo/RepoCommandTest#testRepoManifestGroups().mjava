@@ -21,35 +21,39 @@
 
 		// default should have foo, a & b
 		Repository localDb = createWorkRepository();
-		JGitTestUtil.writeTrashFile(localDb, "manifest.xml", xmlContent.toString());
+		JGitTestUtil.writeTrashFile(
+				localDb, "manifest.xml", xmlContent.toString());
 		RepoCommand command = new RepoCommand(localDb);
-		command.setPath(localDb.getWorkTree().getAbsolutePath() + "/manifest.xml")
+		command
+			.setPath(localDb.getWorkTree().getAbsolutePath() + "/manifest.xml")
 			.setURI(rootUri)
 			.call();
 		File file = new File(localDb.getWorkTree(), "foo/hello.txt");
-		assertTrue("default has foo", file.exists());
+		assertTrue("default should have foo", file.exists());
 		file = new File(localDb.getWorkTree(), "bar/world.txt");
-		assertFalse("default doesn't have bar", file.exists());
+		assertFalse("default shouldn't have bar", file.exists());
 		file = new File(localDb.getWorkTree(), "a/a.txt");
-		assertTrue("default has a", file.exists());
+		assertTrue("default should have a", file.exists());
 		file = new File(localDb.getWorkTree(), "b/b.txt");
-		assertTrue("default has b", file.exists());
+		assertTrue("default should have b", file.exists());
 
 		// all,-a should have bar & b
 		localDb = createWorkRepository();
-		JGitTestUtil.writeTrashFile(localDb, "manifest.xml", xmlContent.toString());
+		JGitTestUtil.writeTrashFile(
+				localDb, "manifest.xml", xmlContent.toString());
 		command = new RepoCommand(localDb);
-		command.setPath(localDb.getWorkTree().getAbsolutePath() + "/manifest.xml")
+		command
+			.setPath(localDb.getWorkTree().getAbsolutePath() + "/manifest.xml")
 			.setURI(rootUri)
 			.setGroups("all,-a")
 			.call();
 		file = new File(localDb.getWorkTree(), "foo/hello.txt");
-		assertFalse("\"all,-a\" doesn't have foo", file.exists());
+		assertFalse("\"all,-a\" shouldn't have foo", file.exists());
 		file = new File(localDb.getWorkTree(), "bar/world.txt");
-		assertTrue("\"all,-a\" has bar", file.exists());
+		assertTrue("\"all,-a\" should have bar", file.exists());
 		file = new File(localDb.getWorkTree(), "a/a.txt");
-		assertFalse("\"all,-a\" doesn't have a", file.exists());
+		assertFalse("\"all,-a\" shuoldn't have a", file.exists());
 		file = new File(localDb.getWorkTree(), "b/b.txt");
-		assertTrue("\"all,-a\" has have b", file.exists());
+		assertTrue("\"all,-a\" should have b", file.exists());
 	}
 

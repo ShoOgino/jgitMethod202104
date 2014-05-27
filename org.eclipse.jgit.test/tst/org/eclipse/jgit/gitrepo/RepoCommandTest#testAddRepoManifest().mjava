@@ -15,10 +15,11 @@
 			.setURI(rootUri)
 			.call();
 		File hello = new File(db.getWorkTree(), "foo/hello.txt");
-		assertTrue("submodule was checked out", hello.exists());
+		assertTrue("submodule should be checked out", hello.exists());
 		BufferedReader reader = new BufferedReader(new FileReader(hello));
 		String content = reader.readLine();
 		reader.close();
-		assertEquals("submodule content is as expected.", "master world", content);
+		assertEquals("submodule content should be as expected",
+				"master world", content);
 	}
 
