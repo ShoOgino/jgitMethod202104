@@ -1,8 +1,11 @@
 		@Override
 		public void endDocument() throws SAXException {
 			if (defaultRemote == null) {
-				throw new SAXException(MessageFormat.format(
-						RepoText.get().errorNoDefault, filename));
+				if (filename != null)
+					throw new SAXException(MessageFormat.format(
+							RepoText.get().errorNoDefaultFilename, filename));
+				else
+					throw new SAXException(RepoText.get().errorNoDefault);
 			}
 			final String remoteUrl;
 			try {
