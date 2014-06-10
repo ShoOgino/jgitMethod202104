@@ -11,8 +11,10 @@
 
 		final int tms = getTimeout() > 0 ? getTimeout() * 1000 : 0;
 
+		final FS fs = local == null ? FS.detect() : local.getFS();
+
 		sock = sch
-				.getSession(uri, getCredentialsProvider(), local.getFS(), tms);
+				.getSession(uri, getCredentialsProvider(), fs, tms);
 		return sock;
 	}
 
