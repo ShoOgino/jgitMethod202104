@@ -8,15 +8,10 @@
 					.setURI(uri)
 					.call()
 					.getRepository();
-			ObjectReader reader = repo.newObjectReader();
-			byte[] result;
 			try {
-				ObjectId oid = repo.resolve(ref + ":" + path); //$NON-NLS-1$
-				result = reader.open(oid).getBytes(Integer.MAX_VALUE);
+				return readFileFromRepo(repo, ref, path);
 			} finally {
-				reader.release();
 				FileUtils.delete(dir, FileUtils.RECURSIVE);
 			}
-			return result;
 		}
 
