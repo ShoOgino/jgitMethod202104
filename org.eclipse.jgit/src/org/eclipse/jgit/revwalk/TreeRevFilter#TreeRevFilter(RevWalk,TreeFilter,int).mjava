@@ -1,0 +1,30 @@
+	/**
+	 * Create a filter for the first phase of a parent-rewriting limited revision
+	 * walk.
+	 * <p>
+	 * This filter is ANDed to evaluate before all other filters and ties the
+	 * configured {@link TreeFilter} into the revision walking process.
+	 * <p>
+	 * If no interesting tree entries are found the commit is colored with
+	 * {@code rewriteFlag}, allowing a later pass implemented by
+	 * {@link RewriteGenerator} to remove those colored commits from the DAG.
+	 *
+	 * @see RewriteGenerator
+	 *
+	 * @param walker
+	 *            walker used for reading trees.
+	 * @param t
+	 *            filter to compare against any changed paths in each commit. If a
+	 *            {@link FollowFilter}, will be replaced with a new filter
+	 *            following new paths after a rename.
+	 * @param rewriteFlag
+	 *            flag to color commits to be removed from the simplified DAT.
+	 */
+	TreeRevFilter(final RevWalk walker, final TreeFilter t,
+			final int rewriteFlag) {
+		pathFilter = new TreeWalk(walker.reader);
+		pathFilter.setFilter(t);
+		pathFilter.setRecursive(t.shouldBeRecursive());
+		this.rewriteFlag = rewriteFlag;
+	}
+

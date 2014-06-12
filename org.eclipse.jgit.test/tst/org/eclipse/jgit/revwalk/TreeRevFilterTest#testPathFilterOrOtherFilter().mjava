@@ -1,0 +1,32 @@
+	@Test
+	public void testPathFilterOrOtherFilter() throws Exception {
+		RevFilter pathFilter = treeRevFilter("d/f");
+		RevFilter skipFilter = SkipRevFilter.create(1);
+		RevFilter orFilter = OrRevFilter.create(skipFilter, pathFilter);
+
+		RevCommit a = parseBody(commit(5, tree(file("d/f", blob("a")))));
+		RevCommit b = parseBody(commit(5, tree(file("d/f", blob("a"))), a));
+		RevCommit c = parseBody(commit(5, tree(file("d/f", blob("b"))), b));
+
+		// Path filter matches c, a.
+		rw.setRevFilter(pathFilter);
+		markStart(c);
+		assertCommit(c, rw.next());
+		assertCommit(a, rw.next());
+
+		// Skip filter matches b, a.
+		rw.reset();
+		rw.setRevFilter(skipFilter);
+		markStart(c);
+		assertCommit(b, rw.next());
+		assertCommit(a, rw.next());
+
+		// (Path OR Skip) matches c, b, a.
+		rw.reset();
+		rw.setRevFilter(orFilter);
+		markStart(c);
+		assertCommit(c, rw.next());
+		assertCommit(b, rw.next());
+		assertCommit(a, rw.next());
+	}
+

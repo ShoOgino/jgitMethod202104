@@ -33,7 +33,7 @@
 				// No changes, so our tree is effectively the same as
 				// our parent tree. We pass the buck to our parent.
 				//
-				c.flags |= REWRITE;
+				c.flags |= rewriteFlag;
 				return false;
 			} else {
 				// We have interesting items, but neither of the special
@@ -54,7 +54,7 @@
 			//
 			if (tw.next())
 				return true;
-			c.flags |= REWRITE;
+			c.flags |= rewriteFlag;
 			return false;
 		}
 
@@ -97,7 +97,7 @@
 					continue;
 				}
 
-				c.flags |= REWRITE;
+				c.flags |= rewriteFlag;
 				c.parents = new RevCommit[] { p };
 				return false;
 			}
@@ -128,7 +128,7 @@
 		// as they are and allow those parents to flow into pending
 		// for further scanning.
 		//
-		c.flags |= REWRITE;
+		c.flags |= rewriteFlag;
 		return false;
 	}
 
