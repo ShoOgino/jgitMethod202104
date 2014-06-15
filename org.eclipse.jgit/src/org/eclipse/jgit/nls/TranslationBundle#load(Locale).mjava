@@ -12,13 +12,17 @@
 	 *
 	 * @param locale
 	 *            defines the locale to be used when loading the resource bundle
-	 * @exception TranslationBundleLoadingException see {@link TranslationBundleLoadingException}
-	 * @exception TranslationStringMissingException see {@link TranslationStringMissingException}
+	 * @exception TranslationBundleLoadingException
+	 *                see {@link TranslationBundleLoadingException}
+	 * @exception TranslationStringMissingException
+	 *                see {@link TranslationStringMissingException}
 	 */
-	void load(Locale locale) throws TranslationBundleLoadingException {
+	void load(Locale locale)
+			throws TranslationBundleLoadingException {
 		Class bundleClass = getClass();
 		try {
-			resourceBundle = ResourceBundle.getBundle(bundleClass.getName(), locale);
+			resourceBundle = ResourceBundle.getBundle(bundleClass.getName(),
+					locale, bundleClass.getClassLoader());
 		} catch (MissingResourceException e) {
 			throw new TranslationBundleLoadingException(bundleClass, locale, e);
 		}
