@@ -1,0 +1,8 @@
+	@Test
+	public void testAlias_invalidConnectionAttempts() throws Exception {
+		config("Host orcz\n" + "\tConnectionAttempts -1\n");
+		final Host h = osc.lookup("orcz");
+		assertNotNull(h);
+		assertEquals(1, h.getConnectionAttempts());
+	}
+

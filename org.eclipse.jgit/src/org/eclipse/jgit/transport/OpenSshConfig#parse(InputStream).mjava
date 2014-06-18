@@ -70,6 +70,18 @@
 				for (final Host c : current)
 					if (c.strictHostKeyChecking == null)
 						c.strictHostKeyChecking = value;
+			} else if (StringUtils.equalsIgnoreCase(
+					"ConnectionAttempts", keyword)) { //$NON-NLS-1$
+				try {
+					final int connectionAttempts = Integer.parseInt(dequote(argValue));
+					if (connectionAttempts > 0) {
+						for (final Host c : current)
+							if (c.connectionAttempts == 0)
+								c.connectionAttempts = connectionAttempts;
+					}
+				} catch (NumberFormatException nfe) {
+					// ignore bad values
+				}
 			}
 		}
 
