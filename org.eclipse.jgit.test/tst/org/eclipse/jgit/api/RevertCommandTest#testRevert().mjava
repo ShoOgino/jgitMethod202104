@@ -26,6 +26,8 @@
 
 		git.revert().include(fixingA).call();
 
+		assertEquals(RepositoryState.SAFE, db.getRepositoryState());
+
 		assertTrue(new File(db.getWorkTree(), "b").exists());
 		checkFile(new File(db.getWorkTree(), "a"),
 				"first line\nsec. line\nthird line\nfourth line\n");
