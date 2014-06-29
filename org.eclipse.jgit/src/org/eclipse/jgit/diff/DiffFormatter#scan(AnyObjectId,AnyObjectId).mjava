@@ -5,11 +5,14 @@
 	 * returned. Callers may choose to format these paths themselves, or convert
 	 * them into {@link FileHeader} instances with a complete edit list by
 	 * calling {@link #toFileHeader(DiffEntry)}.
+	 * <p>
+	 * Either side may be null to indicate that the tree has beed added or
+	 * removed. The diff will be computed against nothing.
 	 *
 	 * @param a
-	 *            the old (or previous) side.
+	 *            the old (or previous) side or null
 	 * @param b
-	 *            the new (or updated) side.
+	 *            the new (or updated) side or null
 	 * @return the paths that are different.
 	 * @throws IOException
 	 *             trees cannot be read or file contents cannot be read.
@@ -19,6 +22,8 @@
 		assertHaveRepository();
 
 		RevWalk rw = new RevWalk(reader);
-		return scan(rw.parseTree(a), rw.parseTree(b));
+		RevTree aTree = a != null ? rw.parseTree(a) : null;
+		RevTree bTree = b != null ? rw.parseTree(b) : null;
+		return scan(aTree, bTree);
 	}
 

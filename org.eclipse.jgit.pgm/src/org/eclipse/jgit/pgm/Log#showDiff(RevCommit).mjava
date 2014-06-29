@@ -1,5 +1,6 @@
 	private void showDiff(RevCommit c) throws IOException {
-		final RevTree a = c.getParent(0).getTree();
+		final RevTree a = c.getParentCount() > 0 ? c.getParent(0).getTree()
+				: null;
 		final RevTree b = c.getTree();
 
 		if (showNameAndStatusOnly)

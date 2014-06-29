@@ -1,0 +1,10 @@
+	private AbstractTreeIterator makeIteratorFromTreeOrNull(RevTree tree)
+			throws IncorrectObjectTypeException, IOException {
+		if (tree != null) {
+			CanonicalTreeParser parser = new CanonicalTreeParser();
+			parser.reset(reader, tree);
+			return parser;
+		} else
+			return new EmptyTreeIterator();
+	}
+

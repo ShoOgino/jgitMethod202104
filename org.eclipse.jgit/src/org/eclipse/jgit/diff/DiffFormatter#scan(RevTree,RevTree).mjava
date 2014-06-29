@@ -5,11 +5,14 @@
 	 * returned. Callers may choose to format these paths themselves, or convert
 	 * them into {@link FileHeader} instances with a complete edit list by
 	 * calling {@link #toFileHeader(DiffEntry)}.
+	 * <p>
+	 * Either side may be null to indicate that the tree has beed added or
+	 * removed. The diff will be computed against nothing.
 	 *
 	 * @param a
-	 *            the old (or previous) side.
+	 *            the old (or previous) side or null
 	 * @param b
-	 *            the new (or updated) side.
+	 *            the new (or updated) side or null
 	 * @return the paths that are different.
 	 * @throws IOException
 	 *             trees cannot be read or file contents cannot be read.
@@ -17,12 +20,8 @@
 	public List<DiffEntry> scan(RevTree a, RevTree b) throws IOException {
 		assertHaveRepository();
 
-		CanonicalTreeParser aParser = new CanonicalTreeParser();
-		CanonicalTreeParser bParser = new CanonicalTreeParser();
-
-		aParser.reset(reader, a);
-		bParser.reset(reader, b);
-
-		return scan(aParser, bParser);
+		AbstractTreeIterator aIterator = makeIteratorFromTreeOrNull(a);
+		AbstractTreeIterator bIterator = makeIteratorFromTreeOrNull(b);
+		return scan(aIterator, bIterator);
 	}
 
