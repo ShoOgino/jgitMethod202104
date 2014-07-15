@@ -1,7 +1,7 @@
 	private RevCommit squashIntoPrevious(boolean sequenceContainsSquash,
 			RebaseTodoLine nextStep)
 			throws IOException, GitAPIException {
-		RevCommit newHead;
+		RevCommit retNewHead;
 		String commitMessage = rebaseState
 				.readFile(MESSAGE_SQUASH);
 
@@ -13,7 +13,7 @@
 				commitMessage = interactiveHandler
 						.modifyCommitMessage(commitMessage);
 			}
-			newHead = new Git(repo).commit()
+			retNewHead = new Git(repo).commit()
 					.setMessage(stripCommentLines(commitMessage))
 					.setAmend(true).call();
 			rebaseState.getFile(MESSAGE_SQUASH).delete();
@@ -21,10 +21,10 @@
 
 		} else {
 			// Next step is either Squash or Fixup
-			newHead = new Git(repo).commit()
+			retNewHead = new Git(repo).commit()
 					.setMessage(commitMessage).setAmend(true)
 					.call();
 		}
-		return newHead;
+		return retNewHead;
 	}
 

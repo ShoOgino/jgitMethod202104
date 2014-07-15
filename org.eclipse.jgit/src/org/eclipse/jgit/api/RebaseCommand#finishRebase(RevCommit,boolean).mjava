@@ -1,12 +1,12 @@
-	private RebaseResult finishRebase(RevCommit newHead,
-			boolean lastStepWasForward) throws IOException, GitAPIException {
+	private RebaseResult finishRebase(RevCommit finalHead,
+			boolean lastStepIsForward) throws IOException, GitAPIException {
 		String headName = rebaseState.readFile(HEAD_NAME);
-		updateHead(headName, newHead, upstreamCommit);
+		updateHead(headName, finalHead, upstreamCommit);
 		boolean stashConflicts = autoStashApply();
 		FileUtils.delete(rebaseState.getDir(), FileUtils.RECURSIVE);
 		if (stashConflicts)
 			return RebaseResult.STASH_APPLY_CONFLICTS_RESULT;
-		if (lastStepWasForward || newHead == null)
+		if (lastStepIsForward || finalHead == null)
 			return RebaseResult.FAST_FORWARD_RESULT;
 		return RebaseResult.OK_RESULT;
 	}

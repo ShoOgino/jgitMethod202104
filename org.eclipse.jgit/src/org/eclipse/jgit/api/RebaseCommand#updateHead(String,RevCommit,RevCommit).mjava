@@ -1,10 +1,10 @@
-	private void updateHead(String headName, RevCommit newHead, RevCommit onto)
+	private void updateHead(String headName, RevCommit aNewHead, RevCommit onto)
 			throws IOException {
 		// point the previous head (if any) to the new commit
 
 		if (headName.startsWith(Constants.R_REFS)) {
 			RefUpdate rup = repo.updateRef(headName);
-			rup.setNewObjectId(newHead);
+			rup.setNewObjectId(aNewHead);
 			rup.setRefLogMessage("rebase finished: " + headName + " onto " //$NON-NLS-1$ //$NON-NLS-2$
 					+ onto.getName(), false);
 			Result res = rup.forceUpdate();
