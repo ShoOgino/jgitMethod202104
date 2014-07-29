@@ -1,0 +1,16 @@
+		/** Remove projects that sits in a subdirectory of any other project. */
+		void removeOverlaps() {
+			Collections.sort(projects);
+			Iterator<Project> iter = projects.iterator();
+			if (!iter.hasNext())
+				return;
+			Project last = iter.next();
+			while (iter.hasNext()) {
+				Project p = iter.next();
+				if (last.isAncestorOf(p))
+					iter.remove();
+				else
+					last = p;
+			}
+		}
+

@@ -14,14 +14,14 @@
 			} catch (URISyntaxException e) {
 				throw new SAXException(e);
 			}
+			removeNotInGroup();
+			removeOverlaps();
 			for (Project proj : projects) {
-				if (inGroups(proj)) {
-					command.addSubmodule(remoteUrl + proj.name,
-							proj.path,
-							proj.revision == null
-									? defaultRevision : proj.revision,
-							proj.copyfiles);
-				}
+				command.addSubmodule(remoteUrl + proj.name,
+						proj.path,
+						proj.revision == null
+								? defaultRevision : proj.revision,
+						proj.copyfiles);
 			}
 		}
 
