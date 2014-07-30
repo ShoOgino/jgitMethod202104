@@ -1,4 +1,8 @@
-	private void extendStringToMatchByOneCharacter(final char c) {
+	/**
+	 * @param c new character to append
+	 * @return true to continue, false if the matcher can stop appending
+	 */
+	private boolean extendStringToMatchByOneCharacter(final char c) {
 		final List<Head> newHeads = listForLocalUseage;
 		newHeads.clear();
 		List<Head> lastAddedHeads = null;
@@ -11,11 +15,13 @@
 			// This is the case with the heads "a" and "*" of "a*b" which
 			// both can return the list ["*","b"]
 			if (headsToAdd != lastAddedHeads) {
-				newHeads.addAll(headsToAdd);
+				if (!headsToAdd.isEmpty())
+					newHeads.addAll(headsToAdd);
 				lastAddedHeads = headsToAdd;
 			}
 		}
 		listForLocalUseage = heads;
 		heads = newHeads;
+		return !newHeads.isEmpty();
 	}
 
