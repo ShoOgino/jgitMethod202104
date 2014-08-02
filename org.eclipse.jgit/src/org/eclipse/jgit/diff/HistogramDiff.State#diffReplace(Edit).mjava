@@ -1,4 +1,4 @@
-		void diffReplace(Edit r) {
+		private void diffReplace(Edit r) {
 			Edit lcs = new HistogramDiffIndex<S>(maxChainLength, cmp, a, b, r)
 					.findLongestCommonSequence();
 			if (lcs != null) {
@@ -10,8 +10,8 @@
 					//
 					edits.add(r);
 				} else {
-					diff(r.before(lcs));
-					diff(r.after(lcs));
+					queue.add(r.after(lcs));
+					queue.add(r.before(lcs));
 				}
 
 			} else if (fallback instanceof LowLevelDiffAlgorithm) {
