@@ -1,10 +1,10 @@
-	private String getRemote() {
-		String remoteName = config.getString(
-				ConfigConstants.CONFIG_BRANCH_SECTION, branchName,
-				ConfigConstants.CONFIG_KEY_REMOTE);
-		if (remoteName == null)
-			return Constants.DEFAULT_REMOTE_NAME;
-		else
-			return remoteName;
+	/**
+	 * @return the remote this branch is configured to fetch from/push to, or
+	 *         {@code null} if not defined
+	 * @since 3.5
+	 */
+	public String getRemote() {
+		return config.getString(ConfigConstants.CONFIG_BRANCH_SECTION,
+				branchName, ConfigConstants.CONFIG_KEY_REMOTE);
 	}
 
