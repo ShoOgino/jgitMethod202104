@@ -1,0 +1,14 @@
+	@Test
+	public void isRebase() {
+		Config c = parse("" //
+				+ "[branch \"undefined\"]\n"
+				+ "[branch \"false\"]\n"
+				+ "  rebase = false\n"
+				+ "[branch \"true\"]\n"
+				+ "  rebase = true\n");
+
+		assertFalse(new BranchConfig(c, "undefined").isRebase());
+		assertFalse(new BranchConfig(c, "false").isRebase());
+		assertTrue(new BranchConfig(c, "true").isRebase());
+	}
+
