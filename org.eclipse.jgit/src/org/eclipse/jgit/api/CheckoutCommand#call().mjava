@@ -28,7 +28,10 @@
 				Git git = new Git(repo);
 				CreateBranchCommand command = git.branchCreate();
 				command.setName(name);
-				command.setStartPoint(getStartPoint().name());
+				if (startCommit != null)
+					command.setStartPoint(startCommit);
+				else
+					command.setStartPoint(startPoint);
 				if (upstreamMode != null)
 					command.setUpstreamMode(upstreamMode);
 				command.call();
@@ -49,7 +52,7 @@
 					this.status = CheckoutResult.NOT_TRIED_RESULT;
 					return repo.getRef(Constants.HEAD);
 				}
-				branch = getStartPoint();
+				branch = getStartPointObjectId();
 			} else {
 				branch = repo.resolve(name);
 				if (branch == null)

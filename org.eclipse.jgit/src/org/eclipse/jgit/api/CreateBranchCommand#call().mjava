@@ -22,7 +22,7 @@
 				throw new RefAlreadyExistsException(MessageFormat.format(
 						JGitText.get().refAlreadyExists1, name));
 
-			ObjectId startAt = getStartPoint();
+			ObjectId startAt = getStartPointObjectId();
 			String startPointFullName = null;
 			if (startPoint != null) {
 				Ref baseRef = repo.getRef(startPoint);
@@ -40,7 +40,7 @@
 					baseCommit = startCommit.getShortMessage();
 				else {
 					RevCommit commit = revWalk.parseCommit(repo
-							.resolve(startPoint));
+							.resolve(getStartPointOrHead()));
 					baseCommit = commit.getShortMessage();
 				}
 				if (exists)
