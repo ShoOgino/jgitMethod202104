@@ -27,9 +27,9 @@
 				git = new Git(repo);
 
 			XmlManifest manifest = new XmlManifest(
-					this, inputStream, path, uri, groups);
+					this, includedReader, path, uri, groups);
 			try {
-				manifest.read();
+				manifest.read(inputStream);
 			} catch (IOException e) {
 				throw new ManifestErrorException(e);
 			}

@@ -1,5 +1,9 @@
 		@Override
 		public void endDocument() throws SAXException {
+			xmlInRead--;
+			if (xmlInRead != 0)
+				return;
+			// Only do the following after we finished reading everything.
 			if (defaultRemote == null) {
 				if (filename != null)
 					throw new SAXException(MessageFormat.format(
