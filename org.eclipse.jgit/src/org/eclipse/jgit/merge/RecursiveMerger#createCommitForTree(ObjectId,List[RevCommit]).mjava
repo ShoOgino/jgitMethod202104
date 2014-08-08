@@ -7,21 +7,16 @@
 	 *            the tree this commit should capture
 	 * @param parents
 	 *            the list of parent commits
-	 * @return a new (persisted) commit
+	 * @return a new commit visible only within this merger's RevWalk.
 	 * @throws IOException
 	 */
 	private RevCommit createCommitForTree(ObjectId tree, List<RevCommit> parents)
 			throws IOException {
 		CommitBuilder c = new CommitBuilder();
-		c.setParentIds(parents);
 		c.setTreeId(tree);
-		c.setAuthor(ident);
-		c.setCommitter(ident);
-		ObjectInserter odi = db.newObjectInserter();
-		ObjectId newCommitId = odi.insert(c);
-		odi.flush();
-		RevCommit ret = walk.lookupCommit(newCommitId);
-		walk.parseHeaders(ret);
-		return ret;
+		c.setParentIds(parents);
+		c.setAuthor(mockAuthor(parents));
+		c.setCommitter(c.getAuthor());
+		return RevCommit.parse(walk, c.build());
 	}
 
