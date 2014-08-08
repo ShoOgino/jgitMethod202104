@@ -206,8 +206,7 @@
 			MergeResult<RawText> result = contentMerge(base, ours, theirs);
 			if (ignoreConflicts)
 				result.setContainsConflicts(false);
-			File of = writeMergedFile(result);
-			updateIndex(base, ours, theirs, result, of);
+			updateIndex(base, ours, theirs, result);
 			if (result.containsConflicts() && !ignoreConflicts)
 				unmergedPaths.add(tw.getPathString());
 			modifiedFiles.add(tw.getPathString());
