@@ -15,37 +15,43 @@
 			CanonicalTreeParser ours, CanonicalTreeParser theirs,
 			MergeResult<RawText> result) throws FileNotFoundException,
 			IOException {
-		File of = writeMergedFile(result);
+		File mergedFile = !inCore ? writeMergedFile(result) : null;
 		if (result.containsConflicts()) {
-			// a conflict occurred, the file will contain conflict markers
-			// the index will be populated with the three stages and only the
-			// workdir (if used) contains the halfways merged content
+			// A conflict occurred, the file will contain conflict markers
+			// the index will be populated with the three stages and the
+			// workdir (if used) contains the halfway merged content.
 			add(tw.getRawPath(), base, DirCacheEntry.STAGE_1, 0, 0);
 			add(tw.getRawPath(), ours, DirCacheEntry.STAGE_2, 0, 0);
 			add(tw.getRawPath(), theirs, DirCacheEntry.STAGE_3, 0, 0);
 			mergeResults.put(tw.getPathString(), result);
-		} else {
-			// no conflict occurred, the file will contain fully merged content.
-			// the index will be populated with the new merged version
-			DirCacheEntry dce = new DirCacheEntry(tw.getPathString());
-			int newMode = mergeFileModes(tw.getRawMode(0), tw.getRawMode(1),
-					tw.getRawMode(2));
-			// set the mode for the new content. Fall back to REGULAR_FILE if
-			// you can't merge modes of OURS and THEIRS
-			dce.setFileMode((newMode == FileMode.MISSING.getBits()) ? FileMode.REGULAR_FILE
-					: FileMode.fromBits(newMode));
-			dce.setLastModified(of.lastModified());
-			dce.setLength((int) of.length());
-			InputStream is = new FileInputStream(of);
+			return;
+		}
+
+		// No conflict occurred, the file will contain fully merged content.
+		// The index will be populated with the new merged version.
+		DirCacheEntry dce = new DirCacheEntry(tw.getPathString());
+
+		// Set the mode for the new content. Fall back to REGULAR_FILE if
+		// we can't merge modes of OURS and THEIRS.
+		int newMode = mergeFileModes(
+				tw.getRawMode(0),
+				tw.getRawMode(1),
+				tw.getRawMode(2));
+		dce.setFileMode(newMode == FileMode.MISSING.getBits()
+				? FileMode.REGULAR_FILE
+				: FileMode.fromBits(newMode));
+		if (mergedFile != null) {
+			long len = mergedFile.length();
+			dce.setLastModified(mergedFile.lastModified());
+			dce.setLength((int) len);
+			InputStream is = new FileInputStream(mergedFile);
 			try {
-				dce.setObjectId(getObjectInserter().insert(
-				    Constants.OBJ_BLOB, of.length(), is));
+				dce.setObjectId(getObjectInserter().insert(OBJ_BLOB, len, is));
 			} finally {
 				is.close();
-				if (inCore)
-					FileUtils.delete(of);
 			}
-			builder.add(dce);
-		}
+		} else
+			dce.setObjectId(insertMergeResult(result));
+		builder.add(dce);
 	}
 
