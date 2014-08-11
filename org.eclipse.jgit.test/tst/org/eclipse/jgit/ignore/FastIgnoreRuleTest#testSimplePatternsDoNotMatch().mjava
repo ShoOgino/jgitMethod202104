@@ -1,0 +1,34 @@
+	@Test
+	public void testSimplePatternsDoNotMatch() {
+		assertNotMatched("ab", "a");
+		assertNotMatched("abc", "a/");
+		assertNotMatched("abc", "a/b");
+
+		assertNotMatched("a", "ab");
+		assertNotMatched("a", "ba");
+		assertNotMatched("a", "aa");
+
+		assertNotMatched("a", "b/ab");
+		assertNotMatched("a", "b/ba");
+
+		assertNotMatched("a", "b/ba");
+		assertNotMatched("a", "b/ab");
+
+		assertNotMatched("a", "b/ba/");
+		assertNotMatched("a", "b/ba/b");
+
+		assertNotMatched("a", "/aa");
+		assertNotMatched("a", "aa/");
+		assertNotMatched("a", "/aa/");
+
+		assertNotMatched("/a", "b/a");
+		assertNotMatched("/a", "/b/a/");
+
+		assertNotMatched("a/", "a");
+		assertNotMatched("a/", "b/a");
+
+		assertNotMatched("/a/", "a");
+		assertNotMatched("/a/", "/a");
+		assertNotMatched("/a/", "b/a");
+	}
+

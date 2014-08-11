@@ -1,0 +1,23 @@
+	@Test
+	public void testSplit() {
+		try {
+			split("/", '/').toArray();
+			fail("should not allow single slash");
+		} catch (IllegalStateException e) {
+			// expected
+		}
+
+		assertArrayEquals(new String[] { "a", "b" }, split("a/b", '/')
+				.toArray());
+		assertArrayEquals(new String[] { "a", "b/" }, split("a/b/", '/')
+				.toArray());
+		assertArrayEquals(new String[] { "/a", "b" }, split("/a/b", '/')
+				.toArray());
+		assertArrayEquals(new String[] { "/a", "b/" }, split("/a/b/", '/')
+				.toArray());
+		assertArrayEquals(new String[] { "/a", "b", "c" }, split("/a/b/c", '/')
+				.toArray());
+		assertArrayEquals(new String[] { "/a", "b", "c/" },
+				split("/a/b/c/", '/').toArray());
+	}
+

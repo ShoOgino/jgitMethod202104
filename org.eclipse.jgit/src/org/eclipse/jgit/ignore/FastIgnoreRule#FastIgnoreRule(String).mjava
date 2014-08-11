@@ -1,0 +1,49 @@
+	/**
+	 *
+	 * @param pattern
+	 *            ignore pattern as described in <a href=
+	 *            "https://www.kernel.org/pub/software/scm/git/docs/gitignore.html"
+	 *            >git manual</a>. If pattern is invalid or is not a pattern
+	 *            (comment), this rule doesn't match anything.
+	 */
+	public FastIgnoreRule(String pattern) {
+		if (pattern == null)
+			throw new IllegalArgumentException("Pattern must not be null!"); //$NON-NLS-1$
+		if (pattern.length() == 0) {
+			dirOnly = false;
+			inverse = false;
+			this.matcher = NO_MATCH;
+			return;
+		}
+		inverse = pattern.charAt(0) == '!';
+		if (inverse) {
+			pattern = pattern.substring(1);
+			if (pattern.length() == 0) {
+				dirOnly = false;
+				this.matcher = NO_MATCH;
+				return;
+			}
+		}
+		if (pattern.charAt(0) == '#') {
+			this.matcher = NO_MATCH;
+			dirOnly = false;
+		} else {
+			dirOnly = pattern.charAt(pattern.length() - 1) == PATH_SEPARATOR;
+			if (dirOnly) {
+				pattern = stripTrailing(pattern, PATH_SEPARATOR);
+				if (pattern.length() == 0) {
+					this.matcher = NO_MATCH;
+					return;
+				}
+			}
+			IMatcher m;
+			try {
+				m = PathMatcher.createPathMatcher(pattern,
+						Character.valueOf(PATH_SEPARATOR), dirOnly);
+			} catch (InvalidPatternException e) {
+				m = NO_MATCH;
+			}
+			this.matcher = m;
+		}
+	}
+

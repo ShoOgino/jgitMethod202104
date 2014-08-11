@@ -1,0 +1,26 @@
+	public void assertMatched(String pattern, String path, Boolean... assume) {
+		boolean match = match(pattern, path);
+		String result = path + " is " + (match ? "ignored" : "not ignored")
+				+ " via '" + pattern + "' rule";
+		if (!match)
+			System.err.println(result);
+		if (assume.length == 0 || !assume[0].booleanValue())
+			assertTrue("Expected a match for: " + pattern + " with: " + path,
+					match);
+		else
+			assumeTrue("Expected a match for: " + pattern + " with: " + path,
+					match);
+
+		if (pattern.startsWith("!"))
+			pattern = pattern.substring(1);
+		else
+			pattern = "!" + pattern;
+		match = match(pattern, path);
+		if (assume.length == 0 || !assume[0].booleanValue())
+			assertFalse("Expected no match for: " + pattern + " with: " + path,
+					match);
+		else
+			assumeFalse("Expected no match for: " + pattern + " with: " + path,
+					match);
+	}
+

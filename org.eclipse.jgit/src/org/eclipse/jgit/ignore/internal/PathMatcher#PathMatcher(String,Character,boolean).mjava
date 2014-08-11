@@ -1,0 +1,12 @@
+	PathMatcher(String pattern, Character pathSeparator, boolean dirOnly)
+			throws InvalidPatternException {
+		super(pattern, dirOnly);
+		slash = getPathSeparator(pathSeparator);
+		beginning = pattern.indexOf(slash) == 0;
+		if (isSimplePathWithSegments(pattern))
+			matchers = null;
+		else
+			matchers = createMatchers(split(pattern, slash), pathSeparator,
+					dirOnly);
+	}
+

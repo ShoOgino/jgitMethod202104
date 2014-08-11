@@ -1,0 +1,38 @@
+	/**
+	 * Splits given string to substrings by given separator
+	 *
+	 * @param pattern
+	 *            non null
+	 * @param slash
+	 *            separator char
+	 * @return list of substrings
+	 */
+	public static List<String> split(String pattern, char slash) {
+		int count = count(pattern, slash, true);
+		if (count < 1)
+			throw new IllegalStateException(
+					"Pattern must have at least two segments: " + pattern); //$NON-NLS-1$
+		List<String> segments = new ArrayList<String>(count);
+		int right = 0;
+		while (true) {
+			int left = right;
+			right = pattern.indexOf(slash, right);
+			if (right == -1) {
+				if (left < pattern.length())
+					segments.add(pattern.substring(left));
+				break;
+			}
+			if (right - left > 0)
+				if (left == 1)
+					// leading slash should remain by the first pattern
+					segments.add(pattern.substring(left - 1, right));
+				else if (right == pattern.length() - 1)
+					// trailing slash should remain too
+					segments.add(pattern.substring(left, right + 1));
+				else
+					segments.add(pattern.substring(left, right));
+			right++;
+		}
+		return segments;
+	}
+

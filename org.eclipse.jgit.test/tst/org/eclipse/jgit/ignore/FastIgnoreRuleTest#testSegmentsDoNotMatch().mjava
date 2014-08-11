@@ -1,0 +1,22 @@
+	@Test
+	public void testSegmentsDoNotMatch() {
+		assertNotMatched("a/b", "/a/bb");
+		assertNotMatched("a/b", "/aa/b");
+		assertNotMatched("a/b", "a/bb");
+		assertNotMatched("a/b", "aa/b");
+		assertNotMatched("a/b", "c/aa/b");
+		assertNotMatched("a/b", "c/a/bb");
+		assertNotMatched("a/b/", "/a/b");
+		assertNotMatched("/a/b/", "/a/b");
+		assertNotMatched("/a/b", "c/a/b");
+		assertNotMatched("/a/b/", "c/a/b");
+		assertNotMatched("/a/b/", "c/a/b/");
+
+		// XXX why is it like this????
+		assertNotMatched("a/b", "c/a/b");
+		assertNotMatched("a/b", "c/a/b/");
+		assertNotMatched("a/b", "c/a/b/c");
+		assertNotMatched("a/b/", "c/a/b/");
+		assertNotMatched("a/b/", "c/a/b/c");
+	}
+

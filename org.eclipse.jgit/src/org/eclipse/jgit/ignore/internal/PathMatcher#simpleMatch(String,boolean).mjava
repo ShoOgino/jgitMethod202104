@@ -1,0 +1,33 @@
+	/*
+	 * Stupid but fast string comparison: the case where we don't have to match
+	 * wildcards or single segments (mean: this is multi-segment path which must
+	 * be at the beginning of the another string)
+	 */
+	private boolean simpleMatch(String path, boolean assumeDirectory) {
+		boolean hasSlash = path.indexOf(slash) == 0;
+		if (beginning && !hasSlash)
+			path = slash + path;
+
+		if (!beginning && hasSlash)
+			path = path.substring(1);
+
+		if (path.equals(pattern))
+			// Exact match
+			if (dirOnly && !assumeDirectory)
+				// Directory expectations not met
+				return false;
+			else
+				// Directory expectations met
+				return true;
+
+		/*
+		 * Add slashes for startsWith check. This avoids matching e.g.
+		 * "/src/new" to /src/newfile" but allows "/src/new" to match
+		 * "/src/new/newfile", as is the git standard
+		 */
+		if (path.startsWith(pattern + FastIgnoreRule.PATH_SEPARATOR))
+			return true;
+
+		return false;
+	}
+

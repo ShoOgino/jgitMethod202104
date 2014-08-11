@@ -1,0 +1,34 @@
+	@Test
+	public void testSimpleCharClass() {
+		assertMatched("[a]", "a");
+		assertMatched("[a]", "a/");
+		assertMatched("[a]", "a/b");
+
+		assertMatched("[a]", "b/a");
+		assertMatched("[a]", "b/a/");
+		assertMatched("[a]", "b/a/b");
+
+		assertMatched("[a]", "/a/");
+		assertMatched("[a]", "/a/b");
+
+		assertMatched("[a]", "c/a/b");
+		assertMatched("[a]", "c/b/a");
+
+		assertMatched("/[a]", "a");
+		assertMatched("/[a]", "a/");
+		assertMatched("/[a]", "a/b");
+		assertMatched("/[a]", "/a");
+		assertMatched("/[a]", "/a/");
+		assertMatched("/[a]", "/a/b");
+
+		assertMatched("[a]/", "a/");
+		assertMatched("[a]/", "a/b");
+		assertMatched("[a]/", "/a/");
+		assertMatched("[a]/", "/a/b");
+
+		assertMatched("/[a]/", "a/");
+		assertMatched("/[a]/", "a/b");
+		assertMatched("/[a]/", "/a/");
+		assertMatched("/[a]/", "/a/b");
+	}
+

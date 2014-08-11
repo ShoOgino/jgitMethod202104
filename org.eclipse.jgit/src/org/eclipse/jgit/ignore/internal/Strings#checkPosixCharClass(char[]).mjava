@@ -1,0 +1,15 @@
+	private static String checkPosixCharClass(char[] buffer) {
+		for (int i = 0; i < POSIX_CHAR_CLASSES.size(); i++) {
+			String clazz = POSIX_CHAR_CLASSES.get(i);
+			boolean match = true;
+			for (int j = 0; j < clazz.length(); j++)
+				if (buffer[j] != clazz.charAt(j)) {
+					match = false;
+					break;
+				}
+			if (match)
+				return JAVA_CHAR_CLASSES.get(i);
+		}
+		return null;
+	}
+

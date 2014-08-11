@@ -1,0 +1,61 @@
+	@Test
+	public void testTargetWithoutLeadingSlash() {
+		// Test basic * and ? for any pattern + any character
+		String pattern = "/*.st?";
+		assertMatched(pattern, "test.stp");
+		assertMatched(pattern, "anothertest.stg");
+		assertMatched(pattern, "anothertest.st0");
+		assertNotMatched(pattern, "anothertest.sta1");
+		// Check that asterisk does not expand to ""
+		assertNotMatched(pattern, "another/test.sta1");
+
+		// Same as above, with a leading slash to ensure that doesn't cause
+		// problems
+		pattern = "/*.st?";
+		assertMatched(pattern, "test.stp");
+		assertMatched(pattern, "anothertest.stg");
+		assertMatched(pattern, "anothertest.st0");
+		assertNotMatched(pattern, "anothertest.sta1");
+		// Check that asterisk does not expand to ""
+		assertNotMatched(pattern, "another/test.sta1");
+
+		// Test for numbers
+		pattern = "/*.sta[0-5]";
+		assertMatched(pattern, "test.sta5");
+		assertMatched(pattern, "test.sta4");
+		assertMatched(pattern, "test.sta3");
+		assertMatched(pattern, "test.sta2");
+		assertMatched(pattern, "test.sta1");
+		assertMatched(pattern, "test.sta0");
+		assertMatched(pattern, "anothertest.sta2");
+		assertNotMatched(pattern, "test.stag");
+		assertNotMatched(pattern, "test.sta6");
+
+		// Test for letters
+		pattern = "/[tv]est.sta[a-d]";
+		assertMatched(pattern, "test.staa");
+		assertMatched(pattern, "test.stab");
+		assertMatched(pattern, "test.stac");
+		assertMatched(pattern, "test.stad");
+		assertMatched(pattern, "vest.stac");
+		assertNotMatched(pattern, "test.stae");
+		assertNotMatched(pattern, "test.sta9");
+
+		// Test child directory/file is matched
+		pattern = "/src/ne?";
+		assertMatched(pattern, "src/new/");
+		assertMatched(pattern, "src/new");
+		assertMatched(pattern, "src/new/a.c");
+		assertMatched(pattern, "src/new/a/a.c");
+		assertNotMatched(pattern, "src/new.c");
+
+		// Test name-only fnmatcher matches
+		pattern = "ne?";
+		assertMatched(pattern, "src/new/");
+		assertMatched(pattern, "src/new");
+		assertMatched(pattern, "src/new/a.c");
+		assertMatched(pattern, "src/new/a/a.c");
+		assertMatched(pattern, "neb");
+		assertNotMatched(pattern, "src/new.c");
+	}
+

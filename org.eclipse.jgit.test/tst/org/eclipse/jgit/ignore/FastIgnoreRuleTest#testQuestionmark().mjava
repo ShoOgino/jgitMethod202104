@@ -1,0 +1,26 @@
+	@Test
+	public void testQuestionmark() {
+		assertMatched("a?", "ab");
+		assertMatched("a?", "ab/");
+
+		assertMatched("a?", "b/ab");
+		assertMatched("a?", "b/ab/");
+		assertMatched("a?", "b/ab/b");
+
+		assertMatched("a?", "/ab/");
+		assertMatched("a?", "/ab/b");
+
+		assertMatched("a?", "c/ab/b");
+		assertMatched("a?", "c/b/ab");
+
+		assertMatched("/a?", "ab");
+		assertMatched("/a?", "ab/");
+		assertMatched("/a?", "ab/b");
+		assertMatched("/a?", "/ab");
+		assertMatched("/a?", "/ab/");
+		assertMatched("/a?", "/ab/b");
+
+		assertMatched("/a?/b", "ab/b");
+		assertMatched("/a?/b", "/ab/b");
+	}
+

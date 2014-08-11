@@ -1,0 +1,16 @@
+	@SuppressWarnings("unused")
+	@Test
+	public void testSimpleRules() {
+		try {
+			new FastIgnoreRule(null);
+			fail("Illegal input allowed!");
+		} catch (IllegalArgumentException e) {
+			// expected
+		}
+		assertFalse(new FastIgnoreRule("/").isMatch("/", false));
+		assertFalse(new FastIgnoreRule("//").isMatch("//", false));
+		assertFalse(new FastIgnoreRule("#").isMatch("#", false));
+		assertFalse(new FastIgnoreRule("").isMatch("", false));
+		assertFalse(new FastIgnoreRule(" ").isMatch(" ", false));
+	}
+

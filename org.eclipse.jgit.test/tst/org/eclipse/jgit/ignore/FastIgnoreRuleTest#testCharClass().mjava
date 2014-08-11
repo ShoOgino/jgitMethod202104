@@ -1,0 +1,34 @@
+	@Test
+	public void testCharClass() {
+		assertMatched("[v-z]", "x");
+		assertMatched("[v-z]", "x/");
+		assertMatched("[v-z]", "x/b");
+
+		assertMatched("[v-z]", "b/x");
+		assertMatched("[v-z]", "b/x/");
+		assertMatched("[v-z]", "b/x/b");
+
+		assertMatched("[v-z]", "/x/");
+		assertMatched("[v-z]", "/x/b");
+
+		assertMatched("[v-z]", "c/x/b");
+		assertMatched("[v-z]", "c/b/x");
+
+		assertMatched("/[v-z]", "x");
+		assertMatched("/[v-z]", "x/");
+		assertMatched("/[v-z]", "x/b");
+		assertMatched("/[v-z]", "/x");
+		assertMatched("/[v-z]", "/x/");
+		assertMatched("/[v-z]", "/x/b");
+
+		assertMatched("[v-z]/", "x/");
+		assertMatched("[v-z]/", "x/b");
+		assertMatched("[v-z]/", "/x/");
+		assertMatched("[v-z]/", "/x/b");
+
+		assertMatched("/[v-z]/", "x/");
+		assertMatched("/[v-z]/", "x/b");
+		assertMatched("/[v-z]/", "/x/");
+		assertMatched("/[v-z]/", "/x/b");
+	}
+

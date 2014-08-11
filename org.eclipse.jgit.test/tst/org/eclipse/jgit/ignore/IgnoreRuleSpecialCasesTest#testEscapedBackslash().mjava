@@ -1,0 +1,10 @@
+	@Test
+	public void testEscapedBackslash() throws Exception {
+		if (useJGitRule)
+			System.err
+					.println("IgnoreRule can't understand escaped backslashes, skipping");
+		Boolean assume = useJGitRule;
+		// In Git CLI a\\b matches a\b file
+		assertMatch("a\\\\b", "a\\b", true, assume);
+	}
+

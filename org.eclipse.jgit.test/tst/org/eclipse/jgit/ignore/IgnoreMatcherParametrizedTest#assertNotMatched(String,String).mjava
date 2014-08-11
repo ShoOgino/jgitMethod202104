@@ -1,0 +1,15 @@
+	/**
+	 * Check for a match. If target ends with "/", match will assume that the
+	 * target is meant to be a directory.
+	 *
+	 * @param pattern
+	 *            Pattern as it would appear in a .gitignore file
+	 * @param target
+	 *            Target file path relative to repository's GIT_DIR
+	 */
+	public void assertNotMatched(String pattern, String target) {
+		boolean value = match(pattern, target);
+		assertFalse("Expected no match for: " + pattern + " with: " + target,
+				value);
+	}
+

@@ -1,0 +1,29 @@
+	@Test
+	public void testDotAsteriskMatch() {
+		assertMatched("a.*", "a.");
+		assertMatched("a.*", "a./");
+		assertMatched("a.*", "a.b");
+
+		assertMatched("a.*", "b/a.b");
+		assertMatched("a.*", "b/a.b/");
+		assertMatched("a.*", "b/a.b/b");
+
+		assertMatched("a.*", "/a.b/");
+		assertMatched("a.*", "/a.b/b");
+
+		assertMatched("a.*", "c/a.b/b");
+		assertMatched("a.*", "c/b/a.b");
+
+		assertMatched("/a.*", "a.b");
+		assertMatched("/a.*", "a.b/");
+		assertMatched("/a.*", "a.b/b");
+		assertMatched("/a.*", "/a.b");
+		assertMatched("/a.*", "/a.b/");
+		assertMatched("/a.*", "/a.b/b");
+
+		assertMatched("/a.*/b", "a.b/b");
+		assertMatched("/a.*/b", "/a.b/b");
+		assertMatched("/a.*/b", "/a.bc/b");
+		assertMatched("/a.*/b", "/a./b");
+	}
+

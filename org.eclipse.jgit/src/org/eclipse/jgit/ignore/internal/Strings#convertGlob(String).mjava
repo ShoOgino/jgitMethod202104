@@ -1,0 +1,154 @@
+	/**
+	 * Conversion from glob to Java regex following two sources: <li>
+	 * http://man7.org/linux/man-pages/man7/glob.7.html <li>
+	 * org.eclipse.jgit.fnmatch.FileNameMatcher.java Seems that there are
+	 * various ways to define what "glob" can be.
+	 *
+	 * @param pattern
+	 *            non null pattern
+	 *
+	 * @return Java regex pattern corresponding to given glob pattern
+	 * @throws InvalidPatternException
+	 */
+	static Pattern convertGlob(String pattern) throws InvalidPatternException {
+		if (UNSUPPORTED.matcher(pattern).find())
+			throw new InvalidPatternException(
+					"Collating symbols [[.a.]] or equivalence class expressions [[=a=]] are not supported", //$NON-NLS-1$
+					pattern);
+
+		StringBuilder sb = new StringBuilder(pattern.length());
+
+		int in_brackets = 0;
+		boolean seenEscape = false;
+		boolean ignoreLastBracket = false;
+		boolean in_char_class = false;
+		// 6 is the length of the longest posix char class "xdigit"
+		char[] charClass = new char[6];
+
+		for (int i = 0; i < pattern.length(); i++) {
+			char c = pattern.charAt(i);
+			switch (c) {
+
+			case '*':
+				if (seenEscape || in_brackets > 0)
+					sb.append(c);
+				else
+					sb.append('.').append(c);
+				break;
+
+			case '.':
+				if (seenEscape)
+					sb.append(c);
+				else
+					sb.append('\\').append('.');
+				break;
+
+			case '?':
+				if (seenEscape || in_brackets > 0)
+					sb.append(c);
+				else
+					sb.append('.');
+				break;
+
+			case ':':
+				if (in_brackets > 0)
+					if (lookBehind(sb) == '['
+							&& isLetter(lookAhead(pattern, i)))
+						in_char_class = true;
+				sb.append(':');
+				break;
+
+			case '-':
+				if (in_brackets > 0) {
+					if (lookAhead(pattern, i) == ']')
+						sb.append('\\').append(c);
+					else
+						sb.append(c);
+				} else
+					sb.append('-');
+				break;
+
+			case '\\':
+				if (in_brackets > 0) {
+					char lookAhead = lookAhead(pattern, i);
+					if (lookAhead == ']' || lookAhead == '[')
+						ignoreLastBracket = true;
+				}
+				sb.append(c);
+				break;
+
+			case '[':
+				if (in_brackets > 0) {
+					sb.append('\\').append('[');
+					ignoreLastBracket = true;
+				} else {
+					if (!seenEscape) {
+						in_brackets++;
+						ignoreLastBracket = false;
+					}
+					sb.append('[');
+				}
+				break;
+
+			case ']':
+				if (seenEscape) {
+					sb.append(']');
+					ignoreLastBracket = true;
+					break;
+				}
+				if (in_brackets <= 0) {
+					sb.append('\\').append(']');
+					ignoreLastBracket = true;
+					break;
+				}
+				char lookBehind = lookBehind(sb);
+				if ((lookBehind == '[' && !ignoreLastBracket)
+						|| lookBehind == '^') {
+					sb.append('\\');
+					sb.append(']');
+					ignoreLastBracket = true;
+				} else {
+					ignoreLastBracket = false;
+					if (!in_char_class) {
+						in_brackets--;
+						sb.append(']');
+					} else {
+						in_char_class = false;
+						String charCl = checkPosixCharClass(charClass);
+						// delete last \[:: chars and set the pattern
+						if (charCl != null) {
+							sb.setLength(sb.length() - 4);
+							sb.append(charCl);
+						}
+						reset(charClass);
+					}
+				}
+				break;
+
+			case '!':
+				if (in_brackets > 0) {
+					if (lookBehind(sb) == '[')
+						sb.append('^');
+					else
+						sb.append(c);
+				} else
+					sb.append(c);
+				break;
+
+			default:
+				if (in_char_class)
+					setNext(charClass, c);
+				else
+					sb.append(c);
+				break;
+			} // end switch
+
+			seenEscape = c == '\\';
+
+		} // end for
+
+		if (in_brackets > 0)
+			throw new InvalidPatternException("Not closed bracket?", pattern); //$NON-NLS-1$
+		return Pattern.compile(sb.toString());
+	}
+
