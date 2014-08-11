@@ -1,0 +1,21 @@
+	private Repository createRepositoryWithRemote() throws IOException,
+			URISyntaxException, MalformedURLException, GitAPIException,
+			InvalidRemoteException, TransportException {
+		// create second repository
+		Repository db2 = createWorkRepository();
+		Git git2 = new Git(db2);
+
+		// setup the second repository to fetch from the first repository
+		final StoredConfig config = db2.getConfig();
+		RemoteConfig remoteConfig = new RemoteConfig(config, "origin");
+		URIish uri = new URIish(db.getDirectory().toURI().toURL());
+		remoteConfig.addURI(uri);
+		remoteConfig.update(config);
+		config.save();
+
+		// fetch from first repository
+		RefSpec spec = new RefSpec("+refs/heads/*:refs/remotes/origin/*");
+		git2.fetch().setRemote("origin").setRefSpecs(spec).call();
+		return db2;
+	}
+
