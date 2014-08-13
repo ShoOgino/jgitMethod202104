@@ -8,19 +8,15 @@
 			}
 
 			Inflater inf = ctx.inflater();
-			DfsBlock b = setInput(inf, pos);
+			pos += setInput(pos, inf);
 			for (int dstoff = 0;;) {
 				int n = inf.inflate(dstbuf, dstoff, dstbuf.length - dstoff);
-				if (n > 0)
-					dstoff += n;
-				else if (inf.needsInput() && b != null) {
-					pos += b.remaining(pos);
-					b = setInput(inf, pos);
-				} else if (inf.needsInput())
-					throw new EOFException(DfsText.get().unexpectedEofInPack);
-				else if (inf.finished())
+				dstoff += n;
+				if (inf.finished())
 					return dstbuf;
-				else
+				if (inf.needsInput())
+					pos += setInput(pos, inf);
+				else if (n == 0)
 					throw new DataFormatException();
 			}
 		}

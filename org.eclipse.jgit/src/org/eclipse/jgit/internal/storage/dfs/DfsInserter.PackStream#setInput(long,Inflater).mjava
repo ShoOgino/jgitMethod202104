@@ -1,0 +1,12 @@
+		private int setInput(long pos, Inflater inf) throws IOException {
+			if (pos < currPos)
+				return getOrLoadBlock(pos).setInput(pos, inf);
+			if (pos < currPos + currPtr) {
+				int s = (int) (pos - currPos);
+				int n = currPtr - s;
+				inf.setInput(currBuf, s, n);
+				return n;
+			}
+			throw new EOFException(DfsText.get().unexpectedEofInPack);
+		}
+
