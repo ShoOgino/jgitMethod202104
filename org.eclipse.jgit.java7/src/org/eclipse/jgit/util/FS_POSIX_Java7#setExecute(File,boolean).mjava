@@ -1,5 +1,35 @@
 	@Override
 	public boolean setExecute(File f, boolean canExecute) {
-		return FileUtil.setExecute(f, canExecute);
+		if (!isFile(f))
+			return false;
+		// only if the execute has to be set, and we know the umask
+		if (canExecute && EXECUTE_FOR_OTHERS != null) {
+			try {
+				Path path = f.toPath();
+				Set<PosixFilePermission> pset = Files
+						.getPosixFilePermissions(path);
+				// user is always allowed to set execute
+				pset.add(PosixFilePermission.OWNER_EXECUTE);
+
+				if (EXECUTE_FOR_GROUP.booleanValue())
+					pset.add(PosixFilePermission.GROUP_EXECUTE);
+
+				if (EXECUTE_FOR_OTHERS.booleanValue())
+					pset.add(PosixFilePermission.OTHERS_EXECUTE);
+
+				Files.setPosixFilePermissions(path, pset);
+				return true;
+			} catch (IOException e) {
+				// The interface doesn't allow to throw IOException
+				final boolean debug = Boolean.parseBoolean(SystemReader
+						.getInstance().getProperty("jgit.fs.debug")); //$NON-NLS-1$
+				if (debug)
+					System.err.println(e);
+				return false;
+			}
+		}
+		// if umask is not working for some reason: fall back to default (buggy)
+		// implementation which does not consider umask: see bug 424395
+		return f.setExecutable(canExecute);
 	}
 
