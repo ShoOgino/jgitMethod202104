@@ -14,11 +14,11 @@
 			CanonicalTreeParser ours, CanonicalTreeParser theirs)
 			throws IOException {
 		RawText baseText = base == null ? RawText.EMPTY_TEXT : getRawText(
-				base.getEntryObjectId(), db);
+				base.getEntryObjectId(), reader);
 		RawText ourText = ours == null ? RawText.EMPTY_TEXT : getRawText(
-				ours.getEntryObjectId(), db);
+				ours.getEntryObjectId(), reader);
 		RawText theirsText = theirs == null ? RawText.EMPTY_TEXT : getRawText(
-				theirs.getEntryObjectId(), db);
+				theirs.getEntryObjectId(), reader);
 		return (mergeAlgorithm.merge(RawTextComparator.DEFAULT, baseText,
 				ourText, theirsText));
 	}

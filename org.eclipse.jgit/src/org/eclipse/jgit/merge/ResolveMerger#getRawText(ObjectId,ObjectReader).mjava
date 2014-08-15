@@ -1,0 +1,7 @@
+	private static RawText getRawText(ObjectId id, ObjectReader reader)
+			throws IOException {
+		if (id.equals(ObjectId.zeroId()))
+			return new RawText(new byte[] {});
+		return new RawText(reader.open(id, OBJ_BLOB).getCachedBytes());
+	}
+
