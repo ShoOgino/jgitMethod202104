@@ -11,18 +11,28 @@
 				else
 					throw new SAXException(RepoText.get().errorNoDefault);
 			}
-			String remoteUrl;
+			removeNotInGroup();
+			removeOverlaps();
+
+			Map<String, String> remoteUrls = new HashMap<String, String>();
+			URI baseUri;
 			try {
-				URI uri = new URI(baseUrl);
-				remoteUrl = uri.resolve(remotes.get(defaultRemote)).toString();
-				if (!remoteUrl.endsWith("/"))
-					remoteUrl = remoteUrl + "/";
+				baseUri = new URI(baseUrl);
 			} catch (URISyntaxException e) {
 				throw new SAXException(e);
 			}
-			removeNotInGroup();
-			removeOverlaps();
 			for (Project proj : projects) {
+				String remote = proj.remote;
+				if (remote == null)
+					remote = defaultRemote;
+				String remoteUrl = remoteUrls.get(remote);
+				if (remoteUrl == null) {
+					remoteUrl = baseUri.resolve(remotes.get(remote)).toString();
+					if (!remoteUrl.endsWith("/"))
+						remoteUrl = remoteUrl + "/";
+					remoteUrls.put(remote, remoteUrl);
+				}
+
 				command.addSubmodule(remoteUrl + proj.name,
 						proj.path,
 						proj.revision == null
