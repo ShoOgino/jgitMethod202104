@@ -1,0 +1,14 @@
+	@Test
+	public void testReadUserConfigWithInvalidCharactersStripped() {
+		final MockSystemReader mockSystemReader = new MockSystemReader();
+		final Config localConfig = new Config(mockSystemReader.openUserConfig(
+				null, FS.DETECTED));
+
+		localConfig.setString("user", null, "name", "foo<bar");
+		localConfig.setString("user", null, "email", "baz>\nqux@example.com");
+
+		UserConfig userConfig = localConfig.get(UserConfig.KEY);
+		assertEquals("foobar", userConfig.getAuthorName());
+		assertEquals("bazqux@example.com", userConfig.getAuthorEmail());
+	}
+
