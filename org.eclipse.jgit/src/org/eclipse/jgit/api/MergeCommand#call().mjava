@@ -106,7 +106,10 @@
 				}
 				String mergeMessage = ""; //$NON-NLS-1$
 				if (!squash) {
-					mergeMessage = new MergeMessageFormatter().format(
+					if (message != null)
+						mergeMessage = message;
+					else
+						mergeMessage = new MergeMessageFormatter().format(
 							commits, head);
 					repo.writeMergeCommitMsg(mergeMessage);
 					repo.writeMergeHeads(Arrays.asList(ref.getObjectId()));
