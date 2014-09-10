@@ -1,0 +1,8 @@
+	private void writeLine(RawText seq, int i) throws IOException {
+		out.beginln();
+		seq.writeLine(out, i);
+		// still BOL? It was a blank line. But writeLine won't lf, so we do.
+		if (out.isBeginln())
+			out.write('\n');
+	}
+

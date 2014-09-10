@@ -1,4 +1,4 @@
-	public static String t(String text) {
+	public String t(String text) {
 		StringBuilder r = new StringBuilder();
 		for (int i = 0; i < text.length(); i++) {
 			char c = text.charAt(i);
@@ -14,7 +14,8 @@
 				break;
 			default:
 				r.append(c);
-				r.append('\n');
+				if (newlineAtEnd || i < text.length() - 1)
+					r.append('\n');
 			}
 		}
 		return r.toString();
