@@ -1,9 +1,10 @@
-	@Test
-	public void testPackRepoWithNoRefs() throws Exception {
+	@Theory
+	public void testPackRepoWithNoRefs(boolean aggressive) throws Exception {
 		tr.commit().add("A", "A").add("B", "B").create();
 		stats = gc.getStatistics();
 		assertEquals(4, stats.numberOfLooseObjects);
 		assertEquals(0, stats.numberOfPackedObjects);
+		configureGc(gc, aggressive);
 		gc.gc();
 		stats = gc.getStatistics();
 		assertEquals(4, stats.numberOfLooseObjects);

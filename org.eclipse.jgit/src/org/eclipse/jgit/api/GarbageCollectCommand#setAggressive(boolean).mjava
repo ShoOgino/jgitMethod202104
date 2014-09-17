@@ -1,0 +1,29 @@
+	/**
+	 * Whether to use aggressive mode or not. If set to true JGit behaves more
+	 * similar to native git's "git gc --aggressive". If set to
+	 * <code>true</code> compressed objects found in old packs are not reused
+	 * but every object is compressed again. Configuration variables
+	 * pack.window and pack.depth are set to 250 for this GC.
+	 *
+	 * @since 3.6
+	 * @param aggressive
+	 *            whether to turn on or off aggressive mode
+	 * @return this instance
+	 */
+	public GarbageCollectCommand setAggressive(boolean aggressive) {
+		if (aggressive) {
+			StoredConfig repoConfig = repo.getConfig();
+			pconfig.setDeltaSearchWindowSize(repoConfig.getInt(
+					ConfigConstants.CONFIG_GC_SECTION,
+					ConfigConstants.CONFIG_KEY_AGGRESSIVE_WINDOW,
+					DEFAULT_GC_AGGRESSIVE_WINDOW));
+			pconfig.setMaxDeltaDepth(repoConfig.getInt(
+					ConfigConstants.CONFIG_GC_SECTION,
+					ConfigConstants.CONFIG_KEY_AGGRESSIVE_DEPTH,
+					DEFAULT_GC_AGGRESSIVE_DEPTH));
+			pconfig.setReuseObjects(false);
+		} else
+			pconfig = new PackConfig(repo);
+		return this;
+	}
+

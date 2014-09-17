@@ -18,7 +18,7 @@
 					}
 
 				});
-		PackWriter pw = new PackWriter(repo);
+		PackWriter pw = new PackWriter((pconfig == null) ? new PackConfig(repo) : pconfig, repo.newObjectReader());
 		try {
 			// prepare the PackWriter
 			pw.setDeltaBaseAsOffset(true);

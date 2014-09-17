@@ -1,10 +1,12 @@
-	@Test
-	public void testPackAllObjectsInOnePack() throws Exception {
+	@Theory
+	public void testPackAllObjectsInOnePack(boolean aggressive)
+			throws Exception {
 		tr.branch("refs/heads/master").commit().add("A", "A").add("B", "B")
 				.create();
 		stats = gc.getStatistics();
 		assertEquals(4, stats.numberOfLooseObjects);
 		assertEquals(0, stats.numberOfPackedObjects);
+		configureGc(gc, aggressive);
 		gc.gc();
 		stats = gc.getStatistics();
 		assertEquals(0, stats.numberOfLooseObjects);

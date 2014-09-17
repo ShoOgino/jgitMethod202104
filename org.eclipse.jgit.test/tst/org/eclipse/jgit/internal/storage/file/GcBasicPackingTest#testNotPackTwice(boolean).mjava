@@ -1,5 +1,5 @@
-	@Test
-	public void testNotPackTwice() throws Exception {
+	@Theory
+	public void testNotPackTwice(boolean aggressive) throws Exception {
 		BranchBuilder bb = tr.branch("refs/heads/master");
 		RevCommit first = bb.commit().message("M").add("M", "M").create();
 		bb.commit().message("B").add("B", "Q").create();
@@ -17,6 +17,7 @@
 
 		gc.setExpireAgeMillis(0);
 		fsTick();
+		configureGc(gc, aggressive);
 		gc.gc();
 		stats = gc.getStatistics();
 		assertEquals(0, stats.numberOfLooseObjects);

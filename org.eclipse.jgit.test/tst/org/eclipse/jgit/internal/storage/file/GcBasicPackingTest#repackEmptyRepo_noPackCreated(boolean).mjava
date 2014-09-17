@@ -1,0 +1,8 @@
+	@Theory
+	public void repackEmptyRepo_noPackCreated(boolean aggressive)
+			throws IOException {
+		configureGc(gc, aggressive);
+		gc.repack();
+		assertEquals(0, repo.getObjectDatabase().getPacks().size());
+	}
+
