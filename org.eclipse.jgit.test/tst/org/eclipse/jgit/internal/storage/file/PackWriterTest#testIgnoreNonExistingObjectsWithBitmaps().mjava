@@ -1,0 +1,19 @@
+	/**
+	 * Try to pass non-existing object as uninteresting, with ignoring setting.
+	 * Use a repo with bitmap indexes because then PackWriter will use
+	 * PackWriterBitmapWalker which had problems with this situation.
+	 *
+	 * @throws IOException
+	 * @throws ParseException
+	 */
+	@Test
+	public void testIgnoreNonExistingObjectsWithBitmaps() throws IOException,
+			ParseException {
+		final ObjectId nonExisting = ObjectId
+				.fromString("0000000000000000000000000000000000000001");
+		new GC(db).gc();
+		createVerifyOpenPack(EMPTY_SET_OBJECT,
+				Collections.singleton(nonExisting), false, true, true);
+		// shouldn't throw anything
+	}
+
