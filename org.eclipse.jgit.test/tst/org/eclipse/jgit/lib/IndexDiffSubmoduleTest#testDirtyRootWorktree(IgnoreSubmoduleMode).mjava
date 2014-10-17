@@ -1,0 +1,11 @@
+	@Theory
+	public void testDirtyRootWorktree(IgnoreSubmoduleMode mode)
+			throws IOException {
+		writeTrashFile("fileInRoot", "2");
+
+		IndexDiff indexDiff = new IndexDiff(db, Constants.HEAD,
+				new FileTreeIterator(db));
+		indexDiff.setIgnoreSubmoduleMode(mode);
+		assertTrue(indexDiff.diff());
+	}
+

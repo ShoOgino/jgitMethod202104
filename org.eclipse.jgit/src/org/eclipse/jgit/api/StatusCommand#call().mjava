@@ -13,6 +13,8 @@
 
 		try {
 			IndexDiff diff = new IndexDiff(repo, Constants.HEAD, workingTreeIt);
+			if (ignoreSubmoduleMode != null)
+				diff.setIgnoreSubmoduleMode(ignoreSubmoduleMode);
 			if (paths != null)
 				diff.setFilter(PathFilterGroup.createFromStrings(paths));
 			if (progressMonitor == null)

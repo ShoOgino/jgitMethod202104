@@ -1,0 +1,23 @@
+	@Override
+	@Before
+	public void setUp() throws Exception {
+		super.setUp();
+		FileRepository submoduleStandalone = createWorkRepository();
+		JGitTestUtil.writeTrashFile(submoduleStandalone, "fileInSubmodule",
+				"submodule");
+		Git submoduleStandaloneGit = Git.wrap(submoduleStandalone);
+		submoduleStandaloneGit.add().addFilepattern("fileInSubmodule").call();
+		submoduleStandaloneGit.commit().setMessage("add file to submodule")
+				.call();
+
+		submodule_db = (FileRepository) Git.wrap(db).submoduleAdd()
+				.setPath("submodule")
+				.setURI(submoduleStandalone.getDirectory().toURI().toString())
+				.call();
+		submodule_trash = submodule_db.getWorkTree();
+		writeTrashFile("fileInRoot", "root");
+		Git rootGit = Git.wrap(db);
+		rootGit.add().addFilepattern("fileInRoot").call();
+		rootGit.commit().setMessage("add submodule and root file").call();
+	}
+

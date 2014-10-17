@@ -1,0 +1,9 @@
+	@Theory
+	public void testInitiallyClean(IgnoreSubmoduleMode mode)
+			throws IOException {
+		IndexDiff indexDiff = new IndexDiff(db, Constants.HEAD,
+				new FileTreeIterator(db));
+		indexDiff.setIgnoreSubmoduleMode(mode);
+		assertFalse(indexDiff.diff());
+	}
+
