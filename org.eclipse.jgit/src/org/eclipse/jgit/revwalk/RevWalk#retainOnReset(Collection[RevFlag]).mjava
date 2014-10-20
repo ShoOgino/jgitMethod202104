@@ -1,0 +1,19 @@
+	/**
+	 * Preserve a set of RevFlags during all {@code reset} methods.
+	 * <p>
+	 * Calling {@code retainOnReset(set)} avoids needing to pass the flags
+	 * during each {@code resetRetain()} invocation on this instance.
+	 * <p>
+	 * Clearing flags marked retainOnReset requires disposing of the flag with
+	 * {@code #disposeFlag(RevFlag)} or disposing of the entire RevWalk by
+	 * {@code #dispose()}.
+	 *
+	 * @param flags
+	 *            the flags to retain during all resets.
+	 * @since 3.6
+	 */
+	public final void retainOnReset(Collection<RevFlag> flags) {
+		for (RevFlag f : flags)
+			retainOnReset(f);
+	}
+
