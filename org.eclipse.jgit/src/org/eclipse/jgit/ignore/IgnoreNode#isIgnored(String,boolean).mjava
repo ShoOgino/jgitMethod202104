@@ -10,19 +10,6 @@
 	 * @return status of the path.
 	 */
 	public MatchResult isIgnored(String entryPath, boolean isDirectory) {
-		if (rules.isEmpty())
-			return MatchResult.CHECK_PARENT;
-
-		// Parse rules in the reverse order that they were read
-		for (int i = rules.size() - 1; i > -1; i--) {
-			FastIgnoreRule rule = rules.get(i);
-			if (rule.isMatch(entryPath, isDirectory)) {
-				if (rule.getResult())
-					return MatchResult.IGNORED;
-				else
-					return MatchResult.NOT_IGNORED;
-			}
-		}
-		return MatchResult.CHECK_PARENT;
+		return isIgnored(entryPath, isDirectory, false);
 	}
 

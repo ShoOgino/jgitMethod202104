@@ -1,0 +1,24 @@
+	@Test
+	public void testRepeatedNegationInDifferentFiles4() throws IOException {
+		writeIgnoreFile(".gitignore", "*.o");
+
+		writeIgnoreFile("a/.gitignore", "e");
+		// Rules are never empty: WorkingTreeIterator optimizes empty rules away
+		// paranoia check in case this optimization will be removed
+		writeIgnoreFile("a/b/.gitignore", "#");
+		writeIgnoreFile("a/b/c/.gitignore", "!e");
+		writeTrashFile("a/b/c/e/nothere.o", "");
+
+		beginWalk();
+		assertEntry(F, tracked, ".gitignore");
+		assertEntry(D, tracked, "a");
+		assertEntry(F, tracked, "a/.gitignore");
+		assertEntry(D, tracked, "a/b");
+		assertEntry(F, tracked, "a/b/.gitignore");
+		assertEntry(D, tracked, "a/b/c");
+		assertEntry(F, tracked, "a/b/c/.gitignore");
+		assertEntry(D, tracked, "a/b/c/e");
+		assertEntry(F, ignored, "a/b/c/e/nothere.o");
+		endWalk();
+	}
+

@@ -1,0 +1,19 @@
+	/*
+	 * See https://bugs.eclipse.org/bugs/show_bug.cgi?id=448094
+	 */
+	@Test
+	public void testRepeatedNegationInDifferentFiles2() throws IOException {
+		writeIgnoreFile(".gitignore", "*.o", "e");
+
+		writeIgnoreFile("a/.gitignore", "!e");
+		writeTrashFile("a/e/nothere.o", "");
+
+		beginWalk();
+		assertEntry(F, tracked, ".gitignore");
+		assertEntry(D, tracked, "a");
+		assertEntry(F, tracked, "a/.gitignore");
+		assertEntry(D, tracked, "a/e");
+		assertEntry(F, ignored, "a/e/nothere.o");
+		endWalk();
+	}
+

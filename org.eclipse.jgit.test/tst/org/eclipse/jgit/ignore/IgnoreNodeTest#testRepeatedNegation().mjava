@@ -1,0 +1,16 @@
+	/*
+	 * See https://bugs.eclipse.org/bugs/show_bug.cgi?id=448094
+	 */
+	@Test
+	public void testRepeatedNegation() throws IOException {
+		writeIgnoreFile(".gitignore", "e", "!e", "e", "!e", "e");
+
+		writeTrashFile("e/nothere.o", "");
+
+		beginWalk();
+		assertEntry(F, tracked, ".gitignore");
+		assertEntry(D, ignored, "e");
+		assertEntry(F, ignored, "e/nothere.o");
+		endWalk();
+	}
+

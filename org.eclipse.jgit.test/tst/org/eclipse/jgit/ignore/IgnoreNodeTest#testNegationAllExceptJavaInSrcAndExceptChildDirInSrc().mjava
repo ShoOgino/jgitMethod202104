@@ -1,0 +1,32 @@
+	/*
+	 * See https://bugs.eclipse.org/bugs/show_bug.cgi?id=407475
+	 */
+	@Test
+	public void testNegationAllExceptJavaInSrcAndExceptChildDirInSrc()
+			throws IOException {
+		// ignore all files except from src directory
+		writeIgnoreFile(".gitignore", "/*", "!/src/");
+		writeTrashFile("nothere.o", "");
+
+		// ignore all files except java in src folder and all children folders.
+		// Last ignore rule breaks old jgit via bug 407475
+		writeIgnoreFile("src/.gitignore", "*", "!*.java", "!*/");
+
+		writeTrashFile("src/keep.java", "");
+		writeTrashFile("src/nothere.o", "");
+		writeTrashFile("src/a/keep.java", "");
+		writeTrashFile("src/a/keep.o", "");
+
+		beginWalk();
+		assertEntry(F, ignored, ".gitignore");
+		assertEntry(F, ignored, "nothere.o");
+		assertEntry(D, tracked, "src");
+		assertEntry(F, ignored, "src/.gitignore");
+		assertEntry(D, tracked, "src/a");
+		assertEntry(F, tracked, "src/a/keep.java");
+		assertEntry(F, tracked, "src/a/keep.o");
+		assertEntry(F, tracked, "src/keep.java");
+		assertEntry(F, ignored, "src/nothere.o");
+		endWalk();
+	}
+

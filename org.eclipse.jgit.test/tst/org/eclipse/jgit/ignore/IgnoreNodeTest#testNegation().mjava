@@ -1,9 +1,19 @@
 	@Test
 	public void testNegation() throws IOException {
-		writeIgnoreFile(".gitignore", "*.o");
+		// ignore all *.o files and ignore all "d" directories
+		writeIgnoreFile(".gitignore", "*.o", "d");
+
+		// negate "ignore" for a/b/keep.o file only
 		writeIgnoreFile("src/a/b/.gitignore", "!keep.o");
 		writeTrashFile("src/a/b/keep.o", "");
 		writeTrashFile("src/a/b/nothere.o", "");
+
+		// negate "ignore" for "d"
+		writeIgnoreFile("src/c/.gitignore", "!d");
+		// negate "ignore" for c/d/keep.o file only
+		writeIgnoreFile("src/c/d/.gitignore", "!keep.o");
+		writeTrashFile("src/c/d/keep.o", "");
+		writeTrashFile("src/c/d/nothere.o", "");
 
 		beginWalk();
 		assertEntry(F, tracked, ".gitignore");
@@ -13,5 +23,14 @@
 		assertEntry(F, tracked, "src/a/b/.gitignore");
 		assertEntry(F, tracked, "src/a/b/keep.o");
 		assertEntry(F, ignored, "src/a/b/nothere.o");
+
+		assertEntry(D, tracked, "src/c");
+		assertEntry(F, tracked, "src/c/.gitignore");
+		assertEntry(D, tracked, "src/c/d");
+		assertEntry(F, tracked, "src/c/d/.gitignore");
+		assertEntry(F, tracked, "src/c/d/keep.o");
+		// must be ignored: "!d" should not negate *both* "d" and *.o rules!
+		assertEntry(F, ignored, "src/c/d/nothere.o");
+		endWalk();
 	}
 

@@ -8,27 +8,6 @@
 	 *             a relevant ignore rule file exists but cannot be read.
 	 */
 	protected boolean isEntryIgnored(final int pLen) throws IOException {
-		IgnoreNode rules = getIgnoreNode();
-		if (rules != null) {
-			// The ignore code wants path to start with a '/' if possible.
-			// If we have the '/' in our path buffer because we are inside
-			// a subdirectory include it in the range we convert to string.
-			//
-			int pOff = pathOffset;
-			if (0 < pOff)
-				pOff--;
-			String p = TreeWalk.pathOf(path, pOff, pLen);
-			switch (rules.isIgnored(p, FileMode.TREE.equals(mode))) {
-			case IGNORED:
-				return true;
-			case NOT_IGNORED:
-				return false;
-			case CHECK_PARENT:
-				break;
-			}
-		}
-		if (parent instanceof WorkingTreeIterator)
-			return ((WorkingTreeIterator) parent).isEntryIgnored(pLen);
-		return false;
+		return isEntryIgnored(pLen, false);
 	}
 
