@@ -1,0 +1,25 @@
+	@Test
+	public void testCommonScoreLargeObject_SameFiles_CR_canonicalization()
+			throws TableFullException, IOException {
+		String text = "" //
+				+ "A\r\n" //
+				+ "B\r\n" //
+				+ "D\r\n" //
+				+ "B\r\n";
+		SimilarityIndex src = new SimilarityIndex();
+		byte[] bytes1 = text.getBytes("UTF-8");
+		src.hash(new ByteArrayInputStream(bytes1), bytes1.length, true);
+		src.sort();
+
+		SimilarityIndex dst = new SimilarityIndex();
+		byte[] bytes2 = text.replace("\r", "").getBytes("UTF-8");
+		dst.hash(new ByteArrayInputStream(bytes2), bytes2.length, true);
+		dst.sort();
+
+		assertEquals(8, src.common(dst));
+		assertEquals(8, dst.common(src));
+
+		assertEquals(100, src.score(dst, 100));
+		assertEquals(100, dst.score(src, 100));
+	}
+
