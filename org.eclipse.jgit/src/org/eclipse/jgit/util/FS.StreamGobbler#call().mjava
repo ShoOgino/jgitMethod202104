@@ -1,0 +1,20 @@
+		public Void call() throws IOException {
+			boolean writeFailure = false;
+
+			String line = null;
+			while ((line = reader.readLine()) != null) {
+				// Do not try to write again after a failure, but keep reading
+				// as long as possible to prevent the input stream from choking.
+				if (!writeFailure && writer != null) {
+					try {
+						writer.write(line);
+						writer.newLine();
+						writer.flush();
+					} catch (IOException e) {
+						writeFailure = true;
+					}
+				}
+			}
+			return null;
+		}
+

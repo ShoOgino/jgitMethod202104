@@ -1,0 +1,11 @@
+	@Test
+	public void testRelativize_scheme() {
+		String base = toOSPathString("file:/home/eclipse/runtime-New_configuration/project_1/file.java");
+		String other = toOSPathString("file:/home/eclipse/runtime-New_configuration/project");
+		// 'file.java' is treated as a folder
+		String expected = toOSPathString("../../project");
+
+		String actual = FileUtils.relativize(base, other);
+		assertEquals(expected, actual);
+	}
+
