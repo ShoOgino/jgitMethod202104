@@ -1,0 +1,33 @@
+	/**
+	 * Assert that an entry;
+	 * <ul>
+	 * <li>Has the correct type</li>
+	 * <li>Exist in the tree walk</li>
+	 * <li>Has the expected attributes on a checkin operation</li>
+	 * <li>Has the expected attributes on a checkout operation</li>
+	 * </ul>
+	 *
+	 * @param type
+	 * @param pathName
+	 * @param checkinAttributes
+	 * @param checkoutAttributes
+	 * @throws IOException
+	 */
+	private void assertEntry(FileMode type, String pathName,
+			Set<Attribute> checkinAttributes, Set<Attribute> checkoutAttributes)
+			throws IOException {
+		assertTrue("walk has entry", walk.next());
+		assertTrue("walk has entry", ci_walk.next());
+		assertEquals(pathName, walk.getPathString());
+		assertEquals(type, walk.getFileMode(0));
+
+		assertEquals(checkinAttributes,
+				asSet(ci_walk.getAttributes().values()));
+		assertEquals(checkoutAttributes, asSet(walk.getAttributes().values()));
+
+		if (D.equals(type)) {
+			walk.enterSubtree();
+			ci_walk.enterSubtree();
+		}
+	}
+

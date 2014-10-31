@@ -1,0 +1,21 @@
+	/**
+	 * Checks that the global attribute file is used as fallback.
+	 *
+	 * @throws IOException
+	 */
+	@Test
+	public void testPrecedenceGlobal() throws IOException {
+		writeGlobalAttributeFile("globalAttributesFile", "*.txt custom=global");
+
+		writeTrashFile("level1/level2/file.txt", "");
+
+		beginWalk();
+
+		assertEntry(D, "level1");
+
+		assertEntry(D, "level1/level2");
+		assertEntry(F, "level1/level2/file.txt", asSet(CUSTOM_GLOBAL));
+
+		endWalk();
+	}
+

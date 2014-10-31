@@ -25,6 +25,7 @@
 		dirCache = repository.readDirCache();
 
 		try (TreeWalk treeWalk = new TreeWalk(repository)) {
+			treeWalk.setOperationType(OperationType.CHECKIN_OP);
 			treeWalk.setRecursive(true);
 			// add the trees (tree, dirchache, workdir)
 			if (tree != null)

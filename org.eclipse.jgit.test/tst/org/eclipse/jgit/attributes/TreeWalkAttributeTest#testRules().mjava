@@ -1,0 +1,45 @@
+	/**
+	 * Basic test for git attributes.
+	 * <p>
+	 * In this use case files are present in both the working tree and the index
+	 * </p>
+	 *
+	 * @throws IOException
+	 * @throws NoFilepatternException
+	 * @throws GitAPIException
+	 */
+	@Test
+	public void testRules() throws IOException, NoFilepatternException,
+			GitAPIException {
+		writeAttributesFile(".git/info/attributes", "windows* eol=crlf");
+
+		writeAttributesFile(".gitattributes", "*.txt eol=lf");
+		writeTrashFile("windows.file", "");
+		writeTrashFile("windows.txt", "");
+		writeTrashFile("readme.txt", "");
+
+		writeAttributesFile("src/config/.gitattributes", "*.txt -delta");
+		writeTrashFile("src/config/readme.txt", "");
+		writeTrashFile("src/config/windows.file", "");
+		writeTrashFile("src/config/windows.txt", "");
+
+		beginWalk();
+
+		git.add().addFilepattern(".").call();
+
+		assertEntry(F, ".gitattributes");
+		assertEntry(F, "readme.txt", asSet(EOL_LF));
+
+		assertEntry(D, "src");
+		assertEntry(D, "src/config");
+		assertEntry(F, "src/config/.gitattributes");
+		assertEntry(F, "src/config/readme.txt", asSet(DELTA_UNSET, EOL_LF));
+		assertEntry(F, "src/config/windows.file", asSet(EOL_CRLF));
+		assertEntry(F, "src/config/windows.txt", asSet(DELTA_UNSET, EOL_CRLF));
+
+		assertEntry(F, "windows.file", asSet(EOL_CRLF));
+		assertEntry(F, "windows.txt", asSet(EOL_CRLF));
+
+		endWalk();
+	}
+

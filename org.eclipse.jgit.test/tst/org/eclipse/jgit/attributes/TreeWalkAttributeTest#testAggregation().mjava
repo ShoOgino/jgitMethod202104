@@ -1,0 +1,42 @@
+	/**
+	 * Checks that the list of attributes is an aggregation of all the
+	 * attributes from the attributes files hierarchy.
+	 *
+	 * @throws IOException
+	 */
+	@Test
+	public void testAggregation() throws IOException {
+		writeGlobalAttributeFile("globalAttributesFile", "*.txt -custom2");
+		writeAttributesFile(".git/info/attributes", "*.txt eol=crlf");
+		writeAttributesFile(".gitattributes", "*.txt custom=root");
+		writeAttributesFile("level1/.gitattributes", "*.txt text");
+		writeAttributesFile("level1/level2/.gitattributes", "*.txt -delta");
+
+		writeTrashFile("l0.txt", "");
+
+		writeTrashFile("level1/l1.txt", "");
+
+		writeTrashFile("level1/level2/l2.txt", "");
+
+		beginWalk();
+
+		assertEntry(F, ".gitattributes");
+		assertEntry(F, "l0.txt", asSet(EOL_CRLF, CUSTOM_ROOT, CUSTOM2_UNSET));
+
+		assertEntry(D, "level1");
+		assertEntry(F, "level1/.gitattributes");
+		assertEntry(F, "level1/l1.txt",
+				asSet(EOL_CRLF, CUSTOM_ROOT, TEXT_SET, CUSTOM2_UNSET));
+
+		assertEntry(D, "level1/level2");
+		assertEntry(F, "level1/level2/.gitattributes");
+		assertEntry(
+				F,
+				"level1/level2/l2.txt",
+				asSet(EOL_CRLF, CUSTOM_ROOT, TEXT_SET, DELTA_UNSET,
+						CUSTOM2_UNSET));
+
+		endWalk();
+
+	}
+

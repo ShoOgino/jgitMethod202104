@@ -1,0 +1,26 @@
+	/**
+	 * Checks that the parent ".gitattributes" file is used as fallback.
+	 *
+	 * @throws IOException
+	 */
+	@Test
+	public void testPrecedenceParent() throws IOException {
+		writeGlobalAttributeFile("globalAttributesFile", "*.txt custom=global");
+		writeAttributesFile(".gitattributes", "*.txt custom=root");
+		writeAttributesFile("level1/.gitattributes", "*.txt custom=parent");
+
+		writeTrashFile("level1/level2/file.txt", "");
+
+		beginWalk();
+
+		assertEntry(F, ".gitattributes");
+
+		assertEntry(D, "level1");
+		assertEntry(F, "level1/.gitattributes");
+
+		assertEntry(D, "level1/level2");
+		assertEntry(F, "level1/level2/file.txt", asSet(CUSTOM_PARENT));
+
+		endWalk();
+	}
+

@@ -1,0 +1,49 @@
+	/**
+	 * Get the {@link AttributesNode} for the current entry.
+	 * <p>
+	 * This method implements the fallback mechanism between the index and the
+	 * working tree depending on the operation type
+	 * </p>
+	 *
+	 * @param opType
+	 * @param workingTreeIterator
+	 * @param dirCacheIterator
+	 * @return a {@link AttributesNode} of the current entry,
+	 *         {@link NullPointerException} otherwise.
+	 * @throws IOException
+	 *             It raises an {@link IOException} if a problem appears while
+	 *             parsing one on the attributes file.
+	 */
+	private AttributesNode getCurrentAttributesNode(OperationType opType,
+			WorkingTreeIterator workingTreeIterator,
+			DirCacheIterator dirCacheIterator) throws IOException {
+		AttributesNode attributesNode = null;
+		switch (opType) {
+		case CHECKIN_OP:
+			if (workingTreeIterator != null) {
+				attributesNode = workingTreeIterator.getEntryAttributesNode();
+			}
+			if (attributesNode == null && dirCacheIterator != null) {
+				attributesNode = dirCacheIterator
+						.getEntryAttributesNode(getObjectReader());
+			}
+			break;
+		case CHECKOUT_OP:
+			if (dirCacheIterator != null) {
+				attributesNode = dirCacheIterator
+						.getEntryAttributesNode(getObjectReader());
+			}
+			if (attributesNode == null && workingTreeIterator != null) {
+				attributesNode = workingTreeIterator.getEntryAttributesNode();
+			}
+			break;
+		default:
+			throw new IllegalStateException(
+					"The only supported operation types are:" //$NON-NLS-1$
+							+ OperationType.CHECKIN_OP + "," //$NON-NLS-1$
+							+ OperationType.CHECKOUT_OP);
+		}
+
+		return attributesNode;
+	}
+

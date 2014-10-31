@@ -1,0 +1,55 @@
+	/**
+	 * Checks that the index is used as fallback when the git attributes file
+	 * are missing in the working tree.
+	 *
+	 * @throws IOException
+	 * @throws NoFilepatternException
+	 * @throws GitAPIException
+	 */
+	@Test
+	public void testIndexOnly() throws IOException, NoFilepatternException,
+			GitAPIException {
+		List<File> attrFiles = new ArrayList<File>();
+		attrFiles.add(writeGlobalAttributeFile("globalAttributesFile",
+				"*.txt -custom2"));
+		attrFiles.add(writeAttributesFile(".git/info/attributes",
+				"*.txt eol=crlf"));
+		attrFiles
+				.add(writeAttributesFile(".gitattributes", "*.txt custom=root"));
+		attrFiles
+				.add(writeAttributesFile("level1/.gitattributes", "*.txt text"));
+		attrFiles.add(writeAttributesFile("level1/level2/.gitattributes",
+				"*.txt -delta"));
+
+		writeTrashFile("l0.txt", "");
+
+		writeTrashFile("level1/l1.txt", "");
+
+		writeTrashFile("level1/level2/l2.txt", "");
+
+		git.add().addFilepattern(".").call();
+
+		// Modify all attributes
+		for (File attrFile : attrFiles)
+			attrFile.delete();
+
+		beginWalk();
+
+		assertEntry(M, ".gitattributes");
+		assertEntry(F, "l0.txt", asSet(CUSTOM_ROOT));
+
+		assertEntry(D, "level1");
+		assertEntry(M, "level1/.gitattributes");
+		assertEntry(F, "level1/l1.txt",
+
+		asSet(CUSTOM_ROOT, TEXT_SET));
+
+		assertEntry(D, "level1/level2");
+		assertEntry(M, "level1/level2/.gitattributes");
+		assertEntry(F, "level1/level2/l2.txt",
+
+		asSet(CUSTOM_ROOT, TEXT_SET, DELTA_UNSET));
+
+		endWalk();
+	}
+

@@ -15,6 +15,7 @@
 		boolean emptyCommit = true;
 
 		try (TreeWalk treeWalk = new TreeWalk(repo)) {
+			treeWalk.setOperationType(OperationType.CHECKIN_OP);
 			int dcIdx = treeWalk
 					.addTree(new DirCacheBuildIterator(existingBuilder));
 			int fIdx = treeWalk.addTree(new FileTreeIterator(repo));

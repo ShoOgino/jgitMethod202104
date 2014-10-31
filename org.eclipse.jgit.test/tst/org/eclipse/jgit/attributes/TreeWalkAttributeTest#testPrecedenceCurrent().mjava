@@ -1,0 +1,30 @@
+	/**
+	 * Checks that a subfolder ".gitattributes" file has precedence over its
+	 * parent.
+	 *
+	 * @throws IOException
+	 */
+	@Test
+	public void testPrecedenceCurrent() throws IOException {
+		writeGlobalAttributeFile("globalAttributesFile", "*.txt custom=global");
+		writeAttributesFile(".gitattributes", "*.txt custom=root");
+		writeAttributesFile("level1/.gitattributes", "*.txt custom=parent");
+		writeAttributesFile("level1/level2/.gitattributes",
+				"*.txt custom=current");
+
+		writeTrashFile("level1/level2/file.txt", "");
+
+		beginWalk();
+
+		assertEntry(F, ".gitattributes");
+
+		assertEntry(D, "level1");
+		assertEntry(F, "level1/.gitattributes");
+
+		assertEntry(D, "level1/level2");
+		assertEntry(F, "level1/level2/.gitattributes");
+		assertEntry(F, "level1/level2/file.txt", asSet(CUSTOM_CURRENT));
+
+		endWalk();
+	}
+

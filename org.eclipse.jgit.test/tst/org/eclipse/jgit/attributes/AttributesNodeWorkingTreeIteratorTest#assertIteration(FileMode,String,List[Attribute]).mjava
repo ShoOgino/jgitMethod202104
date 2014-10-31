@@ -1,15 +1,14 @@
 	private void assertIteration(FileMode type, String pathName,
-			List<Attribute> nodeAttrs) throws IOException {
+			List<Attribute> nodeAttrs)
+			throws IOException {
 		assertTrue("walk has entry", walk.next());
 		assertEquals(pathName, walk.getPathString());
 		assertEquals(type, walk.getFileMode(0));
-		DirCacheIterator itr = walk.getTree(0, DirCacheIterator.class);
+		WorkingTreeIterator itr = walk.getTree(0, WorkingTreeIterator.class);
 		assertNotNull("has tree", itr);
 
-		AttributesNode attributesNode = itr.getEntryAttributesNode(db
-				.newObjectReader());
+		AttributesNode attributesNode = itr.getEntryAttributesNode();
 		assertAttributesNode(pathName, attributesNode, nodeAttrs);
-
 		if (D.equals(type))
 			walk.enterSubtree();
 
