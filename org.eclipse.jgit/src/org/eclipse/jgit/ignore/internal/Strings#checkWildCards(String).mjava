@@ -1,0 +1,15 @@
+	static PatternState checkWildCards(String pattern) {
+		if (isComplexWildcard(pattern))
+			return PatternState.COMPLEX;
+		int startIdx = pattern.indexOf('*');
+		if (startIdx < 0)
+			return PatternState.NONE;
+
+		if (startIdx == pattern.length() - 1)
+			return PatternState.TRAILING_ASTERISK_ONLY;
+		if (pattern.lastIndexOf('*') == 0)
+			return PatternState.LEADING_ASTERISK_ONLY;
+
+		return PatternState.COMPLEX;
+	}
+

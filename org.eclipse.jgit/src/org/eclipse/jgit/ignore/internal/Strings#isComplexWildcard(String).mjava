@@ -1,0 +1,13 @@
+	private static boolean isComplexWildcard(String pattern) {
+		int idx1 = pattern.indexOf('[');
+		if (idx1 != -1) {
+			int idx2 = pattern.indexOf(']');
+			if (idx2 > idx1)
+				return true;
+		}
+		// required to match escaped backslashes '\\\\'
+		if (pattern.indexOf('?') != -1 || pattern.indexOf('\\') != -1)
+			return true;
+		return false;
+	}
+

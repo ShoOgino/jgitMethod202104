@@ -5,8 +5,17 @@
 		if (WildMatcher.WILDMATCH.equals(segment)
 				|| WildMatcher.WILDMATCH2.equals(segment))
 			return WILD;
-		if (isWildCard(segment))
+
+		PatternState state = checkWildCards(segment);
+		switch (state) {
+		case LEADING_ASTERISK_ONLY:
+			return new LeadingAsteriskMatcher(segment, pathSeparator, dirOnly);
+		case TRAILING_ASTERISK_ONLY:
+			return new TrailingAsteriskMatcher(segment, pathSeparator, dirOnly);
+		case COMPLEX:
 			return new WildCardMatcher(segment, pathSeparator, dirOnly);
-		return new NameMatcher(segment, pathSeparator, dirOnly);
+		default:
+			return new NameMatcher(segment, pathSeparator, dirOnly);
+		}
 	}
 

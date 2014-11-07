@@ -1,7 +1,7 @@
 	private void assertMatch(final String pattern, final String input,
 			final boolean matchExpected, Boolean... assume) {
 		boolean assumeDir = input.endsWith("/");
-		if (useJGitRule.booleanValue()) {
+		if (useOldRule.booleanValue()) {
 			final IgnoreRule matcher = new IgnoreRule(pattern);
 			if (assume.length == 0 || !assume[0].booleanValue())
 				assertEquals(matchExpected, matcher.isMatch(input, assumeDir));
