@@ -24,8 +24,14 @@
 			}
 
 			if (unpackError == null) {
+				boolean atomic = isCapabilityEnabled(CAPABILITY_ATOMIC);
 				validateCommands();
+				if (atomic && anyRejects())
+					failPendingCommands();
+
 				preReceive.onPreReceive(this, filterCommands(Result.NOT_ATTEMPTED));
+				if (atomic && anyRejects())
+					failPendingCommands();
 				executeCommands();
 			}
 			unlockPack();
