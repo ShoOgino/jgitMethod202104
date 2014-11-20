@@ -38,7 +38,9 @@
 				|| policy == null)
 			adv.advertiseCapability(OPTION_ALLOW_TIP_SHA1_IN_WANT);
 		adv.setDerefTags(true);
-		advertised = adv.send(getAdvertisedOrDefaultRefs());
+		Map<String, Ref> refs = getAdvertisedOrDefaultRefs();
+		findSymrefs(adv, refs);
+		advertised = adv.send(refs);
 		if (adv.isEmpty())
 			adv.advertiseId(ObjectId.zeroId(), "capabilities^{}"); //$NON-NLS-1$
 		adv.end();
