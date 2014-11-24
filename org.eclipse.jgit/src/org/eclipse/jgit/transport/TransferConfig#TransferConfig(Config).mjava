@@ -1,7 +1,15 @@
 	private TransferConfig(final Config rc) {
-		fetchFsck = rc.getBoolean(
+		checkReceivedObjects = rc.getBoolean(
 				"fetch", "fsckobjects", //$NON-NLS-1$ //$NON-NLS-2$
 				rc.getBoolean("transfer", "fsckobjects", false)); //$NON-NLS-1$ //$NON-NLS-2$
+		allowLeadingZeroFileMode = checkReceivedObjects
+				&& rc.getBoolean("fsck", "allowLeadingZeroFileMode", false); //$NON-NLS-1$ //$NON-NLS-2$
+		safeForWindows = checkReceivedObjects
+				&& rc.getBoolean("fsck", "safeForWindows", //$NON-NLS-1$ //$NON-NLS-2$
+						SystemReader.getInstance().isWindows());
+		safeForMacOS = checkReceivedObjects
+				&& rc.getBoolean("fsck", "safeForMacOS", //$NON-NLS-1$ //$NON-NLS-2$
+						SystemReader.getInstance().isMacOS());
 
 		allowTipSha1InWant = rc.getBoolean(
 				"uploadpack", "allowtipsha1inwant", false); //$NON-NLS-1$ //$NON-NLS-2$

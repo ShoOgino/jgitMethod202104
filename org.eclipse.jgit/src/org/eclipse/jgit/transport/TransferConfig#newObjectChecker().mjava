@@ -1,0 +1,14 @@
+	/**
+	 * @return checker to verify fetched objects, or null if checking is not
+	 *         enabled in the repository configuration.
+	 * @since 3.6
+	 */
+	public ObjectChecker newObjectChecker() {
+		if (!checkReceivedObjects)
+			return null;
+		return new ObjectChecker()
+			.setAllowLeadingZeroFileMode(allowLeadingZeroFileMode)
+			.setSafeForWindows(safeForWindows)
+			.setSafeForMacOS(safeForMacOS);
+	}
+
