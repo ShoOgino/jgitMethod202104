@@ -5,12 +5,18 @@
 			if (cmd.getResult() != Result.NOT_ATTEMPTED)
 				continue;
 
-			if (cmd.getType() == ReceiveCommand.Type.DELETE
-					&& !isAllowDeletes()) {
-				// Deletes are not supported on this repository.
-				//
-				cmd.setResult(Result.REJECTED_NODELETE);
-				continue;
+			if (cmd.getType() == ReceiveCommand.Type.DELETE) {
+				if (!isAllowDeletes()) {
+					// Deletes are not supported on this repository.
+					cmd.setResult(Result.REJECTED_NODELETE);
+					continue;
+				}
+				if (!isAllowBranchDeletes()
+						&& ref.getName().startsWith(Constants.R_HEADS)) {
+					// Branches cannot be deleted, but other refs can.
+					cmd.setResult(Result.REJECTED_NODELETE);
+					continue;
+				}
 			}
 
 			if (cmd.getType() == ReceiveCommand.Type.CREATE) {
