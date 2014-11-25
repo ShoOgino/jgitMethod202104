@@ -17,7 +17,8 @@
 		final LockFile tmp = myLock;
 		requireLocked(tmp);
 		try {
-			writeTo(new SafeBufferedOutputStream(tmp.getOutputStream()));
+			writeTo(liveFile.getParentFile(),
+					new SafeBufferedOutputStream(tmp.getOutputStream()));
 		} catch (IOException err) {
 			tmp.unlock();
 			throw err;
