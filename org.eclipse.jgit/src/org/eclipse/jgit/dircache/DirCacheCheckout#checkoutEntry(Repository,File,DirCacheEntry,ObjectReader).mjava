@@ -12,63 +12,21 @@
 	 *
 	 * @param repo
 	 * @param f
-	 *            the file to be modified. The parent directory for this file
-	 *            has to exist already
+	 *            this parameter is ignored.
 	 * @param entry
 	 *            the entry containing new mode and content
 	 * @param or
 	 *            object reader to use for checkout
 	 * @throws IOException
+	 * @deprecated Do not pass File object.
 	 */
+	@Deprecated
 	public static void checkoutEntry(final Repository repo, File f,
 			DirCacheEntry entry, ObjectReader or) throws IOException {
-		ObjectLoader ol = or.open(entry.getObjectId());
-		File parentDir = f.getParentFile();
-		parentDir.mkdirs();
-		FS fs = repo.getFS();
-		WorkingTreeOptions opt = repo.getConfig().get(WorkingTreeOptions.KEY);
-		if (entry.getFileMode() == FileMode.SYMLINK
-				&& opt.getSymLinks() == SymLinks.TRUE) {
-			byte[] bytes = ol.getBytes();
-			String target = RawParseUtils.decode(bytes);
-			fs.createSymLink(f, target);
-			entry.setLength(bytes.length);
-			entry.setLastModified(fs.lastModified(f));
-		} else {
-			File tmpFile = File.createTempFile(
-					"._" + f.getName(), null, parentDir); //$NON-NLS-1$
-			FileOutputStream rawChannel = new FileOutputStream(tmpFile);
-			OutputStream channel;
-			if (opt.getAutoCRLF() == AutoCRLF.TRUE)
-				channel = new AutoCRLFOutputStream(rawChannel);
-			else
-				channel = rawChannel;
-			try {
-				ol.copyTo(channel);
-			} finally {
-				channel.close();
-			}
-			if (opt.isFileMode() && fs.supportsExecute()) {
-				if (FileMode.EXECUTABLE_FILE.equals(entry.getRawMode())) {
-					if (!fs.canExecute(tmpFile))
-						fs.setExecute(tmpFile, true);
-				} else {
-					if (fs.canExecute(tmpFile))
-						fs.setExecute(tmpFile, false);
-				}
-			}
-			try {
-				FileUtils.rename(tmpFile, f);
-			} catch (IOException e) {
-				throw new IOException(MessageFormat.format(
-						JGitText.get().renameFileFailed, tmpFile.getPath(),
-						f.getPath()));
-			}
-		}
-		entry.setLastModified(f.lastModified());
-		if (opt.getAutoCRLF() != AutoCRLF.FALSE)
-			entry.setLength(f.length()); // AutoCRLF wants on-disk-size
-		else
-			entry.setLength((int) ol.getSize());
+		if (f == null || repo.getWorkTree() == null)
+			throw new IllegalArgumentException();
+		if (!f.equals(new File(repo.getWorkTree(), entry.getPathString())))
+			throw new IllegalArgumentException();
+		checkoutEntry(repo, entry, or);
 	}
 

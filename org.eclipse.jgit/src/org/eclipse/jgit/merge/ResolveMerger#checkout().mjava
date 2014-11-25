@@ -1,11 +1,4 @@
 	private void checkout() throws NoWorkTreeException, IOException {
-		for (Map.Entry<String, DirCacheEntry> entry : toBeCheckedOut
-				.entrySet()) {
-			File f = new File(db.getWorkTree(), entry.getKey());
-			createDir(f.getParentFile());
-			DirCacheCheckout.checkoutEntry(db, f, entry.getValue(), reader);
-			modifiedFiles.add(entry.getKey());
-		}
 		// Iterate in reverse so that "folder/file" is deleted before
 		// "folder". Otherwise this could result in a failing path because
 		// of a non-empty directory, for which delete() would fail.
@@ -17,6 +10,11 @@
 					failingPaths.put(fileName,
 							MergeFailureReason.COULD_NOT_DELETE);
 			modifiedFiles.add(fileName);
+		}
+		for (Map.Entry<String, DirCacheEntry> entry : toBeCheckedOut
+				.entrySet()) {
+			DirCacheCheckout.checkoutEntry(db, entry.getValue(), reader);
+			modifiedFiles.add(entry.getKey());
 		}
 	}
 

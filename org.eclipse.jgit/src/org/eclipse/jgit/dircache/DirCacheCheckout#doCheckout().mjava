@@ -45,19 +45,9 @@
 				removeEmptyParents(file);
 
 			for (String path : updated.keySet()) {
-				// ... create/overwrite this file ...
-				file = new File(repo.getWorkTree(), path);
-				if (!file.getParentFile().mkdirs()) {
-					// ignore
-				}
-
 				DirCacheEntry entry = dc.getEntry(path);
-
-				// submodules are handled with separate operations
-				if (FileMode.GITLINK.equals(entry.getRawMode()))
-					continue;
-
-				checkoutEntry(repo, file, entry, objectReader);
+				if (!FileMode.GITLINK.equals(entry.getRawMode()))
+					checkoutEntry(repo, entry, objectReader);
 			}
 
 			// commit the index builder - a new index is persisted
