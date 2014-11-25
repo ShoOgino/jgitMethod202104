@@ -1,0 +1,14 @@
+		public String getHostname() {
+			if (hostname == null) {
+				try {
+					InetAddress localMachine = InetAddress.getLocalHost();
+					hostname = localMachine.getCanonicalHostName();
+				} catch (UnknownHostException e) {
+					// we do nothing
+					hostname = "localhost"; //$NON-NLS-1$
+				}
+				assert hostname != null;
+			}
+			return hostname;
+		}
+

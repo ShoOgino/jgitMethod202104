@@ -16,11 +16,11 @@
 		if (refName.endsWith(".lock")) //$NON-NLS-1$
 			return false;
 
-		// Borrow logic for filtering out invalid paths. These
-		// are also invalid ref
+		// Refs may be stored as loose files so invalid paths
+		// on the local system must also be invalid refs.
 		try {
-			DirCacheCheckout.checkValidPath(refName);
-		} catch (InvalidPathException e) {
+			SystemReader.getInstance().checkPath(refName);
+		} catch (CorruptObjectException e) {
 			return false;
 		}
 
