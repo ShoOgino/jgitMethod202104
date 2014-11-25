@@ -13,8 +13,7 @@
 	 */
 	@SuppressWarnings("boxing")
 	public DirCacheEntry(final byte[] newPath, final int stage) {
-		if (!isValidPath(newPath))
-			throw new InvalidPathException(toString(newPath));
+		DirCacheCheckout.checkValidPath(toString(newPath));
 		if (stage < 0 || 3 < stage)
 			throw new IllegalArgumentException(MessageFormat.format(
 					JGitText.get().invalidStageForPath,
