@@ -1,0 +1,9 @@
+	@Test
+	public void testInvalidTreeNameIsDotGitSomethingSpaceSomething()
+			throws CorruptObjectException {
+		StringBuilder b = new StringBuilder();
+		entry(b, "100644 .gitfoo bar");
+		byte[] data = Constants.encodeASCII(b.toString());
+		checker.checkTree(data);
+	}
+
