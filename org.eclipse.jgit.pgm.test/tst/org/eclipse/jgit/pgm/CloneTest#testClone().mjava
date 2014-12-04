@@ -1,0 +1,19 @@
+	@Test
+	public void testClone() throws Exception {
+		createInitialCommit();
+
+		File gitDir = db.getDirectory();
+		String sourceURI = gitDir.toURI().toString();
+		File target = createTempDirectory("target");
+		StringBuilder cmd = new StringBuilder("git clone ").append(sourceURI
+				+ " " + target.getPath());
+		String[] result = execute(cmd.toString());
+		assertArrayEquals(new String[] {
+				"Cloning into '" + target.getPath() + "'...",
+						"", "" }, result);
+
+		Git git2 = Git.open(target);
+		List<Ref> branches = git2.branchList().call();
+		assertEquals("expected 1 branch", 1, branches.size());
+	}
+
