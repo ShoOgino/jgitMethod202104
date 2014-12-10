@@ -1,21 +1,17 @@
 	/**
-	 * The optional directory associated with the clone operation. If the
-	 * directory isn't set, a name associated with the source uri will be used.
-	 *
-	 * @see URIish#getHumanishName()
-	 *
-	 * @param directory
-	 *            the directory to clone to
+	 * @param gitDir
+	 *            the repository meta directory
 	 * @return this instance
 	 * @throws IllegalStateException
 	 *             if the combination of directory, gitDir and bare is illegal.
 	 *             E.g. if for a non-bare repository directory and gitDir point
 	 *             to the same directory of if for a bare repository both
 	 *             directory and gitDir are specified
+	 * @since 3.6
 	 */
-	public CloneCommand setDirectory(File directory) {
+	public CloneCommand setGitDir(File gitDir) {
 		validateDirs(directory, gitDir, bare);
-		this.directory = directory;
+		this.gitDir = gitDir;
 		return this;
 	}
 
