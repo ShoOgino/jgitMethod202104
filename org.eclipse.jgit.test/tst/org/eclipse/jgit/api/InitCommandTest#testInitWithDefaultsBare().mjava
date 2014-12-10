@@ -1,0 +1,19 @@
+	// If neither directory nor gitDir is set in a bare repo make sure
+	// worktree and gitDir are set correctly. Standard case. Same as
+	// "git init --bare"
+	@Test(expected = NoWorkTreeException.class)
+	public void testInitWithDefaultsBare() throws JGitInternalException,
+			GitAPIException, IOException {
+		MockSystemReader reader = (MockSystemReader) SystemReader.getInstance();
+		reader.setProperty(Constants.OS_USER_DIR, getTemporaryDirectory()
+				.getAbsolutePath());
+		InitCommand command = new InitCommand();
+		command.setBare(true);
+		Repository repository = command.call().getRepository();
+		addRepoToClose(repository);
+		assertNotNull(repository);
+		assertEqualsFile(new File(reader.getProperty("user.dir")),
+				repository.getDirectory());
+		assertNull(repository.getWorkTree());
+	}
+

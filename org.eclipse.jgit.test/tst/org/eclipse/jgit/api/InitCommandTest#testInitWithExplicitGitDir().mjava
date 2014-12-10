@@ -1,0 +1,17 @@
+	// non-bare repos where gitDir and directory is set. Same as
+	// "git init --separate-git-dir /tmp/a /tmp/b"
+	@Test
+	public void testInitWithExplicitGitDir() throws IOException,
+			JGitInternalException, GitAPIException {
+		File wt = createTempDirectory("testInitRepositoryWT");
+		File gitDir = createTempDirectory("testInitRepositoryGIT");
+		InitCommand command = new InitCommand();
+		command.setDirectory(wt);
+		command.setGitDir(gitDir);
+		Repository repository = command.call().getRepository();
+		addRepoToClose(repository);
+		assertNotNull(repository);
+		assertEqualsFile(wt, repository.getWorkTree());
+		assertEqualsFile(gitDir, repository.getDirectory());
+	}
+

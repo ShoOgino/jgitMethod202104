@@ -1,20 +1,18 @@
 	/**
-	 * The optional directory associated with the init operation. If no
-	 * directory is set, we'll use the current directory
-	 *
-	 * @param directory
-	 *            the directory to init to
+	 * @param gitDir
+	 *            the repository meta directory
 	 * @return this instance
 	 * @throws IllegalStateException
 	 *             if the combination of directory, gitDir and bare is illegal.
 	 *             E.g. if for a non-bare repository directory and gitDir point
 	 *             to the same directory of if for a bare repository both
 	 *             directory and gitDir are specified
+	 * @since 3.6
 	 */
-	public InitCommand setDirectory(File directory)
+	public InitCommand setGitDir(File gitDir)
 			throws IllegalStateException {
 		validateDirs(directory, gitDir, bare);
-		this.directory = directory;
+		this.gitDir = gitDir;
 		return this;
 	}
 

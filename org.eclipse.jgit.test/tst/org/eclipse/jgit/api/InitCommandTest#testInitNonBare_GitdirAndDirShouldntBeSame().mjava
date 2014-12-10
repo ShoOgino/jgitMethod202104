@@ -1,0 +1,15 @@
+	// In a non-bare repo when directory and gitDir is set then they shouldn't
+	// point to the same dir. Same as
+	// "git init --separate-git-dir /tmp/a /tmp/a"
+	// (works in native git but I guess that's more a bug)
+	@Test(expected = IllegalStateException.class)
+	public void testInitNonBare_GitdirAndDirShouldntBeSame()
+			throws JGitInternalException, GitAPIException, IOException {
+		File gitDir = createTempDirectory("testInitRepository.git");
+		InitCommand command = new InitCommand();
+		command.setBare(false);
+		command.setGitDir(gitDir);
+		command.setDirectory(gitDir);
+		command.call().getRepository();
+	}
+
