@@ -4,6 +4,10 @@
 
 		final TestRepository<Repository> src = createTestRepository();
 		final String srcName = src.getRepository().getDirectory().getName();
+		src.getRepository()
+				.getConfig()
+				.setBoolean(ConfigConstants.CONFIG_CORE_SECTION, null,
+						ConfigConstants.CONFIG_KEY_LOGALLREFUPDATES, true);
 
 		ServletContextHandler app = server.addContext("/git");
 		GitServlet gs = new GitServlet();
