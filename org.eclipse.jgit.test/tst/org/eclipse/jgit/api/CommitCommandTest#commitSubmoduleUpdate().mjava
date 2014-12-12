@@ -25,8 +25,8 @@
 		assertEquals(path, generator.getModulesPath());
 		assertEquals(uri, generator.getConfigUrl());
 		Repository subModRepo = generator.getRepository();
-		addRepoToClose(subModRepo);
 		assertNotNull(subModRepo);
+		subModRepo.close();
 		assertEquals(commit2, repo.resolve(Constants.HEAD));
 
 		RevCommit submoduleAddCommit = git.commit().setMessage("submodule add")
