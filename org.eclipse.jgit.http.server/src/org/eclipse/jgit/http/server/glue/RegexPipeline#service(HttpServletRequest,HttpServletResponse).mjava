@@ -1,7 +1,7 @@
 	@Override
 	void service(HttpServletRequest req, HttpServletResponse rsp)
 			throws ServletException, IOException {
-		final String reqInfo = ServletUtils.getEncodedPathInfo(req);
+		final String reqInfo = req.getPathInfo();
 		if (reqInfo == null) {
 			rsp.sendError(SC_NOT_FOUND);
 			return;
