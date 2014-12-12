@@ -10,6 +10,9 @@
 
 		try {
 			ReflogReader reader = repo.getReflogReader(ref);
+			if (reader == null)
+				throw new RefNotFoundException(MessageFormat.format(
+						JGitText.get().refNotResolved, ref));
 			return reader.getReverseEntries();
 		} catch (IOException e) {
 			throw new InvalidRefNameException(MessageFormat.format(
