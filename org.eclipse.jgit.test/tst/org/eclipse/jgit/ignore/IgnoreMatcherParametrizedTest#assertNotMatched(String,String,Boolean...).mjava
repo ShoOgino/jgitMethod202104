@@ -6,10 +6,16 @@
 	 *            Pattern as it would appear in a .gitignore file
 	 * @param target
 	 *            Target file path relative to repository's GIT_DIR
+	 * @param assume
 	 */
-	public void assertNotMatched(String pattern, String target) {
+	public void assertNotMatched(String pattern, String target,
+			Boolean... assume) {
 		boolean value = match(pattern, target);
-		assertFalse("Expected no match for: " + pattern + " with: " + target,
-				value);
+		if (assume.length == 0 || !assume[0].booleanValue())
+			assertFalse("Expected no match for: " + pattern + " with: "
+					+ target, value);
+		else
+			assumeFalse("Expected no match for: " + pattern + " with: "
+					+ target, value);
 	}
 
