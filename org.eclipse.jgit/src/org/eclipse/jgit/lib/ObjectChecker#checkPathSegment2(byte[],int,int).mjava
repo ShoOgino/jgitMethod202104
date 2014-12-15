@@ -27,6 +27,11 @@
 					RawParseUtils.decode(raw, ptr, end)));
 		}
 
+		if (macosx && isMacHFSGit(raw, ptr, end))
+			throw new CorruptObjectException(String.format(
+					"invalid name '%s' contains ignorable Unicode characters",
+					RawParseUtils.decode(raw, ptr, end)));
+
 		if (windows) {
 			// Windows ignores space and dot at end of file name.
 			if (raw[end - 1] == ' ' || raw[end - 1] == '.')
