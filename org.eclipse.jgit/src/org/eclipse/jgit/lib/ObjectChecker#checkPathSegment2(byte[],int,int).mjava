@@ -22,6 +22,9 @@
 							"invalid name '%s'",
 							RawParseUtils.decode(raw, ptr, end)));
 			}
+		} else if (isGitTilde1(raw, ptr, end)) {
+			throw new CorruptObjectException(String.format("invalid name '%s'",
+					RawParseUtils.decode(raw, ptr, end)));
 		}
 
 		if (windows) {
