@@ -1,0 +1,9 @@
+	@Test
+	public void testInvalidTreeNameIsNotMacHFSGitOtherPlatform()
+			throws CorruptObjectException {
+		StringBuilder b = new StringBuilder();
+		entry(b, "100644 .git\u200C");
+		byte[] data = Constants.encode(b.toString());
+		checker.checkTree(data);
+	}
+

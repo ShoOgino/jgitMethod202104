@@ -1,4 +1,9 @@
 	private static boolean isValidPath(final String path) {
-		return DirCacheEntry.isValidPath(Constants.encode(path));
+		try {
+			DirCacheCheckout.checkValidPath(path);
+			return true;
+		} catch (InvalidPathException e) {
+			return false;
+		}
 	}
 

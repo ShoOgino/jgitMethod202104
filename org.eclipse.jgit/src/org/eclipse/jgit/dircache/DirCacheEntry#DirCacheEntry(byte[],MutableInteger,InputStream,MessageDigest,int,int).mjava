@@ -48,6 +48,16 @@
 			md.update((byte) 0);
 		}
 
+		try {
+			DirCacheCheckout.checkValidPath(toString(path));
+		} catch (InvalidPathException e) {
+			CorruptObjectException p =
+				new CorruptObjectException(e.getMessage());
+			if (e.getCause() != null)
+				p.initCause(e.getCause());
+			throw p;
+		}
+
 		// Index records are padded out to the next 8 byte alignment
 		// for historical reasons related to how C Git read the files.
 		//
@@ -61,6 +71,5 @@
 
 		if (mightBeRacilyClean(smudge_s, smudge_ns))
 			smudgeRacilyClean();
-
 	}
 
