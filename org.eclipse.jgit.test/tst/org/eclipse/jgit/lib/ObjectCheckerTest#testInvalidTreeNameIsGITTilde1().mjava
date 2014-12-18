@@ -1,14 +1,13 @@
 	@Test
-	public void testInvalidTreeNameIsMixedCaseGitMacOS() {
+	public void testInvalidTreeNameIsGITTilde1() {
 		StringBuilder b = new StringBuilder();
-		entry(b, "100644 .GiT");
+		entry(b, "100644 GIT~1");
 		byte[] data = Constants.encodeASCII(b.toString());
 		try {
-			checker.setSafeForMacOS(true);
 			checker.checkTree(data);
 			fail("incorrectly accepted an invalid tree");
 		} catch (CorruptObjectException e) {
-			assertEquals("invalid name '.GiT'", e.getMessage());
+			assertEquals("invalid name 'GIT~1'", e.getMessage());
 		}
 	}
 

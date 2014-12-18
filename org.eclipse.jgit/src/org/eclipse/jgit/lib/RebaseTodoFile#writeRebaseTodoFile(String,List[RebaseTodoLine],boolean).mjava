@@ -12,9 +12,8 @@
 	 */
 	public void writeRebaseTodoFile(String path, List<RebaseTodoLine> steps,
 			boolean append) throws IOException {
-		BufferedWriter fw = new BufferedWriter(new OutputStreamWriter(
-				new FileOutputStream(new File(repo.getDirectory(), path),
-						append), Constants.CHARACTER_ENCODING));
+		OutputStream fw = new SafeBufferedOutputStream(new FileOutputStream(
+				new File(repo.getDirectory(), path), append));
 		try {
 			StringBuilder sb = new StringBuilder();
 			for (RebaseTodoLine step : steps) {
@@ -28,8 +27,8 @@
 					sb.append(" "); //$NON-NLS-1$
 					sb.append(step.getShortMessage().trim());
 				}
-				fw.write(sb.toString());
-				fw.newLine();
+				sb.append('\n');
+				fw.write(Constants.encode(sb.toString()));
 			}
 		} finally {
 			fw.close();
