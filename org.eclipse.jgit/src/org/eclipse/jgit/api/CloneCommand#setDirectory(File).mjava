@@ -7,8 +7,14 @@
 	 * @param directory
 	 *            the directory to clone to
 	 * @return this instance
+	 * @throws IllegalStateException
+	 *             if the combination of directory, gitDir and bare is illegal.
+	 *             E.g. if for a non-bare repository directory and gitDir point
+	 *             to the same directory of if for a bare repository both
+	 *             directory and gitDir are specified
 	 */
 	public CloneCommand setDirectory(File directory) {
+		validateDirs(directory, gitDir, bare);
 		this.directory = directory;
 		return this;
 	}

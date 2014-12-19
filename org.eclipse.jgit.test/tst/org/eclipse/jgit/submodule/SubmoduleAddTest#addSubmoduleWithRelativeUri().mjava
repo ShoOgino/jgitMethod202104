@@ -25,7 +25,6 @@
 			fullUri = fullUri.replace('\\', '/');
 		assertEquals(fullUri, generator.getConfigUrl());
 		Repository subModRepo = generator.getRepository();
-		addRepoToClose(subModRepo);
 		assertNotNull(subModRepo);
 		assertEquals(
 				fullUri,
@@ -34,6 +33,7 @@
 						.getString(ConfigConstants.CONFIG_REMOTE_SECTION,
 								Constants.DEFAULT_REMOTE_NAME,
 								ConfigConstants.CONFIG_KEY_URL));
+		subModRepo.close();
 		assertEquals(commit, repo.resolve(Constants.HEAD));
 
 		Status status = Git.wrap(db).status().call();

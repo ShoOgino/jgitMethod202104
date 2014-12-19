@@ -1,0 +1,10 @@
+	@Test
+	public void testInvalidTreeNameIsNotMacHFSGit2()
+			throws CorruptObjectException {
+		StringBuilder b = new StringBuilder();
+		entry(b, "100644 .kit\u200C");
+		byte[] data = Constants.encode(b.toString());
+		checker.setSafeForMacOS(true);
+		checker.checkTree(data);
+	}
+

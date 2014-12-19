@@ -1,0 +1,19 @@
+	// non-bare repos where only gitDir is set. Same as
+	// "git init --separate-git-dir /tmp/a"
+	@Test
+	public void testInitWithOnlyExplicitGitDir() throws IOException,
+			JGitInternalException, GitAPIException {
+		MockSystemReader reader = (MockSystemReader) SystemReader.getInstance();
+		reader.setProperty(Constants.OS_USER_DIR, getTemporaryDirectory()
+				.getAbsolutePath());
+		File gitDir = createTempDirectory("testInitRepository/.git");
+		InitCommand command = new InitCommand();
+		command.setGitDir(gitDir);
+		Repository repository = command.call().getRepository();
+		addRepoToClose(repository);
+		assertNotNull(repository);
+		assertEqualsFile(gitDir, repository.getDirectory());
+		assertEqualsFile(new File(reader.getProperty("user.dir")),
+				repository.getWorkTree());
+	}
+

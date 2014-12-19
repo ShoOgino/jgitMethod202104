@@ -11,12 +11,26 @@
 					throw new CorruptObjectException("invalid name '..'");
 				break;
 			case 4:
-				if (isDotGit(raw, ptr + 1))
+				if (isGit(raw, ptr + 1))
+					throw new CorruptObjectException(String.format(
+							"invalid name '%s'",
+							RawParseUtils.decode(raw, ptr, end)));
+				break;
+			default:
+				if (end - ptr > 4 && isNormalizedGit(raw, ptr + 1, end))
 					throw new CorruptObjectException(String.format(
 							"invalid name '%s'",
 							RawParseUtils.decode(raw, ptr, end)));
 			}
+		} else if (isGitTilde1(raw, ptr, end)) {
+			throw new CorruptObjectException(String.format("invalid name '%s'",
+					RawParseUtils.decode(raw, ptr, end)));
 		}
+
+		if (macosx && isMacHFSGit(raw, ptr, end))
+			throw new CorruptObjectException(String.format(
+					"invalid name '%s' contains ignorable Unicode characters",
+					RawParseUtils.decode(raw, ptr, end)));
 
 		if (windows) {
 			// Windows ignores space and dot at end of file name.

@@ -40,6 +40,8 @@
 					configure(clone);
 					clone.setURI(url);
 					clone.setDirectory(generator.getDirectory());
+					clone.setGitDir(new File(new File(repo.getDirectory(),
+							Constants.MODULES), generator.getPath()));
 					if (monitor != null)
 						clone.setProgressMonitor(monitor);
 					submoduleRepo = clone.call().getRepository();

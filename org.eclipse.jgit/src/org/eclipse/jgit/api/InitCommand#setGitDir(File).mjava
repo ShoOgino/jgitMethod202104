@@ -1,0 +1,18 @@
+	/**
+	 * @param gitDir
+	 *            the repository meta directory
+	 * @return this instance
+	 * @throws IllegalStateException
+	 *             if the combination of directory, gitDir and bare is illegal.
+	 *             E.g. if for a non-bare repository directory and gitDir point
+	 *             to the same directory of if for a bare repository both
+	 *             directory and gitDir are specified
+	 * @since 3.6
+	 */
+	public InitCommand setGitDir(File gitDir)
+			throws IllegalStateException {
+		validateDirs(directory, gitDir, bare);
+		this.gitDir = gitDir;
+		return this;
+	}
+

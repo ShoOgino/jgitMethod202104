@@ -1,0 +1,18 @@
+	private static boolean isNormalizedGit(byte[] raw, int ptr, int end) {
+		if (isGit(raw, ptr)) {
+			int dots = 0;
+			boolean space = false;
+			int p = end - 1;
+			for (; (ptr + 2) < p; p--) {
+				if (raw[p] == '.')
+					dots++;
+				else if (raw[p] == ' ')
+					space = true;
+				else
+					break;
+			}
+			return p == ptr + 2 && (dots == 1 || space);
+		}
+		return false;
+	}
+
