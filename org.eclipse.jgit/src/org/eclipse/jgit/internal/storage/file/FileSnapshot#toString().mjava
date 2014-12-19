@@ -1,0 +1,12 @@
+	@Override
+	public String toString() {
+		if (this == DIRTY)
+			return "DIRTY"; //$NON-NLS-1$
+		if (this == MISSING_FILE)
+			return "MISSING_FILE"; //$NON-NLS-1$
+		DateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", //$NON-NLS-1$
+				Locale.US);
+		return "FileSnapshot[modified: " + f.format(new Date(lastModified)) //$NON-NLS-1$
+				+ ", read: " + f.format(new Date(lastRead)) + "]"; //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
