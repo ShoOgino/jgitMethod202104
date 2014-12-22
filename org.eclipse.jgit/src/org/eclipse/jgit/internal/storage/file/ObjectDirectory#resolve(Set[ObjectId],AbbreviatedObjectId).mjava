@@ -12,7 +12,7 @@
 					p.resolve(matches, id, RESOLVE_ABBREV_LIMIT);
 				} catch (IOException e) {
 					// Assume the pack is corrupted.
-					//
+					logCorruptPackError(e, p);
 					removePack(p);
 				}
 				if (matches.size() > RESOLVE_ABBREV_LIMIT)
