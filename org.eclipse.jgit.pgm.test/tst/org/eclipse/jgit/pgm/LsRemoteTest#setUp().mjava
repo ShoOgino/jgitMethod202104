@@ -1,0 +1,21 @@
+	@Override
+	@Before
+	public void setUp() throws Exception {
+		super.setUp();
+		git = new Git(db);
+		// commit something
+		writeTrashFile("Test.txt", "Hello world");
+		git.add().addFilepattern("Test.txt").call();
+		git.commit().setMessage("Initial commit").call();
+
+		// create a master branch and switch to it
+		git.branchCreate().setName("test").call();
+		RefUpdate rup = db.updateRef(Constants.HEAD);
+		rup.link("refs/heads/test");
+
+		// tags
+		git.tag().setName("tag1").call();
+		git.tag().setName("tag2").call();
+		git.tag().setName("tag3").call();
+	}
+
