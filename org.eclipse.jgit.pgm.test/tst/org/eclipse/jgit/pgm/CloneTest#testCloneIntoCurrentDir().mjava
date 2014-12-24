@@ -1,0 +1,21 @@
+	@Test
+	public void testCloneIntoCurrentDir() throws Exception {
+		createInitialCommit();
+		File target = createTempDirectory("target");
+
+		MockSystemReader sr = (MockSystemReader) SystemReader.getInstance();
+		sr.setProperty(Constants.OS_USER_DIR, target.getAbsolutePath());
+
+		File gitDir = db.getDirectory();
+		String sourceURI = gitDir.toURI().toString();
+		String name = new URIish(sourceURI).getHumanishName();
+		StringBuilder cmd = new StringBuilder("git clone ").append(sourceURI);
+		String[] result = execute(cmd.toString());
+		assertArrayEquals(new String[] {
+				"Cloning into '" + new File(target, name).getName() + "'...",
+				"", "" }, result);
+		Git git2 = Git.open(new File(target, name));
+		List<Ref> branches = git2.branchList().call();
+		assertEquals("expected 1 branch", 1, branches.size());
+	}
+

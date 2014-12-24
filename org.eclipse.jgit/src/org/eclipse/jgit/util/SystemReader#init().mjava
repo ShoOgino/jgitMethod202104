@@ -1,10 +1,7 @@
 	private void init() {
 		// Creating ObjectChecker must be deferred. Unit tests change
 		// behavior of is{Windows,MacOS} in constructor of subclass.
-		if (platformChecker == null) {
-			platformChecker = new ObjectChecker()
-				.setSafeForWindows(isWindows())
-				.setSafeForMacOS(isMacOS());
-		}
+		if (platformChecker == null)
+			setPlatformChecker();
 	}
 

@@ -4,42 +4,42 @@
 			throw die(CLIText.get().conflictingUsageOf_git_dir_andArguments);
 
 		final URIish uri = new URIish(sourceUri);
+		File localNameF;
 		if (localName == null) {
 			try {
 				localName = uri.getHumanishName();
+				localNameF = new File(SystemReader.getInstance().getProperty(
+						Constants.OS_USER_DIR), localName);
 			} catch (IllegalArgumentException e) {
-				throw die(MessageFormat.format(CLIText.get().cannotGuessLocalNameFrom, sourceUri));
+				throw die(MessageFormat.format(
+						CLIText.get().cannotGuessLocalNameFrom, sourceUri));
 			}
+		} else
+			localNameF = new File(localName);
+
+		if (branch == null)
+			branch = Constants.HEAD;
+
+		CloneCommand command = Git.cloneRepository();
+		command.setURI(sourceUri).setRemote(remoteName).setBare(isBare)
+				.setNoCheckout(noCheckout).setBranch(branch);
+
+		command.setGitDir(gitdir == null ? null : new File(gitdir));
+		command.setDirectory(localNameF);
+		outw.println(MessageFormat.format(CLIText.get().cloningInto, localName));
+		try {
+			db = command.call().getRepository();
+			if (db.resolve(Constants.HEAD) == null)
+				outw.println(CLIText.get().clonedEmptyRepository);
+		} catch (InvalidRemoteException e) {
+			throw die(MessageFormat.format(CLIText.get().doesNotExist,
+					sourceUri));
+		} finally {
+			if (db != null)
+				db.close();
 		}
-		if (gitdir == null)
-			gitdir = new File(localName, Constants.DOT_GIT).getAbsolutePath();
 
-		dst = new FileRepositoryBuilder().setGitDir(new File(gitdir)).build();
-		dst.create();
-		final StoredConfig dstcfg = dst.getConfig();
-		dstcfg.setBoolean("core", null, "bare", false); //$NON-NLS-1$ //$NON-NLS-2$
-		dstcfg.save();
-		db = dst;
-
-		outw.print(MessageFormat.format(
-				CLIText.get().initializedEmptyGitRepositoryIn, gitdir));
 		outw.println();
 		outw.flush();
-
-		saveRemote(uri);
-		final FetchResult r = runFetch();
-
-		if (!noCheckout) {
-			final Ref checkoutRef;
-			if (branch == null)
-				checkoutRef = guessHEAD(r);
-			else {
-				checkoutRef = r.getAdvertisedRef(Constants.R_HEADS + branch);
-				if (checkoutRef == null)
-					throw die(MessageFormat.format(
-							CLIText.get().noSuchRemoteRef, branch));
-			}
-			doCheckout(checkoutRef);
-		}
 	}
 
