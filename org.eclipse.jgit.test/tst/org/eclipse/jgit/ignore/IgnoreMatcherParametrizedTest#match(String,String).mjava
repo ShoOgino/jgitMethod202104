@@ -10,16 +10,25 @@
 	 */
 	private boolean match(String pattern, String target) {
 		boolean isDirectory = target.endsWith("/");
+		boolean match;
 		if (useOldRule.booleanValue()) {
 			IgnoreRule r = new IgnoreRule(pattern);
-			// If speed of this test is ever an issue, we can use a presetRule
-			// field
-			// to avoid recompiling a pattern each time.
-			return r.isMatch(target, isDirectory);
+			match = r.isMatch(target, isDirectory);
+		} else {
+			FastIgnoreRule r = new FastIgnoreRule(pattern);
+			match = r.isMatch(target, isDirectory);
 		}
-		FastIgnoreRule r = new FastIgnoreRule(pattern);
-		// If speed of this test is ever an issue, we can use a presetRule field
-		// to avoid recompiling a pattern each time.
-		return r.isMatch(target, isDirectory);
+
+		if (isDirectory) {
+			boolean noTrailingSlash = matchAsDir(pattern,
+					target.substring(0, target.length() - 1));
+			if (match != noTrailingSlash) {
+				String message = "Difference in result for directory pattern: "
+						+ pattern + " with: " + target
+						+ " if target is given without trailing slash";
+				Assert.assertEquals(message, match, noTrailingSlash);
+			}
+		}
+		return match;
 	}
 

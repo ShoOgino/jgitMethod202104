@@ -1,0 +1,15 @@
+	@Test
+	public void testDirModeAndRegex3() {
+		// IgnoreRule was buggy for some cases below, therefore using "Assume"
+		Boolean assume = useOldRule;
+
+		String pattern = "**/src/";
+		assertMatched(pattern, "a/b/src/", assume);
+		assertMatched(pattern, "a/b/src/new", assume);
+		assertMatched(pattern, "a/b/src/new/a.c", assume);
+		assertMatched(pattern, "a/b/src/a.c", assume);
+		// no match as a "file" pattern, because rule is for directories only
+		assertNotMatched(pattern, "a/b/src", assume);
+		assertNotMatched(pattern, "a/b/srcA/", assume);
+	}
+

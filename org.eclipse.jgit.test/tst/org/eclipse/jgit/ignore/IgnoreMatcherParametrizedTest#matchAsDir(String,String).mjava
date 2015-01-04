@@ -1,0 +1,18 @@
+	/**
+	 *
+	 * @param target
+	 *            must not ends with a slash!
+	 * @param pattern
+	 *            same as {@link #match(String, String)}
+	 * @return same as {@link #match(String, String)}
+	 */
+	private boolean matchAsDir(String pattern, String target) {
+		assertFalse(target.endsWith("/"));
+		if (useOldRule.booleanValue()) {
+			IgnoreRule r = new IgnoreRule(pattern);
+			return r.isMatch(target, true);
+		}
+		FastIgnoreRule r = new FastIgnoreRule(pattern);
+		return r.isMatch(target, true);
+	}
+

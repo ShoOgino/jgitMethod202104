@@ -1,10 +1,11 @@
 	@Test
-	public void testTrailingSlash() {
+	public void testDirModeAndNoRegex() {
 		String pattern = "/src/";
 		assertMatched(pattern, "/src/");
 		assertMatched(pattern, "/src/new");
 		assertMatched(pattern, "/src/new/a.c");
 		assertMatched(pattern, "/src/a.c");
+		// no match as a "file" pattern, because rule is for directories only
 		assertNotMatched(pattern, "/src");
 		assertNotMatched(pattern, "/srcA/");
 	}

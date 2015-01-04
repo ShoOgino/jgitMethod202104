@@ -1,16 +1,24 @@
 	void hash(byte[] raw, int ptr, final int end) throws TableFullException {
+		final boolean text = !RawText.isBinary(raw);
+		hashedCnt = 0;
 		while (ptr < end) {
 			int hash = 5381;
+			int blockHashedCnt = 0;
 			int start = ptr;
 
 			// Hash one line, or one block, whichever occurs first.
 			do {
 				int c = raw[ptr++] & 0xff;
+				// Ignore CR in CRLF sequence if text
+				if (text && c == '\r' && ptr < end && raw[ptr] == '\n')
+					continue;
+				blockHashedCnt++;
 				if (c == '\n')
 					break;
 				hash = (hash << 5) + hash + c;
 			} while (ptr < end && ptr - start < 64);
-			add(hash, ptr - start);
+			hashedCnt += blockHashedCnt;
+			add(hash, blockHashedCnt);
 		}
 	}
 

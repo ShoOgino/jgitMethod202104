@@ -1,4 +1,4 @@
-	void hash(InputStream in, long remaining) throws IOException,
+	void hash(InputStream in, long remaining, boolean text) throws IOException,
 			TableFullException {
 		byte[] buf = new byte[4096];
 		int ptr = 0;
@@ -6,6 +6,7 @@
 
 		while (0 < remaining) {
 			int hash = 5381;
+			int blockHashedCnt = 0;
 
 			// Hash one line, or one block, whichever occurs first.
 			int n = 0;
@@ -19,11 +20,16 @@
 
 				n++;
 				int c = buf[ptr++] & 0xff;
+				// Ignore CR in CRLF sequence if text
+				if (text && c == '\r' && ptr < cnt && buf[ptr] == '\n')
+					continue;
+				blockHashedCnt++;
 				if (c == '\n')
 					break;
 				hash = (hash << 5) + hash + c;
 			} while (n < 64 && n < remaining);
-			add(hash, n);
+			hashedCnt += blockHashedCnt;
+			add(hash, blockHashedCnt);
 			remaining -= n;
 		}
 	}

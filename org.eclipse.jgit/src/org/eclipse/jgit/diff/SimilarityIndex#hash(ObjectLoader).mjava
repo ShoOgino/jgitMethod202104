@@ -1,16 +1,9 @@
 	void hash(ObjectLoader obj) throws MissingObjectException, IOException,
 			TableFullException {
 		if (obj.isLarge()) {
-			ObjectStream in = obj.openStream();
-			try {
-				setFileSize(in.getSize());
-				hash(in, fileSize);
-			} finally {
-				in.close();
-			}
+			hashLargeObject(obj);
 		} else {
 			byte[] raw = obj.getCachedBytes();
-			setFileSize(raw.length);
 			hash(raw, 0, raw.length);
 		}
 	}
