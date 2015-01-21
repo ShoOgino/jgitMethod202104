@@ -11,9 +11,7 @@
 				try {
 					p.resolve(matches, id, RESOLVE_ABBREV_LIMIT);
 				} catch (IOException e) {
-					// Assume the pack is corrupted.
-					//
-					removePack(p);
+					handlePackError(e, p);
 				}
 				if (matches.size() > RESOLVE_ABBREV_LIMIT)
 					return;
