@@ -16,10 +16,8 @@
 	 */
 	protected void run(final String[] argv) {
 		try {
-			if (!installConsole()) {
-				AwtAuthenticator.install();
-				AwtCredentialsProvider.install();
-			}
+			ConsoleAuthenticator.install();
+			ConsoleCredentialsProvider.install();
 			configureHttpProxy();
 			execute(argv);
 		} catch (Die err) {
