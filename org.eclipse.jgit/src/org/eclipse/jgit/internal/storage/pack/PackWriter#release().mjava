@@ -1,10 +1,8 @@
-	/** Release all resources used by this writer. */
+	/**
+	 * Release all resources used by this writer. Use {@link #close()} instead.
+	 */
+	@Deprecated
 	public void release() {
-		reader.release();
-		if (myDeflater != null) {
-			myDeflater.end();
-			myDeflater = null;
-		}
-		instances.remove(selfRef);
+		close();
 	}
 
