@@ -1,0 +1,20 @@
+	@Test
+	public void testRelativize_mixedCase() {
+		SystemReader systemReader = SystemReader.getInstance();
+		String base = toOSPathString("C:\\git\\jgit");
+		String other = toOSPathString("C:\\Git\\test\\d\\f.txt");
+		String expectedCaseInsensitive = toOSPathString("..\\test\\d\\f.txt");
+		String expectedCaseSensitive = toOSPathString("..\\..\\Git\\test\\d\\f.txt");
+
+		if (systemReader.isWindows()) {
+			String actual = FileUtils.relativize(base, other);
+			assertEquals(expectedCaseInsensitive, actual);
+		} else if (systemReader.isMacOS()) {
+			String actual = FileUtils.relativize(base, other);
+			assertEquals(expectedCaseInsensitive, actual);
+		} else {
+			String actual = FileUtils.relativize(base, other);
+			assertEquals(expectedCaseSensitive, actual);
+		}
+	}
+

@@ -1,0 +1,22 @@
+	@Test
+	public void testRunHook() throws Exception {
+		assumeSupportedPlatform();
+
+		Hook h = Hook.PRE_COMMIT;
+		writeHookFile(
+				h.getName(),
+				"#!/bin/sh\necho \"test $1 $2\"\nread INPUT\necho $INPUT\necho 1>&2 \"stderr\"");
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		ByteArrayOutputStream err = new ByteArrayOutputStream();
+		ProcessResult res = FS.DETECTED.runIfPresent(db, h, new String[] {
+				"arg1", "arg2" },
+				new PrintStream(out), new PrintStream(err), "stdin");
+		assertEquals("unexpected hook output", "test arg1 arg2\nstdin\n",
+				out.toString("UTF-8"));
+		assertEquals("unexpected output on stderr stream", "stderr\n",
+				err.toString("UTF-8"));
+		assertEquals("unexpected exit code", 0, res.getExitCode());
+		assertEquals("unexpected process status", ProcessResult.Status.OK,
+				res.getStatus());
+	}
+

@@ -1,0 +1,34 @@
+	/**
+	 * Shuts down an {@link ExecutorService} in two phases, first by calling
+	 * {@link ExecutorService#shutdown() shutdown} to reject incoming tasks, and
+	 * then calling {@link ExecutorService#shutdownNow() shutdownNow}, if
+	 * necessary, to cancel any lingering tasks. Returns true if the pool has
+	 * been properly shutdown, false otherwise.
+	 * <p>
+	 *
+	 * @param pool
+	 *            the pool to shutdown
+	 * @return <code>true</code> if the pool has been properly shutdown,
+	 *         <code>false</code> otherwise.
+	 */
+	private static boolean shutdownAndAwaitTermination(ExecutorService pool) {
+		boolean hasShutdown = true;
+		pool.shutdown(); // Disable new tasks from being submitted
+		try {
+			// Wait a while for existing tasks to terminate
+			if (!pool.awaitTermination(5, TimeUnit.SECONDS)) {
+				pool.shutdownNow(); // Cancel currently executing tasks
+				// Wait a while for tasks to respond to being canceled
+				if (!pool.awaitTermination(5, TimeUnit.SECONDS))
+					hasShutdown = false;
+			}
+		} catch (InterruptedException ie) {
+			// (Re-)Cancel if current thread also interrupted
+			pool.shutdownNow();
+			// Preserve interrupt status
+			Thread.currentThread().interrupt();
+			hasShutdown = false;
+		}
+		return hasShutdown;
+	}
+

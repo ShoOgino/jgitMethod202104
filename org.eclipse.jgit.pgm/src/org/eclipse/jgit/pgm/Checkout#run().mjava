@@ -15,6 +15,7 @@
 			command.setCreateBranch(createBranch);
 			command.setName(name);
 			command.setForce(force);
+			command.setOrphan(orphan);
 		}
 		try {
 			String oldBranch = db.getBranch();
@@ -27,10 +28,9 @@
 						name));
 				return;
 			}
-			if (createBranch)
+			if (createBranch || orphan)
 				outw.println(MessageFormat.format(
-						CLIText.get().switchedToNewBranch,
-						Repository.shortenRefName(ref.getName())));
+						CLIText.get().switchedToNewBranch, name));
 			else
 				outw.println(MessageFormat.format(
 						CLIText.get().switchedToBranch,

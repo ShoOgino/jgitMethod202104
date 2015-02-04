@@ -31,7 +31,7 @@
 			String newMessage = interactiveHandler
 					.modifyCommitMessage(oldMessage);
 			newHead = new Git(repo).commit().setMessage(newMessage)
-					.setAmend(true).call();
+					.setAmend(true).setNoVerify(true).call();
 			return null;
 		case EDIT:
 			rebaseState.createFile(AMEND, commitToPick.name());

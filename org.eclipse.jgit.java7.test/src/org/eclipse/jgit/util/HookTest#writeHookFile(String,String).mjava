@@ -1,0 +1,8 @@
+	private File writeHookFile(final String name, final String data)
+			throws IOException {
+		File path = new File(db.getWorkTree() + "/.git/hooks/", name);
+		JGitTestUtil.write(path, data);
+		FS.DETECTED.setExecute(path, true);
+		return path;
+	}
+
