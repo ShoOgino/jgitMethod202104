@@ -1,0 +1,62 @@
+	private void assertStagedFiles(String command, boolean porcelain,
+			boolean untrackedFiles) throws Exception {
+		String[] output = new String[0];
+
+		if (porcelain) {
+			if (untrackedFiles) {
+				output = new String[] { //
+						"A  stagedDeleted", //
+						"A  stagedModified", //
+						"A  tracked", //
+						"A  trackedDeleted", //
+						"A  trackedModified", //
+						"?? stagedNew", //
+						"?? untracked", //
+						"" //
+				};
+			} else {
+				output = new String[] { //
+						"A  stagedDeleted", //
+						"A  stagedModified", //
+						"A  tracked", //
+						"A  trackedDeleted", //
+						"A  trackedModified", //
+						"" //
+				};
+			}
+		} else {
+			if (untrackedFiles) {
+				output = new String[] { //
+						"On branch master", //
+						"Changes to be committed:", //
+						"", //
+						"\tnew file:   stagedDeleted", //
+						"\tnew file:   stagedModified", //
+						"\tnew file:   tracked", //
+						"\tnew file:   trackedDeleted", //
+						"\tnew file:   trackedModified", //
+						"", //
+						"Untracked files:", //
+						"", //
+						"\tstagedNew", //
+						"\tuntracked", //
+						"" //
+				};
+			} else {
+				output = new String[] { //
+						"On branch master", //
+						"Changes to be committed:", //
+						"", //
+						"\tnew file:   stagedDeleted", //
+						"\tnew file:   stagedModified", //
+						"\tnew file:   tracked", //
+						"\tnew file:   trackedDeleted", //
+						"\tnew file:   trackedModified", //
+						"" //
+				};
+			}
+		}
+
+		assertArrayOfLinesEquals(output, execute(command));
+	}
+

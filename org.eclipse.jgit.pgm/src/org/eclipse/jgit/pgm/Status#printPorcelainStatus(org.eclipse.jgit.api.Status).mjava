@@ -76,8 +76,11 @@
 		}
 
 		// untracked are always at the end of the list
-		TreeSet<String> untracked = new TreeSet<String>(status.getUntracked());
-		for (String path : untracked)
-			printPorcelainLine('?', '?', path);
+		if ("all".equals(untrackedFilesMode)) { //$NON-NLS-1$
+			TreeSet<String> untracked = new TreeSet<String>(
+					status.getUntracked());
+			for (String path : untracked)
+				printPorcelainLine('?', '?', path);
+		}
 	}
 

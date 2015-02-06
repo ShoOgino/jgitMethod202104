@@ -1,0 +1,47 @@
+	private void assertUntrackedAndUnmerged(String command, boolean porcelain,
+			boolean untrackedFiles, String branch) throws Exception {
+		String[] output = new String[0];
+		String branchHeader = (branch == null) //
+				? "Not currently on any branch." //
+				: "On branch " + branch;
+
+		if (porcelain) {
+			if (untrackedFiles) {
+				output = new String[] { //
+						"UU unmerged", //
+						"?? untracked", //
+						"" //
+				};
+			} else {
+				output = new String[] { //
+						"UU unmerged", //
+						"" //
+				};
+			}
+		} else {
+			if (untrackedFiles) {
+				output = new String[] { //
+						branchHeader, //
+						"Unmerged paths:", //
+						"", //
+						"\tboth modified:      unmerged", //
+						"", //
+						"Untracked files:", //
+						"", //
+						"\tuntracked", //
+						"" //
+				};
+			} else {
+				output = new String[] { //
+						branchHeader, //
+						"Unmerged paths:", //
+						"", //
+						"\tboth modified:      unmerged", //
+						"" //
+				};
+			}
+		}
+
+		assertArrayOfLinesEquals(output, execute(command));
+	}
+

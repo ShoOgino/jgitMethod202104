@@ -1,0 +1,66 @@
+	private void assertStagedStatus(String command, boolean porcelain,
+			boolean untrackedFiles) throws Exception {
+		String[] output = new String[0];
+
+		if (porcelain) {
+			if (untrackedFiles) {
+				output = new String[] { //
+						"D  stagedDeleted", //
+						"M  stagedModified", //
+						"A  stagedNew", //
+						" D trackedDeleted", //
+						" M trackedModified", //
+						"?? untracked", //
+						"" //
+				};
+			} else {
+				output = new String[] { //
+						"D  stagedDeleted", //
+						"M  stagedModified", //
+						"A  stagedNew", //
+						" D trackedDeleted", //
+						" M trackedModified", //
+						"" //
+				};
+			}
+		} else {
+			if (untrackedFiles) {
+				output = new String[] { //
+						"On branch master", //
+						"Changes to be committed:", //
+						"", //
+						"\tdeleted:    stagedDeleted", //
+						"\tmodified:   stagedModified", //
+						"\tnew file:   stagedNew", //
+						"", //
+						"Changes not staged for commit:", //
+						"", //
+						"\tdeleted:    trackedDeleted", //
+						"\tmodified:   trackedModified", //
+						"", //
+						"Untracked files:", //
+						"", //
+						"\tuntracked", //
+						"" //
+				};
+			} else {
+				output = new String[] { //
+						"On branch master", //
+						"Changes to be committed:", //
+						"", //
+						"\tdeleted:    stagedDeleted", //
+						"\tmodified:   stagedModified", //
+						"\tnew file:   stagedNew", //
+						"", //
+						"Changes not staged for commit:", //
+						"", //
+						"\tdeleted:    trackedDeleted", //
+						"\tmodified:   trackedModified", //
+						"", //
+				};
+			}
+		}
+
+		assertArrayOfLinesEquals(output, execute(command));
+	}
+

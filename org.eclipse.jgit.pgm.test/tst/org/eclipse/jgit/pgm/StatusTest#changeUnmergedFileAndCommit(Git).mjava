@@ -1,0 +1,7 @@
+	private void changeUnmergedFileAndCommit(Git git) throws IOException,
+			GitAPIException {
+		writeTrashFile("unmerged", "changed in master branch");
+		git.add().addFilepattern("unmerged").call();
+		git.commit().setMessage("changed unmerged in master branch").call();
+	}
+

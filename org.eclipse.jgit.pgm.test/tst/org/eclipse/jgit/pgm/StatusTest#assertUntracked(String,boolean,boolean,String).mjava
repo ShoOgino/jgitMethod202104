@@ -1,0 +1,37 @@
+	private void assertUntracked(String command,
+			boolean porcelain,
+			boolean untrackedFiles, String branch) throws Exception {
+		String[] output = new String[0];
+		String branchHeader = "On branch " + branch;
+
+		if (porcelain) {
+			if (untrackedFiles) {
+				output = new String[] { //
+						"?? untracked", //
+						"" //
+				};
+			} else {
+				output = new String[] { //
+						"" //
+				};
+			}
+		} else {
+			if (untrackedFiles) {
+				output = new String[] { //
+						branchHeader, //
+						"Untracked files:", //
+						"", //
+						"\tuntracked", //
+						"" //
+				};
+			} else {
+				output = new String[] { //
+						branchHeader, //
+						"" //
+				};
+			}
+		}
+
+		assertArrayOfLinesEquals(output, execute(command));
+	}
+

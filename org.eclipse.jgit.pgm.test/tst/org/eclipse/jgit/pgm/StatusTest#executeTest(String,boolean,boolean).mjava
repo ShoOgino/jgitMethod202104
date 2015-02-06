@@ -1,0 +1,56 @@
+	/**
+	 * Executes the test sequence.
+	 *
+	 * @param command
+	 *            full git command and parameters to be used
+	 * @param porcelain
+	 *            indicates that porcelain format is expected in the output
+	 * @param untrackedFiles
+	 *            indicates that untracked files are expected in the output
+	 *
+	 * @throws Exception
+	 *             if error during test execution
+	 */
+	private void executeTest(String command, boolean porcelain,
+			boolean untrackedFiles) throws Exception {
+		Git git = new Git(db);
+		// Write all files
+		writeAllFiles();
+		// Test untracked
+		assertUntrackedFiles(command, porcelain, untrackedFiles);
+		// Add to index
+		addFilesToIndex(git);
+		// Test staged count
+		assertStagedFiles(command, porcelain, untrackedFiles);
+		// Commit
+		makeInitialCommit(git);
+		assertAfterInitialCommit(command, porcelain, untrackedFiles);
+		// Make some changes and stage them
+		makeSomeChangesAndStageThem(git);
+		// Test staged/not-staged status
+		assertStagedStatus(command, porcelain, untrackedFiles);
+		// Create unmerged file
+		createUnmergedFile(git);
+		// Commit pending changes
+		commitPendingChanges(git);
+		assertUntracked(command, porcelain, untrackedFiles, "master");
+		// Checkout new branch
+		checkoutTestBranch(git);
+		// Test branch status
+		assertUntracked(command, porcelain, untrackedFiles, "test");
+		// Commit change and checkout master again
+		RevCommit testBranch = commitChangesInTestBranch(git);
+		assertUntracked(command, porcelain, untrackedFiles, "test");
+		checkoutMasterBranch(git);
+		// Change the same file and commit
+		changeUnmergedFileAndCommit(git);
+		assertUntracked(command, porcelain, untrackedFiles, "master");
+		// Merge test branch into master
+		mergeTestBranchInMaster(git, testBranch);
+		// Test unmerged status
+		assertUntrackedAndUnmerged(command, porcelain, untrackedFiles, "master");
+		// Test detached head
+		detachHead(git);
+		assertUntrackedAndUnmerged(command, porcelain, untrackedFiles, null);
+	}
+

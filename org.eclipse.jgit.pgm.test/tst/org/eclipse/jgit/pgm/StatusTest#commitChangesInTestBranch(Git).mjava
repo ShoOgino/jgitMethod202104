@@ -1,0 +1,8 @@
+	private RevCommit commitChangesInTestBranch(Git git) throws IOException,
+			GitAPIException {
+		writeTrashFile("unmerged", "changed in test branch");
+		git.add().addFilepattern("unmerged").call();
+		return git.commit()
+				.setMessage("changed unmerged in test branch").call();
+	}
+

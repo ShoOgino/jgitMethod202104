@@ -1,0 +1,47 @@
+	private void assertUntrackedFiles(String command, boolean porcelain,
+			boolean untrackedFiles) throws Exception {
+		String[] output = new String[0];
+
+		if (porcelain) {
+			if (untrackedFiles) {
+				output = new String[] { //
+						"?? stagedDeleted", //
+						"?? stagedModified", //
+						"?? stagedNew", //
+						"?? tracked", //
+						"?? trackedDeleted", //
+						"?? trackedModified", //
+						"?? untracked", //
+						"" //
+				};
+			} else {
+				output = new String[] { //
+						"" //
+				};
+			}
+		} else {
+			if (untrackedFiles) {
+				output = new String[] { //
+						"On branch master", //
+						"Untracked files:", //
+						"",//
+						"\tstagedDeleted", //
+						"\tstagedModified", //
+						"\tstagedNew", //
+						"\ttracked", //
+						"\ttrackedDeleted", //
+						"\ttrackedModified", //
+						"\tuntracked", //
+						"" //
+				};
+			} else {
+				output = new String[] { //
+						"On branch master", //
+						"" //
+				};
+			}
+		}
+
+		assertArrayOfLinesEquals(output, execute(command));
+	}
+
