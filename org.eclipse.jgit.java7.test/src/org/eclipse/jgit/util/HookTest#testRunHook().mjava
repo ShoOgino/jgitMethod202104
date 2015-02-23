@@ -2,13 +2,13 @@
 	public void testRunHook() throws Exception {
 		assumeSupportedPlatform();
 
-		Hook h = Hook.PRE_COMMIT;
-		writeHookFile(
-				h.getName(),
+		writeHookFile(PreCommitHook.NAME,
 				"#!/bin/sh\necho \"test $1 $2\"\nread INPUT\necho $INPUT\necho 1>&2 \"stderr\"");
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		ByteArrayOutputStream err = new ByteArrayOutputStream();
-		ProcessResult res = FS.DETECTED.runIfPresent(db, h, new String[] {
+		ProcessResult res = FS.DETECTED.runHookIfPresent(db,
+				PreCommitHook.NAME,
+				new String[] {
 				"arg1", "arg2" },
 				new PrintStream(out), new PrintStream(err), "stdin");
 		assertEquals("unexpected hook output", "test arg1 arg2\nstdin\n",

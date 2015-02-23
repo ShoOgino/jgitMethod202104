@@ -9,8 +9,8 @@
 	 *
 	 * @param repository
 	 *            The repository for which a hook should be run.
-	 * @param hook
-	 *            The hook to be executed.
+	 * @param hookName
+	 *            The name of the hook to be executed.
 	 * @param args
 	 *            Arguments to pass to this hook. Cannot be <code>null</code>,
 	 *            but can be an empty array.
@@ -18,11 +18,12 @@
 	 * @throws JGitInternalException
 	 *             if we fail to run the hook somehow. Causes may include an
 	 *             interrupted process or I/O errors.
-	 * @since 3.7
+	 * @since 4.0
 	 */
-	public ProcessResult runIfPresent(Repository repository, final Hook hook,
+	public ProcessResult runHookIfPresent(Repository repository,
+			final String hookName,
 			String[] args) throws JGitInternalException {
-		return runIfPresent(repository, hook, args, System.out, System.err,
+		return runHookIfPresent(repository, hookName, args, System.out, System.err,
 				null);
 	}
 

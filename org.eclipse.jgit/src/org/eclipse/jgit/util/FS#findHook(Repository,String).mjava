@@ -3,15 +3,15 @@
 	 *
 	 * @param repository
 	 *            The repository within which to find a hook.
-	 * @param hook
-	 *            The hook we're trying to find.
+	 * @param hookName
+	 *            The name of the hook we're trying to find.
 	 * @return The {@link File} containing this particular hook if it exists in
 	 *         the given repository, <code>null</code> otherwise.
-	 * @since 3.7
+	 * @since 4.0
 	 */
-	public File findHook(Repository repository, final Hook hook) {
+	public File findHook(Repository repository, final String hookName) {
 		final File hookFile = new File(new File(repository.getDirectory(),
-				Constants.HOOKS), hook.getName());
+				Constants.HOOKS), hookName);
 		return hookFile.isFile() ? hookFile : null;
 	}
 

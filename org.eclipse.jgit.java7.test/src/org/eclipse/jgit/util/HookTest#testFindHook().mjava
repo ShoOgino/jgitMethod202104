@@ -2,11 +2,11 @@
 	public void testFindHook() throws Exception {
 		assumeSupportedPlatform();
 
-		Hook h = Hook.PRE_COMMIT;
-		assertNull("no hook should be installed", FS.DETECTED.findHook(db, h));
-		File hookFile = writeHookFile(h.getName(),
+		assertNull("no hook should be installed",
+				FS.DETECTED.findHook(db, PreCommitHook.NAME));
+		File hookFile = writeHookFile(PreCommitHook.NAME,
 				"#!/bin/bash\necho \"test $1 $2\"");
-		assertEquals("exected to find pre-commit hook", hookFile,
-				FS.DETECTED.findHook(db, h));
+		assertEquals("expected to find pre-commit hook", hookFile,
+				FS.DETECTED.findHook(db, PreCommitHook.NAME));
 	}
 
