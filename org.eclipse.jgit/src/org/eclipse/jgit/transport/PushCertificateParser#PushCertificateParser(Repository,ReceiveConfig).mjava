@@ -1,0 +1,8 @@
+	PushCertificateParser(Repository into, ReceiveConfig cfg) {
+		nonceSlopLimit = cfg.certNonceSlopLimit;
+		nonceGenerator = cfg.certNonceSeed != null
+				? new HMACSHA1NonceGenerator(cfg.certNonceSeed)
+				: null;
+		db = into;
+	}
+

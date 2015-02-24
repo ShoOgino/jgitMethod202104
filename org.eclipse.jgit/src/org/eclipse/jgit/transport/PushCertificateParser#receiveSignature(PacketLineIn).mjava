@@ -1,0 +1,24 @@
+	/**
+	 * Reads the gpg signature. This method assumes the line "-----BEGIN PGP
+	 * SIGNATURE-----\n" has already been parsed and continues parsing until an
+	 * "-----END PGP SIGNATURE-----\n" is found.
+	 *
+	 * @param pckIn
+	 *            where we read the signature from.
+	 * @throws IOException
+	 */
+	public void receiveSignature(PacketLineIn pckIn) throws IOException {
+		try {
+			StringBuilder sig = new StringBuilder();
+			String line = pckIn.readStringRaw();
+			while (!line.equals("-----END PGP SIGNATURE-----\n")) //$NON-NLS-1$
+				sig.append(line);
+			signature = sig.toString();
+			commandList = commandlistBuilder.toString();
+		} catch (EOFException eof) {
+			throw new IOException(MessageFormat.format(
+					JGitText.get().errorInvalidPushCert,
+					"broken push certificate signature")); //$NON-NLS-1$
+		}
+	}
+

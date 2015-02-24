@@ -25,7 +25,17 @@
 				final FirstLine firstLine = new FirstLine(line);
 				enabledCapabilities = firstLine.getCapabilities();
 				line = firstLine.getLine();
+
+				if (line.equals(GitProtocolConstants.OPTION_PUSH_CERT))
+					pushCertificateParser.receiveHeader(pckIn,
+							!isBiDirectionalPipe());
 			}
+
+			if (line.equals("-----BEGIN PGP SIGNATURE-----\n")) //$NON-NLS-1$
+				pushCertificateParser.receiveSignature(pckIn);
+
+			if (pushCertificateParser.enabled())
+				pushCertificateParser.addCommand(line);
 
 			if (line.length() < 83) {
 				final String m = JGitText.get().errorInvalidProtocolWantedOldNewRef;

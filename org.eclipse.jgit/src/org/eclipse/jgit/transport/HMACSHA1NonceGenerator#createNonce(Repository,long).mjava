@@ -1,0 +1,22 @@
+	public synchronized String createNonce(Repository repo, long timestamp)
+			throws IllegalStateException {
+		String path;
+		if (repo instanceof DfsRepository)
+			path = ((DfsRepository) repo).getDescription().getRepositoryName();
+		else if (repo.getDirectory() != null)
+			path = repo.getDirectory().getPath();
+		else
+			throw new IllegalStateException();
+
+		String input = path + ":" + String.valueOf(timestamp); //$NON-NLS-1$
+		byte[] rawHmac;
+		try {
+			rawHmac = mac.doFinal(input.getBytes("UTF-8")); //$NON-NLS-1$
+		} catch (UnsupportedEncodingException e) {
+			throw new IllegalStateException(e);
+		}
+		String sentNonce = String.format(
+				"%d-%20X", new Long(timestamp), rawHmac); //$NON-NLS-1$
+		return sentNonce;
+	}
+

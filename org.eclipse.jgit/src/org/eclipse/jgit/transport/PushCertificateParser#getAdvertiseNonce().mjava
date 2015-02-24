@@ -1,0 +1,10 @@
+	/**
+	 * @return the whole string for the nonce to be included into the capability
+	 *         advertisement.
+	 */
+	public String getAdvertiseNonce() {
+		sentNonce = nonceGenerator.createNonce(db,
+				TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
+		return CAPABILITY_PUSH_CERT + "=" + sentNonce; //$NON-NLS-1$
+	}
+

@@ -1,0 +1,42 @@
+	/**
+	 * Receive a list of commands from the input encapsulated in a push
+	 * certificate. This method doesn't deal with the first line "push-cert \NUL
+	 * <capabilities>", but assumes the first line including the capabilities
+	 * has already been dealt with.
+	 *
+	 * @param pckIn
+	 *            where we take the push certificate header from.
+	 * @param stateless
+	 *            If this server is run as a stateless server, such that it
+	 *            cannot store the sent push certificate and needs to validate
+	 *            what the client sends back.
+	 *
+	 * @throws IOException
+	 */
+	public void receiveHeader(PacketLineIn pckIn, boolean stateless)
+			throws IOException {
+		try {
+			String version = parseNextLine(pckIn, VERSION);
+			if (!version.equals("0.1")) { //$NON-NLS-1$
+				throw new IOException(MessageFormat.format(
+						JGitText.get().errorInvalidPushCert,
+						"version not supported")); //$NON-NLS-1$
+			}
+			pusher = parseNextLine(pckIn, PUSHER);
+			pushee = parseNextLine(pckIn, PUSHEE);
+			receivedNonce = parseNextLine(pckIn, NONCE);
+			// an empty line
+			if (pckIn.readString() != "") { //$NON-NLS-1$
+				throw new IOException(MessageFormat.format(
+						JGitText.get().errorInvalidPushCert,
+						"expected empty line after header")); //$NON-NLS-1$
+			}
+		} catch (EOFException eof) {
+			throw new IOException(MessageFormat.format(
+					JGitText.get().errorInvalidPushCert,
+					"broken push certificate header")); //$NON-NLS-1$
+		}
+		nonceStatus = nonceGenerator.verify(receivedNonce, sentNonce, db,
+				stateless, nonceSlopLimit);
+	}
+
