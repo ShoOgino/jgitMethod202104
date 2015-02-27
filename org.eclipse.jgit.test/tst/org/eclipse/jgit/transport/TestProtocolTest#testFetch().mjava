@@ -1,0 +1,17 @@
+	@Test
+	public void testFetch() throws Exception {
+		ObjectId master = remote.branch("master").commit().create();
+
+		TestProtocol<User> proto = registerDefault();
+		URIish uri = proto.register(new User("user"), remote.getRepository());
+
+		try (Git git = new Git(local.getRepository())) {
+			git.fetch()
+					.setRemote(uri.toString())
+					.setRefSpecs(HEADS)
+					.call();
+			assertEquals(master,
+					local.getRepository().getRef("master").getObjectId());
+		}
+	}
+

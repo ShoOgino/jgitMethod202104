@@ -1,0 +1,11 @@
+	@Override
+	public Transport open(URIish uri, Repository local, String remoteName)
+			throws NotSupportedException, TransportException {
+		Handle h = handles.get(uri);
+		if (h == null) {
+			throw new NotSupportedException(MessageFormat.format(
+					JGitText.get().URINotSupported, uri));
+		}
+		return new TransportInternal(local, uri, h);
+	}
+

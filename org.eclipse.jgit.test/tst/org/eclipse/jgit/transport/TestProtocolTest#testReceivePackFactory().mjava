@@ -1,0 +1,45 @@
+	@Test
+	public void testReceivePackFactory() throws Exception {
+		ObjectId master = local.branch("master").commit().create();
+
+		final AtomicInteger rejected = new AtomicInteger();
+		TestProtocol<User> proto = registerProto(new DefaultUpload(),
+				new ReceivePackFactory<User>() {
+					@Override
+					public ReceivePack create(User req, Repository db)
+							throws ServiceNotAuthorizedException {
+						if (!"user2".equals(req.name)) {
+							rejected.incrementAndGet();
+							throw new ServiceNotAuthorizedException();
+						}
+						return new ReceivePack(db);
+					}
+				});
+
+		// Same repository, different users.
+		URIish user1Uri = proto.register(new User("user1"), remote.getRepository());
+		URIish user2Uri = proto.register(new User("user2"), remote.getRepository());
+
+		try (Git git = new Git(local.getRepository())) {
+			try {
+				git.push()
+						.setRemote(user1Uri.toString())
+						.setRefSpecs(HEADS)
+						.call();
+			} catch (TransportException expected) {
+				assertTrue(expected.getMessage().contains(
+						JGitText.get().pushNotPermitted));
+			}
+			assertEquals(1, rejected.get());
+			assertNull(remote.getRepository().getRef("master"));
+
+			git.push()
+					.setRemote(user2Uri.toString())
+					.setRefSpecs(HEADS)
+					.call();
+			assertEquals(1, rejected.get());
+			assertEquals(master,
+					remote.getRepository().getRef("master").getObjectId());
+		}
+	}
+

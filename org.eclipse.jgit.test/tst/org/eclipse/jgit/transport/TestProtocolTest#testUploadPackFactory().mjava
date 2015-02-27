@@ -1,0 +1,43 @@
+	@Test
+	public void testUploadPackFactory() throws Exception {
+		ObjectId master = remote.branch("master").commit().create();
+
+		final AtomicInteger rejected = new AtomicInteger();
+		TestProtocol<User> proto = registerProto(new UploadPackFactory<User>() {
+			@Override
+			public UploadPack create(User req, Repository db)
+					throws ServiceNotAuthorizedException {
+				if (!"user2".equals(req.name)) {
+					rejected.incrementAndGet();
+					throw new ServiceNotAuthorizedException();
+				}
+				return new UploadPack(db);
+			}
+		}, new DefaultReceive());
+
+		// Same repository, different users.
+		URIish user1Uri = proto.register(new User("user1"), remote.getRepository());
+		URIish user2Uri = proto.register(new User("user2"), remote.getRepository());
+
+		try (Git git = new Git(local.getRepository())) {
+			try {
+				git.fetch()
+						.setRemote(user1Uri.toString())
+						.setRefSpecs(HEADS)
+						.call();
+			} catch (InvalidRemoteException expected) {
+				// Expected.
+			}
+			assertEquals(1, rejected.get());
+			assertNull(local.getRepository().getRef("master"));
+
+			git.fetch()
+					.setRemote(user2Uri.toString())
+					.setRefSpecs(HEADS)
+					.call();
+			assertEquals(1, rejected.get());
+			assertEquals(master,
+					local.getRepository().getRef("master").getObjectId());
+		}
+	}
+

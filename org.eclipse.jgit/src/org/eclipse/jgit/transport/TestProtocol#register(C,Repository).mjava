@@ -1,0 +1,25 @@
+	/**
+	 * Register a repository connection over the internal test protocol.
+	 *
+	 * @param req
+	 *            connection context. This instance is reused for all connections
+	 *            made using this protocol; if it is stateful and usable only for
+	 *            one connection, the same repository should be registered
+	 *            multiple times.
+	 * @param remote
+	 *            remote repository to connect to.
+	 * @return a URI that can be used to connect to this repository for both fetch
+	 *         and push.
+	 */
+	public synchronized URIish register(C req, Repository remote) {
+		URIish uri;
+		try {
+			int n = handles.size();
+			uri = new URIish(SCHEME + "://test/conn" + n); //$NON-NLS-1$
+		} catch (URISyntaxException e) {
+			throw new IllegalStateException();
+		}
+		handles.put(uri, new Handle(req, remote));
+		return uri;
+	}
+
