@@ -1,0 +1,15 @@
+	@Override
+	public void close() {
+		super.close();
+
+		try {
+			if (worker != null) {
+				worker.join();
+			}
+		} catch (InterruptedException ie) {
+			// Stop waiting and return anyway.
+		} finally {
+			worker = null;
+		}
+	}
+

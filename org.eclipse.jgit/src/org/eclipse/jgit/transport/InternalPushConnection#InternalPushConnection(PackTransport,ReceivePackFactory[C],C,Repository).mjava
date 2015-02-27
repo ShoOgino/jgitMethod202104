@@ -1,0 +1,57 @@
+	public InternalPushConnection(PackTransport transport,
+			final ReceivePackFactory<C> receivePackFactory,
+			final C req, final Repository remote) throws TransportException {
+		super(transport);
+
+		final PipedInputStream in_r;
+		final PipedOutputStream in_w;
+
+		final PipedInputStream out_r;
+		final PipedOutputStream out_w;
+		try {
+			in_r = new PipedInputStream();
+			in_w = new PipedOutputStream(in_r);
+
+			out_r = new PipedInputStream();
+			out_w = new PipedOutputStream(out_r);
+		} catch (IOException err) {
+			remote.close();
+			throw new TransportException(uri, JGitText.get().cannotConnectPipes, err);
+		}
+
+		worker = new Thread("JGit-Receive-Pack") { //$NON-NLS-1$
+			public void run() {
+				try {
+					final ReceivePack rp = receivePackFactory.create(req, remote);
+					rp.receive(out_r, in_w, System.err);
+				} catch (ServiceNotEnabledException e) {
+					// Ignored. Client cannot use this repository.
+				} catch (ServiceNotAuthorizedException e) {
+					// Ignored. Client cannot use this repository.
+				} catch (IOException err) {
+					// Client side of the pipes should report the problem.
+				} catch (RuntimeException err) {
+					// Clients side will notice we went away, and report.
+				} finally {
+					try {
+						out_r.close();
+					} catch (IOException e2) {
+						// Ignore close failure, we probably crashed above.
+					}
+
+					try {
+						in_w.close();
+					} catch (IOException e2) {
+						// Ignore close failure, we probably crashed above.
+					}
+
+					remote.close();
+				}
+			}
+		};
+		worker.start();
+
+		init(in_r, out_w);
+		readAdvertisedRefs();
+	}
+

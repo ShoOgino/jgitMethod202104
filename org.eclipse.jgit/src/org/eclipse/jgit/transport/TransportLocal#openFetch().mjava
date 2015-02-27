@@ -1,8 +1,16 @@
 	@Override
 	public FetchConnection openFetch() throws TransportException {
 		final String up = getOptionUploadPack();
-		if ("git-upload-pack".equals(up) || "git upload-pack".equals(up)) //$NON-NLS-1$ //$NON-NLS-2$
-			return new InternalLocalFetchConnection();
-		return new ForkLocalFetchConnection();
+		if (!"git-upload-pack".equals(up) //$NON-NLS-1$
+				&& !"git upload-pack".equals(up)) //$NON-NLS-1$
+			return new ForkLocalFetchConnection();
+
+		UploadPackFactory<Void> upf = new UploadPackFactory<Void>() {
+			@Override
+			public UploadPack create(Void req, Repository db) {
+				return createUploadPack(db);
+			}
+		};
+		return new InternalFetchConnection<Void>(this, upf, null, openRepo());
 	}
 

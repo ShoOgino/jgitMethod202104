@@ -1,9 +1,16 @@
 	@Override
-	public PushConnection openPush() throws NotSupportedException,
-			TransportException {
+	public PushConnection openPush() throws TransportException {
 		final String rp = getOptionReceivePack();
-		if ("git-receive-pack".equals(rp) || "git receive-pack".equals(rp)) //$NON-NLS-1$ //$NON-NLS-2$
-			return new InternalLocalPushConnection();
-		return new ForkLocalPushConnection();
+		if (!"git-receive-pack".equals(rp) //$NON-NLS-1$
+				&& !"git receive-pack".equals(rp)) //$NON-NLS-1$
+			return new ForkLocalPushConnection();
+
+		ReceivePackFactory<Void> rpf = new ReceivePackFactory<Void>() {
+			@Override
+			public ReceivePack create(Void req, Repository db) {
+				return createReceivePack(db);
+			}
+		};
+		return new InternalPushConnection<Void>(this, rpf, null, openRepo());
 	}
 
