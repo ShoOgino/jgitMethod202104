@@ -1,0 +1,13 @@
+	@Override
+	public String call() throws IOException, AbortedByHookException {
+		if (commitMessage == null) {
+			throw new IllegalStateException();
+		}
+		if (canRun()) {
+			getRepository().writeCommitEditMsg(commitMessage);
+			doRun();
+			commitMessage = getRepository().readCommitEditMsg();
+		}
+		return commitMessage;
+	}
+

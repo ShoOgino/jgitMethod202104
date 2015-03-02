@@ -1,0 +1,16 @@
+	@Test
+	public void testCommitMsgHookCanModifyCommitMessage() throws Exception {
+		assumeSupportedPlatform();
+
+		writeHookFile(CommitMsgHook.NAME,
+				"#!/bin/sh\necho \"new message\" > $1\nexit 0");
+		Git git = Git.wrap(db);
+		String path = "a.txt";
+		writeTrashFile(path, "content");
+		git.add().addFilepattern(path).call();
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		RevCommit revCommit = git.commit().setMessage("commit")
+				.setHookOutputStream(new PrintStream(out)).call();
+		assertEquals("new message\n", revCommit.getFullMessage());
+	}
+
