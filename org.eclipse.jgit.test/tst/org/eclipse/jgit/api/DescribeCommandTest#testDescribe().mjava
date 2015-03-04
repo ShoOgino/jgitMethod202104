@@ -11,12 +11,15 @@
 		ObjectId c4 = modify("ddd");
 
 		assertNull(describe(c1));
+		assertNull(describe(c1, true));
 		assertEquals("t1", describe(c2));
 		assertEquals("t2", describe(c3));
+		assertEquals("t2-0-g44579eb", describe(c3, true));
 
 		assertNameStartsWith(c4, "3e563c5");
 		// the value verified with git-describe(1)
 		assertEquals("t2-1-g3e563c5", describe(c4));
+		assertEquals("t2-1-g3e563c5", describe(c4, true));
 
 		// test default target
 		assertEquals("t2-1-g3e563c5", git.describe().call());

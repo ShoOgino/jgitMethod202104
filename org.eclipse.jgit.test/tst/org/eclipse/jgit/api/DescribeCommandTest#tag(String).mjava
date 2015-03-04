@@ -1,4 +1,8 @@
 	private void tag(String tag) throws GitAPIException {
-		git.tag().setName(tag).setMessage(tag).call();
+		TagCommand tagCommand = git.tag().setName(tag)
+				.setAnnotated(useAnnotatedTags);
+		if (useAnnotatedTags)
+			tagCommand.setMessage(tag);
+		tagCommand.call();
 	}
 
