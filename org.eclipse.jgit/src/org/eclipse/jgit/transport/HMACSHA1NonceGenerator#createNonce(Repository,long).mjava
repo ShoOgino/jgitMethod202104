@@ -15,8 +15,6 @@
 		} catch (UnsupportedEncodingException e) {
 			throw new IllegalStateException(e);
 		}
-		String sentNonce = String.format(
-				"%d-%20X", new Long(timestamp), rawHmac); //$NON-NLS-1$
-		return sentNonce;
+		return Long.toString(timestamp) + "-" + toHex(rawHmac); //$NON-NLS-1$
 	}
 
