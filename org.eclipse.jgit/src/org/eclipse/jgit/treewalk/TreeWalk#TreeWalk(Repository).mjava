@@ -2,9 +2,11 @@
 	 * Create a new tree walker for a given repository.
 	 *
 	 * @param repo
-	 *            the repository the walker will obtain data from.
+	 *            the repository the walker will obtain data from. An
+	 *            ObjectReader will be created by the walker, and will be closed
+	 *            when the walker is closed.
 	 */
 	public TreeWalk(final Repository repo) {
-		this(repo.newObjectReader());
+		this(repo.newObjectReader(), true);
 	}
 
