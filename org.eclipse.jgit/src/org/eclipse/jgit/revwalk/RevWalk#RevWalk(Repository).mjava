@@ -3,10 +3,10 @@
 	 *
 	 * @param repo
 	 *            the repository the walker will obtain data from. An
-	 *            ObjectReader will be created by the walker, and must be
-	 *            released by the caller.
+	 *            ObjectReader will be created by the walker, and will be closed
+	 *            when the walker is closed.
 	 */
 	public RevWalk(final Repository repo) {
-		this(repo.newObjectReader());
+		this(repo.newObjectReader(), true);
 	}
 

@@ -1,21 +1,13 @@
 	/**
 	 * Create a new revision walker for a given repository.
+	 * <p>
 	 *
 	 * @param or
-	 *            the reader the walker will obtain data from. The reader should
-	 *            be released by the caller when the walker is no longer
-	 *            required.
+	 *            the reader the walker will obtain data from. The reader is not
+	 *            closed when the walker is closed (but is closed by {@link
+	 *            #dispose()}.
 	 */
 	public RevWalk(ObjectReader or) {
-		reader = or;
-		idBuffer = new MutableObjectId();
-		objects = new ObjectIdOwnerMap<RevObject>();
-		roots = new ArrayList<RevCommit>();
-		queue = new DateRevQueue();
-		pending = new StartGenerator(this);
-		sorting = EnumSet.of(RevSort.NONE);
-		filter = RevFilter.ALL;
-		treeFilter = TreeFilter.ALL;
-		retainBody = true;
+		this(or, false);
 	}
 
