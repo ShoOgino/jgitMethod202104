@@ -27,11 +27,9 @@
 		c.setCommitter(new PersonIdent(committer, new Date(now)));
 		c.setMessage("");
 		ObjectId id;
-		try {
-			id = inserter.insert(c);
-			inserter.flush();
-		} finally {
-			inserter.release();
+		try (ObjectInserter ins = inserter) {
+			id = ins.insert(c);
+			ins.flush();
 		}
 		return pool.lookupCommit(id);
 	}

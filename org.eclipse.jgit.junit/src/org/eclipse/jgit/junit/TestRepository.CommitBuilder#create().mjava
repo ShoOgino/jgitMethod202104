@@ -10,15 +10,13 @@
 				c.setMessage(message);
 
 				ObjectId commitId;
-				try {
+				try (ObjectInserter ins = inserter) {
 					if (topLevelTree != null)
 						c.setTreeId(topLevelTree);
 					else
-						c.setTreeId(tree.writeTree(inserter));
-					commitId = inserter.insert(c);
-					inserter.flush();
-				} finally {
-					inserter.release();
+						c.setTreeId(tree.writeTree(ins));
+					commitId = ins.insert(c);
+					ins.flush();
 				}
 				self = pool.lookupCommit(commitId);
 

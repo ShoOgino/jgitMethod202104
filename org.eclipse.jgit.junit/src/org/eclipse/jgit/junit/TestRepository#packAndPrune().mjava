@@ -12,35 +12,27 @@
 			NullProgressMonitor m = NullProgressMonitor.INSTANCE;
 
 			final File pack, idx;
-			PackWriter pw = new PackWriter(db);
-			try {
+			try (PackWriter pw = new PackWriter(db)) {
 				Set<ObjectId> all = new HashSet<ObjectId>();
 				for (Ref r : db.getAllRefs().values())
 					all.add(r.getObjectId());
 				pw.preparePack(m, all, Collections.<ObjectId> emptySet());
 
 				final ObjectId name = pw.computeName();
-				OutputStream out;
 
 				pack = nameFor(odb, name, ".pack");
-				out = new SafeBufferedOutputStream(new FileOutputStream(pack));
-				try {
+				try (OutputStream out =
+						new SafeBufferedOutputStream(new FileOutputStream(pack))) {
 					pw.writePack(m, m, out);
-				} finally {
-					out.close();
 				}
 				pack.setReadOnly();
 
 				idx = nameFor(odb, name, ".idx");
-				out = new SafeBufferedOutputStream(new FileOutputStream(idx));
-				try {
+				try (OutputStream out =
+						new SafeBufferedOutputStream(new FileOutputStream(idx))) {
 					pw.writeIndex(out);
-				} finally {
-					out.close();
 				}
 				idx.setReadOnly();
-			} finally {
-				pw.release();
 			}
 
 			odb.openPack(pack);
