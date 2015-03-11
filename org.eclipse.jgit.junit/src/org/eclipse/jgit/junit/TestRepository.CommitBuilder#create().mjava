@@ -11,7 +11,6 @@
 					c.setAuthor(author);
 				if (committer != null)
 					c.setCommitter(committer);
-				c.setMessage(message);
 
 				ObjectId commitId;
 				try (ObjectInserter ins = inserter) {
@@ -19,6 +18,9 @@
 						c.setTreeId(topLevelTree);
 					else
 						c.setTreeId(tree.writeTree(ins));
+					if (insertChangeId)
+						insertChangeId(c);
+					c.setMessage(message);
 					commitId = ins.insert(c);
 					ins.flush();
 				}

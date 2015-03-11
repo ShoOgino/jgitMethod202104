@@ -1,0 +1,14 @@
+		private void insertChangeId(org.eclipse.jgit.lib.CommitBuilder c)
+				throws IOException {
+			ObjectId firstParentId = null;
+			if (!parents.isEmpty())
+				firstParentId = parents.get(0);
+			ObjectId changeId = ChangeIdUtil.computeChangeId(c.getTreeId(),
+					firstParentId, c.getAuthor(), c.getCommitter(), message);
+			message = ChangeIdUtil.insertId(message, changeId);
+			if (changeId != null)
+				message = message.replaceAll("\nChange-Id: I" //$NON-NLS-1$
+						+ ObjectId.zeroId().getName() + "\n", "\nChange-Id: I" //$NON-NLS-1$ //$NON-NLS-2$
+						+ changeId.getName() + "\n"); //$NON-NLS-1$
+		}
+

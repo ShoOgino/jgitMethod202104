@@ -1,0 +1,13 @@
+	@Test
+	public void insertChangeId() throws Exception {
+		RevCommit c1 = tr.commit().message("message").insertChangeId().create();
+		rw.parseBody(c1);
+		assertTrue(Pattern.matches(
+				"^message\n\nChange-Id: I[0-9a-f]{40}\n$", c1.getFullMessage()));
+
+		RevCommit c2 = tr.commit().message("").insertChangeId().create();
+		rw.parseBody(c2);
+		assertEquals("\n\nChange-Id: I0000000000000000000000000000000000000000\n",
+				c2.getFullMessage());
+	}
+
