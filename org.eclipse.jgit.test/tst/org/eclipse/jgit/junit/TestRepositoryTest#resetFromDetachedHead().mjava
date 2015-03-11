@@ -1,0 +1,32 @@
+	@Test
+	public void resetFromDetachedHead() throws Exception {
+		Ref head = repo.getRef("HEAD");
+		RevCommit master = tr.branch("master").commit().create();
+		RevCommit branch = tr.branch("branch").commit().create();
+		RevCommit detached = tr.commit().create();
+
+		assertNull(head);
+		assertEquals(master, repo.getRef("refs/heads/master").getObjectId());
+		assertEquals(branch, repo.getRef("refs/heads/branch").getObjectId());
+
+		tr.reset("master");
+		head = repo.getRef("HEAD");
+		assertEquals(master, head.getObjectId());
+		assertFalse(head.isSymbolic());
+
+		tr.reset("branch");
+		head = repo.getRef("HEAD");
+		assertEquals(branch, head.getObjectId());
+		assertFalse(head.isSymbolic());
+
+		tr.reset(detached);
+		head = repo.getRef("HEAD");
+		assertEquals(detached, head.getObjectId());
+		assertFalse(head.isSymbolic());
+
+		tr.reset(detached.name());
+		head = repo.getRef("HEAD");
+		assertEquals(detached, head.getObjectId());
+		assertFalse(head.isSymbolic());
+	}
+

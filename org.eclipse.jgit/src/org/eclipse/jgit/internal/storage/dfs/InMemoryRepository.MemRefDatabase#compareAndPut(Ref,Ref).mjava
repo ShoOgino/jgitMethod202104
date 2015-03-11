@@ -3,23 +3,46 @@
 				throws IOException {
 			ObjectId id = newRef.getObjectId();
 			if (id != null) {
-				RevWalk rw = new RevWalk(getRepository());
-				try {
+				try (RevWalk rw = new RevWalk(getRepository())) {
 					// Validate that the target exists in a new RevWalk, as the RevWalk
 					// from the RefUpdate might be reading back unflushed objects.
 					rw.parseAny(id);
-				} finally {
-					rw.release();
 				}
 			}
 			String name = newRef.getName();
-			if (oldRef == null || oldRef.getStorage() == Storage.NEW)
+			if (oldRef == null)
 				return refs.putIfAbsent(name, newRef) == null;
-			Ref cur = refs.get(name);
-			if (cur != null && eq(cur, oldRef))
-				return refs.replace(name, cur, newRef);
-			else
-				return false;
 
+			synchronized (refs) {
+				Ref cur = refs.get(name);
+				Ref toCompare = cur;
+				if (toCompare != null) {
+					if (toCompare.isSymbolic()) {
+						// Arm's-length dereference symrefs before the compare, since
+						// DfsRefUpdate#doLink(String) stores them undereferenced.
+						Ref leaf = toCompare.getLeaf();
+						if (leaf.getObjectId() == null) {
+							leaf = refs.get(leaf.getName());
+							if (leaf.isSymbolic())
+								// Not supported at the moment.
+								throw new IllegalArgumentException();
+							toCompare = new SymbolicRef(
+									name,
+									new ObjectIdRef.Unpeeled(
+											Storage.NEW,
+											leaf.getName(),
+											leaf.getObjectId()));
+						} else
+							toCompare = toCompare.getLeaf();
+					}
+					if (eq(toCompare, oldRef))
+						return refs.replace(name, cur, newRef);
+				}
+			}
+
+			if (oldRef.getStorage() == Storage.NEW)
+				return refs.putIfAbsent(name, newRef) == null;
+
+			return false;
 		}
 

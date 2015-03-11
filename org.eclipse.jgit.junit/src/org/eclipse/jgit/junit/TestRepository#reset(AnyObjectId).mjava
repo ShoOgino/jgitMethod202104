@@ -1,0 +1,24 @@
+	/**
+	 * Soft-reset HEAD to a detached state.
+	 * <p>
+	 * @param id
+	 *            ID of detached head.
+	 * @throws Exception
+	 * @see #reset(String)
+	 */
+	public void reset(AnyObjectId id) throws Exception {
+		RefUpdate ru = db.updateRef(Constants.HEAD, true);
+		ru.setNewObjectId(id);
+		RefUpdate.Result result = ru.forceUpdate();
+		switch (result) {
+			case FAST_FORWARD:
+			case FORCED:
+			case NEW:
+			case NO_CHANGE:
+				break;
+			default:
+				throw new IOException(String.format(
+						"Checkout \"%s\" failed: %s", id.name(), result));
+		}
+	}
+

@@ -1,8 +1,9 @@
 		private boolean eq(Ref a, Ref b) {
-			if (a.getObjectId() == null && b.getObjectId() == null)
-				return true;
-			if (a.getObjectId() != null)
-				return a.getObjectId().equals(b.getObjectId());
-			return false;
+			if (!Objects.equals(a.getName(), b.getName()))
+				return false;
+			// Compare leaf object IDs, since the oldRef passed into compareAndPut
+			// when detaching a symref is an ObjectIdRef.
+			return Objects.equals(a.getLeaf().getObjectId(),
+					b.getLeaf().getObjectId());
 		}
 
