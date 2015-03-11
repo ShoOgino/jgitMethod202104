@@ -9,8 +9,11 @@
 				setAuthorAndCommitter(c);
 				if (author != null)
 					c.setAuthor(author);
-				if (committer != null)
+				if (committer != null) {
+					if (updateCommitterTime)
+						committer = new PersonIdent(committer, new Date(now));
 					c.setCommitter(committer);
+				}
 
 				ObjectId commitId;
 				try (ObjectInserter ins = inserter) {

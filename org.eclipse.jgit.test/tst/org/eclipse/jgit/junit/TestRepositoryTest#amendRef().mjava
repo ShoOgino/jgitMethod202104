@@ -1,0 +1,40 @@
+	@Test
+	public void amendRef() throws Exception {
+		RevCommit root = tr.commit()
+				.add("todelete", "to be deleted")
+				.create();
+		RevCommit orig = tr.commit().parent(root)
+				.rm("todelete")
+				.add("foo", "foo contents")
+				.add("bar", "bar contents")
+				.add("dir/baz", "baz contents")
+				.create();
+		rw.parseBody(orig);
+		tr.branch("master").update(orig);
+		assertEquals("foo contents", blobAsString(orig, "foo"));
+		assertEquals("bar contents", blobAsString(orig, "bar"));
+		assertEquals("baz contents", blobAsString(orig, "dir/baz"));
+
+		RevCommit amended = tr.amendRef("master")
+				.tick(3)
+				.add("bar", "fixed bar contents")
+				.create();
+		assertEquals(amended, repo.getRef("refs/heads/master").getObjectId());
+		rw.parseBody(amended);
+
+		assertEquals(1, amended.getParentCount());
+		assertEquals(root, amended.getParent(0));
+		assertEquals(orig.getFullMessage(), amended.getFullMessage());
+		assertEquals(orig.getAuthorIdent(), amended.getAuthorIdent());
+
+		// Committer name/email is the same, but time was incremented.
+		assertEquals(new PersonIdent(orig.getCommitterIdent(), new Date(0)),
+				new PersonIdent(amended.getCommitterIdent(), new Date(0)));
+		assertTrue(orig.getCommitTime() < amended.getCommitTime());
+
+		assertEquals("foo contents", blobAsString(amended, "foo"));
+		assertEquals("fixed bar contents", blobAsString(amended, "bar"));
+		assertEquals("baz contents", blobAsString(amended, "dir/baz"));
+		assertNull(TreeWalk.forPath(repo, "todelete", amended.getTree()));
+	}
+

@@ -1,0 +1,27 @@
+	@Test
+	public void amendHead() throws Exception {
+		repo.updateRef("HEAD").link("refs/heads/master");
+		RevCommit root = tr.commit()
+				.add("foo", "foo contents")
+				.create();
+		RevCommit orig = tr.commit().parent(root)
+				.message("original message")
+				.add("bar", "bar contents")
+				.create();
+		tr.branch("master").update(orig);
+
+		RevCommit amended = tr.amendRef("HEAD")
+				.add("foo", "fixed foo contents")
+				.create();
+
+		Ref head = repo.getRef(Constants.HEAD);
+		assertEquals(amended, head.getObjectId());
+		assertTrue(head.isSymbolic());
+		assertEquals("refs/heads/master", head.getTarget().getName());
+
+		rw.parseBody(amended);
+		assertEquals("original message", amended.getFullMessage());
+		assertEquals("fixed foo contents", blobAsString(amended, "foo"));
+		assertEquals("bar contents", blobAsString(amended, "bar"));
+	}
+

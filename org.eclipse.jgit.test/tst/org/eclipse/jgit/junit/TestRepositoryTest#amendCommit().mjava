@@ -1,0 +1,19 @@
+	@Test
+	public void amendCommit() throws Exception {
+		RevCommit root = tr.commit()
+				.add("foo", "foo contents")
+				.create();
+		RevCommit orig = tr.commit().parent(root)
+				.message("original message")
+				.add("bar", "bar contents")
+				.create();
+		RevCommit amended = tr.amend(orig.copy())
+				.add("foo", "fixed foo contents")
+				.create();
+
+		rw.parseBody(amended);
+		assertEquals("original message", amended.getFullMessage());
+		assertEquals("fixed foo contents", blobAsString(amended, "foo"));
+		assertEquals("bar contents", blobAsString(amended, "bar"));
+	}
+

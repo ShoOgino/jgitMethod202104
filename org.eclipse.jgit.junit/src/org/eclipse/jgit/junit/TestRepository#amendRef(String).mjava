@@ -1,0 +1,20 @@
+	/**
+	 * Amend an existing ref.
+	 *
+	 * @param ref
+	 *            the name of the reference to amend, which must already exist.
+	 *            If {@code ref} does not start with {@code refs/} and is not the
+	 *            magic names {@code HEAD} {@code FETCH_HEAD} or {@code
+	 *            MERGE_HEAD}, then {@code refs/heads/} will be prefixed in front
+	 *            of the given name, thereby assuming it is a branch.
+	 * @return commit builder that amends the branch on commit.
+	 * @throws Exception
+	 */
+	public CommitBuilder amendRef(String ref) throws Exception {
+		String name = normalizeRef(ref);
+		Ref r = db.getRef(name);
+		if (r == null)
+			throw new IOException("Not a ref: " + ref);
+		return amend(pool.parseCommit(r.getObjectId()), branch(name).commit());
+	}
+

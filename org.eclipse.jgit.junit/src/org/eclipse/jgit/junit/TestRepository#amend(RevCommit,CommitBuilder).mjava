@@ -1,0 +1,34 @@
+	private CommitBuilder amend(RevCommit old, CommitBuilder b) throws Exception {
+		pool.parseBody(old);
+		b.author(old.getAuthorIdent());
+		b.committer(old.getCommitterIdent());
+		b.message(old.getFullMessage());
+		// Use the committer name from the old commit, but update it after ticking
+		// the clock in CommitBuilder#create().
+		b.updateCommitterTime = true;
+
+		// Reset parents to original parents.
+		b.noParents();
+		for (int i = 0; i < old.getParentCount(); i++)
+			b.parent(old.getParent(i));
+
+		// Reset tree to original tree; resetting parents reset tree contents to the
+		// first parent.
+		b.tree.clear();
+		try (TreeWalk tw = new TreeWalk(db)) {
+			tw.reset(old.getTree());
+			tw.setRecursive(true);
+			while (tw.next()) {
+				b.edit(new PathEdit(tw.getPathString()) {
+					@Override
+					public void apply(DirCacheEntry ent) {
+						ent.setFileMode(tw.getFileMode(0));
+						ent.setObjectId(tw.getObjectId(0));
+					}
+				});
+			}
+		}
+
+		return b;
+	}
+

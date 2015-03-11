@@ -15,17 +15,7 @@
 	 * @throws Exception
 	 */
 	public <T extends AnyObjectId> T update(String ref, T obj) throws Exception {
-		if (Constants.HEAD.equals(ref)) {
-			// nothing
-		} else if ("FETCH_HEAD".equals(ref)) {
-			// nothing
-		} else if ("MERGE_HEAD".equals(ref)) {
-			// nothing
-		} else if (ref.startsWith(Constants.R_REFS)) {
-			// nothing
-		} else
-			ref = Constants.R_HEADS + ref;
-
+		ref = normalizeRef(ref);
 		RefUpdate u = db.updateRef(ref);
 		u.setNewObjectId(obj);
 		switch (u.forceUpdate()) {
