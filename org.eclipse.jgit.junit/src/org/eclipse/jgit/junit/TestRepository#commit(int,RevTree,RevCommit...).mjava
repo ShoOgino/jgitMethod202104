@@ -23,15 +23,13 @@
 		c = new org.eclipse.jgit.lib.CommitBuilder();
 		c.setTreeId(tree);
 		c.setParentIds(parents);
-		c.setAuthor(new PersonIdent(author, new Date(now)));
-		c.setCommitter(new PersonIdent(committer, new Date(now)));
+		c.setAuthor(new PersonIdent(defaultAuthor, new Date(now)));
+		c.setCommitter(new PersonIdent(defaultCommitter, new Date(now)));
 		c.setMessage("");
 		ObjectId id;
-		try {
-			id = inserter.insert(c);
-			inserter.flush();
-		} finally {
-			inserter.release();
+		try (ObjectInserter ins = inserter) {
+			id = ins.insert(c);
+			ins.flush();
 		}
 		return pool.lookupCommit(id);
 	}

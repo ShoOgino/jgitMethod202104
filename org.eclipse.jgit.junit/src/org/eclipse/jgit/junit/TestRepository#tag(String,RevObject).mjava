@@ -18,14 +18,12 @@
 		final TagBuilder t = new TagBuilder();
 		t.setObjectId(dst);
 		t.setTag(name);
-		t.setTagger(new PersonIdent(committer, new Date(now)));
+		t.setTagger(new PersonIdent(defaultCommitter, new Date(now)));
 		t.setMessage("");
 		ObjectId id;
-		try {
-			id = inserter.insert(t);
-			inserter.flush();
-		} finally {
-			inserter.release();
+		try (ObjectInserter ins = inserter) {
+			id = ins.insert(t);
+			ins.flush();
 		}
 		return (RevTag) pool.lookupAny(id, Constants.OBJ_TAG);
 	}

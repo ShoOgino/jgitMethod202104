@@ -14,11 +14,9 @@
 			b.add(e);
 		b.finish();
 		ObjectId root;
-		try {
-			root = dc.writeTree(inserter);
-			inserter.flush();
-		} finally {
-			inserter.release();
+		try (ObjectInserter ins = inserter) {
+			root = dc.writeTree(ins);
+			ins.flush();
 		}
 		return pool.lookupTree(root);
 	}
