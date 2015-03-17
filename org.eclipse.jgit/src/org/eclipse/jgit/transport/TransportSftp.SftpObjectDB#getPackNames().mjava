@@ -31,8 +31,10 @@
 					}
 				});
 			} catch (SftpException je) {
-				throw new TransportException("Can't ls " + objectsPath
-						+ "/pack: " + je.getMessage(), je);
+				throw new TransportException(
+						MessageFormat.format(JGitText.get().cannotListPackPath,
+								objectsPath, je.getMessage()),
+						je);
 			}
 			return packs;
 		}

@@ -10,21 +10,26 @@
 		int ptr = 0;
 
 		if ((ptr = match(raw, ptr, object)) < 0)
-			throw new CorruptObjectException("no object header");
+			throw new CorruptObjectException(
+					JGitText.get().corruptObjectNoObjectHeader);
 		if ((ptr = id(raw, ptr)) < 0 || raw[ptr++] != '\n')
-			throw new CorruptObjectException("invalid object");
+			throw new CorruptObjectException(
+					JGitText.get().corruptObjectInvalidObject);
 
 		if ((ptr = match(raw, ptr, type)) < 0)
-			throw new CorruptObjectException("no type header");
+			throw new CorruptObjectException(
+					JGitText.get().corruptObjectNoTypeHeader);
 		ptr = nextLF(raw, ptr);
 
 		if ((ptr = match(raw, ptr, tag)) < 0)
-			throw new CorruptObjectException("no tag header");
+			throw new CorruptObjectException(
+					JGitText.get().corruptObjectNoTagHeader);
 		ptr = nextLF(raw, ptr);
 
 		if ((ptr = match(raw, ptr, tagger)) > 0) {
 			if ((ptr = personIdent(raw, ptr)) < 0 || raw[ptr++] != '\n')
-				throw new CorruptObjectException("invalid tagger");
+				throw new CorruptObjectException(
+						JGitText.get().corruptObjectInvalidTagger);
 		}
 	}
 

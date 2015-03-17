@@ -153,9 +153,9 @@
 							.equals(localIgnoreSubmoduleMode))
 						continue;
 				} catch (ConfigInvalidException e) {
-					IOException e1 = new IOException(
-							"Found invalid ignore param for submodule "
-									+ smw.getPath());
+					IOException e1 = new IOException(MessageFormat.format(
+							JGitText.get().invalidIgnoreParamSubmodule,
+							smw.getPath()));
 					e1.initCause(e);
 					throw e1;
 				}

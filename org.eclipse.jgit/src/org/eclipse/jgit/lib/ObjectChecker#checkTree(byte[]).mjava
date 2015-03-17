@@ -18,37 +18,46 @@
 			int thisMode = 0;
 			for (;;) {
 				if (ptr == sz)
-					throw new CorruptObjectException("truncated in mode");
+					throw new CorruptObjectException(
+							JGitText.get().corruptObjectTruncatedInMode);
 				final byte c = raw[ptr++];
 				if (' ' == c)
 					break;
 				if (c < '0' || c > '7')
-					throw new CorruptObjectException("invalid mode character");
+					throw new CorruptObjectException(
+							JGitText.get().corruptObjectInvalidModeChar);
 				if (thisMode == 0 && c == '0' && !allowZeroMode)
-					throw new CorruptObjectException("mode starts with '0'");
+					throw new CorruptObjectException(
+							JGitText.get().corruptObjectInvalidModeStartsZero);
 				thisMode <<= 3;
 				thisMode += c - '0';
 			}
 
 			if (FileMode.fromBits(thisMode).getObjectType() == Constants.OBJ_BAD)
-				throw new CorruptObjectException("invalid mode " + thisMode);
+				throw new CorruptObjectException(MessageFormat.format(
+						JGitText.get().corruptObjectInvalidMode2,
+						Integer.valueOf(thisMode)));
 
 			final int thisNameB = ptr;
 			ptr = scanPathSegment(raw, ptr, sz);
 			if (ptr == sz || raw[ptr] != 0)
-				throw new CorruptObjectException("truncated in name");
+				throw new CorruptObjectException(
+						JGitText.get().corruptObjectTruncatedInName);
 			checkPathSegment2(raw, thisNameB, ptr);
 			if (normalized != null) {
 				if (!normalized.add(normalize(raw, thisNameB, ptr)))
-					throw new CorruptObjectException("duplicate entry names");
+					throw new CorruptObjectException(
+							JGitText.get().corruptObjectDuplicateEntryNames);
 			} else if (duplicateName(raw, thisNameB, ptr))
-				throw new CorruptObjectException("duplicate entry names");
+				throw new CorruptObjectException(
+						JGitText.get().corruptObjectDuplicateEntryNames);
 
 			if (lastNameB != 0) {
 				final int cmp = pathCompare(raw, lastNameB, lastNameE,
 						lastMode, thisNameB, ptr, thisMode);
 				if (cmp > 0)
-					throw new CorruptObjectException("incorrectly sorted");
+					throw new CorruptObjectException(
+							JGitText.get().corruptObjectIncorrectSorting);
 			}
 
 			lastNameB = thisNameB;
@@ -57,7 +66,8 @@
 
 			ptr += 1 + Constants.OBJECT_ID_LENGTH;
 			if (ptr > sz)
-				throw new CorruptObjectException("truncated in object id");
+				throw new CorruptObjectException(
+						JGitText.get().corruptObjectTruncatedInObjectId);
 		}
 	}
 

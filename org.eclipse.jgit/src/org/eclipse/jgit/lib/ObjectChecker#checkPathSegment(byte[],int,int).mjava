@@ -11,7 +11,8 @@
 			throws CorruptObjectException {
 		int e = scanPathSegment(raw, ptr, end);
 		if (e < end && raw[e] == 0)
-			throw new CorruptObjectException("name contains byte 0x00");
+			throw new CorruptObjectException(
+					JGitText.get().corruptObjectNameContainsNullByte);
 		checkPathSegment2(raw, ptr, end);
 	}
 

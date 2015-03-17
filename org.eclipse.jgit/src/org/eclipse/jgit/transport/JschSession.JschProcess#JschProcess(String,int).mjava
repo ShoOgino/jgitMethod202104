@@ -21,7 +21,8 @@
 				setupStreams();
 				channel.connect(timeout > 0 ? timeout * 1000 : 0);
 				if (!channel.isConnected())
-					throw new TransportException(uri, "connection failed");
+					throw new TransportException(uri,
+							JGitText.get().connectionFailed);
 			} catch (JSchException e) {
 				throw new TransportException(uri, e.getMessage(), e);
 			}

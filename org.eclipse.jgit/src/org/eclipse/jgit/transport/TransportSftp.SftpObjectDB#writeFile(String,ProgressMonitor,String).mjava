@@ -14,8 +14,9 @@
 					}
 				}
 
-				throw new TransportException("Can't write " + objectsPath + "/" //$NON-NLS-2$
-						+ path + ": " + je.getMessage(), je); //$NON-NLS-1$
+				throw new TransportException(MessageFormat.format(
+						JGitText.get().cannotWriteObjectsPath, objectsPath,
+						path, je.getMessage()), je);
 			}
 		}
 
