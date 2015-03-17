@@ -4,14 +4,16 @@
 	 *            working tree directory that contains {@code .git}.
 	 * @param fs
 	 *            filesystem abstraction to use when accessing the repository.
-	 * @return a {@link Git} object for the existing git repository
+	 * @return a {@link Git} object for the existing git repository. Closing this
+	 *         instance will close the repo.
 	 * @throws IOException
 	 */
 	public static Git open(File dir, FS fs) throws IOException {
 		RepositoryCache.FileKey key;
 
 		key = RepositoryCache.FileKey.lenient(dir, fs);
-		return wrap(new RepositoryBuilder().setFS(fs).setGitDir(key.getFile())
-				.setMustExist(true).build());
+		Repository db = new RepositoryBuilder().setFS(fs).setGitDir(key.getFile())
+				.setMustExist(true).build();
+		return new Git(db, true);
 	}
 

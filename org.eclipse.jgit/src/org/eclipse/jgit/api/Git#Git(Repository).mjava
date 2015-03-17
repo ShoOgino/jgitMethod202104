@@ -1,15 +1,18 @@
 	/**
 	 * Constructs a new {@link Git} object which can interact with the specified
-	 * git repository. All command classes returned by methods of this class
-	 * will always interact with this git repository.
+	 * git repository.
+	 * <p>
+	 * All command classes returned by methods of this class will always interact
+	 * with this git repository.
+	 * <p>
+	 * The caller is responsible for closing the repository; {@link #close()} on
+	 * this instance does not close the repo.
 	 *
 	 * @param repo
-	 *            the git repository this class is interacting with.
-	 *            {@code null} is not allowed
+	 *            the git repository this class is interacting with;
+	 *            {@code null} is not allowed.
 	 */
 	public Git(Repository repo) {
-		if (repo == null)
-			throw new NullPointerException();
-		this.repo = repo;
+		this(repo, false);
 	}
 
