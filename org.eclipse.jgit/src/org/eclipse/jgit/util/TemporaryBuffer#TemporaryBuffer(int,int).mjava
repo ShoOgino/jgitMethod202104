@@ -1,0 +1,19 @@
+	/**
+	 * Create a new empty temporary buffer.
+	 *
+	 * @param estimatedSize
+	 *            estimated size of storage used, to size the initial list of
+	 *            block pointers.
+	 * @param limit
+	 *            maximum number of bytes to store in memory before entering the
+	 *            overflow output path.
+	 * @since 4.0
+	 */
+	protected TemporaryBuffer(final int estimatedSize, final int limit) {
+		if (estimatedSize > limit)
+			throw new IllegalArgumentException();
+		this.inCoreLimit = limit;
+		this.initialBlocks = (estimatedSize - 1) / Block.SZ + 1;
+		reset();
+	}
+
