@@ -5,17 +5,8 @@
 	 *            the entire list of parents for this commit.
 	 */
 	public void setParentIds(List<? extends AnyObjectId> newParents) {
-		ObjectId[] tmpIds = new ObjectId[newParents.size()];
-
-		int newParentCount = 0;
-		for (AnyObjectId newId : newParents) {
-			for (int j = 0; j < newParentCount; j++)
-				if (tmpIds[j].equals(newId))
-					throw new IllegalArgumentException(MessageFormat.format(
-							JGitText.get().duplicateParents,
-							tmpIds[j].getName()));
-			tmpIds[newParentCount++] = newId.copy();
-		}
-		parentIds = tmpIds;
+		parentIds = new ObjectId[newParents.size()];
+		for (int i = 0; i < newParents.size(); i++)
+			parentIds[i] = newParents.get(i).copy();
 	}
 
