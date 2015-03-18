@@ -1,0 +1,21 @@
+	@Test
+	public void cherryPickWithContentMerge() throws Exception {
+		RevCommit base = tr.branch("HEAD").commit()
+				.add("foo", "foo contents\n\n")
+				.create();
+		tr.branch("HEAD").commit()
+				.add("foo", "foo contents\n\nlast line\n")
+				.create();
+		RevCommit toPick = tr.commit()
+				.message("message to cherry-pick")
+				.parent(base)
+				.add("foo", "changed foo contents\n\n")
+				.create();
+		RevCommit result = tr.cherryPick(toPick);
+		rw.parseBody(result);
+
+		assertEquals("message to cherry-pick", result.getFullMessage());
+		assertEquals("changed foo contents\n\nlast line\n",
+				blobAsString(result, "foo"));
+	}
+

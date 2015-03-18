@@ -1,0 +1,18 @@
+	@Test
+	public void cherryPickWithIdenticalContents() throws Exception {
+		RevCommit base = tr.branch("HEAD").commit().add("foo", "foo contents\n")
+				.create();
+		RevCommit head = tr.branch("HEAD").commit()
+				.parent(base)
+				.add("bar", "bar contents\n")
+				.create();
+		RevCommit toPick = tr.commit()
+				.parent(base)
+				.message("message to cherry-pick")
+				.add("bar", "bar contents\n")
+				.create();
+		assertNotEquals(head, toPick);
+		assertNull(tr.cherryPick(toPick));
+		assertEquals(head, repo.getRef("HEAD").getObjectId());
+	}
+
