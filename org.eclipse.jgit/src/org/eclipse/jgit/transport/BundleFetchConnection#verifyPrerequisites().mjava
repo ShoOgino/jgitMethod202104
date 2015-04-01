@@ -2,8 +2,7 @@
 		if (prereqs.isEmpty())
 			return;
 
-		final RevWalk rw = new RevWalk(transport.local);
-		try {
+		try (final RevWalk rw = new RevWalk(transport.local)) {
 			final RevFlag PREREQ = rw.newFlag("PREREQ"); //$NON-NLS-1$
 			final RevFlag SEEN = rw.newFlag("SEEN"); //$NON-NLS-1$
 
@@ -66,8 +65,6 @@
 				throw new MissingBundlePrerequisiteException(transport.uri,
 						missing);
 			}
-		} finally {
-			rw.release();
 		}
 	}
 
