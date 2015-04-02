@@ -27,9 +27,7 @@
 		checkCallable();
 		Collections.sort(only);
 
-		RevWalk rw = new RevWalk(repo);
-
-		try {
+		try (RevWalk rw = new RevWalk(repo)) {
 			RepositoryState state = repo.getRepositoryState();
 			if (!state.canCommit())
 				throw new WrongRepositoryStateException(MessageFormat.format(
@@ -43,8 +41,7 @@
 			processOptions(state, rw);
 
 			if (all && !repo.isBare() && repo.getWorkTree() != null) {
-				Git git = new Git(repo);
-				try {
+				try (Git git = new Git(repo)) {
 					git.add()
 							.addFilepattern(".") //$NON-NLS-1$
 							.setUpdate(true).call();
@@ -83,80 +80,74 @@
 
 			// lock the index
 			DirCache index = repo.lockDirCache();
-			try {
+			try (ObjectInserter odi = repo.newObjectInserter()) {
 				if (!only.isEmpty())
 					index = createTemporaryIndex(headId, index, rw);
 
-				ObjectInserter odi = repo.newObjectInserter();
-				try {
-					// Write the index as tree to the object database. This may
-					// fail for example when the index contains unmerged paths
-					// (unresolved conflicts)
-					ObjectId indexTreeId = index.writeTree(odi);
+				// Write the index as tree to the object database. This may
+				// fail for example when the index contains unmerged paths
+				// (unresolved conflicts)
+				ObjectId indexTreeId = index.writeTree(odi);
 
-					if (insertChangeId)
-						insertChangeId(indexTreeId);
+				if (insertChangeId)
+					insertChangeId(indexTreeId);
 
-					// Create a Commit object, populate it and write it
-					CommitBuilder commit = new CommitBuilder();
-					commit.setCommitter(committer);
-					commit.setAuthor(author);
-					commit.setMessage(message);
+				// Create a Commit object, populate it and write it
+				CommitBuilder commit = new CommitBuilder();
+				commit.setCommitter(committer);
+				commit.setAuthor(author);
+				commit.setMessage(message);
 
-					commit.setParentIds(parents);
-					commit.setTreeId(indexTreeId);
-					ObjectId commitId = odi.insert(commit);
-					odi.flush();
+				commit.setParentIds(parents);
+				commit.setTreeId(indexTreeId);
+				ObjectId commitId = odi.insert(commit);
+				odi.flush();
 
-					RevCommit revCommit = rw.parseCommit(commitId);
-					RefUpdate ru = repo.updateRef(Constants.HEAD);
-					ru.setNewObjectId(commitId);
-					if (reflogComment != null) {
-						ru.setRefLogMessage(reflogComment, false);
-					} else {
-						String prefix = amend ? "commit (amend): " //$NON-NLS-1$
-								: parents.size() == 0 ? "commit (initial): " //$NON-NLS-1$
-										: "commit: "; //$NON-NLS-1$
-						ru.setRefLogMessage(
-								prefix + revCommit.getShortMessage(), false);
+				RevCommit revCommit = rw.parseCommit(commitId);
+				RefUpdate ru = repo.updateRef(Constants.HEAD);
+				ru.setNewObjectId(commitId);
+				if (reflogComment != null) {
+					ru.setRefLogMessage(reflogComment, false);
+				} else {
+					String prefix = amend ? "commit (amend): " //$NON-NLS-1$
+							: parents.size() == 0 ? "commit (initial): " //$NON-NLS-1$
+									: "commit: "; //$NON-NLS-1$
+					ru.setRefLogMessage(prefix + revCommit.getShortMessage(),
+							false);
+				}
+				if (headId != null)
+					ru.setExpectedOldObjectId(headId);
+				else
+					ru.setExpectedOldObjectId(ObjectId.zeroId());
+				Result rc = ru.forceUpdate();
+				switch (rc) {
+				case NEW:
+				case FORCED:
+				case FAST_FORWARD: {
+					setCallable(false);
+					if (state == RepositoryState.MERGING_RESOLVED
+							|| isMergeDuringRebase(state)) {
+						// Commit was successful. Now delete the files
+						// used for merge commits
+						repo.writeMergeCommitMsg(null);
+						repo.writeMergeHeads(null);
+					} else if (state == RepositoryState.CHERRY_PICKING_RESOLVED) {
+						repo.writeMergeCommitMsg(null);
+						repo.writeCherryPickHead(null);
+					} else if (state == RepositoryState.REVERTING_RESOLVED) {
+						repo.writeMergeCommitMsg(null);
+						repo.writeRevertHead(null);
 					}
-					if (headId != null)
-						ru.setExpectedOldObjectId(headId);
-					else
-						ru.setExpectedOldObjectId(ObjectId.zeroId());
-					Result rc = ru.forceUpdate();
-					switch (rc) {
-					case NEW:
-					case FORCED:
-					case FAST_FORWARD: {
-						setCallable(false);
-						if (state == RepositoryState.MERGING_RESOLVED
-								|| isMergeDuringRebase(state)) {
-							// Commit was successful. Now delete the files
-							// used for merge commits
-							repo.writeMergeCommitMsg(null);
-							repo.writeMergeHeads(null);
-						} else if (state == RepositoryState.CHERRY_PICKING_RESOLVED) {
-							repo.writeMergeCommitMsg(null);
-							repo.writeCherryPickHead(null);
-						} else if (state == RepositoryState.REVERTING_RESOLVED) {
-							repo.writeMergeCommitMsg(null);
-							repo.writeRevertHead(null);
-						}
-						return revCommit;
-					}
-					case REJECTED:
-					case LOCK_FAILURE:
-						throw new ConcurrentRefUpdateException(
-								JGitText.get().couldNotLockHEAD, ru.getRef(),
-								rc);
-					default:
-						throw new JGitInternalException(MessageFormat.format(
-								JGitText.get().updatingRefFailed,
-								Constants.HEAD, commitId.toString(), rc));
-					}
-				} finally {
-					odi.release();
+					return revCommit;
+				}
+				case REJECTED:
+				case LOCK_FAILURE:
+					throw new ConcurrentRefUpdateException(
+							JGitText.get().couldNotLockHEAD, ru.getRef(), rc);
+				default:
+					throw new JGitInternalException(MessageFormat.format(
+							JGitText.get().updatingRefFailed, Constants.HEAD,
+							commitId.toString(), rc));
 				}
 			} finally {
 				index.unlock();
@@ -166,8 +157,6 @@
 		} catch (IOException e) {
 			throw new JGitInternalException(
 					JGitText.get().exceptionCaughtDuringExecutionOfCommitCommand, e);
-		} finally {
-			rw.dispose();
 		}
 	}
 
