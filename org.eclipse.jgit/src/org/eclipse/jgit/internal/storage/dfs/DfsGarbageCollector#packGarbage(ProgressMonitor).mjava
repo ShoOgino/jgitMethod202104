@@ -6,11 +6,10 @@
 		cfg.setDeltaCompress(false);
 		cfg.setBuildBitmaps(false);
 
-		PackWriter pw = new PackWriter(cfg, ctx);
-		pw.setDeltaBaseAsOffset(true);
-		pw.setReuseDeltaCommits(true);
-		try {
-			RevWalk pool = new RevWalk(ctx);
+		try (PackWriter pw = new PackWriter(cfg, ctx);
+				RevWalk pool = new RevWalk(ctx)) {
+			pw.setDeltaBaseAsOffset(true);
+			pw.setReuseDeltaCommits(true);
 			pm.beginTask("Finding garbage", objectsBefore());
 			for (DfsPackFile oldPack : packsBefore) {
 				PackIndex oldIdx = oldPack.getPackIndex(ctx);
@@ -27,8 +26,6 @@
 			pm.endTask();
 			if (0 < pw.getObjectCount())
 				writePack(UNREACHABLE_GARBAGE, pw, pm);
-		} finally {
-			pw.release();
 		}
 	}
 
