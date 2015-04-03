@@ -64,8 +64,7 @@
 				.newBatchUpdate()
 				.setAllowNonFastForwards(true)
 				.setRefLogMessage("fetch", true); //$NON-NLS-1$
-		final RevWalk walk = new RevWalk(transport.local);
-		try {
+		try (final RevWalk walk = new RevWalk(transport.local)) {
 			if (monitor instanceof BatchingProgressMonitor) {
 				((BatchingProgressMonitor) monitor).setDelayStart(
 						250, TimeUnit.MILLISECONDS);
@@ -94,8 +93,6 @@
 			throw new TransportException(MessageFormat.format(
 					JGitText.get().failureUpdatingTrackingRef,
 					getFirstFailedRefName(batch), err.getMessage()), err);
-		} finally {
-			walk.release();
 		}
 
 		if (!fetchHeadUpdates.isEmpty()) {
