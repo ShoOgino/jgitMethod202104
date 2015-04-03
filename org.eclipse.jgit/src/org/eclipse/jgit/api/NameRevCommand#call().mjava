@@ -49,11 +49,11 @@
 			}
 
 			setCallable(false);
-			walk.release();
 			return result;
 		} catch (IOException e) {
-			walk.reset();
 			throw new JGitInternalException(e.getMessage(), e);
+		} finally {
+			walk.close();
 		}
 	}
 
