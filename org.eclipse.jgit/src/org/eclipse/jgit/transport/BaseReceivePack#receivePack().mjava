@@ -17,8 +17,7 @@
 		if (sideBand)
 			resolving = new SideBandProgressMonitor(msgOut);
 
-		ObjectInserter ins = db.newObjectInserter();
-		try {
+		try (ObjectInserter ins = db.newObjectInserter()) {
 			String lockMsg = "jgit receive-pack"; //$NON-NLS-1$
 			if (getRefLogIdent() != null)
 				lockMsg += " from " + getRefLogIdent().toExternalString(); //$NON-NLS-1$
@@ -36,8 +35,6 @@
 			packLock = parser.parse(receiving, resolving);
 			packSize = Long.valueOf(parser.getPackSize());
 			ins.flush();
-		} finally {
-			ins.release();
 		}
 
 		if (timeoutIn != null)
