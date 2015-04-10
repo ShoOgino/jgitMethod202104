@@ -8,21 +8,21 @@
 	public void testSymlinkActuallyModified() throws Exception {
 		final String NORMALIZED = "target";
 		final byte[] NORMALIZED_BYTES = Constants.encode(NORMALIZED);
-		ObjectInserter oi = db.newObjectInserter();
-		final ObjectId linkid = oi.insert(Constants.OBJ_BLOB, NORMALIZED_BYTES,
-				0, NORMALIZED_BYTES.length);
-		oi.release();
-		DirCache dc = db.lockDirCache();
-		DirCacheEditor dce = dc.editor();
-		dce.add(new DirCacheEditor.PathEdit("link") {
-			@Override
-			public void apply(DirCacheEntry ent) {
-				ent.setFileMode(FileMode.SYMLINK);
-				ent.setObjectId(linkid);
-				ent.setLength(NORMALIZED_BYTES.length);
-			}
-		});
-		assertTrue(dce.commit());
+		try (ObjectInserter oi = db.newObjectInserter()) {
+			final ObjectId linkid = oi.insert(Constants.OBJ_BLOB,
+					NORMALIZED_BYTES, 0, NORMALIZED_BYTES.length);
+			DirCache dc = db.lockDirCache();
+			DirCacheEditor dce = dc.editor();
+			dce.add(new DirCacheEditor.PathEdit("link") {
+				@Override
+				public void apply(DirCacheEntry ent) {
+					ent.setFileMode(FileMode.SYMLINK);
+					ent.setObjectId(linkid);
+					ent.setLength(NORMALIZED_BYTES.length);
+				}
+			});
+			assertTrue(dce.commit());
+		}
 		new Git(db).commit().setMessage("Adding link").call();
 		new Git(db).reset().setMode(ResetType.HARD).call();
 

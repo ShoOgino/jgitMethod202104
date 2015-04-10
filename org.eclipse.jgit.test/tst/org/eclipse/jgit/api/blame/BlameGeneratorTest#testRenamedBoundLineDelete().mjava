@@ -22,8 +22,7 @@
 		git.add().addFilepattern(FILENAME_2).call();
 		RevCommit c2 = git.commit().setMessage("change file2").call();
 
-		BlameGenerator generator = new BlameGenerator(db, FILENAME_2);
-		try {
+		try (BlameGenerator generator = new BlameGenerator(db, FILENAME_2)) {
 			generator.push(null, db.resolve(Constants.HEAD));
 			assertEquals(3, generator.getResultContents().size());
 
@@ -46,13 +45,10 @@
 			assertEquals(FILENAME_1, generator.getSourcePath());
 
 			assertFalse(generator.next());
-		} finally {
-			generator.release();
 		}
 
 		// and test again with other BlameGenerator API:
-		generator = new BlameGenerator(db, FILENAME_2);
-		try {
+		try (BlameGenerator generator = new BlameGenerator(db, FILENAME_2)) {
 			generator.push(null, db.resolve(Constants.HEAD));
 			BlameResult result = generator.computeBlameResult();
 
@@ -66,9 +62,6 @@
 
 			assertEquals(c1, result.getSourceCommit(2));
 			assertEquals(FILENAME_1, result.getSourcePath(2));
-
-		} finally {
-			generator.release();
 		}
 	}
 

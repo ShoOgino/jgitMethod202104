@@ -2,13 +2,10 @@
 			throws IOException {
 		final RevWalk revWalk = new RevWalk(repo);
 		final byte[] bytes = Constants.encode(data);
-		final ObjectInserter inserter = repo.newObjectInserter();
 		final ObjectId id;
-		try {
+		try (ObjectInserter inserter = repo.newObjectInserter()) {
 			id = inserter.insert(Constants.OBJ_BLOB, bytes);
 			inserter.flush();
-		} finally {
-			inserter.release();
 		}
 		try {
 			parse(id);

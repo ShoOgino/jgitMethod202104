@@ -18,12 +18,9 @@
 		assertEquals(parentCount, commit.getParentCount());
 
 		// Load parents
-		RevWalk walk = new RevWalk(db);
-		try {
+		try (RevWalk walk = new RevWalk(db)) {
 			for (RevCommit parent : commit.getParents())
 				walk.parseBody(parent);
-		} finally {
-			walk.release();
 		}
 
 		assertEquals(1, commit.getParent(1).getParentCount());

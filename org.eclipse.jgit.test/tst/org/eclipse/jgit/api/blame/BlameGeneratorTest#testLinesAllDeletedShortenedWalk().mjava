@@ -18,8 +18,7 @@
 		git.add().addFilepattern("file.txt").call();
 		RevCommit c3 = git.commit().setMessage("create file").call();
 
-		BlameGenerator generator = new BlameGenerator(db, "file.txt");
-		try {
+		try (BlameGenerator generator = new BlameGenerator(db, "file.txt")) {
 			generator.push(null, db.resolve(Constants.HEAD));
 			assertEquals(3, generator.getResultContents().size());
 
@@ -29,8 +28,6 @@
 			assertEquals(3, generator.getResultEnd());
 
 			assertFalse(generator.next());
-		} finally {
-			generator.release();
 		}
 	}
 
