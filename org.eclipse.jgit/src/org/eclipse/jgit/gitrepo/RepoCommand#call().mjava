@@ -46,8 +46,7 @@
 			DirCache index = DirCache.newInCore();
 			DirCacheBuilder builder = index.builder();
 			ObjectInserter inserter = repo.newObjectInserter();
-			RevWalk rw = new RevWalk(repo);
-			try {
+			try (RevWalk rw = new RevWalk(repo)) {
 				Config cfg = new Config();
 				for (Project proj : bareProjects) {
 					String name = proj.path;
@@ -129,8 +128,6 @@
 				return rw.parseCommit(commitId);
 			} catch (IOException e) {
 				throw new ManifestErrorException(e);
-			} finally {
-				rw.release();
 			}
 		} else {
 			return git

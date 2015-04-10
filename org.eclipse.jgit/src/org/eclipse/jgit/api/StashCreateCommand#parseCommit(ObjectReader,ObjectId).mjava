@@ -1,6 +1,7 @@
 	private RevCommit parseCommit(final ObjectReader reader,
 			final ObjectId headId) throws IOException {
-		final RevWalk walk = new RevWalk(reader);
-		return walk.parseCommit(headId);
+		try (final RevWalk walk = new RevWalk(reader)) {
+			return walk.parseCommit(headId);
+		}
 	}
 

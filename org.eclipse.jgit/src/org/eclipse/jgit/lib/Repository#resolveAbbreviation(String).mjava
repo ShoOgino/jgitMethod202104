@@ -1,8 +1,7 @@
 	private ObjectId resolveAbbreviation(final String revstr) throws IOException,
 			AmbiguousObjectException {
 		AbbreviatedObjectId id = AbbreviatedObjectId.fromString(revstr);
-		ObjectReader reader = newObjectReader();
-		try {
+		try (ObjectReader reader = newObjectReader()) {
 			Collection<ObjectId> matches = reader.resolve(id);
 			if (matches.size() == 0)
 				return null;
@@ -10,8 +9,6 @@
 				return matches.iterator().next();
 			else
 				throw new AmbiguousObjectException(id, matches);
-		} finally {
-			reader.release();
 		}
 	}
 

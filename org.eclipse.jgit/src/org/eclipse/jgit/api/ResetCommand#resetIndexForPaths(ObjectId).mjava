@@ -1,10 +1,9 @@
 	private void resetIndexForPaths(ObjectId commitTree) {
 		DirCache dc = null;
-		try {
+		try (final TreeWalk tw = new TreeWalk(repo)) {
 			dc = repo.lockDirCache();
 			DirCacheBuilder builder = dc.builder();
 
-			final TreeWalk tw = new TreeWalk(repo);
 			tw.addTree(new DirCacheBuildIterator(builder));
 			if (commitTree != null)
 				tw.addTree(commitTree);

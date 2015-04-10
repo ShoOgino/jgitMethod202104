@@ -1,10 +1,8 @@
 	private void resetIndex(ObjectId commitTree) throws IOException {
 		DirCache dc = repo.lockDirCache();
-		TreeWalk walk = null;
-		try {
+		try (TreeWalk walk = new TreeWalk(repo)) {
 			DirCacheBuilder builder = dc.builder();
 
-			walk = new TreeWalk(repo);
 			if (commitTree != null)
 				walk.addTree(commitTree);
 			else
@@ -38,8 +36,6 @@
 			builder.commit();
 		} finally {
 			dc.unlock();
-			if (walk != null)
-				walk.release();
 		}
 	}
 

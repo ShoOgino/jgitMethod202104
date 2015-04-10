@@ -12,8 +12,7 @@
 			pm = NullProgressMonitor.INSTANCE;
 
 		DfsObjDatabase objdb = repo.getObjectDatabase();
-		DfsReader ctx = (DfsReader) objdb.newReader();
-		try {
+		try (DfsReader ctx = (DfsReader) objdb.newReader()) {
 			PackConfig pc = new PackConfig(repo);
 			pc.setIndexVersion(2);
 			pc.setDeltaCompress(false);
@@ -42,7 +41,7 @@
 					writeIndex(objdb, pack, pw);
 
 					PackWriter.Statistics stats = pw.getStatistics();
-					pw.release();
+					pw.close();
 					pw = null;
 
 					pack.setPackStats(stats);
@@ -56,11 +55,10 @@
 				}
 			} finally {
 				if (pw != null)
-					pw.release();
+					pw.close();
 			}
 		} finally {
 			rw = null;
-			ctx.release();
 		}
 	}
 

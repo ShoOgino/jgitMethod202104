@@ -19,8 +19,7 @@
 			config.load();
 			modulesConfig = config;
 		} else {
-			TreeWalk configWalk = new TreeWalk(repository);
-			try {
+			try (TreeWalk configWalk = new TreeWalk(repository)) {
 				configWalk.addTree(rootTree);
 
 				// The root tree may be part of the submodule walk, so we need to revert
@@ -46,8 +45,6 @@
 					if (idx > 0)
 						rootTree.next(idx);
 				}
-			} finally {
-				configWalk.release();
 			}
 		}
 		return this;

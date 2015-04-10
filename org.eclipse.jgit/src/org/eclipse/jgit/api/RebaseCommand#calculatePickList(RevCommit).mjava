@@ -1,8 +1,10 @@
 	private List<RevCommit> calculatePickList(RevCommit headCommit)
 			throws GitAPIException, NoHeadException, IOException {
-		LogCommand cmd = new Git(repo).log().addRange(upstreamCommit,
-				headCommit);
-		Iterable<RevCommit> commitsToUse = cmd.call();
+		Iterable<RevCommit> commitsToUse;
+		try (Git git = new Git(repo)) {
+			LogCommand cmd = git.log().addRange(upstreamCommit, headCommit);
+			commitsToUse = cmd.call();
+		}
 		List<RevCommit> cherryPickList = new ArrayList<RevCommit>();
 		for (RevCommit commit : commitsToUse) {
 			if (preserveMerges || commit.getParentCount() == 1)

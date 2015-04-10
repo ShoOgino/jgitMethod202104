@@ -19,9 +19,8 @@
 					JGitText.get().stashApplyOnUnsafeRepository,
 					repo.getRepositoryState()));
 
-		ObjectReader reader = repo.newObjectReader();
-		try {
-			RevWalk revWalk = new RevWalk(reader);
+		try (ObjectReader reader = repo.newObjectReader();
+				RevWalk revWalk = new RevWalk(reader)) {
 
 			ObjectId headCommit = repo.resolve(Constants.HEAD);
 			if (headCommit == null)
@@ -103,8 +102,6 @@
 			throw e;
 		} catch (IOException e) {
 			throw new JGitInternalException(JGitText.get().stashApplyFailed, e);
-		} finally {
-			reader.release();
 		}
 	}
 

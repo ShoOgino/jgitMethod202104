@@ -50,8 +50,7 @@
 	public ObjectId resolve(final String revstr)
 			throws AmbiguousObjectException, IncorrectObjectTypeException,
 			RevisionSyntaxException, IOException {
-		RevWalk rw = new RevWalk(this);
-		try {
+		try (RevWalk rw = new RevWalk(this)) {
 			Object resolved = resolve(rw, revstr);
 			if (resolved instanceof String) {
 				final Ref ref = getRef((String)resolved);
@@ -59,8 +58,6 @@
 			} else {
 				return (ObjectId) resolved;
 			}
-		} finally {
-			rw.release();
 		}
 	}
 

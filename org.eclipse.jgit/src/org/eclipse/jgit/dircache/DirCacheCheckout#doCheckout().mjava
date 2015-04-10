@@ -2,8 +2,7 @@
 			MissingObjectException, IncorrectObjectTypeException,
 			CheckoutConflictException, IndexWriteException {
 		toBeDeleted.clear();
-		ObjectReader objectReader = repo.getObjectDatabase().newReader();
-		try {
+		try (ObjectReader objectReader = repo.getObjectDatabase().newReader()) {
 			if (headCommitTree != null)
 				preScanTwoTrees();
 			else
@@ -53,8 +52,6 @@
 			// commit the index builder - a new index is persisted
 			if (!builder.commit())
 				throw new IndexWriteException();
-		} finally {
-			objectReader.release();
 		}
 		return toBeDeleted.size() == 0;
 	}

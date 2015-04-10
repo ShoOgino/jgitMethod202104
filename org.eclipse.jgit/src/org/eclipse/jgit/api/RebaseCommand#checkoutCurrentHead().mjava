@@ -20,9 +20,9 @@
 		} finally {
 			dc.unlock();
 		}
-		RevWalk rw = new RevWalk(repo);
-		RevCommit commit = rw.parseCommit(repo.resolve(Constants.HEAD));
-		rw.release();
-		return commit;
+		try (RevWalk rw = new RevWalk(repo)) {
+			RevCommit commit = rw.parseCommit(repo.resolve(Constants.HEAD));
+			return commit;
+		}
 	}
 

@@ -1,5 +1,7 @@
 	@Override
 	ObjectId getTreeId() {
-		return new ObjectInserter.Formatter().idFor(build());
+		try (Formatter f = new ObjectInserter.Formatter()) {
+			return f.idFor(build());
+		}
 	}
 
