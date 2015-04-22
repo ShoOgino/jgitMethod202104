@@ -22,29 +22,6 @@
 	 */
 	public static void rename(final File src, final File dst)
 			throws IOException {
-		int attempts = FS.DETECTED.retryFailedLockFileCommit() ? 10 : 1;
-		while (--attempts >= 0) {
-			if (src.renameTo(dst))
-				return;
-			try {
-				if (!dst.delete())
-					delete(dst, EMPTY_DIRECTORIES_ONLY | RECURSIVE);
-				// On *nix there is no try, you do or do not
-				if (src.renameTo(dst))
-					return;
-			} catch (IOException e) {
-				// ignore and continue retry
-			}
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				throw new IOException(MessageFormat.format(
-						JGitText.get().renameFileFailed, src.getAbsolutePath(),
-						dst.getAbsolutePath()));
-			}
-		}
-		throw new IOException(MessageFormat.format(
-				JGitText.get().renameFileFailed, src.getAbsolutePath(),
-				dst.getAbsolutePath()));
+		rename(src, dst, StandardCopyOption.REPLACE_EXISTING);
 	}
 

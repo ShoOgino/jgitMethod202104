@@ -1,0 +1,10 @@
+	@Test
+	public void testAtomicMove() throws IOException {
+		File src = new File(trash, "src");
+		Files.createFile(src.toPath());
+		File dst = new File(trash, "dst");
+		FileUtils.rename(src, dst, StandardCopyOption.ATOMIC_MOVE);
+		assertFalse(Files.exists(src.toPath()));
+		assertTrue(Files.exists(dst.toPath()));
+	}
+
