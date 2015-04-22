@@ -1,0 +1,15 @@
+	protected static URIish extendPath(URIish uri, String pathComponents)
+			throws URISyntaxException {
+		String raw = uri.toString();
+		String newComponents = pathComponents;
+		if (!newComponents.startsWith("/")) {
+			newComponents = '/' + newComponents;
+		}
+		if (!newComponents.endsWith("/")) {
+			newComponents += '/';
+		}
+		int i = raw.lastIndexOf('/');
+		raw = raw.substring(0, i) + newComponents + raw.substring(i + 1);
+		return new URIish(raw);
+	}
+

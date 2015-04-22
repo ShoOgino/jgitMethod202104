@@ -1,4 +1,9 @@
 		void openStream() throws IOException {
-			openStream(null);
+			conn = httpOpen(METHOD_POST, new URL(baseUrl, serviceName),
+					AcceptEncoding.GZIP);
+			conn.setInstanceFollowRedirects(false);
+			conn.setDoOutput(true);
+			conn.setRequestProperty(HDR_CONTENT_TYPE, requestType);
+			conn.setRequestProperty(HDR_ACCEPT, responseType);
 		}
 

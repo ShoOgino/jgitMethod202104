@@ -4,6 +4,12 @@
 		ServletContextHandler redirect = server.addContext("/redirect");
 		redirect.addFilter(new FilterHolder(new Filter() {
 
+			// Enables tests for different codes, and for multiple redirects.
+			// First parameter is the number of redirects, second one is the
+			// redirect status code that should be used
+			private Pattern responsePattern = Pattern
+					.compile("/response/(\\d+)/(30[1237])/");
+
 			@Override
 			public void init(FilterConfig filterConfig)
 					throws ServletException {
@@ -21,10 +27,43 @@
 					fullUrl.append("?")
 							.append(httpServletRequest.getQueryString());
 				}
-				httpServletResponse
-						.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
+				String urlString = fullUrl.toString();
+				if (urlString.contains("/loop/")) {
+					urlString = urlString.replace("/loop/", "/loop/x/");
+					if (urlString.contains("/loop/x/x/x/x/x/x/x/x/")) {
+						// Go back to initial.
+						urlString = urlString.replace("/loop/x/x/x/x/x/x/x/x/",
+								"/loop/");
+					}
+					httpServletResponse.setStatus(
+							HttpServletResponse.SC_MOVED_TEMPORARILY);
+					httpServletResponse.setHeader(HttpSupport.HDR_LOCATION,
+							urlString);
+					return;
+				}
+				int responseCode = HttpServletResponse.SC_MOVED_PERMANENTLY;
+				int nofRedirects = 0;
+				Matcher matcher = responsePattern.matcher(urlString);
+				if (matcher.find()) {
+					nofRedirects = Integer
+							.parseUnsignedInt(matcher.group(1));
+					responseCode = Integer.parseUnsignedInt(matcher.group(2));
+					if (--nofRedirects <= 0) {
+						urlString = fullUrl.substring(0, matcher.start()) + '/'
+								+ fullUrl.substring(matcher.end());
+					} else {
+						urlString = fullUrl.substring(0, matcher.start())
+								+ "/response/" + nofRedirects + "/"
+								+ responseCode + '/'
+								+ fullUrl.substring(matcher.end());
+					}
+				}
+				httpServletResponse.setStatus(responseCode);
+				if (nofRedirects <= 0) {
+					urlString = urlString.replace("/redirect", "/git");
+				}
 				httpServletResponse.setHeader(HttpSupport.HDR_LOCATION,
-						fullUrl.toString().replace("/redirect", "/git"));
+						urlString);
 			}
 
 			@Override

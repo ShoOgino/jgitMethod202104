@@ -1,0 +1,9 @@
+	@Test
+	public void testInitialClone_RedirectMax() throws Exception {
+		FileBasedConfig userConfig = SystemReader.getInstance()
+				.openUserConfig(null, FS.DETECTED);
+		userConfig.setInt("http", null, "maxRedirects", 4);
+		userConfig.save();
+		initialClone_Redirect(4, 302);
+	}
+

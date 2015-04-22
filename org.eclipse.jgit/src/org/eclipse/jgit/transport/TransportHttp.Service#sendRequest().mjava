@@ -1,4 +1,54 @@
 		void sendRequest() throws IOException {
-			sendRequest(null);
+			// Try to compress the content, but only if that is smaller.
+			TemporaryBuffer buf = new TemporaryBuffer.Heap(http.postBuffer);
+			try {
+				GZIPOutputStream gzip = new GZIPOutputStream(buf);
+				out.writeTo(gzip, null);
+				gzip.close();
+				if (out.length() < buf.length())
+					buf = out;
+			} catch (IOException err) {
+				// Most likely caused by overflowing the buffer, meaning
+				// its larger if it were compressed. Don't compress.
+				buf = out;
+			}
+
+			int redirects = 0;
+			for (;;) {
+				openStream();
+				if (buf != out) {
+					conn.setRequestProperty(HDR_CONTENT_ENCODING, ENCODING_GZIP);
+				}
+				conn.setFixedLengthStreamingMode((int) buf.length());
+				try (OutputStream httpOut = conn.getOutputStream()) {
+					buf.writeTo(httpOut, null);
+				}
+
+				if (http.followRedirects == HttpRedirectMode.TRUE) {
+					final int status = HttpSupport.response(conn);
+					switch (status) {
+					case HttpConnection.HTTP_MOVED_PERM:
+					case HttpConnection.HTTP_MOVED_TEMP:
+					case HttpConnection.HTTP_11_MOVED_TEMP:
+						// SEE_OTHER after a POST doesn't make sense for a git
+						// server, so we don't handle it here and thus we'll
+						// report an error in openResponse() later on.
+						URIish newUri = redirect(
+								conn.getHeaderField(HDR_LOCATION),
+								'/' + serviceName, redirects++);
+						try {
+							baseUrl = toURL(newUri);
+						} catch (MalformedURLException e) {
+							throw new TransportException(MessageFormat.format(
+									JGitText.get().invalidRedirectLocation,
+									uri, baseUrl, newUri), e);
+						}
+						continue;
+					default:
+						break;
+					}
+				}
+				break;
+			}
 		}
 

@@ -1,9 +1,14 @@
-	@Test
-	public void testInitialClone_RedirectSmall() throws Exception {
+	private void initialClone_Redirect(int nofRedirects, int code)
+			throws Exception {
 		Repository dst = createBareRepository();
 		assertFalse(dst.hasObject(A_txt));
 
-		try (Transport t = Transport.open(dst, redirectURI)) {
+		URIish cloneFrom = redirectURI;
+		if (code != 301 || nofRedirects > 1) {
+			cloneFrom = extendPath(cloneFrom,
+					"/response/" + nofRedirects + "/" + code);
+		}
+		try (Transport t = Transport.open(dst, cloneFrom)) {
 			t.fetch(NullProgressMonitor.INSTANCE, mirror(master));
 		}
 
@@ -12,12 +17,15 @@
 		fsck(dst, B);
 
 		List<AccessEvent> requests = getRequests();
-		assertEquals(4, requests.size());
+		assertEquals(2 + nofRedirects, requests.size());
 
-		AccessEvent firstRedirect = requests.get(0);
-		assertEquals(301, firstRedirect.getStatus());
+		int n = 0;
+		while (n < nofRedirects) {
+			AccessEvent redirect = requests.get(n++);
+			assertEquals(code, redirect.getStatus());
+		}
 
-		AccessEvent info = requests.get(1);
+		AccessEvent info = requests.get(n++);
 		assertEquals("GET", info.getMethod());
 		assertEquals(join(remoteURI, "info/refs"), info.getPath());
 		assertEquals(1, info.getParameters().size());
@@ -27,10 +35,7 @@
 				info.getResponseHeader(HDR_CONTENT_TYPE));
 		assertEquals("gzip", info.getResponseHeader(HDR_CONTENT_ENCODING));
 
-		AccessEvent secondRedirect = requests.get(2);
-		assertEquals(301, secondRedirect.getStatus());
-
-		AccessEvent service = requests.get(3);
+		AccessEvent service = requests.get(n++);
 		assertEquals("POST", service.getMethod());
 		assertEquals(join(remoteURI, "git-upload-pack"), service.getPath());
 		assertEquals(0, service.getParameters().size());

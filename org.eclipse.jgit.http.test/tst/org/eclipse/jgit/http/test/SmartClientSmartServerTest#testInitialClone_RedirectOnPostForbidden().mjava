@@ -1,0 +1,14 @@
+	@Test
+	public void testInitialClone_RedirectOnPostForbidden() throws Exception {
+		Repository dst = createBareRepository();
+		assertFalse(dst.hasObject(A_txt));
+
+		URIish cloneFrom = extendPath(remoteURI, "/post");
+		try (Transport t = Transport.open(dst, cloneFrom)) {
+			t.fetch(NullProgressMonitor.INSTANCE, mirror(master));
+			fail("Should have failed (redirect on POST)");
+		} catch (TransportException e) {
+			assertTrue(e.getMessage().contains("301"));
+		}
+	}
+

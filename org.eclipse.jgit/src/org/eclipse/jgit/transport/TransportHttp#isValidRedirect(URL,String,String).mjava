@@ -1,0 +1,26 @@
+	private boolean isValidRedirect(URL current, String next, String checkFor) {
+		// Protocols must be the same, or current is "http" and next "https". We
+		// do not follow redirects from https back to http.
+		String oldProtocol = current.getProtocol().toLowerCase(Locale.ROOT);
+		int schemeEnd = next.indexOf("://"); //$NON-NLS-1$
+		if (schemeEnd < 0) {
+			return false;
+		}
+		String newProtocol = next.substring(0, schemeEnd)
+				.toLowerCase(Locale.ROOT);
+		if (!oldProtocol.equals(newProtocol)) {
+			if (!"https".equals(newProtocol)) { //$NON-NLS-1$
+				return false;
+			}
+		}
+		// git allows only rewriting the root, i.e., everything before INFO_REFS
+		// or the service name
+		if (next.indexOf(checkFor) < 0) {
+			return false;
+		}
+		// Basically we should test here that whatever follows INFO_REFS is
+		// unchanged. But since we re-construct the query part
+		// anyway, it doesn't matter.
+		return true;
+	}
+

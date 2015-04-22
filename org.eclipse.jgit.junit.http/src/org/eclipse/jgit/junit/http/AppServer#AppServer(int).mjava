@@ -1,32 +1,10 @@
 	/**
 	 * @param port
-	 *            the http port number
+	 *            the http port number; may be zero to allocate a port
+	 *            dynamically
 	 * @since 4.2
 	 */
 	public AppServer(int port) {
-		server = new Server();
-
-		HttpConfiguration http_config = new HttpConfiguration();
-		http_config.setSecureScheme("https");
-		http_config.setSecurePort(8443);
-		http_config.setOutputBufferSize(32768);
-
-		connector = new ServerConnector(server,
-				new HttpConnectionFactory(http_config));
-		connector.setPort(port);
-		try {
-			final InetAddress me = InetAddress.getByName("localhost");
-			connector.setHost(me.getHostAddress());
-		} catch (UnknownHostException e) {
-			throw new RuntimeException("Cannot find localhost", e);
-		}
-
-		contexts = new ContextHandlerCollection();
-
-		log = new TestRequestLog();
-		log.setHandler(contexts);
-
-		server.setConnectors(new Connector[] { connector });
-		server.setHandler(log);
+		this(port, -1);
 	}
 

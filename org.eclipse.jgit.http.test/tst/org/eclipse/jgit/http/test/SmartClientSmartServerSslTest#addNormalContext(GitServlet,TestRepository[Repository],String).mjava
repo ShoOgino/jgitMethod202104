@@ -1,0 +1,73 @@
+	private ServletContextHandler addNormalContext(GitServlet gs, TestRepository<Repository> src, String srcName) {
+		ServletContextHandler app = server.addContext("/git");
+		app.addFilter(new FilterHolder(new Filter() {
+
+			@Override
+			public void init(FilterConfig filterConfig)
+					throws ServletException {
+				// empty
+			}
+
+			// Redirects http to https for requests containing "/https/".
+			@Override
+			public void doFilter(ServletRequest request,
+					ServletResponse response, FilterChain chain)
+					throws IOException, ServletException {
+				final HttpServletResponse httpServletResponse = (HttpServletResponse) response;
+				final HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+				final StringBuffer fullUrl = httpServletRequest.getRequestURL();
+				if (httpServletRequest.getQueryString() != null) {
+					fullUrl.append("?")
+							.append(httpServletRequest.getQueryString());
+				}
+				String urlString = rewriteUrl(fullUrl.toString(), "https",
+						server.getSecurePort());
+				httpServletResponse
+						.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
+				httpServletResponse.setHeader(HttpSupport.HDR_LOCATION,
+						urlString.replace("/https/", "/"));
+			}
+
+			@Override
+			public void destroy() {
+				// empty
+			}
+		}), "/https/*", EnumSet.of(DispatcherType.REQUEST));
+		app.addFilter(new FilterHolder(new Filter() {
+
+			@Override
+			public void init(FilterConfig filterConfig)
+					throws ServletException {
+				// empty
+			}
+
+			// Redirects https back to http for requests containing "/back/".
+			@Override
+			public void doFilter(ServletRequest request,
+					ServletResponse response, FilterChain chain)
+					throws IOException, ServletException {
+				final HttpServletResponse httpServletResponse = (HttpServletResponse) response;
+				final HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+				final StringBuffer fullUrl = httpServletRequest.getRequestURL();
+				if (httpServletRequest.getQueryString() != null) {
+					fullUrl.append("?")
+							.append(httpServletRequest.getQueryString());
+				}
+				String urlString = rewriteUrl(fullUrl.toString(), "http",
+						server.getPort());
+				httpServletResponse
+						.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
+				httpServletResponse.setHeader(HttpSupport.HDR_LOCATION,
+						urlString.replace("/back/", "/"));
+			}
+
+			@Override
+			public void destroy() {
+				// empty
+			}
+		}), "/back/*", EnumSet.of(DispatcherType.REQUEST));
+		gs.setRepositoryResolver(new TestRepositoryResolver(src, srcName));
+		app.addServlet(new ServletHolder(gs), "/*");
+		return app;
+	}
+

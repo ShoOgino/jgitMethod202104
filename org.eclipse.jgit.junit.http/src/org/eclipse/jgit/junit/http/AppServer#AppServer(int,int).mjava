@@ -1,0 +1,59 @@
+	/**
+	 * @param port
+	 *            for https, may be zero to allocate a port dynamically
+	 * @param sslPort
+	 *            for https,may be zero to allocate a port dynamically. If
+	 *            negative, the server will be set up without https support..
+	 * @since 4.9
+	 */
+	public AppServer(int port, int sslPort) {
+		server = new Server();
+
+		config = new HttpConfiguration();
+		config.setSecureScheme("https");
+		config.setSecurePort(0);
+		config.setOutputBufferSize(32768);
+
+		connector = new ServerConnector(server,
+				new HttpConnectionFactory(config));
+		connector.setPort(port);
+		String ip;
+		String hostName;
+		try {
+			final InetAddress me = InetAddress.getByName("localhost");
+			ip = me.getHostAddress();
+			connector.setHost(ip);
+			hostName = InetAddress.getLocalHost().getCanonicalHostName();
+		} catch (UnknownHostException e) {
+			throw new RuntimeException("Cannot find localhost", e);
+		}
+
+		if (sslPort >= 0) {
+			SslContextFactory sslContextFactory = createTestSslContextFactory(
+					hostName);
+			secureConfig = new HttpConfiguration(config);
+			secureConnector = new ServerConnector(server,
+					new SslConnectionFactory(sslContextFactory,
+							HttpVersion.HTTP_1_1.asString()),
+					new HttpConnectionFactory(secureConfig));
+			secureConnector.setPort(sslPort);
+			secureConnector.setHost(ip);
+		} else {
+			secureConfig = null;
+			secureConnector = null;
+		}
+
+		contexts = new ContextHandlerCollection();
+
+		log = new TestRequestLog();
+		log.setHandler(contexts);
+
+		if (secureConnector == null) {
+			server.setConnectors(new Connector[] { connector });
+		} else {
+			server.setConnectors(
+					new Connector[] { connector, secureConnector });
+		}
+		server.setHandler(log);
+	}
+

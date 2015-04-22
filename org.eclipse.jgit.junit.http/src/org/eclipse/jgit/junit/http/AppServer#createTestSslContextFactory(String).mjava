@@ -1,0 +1,37 @@
+	private SslContextFactory createTestSslContextFactory(String hostName) {
+		SslContextFactory factory = new SslContextFactory(true);
+
+		String dName = "CN=,OU=,O=,ST=,L=,C=";
+
+		try {
+			File tmpDir = Files.createTempDirectory("jks").toFile();
+			tmpDir.deleteOnExit();
+			makePrivate(tmpDir);
+			File keyStore = new File(tmpDir, "keystore.jks");
+			Runtime.getRuntime().exec(
+					new String[] {
+							"keytool", //
+							"-keystore", keyStore.getAbsolutePath(), //
+							"-storepass", keyPassword,
+							"-alias", hostName, //
+							"-genkeypair", //
+							"-keyalg", "RSA", //
+							"-keypass", keyPassword, //
+							"-dname", dName, //
+							"-validity", "2" //
+					}).waitFor();
+			keyStore.deleteOnExit();
+			makePrivate(keyStore);
+			filesToDelete.add(keyStore);
+			filesToDelete.add(tmpDir);
+			factory.setKeyStorePath(keyStore.getAbsolutePath());
+			factory.setKeyStorePassword(keyPassword);
+			factory.setKeyManagerPassword(keyPassword);
+			factory.setTrustStorePath(keyStore.getAbsolutePath());
+			factory.setTrustStorePassword(keyPassword);
+		} catch (InterruptedException | IOException e) {
+			throw new RuntimeException("Cannot create ssl key/certificate", e);
+		}
+		return factory;
+	}
+

@@ -1,0 +1,31 @@
+	private URIish redirect(String location, String checkFor, int redirects)
+			throws TransportException {
+		if (location == null || location.isEmpty()) {
+			throw new TransportException(MessageFormat.format(
+					JGitText.get().redirectLocationMissing, uri, baseUrl));
+		}
+		if (redirects >= http.maxRedirects) {
+			throw new TransportException(MessageFormat.format(
+					JGitText.get().redirectLimitExceeded, uri,
+					Integer.valueOf(http.maxRedirects), baseUrl, location));
+		}
+		try {
+			if (!isValidRedirect(baseUrl, location, checkFor)) {
+				throw new TransportException(
+						MessageFormat.format(JGitText.get().redirectBlocked,
+								uri, baseUrl, location));
+			}
+			location = location.substring(0, location.indexOf(checkFor));
+			URIish result = new URIish(location);
+			if (LOG.isInfoEnabled()) {
+				LOG.info(MessageFormat.format(JGitText.get().redirectHttp, uri,
+						Integer.valueOf(redirects), baseUrl, result));
+			}
+			return result;
+		} catch (URISyntaxException e) {
+			throw new TransportException(MessageFormat.format(
+					JGitText.get().invalidRedirectLocation,
+					uri, baseUrl, location), e);
+		}
+	}
+

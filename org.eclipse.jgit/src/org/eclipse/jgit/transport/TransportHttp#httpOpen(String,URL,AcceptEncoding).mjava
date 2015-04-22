@@ -21,6 +21,10 @@
 			HttpSupport.disableSslVerify(conn);
 		}
 
+		// We must do our own redirect handling to implement git rules and to
+		// handle http->https redirects
+		conn.setInstanceFollowRedirects(false);
+
 		conn.setRequestMethod(method);
 		conn.setUseCaches(false);
 		if (acceptEncoding == AcceptEncoding.GZIP) {

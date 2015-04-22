@@ -1,0 +1,35 @@
+	@Override
+	@Before
+	public void setUp() throws Exception {
+		super.setUp();
+
+		final TestRepository<Repository> src = createTestRepository();
+		final String srcName = src.getRepository().getDirectory().getName();
+		src.getRepository()
+				.getConfig()
+				.setBoolean(ConfigConstants.CONFIG_CORE_SECTION, null,
+						ConfigConstants.CONFIG_KEY_LOGALLREFUPDATES, true);
+
+		GitServlet gs = new GitServlet();
+
+		ServletContextHandler app = addNormalContext(gs, src, srcName);
+
+		server.setUp();
+
+		remoteURI = toURIish(app, srcName);
+		secureURI = new URIish(rewriteUrl(remoteURI.toString(), "https",
+				server.getSecurePort()));
+
+		A_txt = src.blob("A");
+		A = src.commit().add("A_txt", A_txt).create();
+		B = src.commit().parent(A).add("A_txt", "C").add("B", "B").create();
+		src.update(master, B);
+
+		src.update("refs/garbage/a/very/long/ref/name/to/compress", B);
+
+		FileBasedConfig userConfig = SystemReader.getInstance()
+				.openUserConfig(null, FS.DETECTED);
+		userConfig.setBoolean("http", null, "sslVerify", false);
+		userConfig.save();
+	}
+
