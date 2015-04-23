@@ -44,9 +44,13 @@
 				case RENAME:
 					f = getFile(fh.getOldPath(), false);
 					File dest = getFile(fh.getNewPath(), false);
-					if (!f.renameTo(dest))
+					try {
+						FileUtils.rename(f, dest,
+								StandardCopyOption.ATOMIC_MOVE);
+					} catch (IOException e) {
 						throw new PatchApplyException(MessageFormat.format(
-								JGitText.get().renameFileFailed, f, dest));
+								JGitText.get().renameFileFailed, f, dest), e);
+					}
 					break;
 				case COPY:
 					f = getFile(fh.getOldPath(), false);

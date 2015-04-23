@@ -21,10 +21,16 @@
 			FileUtils.delete(tmp, FileUtils.RETRY);
 			return InsertLooseObjectResult.EXISTS_LOOSE;
 		}
-		if (tmp.renameTo(dst)) {
+		try {
+			Files.move(tmp.toPath(), dst.toPath(),
+					StandardCopyOption.ATOMIC_MOVE);
 			dst.setReadOnly();
 			unpackedObjectCache.add(id);
 			return InsertLooseObjectResult.INSERTED;
+		} catch (AtomicMoveNotSupportedException e) {
+			LOG.error(e.getMessage(), e);
+		} catch (IOException e) {
+			// ignore
 		}
 
 		// Maybe the directory doesn't exist yet as the object
@@ -32,10 +38,16 @@
 		// try the rename first as the directory likely does exist.
 		//
 		FileUtils.mkdir(dst.getParentFile(), true);
-		if (tmp.renameTo(dst)) {
+		try {
+			Files.move(tmp.toPath(), dst.toPath(),
+					StandardCopyOption.ATOMIC_MOVE);
 			dst.setReadOnly();
 			unpackedObjectCache.add(id);
 			return InsertLooseObjectResult.INSERTED;
+		} catch (AtomicMoveNotSupportedException e) {
+			LOG.error(e.getMessage(), e);
+		} catch (IOException e) {
+			LOG.debug(e.getMessage(), e);
 		}
 
 		if (!createDuplicate && has(id)) {

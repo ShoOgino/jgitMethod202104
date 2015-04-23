@@ -1,10 +1,22 @@
 	private static boolean rename(File src, File dst) {
-		if (src.renameTo(dst))
+		try {
+			FileUtils.rename(src, dst, StandardCopyOption.ATOMIC_MOVE);
 			return true;
+		} catch (AtomicMoveNotSupportedException e) {
+			LOG.error(e.getMessage(), e);
+		} catch (IOException e) {
+			// ignore
+		}
 
 		File dir = dst.getParentFile();
 		if ((dir.exists() || !dir.mkdirs()) && !dir.isDirectory())
 			return false;
-		return src.renameTo(dst);
+		try {
+			FileUtils.rename(src, dst, StandardCopyOption.ATOMIC_MOVE);
+			return true;
+		} catch (IOException e) {
+			LOG.error(e.getMessage(), e);
+			return false;
+		}
 	}
 
