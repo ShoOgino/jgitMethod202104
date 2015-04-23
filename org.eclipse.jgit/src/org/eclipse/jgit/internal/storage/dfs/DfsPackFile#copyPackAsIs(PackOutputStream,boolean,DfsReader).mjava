@@ -1,7 +1,11 @@
 	void copyPackAsIs(PackOutputStream out, boolean validate, DfsReader ctx)
 			throws IOException {
-		// Pin the first window, this ensures the length is accurate.
-		ctx.pin(this, 0);
-		ctx.copyPackAsIs(this, length, validate, out);
+		MessageDigest md = initCopyPack(out, validate, ctx);
+		long p;
+		if (cache.copyThroughCache(length))
+			p = copyPackThroughCache(out, ctx, md);
+		else
+			p = copyPackBypassCache(out, ctx, md);
+		verifyPackChecksum(p, md, ctx);
 	}
 

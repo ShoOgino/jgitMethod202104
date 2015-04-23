@@ -24,6 +24,12 @@
 		sft = Math.min(sft, maxMem / 4); // don't use more than 1/4 of the heap
 		sft = Math.min(sft, Integer.MAX_VALUE); // cannot exceed array length
 		setStreamFileThreshold((int) sft);
+
+		setStreamPackBufferSize(rc.getInt(
+				CONFIG_CORE_SECTION,
+				CONFIG_DFS_SECTION,
+				CONFIG_KEY_STREAM_BUFFER,
+				getStreamPackBufferSize()));
 		return this;
 	}
 

@@ -5,18 +5,8 @@
 
 		ReadableChannel rc = ctx.db.openFile(packDesc, PACK);
 		try {
-			// If the block alignment is not yet known, discover it. Prefer the
-			// larger size from either the cache or the file itself.
-			int size = blockSize;
-			if (size == 0) {
-				size = rc.blockSize();
-				if (size <= 0)
-					size = cache.getBlockSize();
-				else if (size < cache.getBlockSize())
-					size = (cache.getBlockSize() / size) * size;
-				blockSize = size;
-				pos = (pos / size) * size;
-			}
+			int size = blockSize(rc);
+			pos = (pos / size) * size;
 
 			// If the size of the file is not yet known, try to discover it.
 			// Channels may choose to return -1 to indicate they don't
@@ -38,7 +28,7 @@
 
 			byte[] buf = new byte[size];
 			rc.position(pos);
-			int cnt = IO.read(rc, buf, 0, size);
+			int cnt = read(rc, ByteBuffer.wrap(buf, 0, size));
 			if (cnt != size) {
 				if (0 <= len) {
 					throw new EOFException(MessageFormat.format(
