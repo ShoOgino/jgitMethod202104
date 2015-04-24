@@ -10,16 +10,6 @@
 	 */
 	private boolean match(String pattern, String target) {
 		boolean isDirectory = target.endsWith("/");
-		if (useOldRule.booleanValue()) {
-			IgnoreRule r = new IgnoreRule(pattern);
-			// If speed of this test is ever an issue, we can use a presetRule
-			// field
-			// to avoid recompiling a pattern each time.
-			boolean match = r.isMatch(target, isDirectory);
-			if (r.getNegation())
-				match = !match;
-			return match;
-		}
 		FastIgnoreRule r = new FastIgnoreRule(pattern);
 		// If speed of this test is ever an issue, we can use a presetRule field
 		// to avoid recompiling a pattern each time.
