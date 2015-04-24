@@ -1,5 +1,5 @@
-	private long copyPackBypassCache(PackOutputStream out, DfsReader ctx,
-			MessageDigest md) throws IOException {
+	private long copyPackBypassCache(PackOutputStream out, DfsReader ctx)
+			throws IOException {
 		try (ReadableChannel rc = ctx.db.openFile(packDesc, PACK)) {
 			ByteBuffer buf = newCopyBuffer(out, rc);
 			if (ctx.getOptions().getStreamPackBufferSize() > 0)
@@ -11,7 +11,7 @@
 				if (b != null) {
 					int ptr = (int) (position - b.start);
 					int n = (int) Math.min(b.size() - ptr, remaining);
-					b.write(out, position, n, md);
+					b.write(out, position, n);
 					position += n;
 					remaining -= n;
 					rc.position(position);
@@ -25,8 +25,6 @@
 				else if (n > remaining)
 					n = (int) remaining;
 				out.write(buf.array(), 0, n);
-				if (md != null)
-					md.update(buf.array(), 0, n);
 				position += n;
 				remaining -= n;
 			}
