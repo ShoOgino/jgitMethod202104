@@ -3,6 +3,9 @@
 				throws IOException, ServiceNotEnabledException,
 				ServiceNotAuthorizedException {
 			ReceivePack rp = receivePackFactory.create(req, db);
+			InternalHttpServerGlue.setPeerUserAgent(
+					rp,
+					req.getHeader(HDR_USER_AGENT));
 			req.setAttribute(ATTRIBUTE_HANDLER, rp);
 		}
 

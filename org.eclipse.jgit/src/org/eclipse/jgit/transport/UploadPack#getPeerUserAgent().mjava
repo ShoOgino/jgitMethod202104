@@ -1,0 +1,19 @@
+	/**
+	 * Get the user agent of the client.
+	 * <p>
+	 * If the client is new enough to use {@code agent=} capability that value
+	 * will be returned. Older HTTP clients may also supply their version using
+	 * the HTTP {@code User-Agent} header. The capability overrides the HTTP
+	 * header if both are available.
+	 * <p>
+	 * When an HTTP request has been received this method returns the HTTP
+	 * {@code User-Agent} header value until capabilities have been parsed.
+	 *
+	 * @return user agent supplied by the client. Available only if the client
+	 *         is new enough to advertise its user agent.
+	 * @since 4.0
+	 */
+	public String getPeerUserAgent() {
+		return UserAgent.getAgent(options, userAgent);
+	}
+

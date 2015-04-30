@@ -7,9 +7,7 @@
 			final InputStream in = openInputStream(c);
 			try {
 				if (isSmartHttp(c, service)) {
-					readSmartHeaders(in, service);
-					return new SmartHttpPushConnection(in);
-
+					return smartPush(service, c, in);
 				} else if (!useSmartHttp) {
 					final String msg = JGitText.get().smartHTTPPushDisabled;
 					throw new NotSupportedException(msg);
