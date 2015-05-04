@@ -8,6 +8,8 @@
 				&& ((RevCommit) treeish).getTree() != null)
 			return ((RevCommit) treeish).getTree();
 
-		return new RevWalk(or).parseTree(treeish).getId();
+		try (RevWalk rw = new RevWalk(or)) {
+			return rw.parseTree(treeish).getId();
+		}
 	}
 

@@ -1,0 +1,13 @@
+	private void writeConflictChange(MergeChunk chunk) throws IOException {
+		/*
+		 * In case of a non-three-way merge I'll add the name of the conflicting
+		 * chunk behind the equal signs. I also append the name of the last
+		 * conflicting chunk after the ending greater-than signs. If somebody
+		 * knows a better notation to present non-three-way merges - feel free
+		 * to correct here.
+		 */
+		lastConflictingName = seqName.get(chunk.getSequenceIndex());
+		writeln(threeWayMerge ? "=======" : "======= " //$NON-NLS-1$ //$NON-NLS-2$
+				+ lastConflictingName);
+	}
+

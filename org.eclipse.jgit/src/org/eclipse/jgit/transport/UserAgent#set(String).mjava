@@ -1,0 +1,20 @@
+	/**
+	 * Change the user agent string advertised by JGit.
+	 * <p>
+	 * The new string should start with {@code "JGit/"} (for example
+	 * {@code "JGit/4.0"}) to advertise the implementation as JGit based.
+	 * <p>
+	 * Spaces and other whitespace should be avoided as these will be
+	 * automatically converted to {@code "."}.
+	 * <p>
+	 * User agent strings are restricted to printable ASCII.
+	 *
+	 * @param agent
+	 *            new user agent string for this running JGit library. Setting
+	 *            to null or empty string will avoid sending any identification
+	 *            to the peer.
+	 */
+	public static void set(String agent) {
+		userAgent = StringUtils.isEmptyOrNull(agent) ? null : clean(agent);
+	}
+

@@ -7,26 +7,20 @@
 	 */
 	protected CheckoutCommand checkoutPaths() throws IOException,
 			RefNotFoundException {
-		RevWalk revWalk = new RevWalk(repo);
 		DirCache dc = repo.lockDirCache();
-		try {
-			TreeWalk treeWalk = new TreeWalk(revWalk.getObjectReader());
+		try (RevWalk revWalk = new RevWalk(repo);
+				TreeWalk treeWalk = new TreeWalk(revWalk.getObjectReader())) {
 			treeWalk.setRecursive(true);
 			if (!checkoutAllPaths)
 				treeWalk.setFilter(PathFilterGroup.createFromStrings(paths));
-			try {
-				if (isCheckoutIndex())
-					checkoutPathsFromIndex(treeWalk, dc);
-				else {
-					RevCommit commit = revWalk.parseCommit(getStartPointObjectId());
-					checkoutPathsFromCommit(treeWalk, dc, commit);
-				}
-			} finally {
-				treeWalk.release();
+			if (isCheckoutIndex())
+				checkoutPathsFromIndex(treeWalk, dc);
+			else {
+				RevCommit commit = revWalk.parseCommit(getStartPointObjectId());
+				checkoutPathsFromCommit(treeWalk, dc, commit);
 			}
 		} finally {
 			dc.unlock();
-			revWalk.release();
 		}
 		return this;
 	}

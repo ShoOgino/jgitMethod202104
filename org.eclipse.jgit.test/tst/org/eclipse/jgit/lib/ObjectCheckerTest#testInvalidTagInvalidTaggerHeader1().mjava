@@ -1,5 +1,6 @@
 	@Test
-	public void testInvalidTagInvalidTaggerHeader1() {
+	public void testInvalidTagInvalidTaggerHeader1()
+			throws CorruptObjectException {
 		final StringBuilder b = new StringBuilder();
 
 		b.append("object ");
@@ -17,5 +18,7 @@
 		} catch (CorruptObjectException e) {
 			assertEquals("invalid tagger", e.getMessage());
 		}
+		checker.setAllowInvalidPersonIdent(true);
+		checker.checkTag(data);
 	}
 

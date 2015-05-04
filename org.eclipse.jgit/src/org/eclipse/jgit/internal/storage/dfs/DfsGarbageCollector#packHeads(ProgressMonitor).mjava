@@ -2,14 +2,11 @@
 		if (allHeads.isEmpty())
 			return;
 
-		PackWriter pw = newPackWriter();
-		try {
+		try (PackWriter pw = newPackWriter()) {
 			pw.setTagTargets(tagTargets);
 			pw.preparePack(pm, allHeads, Collections.<ObjectId> emptySet());
 			if (0 < pw.getObjectCount())
 				writePack(GC, pw, pm);
-		} finally {
-			pw.release();
 		}
 	}
 

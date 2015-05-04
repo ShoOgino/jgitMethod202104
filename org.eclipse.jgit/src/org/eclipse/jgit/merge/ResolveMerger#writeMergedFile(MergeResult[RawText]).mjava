@@ -20,12 +20,10 @@
 		File parentFolder = of.getParentFile();
 		if (!fs.exists(parentFolder))
 			parentFolder.mkdirs();
-		FileOutputStream fos = new FileOutputStream(of);
-		try {
-			new MergeFormatter().formatMerge(fos, result,
+		try (OutputStream os = new BufferedOutputStream(
+				new FileOutputStream(of))) {
+			new MergeFormatter().formatMerge(os, result,
 					Arrays.asList(commitNames), CHARACTER_ENCODING);
-		} finally {
-			fos.close();
 		}
 		return of;
 	}

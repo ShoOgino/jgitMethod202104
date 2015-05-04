@@ -11,11 +11,8 @@
 	 *             the object store cannot be accessed.
 	 */
 	public boolean has(final AnyObjectId objectId) throws IOException {
-		final ObjectReader or = newReader();
-		try {
+		try (final ObjectReader or = newReader()) {
 			return or.has(objectId);
-		} finally {
-			or.release();
 		}
 	}
 

@@ -1,0 +1,14 @@
+	static String getAgent(Set<String> options, String transportAgent) {
+		if (options == null || options.isEmpty()) {
+			return transportAgent;
+		}
+		for (String o : options) {
+			if (o.startsWith(OPTION_AGENT)
+					&& o.length() > OPTION_AGENT.length()
+					&& o.charAt(OPTION_AGENT.length()) == '=') {
+				return o.substring(OPTION_AGENT.length() + 1);
+			}
+		}
+		return transportAgent;
+	}
+

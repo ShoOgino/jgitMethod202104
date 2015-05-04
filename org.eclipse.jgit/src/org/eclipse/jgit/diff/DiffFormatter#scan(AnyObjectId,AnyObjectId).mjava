@@ -21,9 +21,10 @@
 			throws IOException {
 		assertHaveRepository();
 
-		RevWalk rw = new RevWalk(reader);
-		RevTree aTree = a != null ? rw.parseTree(a) : null;
-		RevTree bTree = b != null ? rw.parseTree(b) : null;
-		return scan(aTree, bTree);
+		try (RevWalk rw = new RevWalk(reader)) {
+			RevTree aTree = a != null ? rw.parseTree(a) : null;
+			RevTree bTree = b != null ? rw.parseTree(b) : null;
+			return scan(aTree, bTree);
+		}
 	}
 

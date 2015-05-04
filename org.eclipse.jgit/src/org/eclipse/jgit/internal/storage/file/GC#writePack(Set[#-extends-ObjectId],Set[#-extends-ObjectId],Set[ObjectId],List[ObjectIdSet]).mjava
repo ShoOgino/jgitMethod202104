@@ -18,8 +18,9 @@
 					}
 
 				});
-		PackWriter pw = new PackWriter((pconfig == null) ? new PackConfig(repo) : pconfig, repo.newObjectReader());
-		try {
+		try (PackWriter pw = new PackWriter(
+				(pconfig == null) ? new PackConfig(repo) : pconfig,
+				repo.newObjectReader())) {
 			// prepare the PackWriter
 			pw.setDeltaBaseAsOffset(true);
 			pw.setReuseDeltaCommits(false);
@@ -139,7 +140,6 @@
 			}
 			return repo.getObjectDatabase().openPack(realPack);
 		} finally {
-			pw.release();
 			if (tmpPack != null && tmpPack.exists())
 				tmpPack.delete();
 			for (File tmpExt : tmpExts.values()) {

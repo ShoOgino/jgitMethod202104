@@ -1,0 +1,15 @@
+	private void writeConflictMetadata(MergeChunk chunk) throws IOException {
+		if (lastConflictingName != null
+				&& chunk.getConflictState() != ConflictState.NEXT_CONFLICTING_RANGE) {
+			// found the end of an conflict
+			writeConflictEnd();
+		}
+		if (chunk.getConflictState() == ConflictState.FIRST_CONFLICTING_RANGE) {
+			// found the start of an conflict
+			writeConflictStart(chunk);
+		} else if (chunk.getConflictState() == ConflictState.NEXT_CONFLICTING_RANGE) {
+			// found another conflicting chunk
+			writeConflictChange(chunk);
+		}
+	}
+

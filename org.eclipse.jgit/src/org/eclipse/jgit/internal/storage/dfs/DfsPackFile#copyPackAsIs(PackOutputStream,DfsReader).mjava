@@ -1,0 +1,13 @@
+	void copyPackAsIs(PackOutputStream out, DfsReader ctx)
+			throws IOException {
+		// If the length hasn't been determined yet, pin to set it.
+		if (length == -1) {
+			ctx.pin(this, 0);
+			ctx.unpin();
+		}
+		if (cache.shouldCopyThroughCache(length))
+			copyPackThroughCache(out, ctx);
+		else
+			copyPackBypassCache(out, ctx);
+	}
+

@@ -4,16 +4,13 @@
 			throws TransportException {
 		verifyPrerequisites();
 		try {
-			ObjectInserter ins = transport.local.newObjectInserter();
-			try {
+			try (ObjectInserter ins = transport.local.newObjectInserter()) {
 				PackParser parser = ins.newPackParser(bin);
 				parser.setAllowThin(true);
 				parser.setObjectChecker(transport.getObjectChecker());
 				parser.setLockMessage(lockMessage);
 				packLock = parser.parse(NullProgressMonitor.INSTANCE);
 				ins.flush();
-			} finally {
-				ins.release();
 			}
 		} catch (IOException err) {
 			close();

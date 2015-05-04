@@ -1,3 +1,4 @@
+	@SuppressWarnings("null")
 	private void copyAsIs2(PackOutputStream out, LocalObjectToPack src,
 			boolean validate, WindowCursor curs) throws IOException,
 			StoredObjectRepresentationNotAvailableException {
@@ -137,7 +138,7 @@
 			// and we have it pinned.  Write this out without copying.
 			//
 			out.writeHeader(src, inflatedLength);
-			quickCopy.write(out, dataOffset, (int) dataLength, null);
+			quickCopy.write(out, dataOffset, (int) dataLength);
 
 		} else if (dataLength <= buf.length) {
 			// Tiny optimization: Lots of objects are very small deltas or

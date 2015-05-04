@@ -2,15 +2,12 @@
 		if (nonHeads.isEmpty())
 			return;
 
-		PackWriter pw = newPackWriter();
-		try {
+		try (PackWriter pw = newPackWriter()) {
 			for (PackWriter.ObjectIdSet packedObjs : newPackObj)
 				pw.excludeObjects(packedObjs);
 			pw.preparePack(pm, nonHeads, allHeads);
 			if (0 < pw.getObjectCount())
 				writePack(GC, pw, pm);
-		} finally {
-			pw.release();
 		}
 	}
 

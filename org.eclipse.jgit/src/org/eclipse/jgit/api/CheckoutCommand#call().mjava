@@ -25,16 +25,17 @@
 			}
 
 			if (createBranch) {
-				Git git = new Git(repo);
-				CreateBranchCommand command = git.branchCreate();
-				command.setName(name);
-				if (startCommit != null)
-					command.setStartPoint(startCommit);
-				else
-					command.setStartPoint(startPoint);
-				if (upstreamMode != null)
-					command.setUpstreamMode(upstreamMode);
-				command.call();
+				try (Git git = new Git(repo)) {
+					CreateBranchCommand command = git.branchCreate();
+					command.setName(name);
+					if (startCommit != null)
+						command.setStartPoint(startCommit);
+					else
+						command.setStartPoint(startPoint);
+					if (upstreamMode != null)
+						command.setUpstreamMode(upstreamMode);
+					command.call();
+				}
 			}
 
 			Ref headRef = repo.getRef(Constants.HEAD);
@@ -60,11 +61,14 @@
 							JGitText.get().refNotResolved, name));
 			}
 
-			RevWalk revWalk = new RevWalk(repo);
-			AnyObjectId headId = headRef.getObjectId();
-			RevCommit headCommit = headId == null ? null : revWalk
-					.parseCommit(headId);
-			RevCommit newCommit = revWalk.parseCommit(branch);
+			RevCommit headCommit = null;
+			RevCommit newCommit = null;
+			try (RevWalk revWalk = new RevWalk(repo)) {
+				AnyObjectId headId = headRef.getObjectId();
+				headCommit = headId == null ? null
+						: revWalk.parseCommit(headId);
+				newCommit = revWalk.parseCommit(branch);
+			}
 			RevTree headTree = headCommit == null ? null : headCommit.getTree();
 			DirCacheCheckout dco;
 			DirCache dc = repo.lockDirCache();

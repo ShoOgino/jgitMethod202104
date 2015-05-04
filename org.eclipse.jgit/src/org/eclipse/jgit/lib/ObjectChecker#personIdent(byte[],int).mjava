@@ -1,4 +1,7 @@
 	private int personIdent(final byte[] raw, int ptr) {
+		if (allowInvalidPersonIdent)
+			return nextLF(raw, ptr) - 1;
+
 		final int emailB = nextLF(raw, ptr, '<');
 		if (emailB == ptr || raw[emailB - 1] != '<')
 			return -1;

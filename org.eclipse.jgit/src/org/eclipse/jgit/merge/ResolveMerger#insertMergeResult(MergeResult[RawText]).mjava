@@ -1,12 +1,14 @@
 	private ObjectId insertMergeResult(MergeResult<RawText> result)
 			throws IOException {
-		TemporaryBuffer.LocalFile buf = new TemporaryBuffer.LocalFile(10 << 20);
+		TemporaryBuffer.LocalFile buf = new TemporaryBuffer.LocalFile(
+				db.getDirectory(), 10 << 20);
 		try {
 			new MergeFormatter().formatMerge(buf, result,
 					Arrays.asList(commitNames), CHARACTER_ENCODING);
 			buf.close();
-			return getObjectInserter().insert(OBJ_BLOB, buf.length(),
-					buf.openInputStream());
+			try (InputStream in = buf.openInputStream()) {
+				return getObjectInserter().insert(OBJ_BLOB, buf.length(), in);
+			}
 		} finally {
 			buf.destroy();
 		}
