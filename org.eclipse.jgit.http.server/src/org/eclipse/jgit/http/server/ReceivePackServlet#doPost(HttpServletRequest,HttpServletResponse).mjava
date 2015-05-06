@@ -28,6 +28,15 @@
 
 			rp.receive(getInputStream(req), out, null);
 			out.close();
+		} catch (CorruptObjectException e ) {
+			// This should be already reported to the client.
+			getServletContext().log(MessageFormat.format(
+					HttpServerText.get().receivedCorruptObject,
+					e.getMessage(),
+					ServletUtils.identify(rp.getRepository())));
+			consumeRequestBody(req);
+			out.close();
+
 		} catch (UnpackException e) {
 			// This should be already reported to the client.
 			log(rp.getRepository(), e.getCause());
