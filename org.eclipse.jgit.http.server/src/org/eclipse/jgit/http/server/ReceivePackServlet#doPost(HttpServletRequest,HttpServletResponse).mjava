@@ -30,14 +30,12 @@
 			out.close();
 		} catch (UnpackException e) {
 			// This should be already reported to the client.
-			getServletContext().log(
-					HttpServerText.get().internalErrorDuringReceivePack,
-					e.getCause());
+			log(rp.getRepository(), e.getCause());
 			consumeRequestBody(req);
 			out.close();
 
 		} catch (Throwable e) {
-			getServletContext().log(HttpServerText.get().internalErrorDuringReceivePack, e);
+			log(rp.getRepository(), e);
 			if (!rsp.isCommitted()) {
 				rsp.reset();
 				sendError(req, rsp, SC_INTERNAL_SERVER_ERROR);
