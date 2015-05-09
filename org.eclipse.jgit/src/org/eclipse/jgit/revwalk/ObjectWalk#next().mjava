@@ -4,8 +4,6 @@
 		for (;;) {
 			final RevCommit r = super.next();
 			if (r == null) {
-				if (firstCommit != null)
-					reader.walkAdviceBeginTrees(this, firstCommit, lastCommit);
 				return null;
 			}
 			if ((r.flags & UNINTERESTING) != 0) {
@@ -14,9 +12,6 @@
 					return r;
 				continue;
 			}
-			if (firstCommit == null)
-				firstCommit = r;
-			lastCommit = r;
 			pendingObjects.add(r.getTree());
 			return r;
 		}
