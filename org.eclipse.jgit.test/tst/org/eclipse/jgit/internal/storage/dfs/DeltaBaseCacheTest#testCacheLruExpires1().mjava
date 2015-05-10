@@ -1,0 +1,21 @@
+	@Test
+	public void testCacheLruExpires1() {
+		byte[] obj1 = put(1, SZ / 4);
+		put(2, SZ / 4);
+		byte[] obj3 = put(3, SZ / 4);
+		put(4, SZ / 4);
+		assertEquals(SZ, cache.getMemoryUsed());
+
+		get(obj3, 3);
+		get(obj1, 1);
+		put(5, SZ / 2);
+		assertEquals(SZ, cache.getMemoryUsed());
+		assertEquals(SZ, cache.getMemoryUsedByTableForTest());
+		assertEquals(SZ, cache.getMemoryUsedByLruChainForTest());
+		assertNull(cache.get(key, 4));
+		assertNull(cache.get(key, 2));
+
+		get(obj1, 1);
+		get(obj3, 3);
+	}
+

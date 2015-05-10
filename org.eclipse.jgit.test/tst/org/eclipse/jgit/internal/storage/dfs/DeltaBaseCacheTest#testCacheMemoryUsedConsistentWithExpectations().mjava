@@ -1,0 +1,14 @@
+	@Test
+	public void testCacheMemoryUsedConsistentWithExpectations() {
+		put(1, 32);
+		put(2, 32);
+		put(3, 32);
+
+		assertNotNull(cache.get(key, 1));
+		assertNotNull(cache.get(key, 1));
+
+		assertEquals(32 * 3, cache.getMemoryUsed());
+		assertEquals(32 * 3, cache.getMemoryUsedByTableForTest());
+		assertEquals(32 * 3, cache.getMemoryUsedByLruChainForTest());
+	}
+
