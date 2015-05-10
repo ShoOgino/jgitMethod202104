@@ -1,7 +1,7 @@
 	private void releaseMemory() {
 		while (curByteCount > maxByteCount && lruTail != null) {
-			Slot e = lruTail;
-			curByteCount -= e.size;
+			Entry e = lruTail;
+			curByteCount -= e.data.length;
 			lruRemove(e);
 			removeFromTable(e);
 		}
