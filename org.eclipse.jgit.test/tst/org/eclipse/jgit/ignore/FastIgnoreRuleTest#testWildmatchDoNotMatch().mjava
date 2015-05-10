@@ -1,14 +1,8 @@
-	@SuppressWarnings("boxing")
 	@Test
 	public void testWildmatchDoNotMatch() {
-		if (useOldRule)
-			System.err
-					.println("IgnoreRule can't understand wildmatch rules, skipping testWildmatchDoNotMatch!");
-
-		Boolean assume = useOldRule;
-		assertNotMatched("**/a/b", "a/c/b", assume);
-		assertNotMatched("!/**/*.zip", "c/a/b.zip", assume);
-		assertNotMatched("!**/*.zip", "c/a/b.zip", assume);
-		assertNotMatched("a/**/b", "a/c/bb", assume);
+		assertNotMatched("**/a/b", "a/c/b");
+		assertNotMatched("!/**/*.zip", "c/a/b.zip");
+		assertNotMatched("!**/*.zip", "c/a/b.zip");
+		assertNotMatched("a/**/b", "a/c/bb");
 	}
 
