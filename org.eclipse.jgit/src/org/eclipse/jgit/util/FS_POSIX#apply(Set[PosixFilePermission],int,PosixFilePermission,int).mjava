@@ -1,0 +1,11 @@
+	private static void apply(Set<PosixFilePermission> set,
+			int umask, PosixFilePermission perm, int test) {
+		if ((umask & test) == 0) {
+			// If bit is clear in umask, permission is allowed.
+			set.add(perm);
+		} else {
+			// If bit is set in umask, permission is denied.
+			set.remove(perm);
+		}
+	}
+

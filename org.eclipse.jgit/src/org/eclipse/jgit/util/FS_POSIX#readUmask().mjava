@@ -1,20 +1,22 @@
-	/**
-	 * @return umask returned from running umask command in a shell
-	 * @since 4.0
-	 */
-	protected static String readUmask() {
-		Process p;
+	/** @return mask returned from running {@code umask} command in shell. */
+	private static int readUmask() {
 		try {
-			p = Runtime.getRuntime().exec(
-					new String[] { "sh", "-c", "umask" }, null, null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			Process p = Runtime.getRuntime().exec(
+					new String[] { "sh", "-c", "umask" }, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					null, null);
 			try (BufferedReader lineRead = new BufferedReader(
 					new InputStreamReader(p.getInputStream(), Charset
 							.defaultCharset().name()))) {
-				p.waitFor();
-				return lineRead.readLine();
+				if (p.waitFor() == 0) {
+					String s = lineRead.readLine();
+					if (s.matches("0?\\d{3}")) { //$NON-NLS-1$
+						return Integer.parseInt(s, 8);
+					}
+				}
+				return DEFAULT_UMASK;
 			}
 		} catch (Exception e) {
-			return null;
+			return DEFAULT_UMASK;
 		}
 	}
 
