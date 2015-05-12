@@ -1,5 +1,13 @@
 	public AppServer() {
-		connector = new SelectChannelConnector();
+		server = new Server();
+
+		HttpConfiguration http_config = new HttpConfiguration();
+		http_config.setSecureScheme("https");
+		http_config.setSecurePort(8443);
+		http_config.setOutputBufferSize(32768);
+
+		connector = new ServerConnector(server,
+				new HttpConnectionFactory(http_config));
 		connector.setPort(0);
 		try {
 			final InetAddress me = InetAddress.getByName("localhost");
@@ -13,7 +21,6 @@
 		log = new TestRequestLog();
 		log.setHandler(contexts);
 
-		server = new Server();
 		server.setConnectors(new Connector[] { connector });
 		server.setHandler(log);
 	}
