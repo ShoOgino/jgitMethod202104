@@ -6,13 +6,19 @@
 			if (r == null) {
 				return null;
 			}
+			final RevTree t = r.getTree();
 			if ((r.flags & UNINTERESTING) != 0) {
-				markTreeUninteresting(r.getTree());
-				if (boundary)
+				if (objectFilter.include(this, t)) {
+					markTreeUninteresting(t);
+				}
+				if (boundary) {
 					return r;
+				}
 				continue;
 			}
-			pendingObjects.add(r.getTree());
+			if (objectFilter.include(this, t)) {
+				pendingObjects.add(t);
+			}
 			return r;
 		}
 	}

@@ -25,6 +25,10 @@
 				idBuffer.fromRaw(buf, ptr);
 				ptr += ID_SZ;
 
+				if (!objectFilter.include(this, idBuffer)) {
+					continue;
+				}
+
 				RevObject obj = objects.get(idBuffer);
 				if (obj != null && (obj.flags & SEEN) != 0)
 					continue;
