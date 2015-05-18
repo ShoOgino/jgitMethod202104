@@ -1,0 +1,55 @@
+	/**
+	 * Setup a http server using {@link GitServlet}. Tests should be able to
+	 * configure the maximum pack file size, the object checker and custom hooks
+	 * just before they talk to the server.
+	 */
+	@Before
+	public void setUp() throws Exception {
+		super.setUp();
+
+		final TestRepository<Repository> srv = createTestRepository();
+		final String repoName = srv.getRepository().getDirectory().getName();
+
+		ServletContextHandler app = server.addContext("/git");
+		gs = new GitServlet();
+		gs.setRepositoryResolver(new RepositoryResolver<HttpServletRequest>() {
+			public Repository open(HttpServletRequest req, String name)
+					throws RepositoryNotFoundException,
+					ServiceNotEnabledException {
+				if (!name.equals(repoName))
+					throw new RepositoryNotFoundException(name);
+
+				final Repository db = srv.getRepository();
+				db.incrementOpen();
+				return db;
+			}
+		});
+		gs.setReceivePackFactory(new DefaultReceivePackFactory() {
+			public ReceivePack create(HttpServletRequest req, Repository db)
+					throws ServiceNotEnabledException,
+					ServiceNotAuthorizedException {
+				ReceivePack recv = super.create(req, db);
+				if (maxPackSize > 0)
+					recv.setMaxPackSizeLimit(maxPackSize);
+				if (postHook != null)
+					recv.setPostReceiveHook(postHook);
+				if (preHook != null)
+					recv.setPreReceiveHook(preHook);
+				if (oc != null)
+					recv.setObjectChecker(oc);
+				return recv;
+			}
+
+		});
+		app.addServlet(new ServletHolder(gs), "/*");
+
+		server.setUp();
+
+		srvRepo = srv.getRepository();
+		srvURI = toURIish(app, repoName);
+
+		StoredConfig cfg = srvRepo.getConfig();
+		cfg.setBoolean("http", null, "receivepack", true);
+		cfg.save();
+	}
+
