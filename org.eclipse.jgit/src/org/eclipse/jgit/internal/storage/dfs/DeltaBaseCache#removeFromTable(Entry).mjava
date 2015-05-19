@@ -1,0 +1,21 @@
+	private void removeFromTable(Entry e) {
+		int tableIdx = hash(e.offset);
+		Entry p = table[tableIdx];
+
+		if (p == e) {
+			table[tableIdx] = e.tableNext;
+			return;
+		}
+
+		for (; p != null; p = p.tableNext) {
+			if (p.tableNext == e) {
+				p.tableNext = e.tableNext;
+				return;
+			}
+		}
+
+		throw new IllegalStateException(String.format(
+				"entry for %s:%d not in table", //$NON-NLS-1$
+				e.pack, Long.valueOf(e.offset)));
+	}
+

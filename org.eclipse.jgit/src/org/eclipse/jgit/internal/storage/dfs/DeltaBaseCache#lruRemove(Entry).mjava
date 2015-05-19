@@ -1,0 +1,17 @@
+	private void lruRemove(Entry e) {
+		Entry p = e.lruPrev;
+		Entry n = e.lruNext;
+
+		if (p != null) {
+			p.lruNext = n;
+		} else {
+			lruHead = n;
+		}
+
+		if (n != null) {
+			n.lruPrev = p;
+		} else {
+			lruTail = p;
+		}
+	}
+

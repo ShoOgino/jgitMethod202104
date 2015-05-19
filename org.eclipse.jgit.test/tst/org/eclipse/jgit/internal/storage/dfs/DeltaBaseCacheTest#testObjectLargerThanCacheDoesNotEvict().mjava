@@ -1,0 +1,8 @@
+	@Test
+	public void testObjectLargerThanCacheDoesNotEvict() {
+		byte[] obj12 = put(12, 32);
+		put(24, SZ + 5);
+		assertNull("does not store large object", cache.get(key, 24));
+		get(obj12, 12);
+	}
+

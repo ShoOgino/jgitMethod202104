@@ -6,10 +6,9 @@
 		releaseMemory();
 
 		int tableIdx = hash(offset);
-		Slot e = new Slot(key, offset, data.length);
-		e.data = new SoftReference<Entry>(new Entry(data, objectType));
+		Entry e = new Entry(key, offset, objectType, data);
 		e.tableNext = table[tableIdx];
 		table[tableIdx] = e;
-		moveToHead(e);
+		lruPushHead(e);
 	}
 

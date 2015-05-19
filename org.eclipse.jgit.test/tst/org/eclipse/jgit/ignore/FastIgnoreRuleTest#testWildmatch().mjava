@@ -1,40 +1,34 @@
-	@SuppressWarnings("boxing")
 	@Test
 	public void testWildmatch() {
-		if (useOldRule)
-			System.err
-					.println("IgnoreRule can't understand wildmatch rules, skipping testWildmatch!");
+		assertMatched("**/a/b", "a/b");
+		assertMatched("**/a/b", "c/a/b");
+		assertMatched("**/a/b", "c/d/a/b");
+		assertMatched("**/**/a/b", "c/d/a/b");
 
-		Boolean assume = useOldRule;
-		assertMatched("**/a/b", "a/b", assume);
-		assertMatched("**/a/b", "c/a/b", assume);
-		assertMatched("**/a/b", "c/d/a/b", assume);
-		assertMatched("**/**/a/b", "c/d/a/b", assume);
+		assertMatched("/**/a/b", "a/b");
+		assertMatched("/**/a/b", "c/a/b");
+		assertMatched("/**/a/b", "c/d/a/b");
+		assertMatched("/**/**/a/b", "c/d/a/b");
 
-		assertMatched("/**/a/b", "a/b", assume);
-		assertMatched("/**/a/b", "c/a/b", assume);
-		assertMatched("/**/a/b", "c/d/a/b", assume);
-		assertMatched("/**/**/a/b", "c/d/a/b", assume);
+		assertMatched("a/b/**", "a/b");
+		assertMatched("a/b/**", "a/b/c");
+		assertMatched("a/b/**", "a/b/c/d/");
+		assertMatched("a/b/**/**", "a/b/c/d");
 
-		assertMatched("a/b/**", "a/b", assume);
-		assertMatched("a/b/**", "a/b/c", assume);
-		assertMatched("a/b/**", "a/b/c/d/", assume);
-		assertMatched("a/b/**/**", "a/b/c/d", assume);
+		assertMatched("**/a/**/b", "c/d/a/b");
+		assertMatched("**/a/**/b", "c/d/a/e/b");
+		assertMatched("**/**/a/**/**/b", "c/d/a/e/b");
 
-		assertMatched("**/a/**/b", "c/d/a/b", assume);
-		assertMatched("**/a/**/b", "c/d/a/e/b", assume);
-		assertMatched("**/**/a/**/**/b", "c/d/a/e/b", assume);
+		assertMatched("/**/a/**/b", "c/d/a/b");
+		assertMatched("/**/a/**/b", "c/d/a/e/b");
+		assertMatched("/**/**/a/**/**/b", "c/d/a/e/b");
 
-		assertMatched("/**/a/**/b", "c/d/a/b", assume);
-		assertMatched("/**/a/**/b", "c/d/a/e/b", assume);
-		assertMatched("/**/**/a/**/**/b", "c/d/a/e/b", assume);
+		assertMatched("a/**/b", "a/b");
+		assertMatched("a/**/b", "a/c/b");
+		assertMatched("a/**/b", "a/c/d/b");
+		assertMatched("a/**/**/b", "a/c/d/b");
 
-		assertMatched("a/**/b", "a/b", assume);
-		assertMatched("a/**/b", "a/c/b", assume);
-		assertMatched("a/**/b", "a/c/d/b", assume);
-		assertMatched("a/**/**/b", "a/c/d/b", assume);
-
-		assertMatched("a/**/b/**/c", "a/c/b/d/c", assume);
-		assertMatched("a/**/**/b/**/**/c", "a/c/b/d/c", assume);
+		assertMatched("a/**/b/**/c", "a/c/b/d/c");
+		assertMatched("a/**/**/b/**/**/c", "a/c/b/d/c");
 	}
 

@@ -5,7 +5,6 @@
 			for (;;) {
 				final RevCommit c = pending.next();
 				if (c == null) {
-					walker.reader.walkAdviceEnd();
 					return null;
 				}
 
@@ -54,7 +53,6 @@
 					c.disposeBody();
 			}
 		} catch (StopWalkException swe) {
-			walker.reader.walkAdviceEnd();
 			pending.clear();
 			return null;
 		}
