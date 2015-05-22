@@ -1,0 +1,42 @@
+	/**
+	 * @param includedReader
+	 * @param filename
+	 * @param defaultBranch
+	 * @param baseUrl
+	 * @param groups
+	 * @param rootRepo
+	 */
+	public ManifestParser(IncludedFileReader includedReader, String filename,
+			String defaultBranch, String baseUrl, String groups,
+			Repository rootRepo) {
+		this.includedReader = includedReader;
+		this.filename = filename;
+		this.defaultBranch = defaultBranch;
+		this.rootRepo = rootRepo;
+
+		// Strip trailing /s to match repo behavior.
+		int lastIndex = baseUrl.length() - 1;
+		while (lastIndex >= 0 && baseUrl.charAt(lastIndex) == '/')
+			lastIndex--;
+		this.baseUrl = baseUrl.substring(0, lastIndex + 1);
+
+		plusGroups = new HashSet<String>();
+		minusGroups = new HashSet<String>();
+		if (groups == null || groups.length() == 0
+				|| groups.equals("default")) { //$NON-NLS-1$
+			// default means "all,-notdefault"
+			minusGroups.add("notdefault"); //$NON-NLS-1$
+		} else {
+			for (String group : groups.split(",")) { //$NON-NLS-1$
+				if (group.startsWith("-")) //$NON-NLS-1$
+					minusGroups.add(group.substring(1));
+				else
+					plusGroups.add(group);
+			}
+		}
+
+		remotes = new HashMap<String, String>();
+		projects = new ArrayList<RepoProject>();
+		filteredProjects = new ArrayList<RepoProject>();
+	}
+

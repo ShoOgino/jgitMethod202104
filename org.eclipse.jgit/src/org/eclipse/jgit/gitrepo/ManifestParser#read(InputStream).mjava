@@ -1,0 +1,24 @@
+	/**
+	 * Read the xml file.
+	 *
+	 * @param inputStream
+	 */
+	public void read(InputStream inputStream) throws IOException {
+		xmlInRead++;
+		final XMLReader xr;
+		try {
+			xr = XMLReaderFactory.createXMLReader();
+		} catch (SAXException e) {
+			throw new IOException(JGitText.get().noXMLParserAvailable);
+		}
+		xr.setContentHandler(this);
+		try {
+			xr.parse(new InputSource(inputStream));
+		} catch (SAXException e) {
+			IOException error = new IOException(
+						RepoText.get().errorParsingManifestFile);
+			error.initCause(e);
+			throw error;
+		}
+	}
+
