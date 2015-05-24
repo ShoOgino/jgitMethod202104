@@ -1,7 +1,10 @@
 	private String resolveReflogCheckout(int checkoutNo)
 			throws IOException {
-		List<ReflogEntry> reflogEntries = getReflogReader(Constants.HEAD)
-				.getReverseEntries();
+		ReflogReader reader = getReflogReader(Constants.HEAD);
+		if (reader == null) {
+			return null;
+		}
+		List<ReflogEntry> reflogEntries = reader.getReverseEntries();
 		for (ReflogEntry entry : reflogEntries) {
 			CheckoutEntry checkout = entry.parseCheckout();
 			if (checkout != null)
