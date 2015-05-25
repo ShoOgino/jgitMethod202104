@@ -1,4 +1,24 @@
-	int score(SimilarityIndex dst, int maxScore) {
+	/**
+	 * Compute the similarity score between this index and another.
+	 * <p>
+	 * A region of a file is defined as a line in a text file or a fixed-size
+	 * block in a binary file. To prepare an index, each region in the file is
+	 * hashed; the values and counts of hashes are retained in a sorted table.
+	 * Define the similarity fraction F as the the count of matching regions
+	 * between the two files divided between the maximum count of regions in
+	 * either file. The similarity score is F multiplied by the maxScore
+	 * constant, yielding a range [0, maxScore]. It is defined as maxScore for
+	 * the degenerate case of two empty files.
+	 * <p>
+	 * The similarity score is symmetrical; i.e. a.score(b) == b.score(a).
+	 *
+	 * @param dst
+	 *            the other index
+	 * @param maxScore
+	 *            the score representing a 100% match
+	 * @return the similarity score
+	 */
+	public int score(SimilarityIndex dst, int maxScore) {
 		long max = Math.max(hashedCnt, dst.hashedCnt);
 		if (max == 0)
 			return maxScore;

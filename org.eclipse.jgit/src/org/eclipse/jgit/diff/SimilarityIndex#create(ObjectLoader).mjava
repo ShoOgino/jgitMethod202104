@@ -1,0 +1,20 @@
+	/**
+	 * Create a new similarity index for the given object
+	 *
+	 * @param obj
+	 *            the object to hash
+	 * @return similarity index for this object
+	 * @throws IOException
+	 *             file contents cannot be read from the repository.
+	 * @throws TableFullException
+	 *             object hashing overflowed the storage capacity of the
+	 *             SimilarityIndex.
+	 */
+	public static SimilarityIndex create(ObjectLoader obj) throws IOException,
+			TableFullException {
+		SimilarityIndex idx = new SimilarityIndex();
+		idx.hash(obj);
+		idx.sort();
+		return idx;
+	}
+
