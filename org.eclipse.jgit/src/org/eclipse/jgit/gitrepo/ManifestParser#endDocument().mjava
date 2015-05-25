@@ -13,7 +13,7 @@
 			throw new SAXException(e);
 		}
 		for (RepoProject proj : projects) {
-			String remote = proj.remote;
+			String remote = proj.getRemote();
 			if (remote == null) {
 				if (defaultRemote == null) {
 					if (filename != null)
@@ -33,7 +33,7 @@
 					remoteUrl = remoteUrl + "/"; //$NON-NLS-1$
 				remoteUrls.put(remote, remoteUrl);
 			}
-			proj.setUrl(remoteUrl + proj.name)
+			proj.setUrl(remoteUrl + proj.getName())
 					.setDefaultRevision(defaultRevision);
 		}
 
