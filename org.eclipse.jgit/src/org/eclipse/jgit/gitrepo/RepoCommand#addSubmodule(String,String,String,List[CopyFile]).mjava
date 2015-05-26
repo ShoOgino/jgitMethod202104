@@ -1,7 +1,7 @@
 	private void addSubmodule(String url, String name, String revision,
-			List<CopyFile> copyfiles) throws SAXException {
+			List<CopyFile> copyfiles) throws GitAPIException, IOException {
 		if (repo.isBare()) {
-			Project proj = new Project(url, name, revision, null, null);
+			RepoProject proj = new RepoProject(url, name, revision, null, null);
 			proj.copyfiles.addAll(copyfiles);
 			bareProjects.add(proj);
 		} else {
@@ -12,22 +12,18 @@
 			if (monitor != null)
 				add.setProgressMonitor(monitor);
 
-			try {
-				Repository subRepo = add.call();
-				if (revision != null) {
-					Git sub = new Git(subRepo);
-					sub.checkout().setName(findRef(revision, subRepo)).call();
-					subRepo.close();
-					git.add().addFilepattern(name).call();
+			Repository subRepo = add.call();
+			if (revision != null) {
+				try (Git sub = new Git(subRepo)) {
+					sub.checkout().setName(findRef(revision, subRepo))
+							.call();
 				}
-				for (CopyFile copyfile : copyfiles) {
-					copyfile.copy();
-					git.add().addFilepattern(copyfile.dest).call();
-				}
-			} catch (GitAPIException e) {
-				throw new SAXException(e);
-			} catch (IOException e) {
-				throw new SAXException(e);
+				subRepo.close();
+				git.add().addFilepattern(name).call();
+			}
+			for (CopyFile copyfile : copyfiles) {
+				copyfile.copy();
+				git.add().addFilepattern(copyfile.dest).call();
 			}
 		}
 	}

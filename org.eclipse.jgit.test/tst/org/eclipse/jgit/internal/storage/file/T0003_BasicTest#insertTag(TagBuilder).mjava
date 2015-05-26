@@ -1,12 +1,9 @@
 	private ObjectId insertTag(final TagBuilder tag) throws IOException,
 			UnsupportedEncodingException {
-		ObjectInserter oi = db.newObjectInserter();
-		try {
+		try (ObjectInserter oi = db.newObjectInserter()) {
 			ObjectId id = oi.insert(tag);
 			oi.flush();
 			return id;
-		} finally {
-			oi.release();
 		}
 	}
 

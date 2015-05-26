@@ -18,11 +18,11 @@
 		// within the pack has been modified.
 		//
 		final RevObject o2 = writeBlob(eden, "o2");
-		final PackWriter pw = new PackWriter(eden);
-		pw.addObject(o2);
-		pw.addObject(o1);
-		write(out1, pw);
-		pw.release();
+		try (PackWriter pw = new PackWriter(eden)) {
+			pw.addObject(o2);
+			pw.addObject(o1);
+			write(out1, pw);
+		}
 
 		// Try the old name, then the new name. The old name should cause the
 		// pack to reload when it opens and the index and pack mismatch.

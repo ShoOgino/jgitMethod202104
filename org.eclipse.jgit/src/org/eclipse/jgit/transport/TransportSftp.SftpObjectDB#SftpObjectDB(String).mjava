@@ -12,8 +12,9 @@
 				close();
 				throw err;
 			} catch (SftpException je) {
-				throw new TransportException("Can't enter " + path + "/objects"
-						+ ": " + je.getMessage(), je); //$NON-NLS-1$
+				throw new TransportException(MessageFormat.format(
+						JGitText.get().cannotEnterObjectsPath, path,
+						je.getMessage()), je);
 			}
 		}
 

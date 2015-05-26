@@ -7,14 +7,18 @@
 				length = fd.length();
 				onOpenPack();
 			}
+		} catch (InterruptedIOException e) {
+			// don't invalidate the pack, we are interrupted from another thread
+			openFail(false);
+			throw e;
 		} catch (IOException ioe) {
-			openFail();
+			openFail(true);
 			throw ioe;
 		} catch (RuntimeException re) {
-			openFail();
+			openFail(true);
 			throw re;
 		} catch (Error re) {
-			openFail();
+			openFail(true);
 			throw re;
 		}
 	}

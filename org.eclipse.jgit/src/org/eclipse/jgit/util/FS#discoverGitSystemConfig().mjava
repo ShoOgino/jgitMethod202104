@@ -1,0 +1,26 @@
+	/**
+	 * @return the path to the system-wide Git configuration file or
+	 *         {@code null} if it cannot be determined.
+	 * @since 4.0
+	 */
+	protected File discoverGitSystemConfig() {
+		File gitExe = discoverGitExe();
+		if (gitExe == null) {
+			return null;
+		}
+
+		// Trick Git into printing the path to the config file by using "echo"
+		// as the editor.
+		Map<String, String> env = new HashMap<>();
+		env.put("GIT_EDITOR", "echo"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		String w = readPipe(gitExe.getParentFile(),
+				new String[] { "git", "config", "--system", "--edit" }, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				Charset.defaultCharset().name(), env);
+		if (StringUtils.isEmptyOrNull(w)) {
+			return null;
+		}
+
+		return new File(w);
+	}
+

@@ -7,7 +7,7 @@
 					// The newly created pack is registered in the cache.
 					return ctx.open(id, type).openStream();
 				} finally {
-					ctx.release();
+					ctx.close();
 				}
 			}
 
@@ -18,7 +18,7 @@
 							new ReadBackStream(pos), inf, bufsz), bufsz)) {
 				@Override
 				public void close() throws IOException {
-					ctx.release();
+					ctx.close();
 					super.close();
 				}
 			};

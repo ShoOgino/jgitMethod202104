@@ -5,13 +5,16 @@
 			if (c == 0)
 				return ptr;
 			if (c == '/')
-				throw new CorruptObjectException("name contains '/'");
+				throw new CorruptObjectException(
+						JGitText.get().corruptObjectNameContainsSlash);
 			if (windows && isInvalidOnWindows(c)) {
 				if (c > 31)
 					throw new CorruptObjectException(String.format(
-							"name contains '%c'", c));
+							JGitText.get().corruptObjectNameContainsChar,
+							Byte.valueOf(c)));
 				throw new CorruptObjectException(String.format(
-						"name contains byte 0x%x", c & 0xff));
+						JGitText.get().corruptObjectNameContainsByte,
+						Integer.valueOf(c & 0xff)));
 			}
 		}
 		return ptr;

@@ -14,14 +14,9 @@
 		 */
 		protected byte[] readFileFromRepo(Repository repo,
 				String ref, String path) throws GitAPIException, IOException {
-			ObjectReader reader = repo.newObjectReader();
-			byte[] result;
-			try {
+			try (ObjectReader reader = repo.newObjectReader()) {
 				ObjectId oid = repo.resolve(ref + ":" + path); //$NON-NLS-1$
-				result = reader.open(oid).getBytes(Integer.MAX_VALUE);
-			} finally {
-				reader.release();
+				return reader.open(oid).getBytes(Integer.MAX_VALUE);
 			}
-			return result;
 		}
 

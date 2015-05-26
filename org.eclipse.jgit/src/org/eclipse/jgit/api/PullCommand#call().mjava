@@ -102,7 +102,7 @@
 			fetchRes = fetch.call();
 		} else {
 			// we can skip the fetch altogether
-			remoteUri = "local repository";
+			remoteUri = JGitText.get().localRepository;
 			fetchRes = null;
 		}
 
@@ -143,9 +143,9 @@
 			}
 		}
 
-		String upstreamName = "branch \'"
-				+ Repository.shortenRefName(remoteBranchName) + "\' of "
-				+ remoteUri;
+		String upstreamName = MessageFormat.format(
+				JGitText.get().upstreamBranchName,
+				Repository.shortenRefName(remoteBranchName), remoteUri);
 
 		PullResult result;
 		if (pullRebaseMode.rebase) {

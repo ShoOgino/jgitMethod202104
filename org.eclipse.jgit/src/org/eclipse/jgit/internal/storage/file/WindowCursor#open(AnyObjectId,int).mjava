@@ -4,7 +4,8 @@
 		final ObjectLoader ldr = db.openObject(this, objectId);
 		if (ldr == null) {
 			if (typeHint == OBJ_ANY)
-				throw new MissingObjectException(objectId.copy(), "unknown");
+				throw new MissingObjectException(objectId.copy(),
+						JGitText.get().unknownObjectType2);
 			throw new MissingObjectException(objectId.copy(), typeHint);
 		}
 		if (typeHint != OBJ_ANY && ldr.getType() != typeHint)

@@ -18,7 +18,7 @@
 			}
 
 			if (repo.isBare()) {
-				bareProjects = new ArrayList<Project>();
+				bareProjects = new ArrayList<RepoProject>();
 				if (author == null)
 					author = new PersonIdent(repo);
 				if (callback == null)
@@ -26,11 +26,17 @@
 			} else
 				git = new Git(repo);
 
-			XmlManifest manifest = new XmlManifest(
-					this, includedReader, path, uri, groups);
+			ManifestParser parser = new ManifestParser(
+					includedReader, path, branch, uri, groups, repo);
 			try {
-				manifest.read(inputStream);
-			} catch (IOException e) {
+				parser.read(inputStream);
+				for (RepoProject proj : parser.getFilteredProjects()) {
+					addSubmodule(proj.url,
+							proj.path,
+							proj.getRevision(),
+							proj.copyfiles);
+				}
+			} catch (GitAPIException | IOException e) {
 				throw new ManifestErrorException(e);
 			}
 		} finally {
@@ -46,10 +52,9 @@
 			DirCache index = DirCache.newInCore();
 			DirCacheBuilder builder = index.builder();
 			ObjectInserter inserter = repo.newObjectInserter();
-			RevWalk rw = new RevWalk(repo);
-			try {
+			try (RevWalk rw = new RevWalk(repo)) {
 				Config cfg = new Config();
-				for (Project proj : bareProjects) {
+				for (RepoProject proj : bareProjects) {
 					String name = proj.path;
 					String nameUri = proj.name;
 					cfg.setString("submodule", name, "path", name); //$NON-NLS-1$ //$NON-NLS-2$
@@ -129,8 +134,6 @@
 				return rw.parseCommit(commitId);
 			} catch (IOException e) {
 				throw new ManifestErrorException(e);
-			} finally {
-				rw.release();
 			}
 		} else {
 			return git

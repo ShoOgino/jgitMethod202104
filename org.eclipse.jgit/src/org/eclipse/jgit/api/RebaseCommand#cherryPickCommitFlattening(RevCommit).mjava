@@ -12,21 +12,23 @@
 			// here we should skip this step in order to avoid
 			// confusing pseudo-changed
 			String ourCommitName = getOurCommitName();
-			CherryPickResult cherryPickResult = new Git(repo).cherryPick()
+			try (Git git = new Git(repo)) {
+				CherryPickResult cherryPickResult = git.cherryPick()
 					.include(commitToPick).setOurCommitName(ourCommitName)
 					.setReflogPrefix(REFLOG_PREFIX).setStrategy(strategy)
 					.call();
-			switch (cherryPickResult.getStatus()) {
-			case FAILED:
-				if (operation == Operation.BEGIN)
-					return abort(RebaseResult.failed(cherryPickResult
-							.getFailingPaths()));
-				else
+				switch (cherryPickResult.getStatus()) {
+				case FAILED:
+					if (operation == Operation.BEGIN)
+						return abort(RebaseResult
+								.failed(cherryPickResult.getFailingPaths()));
+					else
+						return stop(commitToPick, Status.STOPPED);
+				case CONFLICTING:
 					return stop(commitToPick, Status.STOPPED);
-			case CONFLICTING:
-				return stop(commitToPick, Status.STOPPED);
-			case OK:
-				newHead = cherryPickResult.getNewHead();
+				case OK:
+					newHead = cherryPickResult.getNewHead();
+				}
 			}
 		}
 		return null;

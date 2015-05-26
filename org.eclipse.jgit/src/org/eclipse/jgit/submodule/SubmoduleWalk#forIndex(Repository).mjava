@@ -15,7 +15,7 @@
 			DirCache index = repository.readDirCache();
 			generator.setTree(new DirCacheIterator(index));
 		} catch (IOException e) {
-			generator.release();
+			generator.close();
 			throw e;
 		}
 		return generator;

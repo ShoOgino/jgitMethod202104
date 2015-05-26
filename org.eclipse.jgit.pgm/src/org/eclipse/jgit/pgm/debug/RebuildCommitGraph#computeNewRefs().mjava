@@ -1,9 +1,9 @@
 	private Map<String, Ref> computeNewRefs() throws IOException {
-		final RevWalk rw = new RevWalk(db);
 		final Map<String, Ref> refs = new HashMap<String, Ref>();
-		final BufferedReader br = new BufferedReader(new InputStreamReader(
-				new FileInputStream(refList), Constants.CHARSET));
-		try {
+		try (RevWalk rw = new RevWalk(db);
+				BufferedReader br = new BufferedReader(
+						new InputStreamReader(new FileInputStream(refList),
+								Constants.CHARSET))) {
 			String line;
 			while ((line = br.readLine()) != null) {
 				final String[] parts = line.split("[ \t]{1,}"); //$NON-NLS-1$
@@ -26,9 +26,6 @@
 				refs.put(name, new ObjectIdRef.Unpeeled(Ref.Storage.PACKED,
 						name, id));
 			}
-		} finally {
-			rw.release();
-			br.close();
 		}
 		return refs;
 	}

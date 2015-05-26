@@ -1,0 +1,12 @@
+	/**
+	 * @return the currently used path to the system-wide Git configuration
+	 *         file or {@code null} if none has been set.
+	 * @since 4.0
+	 */
+	public File getGitSystemConfig() {
+		if (gitSystemConfig == null) {
+			gitSystemConfig = new Holder<File>(discoverGitSystemConfig());
+		}
+		return gitSystemConfig.value;
+	}
+

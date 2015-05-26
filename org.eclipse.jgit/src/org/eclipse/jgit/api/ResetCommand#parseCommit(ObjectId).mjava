@@ -1,14 +1,9 @@
 	private RevCommit parseCommit(final ObjectId commitId) {
-		RevCommit commit;
-		RevWalk rw = new RevWalk(repo);
-		try {
-			commit = rw.parseCommit(commitId);
+		try (RevWalk rw = new RevWalk(repo)) {
+			return rw.parseCommit(commitId);
 		} catch (IOException e) {
 			throw new JGitInternalException(MessageFormat.format(
 					JGitText.get().cannotReadCommit, commitId.toString()), e);
-		} finally {
-			rw.release();
 		}
-		return commit;
 	}
 

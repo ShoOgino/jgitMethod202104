@@ -11,8 +11,7 @@
 	 */
 	private boolean isModifiedSubtree_IndexTree(String path, ObjectId tree)
 			throws CorruptObjectException, IOException {
-		NameConflictTreeWalk tw = new NameConflictTreeWalk(repo);
-		try {
+		try (NameConflictTreeWalk tw = new NameConflictTreeWalk(repo)) {
 			tw.addTree(new DirCacheIterator(dc));
 			tw.addTree(tree);
 			tw.setRecursive(true);
@@ -30,8 +29,6 @@
 					return true;
 			}
 			return false;
-		} finally {
-			tw.release();
 		}
 	}
 

@@ -14,6 +14,9 @@
 							packFile.getPath()));
 				}
 				loadedIdx = idx;
+			} catch (InterruptedIOException e) {
+				// don't invalidate the pack, we are interrupted from another thread
+				throw e;
 			} catch (IOException e) {
 				invalid = true;
 				throw e;

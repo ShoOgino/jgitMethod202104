@@ -11,8 +11,7 @@
 	 */
 	public String simplify(final String revstr)
 			throws AmbiguousObjectException, IOException {
-		RevWalk rw = new RevWalk(this);
-		try {
+		try (RevWalk rw = new RevWalk(this)) {
 			Object resolved = resolve(rw, revstr);
 			if (resolved != null)
 				if (resolved instanceof String)
@@ -20,8 +19,6 @@
 				else
 					return ((AnyObjectId) resolved).getName();
 			return null;
-		} finally {
-			rw.release();
 		}
 	}
 

@@ -11,12 +11,14 @@
 			} catch (FileNotFoundException noRef) {
 				return null;
 			} catch (IOException err) {
-				throw new TransportException("Cannot read " + objectsPath + "/" //$NON-NLS-2$
-						+ path + ": " + err.getMessage(), err); //$NON-NLS-1$
+				throw new TransportException(MessageFormat.format(
+						JGitText.get().cannotReadObjectsPath, objectsPath, path,
+						err.getMessage()), err);
 			}
 
 			if (line == null)
-				throw new TransportException("Empty ref: " + name);
+				throw new TransportException(
+						MessageFormat.format(JGitText.get().emptyRef, name));
 
 			if (line.startsWith("ref: ")) { //$NON-NLS-1$
 				final String target = line.substring("ref: ".length()); //$NON-NLS-1$
@@ -37,6 +39,7 @@
 				return r;
 			}
 
-			throw new TransportException("Bad ref: " + name + ": " + line); //$NON-NLS-2$
+			throw new TransportException(
+					MessageFormat.format(JGitText.get().badRef, name, line));
 		}
 

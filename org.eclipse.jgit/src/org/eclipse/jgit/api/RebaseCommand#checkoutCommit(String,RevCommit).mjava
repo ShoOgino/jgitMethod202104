@@ -26,10 +26,11 @@
 			case FORCED:
 				break;
 			default:
-				throw new IOException("Could not rewind to upstream commit");
+				throw new IOException(
+						JGitText.get().couldNotRewindToUpstreamCommit);
 			}
 		} finally {
-			walk.release();
+			walk.close();
 			monitor.endTask();
 		}
 		return true;

@@ -13,7 +13,7 @@
 		Collection<ObjectId> ids = or.resolve(step.getCommit());
 		if (ids.size() != 1)
 			throw new JGitInternalException(
-					"Could not resolve uniquely the abbreviated object ID");
+					JGitText.get().cannotResolveUniquelyAbbrevObjectId);
 		RevCommit commitToPick = walk.parseCommit(ids.iterator().next());
 		if (shouldPick) {
 			if (monitor.isCancelled())
