@@ -14,7 +14,7 @@
 		git.add().addFilepattern("b").call();
 		git.commit().setMessage("add subdir").call();
 
-		final byte[] result = CLIGitCommand.rawExecute( //
+		byte[] result = CLIGitCommand.rawExecute(
 				"git archive --format=tar master", db);
 		String[] expect = { "a", "b.c", "b0c", "b/", "b/a", "b/b", "c" };
 		String[] actual = listTarEntries(result);

@@ -1,6 +1,6 @@
-	private static String[] zipEntryContent(byte[] zipData, String path) //
+	private static String[] zipEntryContent(byte[] zipData, String path)
 			throws IOException {
-		final ZipInputStream in = new ZipInputStream( //
+		ZipInputStream in = new ZipInputStream(
 				new ByteArrayInputStream(zipData));
 		ZipEntry e;
 		while ((e = in.getNextEntry()) != null) {
@@ -8,8 +8,8 @@
 				continue;
 
 			// found!
-			final List<String> l = new ArrayList<String>();
-			final BufferedReader reader = new BufferedReader( //
+			List<String> l = new ArrayList<String>();
+			BufferedReader reader = new BufferedReader(
 					new InputStreamReader(in, "UTF-8"));
 			String line;
 			while ((line = reader.readLine()) != null)

@@ -1,10 +1,10 @@
-	private String[] tarEntryContent(byte[] tarData, String path) //
+	private String[] tarEntryContent(byte[] tarData, String path)
 			throws Exception {
-		final List<String> l = new ArrayList<String>();
-		final Process proc = spawnAssumingCommandPresent("tar", "Oxf", "-", path);
-		final BufferedReader reader = readFromProcess(proc);
-		final OutputStream out = proc.getOutputStream();
-		final Future<?> writing = writeAsync(out, tarData);
+		List<String> l = new ArrayList<String>();
+		Process proc = spawnAssumingCommandPresent("tar", "Oxf", "-", path);
+		BufferedReader reader = readFromProcess(proc);
+		OutputStream out = proc.getOutputStream();
+		Future<?> writing = writeAsync(out, tarData);
 
 		try {
 			String line;
