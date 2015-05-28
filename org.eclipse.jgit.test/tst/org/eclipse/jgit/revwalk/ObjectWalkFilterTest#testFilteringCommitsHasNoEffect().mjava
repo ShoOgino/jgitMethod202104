@@ -1,0 +1,7 @@
+	@Test
+	public void testFilteringCommitsHasNoEffect() throws Exception {
+		AnyObjectId initial = rw.parseCommit(resolve("master^^"));
+		rw.setObjectFilter(new BlacklistObjectFilter(Sets.of(initial)));
+		assertEquals(OBJECT_COUNT, countObjects());
+	}
+

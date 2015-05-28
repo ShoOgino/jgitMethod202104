@@ -1,0 +1,10 @@
+	@Test
+	public void testFilteringTreeFiltersReferencedBlobs() throws Exception {
+		AnyObjectId a1 = rw.parseAny(resolve("master:a"));
+		AnyObjectId a2 = rw.parseAny(resolve("master^:a"));
+		rw.setObjectFilter(new BlacklistObjectFilter(Sets.of(a1, a2)));
+
+		// 2 trees, one blob filtered out
+		assertEquals(OBJECT_COUNT - 3, countObjects());
+	}
+

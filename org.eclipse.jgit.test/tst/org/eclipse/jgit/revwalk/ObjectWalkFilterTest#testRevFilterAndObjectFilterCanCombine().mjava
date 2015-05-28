@@ -1,0 +1,12 @@
+	@Test
+	public void testRevFilterAndObjectFilterCanCombine() throws Exception {
+		AnyObjectId one = rw.parseAny(resolve("master:a/a"));
+		AnyObjectId two = rw.parseAny(resolve("master:b/b"));
+		rw.setObjectFilter(new BlacklistObjectFilter(Sets.of(one, two)));
+		rw.setRevFilter(NotRevFilter.create(
+				MessageRevFilter.create("capitalize")));
+
+		// 2 blobs, one commit, two trees filtered out
+		assertEquals(OBJECT_COUNT - 5, countObjects());
+	}
+
