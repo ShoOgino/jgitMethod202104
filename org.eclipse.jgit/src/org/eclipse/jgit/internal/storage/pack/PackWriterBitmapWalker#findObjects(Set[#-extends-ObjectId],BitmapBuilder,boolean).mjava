@@ -24,7 +24,8 @@
 		}
 
 		if (marked) {
-			walker.setRevFilter(newRevFilter(seen, bitmapResult));
+			BitmapRevFilter filter = newRevFilter(seen, bitmapResult);
+			walker.setRevFilter(filter);
 
 			while (walker.next() != null) {
 				// Iterate through all of the commits. The BitmapRevFilter does
@@ -37,6 +38,7 @@
 				bitmapResult.add(ro, ro.getType());
 				pm.update(1);
 			}
+			countOfBitmapIndexMisses += filter.getCountOfLoadedCommits();
 		}
 
 		return bitmapResult;

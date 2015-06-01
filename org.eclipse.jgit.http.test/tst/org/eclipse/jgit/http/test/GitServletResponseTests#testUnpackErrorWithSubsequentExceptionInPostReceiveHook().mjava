@@ -1,0 +1,51 @@
+	/**
+	 * Configure a {@link GitServlet} that faces a {@link TooLargePackException}
+	 * during persisting the pack and a {@link IllegalStateException} during
+	 * executing postReceiveHooks. This used to lead to exceptions with a
+	 * description of "invalid channel 101" on the client side. Make sure
+	 * clients receive the correct response about the too large pack on the
+	 * correct sideband.
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void testUnpackErrorWithSubsequentExceptionInPostReceiveHook()
+			throws Exception {
+		final TestRepository client = createTestRepository();
+		final RevBlob Q_txt = client
+				.blob("some blob content to measure pack size");
+		final RevCommit Q = client.commit().add("Q", Q_txt).create();
+		final Repository clientRepo = client.getRepository();
+		final String srvBranchName = Constants.R_HEADS + "new.branch";
+		Transport t;
+
+		// this maxPackSize leads to an unPackError
+		maxPackSize = 400;
+		// this PostReceiveHook when called after an unsuccesfull unpack will
+		// lead to an IllegalStateException
+		postHook = new PostReceiveHook() {
+			public void onPostReceive(ReceivePack rp,
+					Collection<ReceiveCommand> commands) {
+				// the maxPackSize setting caused that the packfile couldn't be
+				// saved to disk. Calling getPackSize() now will lead to a
+				// IllegalStateException.
+				rp.getPackSize();
+			}
+		};
+
+		t = Transport.open(clientRepo, srvURI);
+		try {
+			RemoteRefUpdate update = new RemoteRefUpdate(clientRepo, Q.name(),
+					srvBranchName, false, null, null);
+			try {
+				t.push(NullProgressMonitor.INSTANCE,
+						Collections.singleton(update));
+				fail("should not reach this line");
+			} catch (Exception e) {
+				assertTrue(e instanceof TooLargePackException);
+			}
+		} finally {
+			t.close();
+		}
+	}
+

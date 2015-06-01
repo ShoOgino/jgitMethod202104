@@ -1,0 +1,10 @@
+	@Test
+	public void testFilteringTreeFiltersSubtrees() throws Exception {
+		AnyObjectId capitalizeTree = rw.parseAny(resolve("master^:"));
+		rw.setObjectFilter(new BlacklistObjectFilter(
+				Sets.of(capitalizeTree)));
+
+		// trees "master^:" and "master^:a" filtered out
+		assertEquals(OBJECT_COUNT - 2, countObjects());
+	}
+

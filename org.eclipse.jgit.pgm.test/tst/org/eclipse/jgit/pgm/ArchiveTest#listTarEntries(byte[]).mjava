@@ -1,11 +1,11 @@
 	private String[] listTarEntries(byte[] tarData) throws Exception {
-		final List<String> l = new ArrayList<String>();
-		final Process proc = spawnAssumingCommandPresent("tar", "tf", "-");
-		final BufferedReader reader = readFromProcess(proc);
-		final OutputStream out = proc.getOutputStream();
+		List<String> l = new ArrayList<String>();
+		Process proc = spawnAssumingCommandPresent("tar", "tf", "-");
+		BufferedReader reader = readFromProcess(proc);
+		OutputStream out = proc.getOutputStream();
 
 		// Dump tarball to tar stdin in background
-		final Future<?> writing = writeAsync(out, tarData);
+		Future<?> writing = writeAsync(out, tarData);
 
 		try {
 			String line;

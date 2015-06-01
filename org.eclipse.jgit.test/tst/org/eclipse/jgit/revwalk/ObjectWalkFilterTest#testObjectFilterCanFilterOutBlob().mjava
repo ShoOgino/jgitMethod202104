@@ -1,0 +1,10 @@
+	@Test
+	public void testObjectFilterCanFilterOutBlob() throws Exception {
+		AnyObjectId one = rw.parseAny(resolve("master:a/a"));
+		AnyObjectId two = rw.parseAny(resolve("master:b/b"));
+		rw.setObjectFilter(new BlacklistObjectFilter(Sets.of(one, two)));
+
+		// 2 blobs filtered out
+		assertEquals(OBJECT_COUNT - 2, countObjects());
+	}
+
