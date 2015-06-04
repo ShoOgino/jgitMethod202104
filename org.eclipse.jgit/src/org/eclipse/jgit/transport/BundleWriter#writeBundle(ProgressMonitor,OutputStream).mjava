@@ -13,6 +13,9 @@
 	 *             an error occurred reading a local object's data to include in
 	 *             the bundle, or writing compressed object data to the output
 	 *             stream.
+	 * @throws WriteAbortedException
+	 *             the write operation is aborted by
+	 *             {@link ObjectCountCallback}.
 	 */
 	public void writeBundle(ProgressMonitor monitor, OutputStream os)
 			throws IOException {
@@ -20,6 +23,8 @@
 		if (pc == null)
 			pc = new PackConfig(db);
 		try (PackWriter packWriter = new PackWriter(pc, db.newObjectReader())) {
+			packWriter.setObjectCountCallback(callback);
+
 			final HashSet<ObjectId> inc = new HashSet<ObjectId>();
 			final HashSet<ObjectId> exc = new HashSet<ObjectId>();
 			inc.addAll(include.values());

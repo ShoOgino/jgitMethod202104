@@ -1,14 +1,6 @@
 	private byte[] makeBundle(final String name,
 			final String anObjectToInclude, final RevCommit assume)
 			throws FileNotFoundException, IOException {
-		final BundleWriter bw;
-
-		bw = new BundleWriter(db);
-		bw.include(name, ObjectId.fromString(anObjectToInclude));
-		if (assume != null)
-			bw.assume(assume);
-		final ByteArrayOutputStream out = new ByteArrayOutputStream();
-		bw.writeBundle(NullProgressMonitor.INSTANCE, out);
-		return out.toByteArray();
+		return makeBundleWithCallback(name, anObjectToInclude, assume, true);
 	}
 

@@ -21,6 +21,9 @@
 	 *             an error occurred reading a local object's data to include in
 	 *             the pack, or writing compressed object data to the output
 	 *             stream.
+	 * @throws WriteAbortedException
+	 *             the write operation is aborted by
+	 *             {@link PackWriter.ObjectCountCallback}.
 	 */
 	public void writePack(ProgressMonitor compressMonitor,
 			ProgressMonitor writeMonitor, OutputStream packStream)
@@ -62,6 +65,8 @@
 
 		long objCnt = getObjectCount();
 		stats.totalObjects = objCnt;
+		if (callback != null)
+			callback.setObjectCount(objCnt);
 		beginPhase(PackingPhase.WRITING, writeMonitor, objCnt);
 		long writeStart = System.currentTimeMillis();
 		try {
