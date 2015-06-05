@@ -14,7 +14,7 @@
 				public Result call() throws Exception {
 					RefUpdate update = new RefDirectoryUpdate(
 							(RefDirectory) repo.getRefDatabase(),
-							repo.getRef("refs/tags/t")) {
+							repo.exactRef("refs/tags/t")) {
 						@Override
 						public boolean isForceUpdate() {
 							try {
@@ -50,6 +50,6 @@
 			pool.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
 		}
 
-		assertEquals(repo.getRef("refs/tags/t").getObjectId(), b);
+		assertEquals(repo.exactRef("refs/tags/t").getObjectId(), b);
 	}
 

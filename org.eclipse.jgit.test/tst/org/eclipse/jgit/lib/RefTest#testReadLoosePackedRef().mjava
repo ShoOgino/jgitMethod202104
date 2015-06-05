@@ -7,7 +7,7 @@
 	@Test
 	public void testReadLoosePackedRef() throws IOException,
 			InterruptedException {
-		Ref ref = db.getRef("refs/heads/master");
+		Ref ref = db.exactRef("refs/heads/master");
 		assertEquals(Storage.PACKED, ref.getStorage());
 		FileOutputStream os = new FileOutputStream(new File(db.getDirectory(),
 				"refs/heads/master"));
@@ -15,7 +15,7 @@
 		os.write('\n');
 		os.close();
 
-		ref = db.getRef("refs/heads/master");
+		ref = db.exactRef("refs/heads/master");
 		assertEquals(Storage.LOOSE, ref.getStorage());
 	}
 

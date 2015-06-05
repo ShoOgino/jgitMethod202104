@@ -17,7 +17,7 @@
 		checkoutBranch("refs/heads/branch1");
 		assertFalse(new File(db.getWorkTree(), "file2").exists());
 
-		MergeResult result = git.merge().include(db.getRef(Constants.MASTER)).call();
+		MergeResult result = git.merge().include(db.exactRef(R_HEADS + MASTER)).call();
 
 		assertTrue(new File(db.getWorkTree(), "file1").exists());
 		assertTrue(new File(db.getWorkTree(), "file2").exists());

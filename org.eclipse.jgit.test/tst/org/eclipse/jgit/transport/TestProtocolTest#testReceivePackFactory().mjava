@@ -31,7 +31,7 @@
 						JGitText.get().pushNotPermitted));
 			}
 			assertEquals(1, rejected.get());
-			assertNull(remote.getRepository().getRef("master"));
+			assertNull(remote.getRepository().exactRef("refs/heads/master"));
 
 			git.push()
 					.setRemote(user2Uri.toString())
@@ -39,7 +39,7 @@
 					.call();
 			assertEquals(1, rejected.get());
 			assertEquals(master,
-					remote.getRepository().getRef("master").getObjectId());
+					remote.getRepository().exactRef("refs/heads/master").getObjectId());
 		}
 	}
 

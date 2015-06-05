@@ -1,7 +1,7 @@
 	@Test
 	public void testReadSymRefToPacked() throws IOException {
 		writeSymref("HEAD", "refs/heads/b");
-		Ref ref = db.getRef("HEAD");
+		Ref ref = db.exactRef("HEAD");
 		assertEquals(Ref.Storage.LOOSE, ref.getStorage());
 		assertTrue("is symref", ref.isSymbolic());
 		ref = ref.getTarget();

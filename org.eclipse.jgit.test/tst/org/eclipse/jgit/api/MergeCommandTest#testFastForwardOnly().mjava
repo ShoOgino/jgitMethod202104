@@ -9,7 +9,7 @@
 
 		MergeCommand merge = git.merge();
 		merge.setFastForward(FastForwardMode.FF_ONLY);
-		merge.include(db.getRef(Constants.MASTER));
+		merge.include(db.exactRef(R_HEADS + MASTER));
 		MergeResult result = merge.call();
 
 		assertEquals(MergeStatus.FAST_FORWARD, result.getMergeStatus());

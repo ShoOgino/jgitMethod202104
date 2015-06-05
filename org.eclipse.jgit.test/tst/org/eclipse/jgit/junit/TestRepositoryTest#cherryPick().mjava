@@ -17,7 +17,7 @@
 		RevCommit result = tr.cherryPick(toPick);
 		rw.parseBody(result);
 
-		Ref headRef = tr.getRepository().getRef("HEAD");
+		Ref headRef = tr.getRepository().exactRef("HEAD");
 		assertEquals(result, headRef.getObjectId());
 		assertTrue(headRef.isSymbolic());
 		assertEquals("refs/heads/master", headRef.getLeaf().getName());

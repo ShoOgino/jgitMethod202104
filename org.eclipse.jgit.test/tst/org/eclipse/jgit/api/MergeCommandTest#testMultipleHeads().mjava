@@ -21,7 +21,7 @@
 
 		MergeCommand merge = git.merge();
 		merge.include(second.getId());
-		merge.include(db.getRef(Constants.MASTER));
+		merge.include(db.exactRef(R_HEADS + MASTER));
 		try {
 			merge.call();
 			fail("Expected exception not thrown when merging multiple heads");

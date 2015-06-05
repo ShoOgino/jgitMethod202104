@@ -3,7 +3,7 @@
 		Git git = new Git(db);
 		git.commit().setMessage("initial commit").call();
 
-		MergeResult result = git.merge().include(db.getRef(Constants.HEAD)).call();
+		MergeResult result = git.merge().include(db.exactRef(Constants.HEAD)).call();
 		assertEquals(MergeResult.MergeStatus.ALREADY_UP_TO_DATE, result.getMergeStatus());
 		// no reflog entry written by merge
 		assertEquals("commit (initial): initial commit",

@@ -1,9 +1,9 @@
 	@Test
 	public void testThreeBranches() throws IOException {
-		Ref c = db.getRef("refs/heads/c");
-		Ref b = db.getRef("refs/heads/b");
-		Ref a = db.getRef("refs/heads/a");
-		Ref master = db.getRef("refs/heads/master");
+		Ref c = db.exactRef("refs/heads/c");
+		Ref b = db.exactRef("refs/heads/b");
+		Ref a = db.exactRef("refs/heads/a");
+		Ref master = db.exactRef("refs/heads/master");
 		String message = formatter.format(Arrays.asList(c, b, a), master);
 		assertEquals("Merge branches 'c', 'b' and 'a'", message);
 	}

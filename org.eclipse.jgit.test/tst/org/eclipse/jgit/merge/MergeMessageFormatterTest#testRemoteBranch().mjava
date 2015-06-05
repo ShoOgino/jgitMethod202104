@@ -1,7 +1,7 @@
 	@Test
 	public void testRemoteBranch() throws Exception {
-		Ref remoteA = db.getRef("refs/remotes/origin/remote-a");
-		Ref master = db.getRef("refs/heads/master");
+		Ref remoteA = db.exactRef("refs/remotes/origin/remote-a");
+		Ref master = db.exactRef("refs/heads/master");
 		String message = formatter.format(Arrays.asList(remoteA), master);
 		assertEquals("Merge remote-tracking branch 'origin/remote-a'", message);
 	}

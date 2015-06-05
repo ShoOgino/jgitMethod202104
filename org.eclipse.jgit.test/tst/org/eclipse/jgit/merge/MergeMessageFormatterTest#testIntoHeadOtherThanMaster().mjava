@@ -1,7 +1,7 @@
 	@Test
 	public void testIntoHeadOtherThanMaster() throws IOException {
-		Ref a = db.getRef("refs/heads/a");
-		Ref b = db.getRef("refs/heads/b");
+		Ref a = db.exactRef("refs/heads/a");
+		Ref b = db.exactRef("refs/heads/b");
 		SymbolicRef head = new SymbolicRef("HEAD", b);
 		String message = formatter.format(Arrays.asList(a), head);
 		assertEquals("Merge branch 'a' into b", message);

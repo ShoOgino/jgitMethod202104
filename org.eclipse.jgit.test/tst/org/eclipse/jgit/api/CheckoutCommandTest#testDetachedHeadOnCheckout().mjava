@@ -4,7 +4,7 @@
 		CheckoutCommand co = git.checkout();
 		co.setName("master").call();
 
-		String commitId = db.getRef(Constants.MASTER).getObjectId().name();
+		String commitId = db.exactRef(R_HEADS + MASTER).getObjectId().name();
 		co = git.checkout();
 		co.setName(commitId).call();
 
