@@ -1,0 +1,15 @@
+	@Test
+	public void testAmbiguousRefsUnderRefs() throws IOException {
+		ObjectId masterId = db.resolve("refs/heads/master");
+		writeNewRef("refs/foo/bar", masterId);
+		writeNewRef("refs/heads/refs/foo/bar", masterId);
+
+		Ref exactRef = db.getRefDatabase().exactRef("refs/foo/bar");
+		assertEquals("refs/foo/bar", exactRef.getName());
+		assertEquals(masterId, exactRef.getObjectId());
+
+		Ref ref = db.getRef("refs/foo/bar");
+		assertEquals("refs/foo/bar", ref.getName());
+		assertEquals(masterId, ref.getObjectId());
+	}
+

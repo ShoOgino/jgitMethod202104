@@ -1,0 +1,12 @@
+	@Test
+	public void testRefsUnderRefs() throws IOException {
+		ObjectId masterId = db.resolve("refs/heads/master");
+		writeNewRef("refs/heads/refs/foo/bar", masterId);
+
+		assertNull(db.getRefDatabase().exactRef("refs/foo/bar"));
+
+		Ref ref = db.getRef("refs/foo/bar");
+		assertEquals("refs/heads/refs/foo/bar", ref.getName());
+		assertEquals(db.resolve("refs/heads/master"), ref.getObjectId());
+	}
+

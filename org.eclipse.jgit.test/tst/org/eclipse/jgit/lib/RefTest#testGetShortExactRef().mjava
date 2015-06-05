@@ -1,0 +1,10 @@
+	@Test
+	public void testGetShortExactRef() throws IOException {
+		assertNull(db.getRefDatabase().exactRef("master"));
+
+		Ref ref = db.getRefDatabase().exactRef("HEAD");
+		assertEquals("HEAD", ref.getName());
+		assertEquals("refs/heads/master", ref.getTarget().getName());
+		assertEquals(db.resolve("refs/heads/master"), ref.getObjectId());
+	}
+
