@@ -1,0 +1,10 @@
+	@Test
+	public void testFirstExactRef_IgnoresGarbageRef() throws IOException {
+		writeLooseRef("refs/heads/A", A);
+		write(new File(diskRepo.getDirectory(), "refs/heads/bad"), "FAIL\n");
+
+		Ref a = refdir.firstExactRef("refs/heads/bad", "refs/heads/A");
+		assertEquals("refs/heads/A", a.getName());
+		assertEquals(A, a.getObjectId());
+	}
+
