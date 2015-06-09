@@ -2,8 +2,12 @@
 	public void testEmptyValueAtEof() throws Exception {
 		String text = "[a]\nx =";
 		Config c = parse(text);
-		assertEquals("", c.getString("a", null, "x"));
+		assertNull(c.getString("a", null, "x"));
+		assertArrayEquals(new String[]{null},
+				c.getStringList("a", null, "x"));
 		c = parse(text + "\n");
-		assertEquals("", c.getString("a", null, "x"));
+		assertNull(c.getString("a", null, "x"));
+		assertArrayEquals(new String[]{null},
+				c.getStringList("a", null, "x"));
 	}
 
