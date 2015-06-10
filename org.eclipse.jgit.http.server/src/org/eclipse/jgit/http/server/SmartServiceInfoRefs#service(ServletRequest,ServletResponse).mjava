@@ -12,11 +12,9 @@
 			advertise(req, new PacketLineOutRefAdvertiser(out));
 			buf.close();
 		} catch (ServiceNotAuthorizedException e) {
-			res.sendError(SC_UNAUTHORIZED);
-
+			res.sendError(SC_UNAUTHORIZED, e.getMessage());
 		} catch (ServiceNotEnabledException e) {
-			sendError(req, res, SC_FORBIDDEN);
-
+			sendError(req, res, SC_FORBIDDEN, e.getMessage());
 		} catch (ServiceMayNotContinueException e) {
 			if (e.isOutput())
 				buf.close();
