@@ -1,10 +1,13 @@
 	/**
 	 * @return the whole string for the nonce to be included into the capability
-	 *         advertisement.
+	 *         advertisement, or null if push certificates are disabled.
+	 * @since 4.0
 	 */
 	public String getAdvertiseNonce() {
-		sentNonce = nonceGenerator.createNonce(db,
-				TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
-		return CAPABILITY_PUSH_CERT + "=" + sentNonce; //$NON-NLS-1$
+		String nonce = sentNonce();
+		if (nonce == null) {
+			return null;
+		}
+		return CAPABILITY_PUSH_CERT + '=' + nonce;
 	}
 

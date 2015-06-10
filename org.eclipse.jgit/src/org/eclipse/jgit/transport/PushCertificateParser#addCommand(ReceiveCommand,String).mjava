@@ -1,13 +1,15 @@
 	/**
 	 * Add a command to the signature.
 	 *
+	 * @param cmd
+	 *            the command.
 	 * @param rawLine
 	 *            the exact line read from the wire that produced this
 	 *            command, including trailing newline if present.
-	 * @since 4.0
+	 * @since 4.1
 	 */
-	public void addCommand(String rawLine) {
-		commands.add(parseCommand(chomp(rawLine)));
+	public void addCommand(ReceiveCommand cmd, String rawLine) {
+		commands.add(cmd);
 		rawCommands.append(rawLine);
 	}
 

@@ -33,13 +33,8 @@
 							!isBiDirectionalPipe());
 			}
 
-			if (line.equals("-----BEGIN PGP SIGNATURE-----\n")) //$NON-NLS-1$
+			if (line.equals(PushCertificateParser.BEGIN_SIGNATURE)) {
 				pushCertificateParser.receiveSignature(pckIn);
-
-			if (pushCertificateParser.enabled()) {
-				// Must use raw line with optional newline so signed payload can be
-				// reconstructed.
-				pushCertificateParser.addCommand(rawLine);
 			}
 
 			if (line.length() < 83) {
@@ -55,6 +50,11 @@
 				cmd.setRef(refs.get(cmd.getRefName()));
 			}
 			commands.add(cmd);
+			if (pushCertificateParser.enabled()) {
+				// Must use raw line with optional newline so signed payload can be
+				// reconstructed.
+				pushCertificateParser.addCommand(cmd, rawLine);
+			}
 		}
 	}
 

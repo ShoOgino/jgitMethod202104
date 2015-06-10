@@ -1,0 +1,44 @@
+	PushCertificate(String version, PersonIdent pusher, String pushee,
+			String nonce, NonceStatus nonceStatus, List<ReceiveCommand> commands,
+			String rawCommands, String signature) {
+		if (version == null || version.isEmpty()) {
+			throw new IllegalArgumentException(MessageFormat.format(
+					JGitText.get().pushCertificateInvalidField, VERSION));
+		}
+		if (pusher == null) {
+			throw new IllegalArgumentException(MessageFormat.format(
+					JGitText.get().pushCertificateInvalidField, PUSHER));
+		}
+		if (pushee == null || pushee.isEmpty()) {
+			throw new IllegalArgumentException(MessageFormat.format(
+					JGitText.get().pushCertificateInvalidField, PUSHEE));
+		}
+		if (nonce == null || nonce.isEmpty()) {
+			throw new IllegalArgumentException(MessageFormat.format(
+					JGitText.get().pushCertificateInvalidField, NONCE));
+		}
+		if (nonceStatus == null) {
+			throw new IllegalArgumentException(MessageFormat.format(
+					JGitText.get().pushCertificateInvalidField,
+					"nonce status")); //$NON-NLS-1$
+		}
+		if (commands == null || commands.isEmpty()
+				|| rawCommands == null || rawCommands.isEmpty()) {
+			throw new IllegalArgumentException(MessageFormat.format(
+					JGitText.get().pushCertificateInvalidField,
+					"command")); //$NON-NLS-1$
+		}
+		if (signature == null || signature.isEmpty()) {
+			throw new IllegalArgumentException(
+					JGitText.get().pushCertificateInvalidSignature);
+		}
+		this.version = version;
+		this.pusher = pusher;
+		this.pushee = pushee;
+		this.nonce = nonce;
+		this.nonceStatus = nonceStatus;
+		this.commands = commands;
+		this.rawCommands = rawCommands;
+		this.signature = signature;
+	}
+

@@ -1,0 +1,12 @@
+	private static String parseHeader(PacketLineIn pckIn, String header)
+			throws IOException {
+		String s = pckIn.readString();
+		if (s.length() <= header.length()
+				|| !s.startsWith(header)
+				|| s.charAt(header.length()) != ' ') {
+			throw new IOException(MessageFormat.format(
+					JGitText.get().pushCertificateInvalidHeader, header));
+		}
+		return s.substring(header.length() + 1);
+	}
+

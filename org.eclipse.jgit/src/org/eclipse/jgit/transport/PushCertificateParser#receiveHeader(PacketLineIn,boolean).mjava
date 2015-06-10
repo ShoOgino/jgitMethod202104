@@ -1,7 +1,9 @@
 	/**
 	 * Receive a list of commands from the input encapsulated in a push
-	 * certificate. This method doesn't parse the first line "push-cert \NUL
-	 * &lt;capabilities&gt;", but assumes the first line including the
+	 * certificate.
+	 * <p>
+	 * This method doesn't parse the first line {@code "push-cert \NUL
+	 * &lt;capabilities&gt;"}, but assumes the first line including the
 	 * capabilities has already been handled by the caller.
 	 *
 	 * @param pckIn
@@ -14,31 +16,37 @@
 	 * @throws IOException
 	 *             if the certificate from the client is badly malformed or the
 	 *             client disconnects before sending the entire certificate.
+	 * @since 4.0
 	 */
 	public void receiveHeader(PacketLineIn pckIn, boolean stateless)
 			throws IOException {
 		try {
-			String version = parseNextLine(pckIn, VERSION);
-			if (!version.equals("0.1")) { //$NON-NLS-1$
+			version = parseHeader(pckIn, VERSION);
+			if (!version.equals(VERSION_0_1)) {
 				throw new IOException(MessageFormat.format(
-						JGitText.get().errorInvalidPushCert,
-						"version not supported")); //$NON-NLS-1$
+						JGitText.get().pushCertificateInvalidFieldValue, VERSION, version));
 			}
-			pusher = parseNextLine(pckIn, PUSHER);
-			pushee = parseNextLine(pckIn, PUSHEE);
-			receivedNonce = parseNextLine(pckIn, NONCE);
-			// an empty line
-			if (!pckIn.readString().isEmpty()) {
+			String pusherStr = parseHeader(pckIn, PUSHER);
+			pusher = RawParseUtils.parsePersonIdent(pusherStr);
+			if (pusher == null) {
 				throw new IOException(MessageFormat.format(
-						JGitText.get().errorInvalidPushCert,
-						"expected empty line after header")); //$NON-NLS-1$
+						JGitText.get().pushCertificateInvalidFieldValue,
+						PUSHER, pusherStr));
+			}
+			pushee = parseHeader(pckIn, PUSHEE);
+			receivedNonce = parseHeader(pckIn, NONCE);
+			// An empty line.
+			if (!pckIn.readString().isEmpty()) {
+				throw new IOException(
+						JGitText.get().pushCertificateInvalidHeader);
 			}
 		} catch (EOFException eof) {
-			throw new IOException(MessageFormat.format(
-					JGitText.get().errorInvalidPushCert,
-					"broken push certificate header")); //$NON-NLS-1$
+			throw new IOException(
+					JGitText.get().pushCertificateInvalidHeader, eof);
 		}
-		nonceStatus = nonceGenerator.verify(receivedNonce, sentNonce, db,
-				stateless, nonceSlopLimit);
+		nonceStatus = nonceGenerator != null
+				? nonceGenerator.verify(
+					receivedNonce, sentNonce(), db, stateless, nonceSlopLimit)
+				: NonceStatus.UNSOLICITED;
 	}
 

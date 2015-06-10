@@ -1,0 +1,19 @@
+	private static String concatPacketLines(String input, int begin, int end)
+			throws IOException {
+		StringBuilder result = new StringBuilder();
+		int i = 0;
+		PacketLineIn pckIn = newPacketLineIn(input);
+		while (i < end) {
+			String line;
+			try {
+				line = pckIn.readStringRaw();
+			} catch (EOFException e) {
+				break;
+			}
+			if (++i > begin) {
+				result.append(line);
+			}
+		}
+		return result.toString();
+	}
+

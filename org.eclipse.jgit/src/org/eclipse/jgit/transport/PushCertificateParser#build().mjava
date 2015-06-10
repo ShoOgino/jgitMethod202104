@@ -1,0 +1,19 @@
+	/**
+	 * @return the parsed certificate, or null if push certificates are disabled.
+	 * @throws IOException
+	 *             if the push certificate has missing or invalid fields.
+	 * @since 4.1
+	 */
+	public PushCertificate build() throws IOException {
+		if (nonceGenerator == null) {
+			return null;
+		}
+		try {
+			return new PushCertificate(version, pusher, pushee, receivedNonce,
+					nonceStatus, Collections.unmodifiableList(commands),
+					rawCommands.toString(), signature);
+		} catch (IllegalArgumentException e) {
+			throw new IOException(e.getMessage(), e);
+		}
+	}
+
