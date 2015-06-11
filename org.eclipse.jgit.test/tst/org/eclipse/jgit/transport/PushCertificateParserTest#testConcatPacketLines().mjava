@@ -1,0 +1,9 @@
+	@Test
+	public void testConcatPacketLines() throws Exception {
+		String input = "000bline 1\n000bline 2\n000bline 3\n";
+		assertEquals("line 1\n", concatPacketLines(input, 0, 1));
+		assertEquals("line 1\nline 2\n", concatPacketLines(input, 0, 2));
+		assertEquals("line 2\nline 3\n", concatPacketLines(input, 1, 3));
+		assertEquals("line 2\nline 3\n", concatPacketLines(input, 1, 4));
+	}
+

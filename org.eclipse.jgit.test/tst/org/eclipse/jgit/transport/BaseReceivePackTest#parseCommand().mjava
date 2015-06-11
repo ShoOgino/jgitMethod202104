@@ -1,0 +1,12 @@
+	@Test
+	public void parseCommand() {
+		String input = "0000000000000000000000000000000000000000"
+				+ " deadbeefdeadbeefdeadbeefdeadbeefdeadbeef"
+				+ " refs/heads/master";
+		ReceiveCommand cmd = BaseReceivePack.parseCommand(input);
+		assertEquals(ObjectId.zeroId(), cmd.getOldId());
+		assertEquals("deadbeefdeadbeefdeadbeefdeadbeefdeadbeef",
+				cmd.getNewId().name());
+		assertEquals("refs/heads/master", cmd.getRefName());
+	}
+
