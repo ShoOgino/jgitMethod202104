@@ -75,7 +75,7 @@
 
 			writeObjects(out);
 			if (!edgeObjects.isEmpty() || !cachedPacks.isEmpty()) {
-				for (Statistics.ObjectType typeStat : stats.objectTypes) {
+				for (PackStatistics.ObjectType.Accumulator typeStat : stats.objectTypes) {
 					if (typeStat == null)
 						continue;
 					stats.thinPackBytes += typeStat.bytes;
@@ -96,7 +96,7 @@
 			stats.timeWriting = System.currentTimeMillis() - writeStart;
 			stats.depth = depth;
 
-			for (Statistics.ObjectType typeStat : stats.objectTypes) {
+			for (PackStatistics.ObjectType.Accumulator typeStat : stats.objectTypes) {
 				if (typeStat == null)
 					continue;
 				typeStat.cntDeltas += typeStat.reusedDeltas;
