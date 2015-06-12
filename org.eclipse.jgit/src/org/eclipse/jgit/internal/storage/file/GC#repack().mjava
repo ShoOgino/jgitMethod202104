@@ -58,7 +58,14 @@
 			if (rest != null)
 				ret.add(rest);
 		}
-		deleteOldPacks(toBeDeleted, ret);
+		try {
+			deleteOldPacks(toBeDeleted, ret);
+		} catch (ParseException e) {
+			// TODO: the exception has to be wrapped into an IOException because
+			// throwing the ParseException directly would break the API, instead
+			// we should throw a ConfigInvalidException
+			throw new IOException(e);
+		}
 		prunePacked();
 
 		lastPackedRefs = refsBefore;
