@@ -1,0 +1,18 @@
+	@Test
+	public void slop() throws Exception {
+		String sent = gen.createNonce(db, TS - 10);
+		String received = gen.createNonce(db, TS);
+		assertEquals(NonceStatus.BAD,
+				gen.verify(received, sent, db, false, 0));
+		assertEquals(NonceStatus.BAD,
+				gen.verify(received, sent, db, false, 11));
+		assertEquals(NonceStatus.SLOP,
+				gen.verify(received, sent, db, true, 0));
+		assertEquals(NonceStatus.SLOP,
+				gen.verify(received, sent, db, true, 9));
+		assertEquals(NonceStatus.OK,
+				gen.verify(received, sent, db, true, 10));
+		assertEquals(NonceStatus.OK,
+				gen.verify(received, sent, db, true, 11));
+	}
+

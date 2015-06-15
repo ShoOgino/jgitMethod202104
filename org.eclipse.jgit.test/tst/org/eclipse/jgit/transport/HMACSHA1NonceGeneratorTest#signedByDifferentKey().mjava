@@ -1,0 +1,10 @@
+	@Test
+	public void signedByDifferentKey() throws Exception {
+		HMACSHA1NonceGenerator other = new HMACSHA1NonceGenerator("other");
+		String sent = gen.createNonce(db, TS);
+		String received = other.createNonce(db, TS);
+		assertNotEquals(received, sent);
+		assertEquals(NonceStatus.BAD,
+				gen.verify(received, sent, db, false, 0));
+	}
+

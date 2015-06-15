@@ -1,0 +1,12 @@
+	@Test
+	public void invalidFormat() throws Exception {
+		String sent = gen.createNonce(db, TS);
+		int idx = sent.indexOf('-');
+		String sig = sent.substring(idx, sent.length() - idx);
+		assertEquals(NonceStatus.BAD,
+				gen.verify(Long.toString(TS), sent, db, true, 100));
+		assertEquals(NonceStatus.BAD, gen.verify(sig, sent, db, true, 100));
+		assertEquals(NonceStatus.BAD, gen.verify("xxx-" + sig, sent, db, true, 100));
+		assertEquals(NonceStatus.BAD, gen.verify(sent, "xxx-" + sig, db, true, 100));
+	}
+
