@@ -21,10 +21,11 @@
 			}
 			signature = sig.toString();
 			if (!pckIn.readStringRaw().equals(END_CERT)) {
-				throw new IOException(JGitText.get().pushCertificateInvalidSignature);
+				throw new PackProtocolException(
+						JGitText.get().pushCertificateInvalidSignature);
 			}
 		} catch (EOFException eof) {
-			throw new IOException(
+			throw new PackProtocolException(
 					JGitText.get().pushCertificateInvalidSignature, eof);
 		}
 	}

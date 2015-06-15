@@ -23,13 +23,13 @@
 		try {
 			version = parseHeader(pckIn, VERSION);
 			if (!version.equals(VERSION_0_1)) {
-				throw new IOException(MessageFormat.format(
+				throw new PackProtocolException(MessageFormat.format(
 						JGitText.get().pushCertificateInvalidFieldValue, VERSION, version));
 			}
 			String pusherStr = parseHeader(pckIn, PUSHER);
 			pusher = RawParseUtils.parsePersonIdent(pusherStr);
 			if (pusher == null) {
-				throw new IOException(MessageFormat.format(
+				throw new PackProtocolException(MessageFormat.format(
 						JGitText.get().pushCertificateInvalidFieldValue,
 						PUSHER, pusherStr));
 			}
@@ -37,11 +37,11 @@
 			receivedNonce = parseHeader(pckIn, NONCE);
 			// An empty line.
 			if (!pckIn.readString().isEmpty()) {
-				throw new IOException(
+				throw new PackProtocolException(
 						JGitText.get().pushCertificateInvalidHeader);
 			}
 		} catch (EOFException eof) {
-			throw new IOException(
+			throw new PackProtocolException(
 					JGitText.get().pushCertificateInvalidHeader, eof);
 		}
 		nonceStatus = nonceGenerator != null
