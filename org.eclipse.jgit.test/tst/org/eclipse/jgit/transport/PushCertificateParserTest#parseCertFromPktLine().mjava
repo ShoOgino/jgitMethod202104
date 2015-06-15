@@ -29,7 +29,7 @@
 				new DfsRepositoryDescription("repo"));
 
 		PushCertificateParser parser = new PushCertificateParser(
-				db, new ReceiveConfig(cfg));
+				db, new SignedPushConfig(cfg));
 		parser.receiveHeader(pckIn, false);
 		parser.addCommand(pckIn.readStringRaw());
 		assertEquals(PushCertificateParser.BEGIN_SIGNATURE, pckIn.readStringRaw());

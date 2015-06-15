@@ -4,6 +4,7 @@
 	 * @throws IOException
 	 */
 	protected void recvCommands() throws IOException {
+		PushCertificateParser certParser = getPushCertificateParser();
 		FirstLine firstLine = null;
 		for (;;) {
 			String rawLine;
@@ -30,14 +31,13 @@
 				line = firstLine.getLine();
 
 				if (line.equals(GitProtocolConstants.OPTION_PUSH_CERT)) {
-					pushCertificateParser.receiveHeader(pckIn,
-							!isBiDirectionalPipe());
+					certParser.receiveHeader(pckIn, !isBiDirectionalPipe());
 					continue;
 				}
 			}
 
 			if (rawLine.equals(PushCertificateParser.BEGIN_SIGNATURE)) {
-				pushCertificateParser.receiveSignature(pckIn);
+				certParser.receiveSignature(pckIn);
 				continue;
 			}
 
@@ -54,10 +54,10 @@
 				cmd.setRef(refs.get(cmd.getRefName()));
 			}
 			commands.add(cmd);
-			if (pushCertificateParser.enabled()) {
+			if (certParser.enabled()) {
 				// Must use raw line with optional newline so signed payload can be
 				// reconstructed.
-				pushCertificateParser.addCommand(cmd, rawLine);
+				certParser.addCommand(cmd, rawLine);
 			}
 		}
 	}
