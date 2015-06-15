@@ -32,6 +32,11 @@
 			throw new IllegalArgumentException(
 					JGitText.get().pushCertificateInvalidSignature);
 		}
+		if (!signature.startsWith(PushCertificateParser.BEGIN_SIGNATURE)
+				|| !signature.endsWith(PushCertificateParser.END_SIGNATURE)) {
+			throw new IllegalArgumentException(
+					JGitText.get().pushCertificateInvalidSignature);
+		}
 		this.version = version;
 		this.pusher = pusher;
 		this.pushee = pushee;
