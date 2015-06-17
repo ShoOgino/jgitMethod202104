@@ -1,0 +1,11 @@
+	@Test
+	public void testRc() throws IOException, InterruptedException {
+		File script = writeTempFile("exit 3");
+		int rc = FS.DETECTED.runProcess(
+				new ProcessBuilder("/bin/sh", script.getPath(), "a", "b", "c"),
+				out, err, (InputStream) null);
+		assertEquals(3, rc);
+		assertEquals("", new String(out.toByteArray()));
+		assertEquals("", new String(err.toByteArray()));
+	}
+

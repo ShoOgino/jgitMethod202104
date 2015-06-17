@@ -2,89 +2,32 @@
 	 * Runs the given process until termination, clearing its stdout and stderr
 	 * streams on-the-fly.
 	 *
-	 * @param hookProcessBuilder
-	 *            The process builder configured for this hook.
+	 * @param processBuilder
+	 *            The process builder configured for this process.
 	 * @param outRedirect
-	 *            A print stream on which to redirect the hook's stdout. Can be
-	 *            <code>null</code>, in which case the hook's standard output
-	 *            will be lost.
+	 *            A OutputStream on which to redirect the processes stdout. Can
+	 *            be <code>null</code>, in which case the processes standard
+	 *            output will be lost.
 	 * @param errRedirect
-	 *            A print stream on which to redirect the hook's stderr. Can be
-	 *            <code>null</code>, in which case the hook's standard error
-	 *            will be lost.
+	 *            A OutputStream on which to redirect the processes stderr. Can
+	 *            be <code>null</code>, in which case the processes standard
+	 *            error will be lost.
 	 * @param stdinArgs
 	 *            A string to pass on to the standard input of the hook. Can be
 	 *            <code>null</code>.
-	 * @return the exit value of this hook.
+	 * @return the exit value of this process.
 	 * @throws IOException
-	 *             if an I/O error occurs while executing this hook.
+	 *             if an I/O error occurs while executing this process.
 	 * @throws InterruptedException
 	 *             if the current thread is interrupted while waiting for the
 	 *             process to end.
-	 * @since 3.7
+	 * @since 4.2
 	 */
-	protected int runProcess(ProcessBuilder hookProcessBuilder,
+	public int runProcess(ProcessBuilder processBuilder,
 			OutputStream outRedirect, OutputStream errRedirect, String stdinArgs)
 			throws IOException, InterruptedException {
-		final ExecutorService executor = Executors.newFixedThreadPool(2);
-		Process process = null;
-		// We'll record the first I/O exception that occurs, but keep on trying
-		// to dispose of our open streams and file handles
-		IOException ioException = null;
-		try {
-			process = hookProcessBuilder.start();
-			final Callable<Void> errorGobbler = new StreamGobbler(
-					process.getErrorStream(), errRedirect);
-			final Callable<Void> outputGobbler = new StreamGobbler(
-					process.getInputStream(), outRedirect);
-			executor.submit(errorGobbler);
-			executor.submit(outputGobbler);
-			if (stdinArgs != null) {
-				final PrintWriter stdinWriter = new PrintWriter(
-						process.getOutputStream());
-				stdinWriter.print(stdinArgs);
-				stdinWriter.flush();
-				// We are done with this hook's input. Explicitly close its
-				// stdin now to kick off any blocking read the hook might have.
-				stdinWriter.close();
-			}
-			return process.waitFor();
-		} catch (IOException e) {
-			ioException = e;
-		} finally {
-			shutdownAndAwaitTermination(executor);
-			if (process != null) {
-				try {
-					process.waitFor();
-				} catch (InterruptedException e) {
-					// Thrown by the outer try.
-					// Swallow this one to carry on our cleanup, and clear the
-					// interrupted flag (processes throw the exception without
-					// clearing the flag).
-					Thread.interrupted();
-				}
-				// A process doesn't clean its own resources even when destroyed
-				// Explicitly try and close all three streams, preserving the
-				// outer I/O exception if any.
-				try {
-					process.getErrorStream().close();
-				} catch (IOException e) {
-					ioException = ioException != null ? ioException : e;
-				}
-				try {
-					process.getInputStream().close();
-				} catch (IOException e) {
-					ioException = ioException != null ? ioException : e;
-				}
-				try {
-					process.getOutputStream().close();
-				} catch (IOException e) {
-					ioException = ioException != null ? ioException : e;
-				}
-				process.destroy();
-			}
-		}
-		// We can only be here if the outer try threw an IOException.
-		throw ioException;
+		InputStream in = (stdinArgs == null) ? null : new ByteArrayInputStream(
+				stdinArgs.getBytes(Constants.CHARACTER_ENCODING));
+		return runProcess(processBuilder, outRedirect, errRedirect, in);
 	}
 

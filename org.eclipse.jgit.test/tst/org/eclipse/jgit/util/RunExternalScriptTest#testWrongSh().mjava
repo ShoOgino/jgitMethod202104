@@ -1,0 +1,8 @@
+	@Test(expected = IOException.class)
+	public void testWrongSh() throws IOException, InterruptedException {
+		File script = writeTempFile("cat -");
+		FS.DETECTED.runProcess(
+				new ProcessBuilder("/bin/sh-foo", script.getPath(), "a", "b",
+						"c"), out, err, (InputStream) null);
+	}
+
