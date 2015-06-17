@@ -1,0 +1,9 @@
+	@Test
+	public void exoticUserId() throws Exception {
+		String rest = " 218123387 +0700";
+		assertEquals("", parse(rest).getUserId());
+
+		String id = "foo\n\0bar\uabcd\n ";
+		assertEquals(id, parse(id + rest).getUserId());
+	}
+

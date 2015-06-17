@@ -1,0 +1,13 @@
+	@Test
+	public void parseValid() throws Exception {
+		String raw = "A U. Thor <a_u_thor@example.com> 1218123387 +0700";
+		PushCertificateIdent ident = parse(raw);
+		assertEquals(raw, ident.getRaw());
+		assertEquals("A U. Thor <a_u_thor@example.com>", ident.getUserId());
+		assertEquals("A U. Thor", ident.getName());
+		assertEquals("a_u_thor@example.com", ident.getEmailAddress());
+		assertEquals(1218123387000L, ident.getWhen().getTime());
+		assertEquals(TimeZone.getTimeZone("GMT+0700"), ident.getTimeZone());
+		assertEquals(7 * 60, ident.getTimeZoneOffset());
+	}
+

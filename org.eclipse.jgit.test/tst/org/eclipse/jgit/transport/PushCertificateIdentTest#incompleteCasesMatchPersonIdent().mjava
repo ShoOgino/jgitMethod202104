@@ -1,0 +1,52 @@
+	@Test
+	public void incompleteCasesMatchPersonIdent() throws Exception {
+		// See RawParseUtils_ParsePersonIdentTest#testParsePersonIdent_incompleteCases()
+		Date when = new Date(1234567890000l);
+		TimeZone tz = TimeZone.getTimeZone("GMT-7");
+
+		assertMatchesPersonIdent(
+				"Me <> 1234567890 -0700",
+				new PersonIdent("Me", "", when, tz),
+				"Me <>");
+		assertMatchesPersonIdent(
+				" <me@example.com> 1234567890 -0700",
+				new PersonIdent("", "me@example.com", when, tz),
+				" <me@example.com>");
+		assertMatchesPersonIdent(
+				" <> 1234567890 -0700",
+				new PersonIdent("", "", when, tz),
+				" <>");
+		assertMatchesPersonIdent(
+				"<>",
+				new PersonIdent("", "", 0, 0),
+				"<>");
+		assertMatchesPersonIdent(
+				" <>",
+				new PersonIdent("", "", 0, 0),
+				" <>");
+		assertMatchesPersonIdent(
+				"<me@example.com>",
+				new PersonIdent("", "me@example.com", 0, 0),
+				"<me@example.com>");
+		assertMatchesPersonIdent(
+				" <me@example.com>",
+				new PersonIdent("", "me@example.com", 0, 0),
+				" <me@example.com>");
+		assertMatchesPersonIdent(
+				"Me <>",
+				new PersonIdent("Me", "", 0, 0),
+				"Me <>");
+		assertMatchesPersonIdent(
+				"Me <me@example.com>",
+				new PersonIdent("Me", "me@example.com", 0, 0),
+				"Me <me@example.com>");
+		assertMatchesPersonIdent(
+				"Me <me@example.com> 1234567890",
+				new PersonIdent("Me", "me@example.com", 0, 0),
+				"Me <me@example.com>");
+		assertMatchesPersonIdent(
+				"Me <me@example.com> 1234567890 ",
+				new PersonIdent("Me", "me@example.com", 0, 0),
+				"Me <me@example.com>");
+	}
+

@@ -1,0 +1,20 @@
+	/**
+	 * Construct a new identity from an OpenPGP User ID.
+	 *
+	 * @param userId
+	 *            OpenPGP User ID; any UTF-8 string.
+	 * @param when
+	 *            local time.
+	 * @param tzOffset
+	 *            timezone offset; see {@link #getTimeZoneOffset()}.
+	 */
+	public PushCertificateIdent(String userId, long when, int tzOffset) {
+		this.userId = userId;
+		this.when = when;
+		this.tzOffset = tzOffset;
+		StringBuilder sb = new StringBuilder(userId).append(' ').append(when / 1000)
+				.append(' ');
+		PersonIdent.appendTimezone(sb, tzOffset);
+		raw = sb.toString();
+	}
+

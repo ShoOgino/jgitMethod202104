@@ -1,0 +1,22 @@
+	/**
+	 * @return the name portion of the User ID. If no email address would be
+	 *         parsed by {@link #getEmailAddress()}, returns the full User ID with
+	 *         spaces trimmed.
+	 * @since 4.1
+	 */
+	public String getName() {
+		int nameEnd = userId.indexOf('<');
+		if (nameEnd < 0 || userId.indexOf('>', nameEnd) < 0) {
+			nameEnd = userId.length();
+		}
+		nameEnd--;
+		while (nameEnd >= 0 && userId.charAt(nameEnd) == ' ') {
+			nameEnd--;
+		}
+		int nameBegin = 0;
+		while (nameBegin < nameEnd && userId.charAt(nameBegin) == ' ') {
+			nameBegin++;
+		}
+		return userId.substring(nameBegin, nameEnd + 1);
+	}
+

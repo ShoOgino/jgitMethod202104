@@ -1,0 +1,17 @@
+	/**
+	 * @return the email portion of the User ID, if one was successfully parsed
+	 *         from {@link #getUserId()}, or null.
+	 * @since 4.1
+	 */
+	public String getEmailAddress() {
+		int emailBegin = userId.indexOf('<');
+		if (emailBegin < 0) {
+			return null;
+		}
+		int emailEnd = userId.indexOf('>', emailBegin);
+		if (emailEnd < 0) {
+			return null;
+		}
+		return userId.substring(emailBegin + 1, emailEnd);
+	}
+

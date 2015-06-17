@@ -1,0 +1,14 @@
+	private static void assertMatchesPersonIdent(String raw,
+			PersonIdent expectedPersonIdent, String expectedUserId) {
+		PushCertificateIdent certIdent = PushCertificateIdent.parse(raw);
+		assertNotNull(raw);
+		assertEquals(raw, certIdent.getRaw());
+		assertEquals(expectedPersonIdent.getName(), certIdent.getName());
+		assertEquals(expectedPersonIdent.getEmailAddress(),
+				certIdent.getEmailAddress());
+		assertEquals(expectedPersonIdent.getWhen(), certIdent.getWhen());
+		assertEquals(expectedPersonIdent.getTimeZoneOffset(),
+				certIdent.getTimeZoneOffset());
+		assertEquals(expectedUserId, certIdent.getUserId());
+	}
+

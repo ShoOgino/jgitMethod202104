@@ -1,0 +1,58 @@
+	/**
+	 * Parse an identity from a string.
+	 * <p>
+	 * Spaces are trimmed when parsing the timestamp and timezone offset, with one
+	 * exception. The timestamp must be preceded by a single space, and the rest
+	 * of the string prior to that space (including any additional whitespace) is
+	 * treated as the OpenPGP User ID.
+	 * <p>
+	 * If either the timestamp or timezone offsets are missing, mimics {@link
+	 * RawParseUtils#parsePersonIdent(String)} behavior and sets them both to
+	 * zero.
+	 *
+	 * @param str
+	 *            string to parse.
+	 * @return identity, never null.
+	 * @since 4.1
+	 */
+	public static PushCertificateIdent parse(String str) {
+		MutableInteger p = new MutableInteger();
+		byte[] raw = str.getBytes(UTF_8);
+		int tzBegin = raw.length - 1;
+		tzBegin = lastIndexOfTrim(raw, ' ', tzBegin);
+		if (tzBegin < 0 || raw[tzBegin] != ' ') {
+			return new PushCertificateIdent(str, str, 0, 0);
+		}
+		int whenBegin = tzBegin++;
+		int tz = RawParseUtils.parseTimeZoneOffset(raw, tzBegin, p);
+		boolean hasTz = p.value != tzBegin;
+
+		whenBegin = lastIndexOfTrim(raw, ' ', whenBegin);
+		if (whenBegin < 0 || raw[whenBegin] != ' ') {
+			return new PushCertificateIdent(str, str, 0, 0);
+		}
+		int idEnd = whenBegin++;
+		long when = RawParseUtils.parseLongBase10(raw, whenBegin, p);
+		boolean hasWhen = p.value != whenBegin;
+
+		if (hasTz && hasWhen) {
+			idEnd = whenBegin - 1;
+		} else {
+			// If either tz or when are non-numeric, mimic parsePersonIdent behavior and
+			// set them both to zero.
+			tz = 0;
+			when = 0;
+			if (hasTz && !hasWhen) {
+				// Only one trailing numeric field; assume User ID ends before this
+				// field, but discard its value.
+				idEnd = tzBegin - 1;
+			} else {
+				// No trailing numeric fields; User ID is whole raw value.
+				idEnd = raw.length;
+			}
+		}
+		String id = new String(raw, 0, idEnd, UTF_8);
+
+		return new PushCertificateIdent(str, id, when * 1000L, tz);
+	}
+

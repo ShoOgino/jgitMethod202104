@@ -26,12 +26,12 @@
 				throw new PackProtocolException(MessageFormat.format(
 						JGitText.get().pushCertificateInvalidFieldValue, VERSION, version));
 			}
-			String pusherStr = parseHeader(pckIn, PUSHER);
-			pusher = RawParseUtils.parsePersonIdent(pusherStr);
+			String rawPusher = parseHeader(pckIn, PUSHER);
+			pusher = PushCertificateIdent.parse(rawPusher);
 			if (pusher == null) {
 				throw new PackProtocolException(MessageFormat.format(
 						JGitText.get().pushCertificateInvalidFieldValue,
-						PUSHER, pusherStr));
+						PUSHER, rawPusher));
 			}
 			pushee = parseHeader(pckIn, PUSHEE);
 			receivedNonce = parseHeader(pckIn, NONCE);
