@@ -1,0 +1,18 @@
+	@Test
+	public void disabledParserStillRequiresCorrectSyntax() throws Exception {
+		PacketLineIn pckIn = newPacketLineIn("001ccertificate version XYZ\n");
+		PushCertificateParser parser =
+				new PushCertificateParser(db, newDisabledConfig());
+		assertFalse(parser.enabled());
+		try {
+			parser.receiveHeader(pckIn, false);
+			fail("Expected PackProtocolException");
+		} catch (PackProtocolException e) {
+			assertEquals(
+					"Push certificate has missing or invalid value for certificate"
+						+ " version: XYZ",
+					e.getMessage());
+		}
+		assertNull(parser.build());
+	}
+

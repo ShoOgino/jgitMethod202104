@@ -1,0 +1,15 @@
+	@Test
+	public void disabled() throws Exception {
+		PacketLineIn pckIn = newPacketLineIn(INPUT);
+		PushCertificateParser parser =
+				new PushCertificateParser(db, newDisabledConfig());
+		assertFalse(parser.enabled());
+		assertNull(parser.build());
+
+		parser.receiveHeader(pckIn, false);
+		parser.addCommand(pckIn.readStringRaw());
+		assertEquals(PushCertificateParser.BEGIN_SIGNATURE, pckIn.readStringRaw());
+		parser.receiveSignature(pckIn);
+		assertNull(parser.build());
+	}
+
