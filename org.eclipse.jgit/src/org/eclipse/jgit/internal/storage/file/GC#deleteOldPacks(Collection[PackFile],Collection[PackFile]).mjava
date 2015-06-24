@@ -1,13 +1,17 @@
 	/**
 	 * Delete old pack files. What is 'old' is defined by specifying a set of
 	 * old pack files and a set of new pack files. Each pack file contained in
-	 * old pack files but not contained in new pack files will be deleted.
+	 * old pack files but not contained in new pack files will be deleted. If an
+	 * expirationDate is set then pack files which are younger than the
+	 * expirationDate will not be deleted.
 	 *
 	 * @param oldPacks
 	 * @param newPacks
+	 * @throws ParseException
 	 */
 	private void deleteOldPacks(Collection<PackFile> oldPacks,
-			Collection<PackFile> newPacks) {
+			Collection<PackFile> newPacks) throws ParseException {
+		long expireDate = getExpireDate();
 		oldPackLoop: for (PackFile oldPack : oldPacks) {
 			String oldName = oldPack.getPackName();
 			// check whether an old pack file is also among the list of new
@@ -16,7 +20,8 @@
 				if (oldName.equals(newPack.getPackName()))
 					continue oldPackLoop;
 
-			if (!oldPack.shouldBeKept()) {
+			if (!oldPack.shouldBeKept()
+					&& oldPack.getPackFile().lastModified() < expireDate) {
 				oldPack.close();
 				prunePack(oldName);
 			}
