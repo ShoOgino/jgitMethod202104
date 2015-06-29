@@ -1,12 +1,23 @@
 	@Test
-	public void parseCommand() {
-		String input = "0000000000000000000000000000000000000000"
-				+ " deadbeefdeadbeefdeadbeefdeadbeefdeadbeef"
-				+ " refs/heads/master";
-		ReceiveCommand cmd = BaseReceivePack.parseCommand(input);
+	public void parseCommand() throws Exception {
+		String o = "0000000000000000000000000000000000000000";
+		String n = "deadbeefdeadbeefdeadbeefdeadbeefdeadbeef";
+		String r = "refs/heads/master";
+		ReceiveCommand cmd = BaseReceivePack.parseCommand(o + " " + n + " " + r);
 		assertEquals(ObjectId.zeroId(), cmd.getOldId());
 		assertEquals("deadbeefdeadbeefdeadbeefdeadbeefdeadbeef",
 				cmd.getNewId().name());
 		assertEquals("refs/heads/master", cmd.getRefName());
+
+		assertParseCommandFails(null);
+		assertParseCommandFails("");
+		assertParseCommandFails(o.substring(35) + " " + n.substring(35)
+				+ " " + r + "\n");
+		assertParseCommandFails(o + " " + n + " " + r + "\n");
+		assertParseCommandFails(o + " " + n + " " + "refs^foo");
+		assertParseCommandFails(o + " " + n.substring(10) + " " + r);
+		assertParseCommandFails(o.substring(10) + " " + n + " " + r);
+		assertParseCommandFails("X" + o.substring(1) + " " + n + " " + r);
+		assertParseCommandFails(o + " " + "X" + n.substring(1) + " " + r);
 	}
 

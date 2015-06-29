@@ -41,13 +41,13 @@
 				continue;
 			}
 
-			if (line.length() < 83) {
-				final String m = JGitText.get().errorInvalidProtocolWantedOldNewRef;
-				sendError(m);
-				throw new PackProtocolException(m);
+			ReceiveCommand cmd;
+			try {
+				cmd = parseCommand(line);
+			} catch (PackProtocolException e) {
+				sendError(e.getMessage());
+				throw e;
 			}
-
-			final ReceiveCommand cmd = parseCommand(line);
 			if (cmd.getRefName().equals(Constants.HEAD)) {
 				cmd.setResult(Result.REJECTED_CURRENT_BRANCH);
 			} else {
