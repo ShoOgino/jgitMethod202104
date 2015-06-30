@@ -20,34 +20,6 @@
 	 */
 	public void receiveHeader(PacketLineIn pckIn, boolean stateless)
 			throws IOException {
-		received = true;
-		try {
-			version = parseHeader(pckIn, VERSION);
-			if (!version.equals(VERSION_0_1)) {
-				throw new PackProtocolException(MessageFormat.format(
-						JGitText.get().pushCertificateInvalidFieldValue, VERSION, version));
-			}
-			String rawPusher = parseHeader(pckIn, PUSHER);
-			pusher = PushCertificateIdent.parse(rawPusher);
-			if (pusher == null) {
-				throw new PackProtocolException(MessageFormat.format(
-						JGitText.get().pushCertificateInvalidFieldValue,
-						PUSHER, rawPusher));
-			}
-			pushee = parseHeader(pckIn, PUSHEE);
-			receivedNonce = parseHeader(pckIn, NONCE);
-			// An empty line.
-			if (!pckIn.readString().isEmpty()) {
-				throw new PackProtocolException(
-						JGitText.get().pushCertificateInvalidHeader);
-			}
-		} catch (EOFException eof) {
-			throw new PackProtocolException(
-					JGitText.get().pushCertificateInvalidHeader, eof);
-		}
-		nonceStatus = nonceGenerator != null
-				? nonceGenerator.verify(
-					receivedNonce, sentNonce(), db, stateless, nonceSlopLimit)
-				: NonceStatus.UNSOLICITED;
+		receiveHeader(new PacketLineReader(pckIn), stateless);
 	}
 

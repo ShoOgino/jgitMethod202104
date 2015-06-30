@@ -1,0 +1,12 @@
+		@Override
+		public String read() throws IOException {
+			// Presize for a command containing 2 SHA-1s and some refname.
+			String line = IO.readLine(reader, 41 * 2 + 64);
+			if (line.isEmpty()) {
+				throw new EOFException();
+			} else if (line.charAt(line.length() - 1) == '\n') {
+				line = line.substring(0, line.length() - 1);
+			}
+			return line;
+		}
+

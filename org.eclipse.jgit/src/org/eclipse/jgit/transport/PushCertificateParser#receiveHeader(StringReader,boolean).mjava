@@ -1,0 +1,37 @@
+	private void receiveHeader(StringReader reader, boolean stateless)
+			throws IOException {
+		try {
+			try {
+				version = parseHeader(reader, VERSION);
+			} catch (EOFException e) {
+				return;
+			}
+			received = true;
+			if (!version.equals(VERSION_0_1)) {
+				throw new PackProtocolException(MessageFormat.format(
+						JGitText.get().pushCertificateInvalidFieldValue, VERSION, version));
+			}
+			String rawPusher = parseHeader(reader, PUSHER);
+			pusher = PushCertificateIdent.parse(rawPusher);
+			if (pusher == null) {
+				throw new PackProtocolException(MessageFormat.format(
+						JGitText.get().pushCertificateInvalidFieldValue,
+						PUSHER, rawPusher));
+			}
+			pushee = parseHeader(reader, PUSHEE);
+			receivedNonce = parseHeader(reader, NONCE);
+			nonceStatus = nonceGenerator != null
+					? nonceGenerator.verify(
+						receivedNonce, sentNonce(), db, stateless, nonceSlopLimit)
+					: NonceStatus.UNSOLICITED;
+			// An empty line.
+			if (!reader.read().isEmpty()) {
+				throw new PackProtocolException(
+						JGitText.get().pushCertificateInvalidHeader);
+			}
+		} catch (EOFException eof) {
+			throw new PackProtocolException(
+					JGitText.get().pushCertificateInvalidHeader, eof);
+		}
+	}
+

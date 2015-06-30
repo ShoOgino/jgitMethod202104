@@ -1,0 +1,15 @@
+	private void receiveSignature(StringReader reader) throws IOException {
+		received = true;
+		try {
+			StringBuilder sig = new StringBuilder(BEGIN_SIGNATURE).append('\n');
+			String line;
+			while (!(line = reader.read()).equals(END_SIGNATURE)) {
+				sig.append(line).append('\n');
+			}
+			signature = sig.append(END_SIGNATURE).append('\n').toString();
+		} catch (EOFException eof) {
+			throw new PackProtocolException(
+					JGitText.get().pushCertificateInvalidSignature, eof);
+		}
+	}
+

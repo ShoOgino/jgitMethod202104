@@ -1,6 +1,9 @@
-	private static String parseHeader(PacketLineIn pckIn, String header)
+	private static String parseHeader(StringReader reader, String header)
 			throws IOException {
-		String s = pckIn.readString();
+		String s = reader.read();
+		if (s.isEmpty()) {
+			throw new EOFException();
+		}
 		if (s.length() <= header.length()
 				|| !s.startsWith(header)
 				|| s.charAt(header.length()) != ' ') {

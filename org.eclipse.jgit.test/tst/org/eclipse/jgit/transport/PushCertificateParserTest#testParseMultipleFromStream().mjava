@@ -1,0 +1,14 @@
+	@Test
+	public void testParseMultipleFromStream() throws Exception {
+		String input = concatPacketLines(INPUT, 0, 17);
+		assertFalse(input.contains(PushCertificateParser.END_CERT));
+		input += input;
+		Reader reader = new InputStreamReader(
+				new ByteArrayInputStream(Constants.encode(input)));
+
+		assertNotNull(PushCertificateParser.fromReader(reader));
+		assertNotNull(PushCertificateParser.fromReader(reader));
+		assertEquals(-1, reader.read());
+		assertNull(PushCertificateParser.fromReader(reader));
+	}
+

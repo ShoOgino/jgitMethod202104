@@ -1,0 +1,42 @@
+	@Test
+	public void testParseReader() throws Exception {
+		Reader reader = new InputStreamReader(
+				new ByteArrayInputStream(
+						Constants.encode(concatPacketLines(INPUT, 0, 18))));
+		PushCertificate streamCert = PushCertificateParser.fromReader(reader);
+
+		PacketLineIn pckIn = newPacketLineIn(INPUT);
+		PushCertificateParser pckParser =
+				new PushCertificateParser(db, newEnabledConfig());
+		pckParser.receiveHeader(pckIn, false);
+		pckParser.addCommand(pckIn.readString());
+		assertEquals(PushCertificateParser.BEGIN_SIGNATURE, pckIn.readString());
+		pckParser.receiveSignature(pckIn);
+		PushCertificate pckCert = pckParser.build();
+
+		// Nonce status is unsolicited since this was not parsed in the context of
+		// the wire protocol; as a result, certs are not actually equal.
+		assertEquals(NonceStatus.UNSOLICITED, streamCert.getNonceStatus());
+
+		assertEquals(pckCert.getVersion(), streamCert.getVersion());
+		assertEquals(pckCert.getPusherIdent().getName(),
+				streamCert.getPusherIdent().getName());
+		assertEquals(pckCert.getPusherIdent().getEmailAddress(),
+				streamCert.getPusherIdent().getEmailAddress());
+		assertEquals(pckCert.getPusherIdent().getWhen().getTime(),
+				streamCert.getPusherIdent().getWhen().getTime());
+		assertEquals(pckCert.getPusherIdent().getTimeZoneOffset(),
+				streamCert.getPusherIdent().getTimeZoneOffset());
+		assertEquals(pckCert.getPushee(), streamCert.getPushee());
+		assertEquals(pckCert.getNonce(), streamCert.getNonce());
+		assertEquals(pckCert.getSignature(), streamCert.getSignature());
+		assertEquals(pckCert.toText(), streamCert.toText());
+
+		assertEquals(pckCert.getCommands().size(), streamCert.getCommands().size());
+		ReceiveCommand pckCmd = pckCert.getCommands().get(0);
+		ReceiveCommand streamCmd = streamCert.getCommands().get(0);
+		assertEquals(pckCmd.getRefName(), streamCmd.getRefName());
+		assertEquals(pckCmd.getOldId(), streamCmd.getOldId());
+		assertEquals(pckCmd.getNewId().name(), streamCmd.getNewId().name());
+	}
+
