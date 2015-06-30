@@ -1,0 +1,10 @@
+	private static String msg(byte[] bytes, int offset, int length) {
+		try {
+			return MessageFormat.format(
+					JGitText.get().invalidId,
+					new String(bytes, offset, length, US_ASCII));
+		} catch (StringIndexOutOfBoundsException e) {
+			return JGitText.get().invalidId0;
+		}
+	}
+
