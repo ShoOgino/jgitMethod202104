@@ -1,0 +1,15 @@
+	@Test
+	public void saveTwoCertsOnDifferentRefsInOneUpdate() throws Exception {
+		PersonIdent ident1 = newIdent();
+		PersonIdent ident3 = newIdent();
+		PushCertificate addBranch = newCert(
+				command(zeroId(), ID1, "refs/heads/branch"));
+		store.put(addBranch, ident3);
+		PushCertificate addMaster = newCert(
+				command(zeroId(), ID1, "refs/heads/master"));
+		store.put(addMaster, ident1);
+		assertEquals(NEW, store.save());
+		assertCerts("refs/heads/master", addMaster);
+		assertCerts("refs/heads/branch", addBranch);
+	}
+

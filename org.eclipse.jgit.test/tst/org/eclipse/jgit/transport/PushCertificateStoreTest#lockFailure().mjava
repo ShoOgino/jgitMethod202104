@@ -1,0 +1,25 @@
+	@Test
+	public void lockFailure() throws Exception {
+		PushCertificateStore store1 = store;
+		PushCertificateStore store2 = newStore();
+		store2.get("refs/heads/master");
+
+		PushCertificate addMaster = newCert(
+				command(zeroId(), ID1, "refs/heads/master"));
+		store1.put(addMaster, newIdent());
+		assertEquals(NEW, store1.save());
+
+		PushCertificate addBranch = newCert(
+				command(zeroId(), ID2, "refs/heads/branch"));
+		store2.put(addBranch, newIdent());
+
+		assertEquals(LOCK_FAILURE, store2.save());
+		// Reread ref after lock failure.
+		assertCerts(store2, "refs/heads/master", addMaster);
+		assertCerts(store2, "refs/heads/branch");
+
+		assertEquals(FAST_FORWARD, store2.save());
+		assertCerts(store2, "refs/heads/master", addMaster);
+		assertCerts(store2, "refs/heads/branch", addBranch);
+	}
+

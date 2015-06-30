@@ -1,0 +1,13 @@
+	@Test
+	public void changeRefFileToDirectory() throws Exception {
+		PushCertificate deleteRefsHeads = newCert(
+				command(ID1, zeroId(), "refs/heads"));
+		store.put(deleteRefsHeads, newIdent());
+		PushCertificate addMaster = newCert(
+				command(zeroId(), ID1, "refs/heads/master"));
+		store.put(addMaster, newIdent());
+		assertEquals(NEW, store.save());
+		assertCerts("refs/heads", deleteRefsHeads);
+		assertCerts("refs/heads/master", addMaster);
+	}
+

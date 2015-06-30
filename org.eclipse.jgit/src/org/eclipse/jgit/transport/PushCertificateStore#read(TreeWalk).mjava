@@ -1,0 +1,12 @@
+	private static PushCertificate read(TreeWalk tw) throws IOException {
+		if (tw == null || (tw.getRawMode(0) & TYPE_FILE) != TYPE_FILE) {
+			return null;
+		}
+		ObjectLoader loader =
+				tw.getObjectReader().open(tw.getObjectId(0), OBJ_BLOB);
+		try (InputStream in = loader.openStream();
+				Reader r = new BufferedReader(new InputStreamReader(in, UTF_8))) {
+			return PushCertificateParser.fromReader(r);
+		}
+	}
+

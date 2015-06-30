@@ -1,0 +1,8 @@
+	private static void assertCerts(PushCertificateStore store, String refName,
+			PushCertificate... expected) throws Exception {
+		List<PushCertificate> ex = Arrays.asList(expected);
+		PushCertificate first = !ex.isEmpty() ? ex.get(0) : null;
+		assertEquals(first, store.get(refName));
+		assertEquals(ex, toList(store.getAll(refName)));
+	}
+

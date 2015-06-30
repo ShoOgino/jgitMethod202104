@@ -1,0 +1,11 @@
+	private RefUpdate.Result updateRef(ObjectId newId) throws IOException {
+		RefUpdate ru = db.updateRef(REF_NAME);
+		ru.setExpectedOldObjectId(commit != null ? commit : ObjectId.zeroId());
+		ru.setNewObjectId(newId);
+		ru.setRefLogIdent(pending.get(pending.size() - 1).ident);
+		ru.setRefLogMessage(JGitText.get().storePushCertReflog, false);
+		try (RevWalk rw = new RevWalk(reader)) {
+			return ru.update(rw);
+		}
+	}
+

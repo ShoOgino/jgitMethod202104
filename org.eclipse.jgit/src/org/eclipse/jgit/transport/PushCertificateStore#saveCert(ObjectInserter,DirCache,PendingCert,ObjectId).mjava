@@ -1,0 +1,28 @@
+	private ObjectId saveCert(ObjectInserter inserter, DirCache dc,
+			PendingCert pc, ObjectId curr) throws IOException {
+		DirCacheEditor editor = dc.editor();
+		String certText = pc.cert.toText() + pc.cert.getSignature();
+		final ObjectId certId = inserter.insert(OBJ_BLOB, certText.getBytes(UTF_8));
+		for (ReceiveCommand cmd : pc.cert.getCommands()) {
+			editor.add(new PathEdit(pathName(cmd.getRefName())) {
+				@Override
+				public void apply(DirCacheEntry ent) {
+					ent.setFileMode(FileMode.REGULAR_FILE);
+					ent.setObjectId(certId);
+				}
+			});
+		}
+		editor.finish();
+		CommitBuilder cb = new CommitBuilder();
+		cb.setAuthor(pc.ident);
+		cb.setCommitter(pc.ident);
+		cb.setTreeId(dc.writeTree(inserter));
+		if (curr != null) {
+			cb.setParentId(curr);
+		} else {
+			cb.setParentIds(Collections.<ObjectId> emptyList());
+		}
+		cb.setMessage(buildMessage(pc.cert));
+		return inserter.insert(OBJ_COMMIT, cb.build());
+	}
+

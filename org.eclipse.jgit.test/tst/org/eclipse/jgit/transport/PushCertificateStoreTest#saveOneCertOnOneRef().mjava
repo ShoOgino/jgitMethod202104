@@ -1,0 +1,20 @@
+	@Test
+	public void saveOneCertOnOneRef() throws Exception {
+		PersonIdent ident = newIdent();
+		PushCertificate addMaster = newCert(
+				command(zeroId(), ID1, "refs/heads/master"));
+		store.put(addMaster, ident);
+		assertEquals(NEW, store.save());
+		assertCerts("refs/heads/master", addMaster);
+		assertCerts("refs/heads/branch");
+
+		try (RevWalk rw = new RevWalk(repo)) {
+			RevCommit c = rw.parseCommit(repo.resolve(PushCertificateStore.REF_NAME));
+			rw.parseBody(c);
+			assertEquals("Store push certificate for refs/heads/master\n",
+					c.getFullMessage());
+			assertEquals(ident, c.getAuthorIdent());
+			assertEquals(ident, c.getCommitterIdent());
+		}
+	}
+

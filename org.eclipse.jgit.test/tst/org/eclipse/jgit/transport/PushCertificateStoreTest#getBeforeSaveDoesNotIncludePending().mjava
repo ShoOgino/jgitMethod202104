@@ -1,0 +1,16 @@
+	@Test
+	public void getBeforeSaveDoesNotIncludePending() throws Exception {
+		PushCertificate addMaster = newCert(
+				command(zeroId(), ID1, "refs/heads/master"));
+		store.put(addMaster, newIdent());
+		assertEquals(NEW, store.save());
+
+		PushCertificate updateMaster = newCert(
+				command(ID1, ID2, "refs/heads/master"));
+		store.put(updateMaster, newIdent());
+
+		assertCerts("refs/heads/master", addMaster);
+		assertEquals(FAST_FORWARD, store.save());
+		assertCerts("refs/heads/master", updateMaster, addMaster);
+	}
+

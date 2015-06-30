@@ -1,0 +1,22 @@
+	private static PushCertificate newCert(String... updateLines) {
+		StringBuilder cert = new StringBuilder(
+				"certificate version 0.1\n"
+				+ "pusher Dave Borowitz <dborowitz@google.com> 1433954361 -0700\n"
+				+ "pushee git://localhost/repo.git\n"
+				+ "nonce 1433954361-bde756572d665bba81d8\n"
+				+ "\n");
+		for (String updateLine : updateLines) {
+			cert.append(updateLine).append('\n');
+		}
+		cert.append(
+				"-----BEGIN PGP SIGNATURE-----\n"
+				+ "DUMMY/SIGNATURE\n"
+				+ "-----END PGP SIGNATURE-----\n");
+		try {
+			return PushCertificateParser.fromReader(new InputStreamReader(
+					new ByteArrayInputStream(Constants.encode(cert.toString()))));
+		} catch (IOException e) {
+			throw new IllegalArgumentException(e);
+		}
+	}
+

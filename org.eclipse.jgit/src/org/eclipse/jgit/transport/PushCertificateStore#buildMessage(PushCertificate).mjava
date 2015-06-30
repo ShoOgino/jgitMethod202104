@@ -1,0 +1,14 @@
+	private static String buildMessage(PushCertificate cert) {
+		StringBuilder sb = new StringBuilder();
+		if (cert.getCommands().size() == 1) {
+			sb.append(MessageFormat.format(
+					JGitText.get().storePushCertOneRef,
+					cert.getCommands().get(0).getRefName()));
+		} else {
+			sb.append(MessageFormat.format(
+					JGitText.get().storePushCertMultipleRefs,
+					Integer.valueOf(cert.getCommands().size())));
+		}
+		return sb.append('\n').toString();
+	}
+

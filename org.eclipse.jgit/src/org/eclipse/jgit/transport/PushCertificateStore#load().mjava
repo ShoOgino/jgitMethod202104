@@ -1,0 +1,13 @@
+	private void load() throws IOException {
+		close();
+		reader = db.newObjectReader();
+		Ref ref = db.getRefDatabase().exactRef(REF_NAME);
+		if (ref == null) {
+			// No ref, same as empty.
+			return;
+		}
+		try (RevWalk rw = new RevWalk(reader)) {
+			commit = rw.parseCommit(ref.getObjectId());
+		}
+	}
+

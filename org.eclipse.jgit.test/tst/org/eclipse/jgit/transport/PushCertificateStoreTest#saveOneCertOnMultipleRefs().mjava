@@ -1,0 +1,20 @@
+	@Test
+	public void saveOneCertOnMultipleRefs() throws Exception {
+		PersonIdent ident = newIdent();
+		PushCertificate addMasterAndBranch = newCert(
+				command(zeroId(), ID1, "refs/heads/branch"),
+				command(zeroId(), ID2, "refs/heads/master"));
+		store.put(addMasterAndBranch, ident);
+		assertEquals(NEW, store.save());
+		assertCerts("refs/heads/master", addMasterAndBranch);
+		assertCerts("refs/heads/branch", addMasterAndBranch);
+
+		try (RevWalk rw = new RevWalk(repo)) {
+			RevCommit c = rw.parseCommit(repo.resolve(PushCertificateStore.REF_NAME));
+			rw.parseBody(c);
+			assertEquals("Store push certificate for 2 refs\n", c.getFullMessage());
+			assertEquals(ident, c.getAuthorIdent());
+			assertEquals(ident, c.getCommitterIdent());
+		}
+	}
+

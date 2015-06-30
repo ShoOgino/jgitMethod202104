@@ -1,0 +1,13 @@
+	@Test
+	public void saveTwoCertsOnSameRefInTwoUpdates() throws Exception {
+		PushCertificate addMaster = newCert(
+				command(zeroId(), ID1, "refs/heads/master"));
+		store.put(addMaster, newIdent());
+		assertEquals(NEW, store.save());
+		PushCertificate updateMaster = newCert(
+				command(ID1, ID2, "refs/heads/master"));
+		store.put(updateMaster, newIdent());
+		assertEquals(FAST_FORWARD, store.save());
+		assertCerts("refs/heads/master", updateMaster, addMaster);
+	}
+
