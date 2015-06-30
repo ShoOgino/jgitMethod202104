@@ -55,6 +55,15 @@
 			if (toPush.isEmpty())
 				throw new TransportException(JGitText.get().nothingToPush);
 		}
+		if (prePush != null) {
+			try {
+				prePush.setRefs(toPush);
+				prePush.call();
+			} catch (AbortedByHookException | IOException e) {
+				throw new TransportException(e.getMessage(), e);
+			}
+		}
+
 		final PushProcess pushProcess = new PushProcess(this, toPush, out);
 		return pushProcess.execute(monitor);
 	}

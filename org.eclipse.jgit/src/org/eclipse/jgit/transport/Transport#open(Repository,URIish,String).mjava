@@ -23,8 +23,13 @@
 				continue;
 			}
 
-			if (proto.canHandle(uri, local, remoteName))
-				return proto.open(uri, local, remoteName);
+			if (proto.canHandle(uri, local, remoteName)) {
+				Transport tn = proto.open(uri, local, remoteName);
+				tn.prePush = Hooks.prePush(local, tn.hookOutRedirect);
+				tn.prePush.setRemoteLocation(uri.toString());
+				tn.prePush.setRemoteName(remoteName);
+				return tn;
+			}
 		}
 
 		throw new NotSupportedException(MessageFormat.format(JGitText.get().URINotSupported, uri));

@@ -1,0 +1,24 @@
+	/**
+	 * @param toRefs
+	 */
+	public void setRefs(Collection<RemoteRefUpdate> toRefs) {
+		StringBuilder b = new StringBuilder();
+		boolean first = true;
+		for (RemoteRefUpdate u : toRefs) {
+			if (!first)
+				b.append("\n"); //$NON-NLS-1$
+			else
+				first = false;
+			b.append(u.getSrcRef());
+			b.append(" "); //$NON-NLS-1$
+			b.append(u.getNewObjectId().getName());
+			b.append(" "); //$NON-NLS-1$
+			b.append(u.getRemoteName());
+			b.append(" "); //$NON-NLS-1$
+			ObjectId ooid = u.getExpectedOldObjectId();
+			b.append((ooid == null) ? ObjectId.zeroId().getName() : ooid
+					.getName());
+		}
+		refs = b.toString();
+	}
+

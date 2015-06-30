@@ -1,0 +1,33 @@
+	@Test
+	public void testPrePushHook() throws JGitInternalException, IOException,
+			GitAPIException, URISyntaxException {
+
+		// create other repository
+		Repository db2 = createWorkRepository();
+
+		// setup the first repository
+		final StoredConfig config = db.getConfig();
+		RemoteConfig remoteConfig = new RemoteConfig(config, "test");
+		URIish uri = new URIish(db2.getDirectory().toURI().toURL());
+		remoteConfig.addURI(uri);
+		remoteConfig.update(config);
+		config.save();
+
+		File hookOutput = new File(getTemporaryDirectory(), "hookOutput");
+		writeHookFile(PrePushHook.NAME, "#!/bin/sh\necho 1:$1, 2:$2, 3:$3 >\""
+				+ hookOutput.toPath() + "\"\ncat - >>\"" + hookOutput.toPath()
+				+ "\"\nexit 0");
+
+		Git git1 = new Git(db);
+		// create some refs via commits and tag
+		RevCommit commit = git1.commit().setMessage("initial commit").call();
+
+		RefSpec spec = new RefSpec("refs/heads/master:refs/heads/x");
+		git1.push().setRemote("test").setRefSpecs(spec).call();
+		assertEquals(
+				"1:test, 2:file://" + db2.getDirectory().toPath() //
+						+ "/, 3:\n" + "refs/heads/master " + commit.getName()
+						+ " refs/heads/x " + ObjectId.zeroId().name(),
+				read(hookOutput));
+	}
+
