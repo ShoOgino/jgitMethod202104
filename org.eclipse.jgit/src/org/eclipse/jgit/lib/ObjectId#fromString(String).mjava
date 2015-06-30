@@ -6,9 +6,9 @@
 	 * @return the converted object id.
 	 */
 	public static ObjectId fromString(final String str) {
-		if (str.length() != Constants.OBJECT_ID_STRING_LENGTH)
-			throw new IllegalArgumentException(
-					MessageFormat.format(JGitText.get().invalidId, str));
+		if (str.length() != Constants.OBJECT_ID_STRING_LENGTH) {
+			throw new InvalidObjectIdException(str);
+		}
 		return fromHexString(Constants.encodeASCII(str), 0);
 	}
 
