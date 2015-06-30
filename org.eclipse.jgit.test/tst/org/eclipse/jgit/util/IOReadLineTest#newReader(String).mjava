@@ -1,0 +1,11 @@
+	private Reader newReader(String in) {
+		Reader r = new InputStreamReader(
+				new ByteArrayInputStream(Constants.encode(in)));
+		if (buffered) {
+			r = new BufferedReader(r);
+		}
+		assertEquals(Boolean.valueOf(buffered),
+				Boolean.valueOf(r.markSupported()));
+		return r;
+	}
+

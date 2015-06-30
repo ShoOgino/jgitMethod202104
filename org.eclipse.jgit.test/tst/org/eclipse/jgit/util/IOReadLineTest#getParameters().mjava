@@ -1,0 +1,14 @@
+	@SuppressWarnings("boxing")
+	@Parameters(name="buffered={0}, sizeHint={1}")
+	public static Collection<Object[]> getParameters() {
+		Boolean[] bv = {false, true};
+		Integer[] sv = {-1, 0, 1, 2, 3, 4, 64};
+		Collection<Object[]> params = new ArrayList<>(bv.length * sv.length);
+		for (boolean b : bv) {
+			for (Integer s : sv) {
+				params.add(new Object[]{b, s});
+			}
+		}
+		return params;
+	}
+
