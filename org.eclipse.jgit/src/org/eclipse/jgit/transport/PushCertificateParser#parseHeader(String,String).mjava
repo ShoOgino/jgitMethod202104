@@ -1,0 +1,14 @@
+	private static String parseHeader(String s, String header)
+			throws IOException {
+		if (s.isEmpty()) {
+			throw new EOFException();
+		}
+		if (s.length() <= header.length()
+				|| !s.startsWith(header)
+				|| s.charAt(header.length()) != ' ') {
+			throw new PackProtocolException(MessageFormat.format(
+					JGitText.get().pushCertificateInvalidField, header));
+		}
+		return s.substring(header.length() + 1);
+	}
+
