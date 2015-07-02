@@ -1,0 +1,18 @@
+	@Test
+	public void testSshProtoHostWithAuthentication() throws Exception {
+		final String str = "ssh://user:secret@pass@example.com/";
+		URIish u = new URIish(str);
+		assertEquals("ssh", u.getScheme());
+		assertTrue(u.isRemote());
+		assertEquals("/", u.getRawPath());
+		assertEquals("/", u.getPath());
+		assertEquals("example.com", u.getHost());
+		assertEquals(-1, u.getPort());
+		assertEquals("ssh://user@example.com/", u.toString());
+		assertEquals("ssh://user@example.com/", u.toASCIIString());
+		assertEquals("example.com", u.getHumanishName());
+		assertEquals("user", u.getUser());
+		assertEquals("secret@pass", u.getPass());
+		assertEquals(u, new URIish(str));
+	}
+

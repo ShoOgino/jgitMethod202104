@@ -1,0 +1,16 @@
+	@Test
+	public void testSshProtoHostOnly() throws Exception {
+		final String str = "ssh://example.com/";
+		URIish u = new URIish(str);
+		assertEquals("ssh", u.getScheme());
+		assertTrue(u.isRemote());
+		assertEquals("/", u.getRawPath());
+		assertEquals("/", u.getPath());
+		assertEquals("example.com", u.getHost());
+		assertEquals(-1, u.getPort());
+		assertEquals("ssh://example.com/", u.toString());
+		assertEquals("ssh://example.com/", u.toASCIIString());
+		assertEquals("example.com", u.getHumanishName());
+		assertEquals(u, new URIish(str));
+	}
+

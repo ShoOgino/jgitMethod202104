@@ -20,6 +20,10 @@
 	 * <td><code>/path/to/repo/</code></td>
 	 * </tr>
 	 * <tr>
+	 * <td><code>localhost</code></td>
+	 * <td><code>ssh://localhost/</code></td>
+	 * </tr>
+	 * <tr>
 	 * <td><code>/path//to</code></td>
 	 * <td>an empty string</td>
 	 * </tr>
@@ -33,9 +37,12 @@
 	 * @see #getPath
 	 */
 	public String getHumanishName() throws IllegalArgumentException {
-		if ("".equals(getPath()) || getPath() == null) //$NON-NLS-1$
-			throw new IllegalArgumentException();
 		String s = getPath();
+		if ("/".equals(s)) //$NON-NLS-1$
+			s = getHost();
+		if ("".equals(s) || s == null) //$NON-NLS-1$
+			throw new IllegalArgumentException();
+
 		String[] elements;
 		if ("file".equals(scheme) || LOCAL_FILE.matcher(s).matches()) //$NON-NLS-1$
 			elements = s.split("[\\" + File.separatorChar + "/]"); //$NON-NLS-1$ //$NON-NLS-2$
