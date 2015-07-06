@@ -1,6 +1,6 @@
 	@Test
-	public void parseCertFromPktLine() throws Exception {
-		PacketLineIn pckIn = newPacketLineIn(INPUT);
+	public void parseCertFromPktLineNoNewlines() throws Exception {
+		PacketLineIn pckIn = newPacketLineIn(INPUT_NO_NEWLINES);
 		PushCertificateParser parser =
 				new PushCertificateParser(db, newEnabledConfig());
 		parser.receiveHeader(pckIn, false);
@@ -28,6 +28,7 @@
 		assertEquals("6c2b981a177396fb47345b7df3e4d3f854c6bea7",
 				cmd.getNewId().name());
 
+		// Canonical signed payload has reinserted newlines.
 		assertEquals(concatPacketLines(INPUT, 0, 6), cert.toText());
 
 		String signature = concatPacketLines(INPUT, 6, 17);

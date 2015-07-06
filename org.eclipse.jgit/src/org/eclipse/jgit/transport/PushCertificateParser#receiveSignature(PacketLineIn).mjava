@@ -2,9 +2,9 @@
 	 * Read the PGP signature.
 	 * <p>
 	 * This method assumes the line
-	 * {@code "-----BEGIN PGP SIGNATURE-----\n"} has already been parsed,
-	 * and continues parsing until an {@code "-----END PGP SIGNATURE-----\n"} is
-	 * found, followed by {@code "push-cert-end\n"}.
+	 * {@code "-----BEGIN PGP SIGNATURE-----"} has already been parsed,
+	 * and continues parsing until an {@code "-----END PGP SIGNATURE-----"} is
+	 * found, followed by {@code "push-cert-end"}.
 	 *
 	 * @param pckIn
 	 *            where we read the signature from.
@@ -15,13 +15,13 @@
 	public void receiveSignature(PacketLineIn pckIn) throws IOException {
 		received = true;
 		try {
-			StringBuilder sig = new StringBuilder(BEGIN_SIGNATURE);
+			StringBuilder sig = new StringBuilder(BEGIN_SIGNATURE).append('\n');
 			String line;
-			while (!(line = pckIn.readStringRaw()).equals(END_SIGNATURE)) {
-				sig.append(line);
+			while (!(line = pckIn.readString()).equals(END_SIGNATURE)) {
+				sig.append(line).append('\n');
 			}
-			signature = sig.append(END_SIGNATURE).toString();
-			if (!pckIn.readStringRaw().equals(END_CERT)) {
+			signature = sig.append(END_SIGNATURE).append('\n').toString();
+			if (!pckIn.readString().equals(END_CERT)) {
 				throw new PackProtocolException(
 						JGitText.get().pushCertificateInvalidSignature);
 			}

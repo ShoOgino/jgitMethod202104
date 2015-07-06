@@ -7,8 +7,8 @@
 		assertNull(parser.build());
 
 		parser.receiveHeader(pckIn, false);
-		parser.addCommand(pckIn.readStringRaw());
-		assertEquals(PushCertificateParser.BEGIN_SIGNATURE, pckIn.readStringRaw());
+		parser.addCommand(pckIn.readString());
+		assertEquals(PushCertificateParser.BEGIN_SIGNATURE, pckIn.readString());
 		parser.receiveSignature(pckIn);
 		assertNull(parser.build());
 	}

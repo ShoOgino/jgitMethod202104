@@ -1,6 +1,6 @@
 	PushCertificate(String version, PushCertificateIdent pusher, String pushee,
 			String nonce, NonceStatus nonceStatus, List<ReceiveCommand> commands,
-			String rawCommands, String signature) {
+			String signature) {
 		if (version == null || version.isEmpty()) {
 			throw new IllegalArgumentException(MessageFormat.format(
 					JGitText.get().pushCertificateInvalidField, VERSION));
@@ -22,8 +22,7 @@
 					JGitText.get().pushCertificateInvalidField,
 					"nonce status")); //$NON-NLS-1$
 		}
-		if (commands == null || commands.isEmpty()
-				|| rawCommands == null || rawCommands.isEmpty()) {
+		if (commands == null || commands.isEmpty()) {
 			throw new IllegalArgumentException(MessageFormat.format(
 					JGitText.get().pushCertificateInvalidField,
 					"command")); //$NON-NLS-1$
@@ -33,7 +32,7 @@
 					JGitText.get().pushCertificateInvalidSignature);
 		}
 		if (!signature.startsWith(PushCertificateParser.BEGIN_SIGNATURE)
-				|| !signature.endsWith(PushCertificateParser.END_SIGNATURE)) {
+				|| !signature.endsWith(PushCertificateParser.END_SIGNATURE + '\n')) {
 			throw new IllegalArgumentException(
 					JGitText.get().pushCertificateInvalidSignature);
 		}
@@ -43,7 +42,6 @@
 		this.nonce = nonce;
 		this.nonceStatus = nonceStatus;
 		this.commands = commands;
-		this.rawCommands = rawCommands;
 		this.signature = signature;
 	}
 
