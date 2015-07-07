@@ -1,0 +1,18 @@
+	/**
+	 * Create a new iterator to traverse the work tree and its children.
+	 *
+	 * @param repo
+	 *            the repository whose working tree will be scanned.
+	 * @param fileModeStrategy
+	 *            the strategy to use to determine the FileMode for a FileEntry;
+	 *            controls gitlinks etc.
+	 *
+	 * @since 4.3
+	 */
+	public FileTreeIterator(Repository repo, FileModeStrategy fileModeStrategy) {
+		this(repo.getWorkTree(), repo.getFS(),
+				repo.getConfig().get(WorkingTreeOptions.KEY),
+				fileModeStrategy);
+		initRootIterator(repo);
+	}
+

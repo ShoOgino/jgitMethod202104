@@ -1,0 +1,20 @@
+	private Repository createNestedRepo() throws IOException {
+		File gitdir = createUniqueTestGitDir(false);
+		FileRepositoryBuilder builder = new FileRepositoryBuilder();
+		builder.setGitDir(gitdir);
+		Repository nestedRepo = builder.build();
+		nestedRepo.create();
+
+		JGitTestUtil.writeTrashFile(nestedRepo, "sub", "a.txt", "content");
+
+		File nestedRepoPath = new File(nestedRepo.getWorkTree(), "sub/nested");
+		FileRepositoryBuilder nestedBuilder = new FileRepositoryBuilder();
+		nestedBuilder.setWorkTree(nestedRepoPath);
+		nestedBuilder.build().create();
+
+		JGitTestUtil.writeTrashFile(nestedRepo, "sub/nested", "b.txt",
+				"content b");
+
+		return nestedRepo;
+	}
+

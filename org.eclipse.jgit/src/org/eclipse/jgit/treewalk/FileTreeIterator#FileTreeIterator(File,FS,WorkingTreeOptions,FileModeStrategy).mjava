@@ -9,8 +9,18 @@
 	 *            certain file system operations.
 	 * @param options
 	 *            working tree options to be used
+	 * @param fileModeStrategy
+	 *            the strategy to use to determine the FileMode for a FileEntry;
+	 *            controls gitlinks etc.
+	 *
+	 * @since 4.3
 	 */
-	public FileTreeIterator(final File root, FS fs, WorkingTreeOptions options) {
-		this(root, fs, options, DefaultFileModeStrategy.INSTANCE);
+	public FileTreeIterator(final File root, FS fs, WorkingTreeOptions options,
+							FileModeStrategy fileModeStrategy) {
+		super(options);
+		directory = root;
+		this.fs = fs;
+		this.fileModeStrategy = fileModeStrategy;
+		init(entries());
 	}
 
