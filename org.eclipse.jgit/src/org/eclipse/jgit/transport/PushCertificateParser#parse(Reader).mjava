@@ -1,14 +1,7 @@
 	/**
 	 * Parse a push certificate from a reader.
-	 * <p>
-	 * Differences from the {@link PacketLineIn} receiver methods:
-	 * <ul>
-	 * <li>Does not use pkt-line framing.</li>
-	 * <li>Reads an entire cert in one call rather than depending on a loop in
-	 *   the caller.</li>
-	 * <li>Does not assume a {@code "push-cert-end"} line.</li>
-	 * </ul>
 	 *
+	 * @see #fromReader(Reader)
 	 * @param r
 	 *            input reader; consumed only up until the end of the next
 	 *            signature in the input.
@@ -19,8 +12,23 @@
 	 *             if there was an error reading from the input.
 	 * @since 4.1
 	 */
-	public static PushCertificate fromReader(Reader r)
+	public PushCertificate parse(Reader r)
 			throws PackProtocolException, IOException {
-		return new PushCertificateParser().parse(r);
+		StreamReader reader = new StreamReader(r);
+		receiveHeader(reader, true);
+		String line;
+		try {
+			while (!(line = reader.read()).isEmpty()) {
+				if (line.equals(BEGIN_SIGNATURE)) {
+					receiveSignature(reader);
+					break;
+				}
+				addCommand(line);
+			}
+		} catch (EOFException e) {
+			// EOF reached, but might have been at a valid state. Let build call below
+			// sort it out.
+		}
+		return build();
 	}
 
