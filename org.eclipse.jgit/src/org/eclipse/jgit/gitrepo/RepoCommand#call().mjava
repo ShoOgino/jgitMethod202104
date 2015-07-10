@@ -97,7 +97,7 @@
 				ObjectId treeId = index.writeTree(inserter);
 
 				// Create a Commit object, populate it and write it
-				ObjectId headId = repo.resolve(Constants.HEAD + "^{commit}"); //$NON-NLS-1$
+				ObjectId headId = repo.resolve(targetBranch + "^{commit}"); //$NON-NLS-1$
 				CommitBuilder commit = new CommitBuilder();
 				commit.setTreeId(treeId);
 				if (headId != null)
@@ -109,7 +109,7 @@
 				ObjectId commitId = inserter.insert(commit);
 				inserter.flush();
 
-				RefUpdate ru = repo.updateRef(Constants.HEAD);
+				RefUpdate ru = repo.updateRef(targetBranch);
 				ru.setNewObjectId(commitId);
 				ru.setExpectedOldObjectId(headId != null ? headId : ObjectId.zeroId());
 				Result rc = ru.update(rw);
@@ -123,12 +123,14 @@
 					case REJECTED:
 					case LOCK_FAILURE:
 						throw new ConcurrentRefUpdateException(
-								JGitText.get().couldNotLockHEAD, ru.getRef(),
+								MessageFormat.format(
+										JGitText.get().cannotLock, targetBranch),
+								ru.getRef(),
 								rc);
 					default:
 						throw new JGitInternalException(MessageFormat.format(
 								JGitText.get().updatingRefFailed,
-								Constants.HEAD, commitId.name(), rc));
+								targetBranch, commitId.name(), rc));
 				}
 
 				return rw.parseCommit(commitId);

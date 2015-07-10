@@ -1,8 +1,8 @@
 	@Test
 	public void testReplaceManifestBare() throws Exception {
-		Repository remoteDb = createBareRepository();
-		Repository tempDb = createWorkRepository();
-		try {
+		try (
+				Repository remoteDb = createBareRepository();
+				Repository tempDb = createWorkRepository()) {
 			StringBuilder xmlContent = new StringBuilder();
 			xmlContent
 					.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
@@ -69,9 +69,6 @@
 			reader.close();
 			assertTrue("The bar submodule should exist", bar);
 			assertFalse("The foo submodule shouldn't exist", foo);
-		} finally {
-			tempDb.close();
-			remoteDb.close();
 		}
 	}
 

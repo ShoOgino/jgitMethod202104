@@ -1,8 +1,8 @@
 	@Test
 	public void testBareRepo() throws Exception {
-		Repository remoteDb = createBareRepository();
-		Repository tempDb = createWorkRepository();
-		try {
+		try (
+				Repository remoteDb = createBareRepository();
+				Repository tempDb = createWorkRepository()) {
 			StringBuilder xmlContent = new StringBuilder();
 			xmlContent
 					.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
@@ -39,9 +39,6 @@
 			String remote = defaultDb.resolve(Constants.HEAD).name();
 			assertEquals("The gitlink should be the same as remote head",
 					remote, gitlink);
-		} finally {
-			tempDb.close();
-			remoteDb.close();
 		}
 	}
 

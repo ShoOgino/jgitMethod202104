@@ -1,8 +1,8 @@
 	@Test
 	public void testCopyFileBare() throws Exception {
-		Repository remoteDb = createBareRepository();
-		Repository tempDb = createWorkRepository();
-		try {
+		try (
+				Repository remoteDb = createBareRepository();
+				Repository tempDb = createWorkRepository()) {
 			StringBuilder xmlContent = new StringBuilder();
 			xmlContent
 					.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
@@ -34,9 +34,6 @@
 			reader.close();
 			assertEquals("The Hello file should have expected content",
 					"branch world", content);
-		} finally {
-			tempDb.close();
-			remoteDb.close();
 		}
 	}
 
