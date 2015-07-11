@@ -1,0 +1,20 @@
+	private ObjectId write() throws IOException {
+		if (pending.isEmpty()) {
+			return null;
+		}
+		if (reader == null) {
+			load();
+		}
+		sortPending(pending);
+
+		ObjectId curr = commit;
+		DirCache dc = newDirCache();
+		try (ObjectInserter inserter = db.newObjectInserter()) {
+			for (PendingCert pc : pending) {
+				curr = saveCert(inserter, dc, pc, curr);
+			}
+			inserter.flush();
+			return curr;
+		}
+	}
+

@@ -14,22 +14,12 @@
 	 *             repository.
 	 */
 	public RefUpdate.Result save() throws IOException {
-		if (pending.isEmpty()) {
+		ObjectId newId = write();
+		if (newId == null) {
 			return RefUpdate.Result.NO_CHANGE;
 		}
-		if (reader == null) {
-			load();
-		}
-		sortPending(pending);
-
-		ObjectId curr = commit;
-		DirCache dc = newDirCache();
 		try (ObjectInserter inserter = db.newObjectInserter()) {
-			for (PendingCert pc : pending) {
-				curr = saveCert(inserter, dc, pc, curr);
-			}
-			inserter.flush();
-			RefUpdate.Result result = updateRef(curr);
+			RefUpdate.Result result = updateRef(newId);
 			switch (result) {
 				case FAST_FORWARD:
 				case NEW:
