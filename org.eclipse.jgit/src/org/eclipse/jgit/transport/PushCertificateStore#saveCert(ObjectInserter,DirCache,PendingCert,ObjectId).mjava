@@ -1,9 +1,26 @@
 	private ObjectId saveCert(ObjectInserter inserter, DirCache dc,
 			PendingCert pc, ObjectId curr) throws IOException {
+		Map<String, ReceiveCommand> byRef;
+		if (pc.matching != null) {
+			byRef = new HashMap<>();
+			for (ReceiveCommand cmd : pc.matching) {
+				if (byRef.put(cmd.getRefName(), cmd) != null) {
+					throw new IllegalStateException();
+				}
+			}
+		} else {
+			byRef = null;
+		}
+
 		DirCacheEditor editor = dc.editor();
 		String certText = pc.cert.toText() + pc.cert.getSignature();
 		final ObjectId certId = inserter.insert(OBJ_BLOB, certText.getBytes(UTF_8));
+		boolean any = false;
 		for (ReceiveCommand cmd : pc.cert.getCommands()) {
+			if (byRef != null && !commandsEqual(cmd, byRef.get(cmd.getRefName()))) {
+				continue;
+			}
+			any = true;
 			editor.add(new PathEdit(pathName(cmd.getRefName())) {
 				@Override
 				public void apply(DirCacheEntry ent) {
@@ -11,6 +28,9 @@
 					ent.setObjectId(certId);
 				}
 			});
+		}
+		if (!any) {
+			return curr;
 		}
 		editor.finish();
 		CommitBuilder cb = new CommitBuilder();

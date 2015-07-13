@@ -1,0 +1,12 @@
+	@Test
+	public void putMatchingWithSomeMatchingRefs() throws Exception {
+		PushCertificate addMasterAndBranch = newCert(
+				command(zeroId(), ID1, "refs/heads/master"),
+				command(zeroId(), ID2, "refs/heads/branch"));
+		store.put(addMasterAndBranch, newIdent(),
+				Collections.singleton(addMasterAndBranch.getCommands().get(0)));
+		assertEquals(NEW, store.save());
+		assertCerts("refs/heads/master", addMasterAndBranch);
+		assertCerts("refs/heads/branch");
+	}
+

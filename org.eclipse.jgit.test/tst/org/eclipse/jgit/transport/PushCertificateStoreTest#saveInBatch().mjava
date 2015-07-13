@@ -9,10 +9,10 @@
 		List<ReceiveCommand> commands = batch.getCommands();
 		assertEquals(1, commands.size());
 		ReceiveCommand cmd = commands.get(0);
+		assertEquals("refs/meta/push-certs", cmd.getRefName());
+		assertEquals(ReceiveCommand.Result.NOT_ATTEMPTED, cmd.getResult());
 
 		try (RevWalk rw = new RevWalk(repo)) {
-			assertEquals("refs/meta/push-certs", cmd.getRefName());
-			assertEquals(ReceiveCommand.Result.NOT_ATTEMPTED, cmd.getResult());
 			batch.execute(rw, NullProgressMonitor.INSTANCE);
 			assertEquals(ReceiveCommand.Result.OK, cmd.getResult());
 		}

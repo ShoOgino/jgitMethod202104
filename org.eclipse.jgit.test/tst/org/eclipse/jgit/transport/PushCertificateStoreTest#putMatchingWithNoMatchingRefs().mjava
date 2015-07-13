@@ -1,0 +1,9 @@
+	@Test
+	public void putMatchingWithNoMatchingRefs() throws Exception {
+		PushCertificate addMaster = newCert(
+				command(zeroId(), ID1, "refs/heads/master"),
+				command(zeroId(), ID2, "refs/heads/branch"));
+		store.put(addMaster, newIdent(), Collections.<ReceiveCommand> emptyList());
+		assertEquals(NO_CHANGE, store.save());
+	}
+
