@@ -1,0 +1,31 @@
+	@Test
+	public void testTrailingSpaces() throws IOException {
+		writeTrashFile("a  /a", "");
+		writeTrashFile("a  /a ", "");
+		writeTrashFile("a  /a  ", "");
+		writeTrashFile("a /a", "");
+		writeTrashFile("a /a ", "");
+		writeTrashFile("a /a  ", "");
+		writeTrashFile("a/a", "");
+		writeTrashFile("a/a ", "");
+		writeTrashFile("a/a  ", "");
+
+		writeIgnoreFile(".gitignore", "a\\ ", "a \\ ");
+
+		beginWalk();
+		assertEntry(F, tracked, ".gitignore");
+		assertEntry(D, ignored, "a  ");
+		assertEntry(F, ignored, "a  /a");
+		assertEntry(F, ignored, "a  /a ");
+		assertEntry(F, ignored, "a  /a  ");
+		assertEntry(D, ignored, "a ");
+		assertEntry(F, ignored, "a /a");
+		assertEntry(F, ignored, "a /a ");
+		assertEntry(F, ignored, "a /a  ");
+		assertEntry(D, tracked, "a");
+		assertEntry(F, tracked, "a/a");
+		assertEntry(F, ignored, "a/a ");
+		assertEntry(F, ignored, "a/a  ");
+		endWalk();
+	}
+
