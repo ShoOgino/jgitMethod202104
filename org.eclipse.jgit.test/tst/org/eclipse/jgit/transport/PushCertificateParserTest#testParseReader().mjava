@@ -1,8 +1,6 @@
 	@Test
 	public void testParseReader() throws Exception {
-		Reader reader = new InputStreamReader(
-				new ByteArrayInputStream(
-						Constants.encode(concatPacketLines(INPUT, 0, 18))));
+		Reader reader = new StringReader(concatPacketLines(INPUT, 0, 18));
 		PushCertificate streamCert = PushCertificateParser.fromReader(reader);
 
 		PacketLineIn pckIn = newPacketLineIn(INPUT);
