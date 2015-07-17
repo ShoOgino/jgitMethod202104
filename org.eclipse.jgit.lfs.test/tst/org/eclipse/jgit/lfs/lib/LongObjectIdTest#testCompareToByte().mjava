@@ -1,0 +1,21 @@
+	@Test
+	public void testCompareToByte() {
+		AnyLongObjectId id1 = LongObjectId.fromString(
+				"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef");
+		byte[] buf = new byte[32];
+		id1.copyRawTo(buf, 0);
+		assertEquals(0, id1.compareTo(buf, 0));
+
+		LongObjectId
+				.fromString(
+						"1123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef")
+				.copyRawTo(buf, 0);
+		assertEquals(-1, id1.compareTo(buf, 0));
+
+		LongObjectId
+				.fromString(
+						"0023456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef")
+				.copyRawTo(buf, 0);
+		assertEquals(1, id1.compareTo(buf, 0));
+	}
+

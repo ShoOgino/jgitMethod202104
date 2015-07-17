@@ -1,0 +1,20 @@
+	@Test
+	public void testPrefixCompare_Full() {
+		final String s1 = "27e15b72937fc8f558da24ac3d50ec20302a4cf21e33b87ae8e4ce90e89c4b10";
+		final AbbreviatedLongObjectId a = AbbreviatedLongObjectId
+				.fromString(s1);
+		final LongObjectId i1 = LongObjectId.fromString(s1);
+		assertEquals(0, a.prefixCompare(i1));
+		assertTrue(i1.startsWith(a));
+
+		final String s2 = "27e15b72937fc8f558da24ac3d50ec20302a4cf21e33b87ae8e4ce90e89c4b11";
+		final LongObjectId i2 = LongObjectId.fromString(s2);
+		assertTrue(a.prefixCompare(i2) < 0);
+		assertFalse(i2.startsWith(a));
+
+		final String s3 = "27e15b72937fc8f558da24ac3d50ec20302a4cf21e33b87ae8e4ce90e89c4b0f";
+		final LongObjectId i3 = LongObjectId.fromString(s3);
+		assertTrue(a.prefixCompare(i3) > 0);
+		assertFalse(i3.startsWith(a));
+	}
+

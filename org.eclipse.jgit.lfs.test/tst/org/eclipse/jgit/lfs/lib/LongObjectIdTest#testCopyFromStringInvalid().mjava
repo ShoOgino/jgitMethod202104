@@ -1,0 +1,12 @@
+	@Test
+	public void testCopyFromStringInvalid() {
+		AnyLongObjectId id1 = LongObjectIdTestUtils.hash("test");
+		try {
+			LongObjectId.fromString(id1.name() + "01234");
+			fail("expected InvalidLongObjectIdException");
+		} catch (InvalidLongObjectIdException e) {
+			assertEquals("Invalid id: " + id1.name() + "01234",
+					e.getMessage());
+		}
+	}
+

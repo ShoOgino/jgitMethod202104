@@ -1,0 +1,53 @@
+	@Test
+	public void testPrefixCompareByte() {
+		AnyLongObjectId id = LongObjectId.fromString(
+				"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef");
+		byte[] buf = new byte[32];
+		id.copyRawTo(buf, 0);
+
+		AbbreviatedLongObjectId a = id.abbreviate(62);
+		assertEquals(0, a.prefixCompare(buf, 0));
+
+		a = LongObjectId
+				.fromString(
+						"0023456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef")
+				.abbreviate(16);
+		assertEquals(-1, a.prefixCompare(buf, 0));
+		a = LongObjectId
+				.fromString(
+						"0123456789abcdef0023456789abcdef0123456789abcdef0123456789abcdef")
+				.abbreviate(32);
+		assertEquals(-1, a.prefixCompare(buf, 0));
+		a = LongObjectId
+				.fromString(
+						"0123456789abcdef0123456789abcdef0023456789abcdef0123456789abcdef")
+				.abbreviate(48);
+		assertEquals(-1, a.prefixCompare(buf, 0));
+		a = LongObjectId
+				.fromString(
+						"0123456789abcdef0123456789abcdef0123456789abcdef0023456789abcdef")
+				.abbreviate(64);
+		assertEquals(-1, a.prefixCompare(buf, 0));
+
+		a = LongObjectId
+				.fromString(
+						"1123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef")
+				.abbreviate(16);
+		assertEquals(1, a.prefixCompare(buf, 0));
+		a = LongObjectId
+				.fromString(
+						"0123456789abcdef1123456789abcdef0123456789abcdef0123456789abcdef")
+				.abbreviate(32);
+		assertEquals(1, a.prefixCompare(buf, 0));
+		a = LongObjectId
+				.fromString(
+						"0123456789abcdef0123456789abcdef1123456789abcdef0123456789abcdef")
+				.abbreviate(48);
+		assertEquals(1, a.prefixCompare(buf, 0));
+		a = LongObjectId
+				.fromString(
+						"0123456789abcdef0123456789abcdef0123456789abcdef1123456789abcdef")
+				.abbreviate(64);
+		assertEquals(1, a.prefixCompare(buf, 0));
+	}
+

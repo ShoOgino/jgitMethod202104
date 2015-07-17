@@ -1,0 +1,29 @@
+	/**
+	 * Compare this LongObjectId to another and obtain a sort ordering.
+	 *
+	 * @param other
+	 *            the other id to compare to. Must not be null.
+	 * @return &lt; 0 if this id comes before other; 0 if this id is equal to
+	 *         other; &gt; 0 if this id comes after other.
+	 */
+	public final int compareTo(final AnyLongObjectId other) {
+		if (this == other)
+			return 0;
+
+		int cmp;
+
+		cmp = NB.compareUInt64(w1, other.w1);
+		if (cmp != 0)
+			return cmp;
+
+		cmp = NB.compareUInt64(w2, other.w2);
+		if (cmp != 0)
+			return cmp;
+
+		cmp = NB.compareUInt64(w3, other.w3);
+		if (cmp != 0)
+			return cmp;
+
+		return NB.compareUInt64(w4, other.w4);
+	}
+

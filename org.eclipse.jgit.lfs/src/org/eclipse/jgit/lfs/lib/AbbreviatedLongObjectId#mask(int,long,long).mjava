@@ -1,0 +1,18 @@
+	static long mask(final int nibbles, final long word, final long v) {
+		final long b = (word - 1) * 16;
+		if (b + 16 <= nibbles) {
+			// We have all of the bits required for this word.
+			//
+			return v;
+		}
+
+		if (nibbles <= b) {
+			// We have none of the bits required for this word.
+			//
+			return 0;
+		}
+
+		final long s = 64 - (nibbles - b) * 4;
+		return (v >>> s) << s;
+	}
+

@@ -1,0 +1,17 @@
+	@Test
+	public void testFull_FromByteArray() {
+		final String s = "27e15b72937fc8f558da24ac3d50ec20302a4cf21e33b87ae8e4ce90e89c4b10";
+		final byte[] b = org.eclipse.jgit.lib.Constants.encodeASCII(s);
+		final AbbreviatedLongObjectId i = AbbreviatedLongObjectId.fromString(b,
+				0, b.length);
+		assertNotNull(i);
+		assertEquals(s.length(), i.length());
+		assertTrue(i.isComplete());
+		assertEquals(s, i.name());
+
+		final LongObjectId f = i.toLongObjectId();
+		assertNotNull(f);
+		assertEquals(LongObjectId.fromString(s), f);
+		assertEquals(f.hashCode(), i.hashCode());
+	}
+

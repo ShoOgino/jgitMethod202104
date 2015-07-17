@@ -1,0 +1,23 @@
+	/**
+	 * Create id as hash of a file content
+	 *
+	 * @param file
+	 *            the file to hash
+	 * @return id calculated by hashing file content
+	 * @throws FileNotFoundException
+	 *             if file doesn't exist
+	 * @throws IOException
+	 */
+	public static LongObjectId hash(Path file)
+			throws FileNotFoundException, IOException {
+		MessageDigest md = Constants.newMessageDigest();
+		try (InputStream is = new BufferedInputStream(
+				Files.newInputStream(file))) {
+			final byte[] buffer = new byte[4096];
+			for (int read = 0; (read = is.read(buffer)) != -1;) {
+				md.update(buffer, 0, read);
+			}
+		}
+		return LongObjectId.fromRaw(md.digest());
+	}
+

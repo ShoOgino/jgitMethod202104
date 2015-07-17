@@ -1,0 +1,17 @@
+	/**
+	 * Copy this LongObjectId to an output writer in hex format.
+	 *
+	 * @param tmp
+	 *            temporary char array to buffer construct into before writing.
+	 *            Must be at least large enough to hold 2 digits for each byte
+	 *            of object id (64 characters or larger).
+	 * @param w
+	 *            the stream to copy to.
+	 * @throws IOException
+	 *             the stream writing failed.
+	 */
+	public void copyTo(final char[] tmp, final Writer w) throws IOException {
+		toHexCharArray(tmp);
+		w.write(tmp, 0, Constants.LONG_OBJECT_ID_STRING_LENGTH);
+	}
+

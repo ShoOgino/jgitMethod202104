@@ -1,0 +1,25 @@
+	private static long set(long w, int index, long value) {
+		value &= 0xff;
+
+		switch (index) {
+		case 0:
+			return (w & 0x00ffffffffffffffL) | (value << 56);
+		case 1:
+			return (w & 0xff00ffffffffffffL) | (value << 48);
+		case 2:
+			return (w & 0xffff00ffffffffffL) | (value << 40);
+		case 3:
+			return (w & 0xffffff00ffffffffL) | (value << 32);
+		case 4:
+			return (w & 0xffffffff00ffffffL) | (value << 24);
+		case 5:
+			return (w & 0xffffffffff00ffffL) | (value << 16);
+		case 6:
+			return (w & 0xffffffffffff00ffL) | (value << 8);
+		case 7:
+			return (w & 0xffffffffffffff00L) | value;
+		default:
+			throw new ArrayIndexOutOfBoundsException();
+		}
+	}
+

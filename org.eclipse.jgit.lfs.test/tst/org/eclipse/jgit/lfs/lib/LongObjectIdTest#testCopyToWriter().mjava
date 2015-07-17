@@ -1,0 +1,10 @@
+	@Test
+	public void testCopyToWriter() throws IOException {
+		AnyLongObjectId id1 = LongObjectIdTestUtils.hash("test");
+		ByteArrayOutputStream os = new ByteArrayOutputStream(64);
+		OutputStreamWriter w = new OutputStreamWriter(os, Constants.CHARSET);
+		id1.copyTo(w);
+		w.close();
+		assertEquals(id1, LongObjectId.fromString(os.toByteArray(), 0));
+	}
+

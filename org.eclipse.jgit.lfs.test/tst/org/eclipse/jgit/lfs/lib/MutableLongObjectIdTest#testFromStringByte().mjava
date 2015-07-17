@@ -1,0 +1,10 @@
+	@Test
+	public void testFromStringByte() {
+		AnyLongObjectId id = new LongObjectId(1L, 2L, 3L, 4L);
+		MutableLongObjectId m = new MutableLongObjectId();
+		byte[] buf = new byte[64];
+		id.copyTo(buf, 0);
+		m.fromString(buf, 0);
+		assertEquals(id, m);
+	}
+

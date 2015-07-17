@@ -1,0 +1,14 @@
+	/**
+	 * Convert a LongObjectId from hex characters.
+	 *
+	 * @param str
+	 *            the string to read from. Must be 64 characters long.
+	 * @return the converted object id.
+	 */
+	public static LongObjectId fromString(final String str) {
+		if (str.length() != Constants.LONG_OBJECT_ID_STRING_LENGTH)
+			throw new InvalidLongObjectIdException(str);
+		return fromHexString(org.eclipse.jgit.lib.Constants.encodeASCII(str),
+				0);
+	}
+

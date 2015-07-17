@@ -1,0 +1,18 @@
+	/**
+	 * Convert a LongObjectId from raw binary representation.
+	 *
+	 * @param bs
+	 *            the raw byte buffer to read from. At least 32 bytes after p
+	 *            must be available within this byte array.
+	 * @param p
+	 *            position to read the first byte of data from.
+	 * @return the converted object id.
+	 */
+	public static final LongObjectId fromRaw(final byte[] bs, final int p) {
+		final long a = NB.decodeInt64(bs, p);
+		final long b = NB.decodeInt64(bs, p + 8);
+		final long c = NB.decodeInt64(bs, p + 16);
+		final long d = NB.decodeInt64(bs, p + 24);
+		return new LongObjectId(a, b, c, d);
+	}
+

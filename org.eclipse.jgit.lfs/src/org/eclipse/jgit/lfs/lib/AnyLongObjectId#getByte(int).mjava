@@ -1,0 +1,40 @@
+	/**
+	 * Get any byte from the LongObjectId.
+	 *
+	 * Callers hard-coding {@code getByte(0)} should instead use the much faster
+	 * special case variant {@link #getFirstByte()}.
+	 *
+	 * @param index
+	 *            index of the byte to obtain from the raw form of the
+	 *            LongObjectId. Must be in range [0,
+	 *            {@link Constants#LONG_OBJECT_ID_LENGTH}).
+	 * @return the value of the requested byte at {@code index}. Returned values
+	 *         are unsigned and thus are in the range [0,255] rather than the
+	 *         signed byte range of [-128, 127].
+	 * @throws ArrayIndexOutOfBoundsException
+	 *             {@code index} is less than 0, equal to
+	 *             {@link Constants#LONG_OBJECT_ID_LENGTH}, or greater than
+	 *             {@link Constants#LONG_OBJECT_ID_LENGTH}.
+	 */
+	public final int getByte(int index) {
+		long w;
+		switch (index >> 3) {
+		case 0:
+			w = w1;
+			break;
+		case 1:
+			w = w2;
+			break;
+		case 2:
+			w = w3;
+			break;
+		case 3:
+			w = w4;
+			break;
+		default:
+			throw new ArrayIndexOutOfBoundsException(index);
+		}
+
+		return (int) ((w >>> (8 * (15 - (index & 15)))) & 0xff);
+	}
+

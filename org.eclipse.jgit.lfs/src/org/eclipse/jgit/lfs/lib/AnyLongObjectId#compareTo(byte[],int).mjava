@@ -1,0 +1,29 @@
+	/**
+	 * Compare this LongObjectId to a network-byte-order LongObjectId.
+	 *
+	 * @param bs
+	 *            array containing the other LongObjectId in network byte order.
+	 * @param p
+	 *            position within {@code bs} to start the compare at. At least
+	 *            32 bytes, starting at this position are required.
+	 * @return a negative integer, zero, or a positive integer as this object is
+	 *         less than, equal to, or greater than the specified object.
+	 */
+	public final int compareTo(final byte[] bs, final int p) {
+		int cmp;
+
+		cmp = NB.compareUInt64(w1, NB.decodeInt64(bs, p));
+		if (cmp != 0)
+			return cmp;
+
+		cmp = NB.compareUInt64(w2, NB.decodeInt64(bs, p + 8));
+		if (cmp != 0)
+			return cmp;
+
+		cmp = NB.compareUInt64(w3, NB.decodeInt64(bs, p + 16));
+		if (cmp != 0)
+			return cmp;
+
+		return NB.compareUInt64(w4, NB.decodeInt64(bs, p + 24));
+	}
+

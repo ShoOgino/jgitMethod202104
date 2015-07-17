@@ -1,0 +1,28 @@
+	@Test
+	public void testPrefixCompareLong() {
+		AnyLongObjectId id = new LongObjectId(1L, 2L, 3L, 4L);
+		long[] buf = new long[4];
+		id.copyRawTo(buf, 0);
+
+		AbbreviatedLongObjectId a = id.abbreviate(62);
+		assertEquals(0, a.prefixCompare(buf, 0));
+
+		a = new LongObjectId(0L, 2L, 3L, 4L).abbreviate(16);
+		assertEquals(-1, a.prefixCompare(buf, 0));
+		a = new LongObjectId(1L, 1L, 3L, 4L).abbreviate(32);
+		assertEquals(-1, a.prefixCompare(buf, 0));
+		a = new LongObjectId(1L, 2L, 2L, 4L).abbreviate(48);
+		assertEquals(-1, a.prefixCompare(buf, 0));
+		a = new LongObjectId(1L, 2L, 3L, 3L).abbreviate(64);
+		assertEquals(-1, a.prefixCompare(buf, 0));
+
+		a = new LongObjectId(2L, 2L, 3L, 4L).abbreviate(16);
+		assertEquals(1, a.prefixCompare(buf, 0));
+		a = new LongObjectId(1L, 3L, 3L, 4L).abbreviate(32);
+		assertEquals(1, a.prefixCompare(buf, 0));
+		a = new LongObjectId(1L, 2L, 4L, 4L).abbreviate(48);
+		assertEquals(1, a.prefixCompare(buf, 0));
+		a = new LongObjectId(1L, 2L, 3L, 5L).abbreviate(64);
+		assertEquals(1, a.prefixCompare(buf, 0));
+	}
+

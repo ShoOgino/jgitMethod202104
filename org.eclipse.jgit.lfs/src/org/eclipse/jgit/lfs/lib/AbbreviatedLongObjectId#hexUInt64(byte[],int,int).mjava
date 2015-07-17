@@ -1,0 +1,14 @@
+	private static final long hexUInt64(final byte[] bs, int p, final int end) {
+		if (16 <= end - p)
+			return RawParseUtils.parseHexInt64(bs, p);
+
+		long r = 0;
+		int n = 0;
+		while (n < 16 && p < end) {
+			r <<= 4;
+			r |= RawParseUtils.parseHexInt4(bs[p++]);
+			n++;
+		}
+		return r << (16 - n) * 4;
+	}
+

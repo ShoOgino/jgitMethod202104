@@ -1,0 +1,31 @@
+	@Test
+	public void testSetByte() {
+		byte[] exp = new byte[32];
+		for (int i = 0; i < 32; i++) {
+			exp[i] = (byte) (0xa0 + i);
+		}
+
+		MutableLongObjectId id = new MutableLongObjectId();
+		id.fromRaw(exp);
+		assertEquals(LongObjectId.fromRaw(exp).name(), id.name());
+
+		id.setByte(0, 0x10);
+		assertEquals(0x10, id.getByte(0));
+		exp[0] = 0x10;
+		assertEquals(LongObjectId.fromRaw(exp).name(), id.name());
+
+		for (int p = 1; p < 32; p++) {
+			id.setByte(p, 0x10 + p);
+			assertEquals(0x10 + p, id.getByte(p));
+			exp[p] = (byte) (0x10 + p);
+			assertEquals(LongObjectId.fromRaw(exp).name(), id.name());
+		}
+
+		for (int p = 0; p < 32; p++) {
+			id.setByte(p, 0x80 + p);
+			assertEquals(0x80 + p, id.getByte(p));
+			exp[p] = (byte) (0x80 + p);
+			assertEquals(LongObjectId.fromRaw(exp).name(), id.name());
+		}
+	}
+

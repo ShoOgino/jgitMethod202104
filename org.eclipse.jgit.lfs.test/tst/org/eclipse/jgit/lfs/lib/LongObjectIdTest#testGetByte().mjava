@@ -1,0 +1,23 @@
+	@Test
+	public void testGetByte() {
+		byte[] raw = new byte[32];
+		for (int i = 0; i < 32; i++)
+			raw[i] = (byte) (0xa0 + i);
+		LongObjectId id = LongObjectId.fromRaw(raw);
+
+		assertEquals(raw[0] & 0xff, id.getFirstByte());
+		assertEquals(raw[0] & 0xff, id.getByte(0));
+		assertEquals(raw[1] & 0xff, id.getByte(1));
+		assertEquals(raw[1] & 0xff, id.getSecondByte());
+
+		for (int i = 2; i < 32; i++) {
+			assertEquals("index " + i, raw[i] & 0xff, id.getByte(i));
+		}
+		try {
+			id.getByte(32);
+			fail("LongObjectId has 32 byte only");
+		} catch (ArrayIndexOutOfBoundsException e) {
+			// expected
+		}
+	}
+

@@ -1,0 +1,11 @@
+	@Test
+	public void testFromStringWrongLength() {
+		AnyLongObjectId id = LongObjectIdTestUtils.hash("test");
+		try {
+			AbbreviatedLongObjectId.fromString(id.name() + "c0ffee");
+			fail("expected IllegalArgumentException for too long AbbreviatedLongObjectId");
+		} catch (IllegalArgumentException e) {
+			// expected
+		}
+	}
+

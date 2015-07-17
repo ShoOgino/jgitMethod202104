@@ -1,0 +1,12 @@
+	@Test
+	public void testCopyRawBytes() {
+		AnyLongObjectId id1 = LongObjectIdTestUtils.hash("test");
+		AnyLongObjectId id2 = new LongObjectId(id1);
+
+		byte[] buf = new byte[64];
+		id1.copyRawTo(buf, 0);
+		id2.copyRawTo(buf, 32);
+		assertTrue("objects should be equals",
+				LongObjectId.equals(buf, 0, buf, 32));
+	}
+

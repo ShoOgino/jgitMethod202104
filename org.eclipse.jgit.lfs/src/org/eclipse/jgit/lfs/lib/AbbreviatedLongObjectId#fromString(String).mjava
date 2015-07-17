@@ -1,0 +1,15 @@
+	/**
+	 * Convert an AbbreviatedLongObjectId from hex characters.
+	 *
+	 * @param str
+	 *            the string to read from. Must be &lt;= 64 characters.
+	 * @return the converted object id.
+	 */
+	public static final AbbreviatedLongObjectId fromString(final String str) {
+		if (str.length() > Constants.LONG_OBJECT_ID_STRING_LENGTH)
+			throw new IllegalArgumentException(
+					MessageFormat.format(LfsText.get().invalidLongId, str));
+		final byte[] b = org.eclipse.jgit.lib.Constants.encodeASCII(str);
+		return fromHexString(b, 0, b.length);
+	}
+

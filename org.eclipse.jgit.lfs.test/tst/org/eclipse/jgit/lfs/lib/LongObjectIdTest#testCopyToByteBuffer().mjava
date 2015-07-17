@@ -1,0 +1,8 @@
+	@Test
+	public void testCopyToByteBuffer() {
+		AnyLongObjectId id1 = LongObjectIdTestUtils.hash("test");
+		ByteBuffer buf = ByteBuffer.allocate(64);
+		id1.copyTo(buf);
+		assertEquals(id1, LongObjectId.fromString(buf.array(), 0));
+	}
+

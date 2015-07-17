@@ -1,0 +1,11 @@
+	@Test
+	public void testEquals() {
+		AnyLongObjectId id1 = LongObjectIdTestUtils.hash("test");
+		assertTrue("id should equal itself", id1.equals(id1));
+		AnyLongObjectId id2 = new LongObjectId(id1);
+		assertEquals("objects should be equals", id1, id2);
+
+		id2 = LongObjectIdTestUtils.hash("other");
+		assertNotEquals("objects should be not equal", id1, id2);
+	}
+

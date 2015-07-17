@@ -1,0 +1,9 @@
+	@Test
+	public void testCopyToStringBuilder() {
+		AnyLongObjectId id1 = LongObjectIdTestUtils.hash("test");
+		StringBuilder sb = new StringBuilder();
+		char[] buf = new char[64];
+		id1.copyTo(buf, sb);
+		assertEquals(id1, LongObjectId.fromString(sb.toString()));
+	}
+

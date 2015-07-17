@@ -1,0 +1,8 @@
+	@Test
+	public void testCopyToOutputStream() throws IOException {
+		AnyLongObjectId id1 = LongObjectIdTestUtils.hash("test");
+		ByteArrayOutputStream os = new ByteArrayOutputStream(64);
+		id1.copyTo(os);
+		assertEquals(id1, LongObjectId.fromString(os.toByteArray(), 0));
+	}
+

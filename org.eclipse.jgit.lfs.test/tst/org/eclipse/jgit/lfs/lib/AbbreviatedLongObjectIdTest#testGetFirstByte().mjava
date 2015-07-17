@@ -1,0 +1,9 @@
+	@Test
+	public void testGetFirstByte() {
+		AnyLongObjectId id = LongObjectId.fromString(
+				"f423456789abcdef0123456789abcdef0123456789abcdef1123456789abcdef");
+		AbbreviatedLongObjectId a = id.abbreviate(10);
+		assertEquals(0xf4, a.getFirstByte());
+		assertEquals(id.getFirstByte(), a.getFirstByte());
+	}
+

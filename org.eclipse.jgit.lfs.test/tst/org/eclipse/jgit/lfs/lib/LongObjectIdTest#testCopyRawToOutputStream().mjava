@@ -1,0 +1,8 @@
+	@Test
+	public void testCopyRawToOutputStream() throws IOException {
+		AnyLongObjectId id1 = LongObjectIdTestUtils.hash("test");
+		ByteArrayOutputStream os = new ByteArrayOutputStream(32);
+		id1.copyRawTo(os);
+		assertEquals(id1, LongObjectId.fromRaw(os.toByteArray(), 0));
+	}
+

@@ -1,0 +1,13 @@
+	/**
+	 * Get the first 8 bits of the LongObjectId.
+	 *
+	 * This is a faster version of {@code getByte(0)}.
+	 *
+	 * @return a discriminator usable for a fan-out style map. Returned values
+	 *         are unsigned and thus are in the range [0,255] rather than the
+	 *         signed byte range of [-128, 127].
+	 */
+	public final int getFirstByte() {
+		return (int) (w1 >>> 56);
+	}
+

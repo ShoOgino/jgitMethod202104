@@ -1,0 +1,31 @@
+	@Test
+	public void testIsId() {
+		// These are all too short.
+		assertFalse(AbbreviatedLongObjectId.isId(""));
+		assertFalse(AbbreviatedLongObjectId.isId("a"));
+
+		// These are too long.
+		assertFalse(AbbreviatedLongObjectId.isId(LongObjectId
+				.fromString(
+						"27e15b72937fc8f558da24ac3d50ec20302a4cf21e33b87ae8e4ce90e89c4b10")
+				.name() + "0"));
+		assertFalse(AbbreviatedLongObjectId.isId(LongObjectId
+				.fromString(
+						"27e15b72937fc8f558da24ac3d50ec20302a4cf21e33b87ae8e4ce90e89c4b10")
+				.name() + "c0ffee"));
+
+		// These contain non-hex characters.
+		assertFalse(AbbreviatedLongObjectId.isId("01notahexstring"));
+
+		// These should all work.
+		assertTrue(AbbreviatedLongObjectId.isId("ab"));
+		assertTrue(AbbreviatedLongObjectId.isId("abc"));
+		assertTrue(AbbreviatedLongObjectId.isId("abcd"));
+		assertTrue(AbbreviatedLongObjectId.isId("abcd0"));
+		assertTrue(AbbreviatedLongObjectId.isId("abcd09"));
+		assertTrue(AbbreviatedLongObjectId.isId(LongObjectId
+				.fromString(
+						"27e15b72937fc8f558da24ac3d50ec20302a4cf21e33b87ae8e4ce90e89c4b10")
+				.name()));
+	}
+

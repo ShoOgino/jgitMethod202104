@@ -1,0 +1,11 @@
+	@Test
+	public void testFromStringByteWrongLength() {
+		byte[] buf = new byte[65];
+		try {
+			AbbreviatedLongObjectId.fromString(buf, 0, 65);
+			fail("expected IllegalArgumentException for too long AbbreviatedLongObjectId");
+		} catch (IllegalArgumentException e) {
+			// expected
+		}
+	}
+

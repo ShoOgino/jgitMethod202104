@@ -1,0 +1,12 @@
+	private void fromHexString(final byte[] bs, int p) {
+		try {
+			w1 = RawParseUtils.parseHexInt64(bs, p);
+			w2 = RawParseUtils.parseHexInt64(bs, p + 16);
+			w3 = RawParseUtils.parseHexInt64(bs, p + 32);
+			w4 = RawParseUtils.parseHexInt64(bs, p + 48);
+		} catch (ArrayIndexOutOfBoundsException e1) {
+			throw new InvalidLongObjectIdException(bs, p,
+					Constants.LONG_OBJECT_ID_STRING_LENGTH);
+		}
+	}
+

@@ -1,0 +1,14 @@
+	@Test
+	public void testCompareToLong() {
+		AnyLongObjectId id1 = new LongObjectId(1L, 2L, 3L, 4L);
+		long[] buf = new long[4];
+		id1.copyRawTo(buf, 0);
+		assertEquals(0, id1.compareTo(buf, 0));
+
+		new LongObjectId(2L, 2L, 3L, 4L).copyRawTo(buf, 0);
+		assertEquals(-1, id1.compareTo(buf, 0));
+
+		new LongObjectId(0L, 2L, 3L, 4L).copyRawTo(buf, 0);
+		assertEquals(1, id1.compareTo(buf, 0));
+	}
+
