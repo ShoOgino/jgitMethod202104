@@ -3,13 +3,15 @@
 		wcrs = wcrs.setForceUpdate(true);
 		wcrs = wcrs.setSourceDestination(Constants.R_HEADS + "*", dst); //$NON-NLS-1$
 		List<RefSpec> specs = new ArrayList<>();
-		if (cloneAllBranches)
-			specs.add(wcrs);
-		else if (branchesToClone != null
-				&& branchesToClone.size() > 0) {
-			for (String selectedRef : branchesToClone)
-				if (wcrs.matchSource(selectedRef))
+		if (!cloneAllBranches && branchesToClone != null
+				&& !branchesToClone.isEmpty()) {
+			for (String selectedRef : branchesToClone) {
+				if (wcrs.matchSource(selectedRef)) {
 					specs.add(wcrs.expandFromSource(selectedRef));
+				}
+			}
+		} else {
+			specs.add(wcrs);
 		}
 		return specs;
 	}
