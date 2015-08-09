@@ -12,7 +12,7 @@
 					.getFileAttributeView(nioPath,
 							PosixFileAttributeView.class,
 							LinkOption.NOFOLLOW_LINKS).readAttributes();
-			Attributes attributes = new FileUtil.Java7BasicAttributes(
+			Attributes attributes = new Attributes(
 					fs,
 					path,
 					true, //
@@ -25,9 +25,6 @@
 					readAttributes.lastModifiedTime().toMillis(),
 					readAttributes.size());
 			return attributes;
-		} catch (NoSuchFileException e) {
-			return new FileUtil.Java7BasicAttributes(fs, path, false, false,
-					false, false, false, 0L, 0L, 0L);
 		} catch (IOException e) {
 			return new Attributes(path, fs);
 		}

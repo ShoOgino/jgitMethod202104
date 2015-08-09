@@ -7,7 +7,7 @@
 					.getFileAttributeView(nioPath,
 							BasicFileAttributeView.class,
 							LinkOption.NOFOLLOW_LINKS).readAttributes();
-			Attributes attributes = new FileUtil.Java7BasicAttributes(fs, path,
+			Attributes attributes = new Attributes(fs, path,
 					true,
 					readAttributes.isDirectory(),
 					fs.supportsExecute() ? path.canExecute() : false,
@@ -19,9 +19,6 @@
 							.encode(FileUtils.readSymLink(path)).length
 							: readAttributes.size());
 			return attributes;
-		} catch (NoSuchFileException e) {
-			return new FileUtil.Java7BasicAttributes(fs, path, false, false,
-					false, false, false, 0L, 0L, 0L);
 		} catch (IOException e) {
 			return new Attributes(path, fs);
 		}
