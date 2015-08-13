@@ -1,12 +1,15 @@
 	/**
-	 * Prepares the bitmaps to be written to the pack index. Bitmaps can be used
-	 * to speed up fetches and clones by storing the entire object graph at
-	 * selected commits.
-	 *
-	 * This method can only be invoked after
-	 * {@link #writePack(ProgressMonitor, ProgressMonitor, OutputStream)} has
-	 * been invoked and completed successfully. Writing a corresponding bitmap
-	 * index is an optional feature that not all pack users may require.
+	 * Prepares the bitmaps to be written to the bitmap index file.
+	 * <p>
+	 * Bitmaps can be used to speed up fetches and clones by storing the entire
+	 * object graph at selected commits. Writing a bitmap index is an optional
+	 * feature that not all pack users may require.
+	 * <p>
+	 * Called after {@link #writeIndex(OutputStream)}.
+	 * <p>
+	 * To reduce memory internal state is cleared during this method, rendering
+	 * the PackWriter instance useless for anything further than a call to write
+	 * out the new bitmaps with {@link #writeBitmapIndex(OutputStream)}.
 	 *
 	 * @param pm
 	 *            progress monitor to report bitmap building work.
@@ -22,11 +25,17 @@
 		if (pm == null)
 			pm = NullProgressMonitor.INSTANCE;
 
-		writeBitmaps = new PackBitmapIndexBuilder(sortByName());
+		int numCommits = objectsLists[OBJ_COMMIT].size();
+		List<ObjectToPack> byName = sortByName();
+		sortedByName = null;
+		objectsLists = null;
+		objectsMap = null;
+		writeBitmaps = new PackBitmapIndexBuilder(byName);
+		byName = null;
+
 		PackWriterBitmapPreparer bitmapPreparer = new PackWriterBitmapPreparer(
 				reader, writeBitmaps, pm, stats.interestingObjects);
 
-		int numCommits = objectsLists[OBJ_COMMIT].size();
 		Collection<PackWriterBitmapPreparer.BitmapCommit> selectedCommits =
 				bitmapPreparer.doCommitSelection(numCommits);
 

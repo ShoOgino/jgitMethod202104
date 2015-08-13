@@ -1,10 +1,13 @@
 		State snapshot() {
 			long objCnt = 0;
-			objCnt += objectsLists[OBJ_COMMIT].size();
-			objCnt += objectsLists[OBJ_TREE].size();
-			objCnt += objectsLists[OBJ_BLOB].size();
-			objCnt += objectsLists[OBJ_TAG].size();
-			// Exclude CachedPacks.
+			BlockList<ObjectToPack>[] lists = objectsLists;
+			if (lists != null) {
+				objCnt += lists[OBJ_COMMIT].size();
+				objCnt += lists[OBJ_TREE].size();
+				objCnt += lists[OBJ_BLOB].size();
+				objCnt += lists[OBJ_TAG].size();
+				// Exclude CachedPacks.
+			}
 
 			long bytesUsed = OBJECT_TO_PACK_SIZE * objCnt;
 			PackingPhase curr = phase;

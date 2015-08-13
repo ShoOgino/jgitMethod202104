@@ -1,14 +1,13 @@
 	/**
 	 * Write the prepared pack to the supplied stream.
 	 * <p>
-	 * At first, this method collects and sorts objects to pack, then deltas
-	 * search is performed if set up accordingly, finally pack stream is
-	 * written.
-	 * </p>
+	 * Called after {@link #preparePack(ProgressMonitor, ObjectWalk, Set, Set)}
+	 * or {@link #preparePack(ProgressMonitor, Set, Set)}.
+	 * <p>
+	 * Performs delta search if enabled and writes the pack stream.
 	 * <p>
 	 * All reused objects data checksum (Adler32/CRC32) is computed and
 	 * validated against existing checksum.
-	 * </p>
 	 *
 	 * @param compressMonitor
 	 *            progress monitor to report object compression work.
@@ -22,8 +21,8 @@
 	 *             the pack, or writing compressed object data to the output
 	 *             stream.
 	 * @throws WriteAbortedException
-	 *             the write operation is aborted by
-	 *             {@link ObjectCountCallback}.
+	 *             the write operation is aborted by {@link ObjectCountCallback}
+	 *             .
 	 */
 	public void writePack(ProgressMonitor compressMonitor,
 			ProgressMonitor writeMonitor, OutputStream packStream)
