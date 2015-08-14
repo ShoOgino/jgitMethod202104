@@ -2,20 +2,25 @@
 	 * Creates a PackBitmapIndex used for building the contents of an index
 	 * file.
 	 *
-	 * @param byName
-	 *            objects sorted by name.
+	 * @param objects
+	 *            objects sorted by name. The list must be initially sorted by
+	 *            ObjectId (name); it will be resorted in place.
 	 */
-	public PackBitmapIndexBuilder(List<ObjectToPack> byName) {
+	public PackBitmapIndexBuilder(List<ObjectToPack> objects) {
 		super(new ObjectIdOwnerMap<StoredBitmap>());
-		byOffset = sortByOffset(byName);
+		byOffset = new BlockList<>(objects.size());
+		sortByOffsetAndIndex(byOffset, positionEntries, objects);
 
-		int sizeInWords = Math.max(byOffset.length / 64, 4);
+		// 64 objects fit in a single long word (64 bits).
+		// On average a repository is 30% commits, 30% trees, 30% blobs.
+		// Initialize bitmap capacity for worst case to minimize growing.
+		int sizeInWords = Math.max(4, byOffset.size() / 64 / 3);
 		commits = new EWAHCompressedBitmap(sizeInWords);
 		trees = new EWAHCompressedBitmap(sizeInWords);
 		blobs = new EWAHCompressedBitmap(sizeInWords);
 		tags = new EWAHCompressedBitmap(sizeInWords);
-		for (int i = 0; i < byOffset.length; i++) {
-			int type = byOffset[i].getType();
+		for (int i = 0; i < objects.size(); i++) {
+			int type = objects.get(i).getType();
 			switch (type) {
 			case Constants.OBJ_COMMIT:
 				commits.set(i);

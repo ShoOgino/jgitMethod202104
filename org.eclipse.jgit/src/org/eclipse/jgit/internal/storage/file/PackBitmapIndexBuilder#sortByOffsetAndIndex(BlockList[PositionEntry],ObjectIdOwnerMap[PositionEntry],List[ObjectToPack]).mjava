@@ -1,0 +1,18 @@
+	private static void sortByOffsetAndIndex(BlockList<PositionEntry> byOffset,
+			ObjectIdOwnerMap<PositionEntry> positionEntries,
+			List<ObjectToPack> entries) {
+		for (int i = 0; i < entries.size(); i++) {
+			positionEntries.add(new PositionEntry(entries.get(i), i));
+		}
+		Collections.sort(entries, new Comparator<ObjectToPack>() {
+			public int compare(ObjectToPack a, ObjectToPack b) {
+				return Long.signum(a.getOffset() - b.getOffset());
+			}
+		});
+		for (int i = 0; i < entries.size(); i++) {
+			PositionEntry e = positionEntries.get(entries.get(i));
+			e.offsetPosition = i;
+			byOffset.add(e);
+		}
+	}
+
