@@ -1,0 +1,92 @@
+	/**
+	 * Updates the file in the working tree with content and mode from an entry
+	 * in the index. The new content is first written to a new temporary file in
+	 * the same directory as the real file. Then that new file is renamed to the
+	 * final filename.
+	 *
+	 * <p>
+	 * <b>Note:</b> if the entry path on local file system exists as a file, it
+	 * will be deleted and if it exists as a directory, it will be deleted
+	 * recursively, independently if has any content.
+	 * </p>
+	 *
+	 * <p>
+	 * TODO: this method works directly on File IO, we may need another
+	 * abstraction (like WorkingTreeIterator). This way we could tell e.g.
+	 * Eclipse that Files in the workspace got changed
+	 * </p>
+	 *
+	 * @param repo
+	 *            repository managing the destination work tree.
+	 * @param entry
+	 *            the entry containing new mode and content
+	 * @param or
+	 *            object reader to use for checkout
+	 * @param deleteRecursive
+	 *            true to recursively delete final path if it exists on the file
+	 *            system
+	 *
+	 * @throws IOException
+	 * @since 4.2
+	 */
+	public static void checkoutEntry(Repository repo, DirCacheEntry entry,
+			ObjectReader or, boolean deleteRecursive) throws IOException {
+		ObjectLoader ol = or.open(entry.getObjectId());
+		File f = new File(repo.getWorkTree(), entry.getPathString());
+		File parentDir = f.getParentFile();
+		FileUtils.mkdirs(parentDir, true);
+		FS fs = repo.getFS();
+		WorkingTreeOptions opt = repo.getConfig().get(WorkingTreeOptions.KEY);
+		if (entry.getFileMode() == FileMode.SYMLINK
+				&& opt.getSymLinks() == SymLinks.TRUE) {
+			byte[] bytes = ol.getBytes();
+			String target = RawParseUtils.decode(bytes);
+			if (deleteRecursive && f.isDirectory()) {
+				FileUtils.delete(f, FileUtils.RECURSIVE);
+			}
+			fs.createSymLink(f, target);
+			entry.setLength(bytes.length);
+			entry.setLastModified(fs.lastModified(f));
+			return;
+		}
+
+		File tmpFile = File.createTempFile(
+				"._" + f.getName(), null, parentDir); //$NON-NLS-1$
+		OutputStream channel = new FileOutputStream(tmpFile);
+		if (opt.getAutoCRLF() == AutoCRLF.TRUE)
+			channel = new AutoCRLFOutputStream(channel);
+		try {
+			ol.copyTo(channel);
+		} finally {
+			channel.close();
+		}
+		entry.setLength(opt.getAutoCRLF() == AutoCRLF.TRUE ? //
+				tmpFile.length() // AutoCRLF wants on-disk-size
+				: (int) ol.getSize());
+
+		if (opt.isFileMode() && fs.supportsExecute()) {
+			if (FileMode.EXECUTABLE_FILE.equals(entry.getRawMode())) {
+				if (!fs.canExecute(tmpFile))
+					fs.setExecute(tmpFile, true);
+			} else {
+				if (fs.canExecute(tmpFile))
+					fs.setExecute(tmpFile, false);
+			}
+		}
+		try {
+			if (deleteRecursive && f.isDirectory()) {
+				FileUtils.delete(f, FileUtils.RECURSIVE);
+			}
+			FileUtils.rename(tmpFile, f);
+		} catch (IOException e) {
+			throw new IOException(MessageFormat.format(
+					JGitText.get().renameFileFailed, tmpFile.getPath(),
+					f.getPath()));
+		} finally {
+			if (tmpFile.exists()) {
+				FileUtils.delete(tmpFile);
+			}
+		}
+		entry.setLastModified(f.lastModified());
+	}
+

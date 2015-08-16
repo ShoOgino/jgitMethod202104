@@ -1,0 +1,38 @@
+	@Test
+	public void testCheckoutChangeLinkToEmptyDirs() throws Exception {
+		String fname = "was_file";
+		Git git = Git.wrap(db);
+
+		// Add a file
+		writeTrashFile(fname, "a");
+		git.add().addFilepattern(fname).call();
+
+		// Add a link to file
+		String linkName = "link";
+		File link = writeLink(linkName, fname).toFile();
+		git.add().addFilepattern(linkName).call();
+		git.commit().setMessage("Added file and link").call();
+
+		assertWorkDir(mkmap(linkName, "a", fname, "a"));
+
+		// replace link with directory containing only directories, no files
+		FileUtils.delete(link);
+		FileUtils.mkdirs(new File(link, "dummyDir"));
+		assertTrue("Link must be a directory now", link.isDirectory());
+
+		assertFalse("Must not delete non empty directory", link.delete());
+
+		// modify file
+		writeTrashFile(fname, "b");
+		assertWorkDir(mkmap(fname, "b", linkName + "/dummyDir", "/"));
+
+		// revert both paths to HEAD state
+		git.checkout().setStartPoint(Constants.HEAD)
+				.addPath(fname).addPath(linkName).call();
+
+		assertWorkDir(mkmap(fname, "a", linkName, "a"));
+
+		Status st = git.status().call();
+		assertTrue(st.isClean());
+	}
+

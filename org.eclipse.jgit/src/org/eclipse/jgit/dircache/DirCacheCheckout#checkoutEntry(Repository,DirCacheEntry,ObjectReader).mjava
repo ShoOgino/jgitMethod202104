@@ -5,6 +5,13 @@
 	 * final filename.
 	 *
 	 * <p>
+	 * <b>Note:</b> if the entry path on local file system exists as a non-empty
+	 * directory, and the target entry type is a link or file, the checkout will
+	 * fail with {@link IOException} since existing non-empty directory cannot
+	 * be renamed to file or link without deleting it recursively.
+	 * </p>
+	 *
+	 * <p>
 	 * TODO: this method works directly on File IO, we may need another
 	 * abstraction (like WorkingTreeIterator). This way we could tell e.g.
 	 * Eclipse that Files in the workspace got changed
@@ -21,52 +28,6 @@
 	 */
 	public static void checkoutEntry(Repository repo, DirCacheEntry entry,
 			ObjectReader or) throws IOException {
-		ObjectLoader ol = or.open(entry.getObjectId());
-		File f = new File(repo.getWorkTree(), entry.getPathString());
-		File parentDir = f.getParentFile();
-		FileUtils.mkdirs(parentDir, true);
-		FS fs = repo.getFS();
-		WorkingTreeOptions opt = repo.getConfig().get(WorkingTreeOptions.KEY);
-		if (entry.getFileMode() == FileMode.SYMLINK
-				&& opt.getSymLinks() == SymLinks.TRUE) {
-			byte[] bytes = ol.getBytes();
-			String target = RawParseUtils.decode(bytes);
-			fs.createSymLink(f, target);
-			entry.setLength(bytes.length);
-			entry.setLastModified(fs.lastModified(f));
-			return;
-		}
-
-		File tmpFile = File.createTempFile(
-				"._" + f.getName(), null, parentDir); //$NON-NLS-1$
-		OutputStream channel = new FileOutputStream(tmpFile);
-		if (opt.getAutoCRLF() == AutoCRLF.TRUE)
-			channel = new AutoCRLFOutputStream(channel);
-		try {
-			ol.copyTo(channel);
-		} finally {
-			channel.close();
-		}
-		entry.setLength(opt.getAutoCRLF() == AutoCRLF.TRUE ? //
-				tmpFile.length() // AutoCRLF wants on-disk-size
-				: (int) ol.getSize());
-
-		if (opt.isFileMode() && fs.supportsExecute()) {
-			if (FileMode.EXECUTABLE_FILE.equals(entry.getRawMode())) {
-				if (!fs.canExecute(tmpFile))
-					fs.setExecute(tmpFile, true);
-			} else {
-				if (fs.canExecute(tmpFile))
-					fs.setExecute(tmpFile, false);
-			}
-		}
-		try {
-			FileUtils.rename(tmpFile, f);
-		} catch (IOException e) {
-			throw new IOException(MessageFormat.format(
-					JGitText.get().renameFileFailed, tmpFile.getPath(),
-					f.getPath()));
-		}
-		entry.setLastModified(f.lastModified());
+		checkoutEntry(repo, entry, or, false);
 	}
 

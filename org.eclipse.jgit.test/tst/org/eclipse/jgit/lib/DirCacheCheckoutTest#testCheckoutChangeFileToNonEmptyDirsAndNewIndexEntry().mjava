@@ -1,0 +1,40 @@
+	@Test
+	public void testCheckoutChangeFileToNonEmptyDirsAndNewIndexEntry()
+			throws Exception {
+		String fname = "was_file";
+		Git git = Git.wrap(db);
+
+		// Add a file
+		File file = writeTrashFile(fname, "a");
+		git.add().addFilepattern(fname).call();
+		git.commit().setMessage("Added file").call();
+
+		assertWorkDir(mkmap(fname, "a"));
+
+		// replace file with directory containing only directories, no files
+		FileUtils.delete(file);
+
+		// create and add a file in the new directory to the index
+		writeTrashFile(fname + "/dir", "file1", "c");
+		git.add().addFilepattern(fname + "/dir/file1").call();
+
+		// create but do not add a file in the new directory to the index
+		writeTrashFile(fname + "/dir", "file2", "d");
+
+		assertTrue("File must be a directory now", file.isDirectory());
+		assertFalse("Must not delete non empty directory", file.delete());
+
+		// 2 extra files are created
+		assertWorkDir(
+				mkmap(fname + "/dir/file1", "c", fname + "/dir/file2", "d"));
+
+		// revert path to HEAD state
+		git.checkout().setStartPoint(Constants.HEAD).addPath(fname).call();
+		assertWorkDir(mkmap(fname, "a"));
+
+		Status st = git.status().call();
+		assertFalse(st.isClean());
+		assertEquals(1, st.getAdded().size());
+		assertTrue(st.getAdded().contains(fname + "/dir/file1"));
+	}
+
