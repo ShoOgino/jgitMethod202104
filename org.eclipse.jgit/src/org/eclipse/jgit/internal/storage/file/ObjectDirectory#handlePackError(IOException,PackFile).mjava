@@ -8,8 +8,7 @@
 		} else if (e instanceof FileNotFoundException) {
 			warnTmpl = JGitText.get().packWasDeleted;
 			removePack(p);
-		} else if (e.getMessage() != null
-				&& e.getMessage().toLowerCase().contains(STALE_FILE_HANDLE_MSG)) {
+		} else if (FileUtils.isStaleFileHandle(e)) {
 			warnTmpl = JGitText.get().packHandleIsStale;
 			removePack(p);
 		}
