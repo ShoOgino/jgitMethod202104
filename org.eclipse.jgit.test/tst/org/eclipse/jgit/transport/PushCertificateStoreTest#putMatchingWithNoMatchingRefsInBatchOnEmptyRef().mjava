@@ -1,0 +1,12 @@
+	@Test
+	public void putMatchingWithNoMatchingRefsInBatchOnEmptyRef()
+			throws Exception {
+		PushCertificate addMaster = newCert(
+				command(zeroId(), ID1, "refs/heads/master"),
+				command(zeroId(), ID2, "refs/heads/branch"));
+		store.put(addMaster, newIdent(), Collections.<ReceiveCommand> emptyList());
+		BatchRefUpdate batch = repo.getRefDatabase().newBatchUpdate();
+		assertFalse(store.save(batch));
+		assertEquals(0, batch.getCommands().size());
+	}
+
