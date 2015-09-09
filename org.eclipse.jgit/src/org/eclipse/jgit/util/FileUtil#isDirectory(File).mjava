@@ -1,9 +1,12 @@
 	/**
 	 * @param path
 	 * @return {@code true} if the given file a directory
+	 * @deprecated Use
+	 *             {@link Files#isDirectory(java.nio.file.Path, java.nio.file.LinkOption...)}
+	 *             instead
 	 */
+	@Deprecated
 	public static boolean isDirectory(File path) {
-		Path nioPath = path.toPath();
-		return Files.isDirectory(nioPath, LinkOption.NOFOLLOW_LINKS);
+		return FileUtils.isDirectory(path);
 	}
 

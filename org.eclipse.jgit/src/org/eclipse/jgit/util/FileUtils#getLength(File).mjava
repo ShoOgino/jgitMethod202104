@@ -1,0 +1,14 @@
+	/**
+	 * @param file
+	 * @return length of the given file
+	 * @throws IOException
+	 * @since 4.1
+	 */
+	public static long getLength(File file) throws IOException {
+		Path nioPath = file.toPath();
+		if (Files.isSymbolicLink(nioPath))
+			return Files.readSymbolicLink(nioPath).toString()
+					.getBytes(Constants.CHARSET).length;
+		return Files.size(nioPath);
+	}
+

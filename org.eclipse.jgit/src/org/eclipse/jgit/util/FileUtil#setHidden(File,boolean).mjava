@@ -2,10 +2,10 @@
 	 * @param path
 	 * @param hidden
 	 * @throws IOException
+	 * @deprecated Use {@link FileUtils#setHidden(File,boolean)} instead
 	 */
+	@Deprecated
 	public static void setHidden(File path, boolean hidden) throws IOException {
-		Path nioPath = path.toPath();
-		Files.setAttribute(nioPath, "dos:hidden", Boolean.valueOf(hidden), //$NON-NLS-1$
-				LinkOption.NOFOLLOW_LINKS);
+		FileUtils.setHidden(path, hidden);
 	}
 

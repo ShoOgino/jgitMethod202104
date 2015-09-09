@@ -1,0 +1,33 @@
+	/**
+	 * @param fs
+	 * @param file
+	 * @return file system attributes for the given file
+	 * @since 4.1
+	 */
+	public static Attributes getFileAttributesPosix(FS fs, File file) {
+		try {
+			Path nioPath = file.toPath();
+			PosixFileAttributes readAttributes = nioPath
+					.getFileSystem()
+					.provider()
+					.getFileAttributeView(nioPath,
+							PosixFileAttributeView.class,
+							LinkOption.NOFOLLOW_LINKS).readAttributes();
+			Attributes attributes = new Attributes(
+					fs,
+					file,
+					true, //
+					readAttributes.isDirectory(), //
+					readAttributes.permissions().contains(
+							PosixFilePermission.OWNER_EXECUTE),
+					readAttributes.isSymbolicLink(),
+					readAttributes.isRegularFile(), //
+					readAttributes.creationTime().toMillis(), //
+					readAttributes.lastModifiedTime().toMillis(),
+					readAttributes.size());
+			return attributes;
+		} catch (IOException e) {
+			return new Attributes(file, fs);
+		}
+	}
+

@@ -1,26 +1,31 @@
-	static Attributes getFileAttributesBasic(FS fs, File path) {
+	/**
+	 * @param fs
+	 * @param file
+	 * @return non null attributes object
+	 */
+	static Attributes getFileAttributesBasic(FS fs, File file) {
 		try {
-			Path nioPath = path.toPath();
+			Path nioPath = file.toPath();
 			BasicFileAttributes readAttributes = nioPath
 					.getFileSystem()
 					.provider()
 					.getFileAttributeView(nioPath,
 							BasicFileAttributeView.class,
 							LinkOption.NOFOLLOW_LINKS).readAttributes();
-			Attributes attributes = new Attributes(fs, path,
+			Attributes attributes = new Attributes(fs, file,
 					true,
 					readAttributes.isDirectory(),
-					fs.supportsExecute() ? path.canExecute() : false,
+					fs.supportsExecute() ? file.canExecute() : false,
 					readAttributes.isSymbolicLink(),
 					readAttributes.isRegularFile(), //
 					readAttributes.creationTime().toMillis(), //
 					readAttributes.lastModifiedTime().toMillis(),
 					readAttributes.isSymbolicLink() ? Constants
-							.encode(FileUtils.readSymLink(path)).length
+							.encode(readSymLink(file)).length
 							: readAttributes.size());
 			return attributes;
 		} catch (IOException e) {
-			return new Attributes(path, fs);
+			return new Attributes(file, fs);
 		}
 	}
 

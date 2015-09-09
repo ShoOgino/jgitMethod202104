@@ -2,10 +2,12 @@
 	 * @param path
 	 * @return lastModified attribute for given path
 	 * @throws IOException
+	 * @deprecated Use
+	 *             {@link Files#getLastModifiedTime(java.nio.file.Path, java.nio.file.LinkOption...)}
+	 *             instead
 	 */
+	@Deprecated
 	public static long lastModified(File path) throws IOException {
-		Path nioPath = path.toPath();
-		return Files.getLastModifiedTime(nioPath, LinkOption.NOFOLLOW_LINKS)
-				.toMillis();
+		return FileUtils.lastModified(path);
 	}
 
