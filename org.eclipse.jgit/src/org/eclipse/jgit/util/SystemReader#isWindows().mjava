@@ -2,12 +2,10 @@
 	 * @return true if we are running on a Windows.
 	 */
 	public boolean isWindows() {
-		String osDotName = AccessController
-				.doPrivileged(new PrivilegedAction<String>() {
-					public String run() {
-						return getProperty("os.name"); //$NON-NLS-1$
-					}
-				});
-		return osDotName.startsWith("Windows"); //$NON-NLS-1$
+		if (isWindows == null) {
+			String osDotName = getOsName();
+			isWindows = Boolean.valueOf(osDotName.startsWith("Windows")); //$NON-NLS-1$
+		}
+		return isWindows.booleanValue();
 	}
 
