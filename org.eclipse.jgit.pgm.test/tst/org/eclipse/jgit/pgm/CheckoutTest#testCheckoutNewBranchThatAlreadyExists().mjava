@@ -2,7 +2,8 @@
 	public void testCheckoutNewBranchThatAlreadyExists() throws Exception {
 		new Git(db).commit().setMessage("initial commit").call();
 
-		assertEquals("fatal: A branch named 'master' already exists.",
+		assertStringArrayEquals(
+				"fatal: A branch named 'master' already exists.",
 				execute("git checkout -b master"));
 	}
 
