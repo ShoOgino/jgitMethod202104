@@ -7,13 +7,7 @@
 
 		formatHeader(buf, ent);
 
-		if (ent.getOldMode() == GITLINK || ent.getNewMode() == GITLINK) {
-			formatOldNewPaths(buf, ent);
-			writeGitLinkDiffText(buf, ent);
-			editList = new EditList();
-			type = PatchType.UNIFIED;
-
-		} else if (ent.getOldId() == null || ent.getNewId() == null) {
+		if (ent.getOldId() == null || ent.getNewId() == null) {
 			// Content not changed (e.g. only mode, pure rename)
 			editList = new EditList();
 			type = PatchType.UNIFIED;
@@ -21,8 +15,15 @@
 		} else {
 			assertHaveRepository();
 
-			byte[] aRaw = open(OLD, ent);
-			byte[] bRaw = open(NEW, ent);
+			byte[] aRaw, bRaw;
+
+			if (ent.getOldMode() == GITLINK || ent.getNewMode() == GITLINK) {
+				aRaw = writeGitLinkText(ent.getOldId());
+				bRaw = writeGitLinkText(ent.getNewId());
+			} else {
+				aRaw = open(OLD, ent);
+				bRaw = open(NEW, ent);
+			}
 
 			if (aRaw == BINARY || bRaw == BINARY //
 					|| RawText.isBinary(aRaw) || RawText.isBinary(bRaw)) {
