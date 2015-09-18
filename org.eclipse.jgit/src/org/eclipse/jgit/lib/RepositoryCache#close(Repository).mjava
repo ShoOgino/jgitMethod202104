@@ -1,8 +1,8 @@
 	/**
-	 * Remove a repository from the cache.
+	 * Close and remove a repository from the cache.
 	 * <p>
-	 * Removes a repository from the cache, if it is still registered here,
-	 * permitting it to close.
+	 * Removes a repository from the cache, if it is still registered here, and
+	 * close it.
 	 *
 	 * @param db
 	 *            repository to unregister.
@@ -10,7 +10,7 @@
 	public static void close(final Repository db) {
 		if (db.getDirectory() != null) {
 			FileKey key = FileKey.exact(db.getDirectory(), db.getFS());
-			cache.unregisterRepository(key);
+			cache.unregisterAndCloseRepository(key);
 		}
 	}
 

@@ -6,11 +6,13 @@
 	 * {@link RepositoryCache#close(Repository)} to remove and close the
 	 * repository.
 	 *
-	 * @param location
-	 *            location of the repository to remove.
-	 * @since 4.1
+	 * @param db
+	 *            repository to unregister.
+	 * @since 4.3
 	 */
-	public static void unregister(Key location) {
-		cache.unregisterRepository(location);
+	public static void unregister(final Repository db) {
+		if (db.getDirectory() != null) {
+			unregister(FileKey.exact(db.getDirectory(), db.getFS()));
+		}
 	}
 
