@@ -1,0 +1,20 @@
+		/**
+		 * Log algorithm, provider, testability.
+		 *
+		 * @param algorithm
+		 * @throws Exception
+		 */
+		static void reportAlgorithmStatus(String algorithm) throws Exception {
+			final boolean present = isAlgorithmPresent(algorithm);
+			final boolean allowed = present && isAlgorithmAllowed(algorithm);
+			final String provider = present ? securityProviderName(algorithm)
+					: "N/A";
+			String status = "Algorithm: " + algorithm + " @ " + provider + "; "
+					+ "present/allowed : " + present + "/" + allowed;
+			if (allowed) {
+				logger.info("Testing " + status);
+			} else {
+				logger.warn("Missing " + status);
+			}
+		}
+

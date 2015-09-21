@@ -1,0 +1,18 @@
+		/**
+		 * Delete S3 repository folder.
+		 *
+		 * @throws Exception
+		 */
+		static void remoteDelete() throws Exception {
+			Properties props = Props.discover();
+			props.remove(AmazonS3.Keys.PASSWORD); // Disable encryption.
+			String bucket = props.getProperty(Names.TEST_BUCKET);
+			AmazonS3 s3 = new AmazonS3(props);
+			List<String> list = s3.list(bucket, JGIT_REMOTE_DIR);
+			for (String path : list) {
+				path = JGIT_REMOTE_DIR + "/" + path;
+				s3.delete(bucket, path);
+			}
+			logger.debug("remote delete: " + JGIT_REMOTE_DIR);
+		}
+

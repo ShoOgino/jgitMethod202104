@@ -1,0 +1,16 @@
+		/**
+		 * Load BouncyCastle provider if present.
+		 */
+		static void loadBouncyCastle() {
+			try {
+				Class<?> provider = Class.forName(PROVIDER_BC);
+				Provider instance = (Provider) provider
+						.getConstructor(new Class[] {})
+						.newInstance(new Object[] {});
+				Security.addProvider(instance);
+				logger.info("Loaded " + PROVIDER_BC);
+			} catch (Throwable e) {
+				logger.warn("Failed to load " + PROVIDER_BC);
+			}
+		}
+

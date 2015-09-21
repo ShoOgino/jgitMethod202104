@@ -1,0 +1,30 @@
+		/**
+		 * Verify round trip encryption.
+		 *
+		 * @param crypto
+		 * @throws IOException
+		 */
+		static void verifyCrypto(WalkEncryption crypto) throws IOException {
+			String charset = "UTF-8";
+			String sourceText = "secret-message Свобода 老子";
+			String targetText;
+			byte[] cipherText;
+			{
+				byte[] origin = sourceText.getBytes(charset);
+				ByteArrayOutputStream target = new ByteArrayOutputStream();
+				OutputStream source = crypto.encrypt(target);
+				source.write(origin);
+				source.flush();
+				source.close();
+				cipherText = target.toByteArray();
+			}
+			{
+				InputStream source = new ByteArrayInputStream(cipherText);
+				InputStream target = crypto.decrypt(source);
+				ByteArrayOutputStream result = new ByteArrayOutputStream();
+				transferStream(target, result);
+				targetText = result.toString(charset);
+			}
+			assertEquals(sourceText, targetText);
+		}
+

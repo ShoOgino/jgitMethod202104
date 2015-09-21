@@ -1,0 +1,19 @@
+		/**
+		 * Verify if any security provider published the algorithm.
+		 *
+		 * @param algorithm
+		 * @return result
+		 */
+		static boolean isAlgorithmPresent(String algorithm) {
+			Set<String> cipherSet = Security.getAlgorithms("Cipher");
+			for (String source : cipherSet) {
+				// Standard names are not case-sensitive.
+				// http://docs.oracle.com/javase/8/docs/technotes/guides/security/StandardNames.html
+				String target = algorithm.toUpperCase();
+				if (source.equalsIgnoreCase(target)) {
+					return true;
+				}
+			}
+			return false;
+		}
+

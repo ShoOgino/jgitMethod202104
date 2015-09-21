@@ -1,0 +1,14 @@
+		static Properties fromEnvFile() throws Exception {
+			if (haveEnvVarFile(ENV_CONFIG_FILE)) {
+				Properties props = new Properties();
+				props.load(new FileInputStream(ENV_CONFIG_FILE));
+				if (checkTestProps(props)) {
+					return props;
+				} else {
+					throw new Error("Environment config file is incomplete.");
+				}
+			} else {
+				return null;
+			}
+		}
+

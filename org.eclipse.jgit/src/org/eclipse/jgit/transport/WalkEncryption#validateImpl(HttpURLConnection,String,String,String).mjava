@@ -1,17 +1,23 @@
-	protected void validateImpl(final HttpURLConnection u, final String p,
+	// TODO mixed ciphers
+	// consider permitting mixed ciphers to facilitate algorithm migration
+	// i.e. user keeps the password, but changes the algorithm
+	// then existing remote entries will still be readable
+	protected void validateImpl(final HttpURLConnection u, final String prefix,
 			final String version, final String name) throws IOException {
 		String v;
 
-		v = u.getHeaderField(p + JETS3T_CRYPTO_VER);
+		v = u.getHeaderField(prefix + JETS3T_CRYPTO_VER);
 		if (v == null)
 			v = ""; //$NON-NLS-1$
 		if (!version.equals(v))
 			throw new IOException(MessageFormat.format(JGitText.get().unsupportedEncryptionVersion, v));
 
-		v = u.getHeaderField(p + JETS3T_CRYPTO_ALG);
+		v = u.getHeaderField(prefix + JETS3T_CRYPTO_ALG);
 		if (v == null)
 			v = ""; //$NON-NLS-1$
-		if (!name.equals(v))
-			throw new IOException(JGitText.get().unsupportedEncryptionAlgorithm + v);
+		// Standard names are not case-sensitive.
+		// http://docs.oracle.com/javase/8/docs/technotes/guides/security/StandardNames.html
+		if (!name.equalsIgnoreCase(v))
+			throw new IOException(MessageFormat.format(JGitText.get().unsupportedEncryptionAlgorithm, v));
 	}
 

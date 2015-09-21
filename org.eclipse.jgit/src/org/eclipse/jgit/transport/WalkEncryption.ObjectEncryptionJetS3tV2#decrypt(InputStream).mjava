@@ -1,0 +1,11 @@
+		@Override
+		InputStream decrypt(final InputStream in) throws IOException {
+			try {
+				final Cipher cipher = Cipher.getInstance(cryptoAlg);
+				cipher.init(Cipher.DECRYPT_MODE, secretKey, paramSpec);
+				return new CipherInputStream(in, cipher);
+			} catch (GeneralSecurityException e) {
+				throw error(e);
+			}
+		}
+

@@ -1,0 +1,23 @@
+		/**
+		 * Stream copy.
+		 *
+		 * @param from
+		 * @param into
+		 * @return count
+		 * @throws IOException
+		 */
+		static long transferStream(InputStream from, OutputStream into)
+				throws IOException {
+			byte[] array = new byte[1 * 1024];
+			long total = 0;
+			while (true) {
+				int count = from.read(array);
+				if (count == -1) {
+					break;
+				}
+				into.write(array, 0, count);
+				total += count;
+			}
+			return total;
+		}
+

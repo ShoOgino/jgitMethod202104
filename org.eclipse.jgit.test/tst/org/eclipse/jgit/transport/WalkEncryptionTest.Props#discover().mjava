@@ -1,0 +1,45 @@
+		/**
+		 * Find test properties from various sources in order of priority.
+		 *
+		 * @return result
+		 * @throws Exception
+		 */
+		static Properties discover() throws Exception {
+			Properties props;
+			if ((props = fromEnvVars()) != null) {
+				logger.debug(
+						"Using test properties from environment variables.");
+				return props;
+			}
+			if ((props = fromEnvFile()) != null) {
+				logger.debug(
+						"Using test properties from environment variable config file.");
+				return props;
+			}
+			if ((props = fromSysProps()) != null) {
+				logger.debug("Using test properties from system properties.");
+				return props;
+			}
+			if ((props = fromSysFile()) != null) {
+				logger.debug(
+						"Using test properties from system property config file.");
+				return props;
+			}
+			if ((props = fromConfigFile(HOME_CONFIG_FILE)) != null) {
+				logger.debug(
+						"Using test properties from hard coded ${user.home} file.");
+				return props;
+			}
+			if ((props = fromConfigFile(WORK_CONFIG_FILE)) != null) {
+				logger.debug(
+						"Using test properties from hard coded ${user.dir} file.");
+				return props;
+			}
+			if ((props = fromConfigFile(TEST_CONFIG_FILE)) != null) {
+				logger.debug(
+						"Using test properties from hard coded ${project.source} file.");
+				return props;
+			}
+			throw new Error("Can not load test properties form any source.");
+		}
+

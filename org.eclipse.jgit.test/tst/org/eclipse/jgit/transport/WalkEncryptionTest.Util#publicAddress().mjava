@@ -1,0 +1,18 @@
+		/**
+		 * Discover public address of CI server.
+		 *
+		 * @return result
+		 * @throws Exception
+		 */
+		static String publicAddress() throws Exception {
+			String service = "http://checkip.amazonaws.com";
+			URL url = new URL(service);
+			BufferedReader reader = new BufferedReader(
+					new InputStreamReader(url.openStream()));
+			try {
+				return reader.readLine();
+			} finally {
+				reader.close();
+			}
+		}
+

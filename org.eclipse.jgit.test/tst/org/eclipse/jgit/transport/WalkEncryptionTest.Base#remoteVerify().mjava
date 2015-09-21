@@ -1,0 +1,15 @@
+		/**
+		 * Verify if we can create/delete remote file.
+		 *
+		 * @throws Exception
+		 */
+		static void remoteVerify() throws Exception {
+			Properties props = Props.discover();
+			String bucket = props.getProperty(Names.TEST_BUCKET);
+			AmazonS3 s3 = new AmazonS3(props);
+			String file = JGIT_USER + "-" + UUID.randomUUID().toString();
+			String path = JGIT_REMOTE_DIR + "/" + file;
+			s3.put(bucket, path, file.getBytes(UTF_8));
+			s3.delete(bucket, path);
+		}
+

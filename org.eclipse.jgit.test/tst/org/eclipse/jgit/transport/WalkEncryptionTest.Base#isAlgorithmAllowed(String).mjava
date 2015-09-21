@@ -1,0 +1,19 @@
+		/**
+		 * Verify if JRE security policy allows the algorithm.
+		 *
+		 * @param algorithm
+		 * @return result
+		 */
+		static boolean isAlgorithmAllowed(String algorithm) {
+			try {
+				WalkEncryption crypto = new WalkEncryption.ObjectEncryptionJetS3tV2(
+						algorithm, JGIT_PASS);
+				verifyCrypto(crypto);
+				return true;
+			} catch (IOException e) {
+				return false; // Encryption failure.
+			} catch (GeneralSecurityException e) {
+				throw new Error(e); // Construction failure.
+			}
+		}
+

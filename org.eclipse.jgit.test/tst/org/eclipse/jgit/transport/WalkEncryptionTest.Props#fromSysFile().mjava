@@ -1,0 +1,14 @@
+		static Properties fromSysFile() throws Exception {
+			if (haveSysPropFile(SYS_CONFIG_FILE)) {
+				Properties props = new Properties();
+				props.load(new FileInputStream(SYS_CONFIG_FILE));
+				if (checkTestProps(props)) {
+					return props;
+				} else {
+					throw new Error("System props config file is incomplete.");
+				}
+			} else {
+				return null;
+			}
+		}
+

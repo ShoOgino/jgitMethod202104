@@ -1,0 +1,14 @@
+		/**
+		 * Generate remote URI for the test session.
+		 *
+		 * @return result
+		 * @throws Exception
+		 */
+		static String amazonURI() throws Exception {
+			Properties props = Props.discover();
+			String bucket = props.getProperty(Names.TEST_BUCKET);
+			assertNotNull(bucket);
+			return TransportAmazonS3.S3_SCHEME + "://" + JGIT_USER + "@"
+					+ bucket + "/" + JGIT_REPO_DIR;
+		}
+

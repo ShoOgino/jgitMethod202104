@@ -1,0 +1,38 @@
+		ObjectEncryptionJetS3tV2(final String algo, final String key)
+				throws GeneralSecurityException {
+			cryptoAlg = algo;
+
+			// Standard names are not case-sensitive.
+			// http://docs.oracle.com/javase/8/docs/technotes/guides/security/StandardNames.html
+			String cryptoName = cryptoAlg.toUpperCase();
+
+			if (!cryptoName.startsWith("PBE")) //$NON-NLS-1$
+				throw new GeneralSecurityException(JGitText.get().encryptionOnlyPBE);
+
+			PBEKeySpec keySpec = new PBEKeySpec(key.toCharArray(), JETS3T_SALT, JETS3T_ITERATIONS, JETS3T_KEY_SIZE);
+			secretKey = SecretKeyFactory.getInstance(algo).generateSecret(keySpec);
+
+			// Detect algorithms which require initialization vector.
+			boolean useIV = cryptoName.contains("AES"); //$NON-NLS-1$
+
+			// PBEParameterSpec algorithm parameters are supported from Java 8.
+			boolean isJava8 = javaVersion() >= 1.8;
+
+			if (useIV && isJava8) {
+				// Support IV where possible:
+				// * since JCE provider uses random IV for PBE/AES
+				// * and there is no place to store dynamic IV in JetS3t V2
+				// * we use static IV, and tolerate increased security risk
+				// TODO back port this change to JetS3t V2
+				// See:
+				// https://bitbucket.org/jmurty/jets3t/raw/156c00eb160598c2e9937fd6873f00d3190e28ca/src/org/jets3t/service/security/EncryptionUtil.java
+				// http://cr.openjdk.java.net/~mullan/webrevs/ascarpin/webrev.00/raw_files/new/src/share/classes/com/sun/crypto/provider/PBES2Core.java
+				IvParameterSpec paramIV = new IvParameterSpec(ZERO_AES_IV);
+				paramSpec = java8PBEParameterSpec(JETS3T_SALT, JETS3T_ITERATIONS, paramIV);
+			} else {
+				// Strict legacy JetS3t V2 compatibility, with no IV support.
+				paramSpec = java7PBEParameterSpec(JETS3T_SALT, JETS3T_ITERATIONS);
+			}
+
+		}
+

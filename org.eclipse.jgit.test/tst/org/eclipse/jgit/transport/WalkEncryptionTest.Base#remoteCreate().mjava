@@ -1,0 +1,15 @@
+		/**
+		 * Create S3 repository folder.
+		 *
+		 * @throws Exception
+		 */
+		static void remoteCreate() throws Exception {
+			Properties props = Props.discover();
+			props.remove(AmazonS3.Keys.PASSWORD); // Disable encryption.
+			String bucket = props.getProperty(Names.TEST_BUCKET);
+			AmazonS3 s3 = new AmazonS3(props);
+			String path = JGIT_REMOTE_DIR + "/";
+			s3.put(bucket, path, new byte[0]);
+			logger.debug("remote create: " + JGIT_REMOTE_DIR);
+		}
+
