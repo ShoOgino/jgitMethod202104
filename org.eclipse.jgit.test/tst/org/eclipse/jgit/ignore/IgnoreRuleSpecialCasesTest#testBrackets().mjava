@@ -1,0 +1,8 @@
+	@Test
+	public void testBrackets() throws Exception {
+		assertMatch("{}*()", "{}x()", true);
+		assertMatch("[a{}()b][a{}()b]?[a{}()b][a{}()b]", "{}x()", true);
+		assertMatch("x*{x}3", "xa{x}3", true);
+		assertMatch("a*{x}3", "axxx", false);
+	}
+

@@ -1,0 +1,17 @@
+	@Test
+	public void testDollar() throws Exception {
+		assertMatch("$", "$", true);
+		assertMatch("$x", "$x", true);
+		assertMatch("$x", "x$", false);
+		assertMatch("$x", "$", false);
+
+		assertMatch("$x.*", "$x.a", true);
+		assertMatch("*$", "x$", true);
+		assertMatch("*.$", "x.$", true);
+
+		assertMatch("$*x", "$ax", true);
+		assertMatch("x*$", "xa$", true);
+		assertMatch("x*$", "xa", false);
+		assertMatch("[a$b]", "$", true);
+	}
+

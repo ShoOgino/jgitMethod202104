@@ -1,0 +1,18 @@
+	@Test
+	public void testPipe() throws Exception {
+		assertMatch("|", "|", true);
+		assertMatch("|x", "|x", true);
+		assertMatch("|x", "x|", false);
+		assertMatch("|x", "|", false);
+		assertMatch("x|x", "xx", false);
+
+		assertMatch("x|x.*", "x|x.a", true);
+		assertMatch("*|", "x|", true);
+		assertMatch("*.|", "x.|", true);
+
+		assertMatch("x*|a", "xb|a", true);
+		assertMatch("b|*x", "b|ax", true);
+		assertMatch("b|*x", "ax", false);
+		assertMatch("[a|b]", "|", true);
+	}
+
