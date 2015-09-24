@@ -87,6 +87,14 @@
 					char lookAhead = lookAhead(pattern, i);
 					if (lookAhead == ']' || lookAhead == '[')
 						ignoreLastBracket = true;
+				} else {
+					//
+					char lookAhead = lookAhead(pattern, i);
+					if (lookAhead != '\\' && lookAhead != '['
+							&& lookAhead != '?' && lookAhead != '*'
+							&& lookAhead != ' ' && lookBehind(sb) != '\\') {
+						break;
+					}
 				}
 				sb.append(c);
 				break;
