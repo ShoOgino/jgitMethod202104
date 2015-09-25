@@ -1,0 +1,30 @@
+	/**
+	 * Encryption factory.
+	 *
+	 * @param props
+	 * @return instance
+	 * @throws GeneralSecurityException
+	 */
+	static WalkEncryption instance(Properties props)
+			throws GeneralSecurityException {
+
+		String algo = props.getProperty(AmazonS3.Keys.CRYPTO_ALG, Vals.DEFAULT_ALGO);
+		String vers = props.getProperty(AmazonS3.Keys.CRYPTO_VER, Vals.DEFAULT_VERS);
+		String pass = props.getProperty(AmazonS3.Keys.PASSWORD);
+
+		if (pass == null) // Disable encryption.
+			return WalkEncryption.NONE;
+
+		switch (vers) {
+		case Vals.DEFAULT_VERS:
+			return new JetS3tV2(algo, pass);
+		case JGitV1.VERSION:
+			return new JGitV1(algo, pass);
+		case JGitV2.VERSION:
+			return new JGitV2(props);
+		default:
+			throw new GeneralSecurityException(MessageFormat.format(
+					JGitText.get().unsupportedEncryptionVersion, vers));
+		}
+	}
+

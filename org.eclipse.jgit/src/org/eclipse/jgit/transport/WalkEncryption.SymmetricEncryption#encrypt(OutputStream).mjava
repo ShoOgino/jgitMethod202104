@@ -1,0 +1,17 @@
+		@Override
+		OutputStream encrypt(OutputStream output) throws IOException {
+			try {
+				Cipher cipher = Cipher.getInstance(cipherAlgo);
+				cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+				AlgorithmParameters params = cipher.getParameters();
+				if (params == null) {
+					context = EMPTY;
+				} else {
+					context = Base64.encodeBytes(params.getEncoded());
+				}
+				return new CipherOutputStream(output, cipher);
+			} catch (Exception e) {
+				throw error(e);
+			}
+		}
+

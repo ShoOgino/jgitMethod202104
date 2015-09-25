@@ -1,6 +1,9 @@
-		ObjectEncryptionJetS3tV2(final String algo, final String key)
+		JetS3tV2(final String algo, final String key)
 				throws GeneralSecurityException {
 			cryptoAlg = algo;
+
+			// Verify if cipher is present.
+			Cipher cipher = Cipher.getInstance(cryptoAlg);
 
 			// Standard names are not case-sensitive.
 			// http://docs.oracle.com/javase/8/docs/technotes/guides/security/StandardNames.html
@@ -9,7 +12,7 @@
 			if (!cryptoName.startsWith("PBE")) //$NON-NLS-1$
 				throw new GeneralSecurityException(JGitText.get().encryptionOnlyPBE);
 
-			PBEKeySpec keySpec = new PBEKeySpec(key.toCharArray(), JETS3T_SALT, JETS3T_ITERATIONS, JETS3T_KEY_SIZE);
+			PBEKeySpec keySpec = new PBEKeySpec(key.toCharArray(), SALT, ITERATIONS, KEY_SIZE);
 			secretKey = SecretKeyFactory.getInstance(algo).generateSecret(keySpec);
 
 			// Detect algorithms which require initialization vector.
@@ -28,11 +31,15 @@
 				// https://bitbucket.org/jmurty/jets3t/raw/156c00eb160598c2e9937fd6873f00d3190e28ca/src/org/jets3t/service/security/EncryptionUtil.java
 				// http://cr.openjdk.java.net/~mullan/webrevs/ascarpin/webrev.00/raw_files/new/src/share/classes/com/sun/crypto/provider/PBES2Core.java
 				IvParameterSpec paramIV = new IvParameterSpec(ZERO_AES_IV);
-				paramSpec = java8PBEParameterSpec(JETS3T_SALT, JETS3T_ITERATIONS, paramIV);
+				paramSpec = java8PBEParameterSpec(SALT, ITERATIONS, paramIV);
 			} else {
 				// Strict legacy JetS3t V2 compatibility, with no IV support.
-				paramSpec = java7PBEParameterSpec(JETS3T_SALT, JETS3T_ITERATIONS);
+				paramSpec = java7PBEParameterSpec(SALT, ITERATIONS);
 			}
+
+			// Verify if cipher + key are allowed by policy.
+			cipher.init(Cipher.ENCRYPT_MODE, secretKey, paramSpec);
+			cipher.doFinal();
 
 		}
 

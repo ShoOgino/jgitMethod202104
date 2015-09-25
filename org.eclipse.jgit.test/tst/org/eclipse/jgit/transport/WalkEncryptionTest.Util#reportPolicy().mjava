@@ -1,0 +1,14 @@
+		static void reportPolicy() {
+			try {
+				java.lang.reflect.Field isRestricted = Class
+						.forName("javax.crypto.JceSecurity")
+						.getDeclaredField("isRestricted");
+				isRestricted.setAccessible(true);
+				logger.info("JCE security policy restricted="
+						+ isRestricted.get(null));
+			} catch (Throwable e) {
+				logger.info(
+						"Could not report JCE security policy restrictions.");
+			}
+		}
+

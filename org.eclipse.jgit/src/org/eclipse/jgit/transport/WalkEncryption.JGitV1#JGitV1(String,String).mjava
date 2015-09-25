@@ -1,0 +1,10 @@
+		JGitV1(String algo, String pass)
+				throws GeneralSecurityException {
+			super(wrap(algo, pass));
+			String name = cipherAlgo.toUpperCase();
+			Matcher matcherPBE = Pattern.compile(REGEX_PBE).matcher(name);
+			if (!matcherPBE.matches())
+				throw new GeneralSecurityException(
+						JGitText.get().encryptionOnlyPBE);
+		}
+

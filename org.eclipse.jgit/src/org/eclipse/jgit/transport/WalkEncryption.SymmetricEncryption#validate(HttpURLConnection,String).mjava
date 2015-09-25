@@ -1,0 +1,42 @@
+		@Override
+		void validate(HttpURLConnection conn, String prefix)
+				throws IOException {
+			String prof = conn.getHeaderField(prefix + JGIT_PROFILE);
+			String vers = conn.getHeaderField(prefix + JGIT_VERSION);
+			String cont = conn.getHeaderField(prefix + JGIT_CONTEXT);
+
+			if (prof == null) {
+				throw new IOException(MessageFormat
+						.format(JGitText.get().encryptionError, JGIT_PROFILE));
+			}
+			if (vers == null) {
+				throw new IOException(MessageFormat
+						.format(JGitText.get().encryptionError, JGIT_VERSION));
+			}
+			if (cont == null) {
+				throw new IOException(MessageFormat
+						.format(JGitText.get().encryptionError, JGIT_CONTEXT));
+			}
+			if (!profile.equals(prof)) {
+				throw new IOException(MessageFormat.format(
+						JGitText.get().unsupportedEncryptionAlgorithm, prof));
+			}
+			if (!version.equals(vers)) {
+				throw new IOException(MessageFormat.format(
+						JGitText.get().unsupportedEncryptionVersion, vers));
+			}
+			try {
+				decryptCipher = Cipher.getInstance(cipherAlgo);
+				if (cont.isEmpty()) {
+					decryptCipher.init(Cipher.DECRYPT_MODE, secretKey);
+				} else {
+					AlgorithmParameters params = AlgorithmParameters
+							.getInstance(paramsAlgo);
+					params.init(Base64.decode(cont));
+					decryptCipher.init(Cipher.DECRYPT_MODE, secretKey, params);
+				}
+			} catch (Exception e) {
+				throw error(e);
+			}
+		}
+

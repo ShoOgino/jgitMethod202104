@@ -1,0 +1,17 @@
+		@Test
+		public void test_V2_Java7_AES() throws Exception {
+			assumeTrue(isTestConfigPresent());
+			// String profile = "default";
+			String profile = "AES/CBC/PKCS5Padding+PBKDF2WithHmacSHA1";
+			Properties props = new Properties();
+			props.put(AmazonS3.Keys.CRYPTO_ALG, profile);
+			props.put(AmazonS3.Keys.CRYPTO_VER, "2");
+			props.put(AmazonS3.Keys.PASSWORD, JGIT_PASS);
+			props.put(profile + WalkEncryption.Keys.X_ALGO, "AES/CBC/PKCS5Padding");
+			props.put(profile + WalkEncryption.Keys.X_KEY_ALGO, "PBKDF2WithHmacSHA1");
+			props.put(profile + WalkEncryption.Keys.X_KEY_SIZE, "128");
+			props.put(profile + WalkEncryption.Keys.X_KEY_ITER, "10000");
+			props.put(profile + WalkEncryption.Keys.X_KEY_SALT, "e2 55 89 67 8e 8d e8 4c");
+			cryptoTestIfCan(props);
+		}
+

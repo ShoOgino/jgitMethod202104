@@ -1,0 +1,9 @@
+		@Test(expected = Exception.class)
+		public void test_A2_CryptoError() throws Exception {
+			assumeTrue(isTestConfigPresent());
+			Properties props = new Properties();
+			props.put(AmazonS3.Keys.CRYPTO_ALG, ALGO_ERROR);
+			props.put(AmazonS3.Keys.PASSWORD, JGIT_PASS);
+			cryptoTest(props);
+		}
+

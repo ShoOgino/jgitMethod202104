@@ -1,0 +1,9 @@
+		@Override
+		InputStream decrypt(InputStream input) throws IOException {
+			try {
+				return new CipherInputStream(input, decryptCipher);
+			} finally {
+				decryptCipher = null; // Cleanup validate -> decrypt transition.
+			}
+		}
+

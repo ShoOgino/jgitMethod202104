@@ -1,0 +1,12 @@
+		@Override
+		void request(HttpURLConnection conn, String prefix) throws IOException {
+			conn.setRequestProperty(prefix + JGIT_PROFILE, profile);
+			conn.setRequestProperty(prefix + JGIT_VERSION, version);
+			conn.setRequestProperty(prefix + JGIT_CONTEXT, context);
+			// No cleanup:
+			// single encrypt can be followed by several request
+			// from the AmazonS3.putImpl() multiple retry attempts
+			// context = null; // Cleanup encrypt -> request transition.
+			// TODO re-factor AmazonS3.putImpl to be more transaction-like
+		}
+

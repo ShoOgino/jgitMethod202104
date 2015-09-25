@@ -1,0 +1,21 @@
+		/**
+		 * Setup JCE security policy restrictions. Can remove restrictions when
+		 * restrictions are present, but can not impose them when restrictions
+		 * are missing.
+		 *
+		 * @param restrictedOn
+		 */
+		// http://www.docjar.com/html/api/javax/crypto/JceSecurity.java.html
+		static void policySetup(boolean restrictedOn) {
+			try {
+				java.lang.reflect.Field isRestricted = Class
+						.forName("javax.crypto.JceSecurity")
+						.getDeclaredField("isRestricted");
+				isRestricted.setAccessible(true);
+				isRestricted.set(null, new Boolean(restrictedOn));
+			} catch (Throwable e) {
+				logger.info(
+						"Could not setup JCE security policy restrictions.");
+			}
+		}
+
