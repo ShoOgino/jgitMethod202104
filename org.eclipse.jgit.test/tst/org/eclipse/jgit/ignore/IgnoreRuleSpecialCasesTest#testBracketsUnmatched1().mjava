@@ -1,0 +1,21 @@
+	/**
+	 * The ignore rules here <b>do not match</b> any paths because single '['
+	 * begins character group and the entire rule cannot be parsed due the
+	 * invalid glob pattern. See
+	 * http://article.gmane.org/gmane.comp.version-control.git/278699.
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void testBracketsUnmatched1() throws Exception {
+		assertMatch("[", "[", false);
+		assertMatch("[*", "[", false);
+		assertMatch("*[", "[", false);
+		assertMatch("*[", "a[", false);
+		assertMatch("[a][", "a[", false);
+		assertMatch("*[", "a", false);
+		assertMatch("[a", "a", false);
+		assertMatch("[*", "a", false);
+		assertMatch("[*a", "a", false);
+	}
+
