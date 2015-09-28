@@ -1,0 +1,22 @@
+	@SuppressWarnings({ "boxing" })
+	private void assertCgitAndJgitMatch(String pattern,
+			FastIgnoreRule jgitIgnoreRule, CGitIgnoreRule cgitIgnoreRule,
+			String pathToTest) throws IOException, InterruptedException {
+
+		try {
+			boolean cgitMatch = cgitIgnoreRule.isMatch(pathToTest);
+			boolean jgitMatch = jgitIgnoreRule.isMatch(pathToTest,
+					pathToTest.endsWith("/"));
+			if (cgitMatch != jgitMatch) {
+				System.err.println(
+						buildAssertionToAdd(pattern, pathToTest, cgitMatch));
+			}
+			Assert.assertEquals("jgit:" + jgitMatch + " <> cgit:" + cgitMatch
+					+ " for pattern:[" + pattern + "] and path:[" + pathToTest
+					+ "]", cgitMatch, jgitMatch);
+		} catch (CgitFatalException e) {
+			// Lots of generated patterns or path are rejected by Cgit with a
+			// fatal error. We want to ignore them.
+		}
+	}
+

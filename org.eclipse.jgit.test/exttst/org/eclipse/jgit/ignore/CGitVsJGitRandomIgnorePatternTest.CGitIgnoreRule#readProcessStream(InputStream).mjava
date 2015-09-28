@@ -1,0 +1,14 @@
+		private String readProcessStream(InputStream processStream)
+				throws IOException {
+			try (BufferedReader stdOut = new BufferedReader(
+					new InputStreamReader(processStream))) {
+
+				StringBuilder out = new StringBuilder();
+				String s;
+				while ((s = stdOut.readLine()) != null) {
+					out.append(s);
+				}
+				return out.toString();
+			}
+		}
+

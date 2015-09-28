@@ -1,0 +1,16 @@
+		public boolean isMatch(String path)
+				throws IOException, InterruptedException, CgitFatalException {
+			Process proc = startCgitCheckIgnore(path);
+
+			String cgitStdOutput = readProcessStream(proc.getInputStream());
+			String cgitStdError = readProcessStream(proc.getErrorStream());
+
+			int cgitExitCode = proc.waitFor();
+
+			if (cgitExitCode == 128) {
+				throw new CgitFatalException(cgitExitCode, pattern, path,
+						cgitStdError);
+			}
+			return !cgitStdOutput.startsWith("::");
+		}
+

@@ -1,0 +1,15 @@
+		private Process startCgitCheckIgnore(String path) throws IOException {
+			// Use --stdin instead of using argument otherwise paths starting
+			// with "-" were interpreted as
+			// options by git check-ignore
+			String[] command = new String[] { "git", "check-ignore",
+					"--no-index", "-v", "-n", "--stdin" };
+			Process proc = Runtime.getRuntime().exec(command, new String[0],
+					gitDir);
+			OutputStream out = proc.getOutputStream();
+			out.write((path + "\n").getBytes("UTF-8"));
+			out.flush();
+			out.close();
+			return proc;
+		}
+
