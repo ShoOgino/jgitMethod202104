@@ -1,0 +1,19 @@
+	/**
+	 * Single ']' is treated here literally, not as an and of a character group
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void testBracketsUnmatched2() throws Exception {
+		assertMatch("*]", "a", false);
+		assertMatch("]a", "a", false);
+		assertMatch("]*", "a", false);
+		assertMatch("]*a", "a", false);
+
+		assertMatch("]", "]", true);
+		assertMatch("]*", "]", true);
+		assertMatch("]*", "]a", true);
+		assertMatch("*]", "]", true);
+		assertMatch("*]", "a]", true);
+	}
+
