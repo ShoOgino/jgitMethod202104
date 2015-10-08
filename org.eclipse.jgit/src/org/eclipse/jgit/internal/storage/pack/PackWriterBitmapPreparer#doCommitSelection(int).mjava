@@ -1,10 +1,10 @@
-	Collection<BitmapCommit> doCommitSelection(int expectedNumCommits)
+	Collection<BitmapCommit> doCommitSelection(int commitRange)
 			throws MissingObjectException, IncorrectObjectTypeException,
 			IOException {
 		pm.beginTask(JGitText.get().selectingCommits, ProgressMonitor.UNKNOWN);
 		RevWalk rw = new RevWalk(reader);
 		rw.setRetainBody(false);
-		WalkResult result = findPaths(rw, expectedNumCommits);
+		WalkResult result = findPaths(rw, commitRange);
 		pm.endTask();
 
 		int totCommits = result.commitsByOldest.length - result.commitStartPos;
