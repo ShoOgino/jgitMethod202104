@@ -1,0 +1,8 @@
+	@Test
+	public void testDontOverwriteEmptyFolder() throws IOException {
+		setupCase(mk("foo"), mk("foo"), mk("foo"));
+		FileUtils.mkdir(new File(db.getWorkTree(), "d"));
+		checkout();
+		assertWorkDir(mkmap("foo", "foo", "d", "/"));
+	}
+
