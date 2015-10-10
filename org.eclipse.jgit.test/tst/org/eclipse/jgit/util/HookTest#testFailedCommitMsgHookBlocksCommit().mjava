@@ -15,9 +15,11 @@
 			fail("expected commit-msg hook to abort commit");
 		} catch (AbortedByHookException e) {
 			assertEquals("unexpected error message from commit-msg hook",
-					"Rejected by \"commit-msg\" hook.\nstderr\n",
+					"Rejected by \"commit-msg\" hook.\nstderr"
+							+ System.lineSeparator(),
 					e.getMessage());
-			assertEquals("unexpected output from commit-msg hook", "test\n",
+			assertEquals("unexpected output from commit-msg hook",
+					"test" + System.lineSeparator(),
 					out.toString());
 		}
 	}
