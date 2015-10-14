@@ -1,0 +1,21 @@
+	/**
+	 * @param allowEmpty
+	 *            whether it should be allowed to create a commit which has the
+	 *            same tree as it's sole predecessor (a commit which doesn't
+	 *            change anything). By default when creating standard commits
+	 *            (without specifying paths) JGit allows to create such commits.
+	 *            When this flag is set to false an attempt to create an "empty"
+	 *            standard commit will lead to an EmptyCommitException.
+	 *            <p>
+	 *            By default when creating a commit containing only specified
+	 *            paths an attempt to create an empty commit leads to a
+	 *            {@link JGitInternalException}. By setting this flag to
+	 *            <code>true</code> this exception will not be thrown.
+	 * @return {@code this}
+	 * @since 4.2
+	 */
+	public CommitCommand setAllowEmpty(boolean allowEmpty) {
+		this.allowEmpty = Boolean.valueOf(allowEmpty);
+		return this;
+	}
+
