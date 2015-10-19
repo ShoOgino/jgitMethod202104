@@ -1,0 +1,14 @@
+	private PackWriterBitmapPreparer newPeparer(int recentCount, int recentSpan,
+			int distantSpan) throws IOException {
+		List<ObjectToPack> objects = Collections.emptyList();
+		Set<ObjectId> wants = Collections.emptySet();
+		PackConfig config = new PackConfig();
+		config.setBitmapRecentCommitCount(recentCount);
+		config.setBitmapRecentCommitSpan(recentSpan);
+		config.setBitmapDistantCommitSpan(distantSpan);
+		PackBitmapIndexBuilder indexBuilder = new PackBitmapIndexBuilder(
+				objects);
+		return new PackWriterBitmapPreparer(new StubObjectReader(),
+				indexBuilder, null, wants, config);
+	}
+

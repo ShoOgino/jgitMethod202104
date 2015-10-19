@@ -1,0 +1,17 @@
+	@Test
+	public void testNextSelectionDistanceWithSmallerRecentSpan()
+			throws Exception {
+		PackWriterBitmapPreparer preparer = newPeparer(
+				DEFAULT_BITMAP_RECENT_COMMIT_COUNT, // 20000
+				10, // recent span
+				DEFAULT_BITMAP_DISTANT_COMMIT_SPAN); // 5000
+		int[][] distancesAndSpans = { { 0, 10 }, { 100, 10 }, { 10000, 10 },
+				{ 20000, 10 }, { 20010, 10 }, { 20012, 12 }, { 20050, 50 },
+				{ 20200, 200 }, { 22200, 2200 }, { 24999, 4999 },
+				{ 25000, 5000 }, { 50000, 5000 }, { 1000000, 5000 } };
+
+		for (int[] pair : distancesAndSpans) {
+			assertEquals(pair[1], preparer.nextSpan(pair[0]));
+		}
+	}
+

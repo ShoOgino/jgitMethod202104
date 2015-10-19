@@ -1,0 +1,16 @@
+	@Test
+	public void testNextSelectionDistanceForActiveBranch() throws Exception {
+		PackWriterBitmapPreparer preparer = newPeparer(
+				DEFAULT_BITMAP_RECENT_COMMIT_COUNT, // 20000
+				DEFAULT_BITMAP_RECENT_COMMIT_SPAN, // 100
+				DEFAULT_BITMAP_DISTANT_COMMIT_SPAN); // 5000
+		int[][] distancesAndSpans = { { 0, 100 }, { 100, 100 }, { 10000, 100 },
+				{ 20000, 100 }, { 20100, 100 }, { 20102, 102 }, { 20200, 200 },
+				{ 22200, 2200 }, { 24999, 4999 }, { 25000, 5000 },
+				{ 50000, 5000 }, { 1000000, 5000 }, };
+
+		for (int[] pair : distancesAndSpans) {
+			assertEquals(pair[1], preparer.nextSpan(pair[0]));
+		}
+	}
+
