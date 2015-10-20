@@ -1,0 +1,40 @@
+	@Test
+	public void testBitmapsForExcessiveBranches() throws Exception {
+		int oneDayInSeconds = 60 * 60 * 24;
+
+		// All of branch A is committed on day1
+		BranchBuilder bbA = tr.branch("refs/heads/A");
+		for (int i = 0; i < 1001; i++) {
+			String msg = "A" + i;
+			bbA.commit().message(msg).add(msg, msg).create();
+		}
+		// All of in branch B is committed on day91
+		tr.tick(oneDayInSeconds * 90);
+		BranchBuilder bbB = tr.branch("refs/heads/B");
+		for (int i = 0; i < 1001; i++) {
+			String msg = "B" + i;
+			bbB.commit().message(msg).add(msg, msg).create();
+		}
+		// Create 100 other branches with a single commit
+		for (int i = 0; i < 100; i++) {
+			BranchBuilder bb = tr.branch("refs/heads/N" + i);
+			String msg = "singlecommit" + i;
+			bb.commit().message(msg).add(msg, msg).create();
+		}
+		// now is day92
+		tr.tick(oneDayInSeconds);
+
+		// Since there are no merges, commits in recent history are selected
+		// every 200 commits.
+		final int commitsForSparseBranch = 1 + (1001 / 200);
+		final int commitsForFullBranch = 100 + (901 / 200);
+		final int commitsForShallowBranches = 100;
+
+		// Excessive branch history pruning, one old branch.
+		gc.gc();
+		assertEquals(
+				commitsForSparseBranch + commitsForFullBranch
+						+ commitsForShallowBranches,
+				gc.getStatistics().numberOfBitmaps);
+	}
+

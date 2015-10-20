@@ -1,0 +1,37 @@
+	/*-
+	 * Returns the desired distance to the next bitmap based on the distance
+	 * from the tip commit. Only differentiates recent from distant spans,
+	 * selectCommits() handles the contiguous commits at the tip for active
+	 * or inactive branches.
+	 *
+	 * A graph of this function looks like this, where
+	 * the X axis is the distance from the tip commit and the Y axis is the
+	 * bitmap selection distance.
+	 *
+	 * 5000                ____...
+	 *                    /
+	 *                  /
+	 *                /
+	 *              /
+	 *  100  _____/
+	 *       0  20100  25000
+	 *
+	 * Linear scaling between 20100 and 25000 prevents spans >100 for distances
+	 * <20000 (otherwise, a span of 5000 would be returned for a distance of
+	 * 21000, and the range 16000-20000 would have no selections).
+	 */
+	int nextSpan(int distanceFromTip) {
+		if (distanceFromTip < 0) {
+			throw new IllegalArgumentException();
+		}
+
+		// Commits more toward the start will have more bitmaps.
+		if (distanceFromTip <= recentCommitCount) {
+			return recentCommitSpan;
+		}
+
+		int next = Math.min(distanceFromTip - recentCommitCount,
+				distantCommitSpan);
+		return Math.max(next, recentCommitSpan);
+	}
+
