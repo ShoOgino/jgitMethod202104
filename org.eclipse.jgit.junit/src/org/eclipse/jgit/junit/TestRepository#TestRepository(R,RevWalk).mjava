@@ -8,10 +8,6 @@
 	 * @throws IOException
 	 */
 	public TestRepository(R db, RevWalk rw) throws IOException {
-		this.db = db;
-		this.git = Git.wrap(db);
-		this.pool = rw;
-		this.inserter = db.newObjectInserter();
-		this.now = 1236977987000L;
+		this(db, rw, new MockSystemReader());
 	}
 

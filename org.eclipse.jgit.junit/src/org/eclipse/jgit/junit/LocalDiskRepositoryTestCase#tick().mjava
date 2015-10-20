@@ -1,8 +1,7 @@
 	/** Increment the {@link #author} and {@link #committer} times. */
 	protected void tick() {
-		final long delta = TimeUnit.MILLISECONDS.convert(5 * 60,
-				TimeUnit.SECONDS);
-		final long now = author.getWhen().getTime() + delta;
+		mockSystemReader.tick(5 * 60);
+		final long now = mockSystemReader.getCurrentTime();
 		final int tz = mockSystemReader.getTimezone(now);
 
 		author = new PersonIdent(author, now, tz);
