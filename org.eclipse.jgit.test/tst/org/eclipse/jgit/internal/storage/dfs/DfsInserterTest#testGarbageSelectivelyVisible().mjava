@@ -1,0 +1,16 @@
+	@Test
+	public void testGarbageSelectivelyVisible() throws IOException {
+		ObjectInserter ins = db.newObjectInserter();
+		ObjectId fooId = ins.insert(Constants.OBJ_BLOB, Constants.encode("foo"));
+		ins.flush();
+		assertEquals(1, db.getObjectDatabase().listPacks().size());
+
+		// Make pack 0 garbage.
+		db.getObjectDatabase().listPacks().get(0).setPackSource(PackSource.UNREACHABLE_GARBAGE);
+
+		// Default behavior should be that the database has foo, because we allow garbage objects.
+		assertTrue(db.getObjectDatabase().has(fooId));
+		// But we should not be able to see it if we pass the right args.
+		assertFalse(db.getObjectDatabase().has(fooId, true));
+	}
+
