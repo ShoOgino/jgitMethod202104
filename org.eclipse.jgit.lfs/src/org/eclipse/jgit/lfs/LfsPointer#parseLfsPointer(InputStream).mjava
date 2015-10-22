@@ -21,14 +21,13 @@
 				if (s.startsWith("#") || s.length() == 0) { //$NON-NLS-1$
 					continue;
 				} else if (s.startsWith("version") && s.length() > 8 //$NON-NLS-1$
-						&& s.substring(8).trim().equals(VERSION)) {
+						&& (s.substring(8).trim().equals(VERSION) ||
+								s.substring(8).trim().equals(VERSION_LEGACY))) {
 					versionLine = true;
 				} else if (s.startsWith("oid sha256:")) { //$NON-NLS-1$
 					id = LongObjectId.fromString(s.substring(11).trim());
 				} else if (s.startsWith("size") && s.length() > 5) { //$NON-NLS-1$
 					sz = Long.parseLong(s.substring(5).trim());
-				} else {
-					return null;
 				}
 			}
 			if (versionLine && id != null && sz > -1) {

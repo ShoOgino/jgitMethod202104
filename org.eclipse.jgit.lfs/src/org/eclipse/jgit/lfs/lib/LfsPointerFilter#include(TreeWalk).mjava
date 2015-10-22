@@ -1,0 +1,19 @@
+	@Override
+	public boolean include(TreeWalk walk) throws MissingObjectException,
+			IncorrectObjectTypeException, IOException {
+		pointer = null;
+		if (walk.isSubtree()) {
+			return walk.isRecursive();
+		}
+		ObjectId objectId = walk.getObjectId(0);
+		ObjectLoader object = walk.getObjectReader().open(objectId);
+		if (object.getSize() > 1024) {
+			return false;
+		}
+
+		try (ObjectStream stream = object.openStream()) {
+			pointer = LfsPointer.parseLfsPointer(stream);
+			return pointer != null;
+		}
+	}
+

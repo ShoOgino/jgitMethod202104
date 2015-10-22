@@ -1,0 +1,12 @@
+	@Test
+	public void testValidNestedPointersWithoutRecurrence() throws Exception {
+		for (String domain : LFS_VERSION_DOMAINS) {
+			for (String file : VALID_LFS_FILES) {
+				assertLfs("file.bin", String.format(file, domain))
+						.withRecursive(false).shouldBe(true).check();
+				assertLfs("a/file.bin", String.format(file, domain))
+						.withRecursive(false).shouldBe(false).check();
+			}
+		}
+	}
+

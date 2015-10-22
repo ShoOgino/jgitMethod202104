@@ -1,0 +1,25 @@
+		void check() throws Exception {
+			tr = new TestRepository<>(new InMemoryRepository(
+					new DfsRepositoryDescription("test")));
+			RevCommit commit = tr.branch("master").commit().add(path, content)
+					.message("initial commit").create();
+			RevTree tree = parseCommit(commit);
+			LfsPointerFilter filter = new LfsPointerFilter();
+			try (TreeWalk treeWalk = new TreeWalk(tr.getRepository())) {
+				treeWalk.addTree(tree);
+				treeWalk.setRecursive(recursive);
+				treeWalk.setFilter(filter);
+
+				if (state) {
+					assertTrue(treeWalk.next());
+					assertEquals(path, treeWalk.getPathString());
+					assertNotNull(filter.getPointer());
+					assertEquals(SIZE, filter.getPointer().getSize());
+					assertEquals(OID, filter.getPointer().getOid().name());
+				} else {
+					assertFalse(treeWalk.next());
+					assertNull(filter.getPointer());
+				}
+			}
+		}
+
