@@ -88,6 +88,9 @@
 			builder.commit();
 			setCallable(false);
 		} catch (IOException e) {
+			Throwable cause = e.getCause();
+			if (cause != null && cause instanceof FilterFailedException)
+				throw (FilterFailedException) cause;
 			throw new JGitInternalException(
 					JGitText.get().exceptionCaughtDuringExecutionOfAddCommand, e);
 		} finally {

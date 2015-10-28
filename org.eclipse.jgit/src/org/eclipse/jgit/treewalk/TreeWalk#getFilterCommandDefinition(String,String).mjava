@@ -1,0 +1,29 @@
+	/**
+	 * Get the filter command how it is defined in gitconfig. The returned
+	 * string may contain "%f" which needs to be replaced by the current path
+	 * before executing the filter command. These filter definitions are cached
+	 * for better performance.
+	 *
+	 * @param filterDriverName
+	 *            The name of the filter driver as it is referenced in the
+	 *            gitattributes file. E.g. "lfs". For each filter driver there
+	 *            may be many commands defined in the .gitconfig
+	 * @param filterCommandType
+	 *            The type of the filter command for a specific filter driver.
+	 *            May be "clean" or "smudge".
+	 * @return the definition of the command to be executed for this filter
+	 *         driver and filter command
+	 */
+	private String getFilterCommandDefinition(String filterDriverName,
+			String filterCommandType) {
+		String key = filterDriverName + "." + filterCommandType; //$NON-NLS-1$
+		String filterCommand = filterCommandsByNameDotType.get(key);
+		if (filterCommand != null)
+			return filterCommand;
+		filterCommand = config.getString(Constants.ATTR_FILTER,
+				filterDriverName, filterCommandType);
+		if (filterCommand != null)
+			filterCommandsByNameDotType.put(key, filterCommand);
+		return filterCommand;
+	}
+

@@ -1,0 +1,27 @@
+	/**
+	 * Thrown if a filter command returns a non-zero return code
+	 *
+	 * @param rc
+	 *            the return code
+	 * @param filterCommand
+	 *            the command which failed
+	 * @param path
+	 *            the path processed by the filter
+	 * @param stdout
+	 *            the output the filter generated so far. This should be limited
+	 *            to reasonable size.
+	 * @param stderr
+	 *            the stderr output of the filter
+	 */
+	@SuppressWarnings("boxing")
+	public FilterFailedException(int rc, String filterCommand, String path,
+			byte[] stdout, String stderr) {
+		super(MessageFormat.format(JGitText.get().filterExecutionFailedRc,
+				filterCommand, path, rc, stderr));
+		this.rc = rc;
+		this.filterCommand = filterCommand;
+		this.path = path;
+		this.stdout = stdout;
+		this.stderr = stderr;
+	}
+

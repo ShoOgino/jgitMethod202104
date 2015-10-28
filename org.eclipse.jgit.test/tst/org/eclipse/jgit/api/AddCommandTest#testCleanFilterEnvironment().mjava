@@ -1,0 +1,20 @@
+	@Test
+	public void testCleanFilterEnvironment()
+			throws IOException, GitAPIException {
+		writeTrashFile(".gitattributes", "*.txt filter=tstFilter");
+		writeTrashFile("src/a.txt", "foo");
+		File script = writeTempFile("echo $GIT_DIR; echo 1 >xyz");
+
+		Git git = new Git(db);
+		StoredConfig config = git.getRepository().getConfig();
+		config.setString("filter", "tstFilter", "clean",
+				"sh " + slashify(script.getPath()));
+		config.save();
+		git.add().addFilepattern("src/a.txt").call();
+
+		String gitDir = db.getDirectory().getAbsolutePath();
+		assertEquals("[src/a.txt, mode:100644, content:" + gitDir
+				+ "\n]", indexState(CONTENT));
+		assertTrue(new File(db.getWorkTree(), "xyz").exists());
+	}
+

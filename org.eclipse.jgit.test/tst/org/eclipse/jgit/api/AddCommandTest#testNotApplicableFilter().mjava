@@ -1,0 +1,17 @@
+	@Test
+	public void testNotApplicableFilter() throws IOException, GitAPIException {
+		writeTrashFile("a.txt", "foo");
+		File script = writeTempFile("sed s/o/e/g");
+
+		Git git = new Git(db);
+		StoredConfig config = git.getRepository().getConfig();
+		config.setString("filter", "tstFilter", "something",
+				"sh " + script.getPath());
+		config.save();
+		writeTrashFile(".gitattributes", "*.txt filter=tstFilter");
+
+		git.add().addFilepattern("a.txt").call();
+
+		assertEquals("[a.txt, mode:100644, content:foo]", indexState(CONTENT));
+	}
+

@@ -1,0 +1,18 @@
+	/**
+	 * Thrown if during execution of filter command an exception occurred
+	 *
+	 * @param cause
+	 *            the exception
+	 * @param filterCommand
+	 *            the command which failed
+	 * @param path
+	 *            the path processed by the filter
+	 */
+	public FilterFailedException(Exception cause, String filterCommand,
+			String path) {
+		super(MessageFormat.format(JGitText.get().filterExecutionFailed,
+				filterCommand, path), cause);
+		this.filterCommand = filterCommand;
+		this.path = path;
+	}
+

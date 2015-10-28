@@ -1,0 +1,14 @@
+	/**
+	 * @return the clean filter command for the current entry or
+	 *         <code>null</code> if no such command is defined
+	 * @throws IOException
+	 * @since 4.2
+	 */
+	public String getCleanFilterCommand() throws IOException {
+		if (cleanFilterCommand == null && state.walk != null) {
+			cleanFilterCommand = state.walk
+					.getFilterCommand(Constants.ATTR_FILTER_TYPE_CLEAN);
+		}
+		return cleanFilterCommand;
+	}
+
