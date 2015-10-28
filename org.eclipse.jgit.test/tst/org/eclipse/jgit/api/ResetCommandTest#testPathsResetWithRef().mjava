@@ -11,9 +11,9 @@
 		// 'a.txt' has already been modified in setupRepository
 		// 'notAddedToIndex.txt' has been added to repository
 		// reset to the inital commit
-		git.reset().setRef(initialCommit.getName())
-				.addPath(indexFile.getName())
-				.addPath(untrackedFile.getName()).call();
+		assertSameAsHead(git.reset().setRef(initialCommit.getName())
+				.addPath(indexFile.getName()).addPath(untrackedFile.getName())
+				.call());
 
 		// check that HEAD hasn't moved
 		ObjectId head = db.resolve(Constants.HEAD);

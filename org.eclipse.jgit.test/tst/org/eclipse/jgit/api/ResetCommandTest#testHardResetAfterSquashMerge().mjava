@@ -26,7 +26,8 @@
 				result.getMergeStatus());
 		assertNotNull(db.readSquashCommitMsg());
 
-		g.reset().setMode(ResetType.HARD).setRef(first.getName()).call();
+		assertSameAsHead(g.reset().setMode(ResetType.HARD)
+				.setRef(first.getName()).call());
 
 		assertNull(db.readSquashCommitMsg());
 	}

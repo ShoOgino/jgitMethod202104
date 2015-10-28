@@ -25,7 +25,8 @@
 		assertTrue(bEntry.getLength() > 0);
 		assertTrue(bEntry.getLastModified() > 0);
 
-		git.reset().setMode(ResetType.MIXED).setRef(commit2.getName()).call();
+		assertSameAsHead(git.reset().setMode(ResetType.MIXED)
+				.setRef(commit2.getName()).call());
 
 		cache = db.readDirCache();
 

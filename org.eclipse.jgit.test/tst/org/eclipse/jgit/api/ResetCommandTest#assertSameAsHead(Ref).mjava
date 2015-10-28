@@ -1,0 +1,11 @@
+	/**
+	 * Asserts that a certain ref is similar to repos HEAD.
+	 * @param ref
+	 * @throws IOException
+	 */
+	private void assertSameAsHead(Ref ref) throws IOException {
+		Ref headRef = db.getRef(Constants.HEAD);
+		assertEquals(headRef.getName(), ref.getName());
+		assertEquals(headRef.getObjectId(), ref.getObjectId());
+	}
+

@@ -4,7 +4,7 @@
 		File fileA = writeTrashFile("a.txt", "content");
 		git.add().addFilepattern("a.txt").call();
 		// Should assume an empty tree, like in C Git 1.8.2
-		git.reset().setMode(ResetType.HARD).call();
+		assertSameAsHead(git.reset().setMode(ResetType.HARD).call());
 
 		DirCache cache = db.readDirCache();
 		DirCacheEntry aEntry = cache.getEntry("a.txt");

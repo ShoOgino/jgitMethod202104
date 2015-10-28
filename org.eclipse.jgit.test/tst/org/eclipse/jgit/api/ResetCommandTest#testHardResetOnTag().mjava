@@ -11,7 +11,7 @@
 
 		git.add().addFilepattern(untrackedFile.getName()).call();
 
-		git.reset().setRef(tagName).setMode(HARD).call();
+		assertSameAsHead(git.reset().setRef(tagName).setMode(HARD).call());
 
 		ObjectId head = db.resolve(Constants.HEAD);
 		assertEquals(secondCommit, head);
