@@ -23,6 +23,7 @@
 		BitmapBuilder reuse = commitBitmapIndex.newBitmapBuilder();
 		List<BitmapCommit> reuseCommits = new ArrayList<BitmapCommit>();
 		for (PackBitmapIndexRemapper.Entry entry : bitmapRemapper) {
+			// More recent commits did not have the reuse flag set, so skip them
 			if ((entry.getFlags() & FLAG_REUSE) != FLAG_REUSE) {
 				continue;
 			}
@@ -40,8 +41,8 @@
 			}
 		}
 
-		// Do a RevWalk by commit time descending. Keep track of all the paths
-		// from the wants.
+		// Add branch tips that are not represented in old bitmap indices. Set
+		// up the RevWalk to walk the new commits not in the old packs.
 		List<BitmapBuilderEntry> tipCommitBitmaps = new ArrayList<BitmapBuilderEntry>(
 				want.size());
 		Set<RevCommit> peeledWant = new HashSet<RevCommit>(want.size());
@@ -60,6 +61,8 @@
 		}
 
 		// Create a list of commits in reverse order (older to newer).
+		// For each branch that contains the commit, mark its parents as being
+		// in the bitmap.
 		RevCommit[] commits = new RevCommit[expectedCommitCount];
 		int pos = commits.length;
 		RevCommit rc;
