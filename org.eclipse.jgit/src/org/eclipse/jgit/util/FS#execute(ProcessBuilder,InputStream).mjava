@@ -1,0 +1,25 @@
+	/**
+	 * Execute a command defined by a {@link ProcessBuilder}.
+	 *
+	 * @param pb
+	 *            The command to be executed
+	 * @param in
+	 *            The standard input stream passed to the process
+	 * @return The result of the executed command
+	 * @throws InterruptedException
+	 * @throws IOException
+	 * @since 4.2
+	 */
+	public ExecutionResult execute(ProcessBuilder pb, InputStream in)
+			throws IOException, InterruptedException {
+		TemporaryBuffer stdout = new TemporaryBuffer.LocalFile(null);
+		TemporaryBuffer stderr = new TemporaryBuffer.Heap(1024, 1024 * 1024);
+		try {
+			int rc = runProcess(pb, stdout, stderr, in);
+			return new ExecutionResult(stdout, stderr, rc);
+		} finally {
+			stdout.close();
+			stderr.close();
+		}
+	}
+
