@@ -31,6 +31,7 @@
 		final int commitsForShallowBranches = 100;
 
 		// Excessive branch history pruning, one old branch.
+		gc.setExpireAgeMillis(0); // immediately delete old packs
 		gc.gc();
 		assertEquals(
 				commitsForSparseBranch + commitsForFullBranch

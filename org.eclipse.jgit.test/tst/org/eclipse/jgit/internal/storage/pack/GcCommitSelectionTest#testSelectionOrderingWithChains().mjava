@@ -1,0 +1,38 @@
+	@Test
+	public void testSelectionOrderingWithChains() throws Exception {
+		/*-
+		 * Create a history like this, where 'N' is the number of seconds from
+		 * the first commit in the branch:
+		 *
+		 *      ---o---o---o        commits b3,b5,b7
+		 *     /            \
+		 * o--o--o---o---o---o--o   commits m0,m1,m2,m4,m6,m8,m9
+		 */
+		BranchBuilder bb = tr.branch("refs/heads/main");
+		RevCommit m0 = addCommit(bb, "m0");
+		RevCommit m1 = addCommit(bb, "m1", m0);
+		RevCommit m2 = addCommit(bb, "m2", m1);
+		RevCommit b3 = addCommit(bb, "b3", m1);
+		RevCommit m4 = addCommit(bb, "m4", m2);
+		RevCommit b5 = addCommit(bb, "m5", b3);
+		RevCommit m6 = addCommit(bb, "m6", m4);
+		RevCommit b7 = addCommit(bb, "m7", b5);
+		RevCommit m8 = addCommit(bb, "m8", m6, b7);
+		RevCommit m9 = addCommit(bb, "m9", m8);
+
+		List<RevCommit> commits = Arrays.asList(m0, m1, m2, b3, m4, b5, m6, b7,
+				m8, m9);
+		PackWriterBitmapPreparer preparer = newPeparer(m9, commits);
+		List<BitmapCommit> selection = new ArrayList<>(
+				preparer.selectCommits(commits.size()));
+
+		// Verify that the output is ordered by the separate "chains"
+		String[] expected = { m0.name(), m1.name(), m2.name(), m4.name(),
+				m6.name(), m8.name(), m9.name(), b3.name(), b5.name(),
+				b7.name() };
+		assertEquals(expected.length, selection.size());
+		for (int i = 0; i < expected.length; i++) {
+			assertEquals("Entry " + i, expected[i], selection.get(i).getName());
+		}
+	}
+

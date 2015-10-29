@@ -1,0 +1,10 @@
+	private RevCommit addCommit(BranchBuilder bb, String msg,
+			RevCommit... parents) throws Exception {
+		CommitBuilder commit = bb.commit().message(msg).add(msg, msg).tick(1)
+				.noParents();
+		for (RevCommit parent : parents) {
+			commit.parent(parent);
+		}
+		return commit.create();
+	}
+
