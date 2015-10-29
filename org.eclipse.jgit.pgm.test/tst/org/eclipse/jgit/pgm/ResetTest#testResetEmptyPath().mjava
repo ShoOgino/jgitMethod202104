@@ -1,0 +1,9 @@
+	@Test
+	public void testResetEmptyPath() throws Exception {
+		RevCommit commit = git.commit().setMessage("initial commit").call();
+		assertStringArrayEquals("",
+				execute("git reset --hard " + commit.getId().name() + " --"));
+		assertEquals(commit.getId(),
+				git.getRepository().getRef("HEAD").getObjectId());
+	}
+
