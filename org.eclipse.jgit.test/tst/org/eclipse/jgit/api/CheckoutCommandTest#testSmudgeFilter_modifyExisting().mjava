@@ -1,0 +1,37 @@
+	@Test
+	public void testSmudgeFilter_modifyExisting() throws IOException, GitAPIException {
+		File script = writeTempFile("sed s/o/e/g");
+		StoredConfig config = git.getRepository().getConfig();
+		config.setString("filter", "tstFilter", "smudge",
+				"sh " + slashify(script.getPath()));
+		config.save();
+
+		writeTrashFile(".gitattributes", "*.txt filter=tstFilter");
+		git.add().addFilepattern(".gitattributes").call();
+		git.commit().setMessage("add filter").call();
+
+		writeTrashFile("src/a.tmp", "x");
+		// Caution: we need a trailing '\n' since sed on mac always appends
+		// linefeeds if missing
+		writeTrashFile("src/a.txt", "x\n");
+		git.add().addFilepattern("src/a.tmp").addFilepattern("src/a.txt")
+				.call();
+		RevCommit content1 = git.commit().setMessage("add content").call();
+
+		writeTrashFile("src/a.tmp", "foo");
+		writeTrashFile("src/a.txt", "foo\n");
+		git.add().addFilepattern("src/a.tmp").addFilepattern("src/a.txt")
+				.call();
+		RevCommit content2 = git.commit().setMessage("changed content").call();
+
+		git.checkout().setName(content1.getName()).call();
+		git.checkout().setName(content2.getName()).call();
+
+		assertEquals(
+				"[.gitattributes, mode:100644, content:*.txt filter=tstFilter][Test.txt, mode:100644, content:Some change][src/a.tmp, mode:100644, content:foo][src/a.txt, mode:100644, content:foo\n]",
+				indexState(CONTENT));
+		assertEquals(Sets.of("src/a.txt"), git.status().call().getModified());
+		assertEquals("foo", read("src/a.tmp"));
+		assertEquals("fee\n", read("src/a.txt"));
+	}
+

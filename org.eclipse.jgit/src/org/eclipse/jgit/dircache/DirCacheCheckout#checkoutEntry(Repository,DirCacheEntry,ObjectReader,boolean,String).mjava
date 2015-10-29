@@ -1,0 +1,134 @@
+	/**
+	 * Updates the file in the working tree with content and mode from an entry
+	 * in the index. The new content is first written to a new temporary file in
+	 * the same directory as the real file. Then that new file is renamed to the
+	 * final filename.
+	 *
+	 * <p>
+	 * <b>Note:</b> if the entry path on local file system exists as a file, it
+	 * will be deleted and if it exists as a directory, it will be deleted
+	 * recursively, independently if has any content.
+	 * </p>
+	 *
+	 * <p>
+	 * TODO: this method works directly on File IO, we may need another
+	 * abstraction (like WorkingTreeIterator). This way we could tell e.g.
+	 * Eclipse that Files in the workspace got changed
+	 * </p>
+	 *
+	 * @param repo
+	 *            repository managing the destination work tree.
+	 * @param entry
+	 *            the entry containing new mode and content
+	 * @param or
+	 *            object reader to use for checkout
+	 * @param deleteRecursive
+	 *            true to recursively delete final path if it exists on the file
+	 *            system
+	 * @param smudgeFilterCommand
+	 *            the filter command to be run for smudging the entry to be
+	 *            checked out
+	 *
+	 * @throws IOException
+	 * @since 4.2
+	 */
+	public static void checkoutEntry(Repository repo, DirCacheEntry entry,
+			ObjectReader or, boolean deleteRecursive,
+			String smudgeFilterCommand) throws IOException {
+		ObjectLoader ol = or.open(entry.getObjectId());
+		File f = new File(repo.getWorkTree(), entry.getPathString());
+		File parentDir = f.getParentFile();
+		FileUtils.mkdirs(parentDir, true);
+		FS fs = repo.getFS();
+		WorkingTreeOptions opt = repo.getConfig().get(WorkingTreeOptions.KEY);
+		if (entry.getFileMode() == FileMode.SYMLINK
+				&& opt.getSymLinks() == SymLinks.TRUE) {
+			byte[] bytes = ol.getBytes();
+			String target = RawParseUtils.decode(bytes);
+			if (deleteRecursive && f.isDirectory()) {
+				FileUtils.delete(f, FileUtils.RECURSIVE);
+			}
+			fs.createSymLink(f, target);
+			entry.setLength(bytes.length);
+			entry.setLastModified(fs.lastModified(f));
+			return;
+		}
+
+		File tmpFile = File.createTempFile(
+				"._" + f.getName(), null, parentDir); //$NON-NLS-1$
+		OutputStream channel = new FileOutputStream(tmpFile);
+		if (opt.getAutoCRLF() == AutoCRLF.TRUE)
+			channel = new AutoCRLFOutputStream(channel);
+		if (smudgeFilterCommand != null) {
+			ProcessBuilder filterProcessBuilder = fs
+					.runInShell(smudgeFilterCommand, new String[0]);
+			filterProcessBuilder.directory(repo.getWorkTree());
+			filterProcessBuilder.environment().put(Constants.GIT_DIR_KEY,
+					repo.getDirectory().getAbsolutePath());
+			ExecutionResult result;
+			int rc;
+			try {
+				// TODO: wire correctly with AUTOCRLF
+				result = fs.execute(filterProcessBuilder, ol.openStream());
+				rc = result.getRc();
+				if (rc == 0) {
+					result.getStdout().writeTo(channel,
+							NullProgressMonitor.INSTANCE);
+				}
+			} catch (IOException | InterruptedException e) {
+				throw new IOException(new FilterFailedException(e,
+						smudgeFilterCommand, entry.getPathString()));
+
+			} finally {
+				channel.close();
+			}
+			if (rc != 0) {
+				throw new IOException(new FilterFailedException(rc,
+						smudgeFilterCommand, entry.getPathString(),
+						result.getStdout().toByteArray(MAX_EXCEPTION_TEXT_SIZE),
+						RawParseUtils.decode(result.getStderr()
+								.toByteArray(MAX_EXCEPTION_TEXT_SIZE))));
+			}
+		} else {
+			try {
+				ol.copyTo(channel);
+			} finally {
+				channel.close();
+			}
+		}
+		// The entry needs to correspond to the on-disk filesize. If the content
+		// was filtered (either by autocrlf handling or smudge filters) ask the
+		// filesystem again for the length. Otherwise the objectloader knows the
+		// size
+		if (opt.getAutoCRLF() == AutoCRLF.TRUE || smudgeFilterCommand != null) {
+			entry.setLength(tmpFile.length());
+		} else {
+			entry.setLength(ol.getSize());
+		}
+
+		if (opt.isFileMode() && fs.supportsExecute()) {
+			if (FileMode.EXECUTABLE_FILE.equals(entry.getRawMode())) {
+				if (!fs.canExecute(tmpFile))
+					fs.setExecute(tmpFile, true);
+			} else {
+				if (fs.canExecute(tmpFile))
+					fs.setExecute(tmpFile, false);
+			}
+		}
+		try {
+			if (deleteRecursive && f.isDirectory()) {
+				FileUtils.delete(f, FileUtils.RECURSIVE);
+			}
+			FileUtils.rename(tmpFile, f);
+		} catch (IOException e) {
+			throw new IOException(MessageFormat.format(
+					JGitText.get().renameFileFailed, tmpFile.getPath(),
+					f.getPath()));
+		} finally {
+			if (tmpFile.exists()) {
+				FileUtils.delete(tmpFile);
+			}
+		}
+		entry.setLastModified(f.lastModified());
+	}
+
