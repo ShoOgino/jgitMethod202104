@@ -13,6 +13,7 @@
 	 * @return the one-line output of the command
 	 * @since 4.0
 	 */
+	@Nullable
 	protected static String readPipe(File dir, String[] command, String encoding, Map<String, String> env) {
 		final boolean debug = LOG.isDebugEnabled();
 		try {
@@ -26,36 +27,30 @@
 				pb.environment().putAll(env);
 			}
 			Process p = pb.start();
-			BufferedReader lineRead = new BufferedReader(
-					new InputStreamReader(p.getInputStream(), encoding));
 			p.getOutputStream().close();
 			GobblerThread gobbler = new GobblerThread(p, command, dir);
 			gobbler.start();
 			String r = null;
-			try {
+			try (BufferedReader lineRead = new BufferedReader(
+					new InputStreamReader(p.getInputStream(), encoding))) {
 				r = lineRead.readLine();
 				if (debug) {
 					LOG.debug("readpipe may return '" + r + "'"); //$NON-NLS-1$ //$NON-NLS-2$
-					LOG.debug("(ignoring remaing output:"); //$NON-NLS-1$
-				}
-				String l;
-				while ((l = lineRead.readLine()) != null) {
-					if (debug) {
+					LOG.debug("remaining output:\n"); //$NON-NLS-1$
+					String l;
+					while ((l = lineRead.readLine()) != null) {
 						LOG.debug(l);
 					}
 				}
-			} finally {
-				p.getErrorStream().close();
-				lineRead.close();
 			}
 
 			for (;;) {
 				try {
 					int rc = p.waitFor();
 					gobbler.join();
-					if (rc == 0 && r != null && r.length() > 0
-							&& !gobbler.fail.get())
+					if (rc == 0 && !gobbler.fail.get()) {
 						return r;
+					}
 					if (debug) {
 						LOG.debug("readpipe rc=" + rc); //$NON-NLS-1$
 					}
