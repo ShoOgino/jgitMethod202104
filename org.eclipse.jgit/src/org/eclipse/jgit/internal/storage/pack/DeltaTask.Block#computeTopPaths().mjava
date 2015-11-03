@@ -13,22 +13,25 @@
 						if (topPaths.size() < threads) {
 							Slice s = new Slice(cp, i);
 							topPaths.add(new WeightedPath(cw, s));
-							if (topPaths.size() == threads)
+							if (topPaths.size() == threads) {
 								Collections.sort(topPaths);
+							}
 						} else if (topPaths.get(0).weight < cw) {
 							Slice s = new Slice(cp, i);
 							WeightedPath p = new WeightedPath(cw, s);
 							topPaths.set(0, p);
-							if (p.compareTo(topPaths.get(1)) > 0)
+							if (p.compareTo(topPaths.get(1)) > 0) {
 								Collections.sort(topPaths);
+							}
 						}
 					}
 					cp = i;
 					ch = o.getPathHash();
 					cw = 0;
 				}
-				if (o.isEdge() || o.doNotAttemptDelta())
+				if (o.isEdge() || o.doNotAttemptDelta()) {
 					continue;
+				}
 				cw += o.getWeight();
 				totalWeight += o.getWeight();
 			}
@@ -41,8 +44,9 @@
 			});
 
 			bytesPerUnit = 1;
-			while (MAX_METER <= (totalWeight / bytesPerUnit))
+			while (MAX_METER <= (totalWeight / bytesPerUnit)) {
 				bytesPerUnit <<= 10;
+			}
 			return topPaths;
 		}
 

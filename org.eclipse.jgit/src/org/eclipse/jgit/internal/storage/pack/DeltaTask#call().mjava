@@ -4,14 +4,16 @@
 			DeltaWindow w;
 			for (;;) {
 				synchronized (this) {
-					if (slices.isEmpty())
+					if (slices.isEmpty()) {
 						break;
+					}
 					w = initWindow(slices.removeFirst());
 				}
 				runWindow(w);
 			}
-			while ((w = block.stealWork(this)) != null)
+			while ((w = block.stealWork(this)) != null) {
 				runWindow(w);
+			}
 		} finally {
 			block.pm.endWorker();
 			or.close();

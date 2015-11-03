@@ -19,26 +19,30 @@
 				for (; w < weightPerThread && i < endIndex;) {
 					if (nextTop < topPaths.size()
 							&& i == topPaths.get(nextTop).slice.beginIndex) {
-						if (s < i)
+						if (s < i) {
 							task.add(new Slice(s, i));
+						}
 						s = i = topPaths.get(nextTop++).slice.endIndex;
-					} else
+					} else {
 						w += list[i++].getWeight();
+					}
 				}
 
 				// Round up the slice to the end of a path.
 				if (s < i) {
 					int h = list[i - 1].getPathHash();
 					while (i < endIndex) {
-						if (h == list[i].getPathHash())
+						if (h == list[i].getPathHash()) {
 							i++;
-						else
+						} else {
 							break;
+						}
 					}
 					task.add(new Slice(s, i));
 				}
-				if (!task.slices.isEmpty())
+				if (!task.slices.isEmpty()) {
 					tasks.add(task);
+				}
 			}
 			while (topPathItr.hasNext()) {
 				WeightedPath p = topPathItr.next();
