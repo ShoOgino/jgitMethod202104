@@ -127,7 +127,7 @@
 				BitmapBuilder fullBitmap = commitBitmapIndex.newBitmapBuilder();
 				rw.reset();
 				rw.markStart(c);
-				rw.setRevFilter(PackWriterBitmapWalker.newRevFilter(
+				rw.setRevFilter(new AddUnseenToBitmapFilter(
 						selectionHelper.reusedCommitsBitmap, fullBitmap));
 
 				while (rw.next() != null) {
