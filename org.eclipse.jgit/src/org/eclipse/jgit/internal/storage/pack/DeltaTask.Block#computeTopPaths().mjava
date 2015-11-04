@@ -3,8 +3,8 @@
 					threads);
 			int cp = beginIndex;
 			int ch = list[cp].getPathHash();
-			long cw = list[cp].getWeight();
-			totalWeight = list[cp].getWeight();
+			long cw = getAdjustedWeight(list[cp]);
+			totalWeight = cw;
 
 			for (int i = cp + 1; i < endIndex; i++) {
 				ObjectToPack o = list[i];
@@ -29,11 +29,9 @@
 					ch = o.getPathHash();
 					cw = 0;
 				}
-				if (o.isEdge() || o.doNotAttemptDelta()) {
-					continue;
-				}
-				cw += o.getWeight();
-				totalWeight += o.getWeight();
+				int weight = getAdjustedWeight(o);
+				cw += weight;
+				totalWeight += weight;
 			}
 
 			// Sort by starting index to identify gaps later.
