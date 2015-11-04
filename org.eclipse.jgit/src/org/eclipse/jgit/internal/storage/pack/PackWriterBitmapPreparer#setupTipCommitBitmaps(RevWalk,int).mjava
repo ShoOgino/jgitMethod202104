@@ -35,11 +35,11 @@
 			RevCommit rc = (RevCommit) ro;
 			reuseCommits.add(new BitmapCommit(rc, false, entry.getFlags()));
 			rw.markUninteresting(rc);
-			// PackBitmapIndexRemapper.ofObjectType() ties the underlying
-			// bitmap in the old pack into the new bitmap builder.
-			bitmapRemapper.ofObjectType(bitmapRemapper.getBitmap(rc),
-					Constants.OBJ_COMMIT).trim();
-			reuse.add(rc, Constants.OBJ_COMMIT);
+			if (!reuse.contains(rc)) {
+				EWAHCompressedBitmap bitmap = bitmapRemapper.ofObjectType(
+						bitmapRemapper.getBitmap(rc), Constants.OBJ_COMMIT);
+				reuse.or(commitBitmapIndex.toBitmap(writeBitmaps, bitmap));
+			}
 		}
 
 		// Add branch tips that are not represented in old bitmap indices. Set
