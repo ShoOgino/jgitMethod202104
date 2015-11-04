@@ -1,10 +1,11 @@
 		@Override
 		public final boolean include(RevWalk walker, RevCommit cmit) {
-			if (load(cmit)) {
+			if (!seen.contains(cmit) && bitmap.add(cmit, Constants.OBJ_COMMIT)) {
 				return true;
 			}
-			for (RevCommit p : cmit.getParents())
+			for (RevCommit p : cmit.getParents()) {
 				p.add(RevFlag.SEEN);
+			}
 			return false;
 		}
 
