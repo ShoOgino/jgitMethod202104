@@ -34,12 +34,11 @@
 
 			RevCommit rc = (RevCommit) ro;
 			reuseCommits.add(new BitmapCommit(rc, false, entry.getFlags()));
-			rw.markUninteresting(rc);
-			// PackBitmapIndexRemapper.ofObjectType() ties the underlying
-			// bitmap in the old pack into the new bitmap builder.
-			bitmapRemapper.ofObjectType(bitmapRemapper.getBitmap(rc),
-					Constants.OBJ_COMMIT).trim();
-			reuse.add(rc, Constants.OBJ_COMMIT);
+			if (!reuse.contains(rc)) {
+				EWAHCompressedBitmap bitmap = bitmapRemapper.ofObjectType(
+						bitmapRemapper.getBitmap(rc), Constants.OBJ_COMMIT);
+				reuse.or(commitBitmapIndex.toBitmap(writeBitmaps, bitmap));
+			}
 		}
 
 		// Add branch tips that are not represented in old bitmap indices. Set
@@ -66,6 +65,7 @@
 		// Create a list of commits in reverse order (older to newer).
 		// For each branch that contains the commit, mark its parents as being
 		// in the bitmap.
+		rw.setRevFilter(new NotInBitmapFilter(reuse));
 		RevCommit[] commits = new RevCommit[expectedCommitCount];
 		int pos = commits.length;
 		RevCommit rc;
@@ -109,6 +109,6 @@
 		}
 
 		return new CommitSelectionHelper(peeledWant, commits, pos,
-				orderedTipCommitBitmaps, reuseCommits);
+				orderedTipCommitBitmaps, reuse, reuseCommits);
 	}
 

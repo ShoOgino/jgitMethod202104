@@ -30,7 +30,15 @@
 			while (walker.next() != null) {
 				// Iterate through all of the commits. The BitmapRevFilter does
 				// the work.
+				//
+				// filter.include returns true for commits that do not have
+				// a bitmap in bitmapIndex and are not reachable from a
+				// bitmap in bitmapIndex encountered earlier in the walk.
+				// Thus the number of commits returned by next() measures how
+				// much history was traversed without being able to make use
+				// of bitmaps.
 				pm.update(1);
+				countOfBitmapIndexMisses++;
 			}
 
 			RevObject ro;
@@ -38,7 +46,6 @@
 				bitmapResult.add(ro, ro.getType());
 				pm.update(1);
 			}
-			countOfBitmapIndexMisses += filter.getCountOfLoadedCommits();
 		}
 
 		return bitmapResult;

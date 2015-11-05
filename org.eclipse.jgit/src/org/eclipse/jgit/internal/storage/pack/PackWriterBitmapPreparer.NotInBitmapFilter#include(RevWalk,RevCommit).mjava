@@ -1,0 +1,11 @@
+		@Override
+		public final boolean include(RevWalk rw, RevCommit c) {
+			if (!bitmap.contains(c)) {
+				return true;
+			}
+			for (RevCommit p : c.getParents()) {
+				p.add(SEEN);
+			}
+			return false;
+		}
+
