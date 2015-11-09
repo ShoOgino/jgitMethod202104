@@ -1,6 +1,6 @@
 		@Override
 		public Iterator<BitmapObject> iterator() {
-			final IntIterator dynamic = bitmap.andNot(ones(indexObjectCount))
+			final IntIterator dynamic = bitmap.andNot(ones(bitmapIndex.indexObjectCount))
 					.intIterator();
 			final IntIterator commits = ofObjectType(Constants.OBJ_COMMIT);
 			final IntIterator trees = ofObjectType(Constants.OBJ_TREE);
@@ -37,12 +37,12 @@
 						throw new NoSuchElementException();
 
 					int position = cached.next();
-					if (position < indexObjectCount) {
+					if (position < bitmapIndex.indexObjectCount) {
 						out.type = type;
-						out.objectId = packIndex.getObject(position);
+						out.objectId = bitmapIndex.packIndex.getObject(position);
 					} else {
-						position -= indexObjectCount;
-						MutableEntry entry = mutableIndex.getObject(position);
+						position -= bitmapIndex.indexObjectCount;
+						MutableEntry entry = bitmapIndex.mutableIndex.getObject(position);
 						out.type = entry.type;
 						out.objectId = entry;
 					}

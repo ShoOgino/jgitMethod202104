@@ -1,13 +1,13 @@
 		@Override
 		public boolean removeAllOrNone(PackBitmapIndex index) {
-			if (!packIndex.equals(index))
+			if (!bitmapIndex.packIndex.equals(index))
 				return false;
 
 			EWAHCompressedBitmap curr = bitset.combine()
-					.xor(ones(indexObjectCount));
+					.xor(ones(bitmapIndex.indexObjectCount));
 
 			IntIterator ii = curr.intIterator();
-			if (ii.hasNext() && ii.next() < indexObjectCount)
+			if (ii.hasNext() && ii.next() < bitmapIndex.indexObjectCount)
 				return false;
 			bitset = new ComboBitset(curr);
 			return true;
