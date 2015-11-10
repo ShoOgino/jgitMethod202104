@@ -50,8 +50,10 @@
 
 		WorkingTreeIterator workingTreeIterator = getTree(WorkingTreeIterator.class);
 		DirCacheIterator dirCacheIterator = getTree(DirCacheIterator.class);
+		CanonicalTreeParser other = getTree(CanonicalTreeParser.class);
 
-		if (workingTreeIterator == null && dirCacheIterator == null) {
+		if (workingTreeIterator == null && dirCacheIterator == null
+				&& other == null) {
 			// Can not retrieve the attributes without at least one of the above
 			// iterators.
 			return Collections.<String, Attribute> emptyMap();
@@ -71,7 +73,7 @@
 
 			// Gets the attributes located on the current entry path
 			getPerDirectoryEntryAttributes(path, isDir, operationType,
-					workingTreeIterator, dirCacheIterator,
+					workingTreeIterator, dirCacheIterator, other,
 					attributes);
 
 			// Gets the attributes located in the global attribute file

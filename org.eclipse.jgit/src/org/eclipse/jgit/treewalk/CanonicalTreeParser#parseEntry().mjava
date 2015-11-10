@@ -25,5 +25,12 @@
 		}
 		pathLen = tmp;
 		nextPtr = ptr + Constants.OBJECT_ID_LENGTH;
+
+		// Check if this entry is a .gitattributes file
+		if (RawParseUtils.match(path, pathOffset,
+				Constants.DOT_GIT_ATTRIBUTES.getBytes()) == ATTRIBUTESLENGTH)
+			attributesNode = new LazyLoadingAttributesNode(
+					ObjectId.fromRaw(idBuffer(), idOffset()));
+
 	}
 
