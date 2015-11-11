@@ -1,0 +1,15 @@
+	@Test
+	public void testGetAdditionalRefs_OrigHead() throws IOException {
+		writeLooseRef("ORIG_HEAD", A);
+
+		List<Ref> refs = refdir.getAdditionalRefs();
+		assertEquals(1, refs.size());
+
+		Ref r = refs.get(0);
+		assertFalse(r.isSymbolic());
+		assertEquals(A, r.getObjectId());
+		assertEquals("ORIG_HEAD", r.getName());
+		assertFalse(r.isPeeled());
+		assertNull(r.getPeeledObjectId());
+	}
+
