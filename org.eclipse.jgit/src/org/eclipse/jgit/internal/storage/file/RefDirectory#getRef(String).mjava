@@ -4,19 +4,9 @@
 		final RefList<Ref> packed = getPackedRefs();
 		Ref ref = null;
 		for (String prefix : SEARCH_PATH) {
-			try {
-				ref = readRef(prefix + needle, packed);
-				if (ref != null) {
-					ref = resolve(ref, 0, null, null, packed);
-				}
-				if (ref != null) {
-					break;
-				}
-			} catch (IOException e) {
-				if (!(!needle.contains("/") && "".equals(prefix) && e //$NON-NLS-1$ //$NON-NLS-2$
-						.getCause() instanceof InvalidObjectIdException)) {
-					throw e;
-				}
+			ref = readAndResolve(prefix + needle, packed);
+			if (ref != null) {
+				break;
 			}
 		}
 		fireRefsChanged();
