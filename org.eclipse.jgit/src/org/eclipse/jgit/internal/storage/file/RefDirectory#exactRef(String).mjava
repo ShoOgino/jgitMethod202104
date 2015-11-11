@@ -1,8 +1,10 @@
 	/** {@inheritDoc} */
 	@Override
 	public Ref exactRef(String name) throws IOException {
-		Ref ref = readAndResolve(name, getPackedRefs());
-		fireRefsChanged();
-		return ref;
+		try {
+			return readAndResolve(name, getPackedRefs());
+		} finally {
+			fireRefsChanged();
+		}
 	}
 
