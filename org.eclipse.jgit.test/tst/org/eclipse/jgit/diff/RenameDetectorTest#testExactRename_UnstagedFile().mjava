@@ -1,0 +1,13 @@
+	@Test
+	public void testExactRename_UnstagedFile() throws Exception {
+		ObjectId aId = blob("foo");
+		DiffEntry a = DiffEntry.delete(PATH_A, aId);
+		DiffEntry b = DiffEntry.add(PATH_B, aId);
+
+		rd.addAll(Arrays.asList(a, b));
+		List<DiffEntry> entries = rd.compute();
+
+		assertEquals(1, entries.size());
+		assertRename(a, b, 100, entries.get(0));
+	}
+
