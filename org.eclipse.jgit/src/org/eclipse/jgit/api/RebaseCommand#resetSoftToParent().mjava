@@ -1,7 +1,7 @@
 	private void resetSoftToParent() throws IOException,
 			GitAPIException, CheckoutConflictException {
-		Ref orig_head = repo.getRef(Constants.ORIG_HEAD);
-		ObjectId orig_headId = orig_head.getObjectId();
+		Ref ref = repo.getRef(Constants.ORIG_HEAD);
+		ObjectId orig_head = ref == null ? null : ref.getObjectId();
 		try {
 			// we have already commited the cherry-picked commit.
 			// what we need is to have changes introduced by this
@@ -12,7 +12,7 @@
 		} finally {
 			// set ORIG_HEAD back to where we started because soft
 			// reset moved it
-			repo.writeOrigHead(orig_headId);
+			repo.writeOrigHead(orig_head);
 		}
 	}
 
