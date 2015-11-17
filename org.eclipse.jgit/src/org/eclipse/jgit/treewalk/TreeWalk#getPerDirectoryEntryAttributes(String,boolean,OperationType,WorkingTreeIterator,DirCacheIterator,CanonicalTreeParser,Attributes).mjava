@@ -23,7 +23,7 @@
 	private void getPerDirectoryEntryAttributes(String path, boolean isDir,
 			OperationType opType, WorkingTreeIterator workingTreeIterator,
 			DirCacheIterator dirCacheIterator, CanonicalTreeParser other,
-			Map<String, Attribute> attributes)
+			Attributes attributes)
 			throws IOException {
 		// Prevents infinite recurrence
 		if (workingTreeIterator != null || dirCacheIterator != null
@@ -36,8 +36,7 @@
 			getPerDirectoryEntryAttributes(path, isDir, opType,
 					getParent(workingTreeIterator, WorkingTreeIterator.class),
 					getParent(dirCacheIterator, DirCacheIterator.class),
-					getParent(other, CanonicalTreeParser.class),
-					attributes);
+					getParent(other, CanonicalTreeParser.class), attributes);
 		}
 	}
 

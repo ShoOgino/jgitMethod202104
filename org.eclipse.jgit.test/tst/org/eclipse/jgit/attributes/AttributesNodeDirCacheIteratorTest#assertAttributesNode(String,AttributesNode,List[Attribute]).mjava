@@ -4,12 +4,14 @@
 			assertTrue(nodeAttrs == null || nodeAttrs.isEmpty());
 		else {
 
-			Map<String, Attribute> entryAttributes = new LinkedHashMap<String, Attribute>();
-			attributesNode.getAttributes(pathName, false, entryAttributes);
+			Attributes entryAttributes = new Attributes();
+			attributesNode.getAttributes(pathName,
+					false, entryAttributes);
 
 			if (nodeAttrs != null && !nodeAttrs.isEmpty()) {
 				for (Attribute attribute : nodeAttrs) {
-					assertThat(entryAttributes.values(), hasItem(attribute));
+					assertThat(entryAttributes.getAll(),
+							hasItem(attribute));
 				}
 			} else {
 				assertTrue(
