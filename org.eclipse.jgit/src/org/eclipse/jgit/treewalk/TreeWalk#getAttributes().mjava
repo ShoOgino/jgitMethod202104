@@ -48,50 +48,18 @@
 					"The tree walk should have one AttributesNodeProvider set in order to compute the git attributes."); //$NON-NLS-1$
 		}
 
-		WorkingTreeIterator workingTreeIterator = getTree(WorkingTreeIterator.class);
-		DirCacheIterator dirCacheIterator = getTree(DirCacheIterator.class);
-		CanonicalTreeParser other = getTree(CanonicalTreeParser.class);
-
-		if (workingTreeIterator == null && dirCacheIterator == null
-				&& other == null) {
-			// Can not retrieve the attributes without at least one of the above
-			// iterators.
-			return new Attributes();
-		}
-
-		String path = currentHead.getEntryPathString();
-		final boolean isDir = FileMode.TREE.equals(currentHead.mode);
-		Attributes attributes = new Attributes();
 		try {
-			// Gets the global attributes node
-			AttributesNode globalNodeAttr = attributesNodeProvider
-					.getGlobalAttributesNode();
-			// Gets the info attributes node
-			AttributesNode infoNodeAttr = attributesNodeProvider
-					.getInfoAttributesNode();
-
-			// Gets the info attributes
-			if (infoNodeAttr != null) {
-				infoNodeAttr.getAttributes(path, isDir, attributes);
+			// Lazy create the attributesHandler on the first access of
+			// attributes. This requires the info, global and root
+			// attributes nodes
+			if (attributesHandler == null) {
+				attributesHandler = new AttributesHandler(this);
 			}
-
-			// Gets the attributes located on the current entry path
-			getPerDirectoryEntryAttributes(path, isDir, operationType,
-					workingTreeIterator, dirCacheIterator, other, attributes);
-
-			// Gets the attributes located in the global attribute file
-			if (globalNodeAttr != null) {
-				globalNodeAttr.getAttributes(path, isDir, attributes);
-			}
+			attrs = attributesHandler.getAttributes();
+			return attrs;
 		} catch (IOException e) {
-			throw new JGitInternalException("Error while parsing attributes", e); //$NON-NLS-1$
+			throw new JGitInternalException("Error while parsing attributes", //$NON-NLS-1$
+					e);
 		}
-		// now after all attributes are collected - in the correct hierarchy
-		// order - remove all unspecified entries (the ! marker)
-		for (Attribute a : attributes.getAll()) {
-			if (a.getState() == State.UNSPECIFIED)
-				attributes.remove(a.getKey());
-		}
-		return attributes;
 	}
 

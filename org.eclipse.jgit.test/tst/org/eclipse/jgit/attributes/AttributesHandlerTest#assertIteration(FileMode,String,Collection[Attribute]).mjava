@@ -1,0 +1,15 @@
+	private void assertIteration(FileMode type, String pathName,
+			Collection<Attribute> expectedAttrs) throws IOException {
+		assertTrue("walk has entry", walk.next());
+		assertEquals(pathName, walk.getPathString());
+		assertEquals(type, walk.getFileMode(0));
+
+		if (expectedAttrs != null) {
+			assertEquals(new ArrayList<>(expectedAttrs),
+					new ArrayList<>(walk.getAttributes().getAll()));
+		}
+
+		if (D.equals(type))
+			walk.enterSubtree();
+	}
+

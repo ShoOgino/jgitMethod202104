@@ -1,0 +1,12 @@
+	@Test
+	public void testInfoOverridesGlobal() throws Exception {
+		setupRepo("[attr]foo bar1",
+				"[attr]foo bar2", null, "*.txt foo");
+
+		walk = beginWalk();
+		assertIteration(D, "sub");
+		assertIteration(F, "sub/.gitattributes");
+		assertIteration(F, "sub/a.txt", attrs("foo bar2"));
+		endWalk();
+	}
+

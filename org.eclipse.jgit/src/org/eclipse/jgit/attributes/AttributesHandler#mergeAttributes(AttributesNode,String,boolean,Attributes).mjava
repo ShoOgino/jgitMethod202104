@@ -1,24 +1,28 @@
 	/**
-	 * Returns the matching attributes for an entry path.
+	 * Merges the matching node attributes for an entry path.
 	 *
+	 * @param node
+	 *            the node to scan for matches to entryPath
 	 * @param entryPath
 	 *            the path to test. The path must be relative to this attribute
 	 *            node's own repository path, and in repository path format
 	 *            (uses '/' and not '\').
 	 * @param isDirectory
 	 *            true if the target item is a directory.
-	 * @param attributes
-	 *            Map that will hold the attributes matching this entry path. If
-	 *            it is not empty, this method will NOT override any existing
-	 *            entry.
-	 * @since 4.2
+	 * @param result
+	 *            that will hold the attributes matching this entry path. This
+	 *            method will NOT override any existing entry in attributes.
 	 */
-	public void getAttributes(String entryPath,
-			boolean isDirectory, Attributes attributes) {
+	protected void mergeAttributes(@Nullable AttributesNode node,
+			String entryPath,
+			boolean isDirectory, Attributes result) {
+		if (node == null)
+			return;
+		List<AttributesRule> rules = node.getRules();
 		// Parse rules in the reverse order that they were read since the last
 		// entry should be used
-		ListIterator<AttributesRule> ruleIterator = rules.listIterator(rules
-				.size());
+		ListIterator<AttributesRule> ruleIterator = rules
+				.listIterator(rules.size());
 		while (ruleIterator.hasPrevious()) {
 			AttributesRule rule = ruleIterator.previous();
 			if (rule.isMatch(entryPath, isDirectory)) {
@@ -27,9 +31,7 @@
 				// Parses the attributes in the reverse order that they were
 				// read since the last entry should be used
 				while (attributeIte.hasPrevious()) {
-					Attribute attr = attributeIte.previous();
-					if (!attributes.containsKey(attr.getKey()))
-						attributes.put(attr);
+					expandMacro(attributeIte.previous(), result);
 				}
 			}
 		}

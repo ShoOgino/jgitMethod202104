@@ -1,0 +1,35 @@
+	/**
+	 * see {@link TreeWalk#getAttributes()}
+	 *
+	 * @return the {@link Attributes} for the current path represented by the
+	 *         {@link TreeWalk}
+	 * @throws IOException
+	 */
+	public Attributes getAttributes() throws IOException {
+		String entryPath = treeWalk.getPathString();
+		boolean isDirectory = (treeWalk.getFileMode() == FileMode.TREE);
+		Attributes attributes = new Attributes();
+
+		// Gets the info attributes
+		mergeInfoAttributes(entryPath, isDirectory, attributes);
+
+		// Gets the attributes located on the current entry path
+		mergePerDirectoryEntryAttributes(entryPath, isDirectory,
+				treeWalk.getTree(WorkingTreeIterator.class),
+				treeWalk.getTree(DirCacheIterator.class),
+				treeWalk.getTree(CanonicalTreeParser.class),
+				attributes);
+
+		// Gets the attributes located in the global attribute file
+		mergeGlobalAttributes(entryPath, isDirectory, attributes);
+
+		// now after all attributes are collected - in the correct hierarchy
+		// order - remove all unspecified entries (the ! marker)
+		for (Attribute a : attributes.getAll()) {
+			if (a.getState() == State.UNSPECIFIED)
+				attributes.remove(a.getKey());
+		}
+
+		return attributes;
+	}
+

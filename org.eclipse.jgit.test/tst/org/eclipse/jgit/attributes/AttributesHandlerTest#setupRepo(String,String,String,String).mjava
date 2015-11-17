@@ -1,0 +1,41 @@
+	/**
+	 * @param globalAttributesContent
+	 * @param infoAttributesContent
+	 * @param rootAttributesContent
+	 * @param subDirAttributesContent
+	 * @throws Exception
+	 *             Setup a repo with .gitattributes files and a test file
+	 *             sub/a.txt
+	 */
+	private void setupRepo(
+			String globalAttributesContent,
+			String infoAttributesContent, String rootAttributesContent, String subDirAttributesContent)
+					throws Exception {
+		FileBasedConfig config = db.getConfig();
+		if (globalAttributesContent != null) {
+			File f = new File(db.getDirectory(), "global/attributes");
+			write(f, globalAttributesContent);
+			config.setString(ConfigConstants.CONFIG_CORE_SECTION, null,
+					ConfigConstants.CONFIG_KEY_ATTRIBUTESFILE,
+					f.getAbsolutePath());
+
+		}
+		if (infoAttributesContent != null) {
+			File f = new File(db.getDirectory(), Constants.INFO_ATTRIBUTES);
+			write(f, infoAttributesContent);
+		}
+		config.save();
+
+		if (rootAttributesContent != null) {
+			writeAttributesFile(Constants.DOT_GIT_ATTRIBUTES,
+					rootAttributesContent);
+		}
+
+		if (subDirAttributesContent != null) {
+			writeAttributesFile("sub/" + Constants.DOT_GIT_ATTRIBUTES,
+					subDirAttributesContent);
+		}
+
+		writeTrashFile("sub/a.txt", "a");
+	}
+

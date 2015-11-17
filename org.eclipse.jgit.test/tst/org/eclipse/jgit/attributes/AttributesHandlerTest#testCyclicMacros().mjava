@@ -1,0 +1,12 @@
+	@Test
+	public void testCyclicMacros() throws Exception {
+		setupRepo(
+				"[attr]foo x -bar\n[attr]bar y -foo", null, null, "*.txt foo");
+
+		walk = beginWalk();
+		assertIteration(D, "sub");
+		assertIteration(F, "sub/.gitattributes");
+		assertIteration(F, "sub/a.txt", attrs("foo x -bar -y"));
+		endWalk();
+	}
+

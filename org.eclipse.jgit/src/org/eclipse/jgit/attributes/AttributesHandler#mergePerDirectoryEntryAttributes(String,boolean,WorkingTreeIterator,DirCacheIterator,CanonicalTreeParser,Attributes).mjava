@@ -1,0 +1,37 @@
+	/**
+	 * Merges the matching working directory attributes for an entry path.
+	 *
+	 * @param entryPath
+	 *            the path to test. The path must be relative to this attribute
+	 *            node's own repository path, and in repository path format
+	 *            (uses '/' and not '\').
+	 * @param isDirectory
+	 *            true if the target item is a directory.
+	 * @param workingTreeIterator
+	 * @param dirCacheIterator
+	 * @param otherTree
+	 * @param result
+	 *            that will hold the attributes matching this entry path. This
+	 *            method will NOT override any existing entry in attributes.
+	 * @throws IOException
+	 */
+	private void mergePerDirectoryEntryAttributes(String entryPath,
+			boolean isDirectory,
+			@Nullable WorkingTreeIterator workingTreeIterator,
+			@Nullable DirCacheIterator dirCacheIterator,
+			@Nullable CanonicalTreeParser otherTree, Attributes result)
+					throws IOException {
+		// Prevents infinite recurrence
+		if (workingTreeIterator != null || dirCacheIterator != null
+				|| otherTree != null) {
+			AttributesNode attributesNode = attributesNode(
+					treeWalk, workingTreeIterator, dirCacheIterator, otherTree);
+			if (attributesNode != null) {
+				mergeAttributes(attributesNode, entryPath, isDirectory, result);
+			}
+			mergePerDirectoryEntryAttributes(entryPath, isDirectory,
+					parentOf(workingTreeIterator), parentOf(dirCacheIterator),
+					parentOf(otherTree), result);
+		}
+	}
+

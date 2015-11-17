@@ -1,0 +1,11 @@
+	private static <T extends AbstractTreeIterator> T parentOf(@Nullable T node) {
+		if(node==null) return null;
+		@SuppressWarnings("unchecked")
+		Class<T> type = (Class<T>) node.getClass();
+		AbstractTreeIterator parent = node.parent;
+		if (type.isInstance(parent)) {
+			return type.cast(parent);
+		}
+		return null;
+	}
+

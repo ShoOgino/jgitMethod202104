@@ -1,0 +1,11 @@
+	@Test
+	public void testCustomGlobalMacro4() throws Exception {
+		setupRepo("[attr]foo a -b !c d=e", null, null, "*.txt foo=bar");
+
+		walk = beginWalk();
+		assertIteration(D, "sub");
+		assertIteration(F, "sub/.gitattributes");
+		assertIteration(F, "sub/a.txt", attrs("foo=bar a -b d=bar"));
+		endWalk();
+	}
+

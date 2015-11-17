@@ -1,0 +1,11 @@
+	@Test
+	public void testExpandBuiltInMacro1() throws Exception {
+		setupRepo(null, null, null, "*.txt binary");
+
+		walk = beginWalk();
+		assertIteration(D, "sub");
+		assertIteration(F, "sub/.gitattributes");
+		assertIteration(F, "sub/a.txt", attrs("binary -diff -merge -text"));
+		endWalk();
+	}
+

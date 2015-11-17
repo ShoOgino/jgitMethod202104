@@ -1,0 +1,15 @@
+	private static <T extends AbstractTreeIterator> T rootOf(
+			@Nullable T node) {
+		if(node==null) return null;
+		AbstractTreeIterator t=node;
+		while (t!= null && t.parent != null) {
+			t= t.parent;
+		}
+		@SuppressWarnings("unchecked")
+		Class<T> type = (Class<T>) node.getClass();
+		if (type.isInstance(t)) {
+			return type.cast(t);
+		}
+		return null;
+	}
+

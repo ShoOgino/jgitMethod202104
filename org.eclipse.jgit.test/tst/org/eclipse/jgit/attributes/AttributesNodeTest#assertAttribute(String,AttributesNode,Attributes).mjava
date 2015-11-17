@@ -1,7 +1,8 @@
 	private void assertAttribute(String path, AttributesNode node,
-			Attributes attrs) {
+			Attributes attrs) throws IOException {
 		Attributes attributes = new Attributes();
-		node.getAttributes(path, false, attributes);
+		new AttributesHandler(DUMMY_WALK).mergeAttributes(node, path, false,
+				attributes);
 		assertEquals(attrs, attributes);
 	}
 
