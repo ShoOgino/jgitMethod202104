@@ -1,0 +1,21 @@
+	private static Ref toRef(RevWalk rw, ObjectId id, String name,
+			boolean mustExist) throws MissingObjectException, IOException {
+		if (ObjectId.zeroId().equals(id)) {
+			return null;
+		}
+
+		try {
+			RevObject o = rw.parseAny(id);
+			if (o instanceof RevTag) {
+				RevObject p = rw.peel(o);
+				return new ObjectIdRef.PeeledTag(NETWORK, name, id, p.copy());
+			}
+			return new ObjectIdRef.PeeledNonTag(NETWORK, name, id);
+		} catch (MissingObjectException e) {
+			if (mustExist) {
+				throw e;
+			}
+			return new ObjectIdRef.Unpeeled(NETWORK, name, id);
+		}
+	}
+

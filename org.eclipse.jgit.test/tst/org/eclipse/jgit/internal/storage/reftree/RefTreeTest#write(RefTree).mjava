@@ -1,0 +1,8 @@
+	private ObjectId write(RefTree tree) throws IOException {
+		try (ObjectInserter ins = repo.newObjectInserter()) {
+			ObjectId id = tree.writeTree(ins);
+			ins.flush();
+			return id;
+		}
+	}
+
