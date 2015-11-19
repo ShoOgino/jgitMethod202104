@@ -31,6 +31,12 @@
 					}
 				}
 			} catch (FileNotFoundException fnfe) {
+				if (liveFile.exists()) {
+					// Panic: the index file exists but we can't read it
+					throw new IndexReadException(
+							MessageFormat.format(JGitText.get().cannotReadIndex,
+									liveFile.getAbsolutePath(), fnfe));
+				}
 				// Someone must have deleted it between our exists test
 				// and actually opening the path. That's fine, its empty.
 				//
