@@ -2,11 +2,17 @@
 	protected void run() throws Exception {
 		if (all) {
 			Map<String, Ref> allRefs = db.getRefDatabase().getRefs(ALL);
-			for (final Ref r : allRefs.values())
+			for (final Ref r : allRefs.values()) {
 				outw.println(r.getObjectId().name());
+			}
 		} else {
-			for (final ObjectId o : commits)
+			if (verify && commits.size() > 1) {
+				throw new CmdLineException(CLIText.get().needSingleRevision);
+			}
+
+			for (final ObjectId o : commits) {
 				outw.println(o.name());
+			}
 		}
 	}
 
