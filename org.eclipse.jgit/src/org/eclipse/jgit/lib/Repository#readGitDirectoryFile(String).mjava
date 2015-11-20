@@ -11,6 +11,9 @@
 			byte[] raw = IO.readFully(file);
 			return raw.length > 0 ? raw : null;
 		} catch (FileNotFoundException notFound) {
+			if (file.exists()) {
+				throw notFound;
+			}
 			return null;
 		}
 	}

@@ -10,6 +10,9 @@
 						new DigestInputStream(new FileInputStream(packedRefsFile),
 								digest), CHARSET));
 			} catch (FileNotFoundException noPackedRefs) {
+				if (packedRefsFile.exists()) {
+					throw noPackedRefs;
+				}
 				// Ignore it and leave the new list empty.
 				return PackedRefList.NO_PACKED_REFS;
 			}

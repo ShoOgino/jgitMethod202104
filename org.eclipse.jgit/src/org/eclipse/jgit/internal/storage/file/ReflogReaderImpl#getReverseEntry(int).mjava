@@ -9,6 +9,9 @@
 		try {
 			log = IO.readFully(logName);
 		} catch (FileNotFoundException e) {
+			if (logName.exists()) {
+				throw e;
+			}
 			return null;
 		}
 
