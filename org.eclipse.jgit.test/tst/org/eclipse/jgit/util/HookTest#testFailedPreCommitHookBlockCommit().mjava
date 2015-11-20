@@ -15,11 +15,9 @@
 			fail("expected pre-commit hook to abort commit");
 		} catch (AbortedByHookException e) {
 			assertEquals("unexpected error message from pre-commit hook",
-					"Rejected by \"pre-commit\" hook.\nstderr"
-							+ System.lineSeparator(),
+					"Rejected by \"pre-commit\" hook.\nstderr\n",
 					e.getMessage());
-			assertEquals("unexpected output from pre-commit hook",
-					"test" + System.lineSeparator(),
+			assertEquals("unexpected output from pre-commit hook", "test\n",
 					out.toString());
 		}
 	}
