@@ -53,7 +53,7 @@
 		try {
 			id = ObjectId.fromString(buf, 0);
 			if (ref != null && !ref.isSymbolic()
-					&& ref.getTarget().getObjectId().equals(id)) {
+					&& id.equals(ref.getTarget().getObjectId())) {
 				assert(currentSnapshot != null);
 				currentSnapshot.setClean(otherSnapshot);
 				return ref;

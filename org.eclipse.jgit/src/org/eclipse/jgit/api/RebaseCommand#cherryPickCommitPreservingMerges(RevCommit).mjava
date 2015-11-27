@@ -17,6 +17,8 @@
 		lastStepWasForward = newHead != null;
 		if (!lastStepWasForward) {
 			ObjectId headId = getHead().getObjectId();
+			// getHead() checks for null
+			assert headId != null;
 			if (!AnyObjectId.equals(headId, newParents.get(0)))
 				checkoutCommit(headId.getName(), newParents.get(0));
 

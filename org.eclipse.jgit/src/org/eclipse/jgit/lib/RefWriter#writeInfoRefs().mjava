@@ -21,13 +21,20 @@
 				continue;
 			}
 
-			r.getObjectId().copyTo(tmp, w);
+			ObjectId objectId = r.getObjectId();
+			if (objectId == null) {
+				// Symrefs to unborn branches aren't advertised in the info/refs
+				// file.
+				continue;
+			}
+			objectId.copyTo(tmp, w);
 			w.write('\t');
 			w.write(r.getName());
 			w.write('\n');
 
-			if (r.getPeeledObjectId() != null) {
-				r.getPeeledObjectId().copyTo(tmp, w);
+			ObjectId peeledObjectId = r.getPeeledObjectId();
+			if (peeledObjectId != null) {
+				peeledObjectId.copyTo(tmp, w);
 				w.write('\t');
 				w.write(r.getName());
 				w.write("^{}\n"); //$NON-NLS-1$
