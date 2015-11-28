@@ -1,0 +1,18 @@
+	private RefTree rebuild(Map<String, Ref> refMap) {
+		RefTree tree = RefTree.newEmptyTree();
+		List<org.eclipse.jgit.internal.storage.reftree.Command> cmds
+			= new ArrayList<>();
+
+		for (Ref r : refMap.values()) {
+			if (refName.equals(r.getName())) {
+				continue;
+			}
+
+			cmds.add(new org.eclipse.jgit.internal.storage.reftree.Command(
+					null,
+					db.peel(r)));
+		}
+		tree.apply(cmds);
+		return tree;
+	}
+
