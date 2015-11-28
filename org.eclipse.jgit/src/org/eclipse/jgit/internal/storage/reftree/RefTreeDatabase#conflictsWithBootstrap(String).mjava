@@ -1,0 +1,13 @@
+	boolean conflictsWithBootstrap(String name) {
+		if (txnNamespace != null && name.startsWith(txnNamespace)) {
+			return true;
+		} else if (txnCommitted.equals(name)) {
+			return true;
+		} else if (name.length() > txnCommitted.length()
+				&& name.charAt(txnCommitted.length()) == '/'
+				&& name.startsWith(txnCommitted)) {
+			return true;
+		}
+		return false;
+	}
+

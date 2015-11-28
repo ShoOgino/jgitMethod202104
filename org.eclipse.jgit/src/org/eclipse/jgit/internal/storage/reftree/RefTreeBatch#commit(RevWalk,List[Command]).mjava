@@ -1,0 +1,15 @@
+	private void commit(RevWalk rw, List<Command> todo) throws IOException {
+		ReceiveCommand commit = new ReceiveCommand(
+				parentCommitId, newCommitId,
+				refdb.getTxnCommitted());
+		updateBootstrap(rw, commit);
+
+		if (commit.getResult() == OK) {
+			for (Command c : todo) {
+				c.setResult(OK);
+			}
+		} else {
+			reject(todo, commit.getResult().name());
+		}
+	}
+

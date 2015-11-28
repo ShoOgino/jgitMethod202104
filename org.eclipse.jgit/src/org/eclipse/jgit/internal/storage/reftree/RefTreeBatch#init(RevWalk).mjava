@@ -1,0 +1,15 @@
+	void init(RevWalk rw) throws IOException {
+		src = refdb.getBootstrap().exactRef(refdb.getTxnCommitted());
+		if (src != null && src.getObjectId() != null) {
+			RevCommit c = rw.parseCommit(src.getObjectId());
+			parentCommitId = c;
+			parentTreeId = c.getTree();
+			tree = RefTree.read(rw.getObjectReader(), c.getTree());
+		} else {
+			parentCommitId = ObjectId.zeroId();
+			parentTreeId = new ObjectInserter.Formatter()
+					.idFor(OBJ_TREE, new byte[] {});
+			tree = RefTree.newEmptyTree();
+		}
+	}
+

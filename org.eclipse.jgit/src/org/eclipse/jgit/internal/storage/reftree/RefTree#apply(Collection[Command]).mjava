@@ -16,6 +16,11 @@
 		try {
 			DirCacheEditor ed = contents.editor();
 			for (Command cmd : cmdList) {
+				if (!isValidRef(cmd)) {
+					cmd.setResult(REJECTED_OTHER_REASON,
+							JGitText.get().funnyRefname);
+					return abort(cmdList);
+				}
 				apply(ed, cmd);
 			}
 			ed.finish();
