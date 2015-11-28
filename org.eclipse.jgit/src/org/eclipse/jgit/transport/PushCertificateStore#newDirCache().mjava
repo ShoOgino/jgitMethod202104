@@ -1,10 +1,7 @@
 	private DirCache newDirCache() throws IOException {
-		DirCache dc = DirCache.newInCore();
 		if (commit != null) {
-			DirCacheBuilder b = dc.builder();
-			b.addTree(new byte[0], DirCacheEntry.STAGE_0, reader, commit.getTree());
-			b.finish();
+			return DirCache.read(reader, commit.getTree());
 		}
-		return dc;
+		return DirCache.newInCore();
 	}
 
