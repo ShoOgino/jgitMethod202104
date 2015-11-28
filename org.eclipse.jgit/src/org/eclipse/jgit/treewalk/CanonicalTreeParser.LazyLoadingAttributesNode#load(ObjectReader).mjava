@@ -1,6 +1,7 @@
 		AttributesNode load(ObjectReader reader) throws IOException {
 			AttributesNode r = new AttributesNode();
-			ObjectLoader loader = reader.open(objectId);
+			ObjectId id = ObjectId.fromRaw(raw, idOffset);
+			ObjectLoader loader = reader.open(id);
 			if (loader != null) {
 				InputStream in = loader.openStream();
 				try {
