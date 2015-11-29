@@ -1,0 +1,12 @@
+	@Test
+	public void testFindAttributesWhenMissing() throws CorruptObjectException {
+		TreeFormatter tree = new TreeFormatter();
+		tree.append("src", REGULAR_FILE, hash_a);
+		tree.append("zoo", REGULAR_FILE, hash_foo);
+		ctp.reset(tree.toByteArray());
+
+		assertFalse(ctp.findFile(".gitattributes"));
+		assertEquals(11, ctp.idOffset()); // Did not walk the entire tree.
+		assertEquals("src", ctp.getEntryPathString());
+	}
+

@@ -1,0 +1,13 @@
+	@Test
+	public void testFindAttributesWhenSecond() throws CorruptObjectException {
+		TreeFormatter tree = new TreeFormatter();
+		tree.append(".config", SYMLINK, hash_a);
+		tree.append(".gitattributes", REGULAR_FILE, hash_foo);
+		ctp.reset(tree.toByteArray());
+
+		assertTrue(ctp.findFile(".gitattributes"));
+		assertEquals(REGULAR_FILE.getBits(), ctp.getEntryRawMode());
+		assertEquals(".gitattributes", ctp.getEntryPathString());
+		assertEquals(hash_foo, ctp.getEntryObjectId());
+	}
+
