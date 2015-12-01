@@ -1,0 +1,25 @@
+	/**
+	 * Filter a collection of commands according to result.
+	 *
+	 * @param in
+	 *            commands to filter.
+	 * @param want
+	 *            desired status to filter by.
+	 * @return a copy of the command list containing only those commands with
+	 *         the desired status.
+	 * @since 4.3
+	 */
+	public static List<ReceiveCommand> filter(Iterable<ReceiveCommand> in,
+			Result want) {
+		List<ReceiveCommand> r;
+		if (in instanceof Collection)
+			r = new ArrayList<>(((Collection<?>) in).size());
+		else
+			r = new ArrayList<>();
+		for (ReceiveCommand cmd : in) {
+			if (cmd.getResult() == want)
+				r.add(cmd);
+		}
+		return r;
+	}
+
