@@ -1,0 +1,9 @@
+	private static AttributesNode loadAttributes(ObjectReader reader,
+			AnyObjectId id) throws IOException {
+		AttributesNode r = new AttributesNode();
+		try (InputStream in = reader.open(id, OBJ_BLOB).openStream()) {
+			r.parse(in);
+		}
+		return r.getRules().isEmpty() ? noAttributes() : r;
+	}
+

@@ -9,9 +9,9 @@
 	 */
 	public AttributesNode getEntryAttributesNode(ObjectReader reader)
 			throws IOException {
-		if (attributesNode instanceof LazyLoadingAttributesNode)
-			attributesNode = ((LazyLoadingAttributesNode) attributesNode)
-					.load(reader);
-		return attributesNode;
+		if (attributesNode == null) {
+			attributesNode = findAttributes(reader);
+		}
+		return attributesNode.getRules().isEmpty() ? null : attributesNode;
 	}
 

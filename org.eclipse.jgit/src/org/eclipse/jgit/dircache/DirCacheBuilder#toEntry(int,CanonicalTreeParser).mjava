@@ -1,0 +1,12 @@
+	private static DirCacheEntry toEntry(int stage, CanonicalTreeParser i) {
+		byte[] buf = i.getEntryPathBuffer();
+		int len = i.getEntryPathLength();
+		byte[] path = new byte[len];
+		System.arraycopy(buf, 0, path, 0, len);
+
+		DirCacheEntry e = new DirCacheEntry(path, stage);
+		e.setFileMode(i.getEntryRawMode());
+		e.setObjectIdFromRaw(i.idBuffer(), i.idOffset());
+		return e;
+	}
+
