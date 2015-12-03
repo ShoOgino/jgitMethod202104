@@ -1,19 +1,20 @@
 		@Override
 		protected boolean compareAndPut(Ref oldRef, Ref newRef)
 				throws IOException {
-			ObjectId id = newRef.getObjectId();
-			if (id != null) {
-				try (RevWalk rw = new RevWalk(getRepository())) {
-					// Validate that the target exists in a new RevWalk, as the RevWalk
-					// from the RefUpdate might be reading back unflushed objects.
-					rw.parseAny(id);
+			try {
+				lock.writeLock().lock();
+				ObjectId id = newRef.getObjectId();
+				if (id != null) {
+					try (RevWalk rw = new RevWalk(getRepository())) {
+						// Validate that the target exists in a new RevWalk, as the RevWalk
+						// from the RefUpdate might be reading back unflushed objects.
+						rw.parseAny(id);
+					}
 				}
-			}
-			String name = newRef.getName();
-			if (oldRef == null)
-				return refs.putIfAbsent(name, newRef) == null;
+				String name = newRef.getName();
+				if (oldRef == null)
+					return refs.putIfAbsent(name, newRef) == null;
 
-			synchronized (refs) {
 				Ref cur = refs.get(name);
 				Ref toCompare = cur;
 				if (toCompare != null) {
@@ -38,11 +39,13 @@
 					if (eq(toCompare, oldRef))
 						return refs.replace(name, cur, newRef);
 				}
+
+				if (oldRef.getStorage() == Storage.NEW)
+					return refs.putIfAbsent(name, newRef) == null;
+
+				return false;
+			} finally {
+				lock.writeLock().unlock();
 			}
-
-			if (oldRef.getStorage() == Storage.NEW)
-				return refs.putIfAbsent(name, newRef) == null;
-
-			return false;
 		}
 

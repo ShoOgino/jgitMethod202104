@@ -1,6 +1,11 @@
 	private void writeCommands(final Collection<RemoteRefUpdate> refUpdates,
 			final ProgressMonitor monitor, OutputStream outputStream) throws IOException {
 		final String capabilities = enableCapabilities(monitor, outputStream);
+		if (atomic && !capableAtomic) {
+			throw new TransportException(uri,
+					JGitText.get().atomicPushNotSupported);
+		}
+
 		for (final RemoteRefUpdate rru : refUpdates) {
 			if (!capableDeleteRefs && rru.isDelete()) {
 				rru.setStatus(Status.REJECTED_NODELETE);
