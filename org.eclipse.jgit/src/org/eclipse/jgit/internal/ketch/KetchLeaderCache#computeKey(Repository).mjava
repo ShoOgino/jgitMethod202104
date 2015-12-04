@@ -1,0 +1,13 @@
+	private static String computeKey(Repository repo) {
+		if (repo instanceof DfsRepository) {
+			DfsRepository dfs = (DfsRepository) repo;
+			return dfs.getDescription().getRepositoryName();
+		}
+
+		if (repo.getDirectory() != null) {
+			return repo.getDirectory().toURI().toString();
+		}
+
+		throw new IllegalArgumentException();
+	}
+

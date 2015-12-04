@@ -1,0 +1,16 @@
+	private KetchLeader startLeader(String key, Repository repo)
+			throws URISyntaxException {
+		startLock.lock();
+		try {
+			KetchLeader leader = leaders.get(key);
+			if (leader != null) {
+				return leader;
+			}
+			leader = system.createLeader(repo);
+			leaders.put(key, leader);
+			return leader;
+		} finally {
+			startLock.unlock();
+		}
+	}
+
