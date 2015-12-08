@@ -1,0 +1,9 @@
+	@Test
+	public void testNonASCIIDel() throws Exception {
+		ApplyResult result = init("NonASCIIDel", true, false);
+		assertEquals(1, result.getUpdatedFiles().size());
+		assertEquals(new File(db.getWorkTree(), "NonASCIIDel"),
+				result.getUpdatedFiles().get(0));
+		assertFalse(new File(db.getWorkTree(), "NonASCIIDel").exists());
+	}
+
