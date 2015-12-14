@@ -1,0 +1,24 @@
+	@Test
+	public void testWrongOldIdDoesNotReplace() throws IOException {
+		RemoteRefUpdate rru = new RemoteRefUpdate(null, null, obj2, refName,
+				false, null, obj3);
+
+		Map<String, RemoteRefUpdate> updates = new HashMap<>();
+		updates.put(rru.getRemoteName(), rru);
+
+		Transport tn = testProtocol.open(uri, client, "server");
+		try {
+			PushConnection connection = tn.openPush();
+			try {
+				connection.push(NullProgressMonitor.INSTANCE, updates);
+			} finally {
+				connection.close();
+			}
+		} finally {
+			tn.close();
+		}
+
+		assertEquals(REJECTED_OTHER_REASON, rru.getStatus());
+		assertEquals("invalid old id sent", rru.getMessage());
+	}
+
