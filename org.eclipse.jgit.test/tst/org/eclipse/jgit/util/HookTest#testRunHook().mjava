@@ -11,11 +11,10 @@
 				new String[] {
 				"arg1", "arg2" },
 				new PrintStream(out), new PrintStream(err), "stdin");
-		assertEquals("unexpected hook output", "test arg1 arg2"
-				+ System.lineSeparator() + "stdin" + System.lineSeparator(),
+
+		assertEquals("unexpected hook output", "test arg1 arg2\nstdin\n",
 				out.toString("UTF-8"));
-		assertEquals("unexpected output on stderr stream",
-				"stderr" + System.lineSeparator(),
+		assertEquals("unexpected output on stderr stream", "stderr\n",
 				err.toString("UTF-8"));
 		assertEquals("unexpected exit code", 0, res.getExitCode());
 		assertEquals("unexpected process status", ProcessResult.Status.OK,

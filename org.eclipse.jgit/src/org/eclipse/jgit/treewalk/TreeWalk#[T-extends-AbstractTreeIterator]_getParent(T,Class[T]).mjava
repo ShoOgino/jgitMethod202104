@@ -1,0 +1,11 @@
+	private static <T extends AbstractTreeIterator> T getParent(T current,
+			Class<T> type) {
+		if (current != null) {
+			AbstractTreeIterator parent = current.parent;
+			if (type.isInstance(parent)) {
+				return type.cast(parent);
+			}
+		}
+		return null;
+	}
+

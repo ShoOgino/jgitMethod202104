@@ -1,0 +1,28 @@
+	/**
+	 * The path of an added file name contains ';' and afterwards malicious
+	 * commands. Make sure when calling filter commands to properly escape the
+	 * filenames
+	 *
+	 * @throws IOException
+	 * @throws GitAPIException
+	 */
+	@Test
+	public void testCommandInjection() throws IOException, GitAPIException {
+		// Caution: we need a trailing '\n' since sed on mac always appends
+		// linefeeds if missing
+		writeTrashFile("; echo virus", "foo\n");
+		File script = writeTempFile("sed s/o/e/g");
+
+		Git git = new Git(db);
+		StoredConfig config = git.getRepository().getConfig();
+		config.setString("filter", "tstFilter", "clean",
+				"sh " + slashify(script.getPath()) + " %f");
+		writeTrashFile(".gitattributes", "* filter=tstFilter");
+
+		git.add().addFilepattern("; echo virus").call();
+		// Without proper escaping the content would be "feovirus". The sed
+		// command and the "echo virus" would contribute to the content
+		assertEquals("[; echo virus, mode:100644, content:fee\n]",
+				indexState(CONTENT));
+	}
+

@@ -6,7 +6,11 @@
 	 * @throws IOException
 	 */
 	private Set<ObjectId> listRefLogObjects(Ref ref, long minTime) throws IOException {
-		List<ReflogEntry> rlEntries = repo.getReflogReader(ref.getName())
+		ReflogReader reflogReader = repo.getReflogReader(ref.getName());
+		if (reflogReader == null) {
+			return Collections.emptySet();
+		}
+		List<ReflogEntry> rlEntries = reflogReader
 				.getReverseEntries();
 		if (rlEntries == null || rlEntries.isEmpty())
 			return Collections.<ObjectId> emptySet();

@@ -15,7 +15,10 @@
 		try {
 			buf = IO.readSome(path, limit);
 		} catch (FileNotFoundException noFile) {
-			return null; // doesn't exist; not a reference.
+			if (path.exists() && path.isFile()) {
+				throw noFile;
+			}
+			return null; // doesn't exist or no file; not a reference.
 		}
 
 		int n = buf.length;

@@ -27,18 +27,30 @@
 	 * @throws IOException
 	 *             a tree cannot be read to iterate through its entries.
 	 */
-	public void addTree(final byte[] pathPrefix, final int stage,
-			final ObjectReader reader, final AnyObjectId tree) throws IOException {
-		final TreeWalk tw = new TreeWalk(reader);
-		tw.addTree(new CanonicalTreeParser(pathPrefix, reader, tree
-				.toObjectId()));
-		tw.setRecursive(true);
-		if (tw.next()) {
-			final DirCacheEntry newEntry = toEntry(stage, tw);
-			beforeAdd(newEntry);
-			fastAdd(newEntry);
-			while (tw.next())
-				fastAdd(toEntry(stage, tw));
+	public void addTree(byte[] pathPrefix, int stage, ObjectReader reader,
+			AnyObjectId tree) throws IOException {
+		CanonicalTreeParser p = createTreeParser(pathPrefix, reader, tree);
+		while (!p.eof()) {
+			if (isTree(p)) {
+				p = enterTree(p, reader);
+				continue;
+			}
+
+			DirCacheEntry first = toEntry(stage, p);
+			beforeAdd(first);
+			fastAdd(first);
+			p = p.next();
+			break;
+		}
+
+		// Rest of tree entries are correctly sorted; use fastAdd().
+		while (!p.eof()) {
+			if (isTree(p)) {
+				p = enterTree(p, reader);
+			} else {
+				fastAdd(toEntry(stage, p));
+				p = p.next();
+			}
 		}
 	}
 

@@ -1,6 +1,9 @@
-	private void update(String path, ObjectId mId, FileMode mode) {
+	private void update(String path, ObjectId mId, FileMode mode)
+			throws IOException {
 		if (!FileMode.TREE.equals(mode)) {
-			updated.put(path, mId);
+			updated.put(path,
+					walk.getFilterCommand(Constants.ATTR_FILTER_TYPE_SMUDGE));
+
 			DirCacheEntry entry = new DirCacheEntry(path, DirCacheEntry.STAGE_0);
 			entry.setObjectId(mId);
 			entry.setFileMode(mode);

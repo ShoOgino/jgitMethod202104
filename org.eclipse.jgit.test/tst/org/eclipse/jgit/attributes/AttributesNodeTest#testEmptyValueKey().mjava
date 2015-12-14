@@ -1,0 +1,13 @@
+	@Test
+	public void testEmptyValueKey() throws IOException {
+		String attributeFileContent = "*.type1 = \n" //
+				+ "*.type2 =value\n"//
+				+ "*.type3 attr=\n";
+		is = new ByteArrayInputStream(attributeFileContent.getBytes());
+		AttributesNode node = new AttributesNode();
+		node.parse(is);
+		assertAttribute("file.type1", node, new Attributes());
+		assertAttribute("file.type2", node, new Attributes());
+		assertAttribute("file.type3", node, asSet(new Attribute("attr", "")));
+	}
+

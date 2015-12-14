@@ -1,8 +1,8 @@
 	@Test
 	public void testMixed() throws IOException {
-		Ref c = db.getRef("refs/heads/c");
-		Ref remoteA = db.getRef("refs/remotes/origin/remote-a");
-		Ref master = db.getRef("refs/heads/master");
+		Ref c = db.exactRef("refs/heads/c");
+		Ref remoteA = db.exactRef("refs/remotes/origin/remote-a");
+		Ref master = db.exactRef("refs/heads/master");
 		String message = formatter.format(Arrays.asList(c, remoteA), master);
 		assertEquals("Merge branch 'c', remote-tracking branch 'origin/remote-a'",
 				message);

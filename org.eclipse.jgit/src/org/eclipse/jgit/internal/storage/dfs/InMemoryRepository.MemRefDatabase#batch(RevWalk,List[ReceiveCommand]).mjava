@@ -1,0 +1,61 @@
+		private void batch(RevWalk walk, List<ReceiveCommand> cmds) {
+			// Validate that the target exists in a new RevWalk, as the RevWalk
+			// from the RefUpdate might be reading back unflushed objects.
+			Map<ObjectId, ObjectId> peeled = new HashMap<>();
+			try (RevWalk rw = new RevWalk(getRepository())) {
+				for (ReceiveCommand c : cmds) {
+					if (!ObjectId.zeroId().equals(c.getNewId())) {
+						try {
+							RevObject o = rw.parseAny(c.getNewId());
+							if (o instanceof RevTag) {
+								peeled.put(o, rw.peel(o).copy());
+							}
+						} catch (IOException e) {
+							c.setResult(ReceiveCommand.Result.REJECTED_MISSING_OBJECT);
+							reject(cmds);
+							return;
+						}
+					}
+				}
+			}
+
+			// Check all references conform to expected old value.
+			for (ReceiveCommand c : cmds) {
+				Ref r = refs.get(c.getRefName());
+				if (r == null) {
+					if (c.getType() != ReceiveCommand.Type.CREATE) {
+						c.setResult(ReceiveCommand.Result.LOCK_FAILURE);
+						reject(cmds);
+						return;
+					}
+				} else if (r.isSymbolic() || r.getObjectId() == null
+						|| !r.getObjectId().equals(c.getOldId())) {
+					c.setResult(ReceiveCommand.Result.LOCK_FAILURE);
+					reject(cmds);
+					return;
+				}
+			}
+
+			// Write references.
+			for (ReceiveCommand c : cmds) {
+				if (c.getType() == ReceiveCommand.Type.DELETE) {
+					refs.remove(c.getRefName());
+					c.setResult(ReceiveCommand.Result.OK);
+					continue;
+				}
+
+				ObjectId p = peeled.get(c.getNewId());
+				Ref r;
+				if (p != null) {
+					r = new ObjectIdRef.PeeledTag(Storage.PACKED,
+							c.getRefName(), c.getNewId(), p);
+				} else {
+					r = new ObjectIdRef.PeeledNonTag(Storage.PACKED,
+							c.getRefName(), c.getNewId());
+				}
+				refs.put(r.getName(), r);
+				c.setResult(ReceiveCommand.Result.OK);
+			}
+			clearCache();
+		}
+

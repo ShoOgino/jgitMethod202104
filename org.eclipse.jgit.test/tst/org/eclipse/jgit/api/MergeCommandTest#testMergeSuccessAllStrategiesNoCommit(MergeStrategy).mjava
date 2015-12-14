@@ -17,9 +17,9 @@
 
 		MergeResult result = git.merge().setStrategy(mergeStrategy)
 				.setCommit(false)
-				.include(db.getRef(Constants.MASTER)).call();
+				.include(db.exactRef(R_HEADS + MASTER)).call();
 		assertEquals(MergeStatus.MERGED_NOT_COMMITTED, result.getMergeStatus());
-		assertEquals(db.getRef(Constants.HEAD).getTarget().getObjectId(),
+		assertEquals(db.exactRef(Constants.HEAD).getTarget().getObjectId(),
 				thirdCommit.getId());
 	}
 

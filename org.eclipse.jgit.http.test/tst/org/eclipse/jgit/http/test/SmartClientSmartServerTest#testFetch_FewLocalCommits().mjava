@@ -9,7 +9,7 @@
 		} finally {
 			t.close();
 		}
-		assertEquals(B, dst.getRepository().getRef(master).getObjectId());
+		assertEquals(B, dst.getRepository().exactRef(master).getObjectId());
 		List<AccessEvent> cloneRequests = getRequests();
 
 		// Only create a few new commits.
@@ -30,7 +30,7 @@
 		} finally {
 			t.close();
 		}
-		assertEquals(Z, dst.getRepository().getRef(master).getObjectId());
+		assertEquals(Z, dst.getRepository().exactRef(master).getObjectId());
 
 		List<AccessEvent> requests = getRequests();
 		requests.removeAll(cloneRequests);

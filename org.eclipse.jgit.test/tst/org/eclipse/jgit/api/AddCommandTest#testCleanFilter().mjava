@@ -1,0 +1,24 @@
+	@Test
+	public void testCleanFilter() throws IOException,
+			GitAPIException {
+		writeTrashFile(".gitattributes", "*.txt filter=tstFilter");
+		writeTrashFile("src/a.tmp", "foo");
+		// Caution: we need a trailing '\n' since sed on mac always appends
+		// linefeeds if missing
+		writeTrashFile("src/a.txt", "foo\n");
+		File script = writeTempFile("sed s/o/e/g");
+
+		Git git = new Git(db);
+		StoredConfig config = git.getRepository().getConfig();
+		config.setString("filter", "tstFilter", "clean",
+				"sh " + slashify(script.getPath()));
+		config.save();
+
+		git.add().addFilepattern("src/a.txt").addFilepattern("src/a.tmp")
+				.call();
+
+		assertEquals(
+				"[src/a.tmp, mode:100644, content:foo][src/a.txt, mode:100644, content:fee\n]",
+				indexState(CONTENT));
+	}
+

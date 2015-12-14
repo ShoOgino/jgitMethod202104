@@ -37,6 +37,10 @@
 				fullOldName = ref.getName();
 			} else {
 				fullOldName = repo.getFullBranch();
+				if (fullOldName == null) {
+					throw new NoHeadException(
+							JGitText.get().invalidRepositoryStateNoHead);
+				}
 				if (ObjectId.isId(fullOldName))
 					throw new DetachedHeadException();
 			}

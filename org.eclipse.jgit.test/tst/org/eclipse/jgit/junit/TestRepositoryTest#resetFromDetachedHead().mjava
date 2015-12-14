@@ -1,31 +1,31 @@
 	@Test
 	public void resetFromDetachedHead() throws Exception {
-		Ref head = repo.getRef("HEAD");
+		Ref head = repo.exactRef("HEAD");
 		RevCommit master = tr.branch("master").commit().create();
 		RevCommit branch = tr.branch("branch").commit().create();
 		RevCommit detached = tr.commit().create();
 
 		assertNull(head);
-		assertEquals(master, repo.getRef("refs/heads/master").getObjectId());
-		assertEquals(branch, repo.getRef("refs/heads/branch").getObjectId());
+		assertEquals(master, repo.exactRef("refs/heads/master").getObjectId());
+		assertEquals(branch, repo.exactRef("refs/heads/branch").getObjectId());
 
 		tr.reset("master");
-		head = repo.getRef("HEAD");
+		head = repo.exactRef("HEAD");
 		assertEquals(master, head.getObjectId());
 		assertFalse(head.isSymbolic());
 
 		tr.reset("branch");
-		head = repo.getRef("HEAD");
+		head = repo.exactRef("HEAD");
 		assertEquals(branch, head.getObjectId());
 		assertFalse(head.isSymbolic());
 
 		tr.reset(detached);
-		head = repo.getRef("HEAD");
+		head = repo.exactRef("HEAD");
 		assertEquals(detached, head.getObjectId());
 		assertFalse(head.isSymbolic());
 
 		tr.reset(detached.name());
-		head = repo.getRef("HEAD");
+		head = repo.exactRef("HEAD");
 		assertEquals(detached, head.getObjectId());
 		assertFalse(head.isSymbolic());
 	}

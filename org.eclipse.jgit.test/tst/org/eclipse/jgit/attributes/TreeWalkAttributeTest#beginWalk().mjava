@@ -1,0 +1,11 @@
+	private void beginWalk() throws NoWorkTreeException, IOException {
+		walk = new TreeWalk(db);
+		walk.addTree(new FileTreeIterator(db));
+		walk.addTree(new DirCacheIterator(db.readDirCache()));
+
+		ci_walk = new TreeWalk(db);
+		ci_walk.setOperationType(OperationType.CHECKIN_OP);
+		ci_walk.addTree(new FileTreeIterator(db));
+		ci_walk.addTree(new DirCacheIterator(db.readDirCache()));
+	}
+

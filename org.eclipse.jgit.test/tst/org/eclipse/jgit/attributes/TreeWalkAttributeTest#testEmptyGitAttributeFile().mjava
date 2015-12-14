@@ -1,0 +1,27 @@
+	/**
+	 * Checks that an empty .gitattribute file does not return incorrect value.
+	 *
+	 * @throws IOException
+	 */
+	@Test
+	public void testEmptyGitAttributeFile() throws IOException {
+		writeAttributesFile(".git/info/attributes", "");
+		writeTrashFile("l0.txt", "");
+		writeAttributesFile(".gitattributes", "");
+		writeTrashFile("level1/l1.txt", "");
+		writeTrashFile("level1/level2/l2.txt", "");
+
+		beginWalk();
+
+		assertEntry(F, ".gitattributes");
+		assertEntry(F, "l0.txt");
+
+		assertEntry(D, "level1");
+		assertEntry(F, "level1/l1.txt");
+
+		assertEntry(D, "level1/level2");
+		assertEntry(F, "level1/level2/l2.txt");
+
+		endWalk();
+	}
+

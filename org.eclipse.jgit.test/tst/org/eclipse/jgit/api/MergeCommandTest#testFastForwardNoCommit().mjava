@@ -8,7 +8,7 @@
 
 		checkoutBranch("refs/heads/branch1");
 
-		MergeResult result = git.merge().include(db.getRef(Constants.MASTER))
+		MergeResult result = git.merge().include(db.exactRef(R_HEADS + MASTER))
 				.setCommit(false).call();
 
 		assertEquals(MergeResult.MergeStatus.FAST_FORWARD,

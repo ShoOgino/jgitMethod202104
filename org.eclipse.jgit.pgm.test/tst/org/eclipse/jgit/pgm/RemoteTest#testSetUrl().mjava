@@ -1,0 +1,12 @@
+	@Test
+	public void testSetUrl() throws Exception {
+		assertArrayEquals(new String[] { "" },
+				execute("git remote set-url test git://test.com/test"));
+
+		RemoteConfig result = new RemoteConfig(config, "test");
+		assertEquals("test", result.getName());
+		assertArrayEquals(new URIish[] { new URIish("git://test.com/test") },
+				result.getURIs().toArray());
+		assertTrue(result.getPushURIs().isEmpty());
+	}
+

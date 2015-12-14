@@ -1,0 +1,97 @@
+	/**
+	 * Retrieve the git attributes for the current entry.
+	 *
+	 * <h4>Git attribute computation</h4>
+	 *
+	 * <ul>
+	 * <li>Get the attributes matching the current path entry from the info file
+	 * (see {@link AttributesNodeProvider#getInfoAttributesNode()}).</li>
+	 * <li>Completes the list of attributes using the .gitattributes files
+	 * located on the current path (the further the directory that contains
+	 * .gitattributes is from the path in question, the lower its precedence).
+	 * For a checkin operation, it will look first on the working tree (if any).
+	 * If there is no attributes file, it will fallback on the index. For a
+	 * checkout operation, it will first use the index entry and then fallback
+	 * on the working tree if none.</li>
+	 * <li>In the end, completes the list of matching attributes using the
+	 * global attribute file define in the configuration (see
+	 * {@link AttributesNodeProvider#getGlobalAttributesNode()})</li>
+	 *
+	 * </ul>
+	 *
+	 *
+	 * <h4>Iterator constraints</h4>
+	 *
+	 * <p>
+	 * In order to have a correct list of attributes for the current entry, this
+	 * {@link TreeWalk} requires to have at least one
+	 * {@link AttributesNodeProvider} and a {@link DirCacheIterator} set up. An
+	 * {@link AttributesNodeProvider} is used to retrieve the attributes from
+	 * the info attributes file and the global attributes file. The
+	 * {@link DirCacheIterator} is used to retrieve the .gitattributes files
+	 * stored in the index. A {@link WorkingTreeIterator} can also be provided
+	 * to access the local version of the .gitattributes files. If none is
+	 * provided it will fallback on the {@link DirCacheIterator}.
+	 * </p>
+	 *
+	 * @return a {@link Set} of {@link Attribute}s that match the current entry.
+	 * @since 4.2
+	 */
+	public Attributes getAttributes() {
+		if (attrs != null)
+			return attrs;
+
+		if (attributesNodeProvider == null) {
+			// The work tree should have a AttributesNodeProvider to be able to
+			// retrieve the info and global attributes node
+			throw new IllegalStateException(
+					"The tree walk should have one AttributesNodeProvider set in order to compute the git attributes."); //$NON-NLS-1$
+		}
+
+		WorkingTreeIterator workingTreeIterator = getTree(WorkingTreeIterator.class);
+		DirCacheIterator dirCacheIterator = getTree(DirCacheIterator.class);
+		CanonicalTreeParser other = getTree(CanonicalTreeParser.class);
+
+		if (workingTreeIterator == null && dirCacheIterator == null
+				&& other == null) {
+			// Can not retrieve the attributes without at least one of the above
+			// iterators.
+			return new Attributes();
+		}
+
+		String path = currentHead.getEntryPathString();
+		final boolean isDir = FileMode.TREE.equals(currentHead.mode);
+		Attributes attributes = new Attributes();
+		try {
+			// Gets the global attributes node
+			AttributesNode globalNodeAttr = attributesNodeProvider
+					.getGlobalAttributesNode();
+			// Gets the info attributes node
+			AttributesNode infoNodeAttr = attributesNodeProvider
+					.getInfoAttributesNode();
+
+			// Gets the info attributes
+			if (infoNodeAttr != null) {
+				infoNodeAttr.getAttributes(path, isDir, attributes);
+			}
+
+			// Gets the attributes located on the current entry path
+			getPerDirectoryEntryAttributes(path, isDir, operationType,
+					workingTreeIterator, dirCacheIterator, other, attributes);
+
+			// Gets the attributes located in the global attribute file
+			if (globalNodeAttr != null) {
+				globalNodeAttr.getAttributes(path, isDir, attributes);
+			}
+		} catch (IOException e) {
+			throw new JGitInternalException("Error while parsing attributes", e); //$NON-NLS-1$
+		}
+		// now after all attributes are collected - in the correct hierarchy
+		// order - remove all unspecified entries (the ! marker)
+		for (Attribute a : attributes.getAll()) {
+			if (a.getState() == State.UNSPECIFIED)
+				attributes.remove(a.getKey());
+		}
+		return attributes;
+	}
+

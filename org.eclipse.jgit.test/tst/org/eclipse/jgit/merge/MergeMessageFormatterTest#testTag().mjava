@@ -1,7 +1,7 @@
 	@Test
 	public void testTag() throws IOException {
-		Ref tagA = db.getRef("refs/tags/A");
-		Ref master = db.getRef("refs/heads/master");
+		Ref tagA = db.exactRef("refs/tags/A");
+		Ref master = db.exactRef("refs/heads/master");
 		String message = formatter.format(Arrays.asList(tagA), master);
 		assertEquals("Merge tag 'A'", message);
 	}

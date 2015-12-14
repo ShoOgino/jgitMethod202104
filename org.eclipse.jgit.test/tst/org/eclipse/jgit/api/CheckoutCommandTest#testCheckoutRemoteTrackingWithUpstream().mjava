@@ -6,8 +6,8 @@
 				.setStartPoint("origin/test")
 				.setUpstreamMode(SetupUpstreamMode.TRACK).call();
 
-		assertEquals("refs/heads/test", db2.getRef(Constants.HEAD).getTarget()
-				.getName());
+		assertEquals("refs/heads/test",
+				db2.exactRef(Constants.HEAD).getTarget().getName());
 		StoredConfig config = db2.getConfig();
 		assertEquals("origin", config.getString(
 				ConfigConstants.CONFIG_BRANCH_SECTION, "test",

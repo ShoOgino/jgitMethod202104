@@ -1,0 +1,20 @@
+		@Override
+		public BatchRefUpdate newBatchUpdate() {
+			return new BatchRefUpdate(this) {
+				@Override
+				public void execute(RevWalk walk, ProgressMonitor monitor)
+						throws IOException {
+					if (performsAtomicTransactions()) {
+						try {
+							lock.writeLock().lock();
+							batch(walk, getCommands());
+						} finally {
+							lock.writeLock().unlock();
+						}
+					} else {
+						super.execute(walk, monitor);
+					}
+				}
+			};
+		}
+

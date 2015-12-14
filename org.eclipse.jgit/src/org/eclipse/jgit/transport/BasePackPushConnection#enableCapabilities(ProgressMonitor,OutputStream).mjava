@@ -1,6 +1,8 @@
 	private String enableCapabilities(final ProgressMonitor monitor,
 			OutputStream outputStream) {
 		final StringBuilder line = new StringBuilder();
+		if (atomic)
+			capableAtomic = wantCapability(line, CAPABILITY_ATOMIC);
 		capableReport = wantCapability(line, CAPABILITY_REPORT_STATUS);
 		capableDeleteRefs = wantCapability(line, CAPABILITY_DELETE_REFS);
 		capableOfsDelta = wantCapability(line, CAPABILITY_OFS_DELTA);

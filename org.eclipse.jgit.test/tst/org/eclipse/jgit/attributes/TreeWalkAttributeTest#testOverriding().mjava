@@ -1,0 +1,33 @@
+	/**
+	 * Checks that the last entry in .gitattributes is used if 2 lines match the
+	 * same attribute
+	 *
+	 * @throws IOException
+	 */
+	@Test
+	public void testOverriding() throws IOException {
+		writeAttributesFile(".git/info/attributes",//
+				//
+				"*.txt custom=current",//
+				"*.txt custom=parent",//
+				"*.txt custom=root",//
+				"*.txt custom=info",
+				//
+				"*.txt delta",//
+				"*.txt -delta",
+				//
+				"*.txt eol=lf",//
+				"*.txt eol=crlf",
+				//
+				"*.txt text",//
+				"*.txt -text");
+
+		writeTrashFile("l0.txt", "");
+		beginWalk();
+
+		assertEntry(F, "l0.txt",
+				asSet(TEXT_UNSET, EOL_CRLF, DELTA_UNSET, CUSTOM_INFO));
+
+		endWalk();
+	}
+

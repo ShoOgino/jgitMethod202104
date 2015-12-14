@@ -1,6 +1,11 @@
 	private void writeCommands(final Collection<RemoteRefUpdate> refUpdates,
 			final ProgressMonitor monitor, OutputStream outputStream) throws IOException {
 		final String capabilities = enableCapabilities(monitor, outputStream);
+		if (atomic && !capableAtomic) {
+			throw new TransportException(uri,
+					JGitText.get().atomicPushNotSupported);
+		}
+
 		for (final RemoteRefUpdate rru : refUpdates) {
 			if (!capableDeleteRefs && rru.isDelete()) {
 				rru.setStatus(Status.REJECTED_NODELETE);
@@ -8,9 +13,11 @@
 			}
 
 			final StringBuilder sb = new StringBuilder();
-			final Ref advertisedRef = getRef(rru.getRemoteName());
-			final ObjectId oldId = (advertisedRef == null ? ObjectId.zeroId()
-					: advertisedRef.getObjectId());
+			ObjectId oldId = rru.getExpectedOldObjectId();
+			if (oldId == null) {
+				Ref adv = getRef(rru.getRemoteName());
+				oldId = adv != null ? adv.getObjectId() : ObjectId.zeroId();
+			}
 			sb.append(oldId.name());
 			sb.append(' ');
 			sb.append(rru.getNewObjectId().name());

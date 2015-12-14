@@ -6,7 +6,7 @@
 	 */
 	@Test
 	public void testReadSimplePackedRefSameRepo() throws IOException {
-		Ref ref = db.getRef("refs/heads/master");
+		Ref ref = db.exactRef("refs/heads/master");
 		ObjectId pid = db.resolve("refs/heads/master^");
 		assertEquals(Storage.PACKED, ref.getStorage());
 		RefUpdate updateRef = db.updateRef("refs/heads/master");
@@ -15,7 +15,7 @@
 		Result update = updateRef.update();
 		assertEquals(Result.FORCED, update);
 
-		ref = db.getRef("refs/heads/master");
+		ref = db.exactRef("refs/heads/master");
 		assertEquals(Storage.LOOSE, ref.getStorage());
 	}
 

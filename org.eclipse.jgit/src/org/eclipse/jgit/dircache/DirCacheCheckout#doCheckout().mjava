@@ -46,7 +46,8 @@
 			for (String path : updated.keySet()) {
 				DirCacheEntry entry = dc.getEntry(path);
 				if (!FileMode.GITLINK.equals(entry.getRawMode()))
-					checkoutEntry(repo, entry, objectReader, false);
+					checkoutEntry(repo, entry, objectReader, false,
+							updated.get(path));
 			}
 
 			// commit the index builder - a new index is persisted

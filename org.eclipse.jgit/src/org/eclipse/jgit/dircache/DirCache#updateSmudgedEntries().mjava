@@ -6,6 +6,7 @@
 	private void updateSmudgedEntries() throws IOException {
 		List<String> paths = new ArrayList<String>(128);
 		try (TreeWalk walk = new TreeWalk(repository)) {
+			walk.setOperationType(OperationType.CHECKIN_OP);
 			for (int i = 0; i < entryCnt; i++)
 				if (sortedEntries[i].isSmudged())
 					paths.add(sortedEntries[i].getPathString());
@@ -17,6 +18,7 @@
 			FileTreeIterator fIter = new FileTreeIterator(repository);
 			walk.addTree(iIter);
 			walk.addTree(fIter);
+			fIter.setDirCacheIterator(walk, 0);
 			walk.setRecursive(true);
 			while (walk.next()) {
 				iIter = walk.getTree(0, DirCacheIterator.class);

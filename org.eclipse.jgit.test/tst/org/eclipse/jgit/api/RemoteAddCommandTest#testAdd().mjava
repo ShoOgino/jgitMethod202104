@@ -1,0 +1,26 @@
+	@Test
+	public void testAdd() throws Exception {
+		// create another repository
+		Repository remoteRepository = createWorkRepository();
+		URIish uri = new URIish(
+				remoteRepository.getDirectory().toURI().toURL());
+
+		// execute the command to add a new remote
+		RemoteAddCommand cmd = Git.wrap(db).remoteAdd();
+		cmd.setName(REMOTE_NAME);
+		cmd.setUri(uri);
+		RemoteConfig remote = cmd.call();
+
+		// assert that the added remote represents the remote repository
+		assertEquals(REMOTE_NAME, remote.getName());
+		assertArrayEquals(new URIish[] { uri }, remote.getURIs().toArray());
+		assertEquals(1, remote.getFetchRefSpecs().size());
+		assertEquals(
+				String.format("+refs/heads/*:refs/remotes/%s/*", REMOTE_NAME),
+				remote.getFetchRefSpecs().get(0).toString());
+
+		// assert that the added remote is available in the git configuration
+		assertRemoteConfigEquals(remote,
+				new RemoteConfig(db.getConfig(), REMOTE_NAME));
+	}
+

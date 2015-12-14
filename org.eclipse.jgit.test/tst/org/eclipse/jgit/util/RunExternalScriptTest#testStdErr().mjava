@@ -2,10 +2,10 @@
 	public void testStdErr() throws IOException, InterruptedException {
 		File script = writeTempFile("echo hi >&2");
 		int rc = FS.DETECTED.runProcess(
-				new ProcessBuilder("/bin/sh", script.getPath()), null, err,
+				new ProcessBuilder("sh", script.getPath()), null, err,
 				(InputStream) null);
 		assertEquals(0, rc);
 		assertEquals("", new String(out.toByteArray()));
-		assertEquals("hi" + sep, new String(err.toByteArray()));
+		assertEquals("hi" + LF, new String(err.toByteArray()));
 	}
 

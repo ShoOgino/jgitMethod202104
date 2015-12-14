@@ -1,0 +1,19 @@
+	@Test
+	public void testRulesInherited() throws Exception {
+		writeAttributesFile(".gitattributes", "**/*.txt eol=lf");
+		writeTrashFile("src/config/readme.txt", "");
+		writeTrashFile("src/config/windows.file", "");
+
+		beginWalk();
+
+		assertEntry(F, ".gitattributes");
+		assertEntry(D, "src");
+		assertEntry(D, "src/config");
+
+		assertEntry(F, "src/config/readme.txt", asSet(EOL_LF));
+		assertEntry(F, "src/config/windows.file",
+				Collections.<Attribute> emptySet());
+
+		endWalk();
+	}
+

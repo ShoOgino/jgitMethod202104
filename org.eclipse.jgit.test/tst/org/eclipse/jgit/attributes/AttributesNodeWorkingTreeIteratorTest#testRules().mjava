@@ -24,25 +24,19 @@
 		walk = beginWalk();
 
 		assertIteration(F, ".gitattributes");
-		assertIteration(F, "global.txt", asList(EOL_LF), null,
-				asList(CUSTOM_VALUE));
-		assertIteration(F, "readme.txt", asList(EOL_LF), null,
-				asList(CUSTOM_VALUE));
+		assertIteration(F, "global.txt", asList(EOL_LF));
+		assertIteration(F, "readme.txt", asList(EOL_LF));
 
 		assertIteration(D, "src");
 
 		assertIteration(D, "src/config");
 		assertIteration(F, "src/config/.gitattributes");
-		assertIteration(F, "src/config/readme.txt", asList(DELTA_UNSET), null,
-				asList(CUSTOM_VALUE));
-		assertIteration(F, "src/config/windows.file", null, asList(EOL_CRLF),
-				null);
-		assertIteration(F, "src/config/windows.txt", asList(DELTA_UNSET),
-				asList(EOL_CRLF), asList(CUSTOM_VALUE));
+		assertIteration(F, "src/config/readme.txt", asList(DELTA_UNSET));
+		assertIteration(F, "src/config/windows.file", null);
+		assertIteration(F, "src/config/windows.txt", asList(DELTA_UNSET));
 
-		assertIteration(F, "windows.file", null, asList(EOL_CRLF), null);
-		assertIteration(F, "windows.txt", asList(EOL_LF), asList(EOL_CRLF),
-				asList(CUSTOM_VALUE));
+		assertIteration(F, "windows.file", null);
+		assertIteration(F, "windows.txt", asList(EOL_LF));
 
 		endWalk();
 	}

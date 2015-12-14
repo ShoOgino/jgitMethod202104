@@ -17,6 +17,7 @@
 
 		try (ObjectInserter inserter = repo.newObjectInserter();
 				final TreeWalk tw = new TreeWalk(repo)) {
+			tw.setOperationType(OperationType.CHECKIN_OP);
 			dc = repo.lockDirCache();
 			DirCacheIterator c;
 
@@ -24,6 +25,7 @@
 			tw.addTree(new DirCacheBuildIterator(builder));
 			if (workingTreeIterator == null)
 				workingTreeIterator = new FileTreeIterator(repo);
+			workingTreeIterator.setDirCacheIterator(tw, 0);
 			tw.addTree(workingTreeIterator);
 			tw.setRecursive(true);
 			if (!addAll)
@@ -86,6 +88,9 @@
 			builder.commit();
 			setCallable(false);
 		} catch (IOException e) {
+			Throwable cause = e.getCause();
+			if (cause != null && cause instanceof FilterFailedException)
+				throw (FilterFailedException) cause;
 			throw new JGitInternalException(
 					JGitText.get().exceptionCaughtDuringExecutionOfAddCommand, e);
 		} finally {

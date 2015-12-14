@@ -1,0 +1,17 @@
+	/**
+	 * Executes the {@code remote} command with all the options and parameters
+	 * collected by the setter methods of this class.
+	 *
+	 * @return a list of {@link RemoteConfig} objects.
+	 */
+	@Override
+	public List<RemoteConfig> call() throws GitAPIException {
+		checkCallable();
+
+		try {
+			return RemoteConfig.getAllRemoteConfigs(repo.getConfig());
+		} catch (URISyntaxException e) {
+			throw new JGitInternalException(e.getMessage(), e);
+		}
+	}
+

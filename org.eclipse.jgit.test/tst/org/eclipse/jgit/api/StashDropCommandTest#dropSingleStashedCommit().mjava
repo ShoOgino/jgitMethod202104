@@ -1,15 +1,15 @@
 	@Test
 	public void dropSingleStashedCommit() throws Exception {
 		write(committedFile, "content2");
-		Ref stashRef = git.getRepository().getRef(Constants.R_STASH);
+		Ref stashRef = git.getRepository().exactRef(Constants.R_STASH);
 		assertNull(stashRef);
 		RevCommit stashed = git.stashCreate().call();
 		assertNotNull(stashed);
-		stashRef = git.getRepository().getRef(Constants.R_STASH);
-		assertEquals(stashed, git.getRepository().getRef(Constants.R_STASH)
-				.getObjectId());
+		stashRef = git.getRepository().exactRef(Constants.R_STASH);
+		assertEquals(stashed,
+				git.getRepository().exactRef(Constants.R_STASH).getObjectId());
 		assertNull(git.stashDrop().call());
-		stashRef = git.getRepository().getRef(Constants.R_STASH);
+		stashRef = git.getRepository().exactRef(Constants.R_STASH);
 		assertNull(stashRef);
 
 		ReflogReader reader = git.getRepository().getReflogReader(

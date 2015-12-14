@@ -1,0 +1,30 @@
+	/**
+	 * Checks that $GIT_DIR/info/attributes file has the highest precedence.
+	 *
+	 * @throws IOException
+	 */
+	@Test
+	public void testPrecedenceInfo() throws IOException {
+		writeGlobalAttributeFile("globalAttributesFile", "*.txt custom=global");
+		writeAttributesFile(".git/info/attributes", "*.txt custom=info");
+		writeAttributesFile(".gitattributes", "*.txt custom=root");
+		writeAttributesFile("level1/.gitattributes", "*.txt custom=parent");
+		writeAttributesFile("level1/level2/.gitattributes",
+				"*.txt custom=current");
+
+		writeTrashFile("level1/level2/file.txt", "");
+
+		beginWalk();
+
+		assertEntry(F, ".gitattributes");
+
+		assertEntry(D, "level1");
+		assertEntry(F, "level1/.gitattributes");
+
+		assertEntry(D, "level1/level2");
+		assertEntry(F, "level1/level2/.gitattributes");
+		assertEntry(F, "level1/level2/file.txt", asSet(CUSTOM_INFO));
+
+		endWalk();
+	}
+

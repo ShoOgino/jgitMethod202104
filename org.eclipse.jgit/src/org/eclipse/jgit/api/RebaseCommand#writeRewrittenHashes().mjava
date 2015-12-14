@@ -1,10 +1,11 @@
 	private void writeRewrittenHashes() throws RevisionSyntaxException,
-			IOException {
+			IOException, RefNotFoundException {
 		File currentCommitFile = rebaseState.getFile(CURRENT_COMMIT);
 		if (!currentCommitFile.exists())
 			return;
 
-		String head = repo.resolve(Constants.HEAD).getName();
+		ObjectId headId = getHead().getObjectId();
+		String head = headId.getName();
 		String currentCommits = rebaseState.readFile(CURRENT_COMMIT);
 		for (String current : currentCommits.split("\n")) //$NON-NLS-1$
 			RebaseState

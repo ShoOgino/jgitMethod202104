@@ -1,0 +1,58 @@
+	/**
+	 * Checks that the attributes are computed correctly depending on the
+	 * operation type.
+	 * <p>
+	 * In this test we changed the content of the attribute files in the working
+	 * tree compared to the one in the index.
+	 * </p>
+	 *
+	 * @throws IOException
+	 * @throws NoFilepatternException
+	 * @throws GitAPIException
+	 */
+	@Test
+	public void testCheckinCheckoutDifferences() throws IOException,
+			NoFilepatternException, GitAPIException {
+
+		writeGlobalAttributeFile("globalAttributesFile", "*.txt -custom2");
+		writeAttributesFile(".git/info/attributes", "*.txt eol=crlf");
+		writeAttributesFile(".gitattributes", "*.txt custom=root");
+		writeAttributesFile("level1/.gitattributes", "*.txt text");
+		writeAttributesFile("level1/level2/.gitattributes", "*.txt -delta");
+
+		writeTrashFile("l0.txt", "");
+
+		writeTrashFile("level1/l1.txt", "");
+
+		writeTrashFile("level1/level2/l2.txt", "");
+
+		git.add().addFilepattern(".").call();
+
+		beginWalk();
+
+		// Modify all attributes
+		writeGlobalAttributeFile("globalAttributesFile", "*.txt custom2");
+		writeAttributesFile(".git/info/attributes", "*.txt eol=lf");
+		writeAttributesFile(".gitattributes", "*.txt custom=info");
+		writeAttributesFile("level1/.gitattributes", "*.txt -text");
+		writeAttributesFile("level1/level2/.gitattributes", "*.txt delta");
+
+		assertEntry(F, ".gitattributes");
+		assertEntry(F, "l0.txt", asSet(EOL_LF, CUSTOM_INFO, CUSTOM2_SET),
+				asSet(EOL_LF, CUSTOM_ROOT, CUSTOM2_SET));
+
+		assertEntry(D, "level1");
+		assertEntry(F, "level1/.gitattributes");
+		assertEntry(F, "level1/l1.txt",
+				asSet(EOL_LF, CUSTOM_INFO, CUSTOM2_SET, TEXT_UNSET),
+				asSet(EOL_LF, CUSTOM_ROOT, CUSTOM2_SET, TEXT_SET));
+
+		assertEntry(D, "level1/level2");
+		assertEntry(F, "level1/level2/.gitattributes");
+		assertEntry(F, "level1/level2/l2.txt",
+				asSet(EOL_LF, CUSTOM_INFO, CUSTOM2_SET, TEXT_UNSET, DELTA_SET),
+				asSet(EOL_LF, CUSTOM_ROOT, CUSTOM2_SET, TEXT_SET, DELTA_UNSET));
+
+		endWalk();
+	}
+

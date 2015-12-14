@@ -1,0 +1,24 @@
+	/**
+	 * Creates an attributes file and set its location in the git configuration.
+	 *
+	 * @param fileName
+	 * @param attributes
+	 * @return The attribute file
+	 * @throws IOException
+	 * @see Repository#getConfig()
+	 */
+	private File writeGlobalAttributeFile(String fileName, String... attributes)
+			throws IOException {
+		customAttributeFile = File.createTempFile("tmp_", fileName, null);
+		customAttributeFile.deleteOnExit();
+		StringBuilder attributesFileContent = new StringBuilder();
+		for (String attr : attributes) {
+			attributesFileContent.append(attr).append("\n");
+		}
+		JGitTestUtil.write(customAttributeFile,
+				attributesFileContent.toString());
+		db.getConfig().setString("core", null, "attributesfile",
+				customAttributeFile.getAbsolutePath());
+		return customAttributeFile;
+	}
+

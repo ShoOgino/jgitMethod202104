@@ -1,0 +1,42 @@
+	/**
+	 * Get the attributes located on the current entry path.
+	 *
+	 * @param path
+	 *            current entry path
+	 * @param isDir
+	 *            holds true if the current entry is a directory
+	 * @param opType
+	 *            type of operation
+	 * @param workingTreeIterator
+	 *            a {@link WorkingTreeIterator} matching the current entry
+	 * @param dirCacheIterator
+	 *            a {@link DirCacheIterator} matching the current entry
+	 * @param other
+	 *            a {@link CanonicalTreeParser} matching the current entry
+	 * @param attributes
+	 *            Non null map holding the existing attributes. This map will be
+	 *            augmented with new entry. None entry will be overrided.
+	 * @throws IOException
+	 *             It raises an {@link IOException} if a problem appears while
+	 *             parsing one on the attributes file.
+	 */
+	private void getPerDirectoryEntryAttributes(String path, boolean isDir,
+			OperationType opType, WorkingTreeIterator workingTreeIterator,
+			DirCacheIterator dirCacheIterator, CanonicalTreeParser other,
+			Attributes attributes)
+			throws IOException {
+		// Prevents infinite recurrence
+		if (workingTreeIterator != null || dirCacheIterator != null
+				|| other != null) {
+			AttributesNode currentAttributesNode = getCurrentAttributesNode(
+					opType, workingTreeIterator, dirCacheIterator, other);
+			if (currentAttributesNode != null) {
+				currentAttributesNode.getAttributes(path, isDir, attributes);
+			}
+			getPerDirectoryEntryAttributes(path, isDir, opType,
+					getParent(workingTreeIterator, WorkingTreeIterator.class),
+					getParent(dirCacheIterator, DirCacheIterator.class),
+					getParent(other, CanonicalTreeParser.class), attributes);
+		}
+	}
+

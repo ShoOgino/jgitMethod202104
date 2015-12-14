@@ -2,7 +2,7 @@
 		String current = db.getBranch();
 		ObjectId head = db.resolve(Constants.HEAD);
 		for (String branch : branches) {
-			if (current.equals(branch)) {
+			if (branch.equals(current)) {
 				throw die(MessageFormat.format(CLIText.get().cannotDeleteTheBranchWhichYouAreCurrentlyOn, branch));
 			}
 			RefUpdate update = db.updateRef((remote ? Constants.R_REMOTES

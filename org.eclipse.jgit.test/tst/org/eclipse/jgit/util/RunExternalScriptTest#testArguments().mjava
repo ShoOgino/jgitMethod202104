@@ -1,7 +1,8 @@
 	@Test
 	public void testArguments() throws IOException, InterruptedException {
 		File script = writeTempFile("echo $#,$1,$2,$3,$4,$5,$6");
-		int rc = FS.DETECTED.runProcess(new ProcessBuilder("/bin/bash",
+		int rc = FS.DETECTED.runProcess(
+				new ProcessBuilder("sh",
 				script.getPath(), "a", "b", "c"), out, err, (InputStream) null);
 		assertEquals(0, rc);
 		assertEquals("3,a,b,c,,,\n", new String(out.toByteArray()));

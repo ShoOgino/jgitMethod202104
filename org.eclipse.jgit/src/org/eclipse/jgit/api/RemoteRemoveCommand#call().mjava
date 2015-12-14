@@ -1,0 +1,22 @@
+	/**
+	 * Executes the {@code remote} command with all the options and parameters
+	 * collected by the setter methods of this class.
+	 *
+	 * @return the {@link RemoteConfig} object of the removed remote
+	 */
+	@Override
+	public RemoteConfig call() throws GitAPIException {
+		checkCallable();
+
+		try {
+			StoredConfig config = repo.getConfig();
+			RemoteConfig remote = new RemoteConfig(config, name);
+			config.unsetSection(ConfigConstants.CONFIG_KEY_REMOTE, name);
+			config.save();
+			return remote;
+		} catch (IOException | URISyntaxException e) {
+			throw new JGitInternalException(e.getMessage(), e);
+		}
+
+	}
+

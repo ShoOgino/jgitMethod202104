@@ -1,8 +1,8 @@
 	@Test
 	public void testTwoBranches() throws IOException {
-		Ref a = db.getRef("refs/heads/a");
-		Ref b = db.getRef("refs/heads/b");
-		Ref master = db.getRef("refs/heads/master");
+		Ref a = db.exactRef("refs/heads/a");
+		Ref b = db.exactRef("refs/heads/b");
+		Ref master = db.exactRef("refs/heads/master");
 		String message = formatter.format(Arrays.asList(a, b), master);
 		assertEquals("Merge branches 'a' and 'b'", message);
 	}

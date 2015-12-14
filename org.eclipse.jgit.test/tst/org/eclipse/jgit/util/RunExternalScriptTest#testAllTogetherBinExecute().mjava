@@ -1,0 +1,16 @@
+	@Test
+	public void testAllTogetherBinExecute()
+			throws IOException, InterruptedException {
+		String inputStr = "a\nb\rc\r\nd";
+		File script = writeTempFile(
+				"echo $#,$1,$2,$3,$4,$5,$6 >&2 ; cat -; exit 5");
+		ProcessBuilder pb = new ProcessBuilder("sh", script.getPath(), "a",
+				"b", "c");
+		ExecutionResult res = FS.DETECTED.execute(pb,
+				new ByteArrayInputStream(inputStr.getBytes()));
+		assertEquals(5, res.getRc());
+		assertEquals(inputStr, new String(res.getStdout().toByteArray()));
+		assertEquals("3,a,b,c,,," + LF,
+				new String(res.getStderr().toByteArray()));
+	}
+

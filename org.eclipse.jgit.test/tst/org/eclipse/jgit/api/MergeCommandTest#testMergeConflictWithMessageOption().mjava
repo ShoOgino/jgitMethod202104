@@ -19,7 +19,7 @@
 		git.add().addFilepattern("a").call();
 		git.commit().setMessage("main").call();
 
-		Ref sideBranch = db.getRef("side");
+		Ref sideBranch = db.exactRef("refs/heads/side");
 
 		git.merge().include(sideBranch).setStrategy(MergeStrategy.RESOLVE)
 				.setMessage("user message").call();

@@ -1,5 +1,5 @@
 	private void detachHead(Git git) throws IOException, GitAPIException {
-		String commitId = db.getRef(Constants.MASTER).getObjectId().name();
+		String commitId = db.exactRef(R_HEADS + MASTER).getObjectId().name();
 		git.checkout().setName(commitId).call();
 	}
 

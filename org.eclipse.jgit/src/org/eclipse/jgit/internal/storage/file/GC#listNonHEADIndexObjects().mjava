@@ -9,10 +9,7 @@
 	 */
 	private Set<ObjectId> listNonHEADIndexObjects()
 			throws CorruptObjectException, IOException {
-		try {
-			if (repo.getIndexFile() == null)
-				return Collections.emptySet();
-		} catch (NoWorkTreeException e) {
+		if (repo.isBare()) {
 			return Collections.emptySet();
 		}
 		try (TreeWalk treeWalk = new TreeWalk(repo)) {

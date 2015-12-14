@@ -1,0 +1,13 @@
+	@Test
+	public void testCopyStdInExecute()
+			throws IOException, InterruptedException {
+		String inputStr = "a\nb\rc\r\nd";
+		File script = writeTempFile("cat -");
+		ProcessBuilder pb = new ProcessBuilder("sh", script.getPath());
+		ExecutionResult res = FS.DETECTED.execute(pb,
+				new ByteArrayInputStream(inputStr.getBytes()));
+		assertEquals(0, res.getRc());
+		assertEquals(inputStr, new String(res.getStdout().toByteArray()));
+		assertEquals("", new String(res.getStderr().toByteArray()));
+	}
+

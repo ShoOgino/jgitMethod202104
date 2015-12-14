@@ -1,7 +1,9 @@
-	private boolean mightNeedCleaning() {
+	private boolean mightNeedCleaning() throws IOException {
 		switch (getOptions().getAutoCRLF()) {
 		case FALSE:
 		default:
+			if (getCleanFilterCommand() != null)
+				return true;
 			return false;
 
 		case TRUE:

@@ -1,0 +1,32 @@
+	@Before
+	public void setUp() throws Exception {
+		server = newRepo("server");
+		client = newRepo("client");
+		testProtocol = new TestProtocol<>(
+				null,
+				new ReceivePackFactory<Object>() {
+					@Override
+					public ReceivePack create(Object req, Repository db)
+							throws ServiceNotEnabledException,
+							ServiceNotAuthorizedException {
+						return new ReceivePack(db);
+					}
+				});
+		uri = testProtocol.register(ctx, server);
+
+		try (ObjectInserter ins = server.newObjectInserter()) {
+			obj1 = ins.insert(Constants.OBJ_BLOB, Constants.encode("test"));
+			obj3 = ins.insert(Constants.OBJ_BLOB, Constants.encode("not"));
+			ins.flush();
+
+			RefUpdate u = server.updateRef(refName);
+			u.setNewObjectId(obj1);
+			assertEquals(RefUpdate.Result.NEW, u.update());
+		}
+
+		try (ObjectInserter ins = client.newObjectInserter()) {
+			obj2 = ins.insert(Constants.OBJ_BLOB, Constants.encode("file"));
+			ins.flush();
+		}
+	}
+

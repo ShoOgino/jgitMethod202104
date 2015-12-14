@@ -1,0 +1,31 @@
+	private void print(List<RemoteConfig> remotes) throws IOException {
+		for (RemoteConfig remote : remotes) {
+			String remoteName = remote.getName();
+			if (verbose) {
+				List<URIish> fetchURIs = remote.getURIs();
+				List<URIish> pushURIs = remote.getPushURIs();
+
+				String fetchURI = ""; //$NON-NLS-1$
+				if (!fetchURIs.isEmpty()) {
+					fetchURI = fetchURIs.get(0).toString();
+				} else if (!pushURIs.isEmpty()) {
+					fetchURI = pushURIs.get(0).toString();
+				}
+
+				String pushURI = ""; //$NON-NLS-1$
+				if (!pushURIs.isEmpty()) {
+					pushURI = pushURIs.get(0).toString();
+				} else if (!fetchURIs.isEmpty()) {
+					pushURI = fetchURIs.get(0).toString();
+				}
+
+				outw.println(
+						String.format("%s\t%s (fetch)", remoteName, fetchURI)); //$NON-NLS-1$
+				outw.println(
+						String.format("%s\t%s (push)", remoteName, pushURI)); //$NON-NLS-1$
+			} else {
+				outw.println(remoteName);
+			}
+		}
+	}
+

@@ -1,0 +1,25 @@
+	@Test
+	public void testSetPushUrl() throws Exception {
+		// setup an initial remote
+		RemoteConfig remoteConfig = setupRemote();
+
+		// execute the command to change the push url
+		RemoteSetUrlCommand cmd = Git.wrap(db).remoteSetUrl();
+		cmd.setName(REMOTE_NAME);
+		URIish newUri = new URIish("git://test.com/test");
+		cmd.setUri(newUri);
+		cmd.setPush(true);
+		RemoteConfig remote = cmd.call();
+
+		// assert that the changed remote has the old fetch url and the new push
+		// url
+		assertEquals(REMOTE_NAME, remote.getName());
+		assertEquals(remoteConfig.getURIs(), remote.getURIs());
+		assertArrayEquals(new URIish[] { newUri },
+				remote.getPushURIs().toArray());
+
+		// assert that the changed remote is available in the git configuration
+		assertRemoteConfigEquals(remote,
+				new RemoteConfig(db.getConfig(), REMOTE_NAME));
+	}
+

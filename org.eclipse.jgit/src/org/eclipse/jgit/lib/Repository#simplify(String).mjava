@@ -5,10 +5,12 @@
 	 * expects a branch or revision id.
 	 *
 	 * @param revstr
-	 * @return object id or ref name from resolved expression
+	 * @return object id or ref name from resolved expression or {@code null} if
+	 *         given expression cannot be resolved
 	 * @throws AmbiguousObjectException
 	 * @throws IOException
 	 */
+	@Nullable
 	public String simplify(final String revstr)
 			throws AmbiguousObjectException, IOException {
 		try (RevWalk rw = new RevWalk(this)) {

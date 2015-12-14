@@ -1,0 +1,14 @@
+	@Test
+	public void testList() throws Exception {
+		// setup an initial remote
+		RemoteConfig remoteConfig = setupRemote();
+
+		// execute the command to list the remotes
+		List<RemoteConfig> remotes = Git.wrap(db).remoteList().call();
+
+		// assert that there is only one remote
+		assertEquals(1, remotes.size());
+		// assert that the available remote is the initial remote
+		assertRemoteConfigEquals(remoteConfig, remotes.get(0));
+	}
+

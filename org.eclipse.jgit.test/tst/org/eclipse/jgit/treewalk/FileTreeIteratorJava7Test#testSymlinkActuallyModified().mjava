@@ -6,6 +6,7 @@
 	 */
 	@Test
 	public void testSymlinkActuallyModified() throws Exception {
+		org.junit.Assume.assumeTrue(FS.DETECTED.supportsSymlinks());
 		final String NORMALIZED = "target";
 		final byte[] NORMALIZED_BYTES = Constants.encode(NORMALIZED);
 		try (ObjectInserter oi = db.newObjectInserter()) {

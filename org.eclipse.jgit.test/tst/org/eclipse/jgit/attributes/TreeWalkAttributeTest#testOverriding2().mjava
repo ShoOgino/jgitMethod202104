@@ -1,0 +1,22 @@
+	/**
+	 * Checks that the last value of an attribute is used if in the same line an
+	 * attribute is defined several time.
+	 *
+	 * @throws IOException
+	 */
+	@Test
+	public void testOverriding2() throws IOException {
+		writeAttributesFile(".git/info/attributes",
+				"*.txt custom=current custom=parent custom=root custom=info",//
+				"*.txt delta -delta",//
+				"*.txt eol=lf eol=crlf",//
+				"*.txt text -text");
+		writeTrashFile("l0.txt", "");
+		beginWalk();
+
+		assertEntry(F, "l0.txt",
+				asSet(TEXT_UNSET, EOL_CRLF, DELTA_UNSET, CUSTOM_INFO));
+
+		endWalk();
+	}
+

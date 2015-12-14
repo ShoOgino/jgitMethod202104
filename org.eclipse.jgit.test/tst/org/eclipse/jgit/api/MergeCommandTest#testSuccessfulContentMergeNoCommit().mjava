@@ -30,7 +30,7 @@
 				.setCommit(false)
 				.setStrategy(MergeStrategy.RESOLVE).call();
 		assertEquals(MergeStatus.MERGED_NOT_COMMITTED, result.getMergeStatus());
-		assertEquals(db.getRef(Constants.HEAD).getTarget().getObjectId(),
+		assertEquals(db.exactRef(Constants.HEAD).getTarget().getObjectId(),
 				thirdCommit.getId());
 
 		assertEquals("1(side)\na\n3(main)\n", read(new File(db.getWorkTree(),

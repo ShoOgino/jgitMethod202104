@@ -1,7 +1,7 @@
 	@Test
 	public void testOneBranch() throws IOException {
-		Ref a = db.getRef("refs/heads/a");
-		Ref master = db.getRef("refs/heads/master");
+		Ref a = db.exactRef("refs/heads/a");
+		Ref master = db.exactRef("refs/heads/master");
 		String message = formatter.format(Arrays.asList(a), master);
 		assertEquals("Merge branch 'a'", message);
 	}

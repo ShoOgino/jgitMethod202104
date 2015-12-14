@@ -1,0 +1,29 @@
+	@Test
+	public void testMultipleCleanFilter() throws IOException, GitAPIException {
+		writeTrashFile(".gitattributes",
+				"*.txt filter=tstFilter\n*.tmp filter=tstFilter2");
+		// Caution: we need a trailing '\n' since sed on mac always appends
+		// linefeeds if missing
+		writeTrashFile("src/a.tmp", "foo\n");
+		writeTrashFile("src/a.txt", "foo\n");
+		File script = writeTempFile("sed s/o/e/g");
+		File script2 = writeTempFile("sed s/f/x/g");
+
+		Git git = new Git(db);
+		StoredConfig config = git.getRepository().getConfig();
+		config.setString("filter", "tstFilter", "clean",
+				"sh " + slashify(script.getPath()));
+		config.setString("filter", "tstFilter2", "clean",
+				"sh " + slashify(script2.getPath()));
+		config.save();
+
+		git.add().addFilepattern("src/a.txt").addFilepattern("src/a.tmp")
+				.call();
+
+		assertEquals(
+				"[src/a.tmp, mode:100644, content:xoo\n][src/a.txt, mode:100644, content:fee\n]",
+				indexState(CONTENT));
+
+		// TODO: multiple clean filters for one file???
+	}
+

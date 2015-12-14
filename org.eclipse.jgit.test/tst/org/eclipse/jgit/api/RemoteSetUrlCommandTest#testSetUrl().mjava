@@ -1,0 +1,21 @@
+	@Test
+	public void testSetUrl() throws Exception {
+		// setup an initial remote
+		setupRemote();
+
+		// execute the command to change the fetch url
+		RemoteSetUrlCommand cmd = Git.wrap(db).remoteSetUrl();
+		cmd.setName(REMOTE_NAME);
+		URIish newUri = new URIish("git://test.com/test");
+		cmd.setUri(newUri);
+		RemoteConfig remote = cmd.call();
+
+		// assert that the changed remote has the new fetch url
+		assertEquals(REMOTE_NAME, remote.getName());
+		assertArrayEquals(new URIish[] { newUri }, remote.getURIs().toArray());
+
+		// assert that the changed remote is available in the git configuration
+		assertRemoteConfigEquals(remote,
+				new RemoteConfig(db.getConfig(), REMOTE_NAME));
+	}
+
