@@ -1,0 +1,18 @@
+	@Test
+	public void testUpdateSymLink() throws Exception {
+		Assume.assumeTrue(FS.DETECTED.supportsSymlinks());
+
+		Path path = writeLink(LINK, FILE1);
+		git.add().addFilepattern(LINK).call();
+		git.commit().setMessage("Added link").call();
+		assertEquals("3", read(path.toFile()));
+
+		writeLink(LINK, FILE2);
+		assertEquals("c", read(path.toFile()));
+
+		CheckoutCommand co = git.checkout();
+		co.addPath(LINK).call();
+
+		assertEquals("3", read(path.toFile()));
+	}
+

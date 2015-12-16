@@ -1,0 +1,14 @@
+	@Test
+	public void testCreateSymlinkOverrideExisting() throws IOException {
+		FS fs = FS.DETECTED;
+		// show test as ignored if the FS doesn't support symlinks
+		Assume.assumeTrue(fs.supportsSymlinks());
+		File file = new File(trash, "x");
+		fs.createSymLink(file, "y");
+		String target = fs.readSymLink(file);
+		assertEquals("y", target);
+		fs.createSymLink(file, "z");
+		target = fs.readSymLink(file);
+		assertEquals("z", target);
+	}
+

@@ -1,0 +1,20 @@
+	@Test
+	public void testUpdateBrokenSymLinkToDirectory() throws Exception {
+		Assume.assumeTrue(FS.DETECTED.supportsSymlinks());
+
+		Path path = writeLink(LINK, "f");
+		git.add().addFilepattern(LINK).call();
+		git.commit().setMessage("Added link").call();
+		assertEquals("f", FileUtils.readSymLink(path.toFile()));
+		assertTrue(path.toFile().exists());
+
+		writeLink(LINK, "link_to_nowhere");
+		assertFalse(path.toFile().exists());
+		assertEquals("link_to_nowhere", FileUtils.readSymLink(path.toFile()));
+
+		CheckoutCommand co = git.checkout();
+		co.addPath(LINK).call();
+
+		assertEquals("f", FileUtils.readSymLink(path.toFile()));
+	}
+
