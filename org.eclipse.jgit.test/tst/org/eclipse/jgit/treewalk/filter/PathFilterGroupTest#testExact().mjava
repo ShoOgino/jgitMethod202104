@@ -1,11 +1,11 @@
 	@Test
 	public void testExact() throws MissingObjectException,
 			IncorrectObjectTypeException, IOException {
-		assertTrue(filter.include(fakeWalk("a")));
-		assertTrue(filter.include(fakeWalk("b/c")));
-		assertTrue(filter.include(fakeWalk("c/d/e")));
-		assertTrue(filter.include(fakeWalk("c/d/f")));
-		assertTrue(filter.include(fakeWalk("d/e/f/g")));
-		assertTrue(filter.include(fakeWalk("d/e/f/g.x")));
+		assertMatches(Sets.of("a"), fakeWalk("a"));
+		assertMatches(Sets.of("b/c"), fakeWalk("b/c"));
+		assertMatches(Sets.of("c/d/e"), fakeWalk("c/d/e"));
+		assertMatches(Sets.of("c/d/f"), fakeWalk("c/d/f"));
+		assertMatches(Sets.of("d/e/f/g"), fakeWalk("d/e/f/g"));
+		assertMatches(Sets.of("d/e/f/g.x"), fakeWalk("d/e/f/g.x"));
 	}
 

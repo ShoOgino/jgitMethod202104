@@ -1,0 +1,23 @@
+	private void assertMatches(Set<String> expect, TreeWalk tw)
+			throws MissingObjectException, IncorrectObjectTypeException,
+			IOException {
+		List<String> actual = new ArrayList<>();
+		for (String path : singles.keySet()) {
+			if (includes(singles.get(path), tw)) {
+				actual.add(path);
+			}
+		}
+
+		String[] e = expect.toArray(new String[expect.size()]);
+		String[] a = actual.toArray(new String[actual.size()]);
+		Arrays.sort(e);
+		Arrays.sort(a);
+		assertArrayEquals(e, a);
+
+		if (expect.isEmpty()) {
+			assertFalse(includes(filter, tw));
+		} else {
+			assertTrue(includes(filter, tw));
+		}
+	}
+
