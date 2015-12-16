@@ -1,0 +1,13 @@
+	@Test
+	public void testCheckouSingleFile() throws Exception {
+		try (Git git = new Git(db)) {
+			File a = writeTrashFile("a", "file a");
+			git.add().addFilepattern(".").call();
+			git.commit().setMessage("commit file a").call();
+			writeTrashFile("a", "b");
+			assertEquals("b", read(a));
+			assertEquals("[]", Arrays.toString(execute("git checkout -- a")));
+			assertEquals("file a", read(a));
+		}
+	}
+
