@@ -1,0 +1,18 @@
+	@Override
+	@Before
+	public void setUp() throws Exception {
+		assumeTrue(SystemReader.getInstance().isMacOS()
+				&& FS.DETECTED.supportsSymlinks());
+		super.setUp();
+		File testDir = createTempDirectory(this.getClass().getSimpleName());
+		InputStream in = this.getClass().getClassLoader().getResourceAsStream(
+				this.getClass().getPackage().getName().replace('.', '/') + '/'
+						+ FILEREPO + ".txt");
+		assertNotNull("Test repo file not found", in);
+		try {
+			testRepoDir = restoreGitRepo(in, testDir, FILEREPO);
+		} finally {
+			in.close();
+		}
+	}
+

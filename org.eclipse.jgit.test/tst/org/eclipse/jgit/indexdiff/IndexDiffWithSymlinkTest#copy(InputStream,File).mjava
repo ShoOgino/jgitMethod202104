@@ -1,0 +1,10 @@
+	private void copy(InputStream from, File to) throws IOException {
+		try (OutputStream out = new FileOutputStream(to)) {
+			byte[] buffer = new byte[4096];
+			int n;
+			while ((n = from.read(buffer)) > 0) {
+				out.write(buffer, 0, n);
+			}
+		}
+	}
+

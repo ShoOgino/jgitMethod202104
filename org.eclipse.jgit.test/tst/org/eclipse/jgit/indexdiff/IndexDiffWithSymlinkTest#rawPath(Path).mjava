@@ -1,0 +1,14 @@
+	private byte[] rawPath(Path p) {
+		try {
+			Method method = p.getClass().getDeclaredMethod("asByteArray");
+			if (method != null) {
+				method.setAccessible(true);
+				return (byte[]) method.invoke(p);
+			}
+		} catch (NoSuchMethodException | IllegalAccessException
+				| IllegalArgumentException | InvocationTargetException e) {
+			// Ignore and fall through.
+		}
+		return null;
+	}
+

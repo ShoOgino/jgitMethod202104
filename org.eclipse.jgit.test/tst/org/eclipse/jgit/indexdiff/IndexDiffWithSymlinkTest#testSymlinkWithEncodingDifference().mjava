@@ -1,0 +1,39 @@
+	@Test
+	public void testSymlinkWithEncodingDifference() throws Exception {
+		try (Repository testRepo = FileRepositoryBuilder.create(testRepoDir)) {
+			File workingTree = testRepo.getWorkTree();
+			File symLink = new File(new File(workingTree, TESTFOLDER),
+					TESTLINK);
+			// Read the symlink as it was created by cgit
+			Path linkTarget = Files.readSymbolicLink(symLink.toPath());
+			assertEquals("Unexpected link target", TESTTARGET,
+					linkTarget.toString());
+			byte[] raw = rawPath(linkTarget);
+			if (raw != null) {
+				assertArrayEquals("Expected an NFC link target", NFC, raw);
+			}
+			// Now re-create that symlink through Java
+			assertTrue("Could not delete symlink", symLink.delete());
+			Files.createSymbolicLink(symLink.toPath(), Paths.get(TESTTARGET));
+			// Read it again
+			linkTarget = Files.readSymbolicLink(symLink.toPath());
+			assertEquals("Unexpected link target", TESTTARGET,
+					linkTarget.toString());
+			raw = rawPath(linkTarget);
+			if (raw != null) {
+				assertArrayEquals("Expected an NFD link target", NFD, raw);
+			}
+			// Do the indexdiff
+			WorkingTreeIterator iterator = new FileTreeIterator(testRepo);
+			IndexDiff diff = new IndexDiff(testRepo, Constants.HEAD, iterator);
+			diff.setFilter(PathFilterGroup.createFromStrings(
+					Collections.singleton(TESTFOLDER + '/' + TESTLINK)));
+			diff.diff();
+			// We're testing that this does NOT throw "EOFException: Short read
+			// of block." The diff will not report any modified files -- the
+			// link modification is not visible to JGit, which always works with
+			// the Java internal NFC encoding. CGit does report the link as an
+			// unstaged modification here, though.
+		}
+	}
+

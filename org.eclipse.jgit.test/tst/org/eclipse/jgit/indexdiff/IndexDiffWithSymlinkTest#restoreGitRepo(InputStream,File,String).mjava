@@ -1,0 +1,35 @@
+	private File restoreGitRepo(InputStream in, File testDir, String name)
+			throws Exception {
+		File exportedTestRepo = new File(testDir, name + ".txt");
+		copy(in, exportedTestRepo);
+		// Use CGit to restore
+		File restoreScript = new File(testDir, name + ".sh");
+		try (OutputStream out = new BufferedOutputStream(
+				new FileOutputStream(restoreScript));
+				Writer writer = new OutputStreamWriter(out,
+						StandardCharsets.UTF_8)) {
+			writer.write("echo `which git` 1>&2\n");
+			writer.write("echo `git --version` 1>&2\n");
+			writer.write("git init " + name + " && \\\n");
+			writer.write("cd ./" + name + " && \\\n");
+			writer.write("git fast-import < ../" + name + ".txt && \\\n");
+			writer.write("git checkout -f\n");
+		}
+		String[] cmd = { "/bin/sh", "./" + name + ".sh" };
+		int exitCode;
+		String stdErr;
+		Process process = Runtime.getRuntime().exec(cmd, null, testDir);
+		try (InputStream stdOutStream = process.getInputStream();
+				InputStream stdErrStream = process.getErrorStream();
+				OutputStream stdInStream = process.getOutputStream()) {
+			readStream(stdOutStream);
+			stdErr = readStream(stdErrStream);
+			process.waitFor();
+			exitCode = process.exitValue();
+		}
+		if (exitCode != 0) {
+			fail("cgit repo restore returned " + exitCode + '\n' + stdErr);
+		}
+		return new File(new File(testDir, name), Constants.DOT_GIT);
+	}
+
