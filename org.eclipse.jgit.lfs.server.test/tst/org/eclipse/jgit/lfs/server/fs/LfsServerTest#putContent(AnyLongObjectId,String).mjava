@@ -1,0 +1,21 @@
+	protected AnyLongObjectId putContent(AnyLongObjectId id, String s)
+			throws ClientProtocolException, IOException {
+		try (CloseableHttpClient client = HttpClientBuilder.create().build()) {
+			HttpEntity entity = new StringEntity(s,
+					ContentType.APPLICATION_OCTET_STREAM);
+			String hexId = id.name();
+			HttpPut request = new HttpPut(
+					server.getURI() + "/lfs/objects/" + hexId);
+			request.setEntity(entity);
+			try (CloseableHttpResponse response = client.execute(request)) {
+				StatusLine statusLine = response.getStatusLine();
+				int status = statusLine.getStatusCode();
+				if (status >= 400) {
+					throw new RuntimeException("Status: " + status + ". "
+							+ statusLine.getReasonPhrase());
+				}
+			}
+			return id;
+		}
+	}
+

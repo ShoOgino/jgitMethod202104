@@ -1,0 +1,12 @@
+	@Before
+	public void setup() throws Exception {
+		tmp = Files.createTempDirectory("jgit_test_");
+		server = new AppServer();
+		ServletContextHandler app = server.addContext("/lfs");
+		dir = Paths.get(tmp.toString(), "lfs");
+		this.repository = new FileLfsRepository(null, dir);
+		servlet = new FileLfsServlet(repository, timeout);
+		app.addServlet(new ServletHolder(servlet), "/objects/*");
+		server.setUp();
+	}
+

@@ -1,0 +1,21 @@
+		private void addObjectInfo(Response.Body body, LfsObject o)
+				throws IOException {
+			Response.ObjectInfo info = new Response.ObjectInfo();
+			body.objects.add(info);
+			info.oid = o.oid;
+			info.size = o.size;
+
+			LongObjectId oid = LongObjectId.fromString(o.oid);
+			if (repository.getSize(oid) >= 0) {
+				info.actions = new HashMap<>();
+				info.actions.put(DOWNLOAD,
+						repository.getDownloadAction(oid));
+			} else {
+				info.error = new Response.Error();
+				info.error.code = SC_NOT_FOUND;
+				info.error.message = MessageFormat.format(
+						LfsServerText.get().objectNotFound,
+						oid.getName());
+			}
+		}
+

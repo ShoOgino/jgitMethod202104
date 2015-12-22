@@ -1,0 +1,15 @@
+	@Test
+	public void testDownloadNotFound()
+			throws ClientProtocolException, IOException {
+		String TEXT = "test";
+		AnyLongObjectId id = LongObjectIdTestUtils.hash(TEXT);
+		Path f = Paths.get(getTempDirectory().toString(), "download");
+		try {
+			getContent(id, f);
+			fail("expected RuntimeException");
+		} catch (RuntimeException e) {
+			assertEquals("Status: 404 Not Found",
+					e.getMessage());
+		}
+	}
+

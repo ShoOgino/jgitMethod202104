@@ -1,0 +1,24 @@
+	@Override
+	protected void doPost(HttpServletRequest req, HttpServletResponse res)
+			throws ServletException, IOException {
+		res.setStatus(SC_OK);
+		res.setContentType(CONTENTTYPE_VND_GIT_LFS_JSON);
+
+		Writer w = new BufferedWriter(
+				new OutputStreamWriter(res.getOutputStream(), UTF_8));
+
+		Reader r = new BufferedReader(new InputStreamReader(req.getInputStream(), UTF_8));
+		LfsRequest request = gson.fromJson(r, LfsRequest.class);
+
+		LargeFileRepository repo = getLargeFileRepository();
+		if (repo == null) {
+			res.setStatus(SC_SERVICE_UNAVAILABLE);
+			return;
+		}
+
+		TransferHandler handler = TransferHandler
+				.forOperation(request.operation, repo, request.objects);
+		gson.toJson(handler.process(), w);
+		w.flush();
+	}
+

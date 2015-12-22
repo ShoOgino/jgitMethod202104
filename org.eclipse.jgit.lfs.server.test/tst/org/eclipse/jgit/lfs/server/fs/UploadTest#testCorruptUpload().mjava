@@ -1,0 +1,14 @@
+	@Test
+	public void testCorruptUpload() throws Exception {
+		String TEXT = "test";
+		AnyLongObjectId id = LongObjectIdTestUtils.hash("wrongHash");
+		try {
+			putContent(id, TEXT);
+			fail("expected RuntimeException(\"Status 400\")");
+		} catch (RuntimeException e) {
+			assertEquals("Status: 400. Bad Request", e.getMessage());
+		}
+		assertFalse("expect object " + id.name() + " not to exist",
+				repository.getSize(id) >= 0);
+	}
+

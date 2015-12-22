@@ -1,0 +1,9 @@
+	@Override
+	public void close() throws IOException {
+		out.close();
+		if (!aborted) {
+			verifyHash();
+			locked.commit();
+		}
+	}
+

@@ -1,0 +1,11 @@
+	private String getStoreUrl(URI baseURI) {
+		if (storeUrl == null) {
+			if (storeType == StoreType.FS) {
+				storeUrl = baseURI + "/" + OBJECTS; //$NON-NLS-1$
+			} else {
+				die("Local store not running and no --store-url specified"); //$NON-NLS-1$
+			}
+		}
+		return storeUrl;
+	}
+

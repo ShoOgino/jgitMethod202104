@@ -1,0 +1,27 @@
+		AppServer(int port) {
+			server = new Server();
+
+			HttpConfiguration http_config = new HttpConfiguration();
+			http_config.setOutputBufferSize(32768);
+
+			connector = new ServerConnector(server,
+					new HttpConnectionFactory(http_config));
+			connector.setPort(port);
+			try {
+				String host = InetAddress.getByName("localhost") //$NON-NLS-1$
+						.getHostAddress();
+				connector.setHost(host);
+				if (host.contains(":") && !host.startsWith("[")) //$NON-NLS-1$ //$NON-NLS-2$
+					host = "[" + host + "]"; //$NON-NLS-1$//$NON-NLS-2$
+				uri = new URI("http://" + host + ":" + port); //$NON-NLS-1$ //$NON-NLS-2$
+			} catch (UnknownHostException e) {
+				throw new RuntimeException("Cannot find localhost", e); //$NON-NLS-1$
+			} catch (URISyntaxException e) {
+				throw new RuntimeException("Unexpected URI error on " + uri, e); //$NON-NLS-1$
+			}
+
+			contexts = new ContextHandlerCollection();
+			server.setHandler(contexts);
+			server.setConnectors(new Connector[] { connector });
+		}
+

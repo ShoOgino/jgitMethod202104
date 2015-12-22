@@ -1,0 +1,16 @@
+	/**
+	 * Get the path where the given object is stored
+	 *
+	 * @param id
+	 *            id of a large object
+	 * @return path the object's storage path
+	 */
+	protected Path getPath(AnyLongObjectId id) {
+		StringBuilder s = new StringBuilder(
+				Constants.LONG_OBJECT_ID_STRING_LENGTH + 6);
+		s.append(toHexCharArray(id.getFirstByte())).append('/');
+		s.append(toHexCharArray(id.getSecondByte())).append('/');
+		s.append(id.name());
+		return dir.resolve(s.toString());
+	}
+

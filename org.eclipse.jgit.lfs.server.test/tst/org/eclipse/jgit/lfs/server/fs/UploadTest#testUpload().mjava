@@ -1,0 +1,10 @@
+	@Test
+	public void testUpload() throws Exception {
+		String TEXT = "test";
+		AnyLongObjectId id = putContent(TEXT);
+		assertTrue("expect object " + id.name() + " to exist",
+				repository.getSize(id) >= 0);
+		assertEquals("expected object length " + TEXT.length(), TEXT.length(),
+				repository.getSize(id));
+	}
+

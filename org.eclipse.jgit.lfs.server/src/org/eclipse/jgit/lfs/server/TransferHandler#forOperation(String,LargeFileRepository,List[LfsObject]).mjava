@@ -1,0 +1,14 @@
+	static TransferHandler forOperation(String operation,
+			LargeFileRepository repository, List<LfsObject> objects) {
+		switch (operation) {
+		case TransferHandler.UPLOAD:
+			return new Upload(repository, objects);
+		case TransferHandler.DOWNLOAD:
+			return new Download(repository, objects);
+		case TransferHandler.VERIFY:
+		default:
+			throw new UnsupportedOperationException(MessageFormat.format(
+					LfsServerText.get().unsupportedOperation, operation));
+		}
+	}
+

@@ -1,0 +1,30 @@
+	/**
+	 * Creates a file with random content, repeatedly writing a random string of
+	 * 4k length to the file until the file has at least the specified length.
+	 *
+	 * @param f
+	 *            file to fill
+	 * @param size
+	 *            size of the file to generate
+	 * @return length of the generated file in bytes
+	 * @throws IOException
+	 */
+	protected long createPseudoRandomContentFile(Path f, long size)
+			throws IOException {
+		SecureRandom rnd = new SecureRandom();
+		byte[] buf = new byte[4096];
+		rnd.nextBytes(buf);
+		ByteBuffer bytebuf = ByteBuffer.wrap(buf);
+		try (FileChannel outChannel = FileChannel.open(f,
+				StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE)) {
+			long len = 0;
+			do {
+				len += outChannel.write(bytebuf);
+				if (bytebuf.position() == 4096) {
+					bytebuf.rewind();
+				}
+			} while (len < size);
+		}
+		return Files.size(f);
+	}
+

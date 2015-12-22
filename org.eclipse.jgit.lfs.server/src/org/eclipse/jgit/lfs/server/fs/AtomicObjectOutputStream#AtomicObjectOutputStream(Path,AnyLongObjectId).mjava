@@ -1,0 +1,9 @@
+	AtomicObjectOutputStream(Path path, AnyLongObjectId id)
+			throws IOException {
+		locked = new LockFile(path.toFile());
+		locked.lock();
+		this.id = id;
+		out = new DigestOutputStream(locked.getOutputStream(),
+				Constants.newMessageDigest());
+	}
+

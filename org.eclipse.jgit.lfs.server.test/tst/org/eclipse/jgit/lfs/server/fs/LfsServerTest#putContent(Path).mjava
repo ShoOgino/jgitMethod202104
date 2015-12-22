@@ -1,0 +1,25 @@
+	protected LongObjectId putContent(Path f)
+			throws FileNotFoundException, IOException {
+		try (CloseableHttpClient client = HttpClientBuilder.create().build()) {
+			LongObjectId id1, id2;
+			String hexId1, hexId2;
+			try (DigestInputStream in = new DigestInputStream(
+					new BufferedInputStream(Files.newInputStream(f)),
+					Constants.newMessageDigest())) {
+				InputStreamEntity entity = new InputStreamEntity(in,
+						Files.size(f), ContentType.APPLICATION_OCTET_STREAM);
+				id1 = LongObjectIdTestUtils.hash(f);
+				hexId1 = id1.name();
+				HttpPut request = new HttpPut(
+						server.getURI() + "/lfs/objects/" + hexId1);
+				request.setEntity(entity);
+				HttpResponse response = client.execute(request);
+				checkResponseStatus(response);
+				id2 = LongObjectId.fromRaw(in.getMessageDigest().digest());
+				hexId2 = id2.name();
+				assertEquals(hexId1, hexId2);
+			}
+			return id1;
+		}
+	}
+

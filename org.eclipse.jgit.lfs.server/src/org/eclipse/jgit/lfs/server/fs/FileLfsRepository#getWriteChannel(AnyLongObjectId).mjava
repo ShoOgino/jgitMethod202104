@@ -1,0 +1,8 @@
+	WritableByteChannel getWriteChannel(AnyLongObjectId id)
+			throws IOException {
+		Path path = getPath(id);
+		Files.createDirectories(path.getParent());
+		out = new AtomicObjectOutputStream(path, id);
+		return Channels.newChannel(out);
+	}
+

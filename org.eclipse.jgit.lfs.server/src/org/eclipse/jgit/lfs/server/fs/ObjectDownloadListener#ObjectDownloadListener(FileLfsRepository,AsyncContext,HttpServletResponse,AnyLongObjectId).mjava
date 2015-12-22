@@ -1,0 +1,25 @@
+	/**
+	 * @param repository
+	 *            the repository storing large objects
+	 * @param context
+	 *            the servlet asynchronous context
+	 * @param response
+	 *            the servlet response
+	 * @param id
+	 *            id of the object to be downloaded
+	 * @throws IOException
+	 */
+	public ObjectDownloadListener(FileLfsRepository repository,
+			AsyncContext context, HttpServletResponse response,
+			AnyLongObjectId id) throws IOException {
+		this.context = context;
+		this.response = response;
+		this.in = repository.getReadChannel(id);
+		this.out = response.getOutputStream();
+		this.outChannel = Channels.newChannel(out);
+
+		response.addHeader(HttpSupport.HDR_CONTENT_LENGTH,
+				String.valueOf(repository.getSize(id)));
+		response.setContentType(Constants.HDR_APPLICATION_OCTET_STREAM);
+	}
+

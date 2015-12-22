@@ -1,0 +1,10 @@
+	@Test
+	public void testDownload() throws Exception {
+		String TEXT = "test";
+		AnyLongObjectId id = putContent(TEXT);
+		Path f = Paths.get(getTempDirectory().toString(), "download");
+		long len = getContent(id, f);
+		assertEquals(TEXT.length(), len);
+		FileUtils.delete(f.toFile(), FileUtils.RETRY);
+	}
+

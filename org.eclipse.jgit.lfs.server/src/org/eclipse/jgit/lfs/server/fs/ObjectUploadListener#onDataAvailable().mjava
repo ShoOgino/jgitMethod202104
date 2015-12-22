@@ -1,0 +1,23 @@
+	/**
+	 * Writes all the received data to the output channel
+	 *
+	 * @throws IOException
+	 */
+	@Override
+	public void onDataAvailable() throws IOException {
+		while (in.isReady()) {
+			if (inChannel.read(buffer) > 0) {
+				buffer.flip();
+				out.write(buffer);
+				buffer.compact();
+			} else {
+				buffer.flip();
+				while (buffer.hasRemaining()) {
+					out.write(buffer);
+				}
+				close();
+				return;
+			}
+		}
+	}
+

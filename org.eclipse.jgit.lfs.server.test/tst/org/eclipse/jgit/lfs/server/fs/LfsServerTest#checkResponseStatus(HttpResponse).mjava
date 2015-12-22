@@ -1,0 +1,10 @@
+	private void checkResponseStatus(HttpResponse response) {
+		StatusLine statusLine = response.getStatusLine();
+		int status = statusLine.getStatusCode();
+		if (statusLine.getStatusCode() >= 400) {
+			throw new RuntimeException("Status: " + status + " "
+					+ statusLine.getReasonPhrase());
+		}
+		assertEquals(200, status);
+	}
+

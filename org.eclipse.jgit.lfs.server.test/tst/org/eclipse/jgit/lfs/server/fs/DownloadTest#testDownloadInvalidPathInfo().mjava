@@ -1,0 +1,15 @@
+	@Test
+	public void testDownloadInvalidPathInfo()
+			throws ClientProtocolException, IOException {
+		String TEXT = "test";
+		AnyLongObjectId id = putContent(TEXT);
+		Path f = Paths.get(getTempDirectory().toString(), "download");
+		try {
+			getContent(id.name().substring(0, 60), f);
+			fail("expected RuntimeException");
+		} catch (RuntimeException e) {
+			assertEquals("Status: 400 Bad Request",
+					e.getMessage());
+		}
+	}
+

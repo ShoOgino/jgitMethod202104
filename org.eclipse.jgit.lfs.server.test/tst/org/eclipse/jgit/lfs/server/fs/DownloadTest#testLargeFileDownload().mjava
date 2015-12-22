@@ -1,0 +1,17 @@
+	@SuppressWarnings("boxing")
+	@Test
+	public void testLargeFileDownload() throws Exception {
+		Path f = Paths.get(getTempDirectory().toString(), "largeRandomFile");
+		long expectedLen = createPseudoRandomContentFile(f, 5 * MiB);
+		AnyLongObjectId id = putContent(f);
+		Path f2 = Paths.get(getTempDirectory().toString(), "download");
+		long start = System.nanoTime();
+		long len = getContent(id, f2);
+		System.out.println(
+				MessageFormat.format("dowloaded 10 MiB random data in {0}ms",
+						(System.nanoTime() - start) / 1e6));
+		assertEquals(expectedLen, len);
+		FileUtils.delete(f.toFile(), FileUtils.RETRY);
+
+	}
+

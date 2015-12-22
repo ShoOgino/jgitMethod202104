@@ -1,0 +1,23 @@
+	protected long getContent(String hexId, Path f) throws IOException {
+		try (CloseableHttpClient client = HttpClientBuilder.create().build()) {
+			HttpGet request = new HttpGet(
+					server.getURI() + "/lfs/objects/" + hexId);
+			HttpResponse response = client.execute(request);
+			checkResponseStatus(response);
+			HttpEntity entity = response.getEntity();
+			long pos = 0;
+			try (InputStream in = entity.getContent();
+					ReadableByteChannel inChannel = Channels.newChannel(in);
+					FileChannel outChannel = FileChannel.open(f,
+							StandardOpenOption.CREATE_NEW,
+							StandardOpenOption.WRITE)) {
+				long transferred;
+				do {
+					transferred = outChannel.transferFrom(inChannel, pos, MiB);
+					pos += transferred;
+				} while (transferred > 0);
+			}
+			return pos;
+		}
+	}
+

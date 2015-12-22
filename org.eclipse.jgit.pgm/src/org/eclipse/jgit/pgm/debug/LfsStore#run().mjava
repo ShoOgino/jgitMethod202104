@@ -1,0 +1,42 @@
+	protected void run() throws Exception {
+		AppServer server = new AppServer(port);
+		URI baseURI = server.getURI();
+		ServletContextHandler app = server.addContext("/"); //$NON-NLS-1$
+
+		final LargeFileRepository repository;
+		switch (storeType) {
+		case FS:
+			Path dir = Paths.get(directory);
+			FileLfsRepository fsRepo = new FileLfsRepository(
+					getStoreUrl(baseURI), dir);
+			FileLfsServlet content = new FileLfsServlet(fsRepo, 30000);
+			app.addServlet(new ServletHolder(content), STORE_PATH);
+			repository = fsRepo;
+			break;
+
+		default:
+			throw new IllegalArgumentException(
+					"Unknown store type: " + storeType); //$NON-NLS-1$
+		}
+
+		LfsProtocolServlet protocol = new LfsProtocolServlet() {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			protected LargeFileRepository getLargeFileRepository() {
+				return repository;
+			}
+
+		};
+		app.addServlet(new ServletHolder(protocol), PROTOCOL_PATH);
+
+		server.start();
+
+		outw.println("LFS protocol URL: " + getProtocolUrl(baseURI)); //$NON-NLS-1$
+		if (storeType == StoreType.FS) {
+			outw.println("LFS objects located in: " + directory); //$NON-NLS-1$
+			outw.println("LFS store URL: " + getStoreUrl(baseURI)); //$NON-NLS-1$
+		}
+	}
+

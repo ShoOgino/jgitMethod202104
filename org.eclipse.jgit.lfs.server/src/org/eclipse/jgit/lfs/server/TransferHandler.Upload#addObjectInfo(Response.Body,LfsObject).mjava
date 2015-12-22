@@ -1,0 +1,19 @@
+		private void addObjectInfo(Response.Body body, LfsObject o)
+				throws IOException {
+			Response.ObjectInfo info = new Response.ObjectInfo();
+			body.objects.add(info);
+			info.oid = o.oid;
+			info.size = o.size;
+
+			LongObjectId oid = LongObjectId.fromString(o.oid);
+			if (repository.getSize(oid) == -1) {
+				info.actions = new HashMap<>();
+				info.actions.put(UPLOAD,
+						repository.getUploadAction(oid, o.size));
+				Action verify = repository.getVerifyAction(oid);
+				if (verify != null) {
+					info.actions.put(VERIFY, verify);
+				}
+			}
+		}
+

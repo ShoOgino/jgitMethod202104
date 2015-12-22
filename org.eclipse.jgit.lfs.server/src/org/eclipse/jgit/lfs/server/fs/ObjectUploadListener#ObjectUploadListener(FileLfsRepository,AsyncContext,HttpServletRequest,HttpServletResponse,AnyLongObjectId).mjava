@@ -1,0 +1,23 @@
+	/**
+	 * @param repository
+	 *            the repository storing large objects
+	 * @param context
+	 * @param request
+	 * @param response
+	 * @param id
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
+	public ObjectUploadListener(FileLfsRepository repository,
+			AsyncContext context, HttpServletRequest request,
+			HttpServletResponse response, AnyLongObjectId id)
+					throws FileNotFoundException, IOException {
+		this.repository = repository;
+		this.context = context;
+		this.response = response;
+		this.in = request.getInputStream();
+		this.inChannel = Channels.newChannel(in);
+		this.out = repository.getWriteChannel(id);
+		response.setContentType(Constants.CONTENT_TYPE_GIT_LFS_JSON);
+	}
+

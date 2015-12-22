@@ -1,0 +1,11 @@
+	private void verifyHash() {
+		AnyLongObjectId contentHash = LongObjectId
+				.fromRaw(out.getMessageDigest().digest());
+		if (!contentHash.equals(id)) {
+			abort();
+			throw new CorruptLongObjectException(id, contentHash,
+					MessageFormat.format(LfsServerText.get().corruptLongObject,
+							contentHash, id));
+		}
+	}
+
