@@ -1,0 +1,28 @@
+	@Test
+	public void testReplaceFileByPartOfDirectory()
+			throws IOException, NoFilepatternException, GitAPIException {
+		try (Git git = new Git(db)) {
+			writeTrashFile("src/main", "df", "before replacement");
+			writeTrashFile("src/main", "z", "z");
+			writeTrashFile("z", "z2");
+			git.add().addFilepattern("src/main/df")
+				.addFilepattern("src/main/z")
+				.addFilepattern("z")
+				.call();
+			assertEquals(
+					"[src/main/df, mode:100644, content:before replacement]" +
+					"[src/main/z, mode:100644, content:z]" +
+					"[z, mode:100644, content:z2]",
+					indexState(CONTENT));
+			FileUtils.delete(new File(db.getWorkTree(), "src/main/df"));
+			writeTrashFile("src/main/df", "a", "after replacement");
+			writeTrashFile("src/main/df", "b", "unrelated file");
+			git.add().addFilepattern("src/main/df/a").call();
+			assertEquals(
+					"[src/main/df/a, mode:100644, content:after replacement]" +
+					"[src/main/z, mode:100644, content:z]" +
+					"[z, mode:100644, content:z2]",
+					indexState(CONTENT));
+		}
+	}
+
