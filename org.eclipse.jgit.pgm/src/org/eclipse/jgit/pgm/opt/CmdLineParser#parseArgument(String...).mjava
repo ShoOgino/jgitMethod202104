@@ -19,8 +19,27 @@
 			}
 
 			tmp.add(str);
+
+			if (containsHelp(args)) {
+				// suppress exceptions on required parameters if help is present
+				seenHelp = true;
+				// stop argument parsing here
+				break;
+			}
+		}
+		List<OptionHandler> backup = null;
+		if (seenHelp) {
+			backup = unsetRequiredOptions();
 		}
 
-		super.parseArgument(tmp.toArray(new String[tmp.size()]));
+		try {
+			super.parseArgument(tmp.toArray(new String[tmp.size()]));
+		} finally {
+			// reset "required" options to defaults for correct command printout
+			if (backup != null && !backup.isEmpty()) {
+				restoreRequiredOptions(backup);
+			}
+			seenHelp = false;
+		}
 	}
 

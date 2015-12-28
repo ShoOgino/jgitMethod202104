@@ -6,17 +6,7 @@
 	 * @throws IOException
 	 */
 	public void printUsageAndExit(final String message, final CmdLineParser clp) throws IOException {
-		errw.println(message);
-		errw.print("jgit "); //$NON-NLS-1$
-		errw.print(commandName);
-		clp.printSingleLineUsage(errw, getResourceBundle());
-		errw.println();
-
-		errw.println();
-		clp.printUsage(errw, getResourceBundle());
-		errw.println();
-
-		errw.flush();
+		printUsage(message, clp);
 		throw die(true);
 	}
 

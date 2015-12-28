@@ -11,17 +11,20 @@
 	 */
 	protected void parseArguments(final String[] args) throws IOException {
 		final CmdLineParser clp = new CmdLineParser(this);
+		help = containsHelp(args);
 		try {
 			clp.parseArgument(args);
 		} catch (CmdLineException err) {
-			if (!help) {
-				this.errw.println(MessageFormat.format(CLIText.get().fatalError, err.getMessage()));
-				throw die(true, err);
+			this.errw.println(MessageFormat.format(CLIText.get().fatalError, err.getMessage()));
+			if (help) {
+				printUsage("", clp); //$NON-NLS-1$
 			}
+			throw die(true, err);
 		}
 
 		if (help) {
-			printUsageAndExit(clp);
+			printUsage("", clp); //$NON-NLS-1$
+			throw new TerminatedByHelpException();
 		}
 
 		argWalk = clp.getRevWalkGently();
