@@ -1,0 +1,49 @@
+	private int deleteOverlappingSubtree(DirCacheEntry ent, int eIdx) {
+		byte[] entPath = ent.path;
+		int entLen = entPath.length;
+
+		// Delete any file that was previously processed and overlaps
+		// the parent directory for the new entry. Since the editor
+		// always processes entries in path order, binary search back
+		// for the overlap for each parent directory.
+		for (int p = pdir(entPath, entLen); p > 0; p = pdir(entPath, p)) {
+			int i = findEntry(entPath, p);
+			if (i >= 0) {
+				// A file does overlap, delete the file from the array.
+				// No other parents can have overlaps as the file should
+				// have taken care of that itself.
+				int n = --entryCnt - i;
+				System.arraycopy(entries, i + 1, entries, i, n);
+				break;
+			}
+
+			// If at least one other entry already exists in this parent
+			// directory there is no need to continue searching up the tree.
+			i = -(i + 1);
+			if (i < entryCnt && inDir(entries[i], entPath, p)) {
+				break;
+			}
+		}
+
+		int maxEnt = cache.getEntryCount();
+		if (eIdx >= maxEnt) {
+			return maxEnt;
+		}
+
+		DirCacheEntry next = cache.getEntry(eIdx);
+		if (pathCompare(next.path, 0, next.path.length, 0,
+				entPath, 0, entLen, TYPE_TREE) < 0) {
+			// Next DirCacheEntry sorts before new entry as tree. Defer a
+			// DeleteTree command to delete any entries if they exist. This
+			// case only happens for A, A.c, A/c type of conflicts (rare).
+			insertEdit(new DeleteTree(entPath));
+			return eIdx;
+		}
+
+		// Next entry may be contained by the entry-as-tree, skip if so.
+		while (eIdx < maxEnt && inDir(cache.getEntry(eIdx), entPath, entLen)) {
+			eIdx++;
+		}
+		return eIdx;
+	}
+

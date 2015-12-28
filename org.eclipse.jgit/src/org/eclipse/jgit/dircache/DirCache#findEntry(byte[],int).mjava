@@ -17,21 +17,7 @@
 	 *         information. If &lt; 0 the entry does not exist in the index.
 	 * @since 3.4
 	 */
-	public int findEntry(final byte[] p, final int pLen) {
-		int low = 0;
-		int high = entryCnt;
-		while (low < high) {
-			int mid = (low + high) >>> 1;
-			final int cmp = cmp(p, pLen, sortedEntries[mid]);
-			if (cmp < 0)
-				high = mid;
-			else if (cmp == 0) {
-				while (mid > 0 && cmp(p, pLen, sortedEntries[mid - 1]) == 0)
-					mid--;
-				return mid;
-			} else
-				low = mid + 1;
-		}
-		return -(low + 1);
+	public int findEntry(byte[] p, int pLen) {
+		return findEntry(0, p, pLen);
 	}
 

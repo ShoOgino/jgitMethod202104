@@ -1,36 +1,43 @@
 	private void applyEdits() {
 		Collections.sort(edits, EDIT_CMP);
+		editIdx = 0;
 
 		final int maxIdx = cache.getEntryCount();
 		int lastIdx = 0;
-		for (final PathEdit e : edits) {
-			int eIdx = cache.findEntry(e.path, e.path.length);
+		while (editIdx < edits.size()) {
+			PathEdit e = edits.get(editIdx++);
+			int eIdx = cache.findEntry(lastIdx, e.path, e.path.length);
 			final boolean missing = eIdx < 0;
 			if (eIdx < 0)
 				eIdx = -(eIdx + 1);
 			final int cnt = Math.min(eIdx, maxIdx) - lastIdx;
 			if (cnt > 0)
 				fastKeep(lastIdx, cnt);
-			lastIdx = missing ? eIdx : cache.nextEntry(eIdx);
 
-			if (e instanceof DeletePath)
+			if (e instanceof DeletePath) {
+				lastIdx = missing ? eIdx : cache.nextEntry(eIdx);
 				continue;
+			}
 			if (e instanceof DeleteTree) {
 				lastIdx = cache.nextEntry(e.path, e.path.length, eIdx);
 				continue;
 			}
 
 			if (missing) {
-				final DirCacheEntry ent = new DirCacheEntry(e.path);
+				DirCacheEntry ent = new DirCacheEntry(e.path);
 				e.apply(ent);
 				if (ent.getRawMode() == 0) {
 					throw new IllegalArgumentException(MessageFormat.format(
 							JGitText.get().fileModeNotSetForPath,
 							ent.getPathString()));
 				}
+				lastIdx = e.replace
+					? deleteOverlappingSubtree(ent, eIdx)
+					: eIdx;
 				fastAdd(ent);
 			} else {
 				// Apply to all entries of the current path (different stages)
+				lastIdx = cache.nextEntry(eIdx);
 				for (int i = eIdx; i < lastIdx; i++) {
 					final DirCacheEntry ent = cache.getEntry(i);
 					e.apply(ent);
