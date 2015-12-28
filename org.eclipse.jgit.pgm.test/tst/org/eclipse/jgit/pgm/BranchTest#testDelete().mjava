@@ -1,0 +1,16 @@
+	@Test
+	public void testDelete() throws Exception {
+		try {
+			toString(execute("git branch -d"));
+			fail("Must die");
+		} catch (Die e) {
+			// expected, requires argument
+		}
+		String result = toString(execute("git branch second"));
+		assertEquals("", result);
+		result = toString(execute("git branch -d second"));
+		assertEquals("", result);
+		result = toString(execute("git branch"));
+		assertEquals("* master", result);
+	}
+

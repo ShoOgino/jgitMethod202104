@@ -3,7 +3,9 @@
 		RefUpdate updateRef = db.updateRef(Constants.HEAD, true);
 		updateRef.setNewObjectId(db.resolve("6fd41be"));
 		updateRef.update();
-		assertEquals("* (no branch) 6fd41be initial commit",
-				execute("git branch -v")[0]);
+		assertEquals(
+				toString("* (no branch) 6fd41be initial commit",
+						"master      6fd41be initial commit"),
+				toString(execute("git branch -v")));
 	}
 

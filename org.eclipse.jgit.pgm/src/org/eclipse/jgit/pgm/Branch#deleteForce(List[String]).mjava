@@ -1,0 +1,9 @@
+	@Option(name = "--delete-force", aliases = {
+			"-D" }, metaVar = "metaVar_branchNames", usage = "usage_deleteBranchEvenIfNotMerged", handler = OptionWithValuesListHandler.class)
+	public void deleteForce(List<String> names) {
+		if (names.isEmpty()) {
+			throw die(CLIText.get().branchNameRequired);
+		}
+		deleteForce = names;
+	}
+

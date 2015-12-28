@@ -1,0 +1,11 @@
+	@Test
+	public void testDeleteMultiple() throws Exception {
+		String result = toString(execute("git branch second",
+				"git branch third", "git branch fourth"));
+		assertEquals("", result);
+		result = toString(execute("git branch -d second third fourth"));
+		assertEquals("", result);
+		result = toString(execute("git branch"));
+		assertEquals("* master", result);
+	}
+

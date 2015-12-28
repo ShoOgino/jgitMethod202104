@@ -1,0 +1,17 @@
+	@Test
+	public void testCreate() throws Exception {
+		try {
+			toString(execute("git branch a b"));
+			fail("Must die");
+		} catch (Die e) {
+			// expected, too many arguments
+		}
+		String result = toString(execute("git branch second"));
+		assertEquals("", result);
+		result = toString(execute("git branch"));
+		assertEquals(toString("* master", "second"), result);
+		result = toString(execute("git branch -v"));
+		assertEquals(toString("* master 6fd41be initial commit",
+				"second 6fd41be initial commit"), result);
+	}
+

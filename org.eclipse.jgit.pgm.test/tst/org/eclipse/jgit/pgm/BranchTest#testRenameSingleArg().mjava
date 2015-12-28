@@ -1,0 +1,14 @@
+	@Test
+	public void testRenameSingleArg() throws Exception {
+		try {
+			toString(execute("git branch -m"));
+			fail("Must die");
+		} catch (Die e) {
+			// expected, requires argument
+		}
+		String result = toString(execute("git branch -m slave"));
+		assertEquals("", result);
+		result = toString(execute("git branch -a"));
+		assertEquals("* slave", result);
+	}
+

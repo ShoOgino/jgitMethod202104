@@ -1,0 +1,23 @@
+	@Test
+	public void testCreateFromOldCommit() throws Exception {
+		File a = writeTrashFile("a", "a");
+		assertTrue(a.exists());
+		execute("git add a", "git commit -m 'added a'");
+		File b = writeTrashFile("b", "b");
+		assertTrue(b.exists());
+		execute("git add b", "git commit -m 'added b'");
+		String result = toString(execute("git log -n 1 --reverse"));
+		String firstCommitId = result.substring("commit ".length(),
+				result.indexOf('\n'));
+
+		result = toString(execute("git branch -f second " + firstCommitId));
+		assertEquals("", result);
+
+		result = toString(execute("git branch"));
+		assertEquals(toString("* master", "second"), result);
+
+		result = toString(execute("git checkout second"));
+		assertEquals("Switched to branch 'second'", result);
+		assertFalse(b.exists());
+	}
+

@@ -1,0 +1,35 @@
+	@Test
+	public void testDeleteForceMultiple() throws Exception {
+		String result = toString(execute("git branch second",
+				"git branch third", "git branch fourth"));
+
+		assertEquals("", result);
+		result = toString(execute("git checkout second"));
+		assertEquals("Switched to branch 'second'", result);
+
+		File a = writeTrashFile("a", "a");
+		assertTrue(a.exists());
+		execute("git add a", "git commit -m 'added a'");
+
+		result = toString(execute("git checkout master"));
+		assertEquals("Switched to branch 'master'", result);
+
+		result = toString(execute("git branch"));
+		assertEquals(toString("fourth", "* master", "second", "third"), result);
+
+		try {
+			toString(execute("git branch -d second third fourth"));
+			fail("Must die");
+		} catch (Die e) {
+			// expected, the current HEAD is on second and not merged to master
+		}
+		result = toString(execute("git branch"));
+		assertEquals(toString("fourth", "* master", "second", "third"), result);
+
+		result = toString(execute("git branch -D second third fourth"));
+		assertEquals("", result);
+
+		result = toString(execute("git branch"));
+		assertEquals("* master", result);
+	}
+
