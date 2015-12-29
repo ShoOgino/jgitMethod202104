@@ -1,16 +1,17 @@
 	@Test
-	public void testInvalidTreeNameIsMacHFSGit() {
+	public void testInvalidTreeNameIsMacHFSGit() throws CorruptObjectException {
 		StringBuilder b = new StringBuilder();
 		entry(b, "100644 .gi\u200Ct");
-		byte[] data = Constants.encode(b.toString());
-		try {
-			checker.setSafeForMacOS(true);
-			checker.checkTree(data);
-			fail("incorrectly accepted an invalid tree");
-		} catch (CorruptObjectException e) {
-			assertEquals(
-					"invalid name '.gi\u200Ct' contains ignorable Unicode characters",
-					e.getMessage());
-		}
+		byte[] data = encode(b.toString());
+
+		// Fine on POSIX.
+		checker.checkTree(data);
+
+		// Rejected on Mac OS.
+		checker.setSafeForMacOS(true);
+		assertCorrupt(
+				"invalid name '.gi\u200Ct' contains ignorable Unicode characters",
+				OBJ_TREE, data);
+		assertSkipListAccepts(OBJ_TREE, data);
 	}
 

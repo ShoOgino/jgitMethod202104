@@ -1,16 +1,8 @@
 	@Test
 	public void testInvalidTagNoObject6() {
-		final StringBuilder b = new StringBuilder();
-
+		StringBuilder b = new StringBuilder();
 		b.append("object ");
 		b.append("be9");
-
-		final byte[] data = Constants.encodeASCII(b.toString());
-		try {
-			checker.checkTag(data);
-			fail("incorrectly accepted invalid tag");
-		} catch (CorruptObjectException e) {
-			assertEquals("invalid object", e.getMessage());
-		}
+		assertCorrupt("invalid object", OBJ_TAG, b);
 	}
 

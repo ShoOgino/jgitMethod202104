@@ -1,16 +1,12 @@
 	@Test
 	public void testInvalidTreeDuplicateNames6()
-			throws UnsupportedEncodingException {
+			throws UnsupportedEncodingException, CorruptObjectException {
 		StringBuilder b = new StringBuilder();
 		entry(b, "100644 a");
 		entry(b, "100644 A");
 		byte[] data = b.toString().getBytes("UTF-8");
-		try {
-			checker.setSafeForMacOS(true);
-			checker.checkTree(data);
-			fail("incorrectly accepted an invalid tree");
-		} catch (CorruptObjectException e) {
-			assertEquals("duplicate entry names", e.getMessage());
-		}
+		checker.setSafeForMacOS(true);
+		assertCorrupt("duplicate entry names", OBJ_TREE, data);
+		assertSkipListAccepts(OBJ_TREE, data);
 	}
 

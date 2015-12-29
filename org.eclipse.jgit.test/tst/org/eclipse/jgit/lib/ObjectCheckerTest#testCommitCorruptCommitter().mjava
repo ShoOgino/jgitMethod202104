@@ -5,14 +5,12 @@
 		b.append("author <> 0 +0000\n");
 		b.append("committer b <b@c> <b@c> 0 +0000\n");
 
-		byte[] data = Constants.encodeASCII(b.toString());
-		try {
-			checker.checkCommit(data);
-			fail("Did not catch corrupt object");
-		} catch (CorruptObjectException e) {
-			assertEquals("invalid committer", e.getMessage());
-		}
+		byte[] data = encodeASCII(b.toString());
+		assertCorrupt("invalid committer", OBJ_COMMIT, data);
 		checker.setAllowInvalidPersonIdent(true);
 		checker.checkCommit(data);
+
+		checker.setAllowInvalidPersonIdent(false);
+		assertSkipListAccepts(OBJ_COMMIT, data);
 	}
 

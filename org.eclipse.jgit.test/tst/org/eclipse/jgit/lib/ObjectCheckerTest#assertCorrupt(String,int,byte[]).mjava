@@ -1,0 +1,9 @@
+	private void assertCorrupt(String msg, int type, byte[] data) {
+		try {
+			checker.check(type, data);
+			fail("Did not throw CorruptObjectException");
+		} catch (CorruptObjectException e) {
+			assertEquals(msg, e.getMessage());
+		}
+	}
+

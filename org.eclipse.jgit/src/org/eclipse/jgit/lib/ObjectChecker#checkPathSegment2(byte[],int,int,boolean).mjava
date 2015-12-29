@@ -1,4 +1,4 @@
-	private void checkPathSegment2(byte[] raw, int ptr, int end)
+	private void checkPathSegment2(byte[] raw, int ptr, int end, boolean skip)
 			throws CorruptObjectException {
 		if (ptr == end)
 			throw new CorruptObjectException(
@@ -14,36 +14,38 @@
 							JGitText.get().corruptObjectNameDotDot);
 				break;
 			case 4:
-				if (isGit(raw, ptr + 1))
+				if (!skip && isGit(raw, ptr + 1))
 					throw new CorruptObjectException(String.format(
 							JGitText.get().corruptObjectInvalidName,
 							RawParseUtils.decode(raw, ptr, end)));
 				break;
 			default:
-				if (end - ptr > 4 && isNormalizedGit(raw, ptr + 1, end))
+				if (!skip && end - ptr > 4
+						&& isNormalizedGit(raw, ptr + 1, end))
 					throw new CorruptObjectException(String.format(
 							JGitText.get().corruptObjectInvalidName,
 							RawParseUtils.decode(raw, ptr, end)));
 			}
-		} else if (isGitTilde1(raw, ptr, end)) {
+		} else if (!skip && isGitTilde1(raw, ptr, end)) {
 			throw new CorruptObjectException(String.format(
 					JGitText.get().corruptObjectInvalidName,
 					RawParseUtils.decode(raw, ptr, end)));
 		}
-
-		if (macosx && isMacHFSGit(raw, ptr, end))
-			throw new CorruptObjectException(String.format(
-					JGitText.get().corruptObjectInvalidNameIgnorableUnicode,
-					RawParseUtils.decode(raw, ptr, end)));
-
-		if (windows) {
-			// Windows ignores space and dot at end of file name.
-			if (raw[end - 1] == ' ' || raw[end - 1] == '.')
+		if (!skip) {
+			if (macosx && isMacHFSGit(raw, ptr, end))
 				throw new CorruptObjectException(String.format(
-						JGitText.get().corruptObjectInvalidNameEnd,
-						Character.valueOf(((char) raw[end - 1]))));
-			if (end - ptr >= 3)
-				checkNotWindowsDevice(raw, ptr, end);
+						JGitText.get().corruptObjectInvalidNameIgnorableUnicode,
+						RawParseUtils.decode(raw, ptr, end)));
+
+			if (windows) {
+				// Windows ignores space and dot at end of file name.
+				if (raw[end - 1] == ' ' || raw[end - 1] == '.')
+					throw new CorruptObjectException(String.format(
+							JGitText.get().corruptObjectInvalidNameEnd,
+							Character.valueOf(((char) raw[end - 1]))));
+				if (end - ptr >= 3)
+					checkNotWindowsDevice(raw, ptr, end);
+			}
 		}
 	}
 

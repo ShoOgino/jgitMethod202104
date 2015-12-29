@@ -1,21 +1,14 @@
 	@Test
-	public void testInvalidCommitInvalidAuthor5() {
-		final StringBuilder b = new StringBuilder();
-
+	public void testInvalidCommitInvalidAuthor5()
+			throws CorruptObjectException {
+		StringBuilder b = new StringBuilder();
 		b.append("tree ");
 		b.append("be9bfa841874ccc9f2ef7c48d0c76226f89b7189");
 		b.append('\n');
-
 		b.append("author a <b>\n");
 
-		final byte[] data = Constants.encodeASCII(b.toString());
-		try {
-			checker.checkCommit(data);
-			fail("Did not catch corrupt object");
-		} catch (CorruptObjectException e) {
-			// Yes, really, we complain about author not being
-			// found as the invalid parent line wasn't consumed.
-			assertEquals("invalid author", e.getMessage());
-		}
+		byte[] data = encodeASCII(b.toString());
+		assertCorrupt("invalid author", OBJ_COMMIT, data);
+		assertSkipListAccepts(OBJ_COMMIT, data);
 	}
 

@@ -1,23 +1,12 @@
 	@Test
 	public void testInvalidTreeDuplicateNames7()
-			throws UnsupportedEncodingException {
-		try {
-			Class.forName("java.text.Normalizer");
-		} catch (ClassNotFoundException e) {
-			// Ignore this test on Java 5 platform.
-			return;
-		}
-
+			throws UnsupportedEncodingException, CorruptObjectException {
 		StringBuilder b = new StringBuilder();
 		entry(b, "100644 \u0065\u0301");
 		entry(b, "100644 \u00e9");
 		byte[] data = b.toString().getBytes("UTF-8");
-		try {
-			checker.setSafeForMacOS(true);
-			checker.checkTree(data);
-			fail("incorrectly accepted an invalid tree");
-		} catch (CorruptObjectException e) {
-			assertEquals("duplicate entry names", e.getMessage());
-		}
+		checker.setSafeForMacOS(true);
+		assertCorrupt("duplicate entry names", OBJ_TREE, data);
+		assertSkipListAccepts(OBJ_TREE, data);
 	}
 

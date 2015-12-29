@@ -1,0 +1,78 @@
+	/**
+	 * Check a canonical formatted tree for errors.
+	 *
+	 * @param id
+	 *            identity of the object being checked.
+	 * @param raw
+	 *            the raw tree data. The array is never modified.
+	 * @throws CorruptObjectException
+	 *             if any error was detected.
+	 * @since 4.2
+	 */
+	public void checkTree(@Nullable AnyObjectId id, byte[] raw)
+			throws CorruptObjectException {
+		final int sz = raw.length;
+		int ptr = 0;
+		int lastNameB = 0, lastNameE = 0, lastMode = 0;
+		boolean skip = skip(id);
+		Set<String> normalized = !skip && (windows || macosx)
+				? new HashSet<String>()
+				: null;
+
+		while (ptr < sz) {
+			int thisMode = 0;
+			for (;;) {
+				if (ptr == sz)
+					throw new CorruptObjectException(
+							JGitText.get().corruptObjectTruncatedInMode);
+				final byte c = raw[ptr++];
+				if (' ' == c)
+					break;
+				if (c < '0' || c > '7')
+					throw new CorruptObjectException(
+							JGitText.get().corruptObjectInvalidModeChar);
+				if (thisMode == 0 && c == '0' && !allowZeroMode && !skip)
+					throw new CorruptObjectException(
+							JGitText.get().corruptObjectInvalidModeStartsZero);
+				thisMode <<= 3;
+				thisMode += c - '0';
+			}
+
+			if (FileMode.fromBits(thisMode).getObjectType() == Constants.OBJ_BAD)
+				throw new CorruptObjectException(MessageFormat.format(
+						JGitText.get().corruptObjectInvalidMode2,
+						Integer.valueOf(thisMode)));
+
+			final int thisNameB = ptr;
+			ptr = scanPathSegment(raw, ptr, sz);
+			if (ptr == sz || raw[ptr] != 0)
+				throw new CorruptObjectException(
+						JGitText.get().corruptObjectTruncatedInName);
+			checkPathSegment2(raw, thisNameB, ptr, skip);
+			if (normalized != null) {
+				if (!normalized.add(normalize(raw, thisNameB, ptr)))
+					throw new CorruptObjectException(
+							JGitText.get().corruptObjectDuplicateEntryNames);
+			} else if (!skip && duplicateName(raw, thisNameB, ptr))
+				throw new CorruptObjectException(
+						JGitText.get().corruptObjectDuplicateEntryNames);
+
+			if (!skip && lastNameB != 0) {
+				final int cmp = pathCompare(raw, lastNameB, lastNameE,
+						lastMode, thisNameB, ptr, thisMode);
+				if (cmp > 0)
+					throw new CorruptObjectException(
+							JGitText.get().corruptObjectIncorrectSorting);
+			}
+
+			lastNameB = thisNameB;
+			lastNameE = ptr;
+			lastMode = thisMode;
+
+			ptr += 1 + Constants.OBJECT_ID_LENGTH;
+			if (ptr > sz)
+				throw new CorruptObjectException(
+						JGitText.get().corruptObjectTruncatedInObjectId);
+		}
+	}
+

@@ -1,6 +1,6 @@
-	private int personIdent(final byte[] raw, int ptr) {
-		if (allowInvalidPersonIdent)
-			return nextLF(raw, ptr) - 1;
+	private int personIdent(byte[] raw, int ptr, @Nullable AnyObjectId id) {
+		if (allowInvalidPersonIdent || skip(id))
+			return nextLF(raw, ptr);
 
 		final int emailB = nextLF(raw, ptr, '<');
 		if (emailB == ptr || raw[emailB - 1] != '<')
@@ -22,6 +22,10 @@
 		parseBase10(raw, ptr + 1, ptrout); // tz offset
 		if (ptr + 1 == ptrout.value)
 			return -1;
-		return ptrout.value;
+
+		ptr = ptrout.value;
+		if (raw[ptr++] == '\n')
+			return ptr;
+		return -1;
 	}
 
