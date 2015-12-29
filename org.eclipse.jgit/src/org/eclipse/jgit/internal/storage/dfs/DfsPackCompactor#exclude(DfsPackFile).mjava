@@ -12,10 +12,6 @@
 		try (DfsReader ctx = (DfsReader) repo.newObjectReader()) {
 			idx = pack.getPackIndex(ctx);
 		}
-		return exclude(new PackWriter.ObjectIdSet() {
-			public boolean contains(AnyObjectId id) {
-				return idx.hasObject(id);
-			}
-		});
+		return exclude(idx);
 	}
 

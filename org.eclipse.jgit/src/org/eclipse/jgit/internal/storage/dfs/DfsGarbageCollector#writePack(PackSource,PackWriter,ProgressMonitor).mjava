@@ -35,17 +35,10 @@
 			}
 		}
 
-		final ObjectIdOwnerMap<ObjectIdOwnerMap.Entry> packedObjs = pw
-				.getObjectSet();
-		newPackObj.add(new PackWriter.ObjectIdSet() {
-			public boolean contains(AnyObjectId objectId) {
-				return packedObjs.contains(objectId);
-			}
-		});
-
 		PackStatistics stats = pw.getStatistics();
 		pack.setPackStats(stats);
 		newPackStats.add(stats);
+		newPackObj.add(pw.getObjectSet());
 
 		DfsBlockCache.getInstance().getOrCreate(pack, null);
 		return pack;
