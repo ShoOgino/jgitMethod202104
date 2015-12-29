@@ -1,0 +1,19 @@
+	@Override
+	public void printSingleLineUsage(Writer w, ResourceBundle rb) {
+		List<OptionHandler> options = getOptions();
+		if (options.isEmpty()) {
+			super.printSingleLineUsage(w, rb);
+			return;
+		}
+		List<OptionHandler> backup = new ArrayList<>(options);
+		boolean changed = sortRestOfArgumentsHandlerToTheEnd(options);
+		try {
+			super.printSingleLineUsage(w, rb);
+		} finally {
+			if (changed) {
+				options.clear();
+				options.addAll(backup);
+			}
+		}
+	}
+
