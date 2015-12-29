@@ -1,0 +1,27 @@
+	@Test
+	public void testCommitPath() throws Exception {
+		writeTrashFile("a", "a");
+		writeTrashFile("b", "a");
+		String result = toString(execute("git add a"));
+		assertTrue("Unexpected output: " + result, result.isEmpty());
+
+		result = toString(execute("git status -- a"));
+		assertTrue("Unexpected output: " + result,
+				result.contains("new file:   a"));
+
+		result = toString(execute("git status -- b"));
+		assertTrue("Unexpected output: " + result,
+				result.trim().contains("Untracked files:\n	b"));
+
+		result = toString(execute("git commit a -m 'added a'"));
+		assertTrue("Unexpected output: " + result, result.contains("added a"));
+
+		result = toString(execute("git status -- a"));
+		assertTrue("Unexpected output: " + result,
+				result.trim().equals("On branch master"));
+
+		result = toString(execute("git status -- b"));
+		assertTrue("Unexpected output: " + result,
+				result.trim().contains("Untracked files:\n	b"));
+	}
+
