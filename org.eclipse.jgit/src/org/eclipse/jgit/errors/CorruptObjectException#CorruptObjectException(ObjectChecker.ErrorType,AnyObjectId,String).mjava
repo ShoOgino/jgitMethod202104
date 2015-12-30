@@ -1,0 +1,18 @@
+	/**
+	 * Report a specific error condition discovered in an object.
+	 *
+	 * @param type
+	 *            type of error
+	 * @param id
+	 *            identity of the bad object
+	 * @param why
+	 *            description of the error.
+	 * @since 4.2
+	 */
+	public CorruptObjectException(ObjectChecker.ErrorType type, AnyObjectId id,
+			String why) {
+		super(MessageFormat.format(JGitText.get().objectIsCorrupt3,
+				type.getMessageId(), id.name(), why));
+		this.errorType = type;
+	}
+

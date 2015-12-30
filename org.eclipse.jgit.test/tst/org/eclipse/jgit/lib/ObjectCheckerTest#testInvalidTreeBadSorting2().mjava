@@ -6,5 +6,7 @@
 		byte[] data = encodeASCII(b.toString());
 		assertCorrupt("incorrectly sorted", OBJ_TREE, data);
 		assertSkipListAccepts(OBJ_TREE, data);
+		checker.setIgnore(TREE_NOT_SORTED, true);
+		checker.checkTree(data);
 	}
 

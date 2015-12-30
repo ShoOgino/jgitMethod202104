@@ -11,30 +11,29 @@
 	 */
 	public void checkTag(@Nullable AnyObjectId id, byte[] raw)
 			throws CorruptObjectException {
-		int ptr = 0;
-
-		if ((ptr = match(raw, ptr, object)) < 0)
-			throw new CorruptObjectException(
+		bufPtr.value = 0;
+		if (!match(raw, object)) {
+			report(MISSING_OBJECT, id,
 					JGitText.get().corruptObjectNoObjectHeader);
-		if ((ptr = id(raw, ptr)) < 0 || raw[ptr++] != '\n')
-			throw new CorruptObjectException(
+		} else if (!checkId(raw)) {
+			report(BAD_OBJECT_SHA1, id,
 					JGitText.get().corruptObjectInvalidObject);
+		}
 
-		if ((ptr = match(raw, ptr, type)) < 0)
-			throw new CorruptObjectException(
+		if (!match(raw, type)) {
+			report(MISSING_TYPE_ENTRY, id,
 					JGitText.get().corruptObjectNoTypeHeader);
-		ptr = nextLF(raw, ptr);
+		}
+		bufPtr.value = nextLF(raw, bufPtr.value);
 
-		if (match(raw, ptr, tag) < 0 && !skip(id))
-			throw new CorruptObjectException(
+		if (!match(raw, tag)) {
+			report(MISSING_TAG_ENTRY, id,
 					JGitText.get().corruptObjectNoTagHeader);
-		ptr = nextLF(raw, ptr);
+		}
+		bufPtr.value = nextLF(raw, bufPtr.value);
 
-		if ((ptr = match(raw, ptr, tagger)) > 0) {
-			if ((ptr = personIdent(raw, ptr, id)) < 0) {
-				throw new CorruptObjectException(
-						JGitText.get().corruptObjectInvalidTagger);
-			}
+		if (match(raw, tagger)) {
+			checkPersonIdent(raw, id);
 		}
 	}
 

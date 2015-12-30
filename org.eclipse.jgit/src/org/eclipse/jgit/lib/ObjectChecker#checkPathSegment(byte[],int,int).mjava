@@ -9,10 +9,10 @@
 	 */
 	public void checkPathSegment(byte[] raw, int ptr, int end)
 			throws CorruptObjectException {
-		int e = scanPathSegment(raw, ptr, end);
+		int e = scanPathSegment(raw, ptr, end, null);
 		if (e < end && raw[e] == 0)
 			throw new CorruptObjectException(
 					JGitText.get().corruptObjectNameContainsNullByte);
-		checkPathSegment2(raw, ptr, end, false);
+		checkPathSegment2(raw, ptr, end, null);
 	}
 

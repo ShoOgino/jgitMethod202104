@@ -1,0 +1,11 @@
+	@Test
+	public void testNullSha1InTreeEntry() throws CorruptObjectException {
+		byte[] data = concat(
+				encodeASCII("100644 A"), new byte[] { '\0' },
+				new byte[OBJECT_ID_LENGTH]);
+		assertCorrupt("entry points to null SHA-1", OBJ_TREE, data);
+		assertSkipListAccepts(OBJ_TREE, data);
+		checker.setIgnore(NULL_SHA1, true);
+		checker.checkTree(data);
+	}
+

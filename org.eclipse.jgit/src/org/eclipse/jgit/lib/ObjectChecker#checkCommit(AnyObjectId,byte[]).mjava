@@ -11,41 +11,31 @@
 	 */
 	public void checkCommit(@Nullable AnyObjectId id, byte[] raw)
 			throws CorruptObjectException {
-		int ptr = 0;
+		bufPtr.value = 0;
 
-		if ((ptr = match(raw, ptr, tree)) < 0)
-			throw new CorruptObjectException(
-					JGitText.get().corruptObjectNotreeHeader);
-		if ((ptr = id(raw, ptr)) < 0 || raw[ptr++] != '\n')
-			throw new CorruptObjectException(
-					JGitText.get().corruptObjectInvalidTree);
+		if (!match(raw, tree)) {
+			report(MISSING_TREE, id, JGitText.get().corruptObjectNotreeHeader);
+		} else if (!checkId(raw)) {
+			report(BAD_TREE_SHA1, id, JGitText.get().corruptObjectInvalidTree);
+		}
 
-		while (match(raw, ptr, parent) >= 0) {
-			ptr += parent.length;
-			if ((ptr = id(raw, ptr)) < 0 || raw[ptr++] != '\n')
-				throw new CorruptObjectException(
+		while (match(raw, parent)) {
+			if (!checkId(raw)) {
+				report(BAD_PARENT_SHA1, id,
 						JGitText.get().corruptObjectInvalidParent);
+			}
 		}
 
-		int p = match(raw, ptr, author);
-		if (p > ptr) {
-			if ((ptr = personIdent(raw, p, id)) < 0) {
-				throw new CorruptObjectException(
-						JGitText.get().corruptObjectInvalidAuthor);
-			}
-		} else if (!skip(id)) {
-			throw new CorruptObjectException(
-					JGitText.get().corruptObjectNoAuthor);
+		if (match(raw, author)) {
+			checkPersonIdent(raw, id);
+		} else {
+			report(MISSING_AUTHOR, id, JGitText.get().corruptObjectNoAuthor);
 		}
 
-		p = match(raw, ptr, committer);
-		if (p > ptr) {
-			if ((ptr = personIdent(raw, p, id)) < 0) {
-				throw new CorruptObjectException(
-						JGitText.get().corruptObjectInvalidCommitter);
-			}
-		} else if (!skip(id)) {
-			throw new CorruptObjectException(
+		if (match(raw, committer)) {
+			checkPersonIdent(raw, id);
+		} else {
+			report(MISSING_COMMITTER, id,
 					JGitText.get().corruptObjectNoCommitter);
 		}
 	}

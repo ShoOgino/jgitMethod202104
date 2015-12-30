@@ -1,9 +1,11 @@
 	@Test
-	public void testInvalidTreeNameIsDot() {
+	public void testInvalidTreeNameIsDot() throws CorruptObjectException {
 		StringBuilder b = new StringBuilder();
 		entry(b, "100644 .");
 		byte[] data = encodeASCII(b.toString());
 		assertCorrupt("invalid name '.'", OBJ_TREE, data);
-		assertSkipListRejects("invalid name '.'", OBJ_TREE, data);
+		assertSkipListAccepts(OBJ_TREE, data);
+		checker.setIgnore(HAS_DOT, true);
+		checker.checkTree(data);
 	}
 

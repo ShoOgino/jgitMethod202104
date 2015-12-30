@@ -6,5 +6,7 @@
 		byte[] data = encodeASCII(b.toString());
 		assertCorrupt("invalid name '.git. '", OBJ_TREE, data);
 		assertSkipListAccepts(OBJ_TREE, data);
+		checker.setIgnore(HAS_DOTGIT, true);
+		checker.checkTree(data);
 	}
 

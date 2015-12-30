@@ -1,9 +1,11 @@
 	@Test
-	public void testInvalidTreeNameIsEmpty() {
+	public void testInvalidTreeNameIsEmpty() throws CorruptObjectException {
 		StringBuilder b = new StringBuilder();
 		entry(b, "100644 ");
 		byte[] data = encodeASCII(b.toString());
 		assertCorrupt("zero length name", OBJ_TREE, data);
-		assertSkipListRejects("zero length name", OBJ_TREE, data);
+		assertSkipListAccepts(OBJ_TREE, data);
+		checker.setIgnore(EMPTY_NAME, true);
+		checker.checkTree(data);
 	}
 

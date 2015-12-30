@@ -4,7 +4,21 @@
 		entry(b, "100644 foobar");
 		entry(b, "100644 fooaaa");
 		byte[] data = encodeASCII(b.toString());
+
 		assertCorrupt("incorrectly sorted", OBJ_TREE, data);
+
+		ObjectId id = idFor(OBJ_TREE, data);
+		try {
+			checker.check(id, OBJ_TREE, data);
+			fail("Did not throw CorruptObjectException");
+		} catch (CorruptObjectException e) {
+			assertSame(TREE_NOT_SORTED, e.getErrorType());
+			assertEquals("treeNotSorted: object " + id.name()
+					+ ": incorrectly sorted", e.getMessage());
+		}
+
 		assertSkipListAccepts(OBJ_TREE, data);
+		checker.setIgnore(TREE_NOT_SORTED, true);
+		checker.checkTree(data);
 	}
 
