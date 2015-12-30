@@ -1,0 +1,23 @@
+	/**
+	 * @param message
+	 *            non null
+	 * @param clp
+	 *            parser used to print options
+	 * @throws IOException
+	 * @since 4.2
+	 */
+	protected void printUsage(final String message, final CmdLineParser clp)
+			throws IOException {
+		errw.println(message);
+		errw.print("jgit "); //$NON-NLS-1$
+		errw.print(commandName);
+		clp.printSingleLineUsage(errw, getResourceBundle());
+		errw.println();
+
+		errw.println();
+		clp.printUsage(errw, getResourceBundle());
+		errw.println();
+
+		errw.flush();
+	}
+

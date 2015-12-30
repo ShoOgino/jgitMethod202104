@@ -1,0 +1,9 @@
+	@Test
+	public void testHelpArgumentBeforeUnknown() throws Exception {
+		String[] output = execute("git describe -h -XYZ");
+		String all = Arrays.toString(output);
+		assertTrue("Unexpected help output: " + all,
+				all.contains("jgit describe"));
+		assertFalse("Unexpected help output: " + all, all.contains("fatal"));
+	}
+

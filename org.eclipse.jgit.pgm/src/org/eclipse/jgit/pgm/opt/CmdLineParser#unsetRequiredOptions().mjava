@@ -1,0 +1,14 @@
+	private List<OptionHandler> unsetRequiredOptions() {
+		List<OptionHandler> options = getOptions();
+		List<OptionHandler> backup = new ArrayList<>(options);
+		for (Iterator<OptionHandler> iterator = options.iterator(); iterator
+				.hasNext();) {
+			OptionHandler handler = iterator.next();
+			if (handler.option instanceof NamedOptionDef
+					&& handler.option.required()) {
+				iterator.remove();
+			}
+		}
+		return backup;
+	}
+

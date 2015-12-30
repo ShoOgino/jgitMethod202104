@@ -1,0 +1,22 @@
+	@Test
+	public void testCommitAll() throws Exception {
+		writeTrashFile("a", "a");
+		writeTrashFile("b", "a");
+		String result = toString(execute("git add a b"));
+		assertTrue("Unexpected output: " + result, result.isEmpty());
+
+		result = toString(execute("git status -- a b"));
+		assertTrue("Unexpected output: " + result,
+				result.contains("new file:   a"));
+		assertTrue("Unexpected output: " + result,
+				result.contains("new file:   b"));
+
+		result = toString(execute("git commit -m 'added a b'"));
+		assertTrue("Unexpected output: " + result,
+				result.contains("added a b"));
+
+		result = toString(execute("git status -- a b"));
+		assertTrue("Unexpected output: " + result,
+				result.trim().equals("On branch master"));
+	}
+
