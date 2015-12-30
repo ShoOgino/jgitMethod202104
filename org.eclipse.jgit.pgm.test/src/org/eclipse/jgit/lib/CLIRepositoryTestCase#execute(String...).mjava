@@ -1,5 +1,6 @@
 	/**
-	 * Executes specified git commands (with arguments)
+	 * Executes specified git commands (with arguments), throws exception and
+	 * stops execution on first command which output contains a 'fatal:' error
 	 *
 	 * @param cmds
 	 *            each string argument must be a valid git command line, e.g.
@@ -10,7 +11,11 @@
 	protected String[] execute(String... cmds) throws Exception {
 		List<String> result = new ArrayList<String>(cmds.length);
 		for (String cmd : cmds) {
-			result.addAll(CLIGitCommand.execute(cmd, db));
+			List<String> out = CLIGitCommand.execute(cmd, db);
+			if (contains(out, "fatal: ")) {
+				throw new Die(toString(out));
+			}
+			result.addAll(out);
 		}
 		return result.toArray(new String[0]);
 	}
