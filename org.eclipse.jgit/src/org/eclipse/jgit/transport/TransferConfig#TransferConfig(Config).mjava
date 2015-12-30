@@ -1,16 +1,12 @@
 	TransferConfig(final Config rc) {
-		checkReceivedObjects = rc.getBoolean(
-				"fetch", "fsckobjects", //$NON-NLS-1$ //$NON-NLS-2$
-				rc.getBoolean("transfer", "fsckobjects", false)); //$NON-NLS-1$ //$NON-NLS-2$
-		allowLeadingZeroFileMode = checkReceivedObjects
-				&& rc.getBoolean("fsck", "allowLeadingZeroFileMode", false); //$NON-NLS-1$ //$NON-NLS-2$
-		allowInvalidPersonIdent = checkReceivedObjects
-				&& rc.getBoolean("fsck", "allowInvalidPersonIdent", false); //$NON-NLS-1$ //$NON-NLS-2$
-		safeForWindows = checkReceivedObjects
-				&& rc.getBoolean("fsck", "safeForWindows", //$NON-NLS-1$ //$NON-NLS-2$
+		boolean fsck = rc.getBoolean("transfer", "fsckobjects", false); //$NON-NLS-1$ //$NON-NLS-2$
+		fetchFsck = rc.getBoolean("fetch", "fsckobjects", fsck); //$NON-NLS-1$ //$NON-NLS-2$
+		receiveFsck = rc.getBoolean("receive", "fsckobjects", fsck); //$NON-NLS-1$ //$NON-NLS-2$
+		allowLeadingZeroFileMode = rc.getBoolean("fsck", "allowLeadingZeroFileMode", false); //$NON-NLS-1$ //$NON-NLS-2$
+		allowInvalidPersonIdent = rc.getBoolean("fsck", "allowInvalidPersonIdent", false); //$NON-NLS-1$ //$NON-NLS-2$
+		safeForWindows = rc.getBoolean("fsck", "safeForWindows", //$NON-NLS-1$ //$NON-NLS-2$
 						SystemReader.getInstance().isWindows());
-		safeForMacOS = checkReceivedObjects
-				&& rc.getBoolean("fsck", "safeForMacOS", //$NON-NLS-1$ //$NON-NLS-2$
+		safeForMacOS = rc.getBoolean("fsck", "safeForMacOS", //$NON-NLS-1$ //$NON-NLS-2$
 						SystemReader.getInstance().isMacOS());
 
 		allowTipSha1InWant = rc.getBoolean(
