@@ -14,7 +14,7 @@
 		boolean addAll = filepatterns.contains("."); //$NON-NLS-1$
 
 		try (ObjectInserter inserter = repo.newObjectInserter();
-				final TreeWalk tw = new TreeWalk(repo)) {
+				NameConflictTreeWalk tw = new NameConflictTreeWalk(repo)) {
 			tw.setOperationType(OperationType.CHECKIN_OP);
 			dc = repo.lockDirCache();
 
@@ -24,7 +24,6 @@
 				workingTreeIterator = new FileTreeIterator(repo);
 			workingTreeIterator.setDirCacheIterator(tw, 0);
 			tw.addTree(workingTreeIterator);
-			tw.setRecursive(true);
 			if (!addAll)
 				tw.setFilter(PathFilterGroup.createFromStrings(filepatterns));
 
@@ -53,9 +52,14 @@
 					continue;
 				}
 
+				if (tw.isSubtree() && !tw.isDirectoryFileConflict()) {
+					tw.enterSubtree();
+					continue;
+				}
+
 				if (f == null) { // working tree file does not exist
-					if (c != null
-							&& (!update || GITLINK == c.getEntryFileMode())) {
+					if (entry != null
+							&& (!update || GITLINK == entry.getFileMode())) {
 						builder.add(entry);
 					}
 					continue;
@@ -66,6 +70,14 @@
 					// the user specified the file to be added JGit does
 					// not consider the file for addition.
 					builder.add(entry);
+					continue;
+				}
+
+				if (f.getEntryRawMode() == TYPE_TREE) {
+					// Index entry exists and is symlink, gitlink or file,
+					// otherwise the tree would have been entered above.
+					// Replace the index entry by diving into tree of files.
+					tw.enterSubtree();
 					continue;
 				}
 
