@@ -3,20 +3,18 @@
 		writeTrashFile("a", "a");
 		writeTrashFile("b", "a");
 		String result = toString(execute("git add a b"));
-		assertTrue("Unexpected output: " + result, result.isEmpty());
+		assertEquals("", result);
 
 		result = toString(execute("git status -- a b"));
-		assertTrue("Unexpected output: " + result,
-				result.contains("new file:   a"));
-		assertTrue("Unexpected output: " + result,
-				result.contains("new file:   b"));
+		assertEquals(toString("On branch master", "Changes to be committed:",
+				"new file:   a", "new file:   b"), result);
 
 		result = toString(execute("git commit -m 'added a b'"));
-		assertTrue("Unexpected output: " + result,
-				result.contains("added a b"));
+		assertEquals(
+				"[master 3c93fa8e3a28ee26690498be78016edcb3a38c73] added a b",
+				result);
 
 		result = toString(execute("git status -- a b"));
-		assertTrue("Unexpected output: " + result,
-				result.trim().equals("On branch master"));
+		assertEquals("On branch master", result);
 	}
 
