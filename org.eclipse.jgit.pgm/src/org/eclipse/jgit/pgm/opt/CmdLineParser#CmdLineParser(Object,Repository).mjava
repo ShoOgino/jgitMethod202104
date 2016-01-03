@@ -13,8 +13,12 @@
 	 */
 	public CmdLineParser(final Object bean, Repository repo) {
 		super(bean);
-		if (repo == null && bean instanceof TextBuiltin)
-			repo = ((TextBuiltin) bean).getRepository();
+		if (bean instanceof TextBuiltin) {
+			cmd = (TextBuiltin) bean;
+		}
+		if (repo == null && cmd != null) {
+			repo = cmd.getRepository();
+		}
 		this.db = repo;
 	}
 

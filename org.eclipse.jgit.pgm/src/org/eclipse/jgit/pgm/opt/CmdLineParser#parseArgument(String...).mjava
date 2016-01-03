@@ -34,6 +34,11 @@
 
 		try {
 			super.parseArgument(tmp.toArray(new String[tmp.size()]));
+		} catch (Die e) {
+			if (!seenHelp) {
+				throw e;
+			}
+			printToErrorWriter(CLIText.fatalError(e.getMessage()));
 		} finally {
 			// reset "required" options to defaults for correct command printout
 			if (backup != null && !backup.isEmpty()) {
