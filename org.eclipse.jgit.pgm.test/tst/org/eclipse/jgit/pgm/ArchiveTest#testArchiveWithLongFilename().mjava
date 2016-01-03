@@ -12,8 +12,8 @@
 		git.add().addFilepattern("1234567890").call();
 		git.commit().setMessage("file with long name").call();
 
-		byte[] result = CLIGitCommand.rawExecute(
-				"git archive --format=zip HEAD", db);
+		byte[] result = CLIGitCommand.executeRaw(
+				"git archive --format=zip HEAD", db).outBytes();
 		assertArrayEquals(l.toArray(new String[l.size()]),
 				listZipEntries(result));
 	}

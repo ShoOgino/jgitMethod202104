@@ -5,8 +5,8 @@
 		git.add().addFilepattern("xyzzy").call();
 		git.commit().setMessage("add file with content").call();
 
-		byte[] result = CLIGitCommand.rawExecute(
-				"git archive --format=tar HEAD", db);
+		byte[] result = CLIGitCommand.executeRaw(
+				"git archive --format=tar HEAD", db).outBytes();
 		assertArrayEquals(new String[] { payload },
 				tarEntryContent(result, "xyzzy"));
 	}

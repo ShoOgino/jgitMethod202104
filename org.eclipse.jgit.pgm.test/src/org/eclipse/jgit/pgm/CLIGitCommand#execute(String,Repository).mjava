@@ -1,9 +1,6 @@
 	public static List<String> execute(String str, Repository db)
 			throws Exception {
-		try {
-			return IO.readLines(new String(rawExecute(str, db)));
-		} catch (Die e) {
-			return IO.readLines(CLIText.fatalError(e.getMessage()));
-		}
+		Result result = executeRaw(str, db);
+		return getOutput(result);
 	}
 

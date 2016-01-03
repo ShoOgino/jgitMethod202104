@@ -1,8 +1,8 @@
 	@Test
 	public void testTarPrefixOption() throws Exception {
 		commitBazAndFooSlashBar();
-		byte[] result = CLIGitCommand.rawExecute(
-				"git archive --prefix=x/ --format=tar master", db);
+		byte[] result = CLIGitCommand.executeRaw(
+				"git archive --prefix=x/ --format=tar master", db).outBytes();
 		String[] expect = { "x/baz", "x/foo/", "x/foo/bar" };
 		String[] actual = listTarEntries(result);
 

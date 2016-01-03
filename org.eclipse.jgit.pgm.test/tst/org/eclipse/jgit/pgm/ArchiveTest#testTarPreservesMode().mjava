@@ -18,8 +18,8 @@
 
 		git.commit().setMessage("three files with different modes").call();
 
-		byte[] archive = CLIGitCommand.rawExecute(
-				"git archive --format=tar master", db);
+		byte[] archive = CLIGitCommand.executeRaw(
+				"git archive --format=tar master", db).outBytes();
 		writeRaw("with-modes.tar", archive);
 		assertTarContainsEntry("with-modes.tar", "-rw-r--r--", "plain");
 		assertTarContainsEntry("with-modes.tar", "-rwxr-xr-x", "executable");

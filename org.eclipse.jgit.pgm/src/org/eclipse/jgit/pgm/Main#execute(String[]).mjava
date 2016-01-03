@@ -1,13 +1,13 @@
 	private void execute(final String[] argv) throws Exception {
 		final CmdLineParser clp = new SubcommandLineParser(this);
-		PrintWriter writer = new PrintWriter(System.err);
+
 		try {
 			clp.parseArgument(argv);
 		} catch (CmdLineException err) {
 			if (argv.length > 0 && !help && !version) {
 				writer.println(CLIText.fatalError(err.getMessage()));
 				writer.flush();
-				System.exit(1);
+				exit(1, err);
 			}
 		}
 
@@ -23,22 +23,24 @@
 				writer.println(CLIText.get().mostCommonlyUsedCommandsAre);
 				final CommandRef[] common = CommandCatalog.common();
 				int width = 0;
-				for (final CommandRef c : common)
+				for (final CommandRef c : common) {
 					width = Math.max(width, c.getName().length());
+				}
 				width += 2;
 
 				for (final CommandRef c : common) {
 					writer.print(' ');
 					writer.print(c.getName());
-					for (int i = c.getName().length(); i < width; i++)
+					for (int i = c.getName().length(); i < width; i++) {
 						writer.print(' ');
+					}
 					writer.print(CLIText.get().resourceBundle().getString(c.getUsage()));
 					writer.println();
 				}
 				writer.println();
 			}
 			writer.flush();
-			System.exit(1);
+			exit(1, null);
 		}
 
 		if (version) {
@@ -47,17 +49,16 @@
 		}
 
 		final TextBuiltin cmd = subcommand;
-		if (cmd.requiresRepository())
-			cmd.init(openGitDir(gitdir), null);
-		else
-			cmd.init(null, gitdir);
+		init(cmd);
 		try {
 			cmd.execute(arguments.toArray(new String[arguments.size()]));
 		} finally {
-			if (cmd.outw != null)
+			if (cmd.outw != null) {
 				cmd.outw.flush();
-			if (cmd.errw != null)
+			}
+			if (cmd.errw != null) {
 				cmd.errw.flush();
+			}
 		}
 	}
 

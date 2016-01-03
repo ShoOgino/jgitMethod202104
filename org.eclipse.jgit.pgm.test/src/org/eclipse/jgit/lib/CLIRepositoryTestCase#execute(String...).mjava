@@ -11,11 +11,13 @@
 	protected String[] execute(String... cmds) throws Exception {
 		List<String> result = new ArrayList<String>(cmds.length);
 		for (String cmd : cmds) {
-			List<String> out = CLIGitCommand.execute(cmd, db);
-			if (contains(out, "fatal: ")) {
-				throw new Die(toString(out));
+			Result r = CLIGitCommand.executeRaw(cmd, db);
+			if (r.ex instanceof TerminatedByHelpException) {
+				result.addAll(r.errLines());
+			} else if (r.ex != null) {
+				throw r.ex;
 			}
-			result.addAll(out);
+			result.addAll(r.outLines());
 		}
 		return result.toArray(new String[0]);
 	}

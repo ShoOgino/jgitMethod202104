@@ -14,8 +14,8 @@
 		git.add().addFilepattern("b").call();
 		git.commit().setMessage("add subdir").call();
 
-		byte[] result = CLIGitCommand.rawExecute(
-				"git archive --format=zip master", db);
+		byte[] result = CLIGitCommand.executeRaw(
+				"git archive --format=zip master", db).outBytes();
 		String[] expect = { "a", "b.c", "b0c", "b/", "b/a", "b/b", "c" };
 		String[] actual = listZipEntries(result);
 

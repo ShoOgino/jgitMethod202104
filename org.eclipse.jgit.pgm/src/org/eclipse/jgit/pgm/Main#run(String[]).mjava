@@ -13,8 +13,10 @@
 	 *
 	 * @param argv
 	 *            arguments.
+	 * @throws Exception
 	 */
-	protected void run(final String[] argv) {
+	protected void run(final String[] argv) throws Exception {
+		writer = createErrorWriter();
 		try {
 			if (!installConsole()) {
 				AwtAuthenticator.install();
@@ -23,12 +25,14 @@
 			configureHttpProxy();
 			execute(argv);
 		} catch (Die err) {
-			if (err.isAborted())
-				System.exit(1);
-			System.err.println(CLIText.fatalError(err.getMessage()));
-			if (showStackTrace)
-				err.printStackTrace();
-			System.exit(128);
+			if (err.isAborted()) {
+				exit(1, err);
+			}
+			writer.println(CLIText.fatalError(err.getMessage()));
+			if (showStackTrace) {
+				err.printStackTrace(writer);
+			}
+			exit(128, err);
 		} catch (Exception err) {
 			// Try to detect errno == EPIPE and exit normally if that happens
 			// There may be issues with operating system versions and locale,
@@ -36,33 +40,37 @@
 			// under other circumstances.
 			if (err.getClass() == IOException.class) {
 				// Linux, OS X
-				if (err.getMessage().equals("Broken pipe")) //$NON-NLS-1$
-					System.exit(0);
+				if (err.getMessage().equals("Broken pipe")) { //$NON-NLS-1$
+					exit(0, err);
+				}
 				// Windows
-				if (err.getMessage().equals("The pipe is being closed")) //$NON-NLS-1$
-					System.exit(0);
+				if (err.getMessage().equals("The pipe is being closed")) { //$NON-NLS-1$
+					exit(0, err);
+				}
 			}
 			if (!showStackTrace && err.getCause() != null
-					&& err instanceof TransportException)
-				System.err.println(CLIText.fatalError(err.getCause().getMessage()));
+					&& err instanceof TransportException) {
+				writer.println(CLIText.fatalError(err.getCause().getMessage()));
+			}
 
 			if (err.getClass().getName().startsWith("org.eclipse.jgit.errors.")) { //$NON-NLS-1$
-				System.err.println(CLIText.fatalError(err.getMessage()));
-				if (showStackTrace)
+				writer.println(CLIText.fatalError(err.getMessage()));
+				if (showStackTrace) {
 					err.printStackTrace();
-				System.exit(128);
+				}
+				exit(128, err);
 			}
 			err.printStackTrace();
-			System.exit(1);
+			exit(1, err);
 		}
 		if (System.out.checkError()) {
-			System.err.println(CLIText.get().unknownIoErrorStdout);
-			System.exit(1);
+			writer.println(CLIText.get().unknownIoErrorStdout);
+			exit(1, null);
 		}
-		if (System.err.checkError()) {
+		if (writer.checkError()) {
 			// No idea how to present an error here, most likely disk full or
 			// broken pipe
-			System.exit(1);
+			exit(1, null);
 		}
 	}
 

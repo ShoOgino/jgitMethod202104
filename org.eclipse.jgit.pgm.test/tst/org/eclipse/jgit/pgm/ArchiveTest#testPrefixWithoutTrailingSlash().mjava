@@ -10,8 +10,8 @@
 	@Test
 	public void testPrefixWithoutTrailingSlash() throws Exception {
 		commitBazAndFooSlashBar();
-		byte[] result = CLIGitCommand.rawExecute(
-				"git archive --prefix=my- --format=zip master", db);
+		byte[] result = CLIGitCommand.executeRaw(
+				"git archive --prefix=my- --format=zip master", db).outBytes();
 		String[] expect = { "my-baz", "my-foo/", "my-foo/bar" };
 		String[] actual = listZipEntries(result);
 
