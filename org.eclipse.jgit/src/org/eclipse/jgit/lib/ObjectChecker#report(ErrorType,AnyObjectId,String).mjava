@@ -1,0 +1,11 @@
+	private void report(@NonNull ErrorType err, @Nullable AnyObjectId id,
+			String why) throws CorruptObjectException {
+		if (errors.contains(err)
+				&& (id == null || skipList == null || !skipList.contains(id))) {
+			if (id != null) {
+				throw new CorruptObjectException(err, id, why);
+			}
+			throw new CorruptObjectException(why);
+		}
+	}
+

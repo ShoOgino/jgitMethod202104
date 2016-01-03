@@ -2,12 +2,43 @@
 		boolean fsck = rc.getBoolean("transfer", "fsckobjects", false); //$NON-NLS-1$ //$NON-NLS-2$
 		fetchFsck = rc.getBoolean("fetch", "fsckobjects", fsck); //$NON-NLS-1$ //$NON-NLS-2$
 		receiveFsck = rc.getBoolean("receive", "fsckobjects", fsck); //$NON-NLS-1$ //$NON-NLS-2$
-		allowLeadingZeroFileMode = rc.getBoolean("fsck", "allowLeadingZeroFileMode", false); //$NON-NLS-1$ //$NON-NLS-2$
-		allowInvalidPersonIdent = rc.getBoolean("fsck", "allowInvalidPersonIdent", false); //$NON-NLS-1$ //$NON-NLS-2$
-		safeForWindows = rc.getBoolean("fsck", "safeForWindows", //$NON-NLS-1$ //$NON-NLS-2$
+		fsckSkipList = rc.getString(FSCK, null, "skipList"); //$NON-NLS-1$
+		allowInvalidPersonIdent = rc.getBoolean(FSCK, "allowInvalidPersonIdent", false); //$NON-NLS-1$
+		safeForWindows = rc.getBoolean(FSCK, "safeForWindows", //$NON-NLS-1$
 						SystemReader.getInstance().isWindows());
-		safeForMacOS = rc.getBoolean("fsck", "safeForMacOS", //$NON-NLS-1$ //$NON-NLS-2$
+		safeForMacOS = rc.getBoolean(FSCK, "safeForMacOS", //$NON-NLS-1$
 						SystemReader.getInstance().isMacOS());
+
+		ignore = EnumSet.noneOf(ObjectChecker.ErrorType.class);
+		EnumSet<ObjectChecker.ErrorType> set = EnumSet
+				.noneOf(ObjectChecker.ErrorType.class);
+		for (String key : rc.getNames(FSCK)) {
+			if (equalsIgnoreCase(key, "skipList") //$NON-NLS-1$
+					|| equalsIgnoreCase(key, "allowLeadingZeroFileMode") //$NON-NLS-1$
+					|| equalsIgnoreCase(key, "allowInvalidPersonIdent") //$NON-NLS-1$
+					|| equalsIgnoreCase(key, "safeForWindows") //$NON-NLS-1$
+					|| equalsIgnoreCase(key, "safeForMacOS")) { //$NON-NLS-1$
+				continue;
+			}
+
+			ObjectChecker.ErrorType id = FsckKeyNameHolder.parse(key);
+			if (id != null) {
+				switch (rc.getEnum(FSCK, null, key, FsckMode.ERROR)) {
+				case ERROR:
+					ignore.remove(id);
+					break;
+				case WARN:
+				case IGNORE:
+					ignore.add(id);
+					break;
+				}
+				set.add(id);
+			}
+		}
+		if (!set.contains(ObjectChecker.ErrorType.ZERO_PADDED_FILEMODE)
+				&& rc.getBoolean(FSCK, "allowLeadingZeroFileMode", false)) { //$NON-NLS-1$
+			ignore.add(ObjectChecker.ErrorType.ZERO_PADDED_FILEMODE);
+		}
 
 		allowTipSha1InWant = rc.getBoolean(
 				"uploadpack", "allowtipsha1inwant", false); //$NON-NLS-1$ //$NON-NLS-2$

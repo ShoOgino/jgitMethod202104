@@ -5,13 +5,14 @@
 	 * tree entries. This is technically incorrect but gracefully allowed by
 	 * git-core. JGit rejects such trees by default, but may need to accept
 	 * them on broken histories.
+	 * <p>
+	 * Same as {@code setIgnore(ZERO_PADDED_FILEMODE, allow)}.
 	 *
 	 * @param allow allow leading zero mode.
 	 * @return {@code this}.
 	 * @since 3.4
 	 */
 	public ObjectChecker setAllowLeadingZeroFileMode(boolean allow) {
-		allowZeroMode = allow;
-		return this;
+		return setIgnore(ZERO_PADDED_FILEMODE, allow);
 	}
 

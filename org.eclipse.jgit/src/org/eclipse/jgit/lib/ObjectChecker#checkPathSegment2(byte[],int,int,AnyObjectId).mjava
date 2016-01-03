@@ -1,0 +1,56 @@
+	private void checkPathSegment2(byte[] raw, int ptr, int end,
+			@Nullable AnyObjectId id) throws CorruptObjectException {
+		if (ptr == end) {
+			report(EMPTY_NAME, id, JGitText.get().corruptObjectNameZeroLength);
+			return;
+		}
+
+		if (raw[ptr] == '.') {
+			switch (end - ptr) {
+			case 1:
+				report(HAS_DOT, id, JGitText.get().corruptObjectNameDot);
+				break;
+			case 2:
+				if (raw[ptr + 1] == '.') {
+					report(HAS_DOTDOT, id,
+							JGitText.get().corruptObjectNameDotDot);
+				}
+				break;
+			case 4:
+				if (isGit(raw, ptr + 1)) {
+					report(HAS_DOTGIT, id, String.format(
+							JGitText.get().corruptObjectInvalidName,
+							RawParseUtils.decode(raw, ptr, end)));
+				}
+				break;
+			default:
+				if (end - ptr > 4 && isNormalizedGit(raw, ptr + 1, end)) {
+					report(HAS_DOTGIT, id, String.format(
+							JGitText.get().corruptObjectInvalidName,
+							RawParseUtils.decode(raw, ptr, end)));
+				}
+			}
+		} else if (isGitTilde1(raw, ptr, end)) {
+			report(HAS_DOTGIT, id, String.format(
+					JGitText.get().corruptObjectInvalidName,
+					RawParseUtils.decode(raw, ptr, end)));
+		}
+		if (macosx && isMacHFSGit(raw, ptr, end, id)) {
+			report(HAS_DOTGIT, id, String.format(
+					JGitText.get().corruptObjectInvalidNameIgnorableUnicode,
+					RawParseUtils.decode(raw, ptr, end)));
+		}
+
+		if (windows) {
+			// Windows ignores space and dot at end of file name.
+			if (raw[end - 1] == ' ' || raw[end - 1] == '.') {
+				report(WIN32_BAD_NAME, id, String.format(
+						JGitText.get().corruptObjectInvalidNameEnd,
+						Character.valueOf(((char) raw[end - 1]))));
+			}
+			if (end - ptr >= 3) {
+				checkNotWindowsDevice(raw, ptr, end, id);
+			}
+		}
+	}
+

@@ -1,0 +1,38 @@
+	/**
+	 * Check an object for parsing errors.
+	 *
+	 * @param id
+	 *            identify of the object being checked.
+	 * @param objType
+	 *            type of the object. Must be a valid object type code in
+	 *            {@link Constants}.
+	 * @param raw
+	 *            the raw data which comprises the object. This should be in the
+	 *            canonical format (that is the format used to generate the
+	 *            ObjectId of the object). The array is never modified.
+	 * @throws CorruptObjectException
+	 *             if an error is identified.
+	 * @since 4.2
+	 */
+	public void check(@Nullable AnyObjectId id, int objType, byte[] raw)
+			throws CorruptObjectException {
+		switch (objType) {
+		case OBJ_COMMIT:
+			checkCommit(id, raw);
+			break;
+		case OBJ_TAG:
+			checkTag(id, raw);
+			break;
+		case OBJ_TREE:
+			checkTree(id, raw);
+			break;
+		case OBJ_BLOB:
+			checkBlob(raw);
+			break;
+		default:
+			report(UNKNOWN_TYPE, id, MessageFormat.format(
+					JGitText.get().corruptObjectInvalidType2,
+					Integer.valueOf(objType)));
+		}
+	}
+

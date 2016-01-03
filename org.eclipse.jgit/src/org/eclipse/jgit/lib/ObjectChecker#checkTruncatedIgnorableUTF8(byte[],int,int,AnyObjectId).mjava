@@ -1,0 +1,11 @@
+	private boolean checkTruncatedIgnorableUTF8(byte[] raw, int ptr, int end,
+			@Nullable AnyObjectId id) throws CorruptObjectException {
+		if ((ptr + 2) >= end) {
+			report(BAD_UTF8, id, MessageFormat.format(
+					JGitText.get().corruptObjectInvalidNameInvalidUtf8,
+					toHexString(raw, ptr, end)));
+			return false;
+		}
+		return true;
+	}
+
