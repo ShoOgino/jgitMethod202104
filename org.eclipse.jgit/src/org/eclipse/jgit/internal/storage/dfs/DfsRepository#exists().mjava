@@ -6,6 +6,9 @@
 	 *             the repository cannot be checked.
 	 */
 	public boolean exists() throws IOException {
-		return getRefDatabase().exists();
+		if (getRefDatabase() instanceof DfsRefDatabase) {
+			return ((DfsRefDatabase) getRefDatabase()).exists();
+		}
+		return true;
 	}
 
