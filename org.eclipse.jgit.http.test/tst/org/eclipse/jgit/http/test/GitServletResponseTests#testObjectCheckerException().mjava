@@ -19,8 +19,9 @@
 		preHook = null;
 		oc = new ObjectChecker() {
 			@Override
-			public void checkCommit(byte[] raw) throws CorruptObjectException {
-				throw new IllegalStateException();
+			public void checkCommit(AnyObjectId id, byte[] raw)
+					throws CorruptObjectException {
+				throw new CorruptObjectException("refusing all commits");
 			}
 		};
 
