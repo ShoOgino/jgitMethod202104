@@ -1,0 +1,44 @@
+	@Override
+	protected void run() throws Exception {
+		try (ObjectReader reader = db.newObjectReader();
+				RevWalk rw = new RevWalk(reader);
+				ObjectInserter inserter = db.newObjectInserter()) {
+			RefDatabase refDb = db.getRefDatabase();
+
+			CommitBuilder b = new CommitBuilder();
+			Ref ref = db.getRefDatabase().exactRef(refName);
+			RefUpdate update = db.updateRef(refName);
+			ObjectId oldTreeId;
+
+			if (ref != null && ref.getObjectId() != null) {
+				ObjectId oldId = ref.getObjectId();
+				update.setExpectedOldObjectId(oldId);
+				b.setParentId(oldId);
+				oldTreeId = rw.parseCommit(oldId).getTree();
+			} else {
+				update.setExpectedOldObjectId(ObjectId.zeroId());
+				oldTreeId = ObjectId.zeroId();
+			}
+
+			RefTree tree = rebuild(refDb.getRefs(RefDatabase.ALL));
+			b.setTreeId(tree.writeTree(inserter));
+			b.setAuthor(new PersonIdent(db));
+			b.setCommitter(b.getAuthor());
+			if (b.getTreeId().equals(oldTreeId)) {
+				return;
+			}
+
+			update.setNewObjectId(inserter.insert(b));
+			inserter.flush();
+
+			RefUpdate.Result result = update.update(rw);
+			switch (result) {
+			case NEW:
+			case FAST_FORWARD:
+				break;
+			default:
+				throw die(String.format("%s: %s", update.getName(), result)); //$NON-NLS-1$
+			}
+		}
+	}
+

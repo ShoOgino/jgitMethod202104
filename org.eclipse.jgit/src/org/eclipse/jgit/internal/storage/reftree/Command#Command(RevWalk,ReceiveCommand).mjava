@@ -1,0 +1,19 @@
+	/**
+	 * Construct a RefTree command wrapped around a ReceiveCommand.
+	 *
+	 * @param rw
+	 *            walk instance to peel the {@code newId}.
+	 * @param cmd
+	 *            command received from a push client.
+	 * @throws MissingObjectException
+	 *             {@code oldId} or {@code newId} is missing.
+	 * @throws IOException
+	 *             {@code oldId} or {@code newId} cannot be peeled.
+	 */
+	public Command(RevWalk rw, ReceiveCommand cmd)
+			throws MissingObjectException, IOException {
+		this.oldRef = toRef(rw, cmd.getOldId(), cmd.getRefName(), false);
+		this.newRef = toRef(rw, cmd.getNewId(), cmd.getRefName(), true);
+		this.cmd = cmd;
+	}
+
