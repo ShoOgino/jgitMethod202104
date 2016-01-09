@@ -25,8 +25,9 @@
 			if (nextNamePos + 1 == nextPtr)
 				return false;
 
-			final int cmp = pathCompare(raw, thisNamePos, thisNameEnd,
-					FileMode.TREE.getBits(), nextNamePos, nextPtr - 1, nextMode);
+			int cmp = compareSameName(
+					raw, thisNamePos, thisNameEnd,
+					raw, nextNamePos, nextPtr - 1, nextMode);
 			if (cmp < 0)
 				return false;
 			else if (cmp == 0)
