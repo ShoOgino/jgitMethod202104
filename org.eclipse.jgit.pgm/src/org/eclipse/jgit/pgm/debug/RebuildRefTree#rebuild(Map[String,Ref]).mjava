@@ -4,10 +4,10 @@
 			= new ArrayList<>();
 
 		for (Ref r : refMap.values()) {
-			if (refName.equals(r.getName())) {
+			if (r.getName().equals(txnCommitted)
+					|| r.getName().startsWith(txnNamespace)) {
 				continue;
 			}
-
 			cmds.add(new org.eclipse.jgit.internal.storage.reftree.Command(
 					null,
 					db.peel(r)));
