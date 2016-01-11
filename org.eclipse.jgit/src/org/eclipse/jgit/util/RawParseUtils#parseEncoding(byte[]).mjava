@@ -5,29 +5,33 @@
 	 * {@link #encoding(byte[], int)} and then returns the proper character set
 	 * to apply to this buffer to evaluate its contents as character data.
 	 * <p>
-	 * If no encoding header is present, {@link Constants#CHARSET} is assumed.
+	 * If no encoding header is present {@code UTF-8} is assumed.
 	 *
 	 * @param b
 	 *            buffer to scan.
 	 * @return the Java character set representation. Never null.
+	 * @throws IllegalCharsetNameException
+	 *             if the character set requested by the encoding header is
+	 *             malformed and unsupportable.
+	 * @throws UnsupportedCharsetException
+	 *             if the JRE does not support the character set requested by
+	 *             the encoding header.
 	 */
 	public static Charset parseEncoding(final byte[] b) {
-		final int enc = encoding(b, 0);
-		if (enc < 0)
-			return Constants.CHARSET;
-		final int lf = nextLF(b, enc);
-		String decoded = decode(Constants.CHARSET, b, enc, lf - 1);
+		String enc = parseEncodingName(b);
+		if (enc == null) {
+			return UTF_8;
+		}
+
+		String name = enc.trim();
 		try {
-			return Charset.forName(decoded);
-		} catch (IllegalCharsetNameException badName) {
-			Charset aliased = charsetForAlias(decoded);
-			if (aliased != null)
+			return Charset.forName(name);
+		} catch (IllegalCharsetNameException
+				| UnsupportedCharsetException badName) {
+			Charset aliased = charsetForAlias(name);
+			if (aliased != null) {
 				return aliased;
-			throw badName;
-		} catch (UnsupportedCharsetException badName) {
-			Charset aliased = charsetForAlias(decoded);
-			if (aliased != null)
-				return aliased;
+			}
 			throw badName;
 		}
 	}
