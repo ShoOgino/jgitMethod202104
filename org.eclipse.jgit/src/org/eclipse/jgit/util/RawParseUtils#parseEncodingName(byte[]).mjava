@@ -1,0 +1,21 @@
+	/**
+	 * Parse the "encoding " header as a string.
+	 * <p>
+	 * Locates the "encoding " header (if present) and returns its value.
+	 *
+	 * @param b
+	 *            buffer to scan.
+	 * @return the encoding header as specified in the commit; null if the
+	 *         header was not present and should be assumed.
+	 * @since 4.2
+	 */
+	@Nullable
+	public static String parseEncodingName(final byte[] b) {
+		int enc = encoding(b, 0);
+		if (enc < 0) {
+			return null;
+		}
+		int lf = nextLF(b, enc);
+		return decode(UTF_8, b, enc, lf - 1);
+	}
+

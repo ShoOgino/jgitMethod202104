@@ -1,0 +1,17 @@
+	/**
+	 * Determine the encoding of the commit message buffer.
+	 * <p>
+	 * Locates the "encoding" header (if present) and returns its value. Due to
+	 * corruption in the wild this may be an invalid encoding name that is not
+	 * recognized by any character encoding library.
+	 * <p>
+	 * If no encoding header is present, null.
+	 *
+	 * @return the preferred encoding of {@link #getRawBuffer()}; or null.
+	 * @since 4.2
+	 */
+	@Nullable
+	public final String getEncodingName() {
+		return RawParseUtils.parseEncodingName(buffer);
+	}
+

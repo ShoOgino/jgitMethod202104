@@ -17,7 +17,15 @@
 	 *         parsed.
 	 */
 	public static PersonIdent parsePersonIdent(final byte[] raw, final int nameB) {
-		final Charset cs = parseEncoding(raw);
+		Charset cs;
+		try {
+			cs = parseEncoding(raw);
+		} catch (IllegalCharsetNameException | UnsupportedCharsetException e) {
+			// Assume UTF-8 for person identities, usually this is correct.
+			// If not decode() will fall back to the ISO-8859-1 encoding.
+			cs = UTF_8;
+		}
+
 		final int emailB = nextLF(raw, nameB, '<');
 		final int emailE = nextLF(raw, emailB, '>');
 		if (emailB >= raw.length || raw[emailB] == '\n' ||
