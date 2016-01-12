@@ -16,19 +16,23 @@
 		Collection<PackFile> toBeDeleted = repo.getObjectDatabase().getPacks();
 
 		long time = System.currentTimeMillis();
-		Map<String, Ref> refsBefore = getAllRefs();
+		Collection<Ref> refsBefore = getAllRefs();
 
 		Set<ObjectId> allHeads = new HashSet<ObjectId>();
 		Set<ObjectId> nonHeads = new HashSet<ObjectId>();
+		Set<ObjectId> txnHeads = new HashSet<ObjectId>();
 		Set<ObjectId> tagTargets = new HashSet<ObjectId>();
 		Set<ObjectId> indexObjects = listNonHEADIndexObjects();
+		RefDatabase refdb = repo.getRefDatabase();
 
-		for (Ref ref : refsBefore.values()) {
+		for (Ref ref : refsBefore) {
 			nonHeads.addAll(listRefLogObjects(ref, 0));
 			if (ref.isSymbolic() || ref.getObjectId() == null)
 				continue;
 			if (ref.getName().startsWith(Constants.R_HEADS))
 				allHeads.add(ref.getObjectId());
+			else if (RefTreeNames.isRefTree(refdb, ref.getName()))
+				txnHeads.add(ref.getObjectId());
 			else
 				nonHeads.add(ref.getObjectId());
 			if (ref.getPeeledObjectId() != null)
@@ -57,6 +61,11 @@
 			PackFile rest = writePack(nonHeads, allHeads, tagTargets, excluded);
 			if (rest != null)
 				ret.add(rest);
+		}
+		if (!txnHeads.isEmpty()) {
+			PackFile txn = writePack(txnHeads, null, null, excluded);
+			if (txn != null)
+				ret.add(txn);
 		}
 		try {
 			deleteOldPacks(toBeDeleted, ret);
