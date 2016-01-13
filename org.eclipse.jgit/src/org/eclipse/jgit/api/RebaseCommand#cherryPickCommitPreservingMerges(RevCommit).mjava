@@ -68,6 +68,7 @@
 					// their non-first parents rewritten
 					MergeCommand merge = git.merge()
 							.setFastForward(MergeCommand.FastForwardMode.NO_FF)
+							.setProgressMonitor(monitor)
 							.setCommit(false);
 					for (int i = 1; i < commitToPick.getParentCount(); i++)
 						merge.include(newParents.get(i));
