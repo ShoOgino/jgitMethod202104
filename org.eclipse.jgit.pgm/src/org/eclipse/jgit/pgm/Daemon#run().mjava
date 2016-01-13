@@ -46,7 +46,9 @@
 			service(d, n).setOverridable(true);
 		for (final String n : forbidOverride)
 			service(d, n).setOverridable(false);
-
+		if (ketchServerType == KetchServerType.LEADER) {
+			startKetchLeader(d);
+		}
 		d.start();
 		outw.println(MessageFormat.format(CLIText.get().listeningOn, d.getAddress()));
 	}
