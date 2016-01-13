@@ -14,16 +14,18 @@
 	 *            progress during object enumeration.
 	 * @param want
 	 *            collection of objects to be marked as interesting (start
-	 *            points of graph traversal).
+	 *            points of graph traversal). Must not be {@code null}.
 	 * @param have
 	 *            collection of objects to be marked as uninteresting (end
-	 *            points of graph traversal).
+	 *            points of graph traversal). Pass {@link #NONE} if all objects
+	 *            reachable from {@code want} are desired, such as when serving
+	 *            a clone.
 	 * @throws IOException
 	 *             when some I/O problem occur during reading objects.
 	 */
 	public void preparePack(ProgressMonitor countingMonitor,
-			Set<? extends ObjectId> want,
-			Set<? extends ObjectId> have) throws IOException {
+			@NonNull Set<? extends ObjectId> want,
+			@NonNull Set<? extends ObjectId> have) throws IOException {
 		ObjectWalk ow;
 		if (shallowPack)
 			ow = new DepthWalk.ObjectWalk(reader, depth);

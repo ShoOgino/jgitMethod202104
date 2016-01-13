@@ -1,13 +1,8 @@
-	private void findObjectsToPack(final ProgressMonitor countingMonitor,
-			final ObjectWalk walker, final Set<? extends ObjectId> want,
-			Set<? extends ObjectId> have)
-			throws MissingObjectException, IOException,
-			IncorrectObjectTypeException {
+	private void findObjectsToPack(@NonNull ProgressMonitor countingMonitor,
+			@NonNull ObjectWalk walker, @NonNull Set<? extends ObjectId> want,
+			@NonNull Set<? extends ObjectId> have) throws IOException {
 		final long countingStart = System.currentTimeMillis();
 		beginPhase(PackingPhase.COUNTING, countingMonitor, ProgressMonitor.UNKNOWN);
-
-		if (have == null)
-			have = Collections.emptySet();
 
 		stats.interestingObjects = Collections.unmodifiableSet(new HashSet<ObjectId>(want));
 		stats.uninterestingObjects = Collections.unmodifiableSet(new HashSet<ObjectId>(have));
