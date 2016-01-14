@@ -1,8 +1,10 @@
 	@Test
 	public void testCheckoutNewBranch() throws Exception {
-		new Git(db).commit().setMessage("initial commit").call();
+		try (Git git = new Git(db)) {
+			git.commit().setMessage("initial commit").call();
 
-		assertStringArrayEquals("Switched to a new branch 'side'",
-				execute("git checkout -b side"));
+			assertStringArrayEquals("Switched to a new branch 'side'",
+					execute("git checkout -b side"));
+		}
 	}
 
