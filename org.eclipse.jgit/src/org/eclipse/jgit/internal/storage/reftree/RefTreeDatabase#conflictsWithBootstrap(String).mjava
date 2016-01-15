@@ -3,7 +3,13 @@
 			return true;
 		} else if (txnCommitted.equals(name)) {
 			return true;
-		} else if (name.length() > txnCommitted.length()
+		}
+
+		if (name.indexOf('/') < 0 && !HEAD.equals(name)) {
+			return true;
+		}
+
+		if (name.length() > txnCommitted.length()
 				&& name.charAt(txnCommitted.length()) == '/'
 				&& name.startsWith(txnCommitted)) {
 			return true;

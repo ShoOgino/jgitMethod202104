@@ -1,0 +1,23 @@
+	@Before
+	public void setUp() throws Exception {
+		FileRepository init = createWorkRepository();
+		FileBasedConfig cfg = init.getConfig();
+		cfg.setInt("core", null, "repositoryformatversion", 1);
+		cfg.setString("extensions", null, "refsStorage", "reftree");
+		cfg.save();
+
+		repo = (FileRepository) new FileRepositoryBuilder()
+				.setGitDir(init.getDirectory())
+				.build();
+		refdb = (RefTreeDatabase) repo.getRefDatabase();
+		bootstrap = refdb.getBootstrap();
+		addRepoToClose(repo);
+
+		RefUpdate head = refdb.newUpdate(HEAD, true);
+		head.link(R_HEADS + MASTER);
+
+		testRepo = new TestRepository<>(init);
+		A = testRepo.commit().create();
+		B = testRepo.commit(testRepo.getRevWalk().parseCommit(A));
+	}
+
