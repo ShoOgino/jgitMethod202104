@@ -1,0 +1,50 @@
+	@Test
+	public void test006_addDeepTree() throws IOException {
+		final Tree t = new Tree(db);
+
+		final Tree e = t.addTree("e");
+		assertNotNull("have e", e);
+		assertTrue("e.parent == t", e.getParent() == t);
+		final Tree f = t.addTree("f");
+		assertNotNull("have f", f);
+		assertTrue("f.parent == t", f.getParent() == t);
+		final Tree g = f.addTree("g");
+		assertNotNull("have g", g);
+		assertTrue("g.parent == f", g.getParent() == f);
+		final Tree h = g.addTree("h");
+		assertNotNull("have h", h);
+		assertTrue("h.parent = g", h.getParent() == g);
+
+		h.setId(SOME_FAKE_ID);
+		assertTrue("h not modified", !h.isModified());
+		g.setId(SOME_FAKE_ID);
+		assertTrue("g not modified", !g.isModified());
+		f.setId(SOME_FAKE_ID);
+		assertTrue("f not modified", !f.isModified());
+		e.setId(SOME_FAKE_ID);
+		assertTrue("e not modified", !e.isModified());
+		t.setId(SOME_FAKE_ID);
+		assertTrue("t not modified.", !t.isModified());
+
+		assertEquals("full path of h ok", "f/g/h", h.getFullName());
+		assertTrue("Can find h", t.findTreeMember(h.getFullName()) == h);
+		assertTrue("Can't find f/z", t.findBlobMember("f/z") == null);
+		assertTrue("Can't find y/z", t.findBlobMember("y/z") == null);
+
+		final FileTreeEntry i = h.addFile("i");
+		assertNotNull(i);
+		assertEquals("full path of i ok", "f/g/h/i", i.getFullName());
+		assertTrue("Can find i", t.findBlobMember(i.getFullName()) == i);
+		assertTrue("h modified", h.isModified());
+		assertTrue("g modified", g.isModified());
+		assertTrue("f modified", f.isModified());
+		assertTrue("e not modified", !e.isModified());
+		assertTrue("t modified", t.isModified());
+
+		assertTrue("h no id", h.getId() == null);
+		assertTrue("g no id", g.getId() == null);
+		assertTrue("f no id", f.getId() == null);
+		assertTrue("e has id", e.getId() != null);
+		assertTrue("t no id", t.getId() == null);
+	}
+

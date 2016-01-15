@@ -1,0 +1,17 @@
+	@Test
+	public void test008_SubtreeInternalSorting() throws IOException {
+		final Tree t = new Tree(db);
+		final FileTreeEntry e0 = t.addFile("a-b");
+		final FileTreeEntry e1 = t.addFile("a-");
+		final FileTreeEntry e2 = t.addFile("a=b");
+		final Tree e3 = t.addTree("a");
+		final FileTreeEntry e4 = t.addFile("a=");
+
+		final TreeEntry[] ents = t.members();
+		assertSame(e1, ents[0]);
+		assertSame(e0, ents[1]);
+		assertSame(e3, ents[2]);
+		assertSame(e4, ents[3]);
+		assertSame(e2, ents[4]);
+	}
+
