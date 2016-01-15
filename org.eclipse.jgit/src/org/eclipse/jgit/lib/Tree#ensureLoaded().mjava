@@ -1,0 +1,7 @@
+	private void ensureLoaded() throws IOException, MissingObjectException {
+		if (!isLoaded()) {
+			ObjectLoader ldr = db.open(getId(), Constants.OBJ_TREE);
+			readTree(ldr.getCachedBytes());
+		}
+	}
+

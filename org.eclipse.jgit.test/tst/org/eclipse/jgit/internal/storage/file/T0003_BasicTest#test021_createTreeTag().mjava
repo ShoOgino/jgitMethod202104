@@ -1,8 +1,9 @@
 	@Test
 	public void test021_createTreeTag() throws IOException {
 		final ObjectId emptyId = insertEmptyBlob();
-		TreeFormatter almostEmptyTree = new TreeFormatter();
-		almostEmptyTree.append("empty", FileMode.REGULAR_FILE, emptyId);
+		final Tree almostEmptyTree = new Tree(db);
+		almostEmptyTree.addEntry(new FileTreeEntry(almostEmptyTree, emptyId,
+				"empty".getBytes(), false));
 		final ObjectId almostEmptyTreeId = insertTree(almostEmptyTree);
 		final TagBuilder t = new TagBuilder();
 		t.setObjectId(almostEmptyTreeId, Constants.OBJ_TREE);

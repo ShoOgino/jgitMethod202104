@@ -2,7 +2,8 @@
 	public void testAdded() throws IOException {
 		writeTrashFile("file1", "file1");
 		writeTrashFile("dir/subfile", "dir/subfile");
-		ObjectId tree = insertTree(new TreeFormatter());
+		Tree tree = new Tree(db);
+		tree.setId(insertTree(tree));
 
 		DirCache index = db.lockDirCache();
 		DirCacheEditor editor = index.editor();
@@ -10,7 +11,7 @@
 		editor.add(add(db, trash, "dir/subfile"));
 		editor.commit();
 		FileTreeIterator iterator = new FileTreeIterator(db);
-		IndexDiff diff = new IndexDiff(db, tree, iterator);
+		IndexDiff diff = new IndexDiff(db, tree.getId(), iterator);
 		diff.diff();
 		assertEquals(2, diff.getAdded().size());
 		assertTrue(diff.getAdded().contains("file1"));
