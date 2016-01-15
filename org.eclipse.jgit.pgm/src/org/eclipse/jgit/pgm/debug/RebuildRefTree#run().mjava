@@ -54,6 +54,15 @@
 			default:
 				throw die(String.format("%s: %s", update.getName(), result)); //$NON-NLS-1$
 			}
+
+			if (enable && !(db.getRefDatabase() instanceof RefTreeDatabase)) {
+				StoredConfig cfg = db.getConfig();
+				cfg.setInt("core", null, "repositoryformatversion", 1); //$NON-NLS-1$ //$NON-NLS-2$
+				cfg.setString("extensions", null, "refsStorage", "reftree"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				cfg.save();
+				errw.println("Enabled reftree."); //$NON-NLS-1$
+				errw.flush();
+			}
 		}
 	}
 
