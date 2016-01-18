@@ -1,0 +1,18 @@
+	private ObjectId insertProposals(Repository git)
+			throws IOException, NoOp {
+		ObjectId id;
+		try (ObjectInserter inserter = git.newObjectInserter()) {
+			// TODO(sop) Process signed push certificates.
+
+			if (queuedTree != null) {
+				id = insertSingleProposal(git, inserter);
+			} else {
+				id = insertMultiProposal(git, inserter);
+			}
+
+			stageCommands = makeStageList(git, inserter);
+			inserter.flush();
+		}
+		return id;
+	}
+

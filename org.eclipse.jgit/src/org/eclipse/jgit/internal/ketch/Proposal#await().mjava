@@ -1,0 +1,14 @@
+	/**
+	 * Wait for the proposal to be attempted and {@link #isDone()} to be true.
+	 *
+	 * @throws InterruptedException
+	 *             caller was interrupted before proposal executed.
+	 */
+	public void await() throws InterruptedException {
+		synchronized (state) {
+			while (!state.get().isDone()) {
+				state.wait();
+			}
+		}
+	}
+

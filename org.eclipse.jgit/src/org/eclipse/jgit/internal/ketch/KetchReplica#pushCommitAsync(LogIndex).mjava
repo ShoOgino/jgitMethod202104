@@ -1,0 +1,6 @@
+	void pushCommitAsync(LogIndex committed) {
+		List<ReceiveCommand> cmds = new ArrayList<>();
+		prepareTxnCommitted(cmds, committed);
+		pushAsync(new ReplicaPushRequest(this, cmds));
+	}
+

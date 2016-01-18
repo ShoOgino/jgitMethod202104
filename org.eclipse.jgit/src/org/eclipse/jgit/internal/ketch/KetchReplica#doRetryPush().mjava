@@ -1,0 +1,10 @@
+	private void doRetryPush() {
+		leader.lock.lock();
+		try {
+			retryFuture = null;
+			runNextPushRequest();
+		} finally {
+			leader.lock.unlock();
+		}
+	}
+
