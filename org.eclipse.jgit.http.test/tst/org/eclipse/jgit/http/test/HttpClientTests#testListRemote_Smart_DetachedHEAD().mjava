@@ -8,16 +8,9 @@
 
 		Repository dst = createBareRepository();
 		Ref head;
-		Transport t = Transport.open(dst, smartAuthNoneURI);
-		try {
-			FetchConnection c = t.openFetch();
-			try {
-				head = c.getRef(Constants.HEAD);
-			} finally {
-				c.close();
-			}
-		} finally {
-			t.close();
+		try (Transport t = Transport.open(dst, smartAuthNoneURI);
+				FetchConnection c = t.openFetch()) {
+			head = c.getRef(Constants.HEAD);
 		}
 		assertNotNull("has " + Constants.HEAD, head);
 		assertEquals(Q, head.getObjectId());

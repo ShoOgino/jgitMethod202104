@@ -4,8 +4,7 @@
 		final RevCommit Q = src.commit().create();
 		final Repository db = src.getRepository();
 
-		Transport t = Transport.open(db, remoteURI);
-		try {
+		try (Transport t = Transport.open(db, remoteURI)) {
 			try {
 				t.push(NullProgressMonitor.INSTANCE, push(src, Q));
 				fail("push incorrectly completed against a dumb server");
@@ -13,8 +12,6 @@
 				String exp = "remote does not support smart HTTP push";
 				assertEquals(exp, nse.getMessage());
 			}
-		} finally {
-			t.close();
 		}
 	}
 

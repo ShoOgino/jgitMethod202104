@@ -16,12 +16,9 @@
 
 		// Clone from dst into src
 		//
-		Transport t = Transport.open(src, uriOf(dst));
-		try {
+		try (Transport t = Transport.open(src, uriOf(dst))) {
 			t.fetch(PM, Collections.singleton(new RefSpec("+refs/*:refs/*")));
 			assertEquals(B, src.resolve(R_MASTER));
-		} finally {
-			t.close();
 		}
 
 		// Now put private stuff into dst.

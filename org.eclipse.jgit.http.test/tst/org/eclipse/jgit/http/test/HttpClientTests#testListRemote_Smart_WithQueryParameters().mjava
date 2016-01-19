@@ -2,16 +2,13 @@
 	public void testListRemote_Smart_WithQueryParameters() throws Exception {
 		URIish myURI = toURIish("/snone/do?r=1&p=test.git");
 		Repository dst = createBareRepository();
-		Transport t = Transport.open(dst, myURI);
-		try {
+		try (Transport t = Transport.open(dst, myURI)) {
 			try {
 				t.openFetch();
 				fail("test did not fail to find repository as expected");
 			} catch (NoRemoteRepositoryException err) {
 				// expected
 			}
-		} finally {
-			t.close();
 		}
 
 		List<AccessEvent> requests = getRequests();

@@ -3,11 +3,8 @@
 		// Bootstrap by doing the clone.
 		//
 		TestRepository dst = createTestRepository();
-		Transport t = Transport.open(dst.getRepository(), remoteURI);
-		try {
+		try (Transport t = Transport.open(dst.getRepository(), remoteURI)) {
 			t.fetch(NullProgressMonitor.INSTANCE, mirror(master));
-		} finally {
-			t.close();
 		}
 		assertEquals(B, dst.getRepository().exactRef(master).getObjectId());
 		List<AccessEvent> cloneRequests = getRequests();
@@ -24,11 +21,8 @@
 
 		// Now incrementally update.
 		//
-		t = Transport.open(dst.getRepository(), remoteURI);
-		try {
+		try (Transport t = Transport.open(dst.getRepository(), remoteURI)) {
 			t.fetch(NullProgressMonitor.INSTANCE, mirror(master));
-		} finally {
-			t.close();
 		}
 		assertEquals(Z, dst.getRepository().exactRef(master).getObjectId());
 

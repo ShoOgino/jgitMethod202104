@@ -7,10 +7,11 @@
 	@Test
 	public void testFindRemoteRefUpdatesNoWildcardNoTracking()
 			throws IOException {
-		transport = Transport.open(db, remoteConfig);
-		final Collection<RemoteRefUpdate> result = transport
-				.findRemoteRefUpdatesFor(Collections.nCopies(1, new RefSpec(
-						"refs/heads/master:refs/heads/x")));
+		Collection<RemoteRefUpdate> result;
+		try (Transport transport = Transport.open(db, remoteConfig)) {
+			result = transport.findRemoteRefUpdatesFor(Collections.nCopies(1,
+					new RefSpec("refs/heads/master:refs/heads/x")));
+		}
 
 		assertEquals(1, result.size());
 		final RemoteRefUpdate rru = result.iterator().next();

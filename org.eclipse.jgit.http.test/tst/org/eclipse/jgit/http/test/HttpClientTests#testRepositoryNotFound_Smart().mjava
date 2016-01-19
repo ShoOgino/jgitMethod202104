@@ -2,8 +2,7 @@
 	public void testRepositoryNotFound_Smart() throws Exception {
 		URIish uri = toURIish("/smart.none/not-found");
 		Repository dst = createBareRepository();
-		Transport t = Transport.open(dst, uri);
-		try {
+		try (Transport t = Transport.open(dst, uri)) {
 			try {
 				t.openFetch();
 				fail("connection opened to not found repository");
@@ -12,8 +11,6 @@
 						+ "/info/refs?service=git-upload-pack not found";
 				assertEquals(exp, err.getMessage());
 			}
-		} finally {
-			t.close();
 		}
 	}
 
