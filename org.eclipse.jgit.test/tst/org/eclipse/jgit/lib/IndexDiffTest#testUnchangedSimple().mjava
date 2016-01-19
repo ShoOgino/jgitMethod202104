@@ -10,17 +10,16 @@
 		git.add().addFilepattern("a=c").call();
 		git.add().addFilepattern("a=d").call();
 
-		Tree tree = new Tree(db);
+		TreeFormatter tree = new TreeFormatter();
 		// got the hash id'd from the data using echo -n a.b|git hash-object -t blob --stdin
-		tree.addFile("a.b").setId(ObjectId.fromString("f6f28df96c2b40c951164286e08be7c38ec74851"));
-		tree.addFile("a.c").setId(ObjectId.fromString("6bc0e647512d2a0bef4f26111e484dc87df7f5ca"));
-		tree.addFile("a=c").setId(ObjectId.fromString("06022365ddbd7fb126761319633bf73517770714"));
-		tree.addFile("a=d").setId(ObjectId.fromString("fa6414df3da87840700e9eeb7fc261dd77ccd5c2"));
-
-		tree.setId(insertTree(tree));
+		tree.append("a.b", FileMode.REGULAR_FILE, ObjectId.fromString("f6f28df96c2b40c951164286e08be7c38ec74851"));
+		tree.append("a.c", FileMode.REGULAR_FILE, ObjectId.fromString("6bc0e647512d2a0bef4f26111e484dc87df7f5ca"));
+		tree.append("a=c", FileMode.REGULAR_FILE, ObjectId.fromString("06022365ddbd7fb126761319633bf73517770714"));
+		tree.append("a=d", FileMode.REGULAR_FILE, ObjectId.fromString("fa6414df3da87840700e9eeb7fc261dd77ccd5c2"));
+		ObjectId treeId = insertTree(tree);
 
 		FileTreeIterator iterator = new FileTreeIterator(db);
-		IndexDiff diff = new IndexDiff(db, tree.getId(), iterator);
+		IndexDiff diff = new IndexDiff(db, treeId, iterator);
 		diff.diff();
 		assertEquals(0, diff.getChanged().size());
 		assertEquals(0, diff.getAdded().size());

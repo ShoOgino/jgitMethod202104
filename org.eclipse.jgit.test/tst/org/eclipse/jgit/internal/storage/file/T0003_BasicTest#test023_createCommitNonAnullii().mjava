@@ -1,9 +1,8 @@
 	@Test
 	public void test023_createCommitNonAnullii() throws IOException {
 		final ObjectId emptyId = insertEmptyBlob();
-		final Tree almostEmptyTree = new Tree(db);
-		almostEmptyTree.addEntry(new FileTreeEntry(almostEmptyTree, emptyId,
-				"empty".getBytes(), false));
+		TreeFormatter almostEmptyTree = new TreeFormatter();
+		almostEmptyTree.append("empty", FileMode.REGULAR_FILE, emptyId);
 		final ObjectId almostEmptyTreeId = insertTree(almostEmptyTree);
 		CommitBuilder commit = new CommitBuilder();
 		commit.setTreeId(almostEmptyTreeId);
