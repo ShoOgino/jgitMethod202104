@@ -1,6 +1,14 @@
-	private void disableSslVerify(HttpConnection conn)
+	/**
+	 * Disable SSL and hostname verification for given HTTP connection
+	 *
+	 * @param conn
+	 * @throws IOException
+	 * @since 4.3
+	 */
+	public static void disableSslVerify(HttpConnection conn)
 			throws IOException {
-		final TrustManager[] trustAllCerts = new TrustManager[] { new DummyX509TrustManager() };
+		final TrustManager[] trustAllCerts = new TrustManager[] {
+				new DummyX509TrustManager() };
 		try {
 			conn.configure(null, trustAllCerts, null);
 			conn.setHostnameVerifier(new DummyHostnameVerifier());
