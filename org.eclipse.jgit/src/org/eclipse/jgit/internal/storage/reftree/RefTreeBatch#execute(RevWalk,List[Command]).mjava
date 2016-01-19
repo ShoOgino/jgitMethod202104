@@ -11,13 +11,13 @@
 	void execute(RevWalk rw, List<Command> todo) throws IOException {
 		for (Command c : todo) {
 			if (c.getResult() != NOT_ATTEMPTED) {
-				reject(todo, JGitText.get().transactionAborted);
+				Command.abort(todo, null);
 				return;
 			}
 			if (refdb.conflictsWithBootstrap(c.getRefName())) {
 				c.setResult(REJECTED_OTHER_REASON, MessageFormat
 						.format(JGitText.get().invalidRefName, c.getRefName()));
-				reject(todo, JGitText.get().transactionAborted);
+				Command.abort(todo, null);
 				return;
 			}
 		}

@@ -19,7 +19,8 @@
 				if (!isValidRef(cmd)) {
 					cmd.setResult(REJECTED_OTHER_REASON,
 							JGitText.get().funnyRefname);
-					return abort(cmdList);
+					Command.abort(cmdList, null);
+					return false;
 				}
 				apply(ed, cmd);
 			}
@@ -35,9 +36,11 @@
 					break;
 				}
 			}
-			return abort(cmdList);
+			Command.abort(cmdList, null);
+			return false;
 		} catch (LockFailureException e) {
-			return abort(cmdList);
+			Command.abort(cmdList, null);
+			return false;
 		}
 	}
 

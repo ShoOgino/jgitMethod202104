@@ -5,7 +5,7 @@
 			try (RevWalk rw = new RevWalk(getRepository())) {
 				for (ReceiveCommand c : cmds) {
 					if (c.getResult() != ReceiveCommand.Result.NOT_ATTEMPTED) {
-						reject(cmds);
+						ReceiveCommand.abort(cmds);
 						return;
 					}
 
@@ -17,7 +17,7 @@
 							}
 						} catch (IOException e) {
 							c.setResult(ReceiveCommand.Result.REJECTED_MISSING_OBJECT);
-							reject(cmds);
+							ReceiveCommand.abort(cmds);
 							return;
 						}
 					}
@@ -30,7 +30,7 @@
 				if (r == null) {
 					if (c.getType() != ReceiveCommand.Type.CREATE) {
 						c.setResult(ReceiveCommand.Result.LOCK_FAILURE);
-						reject(cmds);
+						ReceiveCommand.abort(cmds);
 						return;
 					}
 				} else {
@@ -38,7 +38,7 @@
 					if (r.isSymbolic() || objectId == null
 							|| !objectId.equals(c.getOldId())) {
 						c.setResult(ReceiveCommand.Result.LOCK_FAILURE);
-						reject(cmds);
+						ReceiveCommand.abort(cmds);
 						return;
 					}
 				}
