@@ -6,8 +6,7 @@
 		cfg.save();
 
 		Repository dst = createBareRepository();
-		Transport t = Transport.open(dst, smartAuthNoneURI);
-		try {
+		try (Transport t = Transport.open(dst, smartAuthNoneURI)) {
 			try {
 				t.openFetch();
 				fail("connection opened even though service disabled");
@@ -16,8 +15,6 @@
 						+ JGitText.get().serviceNotEnabledNoName;
 				assertEquals(exp, err.getMessage());
 			}
-		} finally {
-			t.close();
 		}
 	}
 

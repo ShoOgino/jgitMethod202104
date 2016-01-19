@@ -7,16 +7,9 @@
 
 		Repository dst = createBareRepository();
 		Ref head;
-		Transport t = Transport.open(dst, dumbAuthNoneURI);
-		try {
-			FetchConnection c = t.openFetch();
-			try {
-				head = c.getRef(Constants.HEAD);
-			} finally {
-				c.close();
-			}
-		} finally {
-			t.close();
+		try (Transport t = Transport.open(dst, dumbAuthNoneURI);
+				FetchConnection c = t.openFetch()) {
+			head = c.getRef(Constants.HEAD);
 		}
 		assertNull("has no " + Constants.HEAD, head);
 	}

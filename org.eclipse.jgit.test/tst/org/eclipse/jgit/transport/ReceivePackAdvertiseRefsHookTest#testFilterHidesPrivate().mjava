@@ -1,7 +1,8 @@
 	@Test
 	public void testFilterHidesPrivate() throws Exception {
 		Map<String, Ref> refs;
-		TransportLocal t = new TransportLocal(src, uriOf(dst), dst.getDirectory()) {
+		try (TransportLocal t = new TransportLocal(src, uriOf(dst),
+				dst.getDirectory()) {
 			@Override
 			ReceivePack createReceivePack(final Repository db) {
 				db.close();
@@ -11,16 +12,10 @@
 				rp.setAdvertiseRefsHook(new HidePrivateHook());
 				return rp;
 			}
-		};
-		try {
-			PushConnection c = t.openPush();
-			try {
+		}) {
+			try (PushConnection c = t.openPush()) {
 				refs = c.getRefsMap();
-			} finally {
-				c.close();
 			}
-		} finally {
-			t.close();
 		}
 
 		assertNotNull(refs);

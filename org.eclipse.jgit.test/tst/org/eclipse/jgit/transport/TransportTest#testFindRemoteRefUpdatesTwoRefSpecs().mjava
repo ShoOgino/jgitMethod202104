@@ -6,12 +6,14 @@
 	 */
 	@Test
 	public void testFindRemoteRefUpdatesTwoRefSpecs() throws IOException {
-		transport = Transport.open(db, remoteConfig);
 		final RefSpec specA = new RefSpec("+refs/heads/a:refs/heads/b");
 		final RefSpec specC = new RefSpec("+refs/heads/c:refs/heads/d");
 		final Collection<RefSpec> specs = Arrays.asList(specA, specC);
-		final Collection<RemoteRefUpdate> result = transport
-				.findRemoteRefUpdatesFor(specs);
+
+		Collection<RemoteRefUpdate> result;
+		try (Transport transport = Transport.open(db, remoteConfig)) {
+			result = transport.findRemoteRefUpdatesFor(specs);
+		}
 
 		assertEquals(2, result.size());
 		boolean foundA = false;
