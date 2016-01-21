@@ -1,8 +1,7 @@
 	// try to do a commit without specifying a message. Should fail!
 	@Test
 	public void testWrongParams() throws GitAPIException {
-		Git git = new Git(db);
-		try {
+		try (Git git = new Git(db)) {
 			git.commit().setAuthor(author).call();
 			fail("Didn't get the expected exception");
 		} catch (NoMessageException e) {
