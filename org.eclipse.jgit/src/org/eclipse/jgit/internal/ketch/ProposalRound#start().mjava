@@ -1,0 +1,26 @@
+	void start() throws IOException {
+		for (Proposal p : todo) {
+			p.notifyState(RUNNING);
+		}
+		try {
+			ObjectId id;
+			try (Repository git = leader.openRepository()) {
+				id = insertProposals(git);
+			}
+			runAsync(id);
+		} catch (NoOp e) {
+			for (Proposal p : todo) {
+				p.success();
+			}
+			leader.lock.lock();
+			try {
+				leader.nextRound();
+			} finally {
+				leader.lock.unlock();
+			}
+		} catch (IOException e) {
+			abort();
+			throw e;
+		}
+	}
+

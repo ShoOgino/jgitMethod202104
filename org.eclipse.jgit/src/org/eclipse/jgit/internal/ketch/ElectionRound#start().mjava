@@ -1,0 +1,11 @@
+	@Override
+	void start() throws IOException {
+		ObjectId id;
+		try (Repository git = leader.openRepository();
+				ObjectInserter inserter = git.newObjectInserter()) {
+			id = bumpTerm(git, inserter);
+			inserter.flush();
+		}
+		runAsync(id);
+	}
+

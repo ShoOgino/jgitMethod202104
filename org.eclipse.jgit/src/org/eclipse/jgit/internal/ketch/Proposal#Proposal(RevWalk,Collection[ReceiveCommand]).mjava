@@ -1,0 +1,17 @@
+	/**
+	 * Create a proposal from a collection of received commands.
+	 *
+	 * @param rw
+	 *            walker to assist in preparing commands.
+	 * @param cmds
+	 *            list of pending commands.
+	 * @throws MissingObjectException
+	 *             newId of a command is not found locally.
+	 * @throws IOException
+	 *             local objects cannot be accessed.
+	 */
+	public Proposal(RevWalk rw, Collection<ReceiveCommand> cmds)
+			throws MissingObjectException, IOException {
+		commands = asCommandList(rw, cmds);
+	}
+

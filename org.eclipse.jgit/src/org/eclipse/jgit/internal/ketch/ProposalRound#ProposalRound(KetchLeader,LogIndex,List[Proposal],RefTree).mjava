@@ -1,0 +1,12 @@
+	ProposalRound(KetchLeader leader, LogIndex head, List<Proposal> todo,
+			@Nullable RefTree tree) {
+		super(leader, head);
+		this.todo = todo;
+
+		if (tree != null && canCombine(todo)) {
+			this.queuedTree = tree;
+		} else {
+			leader.roundHoldsReferenceToRefTree = false;
+		}
+	}
+
