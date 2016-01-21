@@ -1,9 +1,8 @@
 	@Test
 	public void testAddNonExistingSingleFile() throws GitAPIException {
-		Git git = new Git(db);
-
-		DirCache dc = git.add().addFilepattern("a.txt").call();
-		assertEquals(0, dc.getEntryCount());
-
+		try (Git git = new Git(db)) {
+			DirCache dc = git.add().addFilepattern("a.txt").call();
+			assertEquals(0, dc.getEntryCount());
+		}
 	}
 

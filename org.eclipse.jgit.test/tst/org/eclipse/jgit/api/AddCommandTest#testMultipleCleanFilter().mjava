@@ -9,21 +9,22 @@
 		File script = writeTempFile("sed s/o/e/g");
 		File script2 = writeTempFile("sed s/f/x/g");
 
-		Git git = new Git(db);
-		StoredConfig config = git.getRepository().getConfig();
-		config.setString("filter", "tstFilter", "clean",
-				"sh " + slashify(script.getPath()));
-		config.setString("filter", "tstFilter2", "clean",
-				"sh " + slashify(script2.getPath()));
-		config.save();
+		try (Git git = new Git(db)) {
+			StoredConfig config = git.getRepository().getConfig();
+			config.setString("filter", "tstFilter", "clean",
+					"sh " + slashify(script.getPath()));
+			config.setString("filter", "tstFilter2", "clean",
+					"sh " + slashify(script2.getPath()));
+			config.save();
 
-		git.add().addFilepattern("src/a.txt").addFilepattern("src/a.tmp")
-				.call();
+			git.add().addFilepattern("src/a.txt").addFilepattern("src/a.tmp")
+					.call();
 
-		assertEquals(
-				"[src/a.tmp, mode:100644, content:xoo\n][src/a.txt, mode:100644, content:fee\n]",
-				indexState(CONTENT));
+			assertEquals(
+					"[src/a.tmp, mode:100644, content:xoo\n][src/a.txt, mode:100644, content:fee\n]",
+					indexState(CONTENT));
 
-		// TODO: multiple clean filters for one file???
+			// TODO: multiple clean filters for one file???
+		}
 	}
 

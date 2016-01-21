@@ -16,37 +16,38 @@
 		writer.print("content b");
 		writer.close();
 
-		Git git = new Git(db);
-		git.add().addFilepattern("sub").call();
+		try (Git git = new Git(db)) {
+			git.add().addFilepattern("sub").call();
 
-		assertEquals(
-				"[sub/a.txt, mode:100644, content:content]" +
-				"[sub/b.txt, mode:100644, content:content b]",
-				indexState(CONTENT));
+			assertEquals(
+					"[sub/a.txt, mode:100644, content:content]" +
+					"[sub/b.txt, mode:100644, content:content b]",
+					indexState(CONTENT));
 
-		git.commit().setMessage("commit").call();
+			git.commit().setMessage("commit").call();
 
-		// new unstaged file sub/c.txt
-		File file3 = new File(db.getWorkTree(), "sub/c.txt");
-		FileUtils.createNewFile(file3);
-		writer = new PrintWriter(file3);
-		writer.print("content c");
-		writer.close();
+			// new unstaged file sub/c.txt
+			File file3 = new File(db.getWorkTree(), "sub/c.txt");
+			FileUtils.createNewFile(file3);
+			writer = new PrintWriter(file3);
+			writer.print("content c");
+			writer.close();
 
-		// file sub/a.txt is modified
-		writer = new PrintWriter(file);
-		writer.print("modified content");
-		writer.close();
+			// file sub/a.txt is modified
+			writer = new PrintWriter(file);
+			writer.print("modified content");
+			writer.close();
 
-		FileUtils.delete(file2);
+			FileUtils.delete(file2);
 
-		// change in sub/a.txt is staged
-		// deletion of sub/b.txt is staged
-		// sub/c.txt is not staged
-		git.add().addFilepattern("sub").setUpdate(true).call();
-		// change in sub/a.txt is staged
-		assertEquals(
-				"[sub/a.txt, mode:100644, content:modified content]",
-				indexState(CONTENT));
+			// change in sub/a.txt is staged
+			// deletion of sub/b.txt is staged
+			// sub/c.txt is not staged
+			git.add().addFilepattern("sub").setUpdate(true).call();
+			// change in sub/a.txt is staged
+			assertEquals(
+					"[sub/a.txt, mode:100644, content:modified content]",
+					indexState(CONTENT));
+		}
 	}
 

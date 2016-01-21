@@ -13,16 +13,17 @@
 		writeTrashFile("; echo virus", "foo\n");
 		File script = writeTempFile("sed s/o/e/g");
 
-		Git git = new Git(db);
-		StoredConfig config = git.getRepository().getConfig();
-		config.setString("filter", "tstFilter", "clean",
-				"sh " + slashify(script.getPath()) + " %f");
-		writeTrashFile(".gitattributes", "* filter=tstFilter");
+		try (Git git = new Git(db)) {
+			StoredConfig config = git.getRepository().getConfig();
+			config.setString("filter", "tstFilter", "clean",
+					"sh " + slashify(script.getPath()) + " %f");
+			writeTrashFile(".gitattributes", "* filter=tstFilter");
 
-		git.add().addFilepattern("; echo virus").call();
-		// Without proper escaping the content would be "feovirus". The sed
-		// command and the "echo virus" would contribute to the content
-		assertEquals("[; echo virus, mode:100644, content:fee\n]",
-				indexState(CONTENT));
+			git.add().addFilepattern("; echo virus").call();
+			// Without proper escaping the content would be "feovirus". The sed
+			// command and the "echo virus" would contribute to the content
+			assertEquals("[; echo virus, mode:100644, content:fee\n]",
+					indexState(CONTENT));
+		}
 	}
 

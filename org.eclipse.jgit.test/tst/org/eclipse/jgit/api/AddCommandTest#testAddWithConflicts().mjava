@@ -43,12 +43,13 @@
 
 		// now the test begins
 
-		Git git = new Git(db);
-		dc = git.add().addFilepattern("a.txt").call();
+		try (Git git = new Git(db)) {
+			dc = git.add().addFilepattern("a.txt").call();
 
-		assertEquals(
-				"[a.txt, mode:100644, content:our content]" +
-				"[b.txt, mode:100644, content:content b]",
-				indexState(CONTENT));
+			assertEquals(
+					"[a.txt, mode:100644, content:our content]" +
+					"[b.txt, mode:100644, content:content b]",
+					indexState(CONTENT));
+		}
 	}
 
