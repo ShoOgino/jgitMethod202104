@@ -2,24 +2,25 @@
 	// exceptions
 	@Test
 	public void testMultipleInvocations() throws GitAPIException {
-		Git git = new Git(db);
-		CommitCommand commitCmd = git.commit();
-		commitCmd.setMessage("initial commit").call();
-		try {
-			// check that setters can't be called after invocation
-			commitCmd.setAuthor(author);
-			fail("didn't catch the expected exception");
-		} catch (IllegalStateException e) {
-			// expected
-		}
-		LogCommand logCmd = git.log();
-		logCmd.call();
-		try {
-			// check that call can't be called twice
+		try (Git git = new Git(db)) {
+			CommitCommand commitCmd = git.commit();
+			commitCmd.setMessage("initial commit").call();
+			try {
+				// check that setters can't be called after invocation
+				commitCmd.setAuthor(author);
+				fail("didn't catch the expected exception");
+			} catch (IllegalStateException e) {
+				// expected
+			}
+			LogCommand logCmd = git.log();
 			logCmd.call();
-			fail("didn't catch the expected exception");
-		} catch (IllegalStateException e) {
-			// expected
+			try {
+				// check that call can't be called twice
+				logCmd.call();
+				fail("didn't catch the expected exception");
+			} catch (IllegalStateException e) {
+				// expected
+			}
 		}
 	}
 

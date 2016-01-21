@@ -1,10 +1,11 @@
 	@Test
 	public void testDeleteBadName() throws Exception {
-		Git git = new Git(db);
-		git.commit().setMessage("initial commit").call();
+		try (Git git = new Git(db)) {
+			git.commit().setMessage("initial commit").call();
 
-		List<String> deleted = git.tagDelete().setTags("bad~tag~name")
-				.call();
-		assertEquals(0, deleted.size());
+			List<String> deleted = git.tagDelete().setTags("bad~tag~name")
+					.call();
+			assertEquals(0, deleted.size());
+		}
 	}
 

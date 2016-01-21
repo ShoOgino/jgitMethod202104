@@ -1,24 +1,24 @@
 	@Test
 	public void testEditAllLines() throws Exception {
-		Git git = new Git(db);
+		try (Git git = new Git(db)) {
+			String[] content1 = new String[] { "a", "1" };
+			String[] content2 = new String[] { "b", "2" };
 
-		String[] content1 = new String[] { "a", "1" };
-		String[] content2 = new String[] { "b", "2" };
+			writeTrashFile("file.txt", join(content1));
+			git.add().addFilepattern("file.txt").call();
+			git.commit().setMessage("edit file").call();
 
-		writeTrashFile("file.txt", join(content1));
-		git.add().addFilepattern("file.txt").call();
-		git.commit().setMessage("edit file").call();
+			writeTrashFile("file.txt", join(content2));
+			git.add().addFilepattern("file.txt").call();
+			RevCommit commit2 = git.commit().setMessage("create file").call();
 
-		writeTrashFile("file.txt", join(content2));
-		git.add().addFilepattern("file.txt").call();
-		RevCommit commit2 = git.commit().setMessage("create file").call();
+			BlameCommand command = new BlameCommand(db);
 
-		BlameCommand command = new BlameCommand(db);
-
-		command.setFilePath("file.txt");
-		BlameResult lines = command.call();
-		assertEquals(content2.length, lines.getResultContents().size());
-		assertEquals(commit2, lines.getSourceCommit(0));
-		assertEquals(commit2, lines.getSourceCommit(1));
+			command.setFilePath("file.txt");
+			BlameResult lines = command.call();
+			assertEquals(content2.length, lines.getResultContents().size());
+			assertEquals(commit2, lines.getSourceCommit(0));
+			assertEquals(commit2, lines.getSourceCommit(1));
+		}
 	}
 

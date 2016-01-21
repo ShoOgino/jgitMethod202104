@@ -1,30 +1,29 @@
 	@Test
 	public void testModeChange() throws IOException, GitAPIException {
-		if (System.getProperty("os.name").startsWith("Windows"))
-			return; // SKIP
-		Git git = new Git(db);
+		assumeFalse(System.getProperty("os.name").startsWith("Windows"));// SKIP
+		try (Git git = new Git(db)) {
+			// create file
+			File file = new File(db.getWorkTree(), "a.txt");
+			FileUtils.createNewFile(file);
+			PrintWriter writer = new PrintWriter(file);
+			writer.print("content1");
+			writer.close();
 
-		// create file
-		File file = new File(db.getWorkTree(), "a.txt");
-		FileUtils.createNewFile(file);
-		PrintWriter writer = new PrintWriter(file);
-		writer.print("content1");
-		writer.close();
+			// First commit - a.txt file
+			git.add().addFilepattern("a.txt").call();
+			git.commit().setMessage("commit1").setCommitter(committer).call();
 
-		// First commit - a.txt file
-		git.add().addFilepattern("a.txt").call();
-		git.commit().setMessage("commit1").setCommitter(committer).call();
+			// pure mode change should be committable
+			FS fs = db.getFS();
+			fs.setExecute(file, true);
+			git.add().addFilepattern("a.txt").call();
+			git.commit().setMessage("mode change").setCommitter(committer).call();
 
-		// pure mode change should be committable
-		FS fs = db.getFS();
-		fs.setExecute(file, true);
-		git.add().addFilepattern("a.txt").call();
-		git.commit().setMessage("mode change").setCommitter(committer).call();
-
-		// pure mode change should be committable with -o option
-		fs.setExecute(file, false);
-		git.add().addFilepattern("a.txt").call();
-		git.commit().setMessage("mode change").setCommitter(committer)
-				.setOnly("a.txt").call();
+			// pure mode change should be committable with -o option
+			fs.setExecute(file, false);
+			git.add().addFilepattern("a.txt").call();
+			git.commit().setMessage("mode change").setCommitter(committer)
+					.setOnly("a.txt").call();
+		}
 	}
 

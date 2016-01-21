@@ -1,8 +1,6 @@
 	@Test
 	public void testAddNothing() throws GitAPIException {
-		Git git = new Git(db);
-
-		try {
+		try (Git git = new Git(db)) {
 			git.add().call();
 			fail("Expected IllegalArgumentException");
 		} catch (NoFilepatternException e) {

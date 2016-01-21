@@ -1,14 +1,15 @@
 	@Test
 	public void testCherryPickDirtyIndex() throws Exception {
-		Git git = new Git(db);
-		RevCommit sideCommit = prepareCherryPick(git);
+		try (Git git = new Git(db)) {
+			RevCommit sideCommit = prepareCherryPick(git);
 
-		// modify and add file a
-		writeTrashFile("a", "a(modified)");
-		git.add().addFilepattern("a").call();
-		// do not commit
+			// modify and add file a
+			writeTrashFile("a", "a(modified)");
+			git.add().addFilepattern("a").call();
+			// do not commit
 
-		doCherryPickAndCheckResult(git, sideCommit,
-				MergeFailureReason.DIRTY_INDEX);
+			doCherryPickAndCheckResult(git, sideCommit,
+					MergeFailureReason.DIRTY_INDEX);
+		}
 	}
 
