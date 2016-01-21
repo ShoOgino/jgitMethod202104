@@ -1,14 +1,15 @@
 	@Test
 	public void testDiffNullToNull() throws Exception {
-		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		DiffFormatter dfmt = new DiffFormatter(new SafeBufferedOutputStream(os));
-		dfmt.setRepository(db);
-		dfmt.format((AnyObjectId) null, null);
-		dfmt.flush();
+		try (ByteArrayOutputStream os = new ByteArrayOutputStream();
+				DiffFormatter dfmt = new DiffFormatter(new SafeBufferedOutputStream(os))) {
+			dfmt.setRepository(db);
+			dfmt.format((AnyObjectId) null, null);
+			dfmt.flush();
 
-		String actual = os.toString("UTF-8");
-		String expected = "";
+			String actual = os.toString("UTF-8");
+			String expected = "";
 
-		assertEquals(expected, actual);
+			assertEquals(expected, actual);
+		}
 	}
 
