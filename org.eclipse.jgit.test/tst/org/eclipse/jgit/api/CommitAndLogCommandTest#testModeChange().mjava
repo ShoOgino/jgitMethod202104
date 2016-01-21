@@ -1,7 +1,6 @@
 	@Test
 	public void testModeChange() throws IOException, GitAPIException {
-		if (System.getProperty("os.name").startsWith("Windows"))
-			return; // SKIP
+		assumeFalse(System.getProperty("os.name").startsWith("Windows"));// SKIP
 		try (Git git = new Git(db)) {
 			// create file
 			File file = new File(db.getWorkTree(), "a.txt");
