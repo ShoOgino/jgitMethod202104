@@ -1,0 +1,11 @@
+	public static List<String> executeUnchecked(String str, Repository db)
+			throws Exception {
+		CLIGitCommand cmd = new CLIGitCommand(db);
+		try {
+			cmd.run(str);
+			return getOutput(cmd.result);
+		} catch (Throwable e) {
+			return cmd.result.errLines();
+		}
+	}
+

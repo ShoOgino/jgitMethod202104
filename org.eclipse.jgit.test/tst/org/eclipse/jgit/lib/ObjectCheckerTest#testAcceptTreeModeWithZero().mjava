@@ -2,7 +2,14 @@
 	public void testAcceptTreeModeWithZero() throws CorruptObjectException {
 		StringBuilder b = new StringBuilder();
 		entry(b, "040000 a");
+		byte[] data = encodeASCII(b.toString());
 		checker.setAllowLeadingZeroFileMode(true);
-		checker.checkTree(Constants.encodeASCII(b.toString()));
+		checker.checkTree(data);
+
+		checker.setAllowLeadingZeroFileMode(false);
+		assertSkipListAccepts(OBJ_TREE, data);
+
+		checker.setIgnore(ZERO_PADDED_FILEMODE, true);
+		checker.checkTree(data);
 	}
 

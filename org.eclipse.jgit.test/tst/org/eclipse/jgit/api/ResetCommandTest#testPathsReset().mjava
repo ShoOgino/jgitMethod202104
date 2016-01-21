@@ -10,8 +10,8 @@
 
 		// 'a.txt' has already been modified in setupRepository
 		// 'notAddedToIndex.txt' has been added to repository
-		git.reset().addPath(indexFile.getName())
-				.addPath(untrackedFile.getName()).call();
+		assertSameAsHead(git.reset().addPath(indexFile.getName())
+				.addPath(untrackedFile.getName()).call());
 
 		DirCacheEntry postReset = DirCache.read(db.getIndexFile(), db.getFS())
 				.getEntry(indexFile.getName());

@@ -4,6 +4,11 @@
 			Map<ObjectId, ObjectId> peeled = new HashMap<>();
 			try (RevWalk rw = new RevWalk(getRepository())) {
 				for (ReceiveCommand c : cmds) {
+					if (c.getResult() != ReceiveCommand.Result.NOT_ATTEMPTED) {
+						ReceiveCommand.abort(cmds);
+						return;
+					}
+
 					if (!ObjectId.zeroId().equals(c.getNewId())) {
 						try {
 							RevObject o = rw.parseAny(c.getNewId());
@@ -12,7 +17,7 @@
 							}
 						} catch (IOException e) {
 							c.setResult(ReceiveCommand.Result.REJECTED_MISSING_OBJECT);
-							reject(cmds);
+							ReceiveCommand.abort(cmds);
 							return;
 						}
 					}
@@ -25,14 +30,17 @@
 				if (r == null) {
 					if (c.getType() != ReceiveCommand.Type.CREATE) {
 						c.setResult(ReceiveCommand.Result.LOCK_FAILURE);
-						reject(cmds);
+						ReceiveCommand.abort(cmds);
 						return;
 					}
-				} else if (r.isSymbolic() || r.getObjectId() == null
-						|| !r.getObjectId().equals(c.getOldId())) {
-					c.setResult(ReceiveCommand.Result.LOCK_FAILURE);
-					reject(cmds);
-					return;
+				} else {
+					ObjectId objectId = r.getObjectId();
+					if (r.isSymbolic() || objectId == null
+							|| !objectId.equals(c.getOldId())) {
+						c.setResult(ReceiveCommand.Result.LOCK_FAILURE);
+						ReceiveCommand.abort(cmds);
+						return;
+					}
 				}
 			}
 

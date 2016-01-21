@@ -1,6 +1,11 @@
 	private void want(final Ref src, final RefSpec spec)
 			throws TransportException {
 		final ObjectId newId = src.getObjectId();
+		if (newId == null) {
+			throw new NullPointerException(MessageFormat.format(
+					JGitText.get().transportProvidedRefWithNoObjectId,
+					src.getName()));
+		}
 		if (spec.getDestination() != null) {
 			final TrackingRefUpdate tru = createUpdate(spec, newId);
 			if (newId.equals(tru.getOldObjectId()))

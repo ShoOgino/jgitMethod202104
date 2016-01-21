@@ -16,17 +16,13 @@
 		}
 
 		saveStatInformation();
-		if (lck.renameTo(ref)) {
+		try {
+			FileUtils.rename(lck, ref, StandardCopyOption.ATOMIC_MOVE);
 			haveLck = false;
 			return true;
+		} catch (IOException e) {
+			unlock();
+			return false;
 		}
-		if (!ref.exists() || deleteRef()) {
-			if (renameLock()) {
-				haveLck = false;
-				return true;
-			}
-		}
-		unlock();
-		return false;
 	}
 

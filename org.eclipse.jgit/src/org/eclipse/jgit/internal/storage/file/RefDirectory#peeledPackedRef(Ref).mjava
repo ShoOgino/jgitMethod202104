@@ -10,15 +10,19 @@
 	 */
 	private Ref peeledPackedRef(Ref f)
 			throws MissingObjectException, IOException {
-		if (f.getStorage().isPacked() && f.isPeeled())
+		if (f.getStorage().isPacked() && f.isPeeled()) {
 			return f;
-		if (!f.isPeeled())
+		}
+		if (!f.isPeeled()) {
 			f = peel(f);
-		if (f.getPeeledObjectId() != null)
+		}
+		ObjectId peeledObjectId = f.getPeeledObjectId();
+		if (peeledObjectId != null) {
 			return new ObjectIdRef.PeeledTag(PACKED, f.getName(),
-					f.getObjectId(), f.getPeeledObjectId());
-		else
+					f.getObjectId(), peeledObjectId);
+		} else {
 			return new ObjectIdRef.PeeledNonTag(PACKED, f.getName(),
 					f.getObjectId());
+		}
 	}
 

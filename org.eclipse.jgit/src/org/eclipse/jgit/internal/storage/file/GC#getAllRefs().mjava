@@ -5,10 +5,15 @@
 	 * @return a map where names of refs point to ref objects
 	 * @throws IOException
 	 */
-	private Map<String, Ref> getAllRefs() throws IOException {
-		Map<String, Ref> ret = repo.getRefDatabase().getRefs(ALL);
-		for (Ref ref : repo.getRefDatabase().getAdditionalRefs())
-			ret.put(ref.getName(), ref);
-		return ret;
+	private Collection<Ref> getAllRefs() throws IOException {
+		Collection<Ref> refs = RefTreeNames.allRefs(repo.getRefDatabase());
+		List<Ref> addl = repo.getRefDatabase().getAdditionalRefs();
+		if (!addl.isEmpty()) {
+			List<Ref> all = new ArrayList<>(refs.size() + addl.size());
+			all.addAll(refs);
+			all.addAll(addl);
+			return all;
+		}
+		return refs;
 	}
 

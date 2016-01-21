@@ -15,8 +15,7 @@
 				ObjectId.zeroId()));
 
 		server.setPerformsAtomicTransactions(false);
-		Transport tn = testProtocol.open(uri, client, "server");
-		try {
+		try (Transport tn = testProtocol.open(uri, client, "server")) {
 			tn.setPushAtomic(true);
 			tn.push(NullProgressMonitor.INSTANCE, cmds);
 			fail("did not throw TransportException");
@@ -24,8 +23,6 @@
 			assertEquals(
 					uri + ": " + JGitText.get().atomicPushNotSupported,
 					e.getMessage());
-		} finally {
-			tn.close();
 		}
 	}
 

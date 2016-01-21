@@ -1,13 +1,11 @@
 	@Test
-	public void testInvalidTreeNameIsEmpty() {
-		final StringBuilder b = new StringBuilder();
+	public void testInvalidTreeNameIsEmpty() throws CorruptObjectException {
+		StringBuilder b = new StringBuilder();
 		entry(b, "100644 ");
-		final byte[] data = Constants.encodeASCII(b.toString());
-		try {
-			checker.checkTree(data);
-			fail("incorrectly accepted an invalid tree");
-		} catch (CorruptObjectException e) {
-			assertEquals("zero length name", e.getMessage());
-		}
+		byte[] data = encodeASCII(b.toString());
+		assertCorrupt("zero length name", OBJ_TREE, data);
+		assertSkipListAccepts(OBJ_TREE, data);
+		checker.setIgnore(EMPTY_NAME, true);
+		checker.checkTree(data);
 	}
 

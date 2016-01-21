@@ -1,0 +1,16 @@
+	@Override
+	public int parseArguments(Parameters params) throws CmdLineException {
+		final List<String> list = new ArrayList<>();
+		for (int idx = 0; idx < params.size(); idx++) {
+			final String p;
+			try {
+				p = params.getParameter(idx);
+			} catch (CmdLineException cle) {
+				break;
+			}
+			list.add(p);
+		}
+		setter.addValue(list);
+		return list.size();
+	}
+

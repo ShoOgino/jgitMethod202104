@@ -1,12 +1,21 @@
 	@Test
 	public void testKeyIsPrefixOfFilter() throws MissingObjectException,
 			IncorrectObjectTypeException, IOException {
-		assertTrue(filter.include(fakeWalk("b")));
-		assertTrue(filter.include(fakeWalk("c/d")));
-		assertTrue(filter.include(fakeWalk("c/d")));
-		assertTrue(filter.include(fakeWalk("c")));
-		assertTrue(filter.include(fakeWalk("d/e/f")));
-		assertTrue(filter.include(fakeWalk("d/e")));
-		assertTrue(filter.include(fakeWalk("d")));
+		assertMatches(Sets.of("b/c"), fakeWalkAtSubtree("b"));
+		assertMatches(Sets.of("c/d/e", "c/d/f"), fakeWalkAtSubtree("c/d"));
+		assertMatches(Sets.of("c/d/e", "c/d/f"), fakeWalkAtSubtree("c"));
+		assertMatches(Sets.of("d/e/f/g", "d/e/f/g.x"),
+				fakeWalkAtSubtree("d/e/f"));
+		assertMatches(Sets.of("d/e/f/g", "d/e/f/g.x"),
+				fakeWalkAtSubtree("d/e"));
+		assertMatches(Sets.of("d/e/f/g", "d/e/f/g.x"), fakeWalkAtSubtree("d"));
+
+		assertNoMatches(fakeWalk("b"));
+		assertNoMatches(fakeWalk("c/d"));
+		assertNoMatches(fakeWalk("c"));
+		assertNoMatches(fakeWalk("d/e/f"));
+		assertNoMatches(fakeWalk("d/e"));
+		assertNoMatches(fakeWalk("d"));
+
 	}
 

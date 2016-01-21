@@ -1,0 +1,16 @@
+	@Test
+	public void testReplaceDirectoryWithFile()
+			throws IOException, NoFilepatternException, GitAPIException {
+		try (Git git = new Git(db)) {
+			writeTrashFile("df/f", "before replacement");
+			git.add().addFilepattern("df").call();
+			assertEquals("[df/f, mode:100644, content:before replacement]",
+					indexState(CONTENT));
+			FileUtils.delete(new File(db.getWorkTree(), "df"), RECURSIVE);
+			writeTrashFile("df", "after replacement");
+			git.add().addFilepattern("df").call();
+			assertEquals("[df, mode:100644, content:after replacement]",
+					indexState(CONTENT));
+		}
+	}
+

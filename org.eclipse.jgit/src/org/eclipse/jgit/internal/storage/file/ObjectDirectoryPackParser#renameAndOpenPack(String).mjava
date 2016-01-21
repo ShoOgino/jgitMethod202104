@@ -51,20 +51,25 @@
 			}
 		}
 
-		if (!tmpPack.renameTo(finalPack)) {
+		try {
+			FileUtils.rename(tmpPack, finalPack,
+					StandardCopyOption.ATOMIC_MOVE);
+		} catch (IOException e) {
 			cleanupTemporaryFiles();
 			keep.unlock();
 			throw new IOException(MessageFormat.format(
-					JGitText.get().cannotMovePackTo, finalPack));
+					JGitText.get().cannotMovePackTo, finalPack), e);
 		}
 
-		if (!tmpIdx.renameTo(finalIdx)) {
+		try {
+			FileUtils.rename(tmpIdx, finalIdx, StandardCopyOption.ATOMIC_MOVE);
+		} catch (IOException e) {
 			cleanupTemporaryFiles();
 			keep.unlock();
 			if (!finalPack.delete())
 				finalPack.deleteOnExit();
 			throw new IOException(MessageFormat.format(
-					JGitText.get().cannotMoveIndexTo, finalIdx));
+					JGitText.get().cannotMoveIndexTo, finalIdx), e);
 		}
 
 		try {

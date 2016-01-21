@@ -9,7 +9,7 @@
 		git.add().addFilepattern(untrackedFile.getName()).call();
 
 		// 'dir/b.txt' has already been modified in setupRepository
-		git.reset().addPath("dir").call();
+		assertSameAsHead(git.reset().addPath("dir").call());
 
 		DirCacheEntry postReset = DirCache.read(db.getIndexFile(), db.getFS())
 				.getEntry("dir/b.txt");

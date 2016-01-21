@@ -1,0 +1,13 @@
+	private void insertEdit(DeleteTree d) {
+		for (int i = editIdx; i < edits.size(); i++) {
+			int cmp = EDIT_CMP.compare(d, edits.get(i));
+			if (cmp < 0) {
+				edits.add(i, d);
+				return;
+			} else if (cmp == 0) {
+				return;
+			}
+		}
+		edits.add(d);
+	}
+

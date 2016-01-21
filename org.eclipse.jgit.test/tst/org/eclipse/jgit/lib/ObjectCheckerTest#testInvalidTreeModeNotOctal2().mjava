@@ -1,13 +1,9 @@
 	@Test
 	public void testInvalidTreeModeNotOctal2() {
-		final StringBuilder b = new StringBuilder();
+		StringBuilder b = new StringBuilder();
 		entry(b, "Z a");
-		final byte[] data = Constants.encodeASCII(b.toString());
-		try {
-			checker.checkTree(data);
-			fail("incorrectly accepted an invalid tree");
-		} catch (CorruptObjectException e) {
-			assertEquals("invalid mode character", e.getMessage());
-		}
+		byte[] data = encodeASCII(b.toString());
+		assertCorrupt("invalid mode character", OBJ_TREE, data);
+		assertSkipListRejects("invalid mode character", OBJ_TREE, data);
 	}
 

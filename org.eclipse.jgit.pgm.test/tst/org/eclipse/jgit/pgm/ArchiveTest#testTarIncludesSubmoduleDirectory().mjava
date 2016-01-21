@@ -8,8 +8,8 @@
 		git.submoduleAdd().setURI("./.").setPath("b").call().close();
 		git.commit().setMessage("add submodule").call();
 
-		byte[] result = CLIGitCommand.rawExecute(
-				"git archive --format=tar master", db);
+		byte[] result = CLIGitCommand.executeRaw(
+				"git archive --format=tar master", db).outBytes();
 		String[] expect = { ".gitmodules", "a", "b/", "c" };
 		String[] actual = listTarEntries(result);
 

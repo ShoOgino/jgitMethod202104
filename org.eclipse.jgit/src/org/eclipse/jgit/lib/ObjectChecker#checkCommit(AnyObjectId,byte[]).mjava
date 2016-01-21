@@ -1,0 +1,42 @@
+	/**
+	 * Check a commit for errors.
+	 *
+	 * @param id
+	 *            identity of the object being checked.
+	 * @param raw
+	 *            the commit data. The array is never modified.
+	 * @throws CorruptObjectException
+	 *             if any error was detected.
+	 * @since 4.2
+	 */
+	public void checkCommit(@Nullable AnyObjectId id, byte[] raw)
+			throws CorruptObjectException {
+		bufPtr.value = 0;
+
+		if (!match(raw, tree)) {
+			report(MISSING_TREE, id, JGitText.get().corruptObjectNotreeHeader);
+		} else if (!checkId(raw)) {
+			report(BAD_TREE_SHA1, id, JGitText.get().corruptObjectInvalidTree);
+		}
+
+		while (match(raw, parent)) {
+			if (!checkId(raw)) {
+				report(BAD_PARENT_SHA1, id,
+						JGitText.get().corruptObjectInvalidParent);
+			}
+		}
+
+		if (match(raw, author)) {
+			checkPersonIdent(raw, id);
+		} else {
+			report(MISSING_AUTHOR, id, JGitText.get().corruptObjectNoAuthor);
+		}
+
+		if (match(raw, committer)) {
+			checkPersonIdent(raw, id);
+		} else {
+			report(MISSING_COMMITTER, id,
+					JGitText.get().corruptObjectNoCommitter);
+		}
+	}
+

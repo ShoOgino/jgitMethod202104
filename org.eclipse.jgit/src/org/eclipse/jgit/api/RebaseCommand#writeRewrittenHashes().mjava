@@ -5,6 +5,8 @@
 			return;
 
 		ObjectId headId = getHead().getObjectId();
+		// getHead() checks for null
+		assert headId != null;
 		String head = headId.getName();
 		String currentCommits = rebaseState.readFile(CURRENT_COMMIT);
 		for (String current : currentCommits.split("\n")) //$NON-NLS-1$

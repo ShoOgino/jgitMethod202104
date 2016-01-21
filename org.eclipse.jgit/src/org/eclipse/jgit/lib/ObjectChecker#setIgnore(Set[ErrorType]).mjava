@@ -1,0 +1,16 @@
+	/**
+	 * Configure error types to be ignored across all objects.
+	 *
+	 * @param ids
+	 *            error types to ignore. The caller's set is copied.
+	 * @return {@code this}
+	 * @since 4.2
+	 */
+	public ObjectChecker setIgnore(@Nullable Set<ErrorType> ids) {
+		errors = EnumSet.allOf(ErrorType.class);
+		if (ids != null) {
+			errors.removeAll(ids);
+		}
+		return this;
+	}
+

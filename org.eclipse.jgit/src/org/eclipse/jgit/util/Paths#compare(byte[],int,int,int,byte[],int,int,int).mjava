@@ -1,0 +1,36 @@
+	/**
+	 * Compare two paths according to Git path sort ordering rules.
+	 *
+	 * @param aPath
+	 *            first path buffer. The range {@code [aPos, aEnd)} is used.
+	 * @param aPos
+	 *            index into {@code aPath} where the first path starts.
+	 * @param aEnd
+	 *            1 past last index of {@code aPath}.
+	 * @param aMode
+	 *            mode of the first file. Trees are sorted as though
+	 *            {@code aPath[aEnd] == '/'}, even if aEnd does not exist.
+	 * @param bPath
+	 *            second path buffer. The range {@code [bPos, bEnd)} is used.
+	 * @param bPos
+	 *            index into {@code bPath} where the second path starts.
+	 * @param bEnd
+	 *            1 past last index of {@code bPath}.
+	 * @param bMode
+	 *            mode of the second file. Trees are sorted as though
+	 *            {@code bPath[bEnd] == '/'}, even if bEnd does not exist.
+	 * @return &lt;0 if {@code aPath} sorts before {@code bPath};
+	 *         0 if the paths are the same;
+	 *         &gt;0 if {@code aPath} sorts after {@code bPath}.
+	 */
+	public static int compare(byte[] aPath, int aPos, int aEnd, int aMode,
+			byte[] bPath, int bPos, int bEnd, int bMode) {
+		int cmp = coreCompare(
+				aPath, aPos, aEnd, aMode,
+				bPath, bPos, bEnd, bMode);
+		if (cmp == 0) {
+			cmp = lastPathChar(aMode) - lastPathChar(bMode);
+		}
+		return cmp;
+	}
+

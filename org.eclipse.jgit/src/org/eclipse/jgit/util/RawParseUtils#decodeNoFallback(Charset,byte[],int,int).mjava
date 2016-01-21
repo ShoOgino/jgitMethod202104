@@ -22,23 +22,21 @@
 	public static String decodeNoFallback(final Charset cs,
 			final byte[] buffer, final int start, final int end)
 			throws CharacterCodingException {
-		final ByteBuffer b = ByteBuffer.wrap(buffer, start, end - start);
+		ByteBuffer b = ByteBuffer.wrap(buffer, start, end - start);
 		b.mark();
 
 		// Try our built-in favorite. The assumption here is that
 		// decoding will fail if the data is not actually encoded
 		// using that encoder.
-		//
 		try {
-			return decode(b, Constants.CHARSET);
+			return decode(b, UTF_8);
 		} catch (CharacterCodingException e) {
 			b.reset();
 		}
 
-		if (!cs.equals(Constants.CHARSET)) {
+		if (!cs.equals(UTF_8)) {
 			// Try the suggested encoding, it might be right since it was
 			// provided by the caller.
-			//
 			try {
 				return decode(b, cs);
 			} catch (CharacterCodingException e) {
@@ -48,9 +46,8 @@
 
 		// Try the default character set. A small group of people
 		// might actually use the same (or very similar) locale.
-		//
-		final Charset defcs = Charset.defaultCharset();
-		if (!defcs.equals(cs) && !defcs.equals(Constants.CHARSET)) {
+		Charset defcs = Charset.defaultCharset();
+		if (!defcs.equals(cs) && !defcs.equals(UTF_8)) {
 			try {
 				return decode(b, defcs);
 			} catch (CharacterCodingException e) {

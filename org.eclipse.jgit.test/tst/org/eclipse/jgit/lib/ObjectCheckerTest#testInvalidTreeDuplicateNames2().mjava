@@ -1,14 +1,12 @@
 	@Test
-	public void testInvalidTreeDuplicateNames2() {
-		final StringBuilder b = new StringBuilder();
+	public void testInvalidTreeDuplicateNames2() throws CorruptObjectException {
+		StringBuilder b = new StringBuilder();
 		entry(b, "100644 a");
 		entry(b, "100755 a");
-		final byte[] data = Constants.encodeASCII(b.toString());
-		try {
-			checker.checkTree(data);
-			fail("incorrectly accepted an invalid tree");
-		} catch (CorruptObjectException e) {
-			assertEquals("duplicate entry names", e.getMessage());
-		}
+		byte[] data = encodeASCII(b.toString());
+		assertCorrupt("duplicate entry names", OBJ_TREE, data);
+		assertSkipListAccepts(OBJ_TREE, data);
+		checker.setIgnore(DUPLICATE_ENTRIES, true);
+		checker.checkTree(data);
 	}
 

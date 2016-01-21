@@ -31,14 +31,21 @@
 			if (r.getStorage() != Ref.Storage.PACKED)
 				continue;
 
-			r.getObjectId().copyTo(tmp, w);
+			ObjectId objectId = r.getObjectId();
+			if (objectId == null) {
+				// A packed ref cannot be a symref, let alone a symref
+				// to an unborn branch.
+				throw new NullPointerException();
+			}
+			objectId.copyTo(tmp, w);
 			w.write(' ');
 			w.write(r.getName());
 			w.write('\n');
 
-			if (r.getPeeledObjectId() != null) {
+			ObjectId peeledObjectId = r.getPeeledObjectId();
+			if (peeledObjectId != null) {
 				w.write('^');
-				r.getPeeledObjectId().copyTo(tmp, w);
+				peeledObjectId.copyTo(tmp, w);
 				w.write('\n');
 			}
 		}

@@ -1,0 +1,19 @@
+	/**
+	 * Create a RefTreeDb for a repository.
+	 *
+	 * @param repo
+	 *            the repository using references in this database.
+	 * @param bootstrap
+	 *            bootstrap reference database storing the references that
+	 *            anchor the {@link RefTree}.
+	 * @param txnCommitted
+	 *            name of the bootstrap reference holding the committed RefTree.
+	 */
+	public RefTreeDatabase(Repository repo, RefDatabase bootstrap,
+			String txnCommitted) {
+		this.repo = repo;
+		this.bootstrap = bootstrap;
+		this.txnNamespace = initNamespace(txnCommitted);
+		this.txnCommitted = txnCommitted;
+	}
+

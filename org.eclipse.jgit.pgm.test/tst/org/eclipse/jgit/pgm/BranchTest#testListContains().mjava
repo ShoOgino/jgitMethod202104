@@ -1,13 +1,13 @@
 	@Test
 	public void testListContains() throws Exception {
 		try (Git git = new Git(db)) {
-				git.branchCreate().setName("initial").call();
+			git.branchCreate().setName("initial").call();
 			RevCommit second = git.commit().setMessage("second commit")
 					.call();
-			assertArrayOfLinesEquals(new String[] { "  initial", "* master", "" },
-					execute("git branch --contains 6fd41be"));
-			assertArrayOfLinesEquals(new String[] { "* master", "" },
-					execute("git branch --contains " + second.name()));
+			assertEquals(toString("  initial", "* master"),
+					toString(execute("git branch --contains 6fd41be")));
+			assertEquals("* master",
+					toString(execute("git branch --contains " + second.name())));
 		}
 	}
 

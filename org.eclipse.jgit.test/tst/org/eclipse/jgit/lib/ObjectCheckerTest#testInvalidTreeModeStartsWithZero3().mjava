@@ -1,13 +1,7 @@
 	@Test
 	public void testInvalidTreeModeStartsWithZero3() {
-		final StringBuilder b = new StringBuilder();
+		StringBuilder b = new StringBuilder();
 		entry(b, "040000 a");
-		final byte[] data = Constants.encodeASCII(b.toString());
-		try {
-			checker.checkTree(data);
-			fail("incorrectly accepted an invalid tree");
-		} catch (CorruptObjectException e) {
-			assertEquals("mode starts with '0'", e.getMessage());
-		}
+		assertCorrupt("mode starts with '0'", OBJ_TREE, b);
 	}
 

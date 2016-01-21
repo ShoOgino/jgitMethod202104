@@ -1,0 +1,12 @@
+	private static String[] convertToMainArgs(String str)
+			throws Exception {
+		String[] args = split(str);
+		if (!args[0].equalsIgnoreCase("git") || args.length < 2) {
+			throw new IllegalArgumentException(
+					"Expected 'git <command> [<args>]', was:" + str);
+		}
+		String[] argv = new String[args.length - 1];
+		System.arraycopy(args, 1, argv, 0, args.length - 1);
+		return argv;
+	}
+

@@ -1,0 +1,12 @@
+	private void assertSkipListRejects(String msg, int type, byte[] data) {
+		ObjectId id = idFor(type, data);
+		checker.setSkipList(set(id));
+		try {
+			checker.check(id, type, data);
+			fail("Did not throw CorruptObjectException");
+		} catch (CorruptObjectException e) {
+			assertEquals(msg, e.getMessage());
+		}
+		checker.setSkipList(null);
+	}
+

@@ -9,16 +9,16 @@
 
 		writeTrashFile("dir/file3", "changed");
 
-		Tree tree = new Tree(db);
-		tree.addFile("file2").setId(ObjectId.fromString("0123456789012345678901234567890123456789"));
-		tree.addFile("dir/file3").setId(ObjectId.fromString("0123456789012345678901234567890123456789"));
-		assertEquals(2, tree.memberCount());
+		TreeFormatter dir = new TreeFormatter();
+		dir.append("file3", FileMode.REGULAR_FILE, ObjectId.fromString("0123456789012345678901234567890123456789"));
 
-		Tree tree2 = (Tree) tree.findTreeMember("dir");
-		tree2.setId(insertTree(tree2));
-		tree.setId(insertTree(tree));
+		TreeFormatter tree = new TreeFormatter();
+		tree.append("dir", FileMode.TREE, insertTree(dir));
+		tree.append("file2", FileMode.REGULAR_FILE, ObjectId.fromString("0123456789012345678901234567890123456789"));
+		ObjectId treeId = insertTree(tree);
+
 		FileTreeIterator iterator = new FileTreeIterator(db);
-		IndexDiff diff = new IndexDiff(db, tree.getId(), iterator);
+		IndexDiff diff = new IndexDiff(db, treeId, iterator);
 		diff.diff();
 		assertEquals(2, diff.getChanged().size());
 		assertTrue(diff.getChanged().contains("file2"));

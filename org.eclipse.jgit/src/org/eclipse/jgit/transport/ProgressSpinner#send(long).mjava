@@ -1,0 +1,10 @@
+	private void send(long now) {
+		StringBuilder buf = new StringBuilder(msg.length() + 16);
+		buf.append('\r').append(msg).append("... ("); //$NON-NLS-1$
+		buf.append(STATES[state]);
+		buf.append(")  "); //$NON-NLS-1$
+		shown = true;
+		write(buf.toString());
+		nextUpdateMillis = now + MIN_REFRESH_MILLIS;
+	}
+

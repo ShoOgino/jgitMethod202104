@@ -1,0 +1,15 @@
+	/**
+	 * See bug 484951: "git repo -h" should not print unexpected values
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void testZombieHelpArgument() throws Exception {
+		String[] output = execute("git repo -h");
+		String all = Arrays.toString(output);
+		assertTrue("Unexpected help output: " + all,
+				all.contains("jgit repo"));
+		assertFalse("Unexpected help output: " + all,
+				all.contains("jgit repo VAL"));
+	}
+

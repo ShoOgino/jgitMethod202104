@@ -5,7 +5,6 @@
 		final RevCommit Q = src.commit().add("Q", Q_bin).create();
 		final Repository db = src.getRepository();
 		final String dstName = Constants.R_HEADS + "new.branch";
-		Transport t;
 
 		enableReceivePack();
 
@@ -14,8 +13,7 @@
 		cfg.setInt("http", null, "postbuffer", 8 * 1024);
 		cfg.save();
 
-		t = Transport.open(db, remoteURI);
-		try {
+		try (Transport t = Transport.open(db, remoteURI)) {
 			final String srcExpr = Q.name();
 			final boolean forceUpdate = false;
 			final String localName = null;
@@ -24,8 +22,6 @@
 			RemoteRefUpdate u = new RemoteRefUpdate(src.getRepository(),
 					srcExpr, dstName, forceUpdate, localName, oldId);
 			t.push(NullProgressMonitor.INSTANCE, Collections.singleton(u));
-		} finally {
-			t.close();
 		}
 
 		assertTrue(remoteRepository.hasObject(Q_bin));

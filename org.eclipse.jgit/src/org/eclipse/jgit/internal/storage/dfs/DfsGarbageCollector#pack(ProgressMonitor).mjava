@@ -23,22 +23,25 @@
 
 		ctx = (DfsReader) objdb.newReader();
 		try {
-			refdb.clearCache();
+			refdb.refresh();
 			objdb.clearCache();
 
-			refsBefore = refdb.getRefs(ALL);
+			Collection<Ref> refsBefore = RefTreeNames.allRefs(refdb);
 			packsBefore = packsToRebuild();
 			if (packsBefore.isEmpty())
 				return true;
 
 			allHeads = new HashSet<ObjectId>();
 			nonHeads = new HashSet<ObjectId>();
+			txnHeads = new HashSet<ObjectId>();
 			tagTargets = new HashSet<ObjectId>();
-			for (Ref ref : refsBefore.values()) {
+			for (Ref ref : refsBefore) {
 				if (ref.isSymbolic() || ref.getObjectId() == null)
 					continue;
 				if (isHead(ref))
 					allHeads.add(ref.getObjectId());
+				else if (RefTreeNames.isRefTree(refdb, ref.getName()))
+					txnHeads.add(ref.getObjectId());
 				else
 					nonHeads.add(ref.getObjectId());
 				if (ref.getPeeledObjectId() != null)
@@ -50,6 +53,7 @@
 			try {
 				packHeads(pm);
 				packRest(pm);
+				packRefTreeGraph(pm);
 				packGarbage(pm);
 				objdb.commitPack(newPackDesc, toPrune());
 				rollback = false;

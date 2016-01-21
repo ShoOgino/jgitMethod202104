@@ -14,16 +14,17 @@
 	 *         spanned multiple lines. Embedded LFs are converted to spaces.
 	 */
 	public final String getShortMessage() {
-		final byte[] raw = buffer;
-		final int msgB = RawParseUtils.commitMessage(raw, 0);
-		if (msgB < 0)
+		byte[] raw = buffer;
+		int msgB = RawParseUtils.commitMessage(raw, 0);
+		if (msgB < 0) {
 			return ""; //$NON-NLS-1$
+		}
 
-		final Charset enc = RawParseUtils.parseEncoding(raw);
-		final int msgE = RawParseUtils.endOfParagraph(raw, msgB);
-		String str = RawParseUtils.decode(enc, raw, msgB, msgE);
-		if (hasLF(raw, msgB, msgE))
+		int msgE = RawParseUtils.endOfParagraph(raw, msgB);
+		String str = RawParseUtils.decode(guessEncoding(), raw, msgB, msgE);
+		if (hasLF(raw, msgB, msgE)) {
 			str = StringUtils.replaceLineBreaksWithSpace(str);
+		}
 		return str;
 	}
 

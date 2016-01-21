@@ -5,7 +5,7 @@
 		git.add().addFilepattern("a.txt").call();
 		writeTrashFile("a.txt", "modified");
 		// should use default mode MIXED
-		git.reset().call();
+		assertSameAsHead(git.reset().call());
 
 		DirCache cache = db.readDirCache();
 		DirCacheEntry aEntry = cache.getEntry("a.txt");

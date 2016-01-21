@@ -18,7 +18,7 @@
 		RevCommit c2 = bb.commit().add("f", contentB).create();
 		testRepo.getRevWalk().parseHeaders(c2);
 		PackIndex pf2 = writePack(repo, Collections.singleton(c2),
-				Collections.singleton(objectIdSet(pf1)));
+				Collections.<ObjectIdSet> singleton(pf1));
 		assertContent(
 				pf2,
 				Arrays.asList(c2.getId(), c2.getTree().getId(),

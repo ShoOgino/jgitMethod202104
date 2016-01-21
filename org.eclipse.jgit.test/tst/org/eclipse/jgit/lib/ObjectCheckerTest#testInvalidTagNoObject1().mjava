@@ -1,13 +1,5 @@
 	@Test
 	public void testInvalidTagNoObject1() {
-		final StringBuilder b = new StringBuilder();
-
-		final byte[] data = Constants.encodeASCII(b.toString());
-		try {
-			checker.checkTag(data);
-			fail("incorrectly accepted invalid tag");
-		} catch (CorruptObjectException e) {
-			assertEquals("no object header", e.getMessage());
-		}
+		assertCorrupt("no object header", OBJ_TAG, new byte[0]);
 	}
 

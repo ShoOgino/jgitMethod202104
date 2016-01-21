@@ -1,29 +1,32 @@
 	@Override
 	protected void run() throws Exception {
-		if (delete || deleteForce)
-			delete(deleteForce);
-		else {
-			if (branches.size() > 2)
-				throw die(CLIText.get().tooManyRefsGiven + new CmdLineParser(this).printExample(ExampleMode.ALL));
-
+		if (delete != null || deleteForce != null) {
+			if (delete != null) {
+				delete(delete, false);
+			}
+			if (deleteForce != null) {
+				delete(deleteForce, true);
+			}
+		} else {
 			if (rename) {
 				String src, dst;
-				if (branches.size() == 1) {
+				if (otherBranch == null) {
 					final Ref head = db.getRef(Constants.HEAD);
-					if (head != null && head.isSymbolic())
+					if (head != null && head.isSymbolic()) {
 						src = head.getLeaf().getName();
-					else
+					} else {
 						throw die(CLIText.get().cannotRenameDetachedHEAD);
-					dst = branches.get(0);
+					}
+					dst = branch;
 				} else {
-					src = branches.get(0);
+					src = branch;
 					final Ref old = db.getRef(src);
 					if (old == null)
 						throw die(MessageFormat.format(CLIText.get().doesNotExist, src));
 					if (!old.getName().startsWith(Constants.R_HEADS))
 						throw die(MessageFormat.format(CLIText.get().notABranch, src));
 					src = old.getName();
-					dst = branches.get(1);
+					dst = otherBranch;
 				}
 
 				if (!dst.startsWith(Constants.R_HEADS))
@@ -35,13 +38,14 @@
 				if (r.rename() != Result.RENAMED)
 					throw die(MessageFormat.format(CLIText.get().cannotBeRenamed, src));
 
-			} else if (branches.size() > 0) {
-				String newHead = branches.get(0);
+			} else if (createForce || branch != null) {
+				String newHead = branch;
 				String startBranch;
-				if (branches.size() == 2)
-					startBranch = branches.get(1);
-				else
+				if (createForce) {
+					startBranch = otherBranch;
+				} else {
 					startBranch = Constants.HEAD;
+				}
 				Ref startRef = db.getRef(startBranch);
 				ObjectId startAt = db.resolve(startBranch + "^0"); //$NON-NLS-1$
 				if (startRef != null) {
@@ -54,22 +58,27 @@
 				}
 				startBranch = Repository.shortenRefName(startBranch);
 				String newRefName = newHead;
-				if (!newRefName.startsWith(Constants.R_HEADS))
+				if (!newRefName.startsWith(Constants.R_HEADS)) {
 					newRefName = Constants.R_HEADS + newRefName;
-				if (!Repository.isValidRefName(newRefName))
+				}
+				if (!Repository.isValidRefName(newRefName)) {
 					throw die(MessageFormat.format(CLIText.get().notAValidRefName, newRefName));
-				if (!createForce && db.resolve(newRefName) != null)
+				}
+				if (!createForce && db.resolve(newRefName) != null) {
 					throw die(MessageFormat.format(CLIText.get().branchAlreadyExists, newHead));
+				}
 				RefUpdate updateRef = db.updateRef(newRefName);
 				updateRef.setNewObjectId(startAt);
 				updateRef.setForceUpdate(createForce);
 				updateRef.setRefLogMessage(MessageFormat.format(CLIText.get().branchCreatedFrom, startBranch), false);
 				Result update = updateRef.update();
-				if (update == Result.REJECTED)
+				if (update == Result.REJECTED) {
 					throw die(MessageFormat.format(CLIText.get().couldNotCreateBranch, newHead, update.toString()));
+				}
 			} else {
-				if (verbose)
+				if (verbose) {
 					rw = new RevWalk(db);
+				}
 				list();
 			}
 		}

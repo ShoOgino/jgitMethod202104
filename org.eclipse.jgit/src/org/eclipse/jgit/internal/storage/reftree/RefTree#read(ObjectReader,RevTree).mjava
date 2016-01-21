@@ -1,0 +1,23 @@
+	/**
+	 * Load a reference tree.
+	 *
+	 * @param reader
+	 *            reader to scan the reference tree with.
+	 * @param tree
+	 *            the tree to read.
+	 * @return the ref tree read from the commit.
+	 * @throws IOException
+	 *             the repository cannot be accessed through the reader.
+	 * @throws CorruptObjectException
+	 *             a tree object is corrupt and cannot be read.
+	 * @throws IncorrectObjectTypeException
+	 *             a tree object wasn't actually a tree.
+	 * @throws MissingObjectException
+	 *             a reference tree object doesn't exist.
+	 */
+	public static RefTree read(ObjectReader reader, RevTree tree)
+			throws MissingObjectException, IncorrectObjectTypeException,
+			CorruptObjectException, IOException {
+		return new RefTree(DirCache.read(reader, tree));
+	}
+

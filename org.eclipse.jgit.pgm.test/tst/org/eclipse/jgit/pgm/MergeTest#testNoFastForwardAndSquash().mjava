@@ -1,6 +1,7 @@
 	@Test
 	public void testNoFastForwardAndSquash() throws Exception {
-		assertEquals("fatal: You cannot combine --squash with --no-ff.",
-				execute("git merge master --no-ff --squash")[0]);
+		assertEquals(
+				CLIText.fatalError(CLIText.get().cannotCombineSquashWithNoff),
+				executeUnchecked("git merge master --no-ff --squash")[0]);
 	}
 

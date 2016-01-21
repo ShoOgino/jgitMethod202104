@@ -1,0 +1,15 @@
+	@Test
+	public void testWildcardAfterText1() {
+		RefSpec a = new RefSpec("refs/heads/*/for-linus:refs/remotes/mine/*-blah");
+		assertTrue(a.isWildcard());
+		assertTrue(a.matchDestination("refs/remotes/mine/x-blah"));
+		assertTrue(a.matchDestination("refs/remotes/mine/foo-blah"));
+		assertTrue(a.matchDestination("refs/remotes/mine/foo/x-blah"));
+		assertFalse(a.matchDestination("refs/remotes/origin/foo/x-blah"));
+
+		RefSpec b = a.expandFromSource("refs/heads/foo/for-linus");
+		assertEquals("refs/remotes/mine/foo-blah", b.getDestination());
+		RefSpec c = a.expandFromDestination("refs/remotes/mine/foo-blah");
+		assertEquals("refs/heads/foo/for-linus", c.getSource());
+	}
+

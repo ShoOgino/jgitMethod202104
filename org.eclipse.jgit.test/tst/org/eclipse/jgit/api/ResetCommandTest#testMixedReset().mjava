@@ -3,8 +3,8 @@
 			AmbiguousObjectException, IOException, GitAPIException {
 		setupRepository();
 		ObjectId prevHead = db.resolve(Constants.HEAD);
-		git.reset().setMode(ResetType.MIXED).setRef(initialCommit.getName())
-				.call();
+		assertSameAsHead(git.reset().setMode(ResetType.MIXED)
+				.setRef(initialCommit.getName()).call());
 		// check if HEAD points to initial commit now
 		ObjectId head = db.resolve(Constants.HEAD);
 		assertEquals(initialCommit, head);

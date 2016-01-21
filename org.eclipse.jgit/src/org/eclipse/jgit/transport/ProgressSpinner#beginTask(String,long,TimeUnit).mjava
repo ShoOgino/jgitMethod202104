@@ -1,0 +1,23 @@
+	/**
+	 * Begin a time consuming task.
+	 *
+	 * @param title
+	 *            description of the task, suitable for human viewing.
+	 * @param delay
+	 *            delay to wait before displaying anything at all.
+	 * @param delayUnits
+	 *            unit for {@code delay}.
+	 */
+	public void beginTask(String title, long delay, TimeUnit delayUnits) {
+		msg = title;
+		state = 0;
+		shown = false;
+
+		long now = System.currentTimeMillis();
+		if (delay > 0) {
+			nextUpdateMillis = now + delayUnits.toMillis(delay);
+		} else {
+			send(now);
+		}
+	}
+

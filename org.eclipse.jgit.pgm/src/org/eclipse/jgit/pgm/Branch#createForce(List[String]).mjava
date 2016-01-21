@@ -1,0 +1,18 @@
+	@Option(name = "--create-force", aliases = {
+			"-f" }, metaVar = "metaVar_branchAndStartPoint", usage = "usage_forceCreateBranchEvenExists", handler = OptionWithValuesListHandler.class)
+	public void createForce(List<String> branchAndStartPoint) {
+		createForce = true;
+		if (branchAndStartPoint.isEmpty()) {
+			throw die(CLIText.get().branchNameRequired);
+		}
+		if (branchAndStartPoint.size() > 2) {
+			throw die(CLIText.get().tooManyRefsGiven);
+		}
+		if (branchAndStartPoint.size() == 1) {
+			branch = branchAndStartPoint.get(0);
+		} else {
+			branch = branchAndStartPoint.get(0);
+			otherBranch = branchAndStartPoint.get(1);
+		}
+	}
+

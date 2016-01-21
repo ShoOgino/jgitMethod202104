@@ -1,0 +1,11 @@
+	private void run(String commandLine) throws Exception {
+		String[] argv = convertToMainArgs(commandLine);
+		try {
+			super.run(argv);
+		} catch (TerminatedByHelpException e) {
+			// this is not a failure, super called exit() on help
+		} finally {
+			writer.flush();
+		}
+	}
+

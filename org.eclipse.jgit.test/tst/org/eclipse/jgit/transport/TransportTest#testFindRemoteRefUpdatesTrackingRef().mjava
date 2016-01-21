@@ -7,10 +7,12 @@
 	public void testFindRemoteRefUpdatesTrackingRef() throws IOException {
 		remoteConfig.addFetchRefSpec(new RefSpec(
 				"refs/heads/*:refs/remotes/test/*"));
-		transport = Transport.open(db, remoteConfig);
-		final Collection<RemoteRefUpdate> result = transport
-				.findRemoteRefUpdatesFor(Collections.nCopies(1, new RefSpec(
-						"+refs/heads/a:refs/heads/a")));
+
+		Collection<RemoteRefUpdate> result;
+		try (Transport transport = Transport.open(db, remoteConfig)) {
+			result = transport.findRemoteRefUpdatesFor(Collections.nCopies(1,
+					new RefSpec("+refs/heads/a:refs/heads/a")));
+		}
 
 		assertEquals(1, result.size());
 		final TrackingRefUpdate tru = result.iterator().next()

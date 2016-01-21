@@ -6,17 +6,15 @@
 		cfg.save();
 
 		Repository dst = createBareRepository();
-		Transport t = Transport.open(dst, smartAuthNoneURI);
-		try {
+		try (Transport t = Transport.open(dst, smartAuthNoneURI)) {
 			try {
 				t.openFetch();
 				fail("connection opened even though service disabled");
 			} catch (TransportException err) {
-				String exp = smartAuthNoneURI + ": Git access forbidden";
+				String exp = smartAuthNoneURI + ": "
+						+ JGitText.get().serviceNotEnabledNoName;
 				assertEquals(exp, err.getMessage());
 			}
-		} finally {
-			t.close();
 		}
 	}
 

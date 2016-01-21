@@ -1,0 +1,52 @@
+	private void checkPersonIdent(byte[] raw, @Nullable AnyObjectId id)
+			throws CorruptObjectException {
+		if (allowInvalidPersonIdent) {
+			bufPtr.value = nextLF(raw, bufPtr.value);
+			return;
+		}
+
+		final int emailB = nextLF(raw, bufPtr.value, '<');
+		if (emailB == bufPtr.value || raw[emailB - 1] != '<') {
+			report(MISSING_EMAIL, id, JGitText.get().corruptObjectMissingEmail);
+			bufPtr.value = nextLF(raw, bufPtr.value);
+			return;
+		}
+
+		final int emailE = nextLF(raw, emailB, '>');
+		if (emailE == emailB || raw[emailE - 1] != '>') {
+			report(BAD_EMAIL, id, JGitText.get().corruptObjectBadEmail);
+			bufPtr.value = nextLF(raw, bufPtr.value);
+			return;
+		}
+		if (emailE == raw.length || raw[emailE] != ' ') {
+			report(MISSING_SPACE_BEFORE_DATE, id,
+					JGitText.get().corruptObjectBadDate);
+			bufPtr.value = nextLF(raw, bufPtr.value);
+			return;
+		}
+
+		parseBase10(raw, emailE + 1, bufPtr); // when
+		if (emailE + 1 == bufPtr.value || bufPtr.value == raw.length
+				|| raw[bufPtr.value] != ' ') {
+			report(BAD_DATE, id, JGitText.get().corruptObjectBadDate);
+			bufPtr.value = nextLF(raw, bufPtr.value);
+			return;
+		}
+
+		int p = bufPtr.value + 1;
+		parseBase10(raw, p, bufPtr); // tz offset
+		if (p == bufPtr.value) {
+			report(BAD_TIMEZONE, id, JGitText.get().corruptObjectBadTimezone);
+			bufPtr.value = nextLF(raw, bufPtr.value);
+			return;
+		}
+
+		p = bufPtr.value;
+		if (raw[p] == '\n') {
+			bufPtr.value = p + 1;
+		} else {
+			report(BAD_TIMEZONE, id, JGitText.get().corruptObjectBadTimezone);
+			bufPtr.value = nextLF(raw, p);
+		}
+	}
+

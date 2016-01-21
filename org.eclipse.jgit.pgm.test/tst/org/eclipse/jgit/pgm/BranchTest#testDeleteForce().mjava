@@ -1,0 +1,36 @@
+	@Test
+	public void testDeleteForce() throws Exception {
+		try {
+			toString(execute("git branch -D"));
+			fail("Must die");
+		} catch (Die e) {
+			// expected, requires argument
+		}
+		String result = toString(execute("git branch second"));
+		assertEquals("", result);
+		result = toString(execute("git checkout second"));
+		assertEquals("Switched to branch 'second'", result);
+
+		File a = writeTrashFile("a", "a");
+		assertTrue(a.exists());
+		execute("git add a", "git commit -m 'added a'");
+
+		result = toString(execute("git checkout master"));
+		assertEquals("Switched to branch 'master'", result);
+
+		result = toString(execute("git branch"));
+		assertEquals(toString("* master", "second"), result);
+
+		try {
+			toString(execute("git branch -d second"));
+			fail("Must die");
+		} catch (Die e) {
+			// expected, the current HEAD is on second and not merged to master
+		}
+		result = toString(execute("git branch -D second"));
+		assertEquals("", result);
+
+		result = toString(execute("git branch"));
+		assertEquals("* master", result);
+	}
+

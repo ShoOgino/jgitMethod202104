@@ -1,7 +1,24 @@
+	/**
+	 * Executes specified git commands (with arguments), throws exception and
+	 * stops execution on first command which output contains a 'fatal:' error
+	 *
+	 * @param cmds
+	 *            each string argument must be a valid git command line, e.g.
+	 *            "git branch -h"
+	 * @return command output
+	 * @throws Exception
+	 */
 	protected String[] execute(String... cmds) throws Exception {
 		List<String> result = new ArrayList<String>(cmds.length);
-		for (String cmd : cmds)
-			result.addAll(CLIGitCommand.execute(cmd, db));
+		for (String cmd : cmds) {
+			Result r = CLIGitCommand.executeRaw(cmd, db);
+			if (r.ex instanceof TerminatedByHelpException) {
+				result.addAll(r.errLines());
+			} else if (r.ex != null) {
+				throw r.ex;
+			}
+			result.addAll(r.outLines());
+		}
 		return result.toArray(new String[0]);
 	}
 

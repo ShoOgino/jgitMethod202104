@@ -26,6 +26,10 @@
 		// less obvious #2 due to git sorting order
 		filter.include(fakeWalk("d/e/f/g/h.txt"));
 
+		// listed before g/y, so can't StopWalk here
+		filter.include(fakeWalk("d/e/f/g.y"));
+		singles.get("d/e/f/g").include(fakeWalk("d/e/f/g.y"));
+
 		// non-ascii
 		try {
 			filter.include(fakeWalk("\u00C0"));

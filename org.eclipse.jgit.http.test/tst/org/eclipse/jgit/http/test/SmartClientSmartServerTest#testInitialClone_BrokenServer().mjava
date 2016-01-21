@@ -3,8 +3,7 @@
 		Repository dst = createBareRepository();
 		assertFalse(dst.hasObject(A_txt));
 
-		Transport t = Transport.open(dst, brokenURI);
-		try {
+		try (Transport t = Transport.open(dst, brokenURI)) {
 			try {
 				t.fetch(NullProgressMonitor.INSTANCE, mirror(master));
 				fail("fetch completed despite upload-pack being broken");
@@ -14,8 +13,6 @@
 						+ " received Content-Type text/plain; charset=UTF-8";
 				assertEquals(exp, err.getMessage());
 			}
-		} finally {
-			t.close();
 		}
 
 		List<AccessEvent> requests = getRequests();

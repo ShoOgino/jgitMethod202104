@@ -1,9 +1,13 @@
 	private static String getHeadName(Ref head) {
 		String headName;
-		if (head.isSymbolic())
+		if (head.isSymbolic()) {
 			headName = head.getTarget().getName();
-		else
-			headName = head.getObjectId().getName();
+		} else {
+			ObjectId headId = head.getObjectId();
+			// the callers are checking this already
+			assert headId != null;
+			headName = headId.getName();
+		}
 		return headName;
 	}
 

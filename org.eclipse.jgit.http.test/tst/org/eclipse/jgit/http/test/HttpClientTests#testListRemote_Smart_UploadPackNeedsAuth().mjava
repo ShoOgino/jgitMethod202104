@@ -1,18 +1,15 @@
 	@Test
 	public void testListRemote_Smart_UploadPackNeedsAuth() throws Exception {
 		Repository dst = createBareRepository();
-		Transport t = Transport.open(dst, smartAuthBasicURI);
-		try {
+		try (Transport t = Transport.open(dst, smartAuthBasicURI)) {
 			try {
 				t.openFetch();
 				fail("connection opened even though service disabled");
 			} catch (TransportException err) {
 				String exp = smartAuthBasicURI + ": "
-						+ JGitText.get().notAuthorized;
+						+ JGitText.get().noCredentialsProvider;
 				assertEquals(exp, err.getMessage());
 			}
-		} finally {
-			t.close();
 		}
 	}
 

@@ -1,0 +1,25 @@
+	private int scanPathSegment(byte[] raw, int ptr, int end,
+			@Nullable AnyObjectId id) throws CorruptObjectException {
+		for (; ptr < end; ptr++) {
+			byte c = raw[ptr];
+			if (c == 0) {
+				return ptr;
+			}
+			if (c == '/') {
+				report(FULL_PATHNAME, id,
+						JGitText.get().corruptObjectNameContainsSlash);
+			}
+			if (windows && isInvalidOnWindows(c)) {
+				if (c > 31) {
+					throw new CorruptObjectException(String.format(
+							JGitText.get().corruptObjectNameContainsChar,
+							Byte.valueOf(c)));
+				}
+				throw new CorruptObjectException(String.format(
+						JGitText.get().corruptObjectNameContainsByte,
+						Integer.valueOf(c & 0xff)));
+			}
+		}
+		return ptr;
+	}
+

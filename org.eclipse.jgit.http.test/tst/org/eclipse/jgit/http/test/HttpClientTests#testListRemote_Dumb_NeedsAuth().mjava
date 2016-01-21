@@ -1,18 +1,15 @@
 	@Test
 	public void testListRemote_Dumb_NeedsAuth() throws Exception {
 		Repository dst = createBareRepository();
-		Transport t = Transport.open(dst, dumbAuthBasicURI);
-		try {
+		try (Transport t = Transport.open(dst, dumbAuthBasicURI)) {
 			try {
 				t.openFetch();
 				fail("connection opened even info/refs needs auth basic");
 			} catch (TransportException err) {
 				String exp = dumbAuthBasicURI + ": "
-						+ JGitText.get().notAuthorized;
+						+ JGitText.get().noCredentialsProvider;
 				assertEquals(exp, err.getMessage());
 			}
-		} finally {
-			t.close();
 		}
 	}
 

@@ -1,0 +1,17 @@
+	int findEntry(int low, byte[] p, int pLen) {
+		int high = entryCnt;
+		while (low < high) {
+			int mid = (low + high) >>> 1;
+			final int cmp = cmp(p, pLen, sortedEntries[mid]);
+			if (cmp < 0)
+				high = mid;
+			else if (cmp == 0) {
+				while (mid > 0 && cmp(p, pLen, sortedEntries[mid - 1]) == 0)
+					mid--;
+				return mid;
+			} else
+				low = mid + 1;
+		}
+		return -(low + 1);
+	}
+

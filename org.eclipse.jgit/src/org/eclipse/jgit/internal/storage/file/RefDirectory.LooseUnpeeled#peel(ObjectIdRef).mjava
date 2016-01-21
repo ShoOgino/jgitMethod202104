@@ -1,9 +1,12 @@
 		public LooseRef peel(ObjectIdRef newLeaf) {
-			if (newLeaf.getPeeledObjectId() != null)
+			ObjectId peeledObjectId = newLeaf.getPeeledObjectId();
+			ObjectId objectId = getObjectId();
+			if (peeledObjectId != null) {
 				return new LoosePeeledTag(snapShot, getName(),
-						getObjectId(), newLeaf.getPeeledObjectId());
-			else
+						objectId, peeledObjectId);
+			} else {
 				return new LooseNonTag(snapShot, getName(),
-						getObjectId());
+						objectId);
+			}
 		}
 

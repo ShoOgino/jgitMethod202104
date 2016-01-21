@@ -1,0 +1,39 @@
+	private void checkNameConflicts() {
+		int end = entryCnt - 1;
+		for (int eIdx = 0; eIdx < end; eIdx++) {
+			DirCacheEntry e = entries[eIdx];
+			if (e.getStage() != 0) {
+				continue;
+			}
+
+			byte[] ePath = e.path;
+			int prefixLen = lastSlash(ePath) + 1;
+
+			for (int nIdx = eIdx + 1; nIdx < entryCnt; nIdx++) {
+				DirCacheEntry n = entries[nIdx];
+				if (n.getStage() != 0) {
+					continue;
+				}
+
+				byte[] nPath = n.path;
+				if (!startsWith(ePath, nPath, prefixLen)) {
+					// Different prefix; this entry is in another directory.
+					break;
+				}
+
+				int s = nextSlash(nPath, prefixLen);
+				int m = s < nPath.length ? TYPE_TREE : n.getRawMode();
+				int cmp = compareSameName(
+						ePath, prefixLen, ePath.length,
+						nPath, prefixLen, s, m);
+				if (cmp < 0) {
+					break;
+				} else if (cmp == 0) {
+					throw new DirCacheNameConflictException(
+							e.getPathString(),
+							n.getPathString());
+				}
+			}
+		}
+	}
+
