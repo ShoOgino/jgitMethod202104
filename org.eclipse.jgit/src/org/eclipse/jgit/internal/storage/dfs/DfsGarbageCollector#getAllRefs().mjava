@@ -1,12 +1,4 @@
-	/**
-	 * Returns a collection of all refs and additional refs (e.g. FETCH_HEAD,
-	 * MERGE_HEAD, ...)
-	 *
-	 * @return a collection of refs pointing to live objects.
-	 * @throws IOException
-	 */
 	private Collection<Ref> getAllRefs() throws IOException {
-		RefDatabase refdb = repo.getRefDatabase();
 		Collection<Ref> refs = refdb.getRefs(RefDatabase.ALL).values();
 		List<Ref> addl = refdb.getAdditionalRefs();
 		if (!addl.isEmpty()) {

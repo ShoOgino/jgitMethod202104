@@ -1,6 +1,9 @@
 	@Override
 	public Ref exactRef(String name) throws IOException {
-		if (conflictsWithBootstrap(name)) {
+		if (!repo.isBare() && name.indexOf('/') < 0 && !HEAD.equals(name)) {
+			// Pass through names like MERGE_HEAD, ORIG_HEAD, FETCH_HEAD.
+			return bootstrap.exactRef(name);
+		} else if (conflictsWithBootstrap(name)) {
 			return null;
 		}
 
