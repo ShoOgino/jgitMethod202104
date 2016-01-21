@@ -1,21 +1,21 @@
 	@Test
 	public void testCherryPickConflictReset() throws Exception {
-		Git git = new Git(db);
+		try (Git git = new Git(db)) {
+			RevCommit sideCommit = prepareCherryPick(git);
 
-		RevCommit sideCommit = prepareCherryPick(git);
+			CherryPickResult result = git.cherryPick().include(sideCommit.getId())
+					.call();
 
-		CherryPickResult result = git.cherryPick().include(sideCommit.getId())
-				.call();
+			assertEquals(CherryPickStatus.CONFLICTING, result.getStatus());
+			assertEquals(RepositoryState.CHERRY_PICKING, db.getRepositoryState());
+			assertTrue(new File(db.getDirectory(), Constants.CHERRY_PICK_HEAD)
+					.exists());
 
-		assertEquals(CherryPickStatus.CONFLICTING, result.getStatus());
-		assertEquals(RepositoryState.CHERRY_PICKING, db.getRepositoryState());
-		assertTrue(new File(db.getDirectory(), Constants.CHERRY_PICK_HEAD)
-				.exists());
+			git.reset().setMode(ResetType.MIXED).setRef("HEAD").call();
 
-		git.reset().setMode(ResetType.MIXED).setRef("HEAD").call();
-
-		assertEquals(RepositoryState.SAFE, db.getRepositoryState());
-		assertFalse(new File(db.getDirectory(), Constants.CHERRY_PICK_HEAD)
-				.exists());
+			assertEquals(RepositoryState.SAFE, db.getRepositoryState());
+			assertFalse(new File(db.getDirectory(), Constants.CHERRY_PICK_HEAD)
+					.exists());
+		}
 	}
 
