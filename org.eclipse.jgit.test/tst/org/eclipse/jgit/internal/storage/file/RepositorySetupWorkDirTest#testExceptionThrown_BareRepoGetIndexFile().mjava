@@ -1,8 +1,8 @@
 	@Test
 	public void testExceptionThrown_BareRepoGetIndexFile() throws Exception {
 		File gitDir = getFile("workdir");
-		try {
-			new FileRepository(gitDir).getIndexFile();
+		try (Repository repo = new FileRepository(gitDir)) {
+			repo.getIndexFile();
 			fail("Expected NoWorkTreeException missing");
 		} catch (NoWorkTreeException e) {
 			// expected
