@@ -3,7 +3,7 @@
 			throws Exception {
 		final int type = Constants.OBJ_BLOB;
 		byte[] data = getRng().nextBytes(streamThreshold + 5);
-		ObjectId id = new ObjectInserter.Formatter().idFor(type, data);
+		ObjectId id = getId(type, data);
 		byte[] gz = compressStandardFormat(type, data);
 		gz[gz.length - 1] = 0;
 		gz[gz.length - 2] = 0;
