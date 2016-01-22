@@ -1,23 +1,24 @@
-	@SuppressWarnings("resource" /* java 7 */)
 	@Test
 	public void scanWithGitDirRef() throws Exception {
 		Repository repo1 = createWorkRepository();
 		File dir = createTempDirectory("dir");
 		File dotGit = new File(dir, Constants.DOT_GIT);
-		new FileWriter(dotGit).append(
-				"gitdir: " + repo1.getDirectory().getAbsolutePath()).close();
-		FileRepositoryBuilder builder = new FileRepositoryBuilder();
+		try (FileWriter writer = new FileWriter(dotGit)) {
+			writer.append(
+					"gitdir: " + repo1.getDirectory().getAbsolutePath()).close();
+			FileRepositoryBuilder builder = new FileRepositoryBuilder();
 
-		builder.setWorkTree(dir);
-		builder.findGitDir(dir);
-		assertEquals(repo1.getDirectory().getAbsolutePath(), builder
-				.getGitDir().getAbsolutePath());
-		builder.setMustExist(true);
-		Repository repo2 = builder.build();
+			builder.setWorkTree(dir);
+			builder.findGitDir(dir);
+			assertEquals(repo1.getDirectory().getAbsolutePath(), builder
+					.getGitDir().getAbsolutePath());
+			builder.setMustExist(true);
+			Repository repo2 = builder.build();
 
-		// The tmp directory may be a symlink
-		assertEquals(repo1.getDirectory().getCanonicalPath(), repo2
-				.getDirectory().getCanonicalPath());
-		assertEquals(dir, repo2.getWorkTree());
+			// The tmp directory may be a symlink
+			assertEquals(repo1.getDirectory().getCanonicalPath(), repo2
+					.getDirectory().getCanonicalPath());
+			assertEquals(dir, repo2.getWorkTree());
+		}
 	}
 

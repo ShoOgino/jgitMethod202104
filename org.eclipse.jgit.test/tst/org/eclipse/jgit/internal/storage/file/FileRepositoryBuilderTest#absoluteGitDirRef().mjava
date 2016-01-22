@@ -1,19 +1,19 @@
-	@SuppressWarnings("resource" /* java 7 */)
 	@Test
 	public void absoluteGitDirRef() throws Exception {
 		Repository repo1 = createWorkRepository();
 		File dir = createTempDirectory("dir");
 		File dotGit = new File(dir, Constants.DOT_GIT);
-		new FileWriter(dotGit).append(
-				"gitdir: " + repo1.getDirectory().getAbsolutePath()).close();
-		FileRepositoryBuilder builder = new FileRepositoryBuilder();
+		try (FileWriter writer = new FileWriter(dotGit)) {
+			writer.append("gitdir: " + repo1.getDirectory().getAbsolutePath()).close();
+			FileRepositoryBuilder builder = new FileRepositoryBuilder();
 
-		builder.setWorkTree(dir);
-		builder.setMustExist(true);
-		Repository repo2 = builder.build();
+			builder.setWorkTree(dir);
+			builder.setMustExist(true);
+			Repository repo2 = builder.build();
 
-		assertEquals(repo1.getDirectory().getAbsolutePath(), repo2
-				.getDirectory().getAbsolutePath());
-		assertEquals(dir, repo2.getWorkTree());
+			assertEquals(repo1.getDirectory().getAbsolutePath(), repo2
+					.getDirectory().getAbsolutePath());
+			assertEquals(dir, repo2.getWorkTree());
+		}
 	}
 

@@ -1,4 +1,3 @@
-	@SuppressWarnings("unused")
 	@Test
 	public void emptyRepositoryFormatVersion() throws Exception {
 		Repository r = createWorkRepository();
@@ -7,6 +6,8 @@
 				ConfigConstants.CONFIG_KEY_REPO_FORMAT_VERSION, "");
 		config.save();
 
-		new FileRepository(r.getDirectory());
+		try (FileRepository repo = new FileRepository(r.getDirectory())) {
+			// Unused
+		}
 	}
 
