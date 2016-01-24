@@ -1,5 +1,7 @@
 	private RevObject parse(final AnyObjectId id)
 			throws MissingObjectException, IOException {
-		return new RevWalk(db).parseAny(id);
+		try (RevWalk rw = new RevWalk(db)) {
+			return rw.parseAny(id);
+		}
 	}
 

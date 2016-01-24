@@ -2,7 +2,7 @@
 	public void testStandardFormat_LargeObject() throws Exception {
 		final int type = Constants.OBJ_BLOB;
 		byte[] data = getRng().nextBytes(streamThreshold + 5);
-		ObjectId id = new ObjectInserter.Formatter().idFor(type, data);
+		ObjectId id = getId(type, data);
 		write(id, compressStandardFormat(type, data));
 
 		ObjectLoader ol;
