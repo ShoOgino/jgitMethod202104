@@ -2,6 +2,7 @@
 	public void testIsBare_CreateRepositoryFromArbitraryGitDir()
 			throws Exception {
 		File gitDir = getFile("workdir");
-		assertTrue(new FileRepository(gitDir).isBare());
+		Repository repo = new FileRepositoryBuilder().setGitDir(gitDir).build();
+		assertTrue(repo.isBare());
 	}
 

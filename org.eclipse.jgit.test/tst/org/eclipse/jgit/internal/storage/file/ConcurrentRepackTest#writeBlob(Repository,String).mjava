@@ -1,6 +1,5 @@
 	private RevObject writeBlob(final Repository repo, final String data)
 			throws IOException {
-		final RevWalk revWalk = new RevWalk(repo);
 		final byte[] bytes = Constants.encode(data);
 		final ObjectId id;
 		try (ObjectInserter inserter = repo.newObjectInserter()) {
@@ -13,6 +12,8 @@
 		} catch (MissingObjectException e) {
 			// Ok
 		}
-		return revWalk.lookupBlob(id);
+		try (RevWalk revWalk = new RevWalk(repo)) {
+			return revWalk.lookupBlob(id);
+		}
 	}
 
