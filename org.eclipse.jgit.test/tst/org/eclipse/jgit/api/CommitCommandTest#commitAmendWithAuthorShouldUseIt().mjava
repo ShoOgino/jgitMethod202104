@@ -1,17 +1,17 @@
 	@Test
 	public void commitAmendWithAuthorShouldUseIt() throws Exception {
-		Git git = new Git(db);
+		try (Git git = new Git(db)) {
+			writeTrashFile("file1", "file1");
+			git.add().addFilepattern("file1").call();
+			git.commit().setMessage("initial commit").call();
 
-		writeTrashFile("file1", "file1");
-		git.add().addFilepattern("file1").call();
-		git.commit().setMessage("initial commit").call();
+			RevCommit amended = git.commit().setAmend(true)
+					.setAuthor("New Author", "newauthor@example.org")
+					.setMessage("amend commit").call();
 
-		RevCommit amended = git.commit().setAmend(true)
-				.setAuthor("New Author", "newauthor@example.org")
-				.setMessage("amend commit").call();
-
-		PersonIdent amendedAuthor = amended.getAuthorIdent();
-		assertEquals("New Author", amendedAuthor.getName());
-		assertEquals("newauthor@example.org", amendedAuthor.getEmailAddress());
+			PersonIdent amendedAuthor = amended.getAuthorIdent();
+			assertEquals("New Author", amendedAuthor.getName());
+			assertEquals("newauthor@example.org", amendedAuthor.getEmailAddress());
+		}
 	}
 
