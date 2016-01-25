@@ -30,8 +30,10 @@
 		checkFile(theFile, "1master\n2\n3\ntopic\n");
 		// our old branch should be checked out again
 		assertEquals("refs/heads/topic", db.getFullBranch());
-		assertEquals(lastMasterChange, new RevWalk(db).parseCommit(
-				db.resolve(Constants.HEAD)).getParent(0));
+		try (RevWalk rw = new RevWalk(db)) {
+			assertEquals(lastMasterChange, rw.parseCommit(
+					db.resolve(Constants.HEAD)).getParent(0));
+		}
 		assertEquals(origHead, db.readOrigHead());
 		List<ReflogEntry> headLog = db.getReflogReader(Constants.HEAD)
 				.getReverseEntries();

@@ -31,8 +31,10 @@
 		RebaseResult res = git.rebase().setUpstream("refs/heads/master").call();
 		assertEquals(Status.OK, res.getStatus());
 		checkFile(theFile, "1master\n2\n3\ntopic\n");
-		assertEquals(lastMasterChange, new RevWalk(db).parseCommit(
-				db.resolve(Constants.HEAD)).getParent(0));
+		try (RevWalk rw = new RevWalk(db)) {
+			assertEquals(lastMasterChange, rw.parseCommit(
+					db.resolve(Constants.HEAD)).getParent(0));
+		}
 
 		List<ReflogEntry> headLog = db.getReflogReader(Constants.HEAD)
 				.getReverseEntries();

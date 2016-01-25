@@ -50,9 +50,10 @@
 		assertEquals(res.getStatus(), Status.ABORTED);
 		assertEquals("refs/heads/topic", db.getFullBranch());
 		checkFile(FILE1, "1topic", "2", "3", "topic4");
-		RevWalk rw = new RevWalk(db);
-		assertEquals(lastTopicCommit, rw
-				.parseCommit(db.resolve(Constants.HEAD)));
+		try (RevWalk rw = new RevWalk(db)) {
+			assertEquals(lastTopicCommit,
+					rw.parseCommit(db.resolve(Constants.HEAD)));
+		}
 		assertEquals(RepositoryState.SAFE, db.getRepositoryState());
 
 		// rebase- dir in .git must be deleted

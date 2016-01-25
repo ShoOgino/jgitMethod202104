@@ -34,8 +34,10 @@
 
 		// our old branch should be checked out again
 		assertEquals("refs/heads/file3", db.getFullBranch());
-		assertEquals(addFile2, new RevWalk(db).parseCommit(
-				db.resolve(Constants.HEAD)).getParent(0));
+		try (RevWalk rw = new RevWalk(db)) {
+			assertEquals(addFile2, rw.parseCommit(
+					db.resolve(Constants.HEAD)).getParent(0));
+		}
 
 		checkoutBranch("refs/heads/file2");
 		assertTrue(new File(db.getWorkTree(), FILE1).exists());

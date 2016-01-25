@@ -46,10 +46,11 @@
 		assertEquals(RepositoryState.SAFE, db.getRepositoryState());
 
 		ObjectId headId = db.resolve(Constants.HEAD);
-		RevWalk rw = new RevWalk(db);
-		RevCommit rc = rw.parseCommit(headId);
-		RevCommit parent = rw.parseCommit(rc.getParent(0));
-		assertEquals("change file1 in topic\n\nThis is conflicting", parent
-				.getFullMessage());
+		try (RevWalk rw = new RevWalk(db)) {
+			RevCommit rc = rw.parseCommit(headId);
+			RevCommit parent = rw.parseCommit(rc.getParent(0));
+			assertEquals("change file1 in topic\n\nThis is conflicting", parent
+					.getFullMessage());
+		}
 	}
 
