@@ -1,11 +1,12 @@
 	@Test
 	public void testIsModifiedSymlinkAsFile() throws Exception {
 		writeTrashFile("symlink", "content");
-		Git git = new Git(db);
-		db.getConfig().setString(ConfigConstants.CONFIG_CORE_SECTION, null,
-				ConfigConstants.CONFIG_KEY_SYMLINKS, "false");
-		git.add().addFilepattern("symlink").call();
-		git.commit().setMessage("commit").call();
+		try (Git git = new Git(db)) {
+			db.getConfig().setString(ConfigConstants.CONFIG_CORE_SECTION, null,
+					ConfigConstants.CONFIG_KEY_SYMLINKS, "false");
+			git.add().addFilepattern("symlink").call();
+			git.commit().setMessage("commit").call();
+		}
 
 		// Modify previously committed DirCacheEntry and write it back to disk
 		DirCacheEntry dce = db.readDirCache().getEntry("symlink");

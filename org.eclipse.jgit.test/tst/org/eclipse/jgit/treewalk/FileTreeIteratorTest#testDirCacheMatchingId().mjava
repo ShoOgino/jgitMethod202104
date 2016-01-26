@@ -1,10 +1,11 @@
 	@Test
 	public void testDirCacheMatchingId() throws Exception {
 		File f = writeTrashFile("file", "content");
-		Git git = new Git(db);
-		writeTrashFile("file", "content");
-		fsTick(f);
-		git.add().addFilepattern("file").call();
+		try (Git git = new Git(db)) {
+			writeTrashFile("file", "content");
+			fsTick(f);
+			git.add().addFilepattern("file").call();
+		}
 		DirCacheEntry dce = db.readDirCache().getEntry("file");
 		TreeWalk tw = new TreeWalk(db);
 		FileTreeIterator fti = new FileTreeIterator(trash, db.getFS(), db
