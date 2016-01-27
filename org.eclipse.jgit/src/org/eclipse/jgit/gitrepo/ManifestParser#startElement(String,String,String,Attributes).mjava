@@ -17,14 +17,14 @@
 		} else if ("remote".equals(qName)) { //$NON-NLS-1$
 			String alias = attributes.getValue("alias"); //$NON-NLS-1$
 			String fetch = attributes.getValue("fetch"); //$NON-NLS-1$
-			remotes.put(attributes.getValue("name"), fetch); //$NON-NLS-1$
+			String revision = attributes.getValue("revision"); //$NON-NLS-1$
+			Remote remote = new Remote(fetch, revision);
+			remotes.put(attributes.getValue("name"), remote); //$NON-NLS-1$
 			if (alias != null)
-				remotes.put(alias, fetch);
+				remotes.put(alias, remote);
 		} else if ("default".equals(qName)) { //$NON-NLS-1$
 			defaultRemote = attributes.getValue("remote"); //$NON-NLS-1$
 			defaultRevision = attributes.getValue("revision"); //$NON-NLS-1$
-			if (defaultRevision == null)
-				defaultRevision = defaultBranch;
 		} else if ("copyfile".equals(qName)) { //$NON-NLS-1$
 			if (currentProject == null)
 				throw new SAXException(RepoText.get().invalidManifest);
