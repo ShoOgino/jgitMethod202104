@@ -54,9 +54,10 @@
 		git.rebase().setOperation(Operation.SKIP).call();
 
 		ObjectId headId = db.resolve(Constants.HEAD);
-		RevWalk rw = new RevWalk(db);
-		RevCommit rc = rw.parseCommit(headId);
-		RevCommit parent = rw.parseCommit(rc.getParent(0));
-		assertEquals("A different commit message", parent.getFullMessage());
+		try (RevWalk rw = new RevWalk(db)) {
+			RevCommit rc = rw.parseCommit(headId);
+			RevCommit parent = rw.parseCommit(rc.getParent(0));
+			assertEquals("A different commit message", parent.getFullMessage());
+		}
 	}
 

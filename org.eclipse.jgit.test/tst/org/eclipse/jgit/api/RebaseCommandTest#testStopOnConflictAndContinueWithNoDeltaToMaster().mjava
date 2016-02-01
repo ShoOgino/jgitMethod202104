@@ -42,8 +42,9 @@
 		git.rebase().setOperation(Operation.SKIP).call();
 
 		ObjectId headId = db.resolve(Constants.HEAD);
-		RevWalk rw = new RevWalk(db);
-		RevCommit rc = rw.parseCommit(headId);
-		assertEquals("change file1 in master", rc.getFullMessage());
+		try (RevWalk rw = new RevWalk(db)) {
+			RevCommit rc = rw.parseCommit(headId);
+			assertEquals("change file1 in master", rc.getFullMessage());
+		}
 	}
 

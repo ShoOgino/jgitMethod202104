@@ -71,9 +71,10 @@
 		res = git.rebase().setOperation(Operation.ABORT).call();
 		assertEquals(res.getStatus(), Status.ABORTED);
 		assertEquals("refs/heads/topic", db.getFullBranch());
-		RevWalk rw = new RevWalk(db);
-		assertEquals(conflicting, rw.parseCommit(db.resolve(Constants.HEAD)));
-		assertEquals(RepositoryState.SAFE, db.getRepositoryState());
+		try (RevWalk rw = new RevWalk(db)) {
+			assertEquals(conflicting, rw.parseCommit(db.resolve(Constants.HEAD)));
+			assertEquals(RepositoryState.SAFE, db.getRepositoryState());
+		}
 
 		// rebase- dir in .git must be deleted
 		assertFalse(new File(db.getDirectory(), "rebase-merge").exists());
