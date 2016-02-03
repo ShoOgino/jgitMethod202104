@@ -1,0 +1,57 @@
+	/**
+	 * Create an AWSV4 authorization for a request, suitable for embedding in
+	 * query parameters.
+	 *
+	 * @param bucketConfig
+	 *            configuration of S3 storage bucket this request should be
+	 *            signed for
+	 * @param url
+	 *            HTTP request URL
+	 * @param httpMethod
+	 *            HTTP method
+	 * @param headers
+	 *            The HTTP request headers; 'Host' and 'X-Amz-Date' will be
+	 *            added to this set.
+	 * @param queryParameters
+	 *            Any query parameters that will be added to the endpoint. The
+	 *            parameters should be specified in canonical format.
+	 * @param bodyHash
+	 *            Pre-computed SHA256 hash of the request body content; this
+	 *            value should also be set as the header 'X-Amz-Content-SHA256'
+	 *            for non-streaming uploads.
+	 * @return The computed authorization string for the request. This value
+	 *         needs to be set as the header 'Authorization' on the subsequent
+	 *         HTTP request.
+	 */
+	static String createAuthorizationQuery(S3Config bucketConfig, URL url,
+			String httpMethod, Map<String, String> headers,
+			Map<String, String> queryParameters, String bodyHash) {
+		addHostHeader(url, headers);
+
+		queryParameters.put(X_AMZ_ALGORITHM, SCHEME + "-" + ALGORITHM); //$NON-NLS-1$
+
+		Date now = new Date();
+		String dateStamp = dateStamp(now);
+		String scope = scope(bucketConfig.getRegion(), dateStamp);
+		queryParameters.put(X_AMZ_CREDENTIAL,
+				bucketConfig.getAccessKey() + "/" + scope); //$NON-NLS-1$
+
+		String dateTimeStampISO8601 = dateTimeStampISO8601(now);
+		queryParameters.put(X_AMZ_DATE, dateTimeStampISO8601);
+
+		String canonicalizedHeaderNames = canonicalizeHeaderNames(headers);
+		queryParameters.put(X_AMZ_SIGNED_HEADERS, canonicalizedHeaderNames);
+
+		String canonicalizedQueryParameters = canonicalizeQueryString(
+				queryParameters);
+		String canonicalizedHeaders = canonicalizeHeaderString(headers);
+		String canonicalRequest = canonicalRequest(url, httpMethod,
+				canonicalizedQueryParameters, canonicalizedHeaderNames,
+				canonicalizedHeaders, bodyHash);
+		byte[] signature = createSignature(bucketConfig, dateTimeStampISO8601,
+				dateStamp, scope, canonicalRequest);
+		queryParameters.put(X_AMZ_SIGNATURE, toHex(signature));
+
+		return formatAuthorizationQuery(queryParameters);
+	}
+

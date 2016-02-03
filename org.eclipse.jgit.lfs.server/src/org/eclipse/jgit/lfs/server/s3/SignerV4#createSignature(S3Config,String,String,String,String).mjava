@@ -1,0 +1,15 @@
+	private static byte[] createSignature(S3Config bucketConfig,
+			String dateTimeStamp, String dateStamp,
+			String scope, String canonicalRequest) {
+		String stringToSign = stringToSign(SCHEME, ALGORITHM, dateTimeStamp,
+				scope, canonicalRequest);
+
+		byte[] signature = (SCHEME + bucketConfig.getSecretKey()).getBytes();
+		signature = sign(dateStamp, signature);
+		signature = sign(bucketConfig.getRegion(), signature);
+		signature = sign(S3, signature);
+		signature = sign(TERMINATOR, signature);
+		signature = sign(stringToSign, signature);
+		return signature;
+	}
+

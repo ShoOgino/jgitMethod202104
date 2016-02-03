@@ -1,0 +1,16 @@
+	@Override
+	public Response.Action getDownloadAction(AnyLongObjectId oid) {
+		URL endpointUrl = getObjectUrl(oid);
+		Map<String, String> queryParams = new HashMap<String, String>();
+		queryParams.put(X_AMZ_EXPIRES,
+				Integer.toString(s3Config.getExpirationSeconds()));
+		Map<String, String> headers = new HashMap<String, String>();
+		String authorizationQueryParameters = SignerV4.createAuthorizationQuery(
+				s3Config, endpointUrl, METHOD_GET, headers, queryParams,
+				UNSIGNED_PAYLOAD);
+
+		Response.Action a = new Response.Action();
+		a.href = endpointUrl.toString() + "?" + authorizationQueryParameters; //$NON-NLS-1$
+		return a;
+	}
+

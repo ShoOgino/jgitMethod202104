@@ -1,0 +1,19 @@
+	@Override
+	public Response.Action getUploadAction(AnyLongObjectId oid, long size) {
+		cacheObjectMetaData(oid, size);
+		URL objectUrl = getObjectUrl(oid);
+		Map<String, String> headers = new HashMap<String, String>();
+		headers.put(X_AMZ_CONTENT_SHA256, oid.getName());
+		headers.put(HDR_CONTENT_LENGTH, Long.toString(size));
+		headers.put(X_AMZ_STORAGE_CLASS, s3Config.getStorageClass());
+		headers.put(HttpSupport.HDR_CONTENT_TYPE, "application/octet-stream"); //$NON-NLS-1$
+		headers = SignerV4.createHeaderAuthorization(s3Config, objectUrl,
+				METHOD_PUT, headers, oid.getName());
+
+		Response.Action a = new Response.Action();
+		a.href = objectUrl.toString();
+		a.header = new HashMap<>();
+		a.header.putAll(headers);
+		return a;
+	}
+

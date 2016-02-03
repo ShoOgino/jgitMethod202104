@@ -1,0 +1,32 @@
+	private static String canonicalizeQueryString(
+			Map<String, String> parameters) {
+		if (parameters == null || parameters.isEmpty()) {
+			return ""; //$NON-NLS-1$
+		}
+
+		SortedMap<String, String> sorted = new TreeMap<String, String>();
+
+		Iterator<Map.Entry<String, String>> pairs = parameters.entrySet()
+				.iterator();
+		while (pairs.hasNext()) {
+			Map.Entry<String, String> pair = pairs.next();
+			String key = pair.getKey();
+			String value = pair.getValue();
+			sorted.put(urlEncode(key, false), urlEncode(value, false));
+		}
+
+		StringBuilder builder = new StringBuilder();
+		pairs = sorted.entrySet().iterator();
+		while (pairs.hasNext()) {
+			Map.Entry<String, String> pair = pairs.next();
+			builder.append(pair.getKey());
+			builder.append("="); //$NON-NLS-1$
+			builder.append(pair.getValue());
+			if (pairs.hasNext()) {
+				builder.append("&"); //$NON-NLS-1$
+			}
+		}
+
+		return builder.toString();
+	}
+
