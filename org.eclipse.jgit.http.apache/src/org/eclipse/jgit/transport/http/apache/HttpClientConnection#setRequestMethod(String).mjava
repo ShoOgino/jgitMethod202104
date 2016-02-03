@@ -1,12 +1,14 @@
 	public void setRequestMethod(String method) throws ProtocolException {
 		this.method = method;
-		if ("GET".equalsIgnoreCase(method)) //$NON-NLS-1$
+		if (METHOD_GET.equalsIgnoreCase(method)) {
 			req = new HttpGet(url.toString());
-		else if ("PUT".equalsIgnoreCase(method)) //$NON-NLS-1$
+		} else if (METHOD_HEAD.equalsIgnoreCase(method)) {
+			req = new HttpHead(url.toString());
+		} else if (METHOD_PUT.equalsIgnoreCase(method)) {
 			req = new HttpPut(url.toString());
-		else if ("POST".equalsIgnoreCase(method)) //$NON-NLS-1$
+		} else if (METHOD_POST.equalsIgnoreCase(method)) {
 			req = new HttpPost(url.toString());
-		else {
+		} else {
 			this.method = null;
 			throw new UnsupportedOperationException();
 		}
