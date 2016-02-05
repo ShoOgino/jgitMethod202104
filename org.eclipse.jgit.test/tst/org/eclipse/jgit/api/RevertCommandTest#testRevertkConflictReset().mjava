@@ -1,23 +1,23 @@
 	@Test
 	public void testRevertkConflictReset() throws Exception {
-		Git git = new Git(db);
+		try (Git git = new Git(db)) {
+			RevCommit sideCommit = prepareRevert(git);
 
-		RevCommit sideCommit = prepareRevert(git);
+			RevertCommand revert = git.revert();
+			RevCommit newHead = revert.include(sideCommit.getId()).call();
+			assertNull(newHead);
+			MergeResult result = revert.getFailingResult();
 
-		RevertCommand revert = git.revert();
-		RevCommit newHead = revert.include(sideCommit.getId()).call();
-		assertNull(newHead);
-		MergeResult result = revert.getFailingResult();
+			assertEquals(MergeStatus.CONFLICTING, result.getMergeStatus());
+			assertEquals(RepositoryState.REVERTING, db.getRepositoryState());
+			assertTrue(new File(db.getDirectory(), Constants.REVERT_HEAD)
+					.exists());
 
-		assertEquals(MergeStatus.CONFLICTING, result.getMergeStatus());
-		assertEquals(RepositoryState.REVERTING, db.getRepositoryState());
-		assertTrue(new File(db.getDirectory(), Constants.REVERT_HEAD)
-				.exists());
+			git.reset().setMode(ResetType.MIXED).setRef("HEAD").call();
 
-		git.reset().setMode(ResetType.MIXED).setRef("HEAD").call();
-
-		assertEquals(RepositoryState.SAFE, db.getRepositoryState());
-		assertFalse(new File(db.getDirectory(), Constants.REVERT_HEAD)
-				.exists());
+			assertEquals(RepositoryState.SAFE, db.getRepositoryState());
+			assertFalse(new File(db.getDirectory(), Constants.REVERT_HEAD)
+					.exists());
+		}
 	}
 
