@@ -12,31 +12,32 @@
 				path1, ConfigConstants.CONFIG_KEY_URL, url1);
 		modulesConfig.save();
 
-		Git git = new Git(db);
-		writeTrashFile("file.txt", "content");
-		git.add().addFilepattern("file.txt").call();
-		assertNotNull(git.commit().setMessage("create file").call());
+		try (Git git = new Git(db)) {
+			writeTrashFile("file.txt", "content");
+			git.add().addFilepattern("file.txt").call();
+			assertNotNull(git.commit().setMessage("create file").call());
 
-		SubmoduleAddCommand command = new SubmoduleAddCommand(db);
-		command.setPath(path2);
-		String url2 = db.getDirectory().toURI().toString();
-		command.setURI(url2);
-		Repository r = command.call();
-		assertNotNull(r);
-		addRepoToClose(r);
+			SubmoduleAddCommand command = new SubmoduleAddCommand(db);
+			command.setPath(path2);
+			String url2 = db.getDirectory().toURI().toString();
+			command.setURI(url2);
+			Repository r = command.call();
+			assertNotNull(r);
+			addRepoToClose(r);
 
-		modulesConfig.load();
-		assertEquals(path1, modulesConfig.getString(
-				ConfigConstants.CONFIG_SUBMODULE_SECTION, path1,
-				ConfigConstants.CONFIG_KEY_PATH));
-		assertEquals(url1, modulesConfig.getString(
-				ConfigConstants.CONFIG_SUBMODULE_SECTION, path1,
-				ConfigConstants.CONFIG_KEY_URL));
-		assertEquals(path2, modulesConfig.getString(
-				ConfigConstants.CONFIG_SUBMODULE_SECTION, path2,
-				ConfigConstants.CONFIG_KEY_PATH));
-		assertEquals(url2, modulesConfig.getString(
-				ConfigConstants.CONFIG_SUBMODULE_SECTION, path2,
-				ConfigConstants.CONFIG_KEY_URL));
+			modulesConfig.load();
+			assertEquals(path1, modulesConfig.getString(
+					ConfigConstants.CONFIG_SUBMODULE_SECTION, path1,
+					ConfigConstants.CONFIG_KEY_PATH));
+			assertEquals(url1, modulesConfig.getString(
+					ConfigConstants.CONFIG_SUBMODULE_SECTION, path1,
+					ConfigConstants.CONFIG_KEY_URL));
+			assertEquals(path2, modulesConfig.getString(
+					ConfigConstants.CONFIG_SUBMODULE_SECTION, path2,
+					ConfigConstants.CONFIG_KEY_PATH));
+			assertEquals(url2, modulesConfig.getString(
+					ConfigConstants.CONFIG_SUBMODULE_SECTION, path2,
+					ConfigConstants.CONFIG_KEY_URL));
+		}
 	}
 

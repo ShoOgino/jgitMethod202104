@@ -11,8 +11,7 @@
 	 * @return the created commit
 	 */
 	protected RevCommit commitFile(String filename, String contents, String branch) {
-		try {
-			Git git = new Git(db);
+		try (Git git = new Git(db)) {
 			Repository repo = git.getRepository();
 			String originalBranch = repo.getFullBranch();
 			boolean empty = repo.resolve(Constants.HEAD) == null;

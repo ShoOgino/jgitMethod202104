@@ -1,4 +1,3 @@
-	@SuppressWarnings("unused")
 	@Test
 	public void test008_FailOnWrongVersion() throws IOException {
 		final File cfg = new File(db.getDirectory(), Constants.CONFIG);
@@ -7,8 +6,7 @@
 				+ badvers + "\n";
 		write(cfg, configStr);
 
-		try {
-			new FileRepository(db.getDirectory());
+		try (FileRepository unused = new FileRepository(db.getDirectory())) {
 			fail("incorrectly opened a bad repository");
 		} catch (IllegalArgumentException ioe) {
 			assertNotNull(ioe.getMessage());
