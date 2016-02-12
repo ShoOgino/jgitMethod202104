@@ -6,44 +6,44 @@
 		String branch = "refs/heads/master";
 		String trackingBranch = "refs/remotes/" + remote + "/master";
 
-		Git git = new Git(db);
+		try (Git git = new Git(db)) {
+			RevCommit commit1 = git.commit().setMessage("Initial commit")
+					.call();
 
-		RevCommit commit1 = git.commit().setMessage("Initial commit")
-				.call();
+			RefUpdate branchRefUpdate = db.updateRef(branch);
+			branchRefUpdate.setNewObjectId(commit1.getId());
+			branchRefUpdate.update();
 
-		RefUpdate branchRefUpdate = db.updateRef(branch);
-		branchRefUpdate.setNewObjectId(commit1.getId());
-		branchRefUpdate.update();
+			RefUpdate trackingBranchRefUpdate = db.updateRef(trackingBranch);
+			trackingBranchRefUpdate.setNewObjectId(commit1.getId());
+			trackingBranchRefUpdate.update();
 
-		RefUpdate trackingBranchRefUpdate = db.updateRef(trackingBranch);
-		trackingBranchRefUpdate.setNewObjectId(commit1.getId());
-		trackingBranchRefUpdate.update();
-
-		final StoredConfig config = db.getConfig();
-		RemoteConfig remoteConfig = new RemoteConfig(config, remote);
-		URIish uri = new URIish(db2.getDirectory().toURI().toURL());
-		remoteConfig.addURI(uri);
-		remoteConfig.addFetchRefSpec(new RefSpec("+refs/heads/*:refs/remotes/"
-				+ remote + "/*"));
-		remoteConfig.update(config);
-		config.save();
+			final StoredConfig config = db.getConfig();
+			RemoteConfig remoteConfig = new RemoteConfig(config, remote);
+			URIish uri = new URIish(db2.getDirectory().toURI().toURL());
+			remoteConfig.addURI(uri);
+			remoteConfig.addFetchRefSpec(new RefSpec("+refs/heads/*:refs/remotes/"
+					+ remote + "/*"));
+			remoteConfig.update(config);
+			config.save();
 
 
-		RevCommit commit2 = git.commit().setMessage("Commit to push").call();
+			RevCommit commit2 = git.commit().setMessage("Commit to push").call();
 
-		RefSpec spec = new RefSpec(branch + ":" + branch);
-		Iterable<PushResult> resultIterable = git.push().setRemote(remote)
-				.setRefSpecs(spec).call();
+			RefSpec spec = new RefSpec(branch + ":" + branch);
+			Iterable<PushResult> resultIterable = git.push().setRemote(remote)
+					.setRefSpecs(spec).call();
 
-		PushResult result = resultIterable.iterator().next();
-		TrackingRefUpdate trackingRefUpdate = result
-				.getTrackingRefUpdate(trackingBranch);
+			PushResult result = resultIterable.iterator().next();
+			TrackingRefUpdate trackingRefUpdate = result
+					.getTrackingRefUpdate(trackingBranch);
 
-		assertNotNull(trackingRefUpdate);
-		assertEquals(trackingBranch, trackingRefUpdate.getLocalName());
-		assertEquals(branch, trackingRefUpdate.getRemoteName());
-		assertEquals(commit2.getId(), trackingRefUpdate.getNewObjectId());
-		assertEquals(commit2.getId(), db.resolve(trackingBranch));
-		assertEquals(commit2.getId(), db2.resolve(branch));
+			assertNotNull(trackingRefUpdate);
+			assertEquals(trackingBranch, trackingRefUpdate.getLocalName());
+			assertEquals(branch, trackingRefUpdate.getRemoteName());
+			assertEquals(commit2.getId(), trackingRefUpdate.getNewObjectId());
+			assertEquals(commit2.getId(), db.resolve(trackingBranch));
+			assertEquals(commit2.getId(), db2.resolve(branch));
+		}
 	}
 
