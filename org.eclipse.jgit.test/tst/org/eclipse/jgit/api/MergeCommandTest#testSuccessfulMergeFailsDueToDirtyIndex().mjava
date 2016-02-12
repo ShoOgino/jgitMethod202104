@@ -1,36 +1,36 @@
 	@Test
 	public void testSuccessfulMergeFailsDueToDirtyIndex() throws Exception {
-		Git git = new Git(db);
+		try (Git git = new Git(db)) {
+			File fileA = writeTrashFile("a", "a");
+			RevCommit initialCommit = addAllAndCommit(git);
 
-		File fileA = writeTrashFile("a", "a");
-		RevCommit initialCommit = addAllAndCommit(git);
+			// switch branch
+			createBranch(initialCommit, "refs/heads/side");
+			checkoutBranch("refs/heads/side");
+			// modify file a
+			write(fileA, "a(side)");
+			writeTrashFile("b", "b");
+			RevCommit sideCommit = addAllAndCommit(git);
 
-		// switch branch
-		createBranch(initialCommit, "refs/heads/side");
-		checkoutBranch("refs/heads/side");
-		// modify file a
-		write(fileA, "a(side)");
-		writeTrashFile("b", "b");
-		RevCommit sideCommit = addAllAndCommit(git);
+			// switch branch
+			checkoutBranch("refs/heads/master");
+			writeTrashFile("c", "c");
+			addAllAndCommit(git);
 
-		// switch branch
-		checkoutBranch("refs/heads/master");
-		writeTrashFile("c", "c");
-		addAllAndCommit(git);
+			// modify and add file a
+			write(fileA, "a(modified)");
+			git.add().addFilepattern("a").call();
+			// do not commit
 
-		// modify and add file a
-		write(fileA, "a(modified)");
-		git.add().addFilepattern("a").call();
-		// do not commit
+			// get current index state
+			String indexState = indexState(CONTENT);
 
-		// get current index state
-		String indexState = indexState(CONTENT);
+			// merge
+			MergeResult result = git.merge().include(sideCommit.getId())
+					.setStrategy(MergeStrategy.RESOLVE).call();
 
-		// merge
-		MergeResult result = git.merge().include(sideCommit.getId())
-				.setStrategy(MergeStrategy.RESOLVE).call();
-
-		checkMergeFailedResult(result, MergeFailureReason.DIRTY_INDEX,
-				indexState, fileA);
+			checkMergeFailedResult(result, MergeFailureReason.DIRTY_INDEX,
+					indexState, fileA);
+		}
 	}
 

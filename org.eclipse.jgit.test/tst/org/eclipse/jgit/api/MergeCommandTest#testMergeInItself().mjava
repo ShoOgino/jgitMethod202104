@@ -1,10 +1,11 @@
 	@Test
 	public void testMergeInItself() throws Exception {
-		Git git = new Git(db);
-		git.commit().setMessage("initial commit").call();
+		try (Git git = new Git(db)) {
+			git.commit().setMessage("initial commit").call();
 
-		MergeResult result = git.merge().include(db.exactRef(Constants.HEAD)).call();
-		assertEquals(MergeResult.MergeStatus.ALREADY_UP_TO_DATE, result.getMergeStatus());
+			MergeResult result = git.merge().include(db.exactRef(Constants.HEAD)).call();
+			assertEquals(MergeResult.MergeStatus.ALREADY_UP_TO_DATE, result.getMergeStatus());
+		}
 		// no reflog entry written by merge
 		assertEquals("commit (initial): initial commit",
 				db
