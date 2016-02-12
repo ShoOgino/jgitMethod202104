@@ -1,8 +1,8 @@
-	private void commit(String commitMsg, PersonIdent author,
-			PersonIdent committer) throws IOException {
+	private void commit(String commitMsg, long commitTime, int tz)
+			throws IOException {
 		final CommitBuilder commit = new CommitBuilder();
-		commit.setAuthor(author);
-		commit.setCommitter(committer);
+		commit.setAuthor(new PersonIdent(author, commitTime, tz));
+		commit.setCommitter(new PersonIdent(committer, commitTime, tz));
 		commit.setMessage(commitMsg);
 		ObjectId id;
 		try (ObjectInserter inserter = db.newObjectInserter()) {

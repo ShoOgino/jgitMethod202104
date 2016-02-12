@@ -1,8 +1,10 @@
 	@Test
 	public void testSingleCommit() throws Exception {
-		new Git(db).commit().setMessage("initial commit").call();
+		try (Git git = new Git(db)) {
+			git.commit().setMessage("initial commit").call();
 
-		assertEquals("6fd41be HEAD@{0}: commit (initial): initial commit",
-				execute("git reflog")[0]);
+			assertEquals("6fd41be HEAD@{0}: commit (initial): initial commit",
+					execute("git reflog")[0]);
+		}
 	}
 

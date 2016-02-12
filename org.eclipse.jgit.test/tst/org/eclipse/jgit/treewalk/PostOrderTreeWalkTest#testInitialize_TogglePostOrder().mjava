@@ -1,10 +1,11 @@
 	@Test
 	public void testInitialize_TogglePostOrder() throws Exception {
-		final TreeWalk tw = new TreeWalk(db);
-		assertFalse(tw.isPostOrderTraversal());
-		tw.setPostOrderTraversal(true);
-		assertTrue(tw.isPostOrderTraversal());
-		tw.setPostOrderTraversal(false);
-		assertFalse(tw.isPostOrderTraversal());
+		try (final TreeWalk tw = new TreeWalk(db)) {
+			assertFalse(tw.isPostOrderTraversal());
+			tw.setPostOrderTraversal(true);
+			assertTrue(tw.isPostOrderTraversal());
+			tw.setPostOrderTraversal(false);
+			assertFalse(tw.isPostOrderTraversal());
+		}
 	}
 
