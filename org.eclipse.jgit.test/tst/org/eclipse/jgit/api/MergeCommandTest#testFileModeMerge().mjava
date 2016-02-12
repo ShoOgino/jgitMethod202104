@@ -1,8 +1,7 @@
 	@Test
 	public void testFileModeMerge() throws Exception {
-		if (!FS.DETECTED.supportsExecute())
-			return;
 		// Only Java6
+		assumeTrue(FS.DETECTED.supportsExecute());
 		try (Git git = new Git(db)) {
 			writeTrashFile("mergeableMode", "a");
 			setExecutable(git, "mergeableMode", false);
