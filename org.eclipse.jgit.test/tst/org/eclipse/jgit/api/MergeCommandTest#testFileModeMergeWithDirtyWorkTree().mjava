@@ -1,33 +1,32 @@
 	@Test
 	public void testFileModeMergeWithDirtyWorkTree() throws Exception {
-		if (!FS.DETECTED.supportsExecute())
-			return;
 		// Only Java6 (or set x bit in index)
+		assumeTrue(FS.DETECTED.supportsExecute());
 
-		Git git = new Git(db);
+		try (Git git = new Git(db)) {
+			writeTrashFile("mergeableButDirty", "a");
+			setExecutable(git, "mergeableButDirty", false);
+			RevCommit initialCommit = addAllAndCommit(git);
 
-		writeTrashFile("mergeableButDirty", "a");
-		setExecutable(git, "mergeableButDirty", false);
-		RevCommit initialCommit = addAllAndCommit(git);
+			// switch branch
+			createBranch(initialCommit, "refs/heads/side");
+			checkoutBranch("refs/heads/side");
+			setExecutable(git, "mergeableButDirty", true);
+			RevCommit sideCommit = addAllAndCommit(git);
 
-		// switch branch
-		createBranch(initialCommit, "refs/heads/side");
-		checkoutBranch("refs/heads/side");
-		setExecutable(git, "mergeableButDirty", true);
-		RevCommit sideCommit = addAllAndCommit(git);
+			// switch branch
+			createBranch(initialCommit, "refs/heads/side2");
+			checkoutBranch("refs/heads/side2");
+			setExecutable(git, "mergeableButDirty", false);
+			addAllAndCommit(git);
 
-		// switch branch
-		createBranch(initialCommit, "refs/heads/side2");
-		checkoutBranch("refs/heads/side2");
-		setExecutable(git, "mergeableButDirty", false);
-		addAllAndCommit(git);
+			writeTrashFile("mergeableButDirty", "b");
 
-		writeTrashFile("mergeableButDirty", "b");
-
-		// merge
-		MergeResult result = git.merge().include(sideCommit.getId())
-				.setStrategy(MergeStrategy.RESOLVE).call();
-		assertEquals(MergeStatus.FAILED, result.getMergeStatus());
-		assertFalse(canExecute(git, "mergeableButDirty"));
+			// merge
+			MergeResult result = git.merge().include(sideCommit.getId())
+					.setStrategy(MergeStrategy.RESOLVE).call();
+			assertEquals(MergeStatus.FAILED, result.getMergeStatus());
+			assertFalse(canExecute(git, "mergeableButDirty"));
+		}
 	}
 
