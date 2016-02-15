@@ -7,7 +7,6 @@
 	 */
 	@Test
 	public void testUnchangedComplex() throws IOException, GitAPIException {
-		Git git = new Git(db);
 		writeTrashFile("a.b", "a.b");
 		writeTrashFile("a.c", "a.c");
 		writeTrashFile("a/b.b/b", "a/b.b/b");
@@ -15,10 +14,12 @@
 		writeTrashFile("a/c", "a/c");
 		writeTrashFile("a=c", "a=c");
 		writeTrashFile("a=d", "a=d");
-		git.add().addFilepattern("a.b").addFilepattern("a.c")
-				.addFilepattern("a/b.b/b").addFilepattern("a/b")
-				.addFilepattern("a/c").addFilepattern("a=c")
-				.addFilepattern("a=d").call();
+		try (Git git = new Git(db)) {
+			git.add().addFilepattern("a.b").addFilepattern("a.c")
+					.addFilepattern("a/b.b/b").addFilepattern("a/b")
+					.addFilepattern("a/c").addFilepattern("a=c")
+					.addFilepattern("a=d").call();
+		}
 
 
 		// got the hash id'd from the data using echo -n a.b|git hash-object -t blob --stdin

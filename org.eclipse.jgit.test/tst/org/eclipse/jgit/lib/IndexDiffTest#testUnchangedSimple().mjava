@@ -4,11 +4,12 @@
 		writeTrashFile("a.c", "a.c");
 		writeTrashFile("a=c", "a=c");
 		writeTrashFile("a=d", "a=d");
-		Git git = new Git(db);
-		git.add().addFilepattern("a.b").call();
-		git.add().addFilepattern("a.c").call();
-		git.add().addFilepattern("a=c").call();
-		git.add().addFilepattern("a=d").call();
+		try (Git git = new Git(db)) {
+			git.add().addFilepattern("a.b").call();
+			git.add().addFilepattern("a.c").call();
+			git.add().addFilepattern("a=c").call();
+			git.add().addFilepattern("a=d").call();
+		}
 
 		TreeFormatter tree = new TreeFormatter();
 		// got the hash id'd from the data using echo -n a.b|git hash-object -t blob --stdin
