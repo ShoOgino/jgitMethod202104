@@ -3,8 +3,9 @@
 		final DirCache dc = DirCache.newInCore();
 		assertEquals(0, dc.getEntryCount());
 
-		final TreeWalk tw = new TreeWalk(db);
-		tw.addTree(new DirCacheIterator(dc));
-		assertFalse(tw.next());
+		try (final TreeWalk tw = new TreeWalk(db)) {
+			tw.addTree(new DirCacheIterator(dc));
+			assertFalse(tw.next());
+		}
 	}
 
