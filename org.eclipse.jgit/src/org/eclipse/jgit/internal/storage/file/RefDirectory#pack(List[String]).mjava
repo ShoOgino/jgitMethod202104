@@ -15,7 +15,7 @@
 		FS fs = parent.getFS();
 
 		// Lock the packed refs file and read the content
-		LockFile lck = new LockFile(packedRefsFile, fs);
+		LockFile lck = new LockFile(packedRefsFile);
 		if (!lck.lock())
 			throw new IOException(MessageFormat.format(
 					JGitText.get().cannotLock, packedRefsFile));
@@ -46,8 +46,7 @@
 				File refFile = fileFor(refName);
 				if (!fs.exists(refFile))
 					continue;
-				LockFile rLck = new LockFile(refFile,
-						parent.getFS());
+				LockFile rLck = new LockFile(refFile);
 				if (!rLck.lock())
 					continue;
 				try {

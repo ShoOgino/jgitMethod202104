@@ -1,39 +1,39 @@
 	@Test
 	public void testMergeFailingWithDirtyWorkingTree() throws Exception {
-		Git git = new Git(db);
+		try (Git git = new Git(db)) {
+			writeTrashFile("a", "1\na\n3\n");
+			writeTrashFile("b", "1\nb\n3\n");
+			git.add().addFilepattern("a").addFilepattern("b").call();
+			RevCommit initialCommit = git.commit().setMessage("initial").call();
 
-		writeTrashFile("a", "1\na\n3\n");
-		writeTrashFile("b", "1\nb\n3\n");
-		git.add().addFilepattern("a").addFilepattern("b").call();
-		RevCommit initialCommit = git.commit().setMessage("initial").call();
+			createBranch(initialCommit, "refs/heads/side");
+			checkoutBranch("refs/heads/side");
 
-		createBranch(initialCommit, "refs/heads/side");
-		checkoutBranch("refs/heads/side");
+			writeTrashFile("a", "1(side)\na\n3\n");
+			writeTrashFile("b", "1\nb(side)\n3\n");
+			git.add().addFilepattern("a").addFilepattern("b").call();
+			RevCommit secondCommit = git.commit().setMessage("side").call();
 
-		writeTrashFile("a", "1(side)\na\n3\n");
-		writeTrashFile("b", "1\nb(side)\n3\n");
-		git.add().addFilepattern("a").addFilepattern("b").call();
-		RevCommit secondCommit = git.commit().setMessage("side").call();
+			assertEquals("1\nb(side)\n3\n", read(new File(db.getWorkTree(), "b")));
+			checkoutBranch("refs/heads/master");
+			assertEquals("1\nb\n3\n", read(new File(db.getWorkTree(), "b")));
 
-		assertEquals("1\nb(side)\n3\n", read(new File(db.getWorkTree(), "b")));
-		checkoutBranch("refs/heads/master");
-		assertEquals("1\nb\n3\n", read(new File(db.getWorkTree(), "b")));
+			writeTrashFile("a", "1\na\n3(main)\n");
+			git.add().addFilepattern("a").call();
+			git.commit().setMessage("main").call();
 
-		writeTrashFile("a", "1\na\n3(main)\n");
-		git.add().addFilepattern("a").call();
-		git.commit().setMessage("main").call();
+			writeTrashFile("a", "--- dirty ---");
+			MergeResult result = git.merge().include(secondCommit.getId())
+					.setStrategy(MergeStrategy.RESOLVE).call();
 
-		writeTrashFile("a", "--- dirty ---");
-		MergeResult result = git.merge().include(secondCommit.getId())
-				.setStrategy(MergeStrategy.RESOLVE).call();
+			assertEquals(MergeStatus.FAILED, result.getMergeStatus());
 
-		assertEquals(MergeStatus.FAILED, result.getMergeStatus());
+			assertEquals("--- dirty ---", read(new File(db.getWorkTree(), "a")));
+			assertEquals("1\nb\n3\n", read(new File(db.getWorkTree(), "b")));
 
-		assertEquals("--- dirty ---", read(new File(db.getWorkTree(), "a")));
-		assertEquals("1\nb\n3\n", read(new File(db.getWorkTree(), "b")));
+			assertEquals(null, result.getConflicts());
 
-		assertEquals(null, result.getConflicts());
-
-		assertEquals(RepositoryState.SAFE, db.getRepositoryState());
+			assertEquals(RepositoryState.SAFE, db.getRepositoryState());
+		}
 	}
 

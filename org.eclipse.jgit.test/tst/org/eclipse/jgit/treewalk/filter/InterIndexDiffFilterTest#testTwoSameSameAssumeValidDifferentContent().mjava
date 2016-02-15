@@ -10,12 +10,13 @@
 		ed2.add(new AddEdit("a/a", FileMode.REGULAR_FILE, id("b"), 1, true));
 		ed2.finish();
 
-		TreeWalk tw = new TreeWalk(db);
-		tw.setRecursive(true);
-		tw.addTree(new DirCacheIterator(dc1));
-		tw.addTree(new DirCacheIterator(dc2));
-		tw.setFilter(InterIndexDiffFilter.INSTANCE);
+		try (TreeWalk tw = new TreeWalk(db)) {
+			tw.setRecursive(true);
+			tw.addTree(new DirCacheIterator(dc1));
+			tw.addTree(new DirCacheIterator(dc2));
+			tw.setFilter(InterIndexDiffFilter.INSTANCE);
 
-		assertFalse(tw.next());
+			assertFalse(tw.next());
+		}
 	}
 
