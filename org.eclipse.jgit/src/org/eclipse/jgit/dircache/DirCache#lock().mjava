@@ -10,7 +10,7 @@
 	public boolean lock() throws IOException {
 		if (liveFile == null)
 			throw new IOException(JGitText.get().dirCacheDoesNotHaveABackingFile);
-		final LockFile tmp = new LockFile(liveFile, fs);
+		final LockFile tmp = new LockFile(liveFile);
 		if (tmp.lock()) {
 			tmp.setNeedStatInformation(true);
 			myLock = tmp;
