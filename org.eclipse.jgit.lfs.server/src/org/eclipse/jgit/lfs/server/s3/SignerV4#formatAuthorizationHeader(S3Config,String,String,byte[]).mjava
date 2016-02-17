@@ -1,0 +1,12 @@
+	private static String formatAuthorizationHeader(
+			S3Config bucketConfig, String canonicalizedHeaderNames,
+			String scope, byte[] signature) {
+		StringBuilder s = new StringBuilder();
+		s.append(SCHEME).append("-").append(ALGORITHM).append(" "); //$NON-NLS-1$ //$NON-NLS-2$
+		s.append("Credential=").append(bucketConfig.getAccessKey()).append("/") //$NON-NLS-1$//$NON-NLS-2$
+				.append(scope).append(","); //$NON-NLS-1$
+		s.append("SignedHeaders=").append(canonicalizedHeaderNames).append(","); //$NON-NLS-1$ //$NON-NLS-2$
+		s.append("Signature=").append(toHex(signature)); //$NON-NLS-1$
+		return s.toString();
+	}
+

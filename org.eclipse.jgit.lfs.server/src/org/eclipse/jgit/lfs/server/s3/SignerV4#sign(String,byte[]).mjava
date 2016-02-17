@@ -1,0 +1,13 @@
+	private static byte[] sign(String stringData, byte[] key) {
+		try {
+			byte[] data = stringData.getBytes("UTF-8"); //$NON-NLS-1$
+			Mac mac = Mac.getInstance(HMACSHA256);
+			mac.init(new SecretKeySpec(key, HMACSHA256));
+			return mac.doFinal(data);
+		} catch (Exception e) {
+			throw new RuntimeException(MessageFormat.format(
+					LfsServerText.get().failedToCalcSignature, e.getMessage()),
+					e);
+		}
+	}
+

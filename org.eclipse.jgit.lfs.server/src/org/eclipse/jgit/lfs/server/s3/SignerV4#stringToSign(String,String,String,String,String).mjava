@@ -1,0 +1,7 @@
+	private static String stringToSign(String scheme, String algorithm,
+			String dateTime, String scope, String canonicalRequest) {
+		return String.format("%s-%s\n%s\n%s\n%s", //$NON-NLS-1$
+				scheme, algorithm, dateTime, scope,
+				toHex(hash(canonicalRequest)));
+	}
+

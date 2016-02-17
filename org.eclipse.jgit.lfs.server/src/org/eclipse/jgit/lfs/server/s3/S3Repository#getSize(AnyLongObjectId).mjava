@@ -1,0 +1,34 @@
+	@Override
+	public long getSize(AnyLongObjectId oid) throws IOException {
+		URL endpointUrl = getObjectUrl(oid);
+		Map<String, String> queryParams = new HashMap<String, String>();
+		queryParams.put(X_AMZ_EXPIRES,
+				Integer.toString(s3Config.getExpirationSeconds()));
+		Map<String, String> headers = new HashMap<String, String>();
+
+		String authorizationQueryParameters = SignerV4.createAuthorizationQuery(
+				s3Config, endpointUrl, METHOD_HEAD, headers, queryParams,
+				UNSIGNED_PAYLOAD);
+		String href = endpointUrl.toString() + "?" //$NON-NLS-1$
+				+ authorizationQueryParameters;
+
+		Proxy proxy = HttpSupport.proxyFor(ProxySelector.getDefault(),
+				endpointUrl);
+		HttpClientConnectionFactory f = new HttpClientConnectionFactory();
+		HttpConnection conn = f.create(new URL(href), proxy);
+		if (s3Config.isDisableSslVerify()) {
+			HttpSupport.disableSslVerify(conn);
+		}
+		conn.setRequestMethod(METHOD_HEAD);
+		conn.connect();
+		int status = conn.getResponseCode();
+		if (status == SC_OK) {
+			String contentLengthHeader = conn
+					.getHeaderField(HDR_CONTENT_LENGTH);
+			if (contentLengthHeader != null) {
+				return Integer.parseInt(contentLengthHeader);
+			}
+		}
+		return -1;
+	}
+

@@ -1,0 +1,45 @@
+	/**
+	 * Sign headers for given bucket, url and HTTP method and add signature in
+	 * Authorization header.
+	 *
+	 * @param bucketConfig
+	 *            configuration of S3 storage bucket this request should be
+	 *            signed for
+	 * @param url
+	 *            HTTP request URL
+	 * @param httpMethod
+	 *            HTTP method
+	 * @param headers
+	 *            HTTP headers to sign
+	 * @param bodyHash
+	 *            Pre-computed SHA256 hash of the request body content; this
+	 *            value should also be set as the header 'X-Amz-Content-SHA256'
+	 *            for non-streaming uploads.
+	 * @return HTTP headers signd by an Authorization header added to the
+	 *         headers
+	 */
+	static Map<String, String> createHeaderAuthorization(
+			S3Config bucketConfig, URL url, String httpMethod,
+			Map<String, String> headers, String bodyHash) {
+		addHostHeader(url, headers);
+
+		Date now = new Date();
+		String dateTimeStamp = dateTimeStampISO8601(now);
+		headers.put(X_AMZ_DATE, dateTimeStamp);
+
+		String canonicalizedHeaderNames = canonicalizeHeaderNames(headers);
+		String canonicalizedHeaders = canonicalizeHeaderString(headers);
+		String canonicalRequest = canonicalRequest(url, httpMethod, "", //$NON-NLS-1$
+				canonicalizedHeaderNames, canonicalizedHeaders, bodyHash);
+		String dateStamp = dateStamp(now);
+		String scope = scope(bucketConfig.getRegion(), dateStamp);
+
+		byte[] signature = createSignature(bucketConfig, dateTimeStamp,
+				dateStamp, scope, canonicalRequest);
+
+		headers.put(HDR_AUTHORIZATION, formatAuthorizationHeader(bucketConfig,
+				canonicalizedHeaderNames, scope, signature)); // $NON-NLS-1$
+
+		return headers;
+	}
+

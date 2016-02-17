@@ -1,0 +1,10 @@
+	private static void addHostHeader(URL url,
+			Map<String, String> headers) {
+		String hostHeader = url.getHost();
+		int port = url.getPort();
+		if (port > -1) {
+			hostHeader.concat(":" + Integer.toString(port)); //$NON-NLS-1$
+		}
+		headers.put("Host", hostHeader); //$NON-NLS-1$
+	}
+

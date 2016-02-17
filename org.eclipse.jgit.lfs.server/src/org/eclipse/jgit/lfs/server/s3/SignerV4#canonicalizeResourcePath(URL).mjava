@@ -1,0 +1,17 @@
+	private static String canonicalizeResourcePath(URL endpoint) {
+		if (endpoint == null) {
+			return "/"; //$NON-NLS-1$
+		}
+		String path = endpoint.getPath();
+		if (path == null || path.isEmpty()) {
+			return "/"; //$NON-NLS-1$
+		}
+
+		String encodedPath = urlEncode(path, true);
+		if (encodedPath.startsWith("/")) { //$NON-NLS-1$
+			return encodedPath;
+		} else {
+			return "/" + encodedPath; //$NON-NLS-1$
+		}
+	}
+

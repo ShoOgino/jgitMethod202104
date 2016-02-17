@@ -14,9 +14,17 @@
 			repository = fsRepo;
 			break;
 
+		case S3:
+			readAWSKeys();
+			checkOptions();
+			S3Config config = new S3Config(region.toString(), bucket,
+					storageClass.toString(), accessKey, secretKey,
+					expirationSeconds, disableSslVerify);
+			repository = new S3Repository(config);
+			break;
 		default:
-			throw new IllegalArgumentException(
-					"Unknown store type: " + storeType); //$NON-NLS-1$
+			throw new IllegalArgumentException(MessageFormat
+					.format(CLIText.get().lfsUnknownStoreType, storeType));
 		}
 
 		LfsProtocolServlet protocol = new LfsProtocolServlet() {
@@ -33,10 +41,13 @@
 
 		server.start();
 
-		outw.println("LFS protocol URL: " + getProtocolUrl(baseURI)); //$NON-NLS-1$
+		outw.println(MessageFormat.format(CLIText.get().lfsProtocolUrl,
+				getProtocolUrl(baseURI)));
 		if (storeType == StoreType.FS) {
-			outw.println("LFS objects located in: " + directory); //$NON-NLS-1$
-			outw.println("LFS store URL: " + getStoreUrl(baseURI)); //$NON-NLS-1$
+			outw.println(MessageFormat.format(CLIText.get().lfsStoreDirectory,
+					directory));
+			outw.println(MessageFormat.format(CLIText.get().lfsStoreUrl,
+					getStoreUrl(baseURI)));
 		}
 	}
 
