@@ -3,7 +3,6 @@
 			if (!up.isBiDirectionalPipe())
 				new ReachableCommitRequestValidator().checkWants(up, wants);
 			else if (!wants.isEmpty())
-				throw new PackProtocolException(MessageFormat.format(
-						JGitText.get().wantNotValid, wants.iterator().next().name()));
+				throw new WantNotValidException(wants.iterator().next());
 		}
 

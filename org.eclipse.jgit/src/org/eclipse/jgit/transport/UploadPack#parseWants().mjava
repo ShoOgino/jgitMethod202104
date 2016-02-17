@@ -26,9 +26,7 @@
 			}
 			wantIds.clear();
 		} catch (MissingObjectException notFound) {
-			ObjectId id = notFound.getObjectId();
-			throw new PackProtocolException(MessageFormat.format(
-					JGitText.get().wantNotValid, id.name()), notFound);
+			throw new WantNotValidException(notFound.getObjectId(), notFound);
 		} finally {
 			q.release();
 		}

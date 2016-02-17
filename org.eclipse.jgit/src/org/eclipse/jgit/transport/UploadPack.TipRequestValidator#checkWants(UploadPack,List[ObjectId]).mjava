@@ -7,8 +7,7 @@
 					refIdSet(up.getRepository().getRefDatabase().getRefs(ALL).values());
 				for (ObjectId obj : wants) {
 					if (!refIds.contains(obj))
-						throw new PackProtocolException(MessageFormat.format(
-								JGitText.get().wantNotValid, obj.name()));
+						throw new WantNotValidException(obj);
 				}
 			}
 		}
