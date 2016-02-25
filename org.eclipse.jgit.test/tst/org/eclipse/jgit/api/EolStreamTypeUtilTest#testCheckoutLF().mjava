@@ -1,0 +1,18 @@
+	@Test
+	public void testCheckoutLF() throws Exception {
+		testCheckout(TEXT_LF, AUTO_LF, "", "");
+		testCheckout(TEXT_LF, AUTO_LF, "\r", "\r");
+		testCheckout(TEXT_LF, AUTO_LF, "\n", "\n");
+
+		testCheckout(TEXT_LF, AUTO_LF, "\r\n", "\n");
+		testCheckout(TEXT_LF, AUTO_LF, "\n\r", "\n\r");
+
+		testCheckout(TEXT_LF, AUTO_LF, "\n\r\n", "\n\n");
+		testCheckout(TEXT_LF, AUTO_LF, "\r\n\r", "\n\r");
+
+		testCheckout(TEXT_LF, AUTO_LF, "a\nb\n", "a\nb\n");
+		testCheckout(TEXT_LF, AUTO_LF, "a\rb\r", "a\rb\r");
+		testCheckout(TEXT_LF, AUTO_LF, "a\n\rb\n\r", "a\n\rb\n\r");
+		testCheckout(TEXT_LF, AUTO_LF, "a\r\nb\r\n", "a\nb\n");
+	}
+

@@ -1,0 +1,18 @@
+	@Test
+	public void testCheckinLF() throws Exception {
+		testCheckin(TEXT_LF, AUTO_LF, "", "");
+		testCheckin(TEXT_LF, AUTO_LF, "\r", "\r");
+		testCheckin(TEXT_LF, AUTO_LF, "\n", "\n");
+
+		testCheckin(TEXT_LF, AUTO_LF, "\r\n", "\n");
+		testCheckin(TEXT_LF, AUTO_LF, "\n\r", "\n\r");
+
+		testCheckin(TEXT_LF, AUTO_LF, "\n\r\n", "\n\n");
+		testCheckin(TEXT_LF, AUTO_LF, "\r\n\r", "\n\r");
+
+		testCheckin(TEXT_LF, AUTO_LF, "a\nb\n", "a\nb\n");
+		testCheckin(TEXT_LF, AUTO_LF, "a\rb\r", "a\rb\r");
+		testCheckin(TEXT_LF, AUTO_LF, "a\n\rb\n\r", "a\n\rb\n\r");
+		testCheckin(TEXT_LF, AUTO_LF, "a\r\nb\r\n", "a\nb\n");
+	}
+

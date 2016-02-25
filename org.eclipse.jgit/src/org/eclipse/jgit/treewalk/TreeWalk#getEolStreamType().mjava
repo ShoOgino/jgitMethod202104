@@ -1,0 +1,13 @@
+	/**
+	 * @return the EOL stream type of the current entry using the config and
+	 *         {@link #getAttributes()} Note that this method may return null if
+	 *         the {@link TreeWalk} is not based on a working tree
+	 * @since 4.3
+	 */
+	public @Nullable EolStreamType getEolStreamType() {
+			if (attributesNodeProvider == null || config == null)
+				return null;
+			return EolStreamTypeUtil.detectStreamType(operationType,
+					config.get(WorkingTreeOptions.KEY), getAttributes());
+	}
+

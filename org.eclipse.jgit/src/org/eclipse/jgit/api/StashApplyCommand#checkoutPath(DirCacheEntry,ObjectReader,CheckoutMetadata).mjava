@@ -1,0 +1,12 @@
+	private void checkoutPath(DirCacheEntry entry, ObjectReader reader,
+			CheckoutMetadata checkoutMetadata) {
+		try {
+			DirCacheCheckout.checkoutEntry(repo, entry, reader, true,
+					checkoutMetadata);
+		} catch (IOException e) {
+			throw new JGitInternalException(MessageFormat.format(
+					JGitText.get().checkoutConflictWithFile,
+					entry.getPathString()), e);
+		}
+	}
+

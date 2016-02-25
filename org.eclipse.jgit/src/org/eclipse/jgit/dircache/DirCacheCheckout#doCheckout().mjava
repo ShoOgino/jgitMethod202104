@@ -43,11 +43,12 @@
 			if (file != null)
 				removeEmptyParents(file);
 
-			for (String path : updated.keySet()) {
+			for (Map.Entry<String, CheckoutMetadata> e : updated.entrySet()) {
+				String path = e.getKey();
+				CheckoutMetadata meta = e.getValue();
 				DirCacheEntry entry = dc.getEntry(path);
 				if (!FileMode.GITLINK.equals(entry.getRawMode()))
-					checkoutEntry(repo, entry, objectReader, false,
-							updated.get(path));
+					checkoutEntry(repo, entry, objectReader, false, meta);
 			}
 
 			// commit the index builder - a new index is persisted

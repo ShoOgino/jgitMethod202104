@@ -1,0 +1,11 @@
+	private void collectRepositoryState() throws Exception {
+		dc = db.readDirCache();
+		walk = beginWalk();
+		if (dotGitattributes != null)
+			collectEntryContentAndAttributes(F, ".gitattributes", null);
+		collectEntryContentAndAttributes(F, fileCRLF.getName(), entryCRLF);
+		collectEntryContentAndAttributes(F, fileLF.getName(), entryLF);
+		collectEntryContentAndAttributes(F, fileMixed.getName(), entryMixed);
+		endWalk();
+	}
+

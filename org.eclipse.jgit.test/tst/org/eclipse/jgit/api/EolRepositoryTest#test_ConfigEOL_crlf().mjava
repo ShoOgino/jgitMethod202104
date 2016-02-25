@@ -1,0 +1,11 @@
+	@Test
+	public void test_ConfigEOL_crlf() throws Exception {
+		// for EOL to work, the text attribute must be set
+		setupGitAndDoHardReset(null, EOL.CRLF, "*.txt text", null, null);
+		collectRepositoryState();
+		assertEquals("text", entryCRLF.attrs);
+		checkEntryContent(entryCRLF, CONTENT_CRLF, CONTENT_LF);
+		checkEntryContent(entryLF, CONTENT_CRLF, CONTENT_LF);
+		checkEntryContent(entryMixed, CONTENT_CRLF, CONTENT_LF);
+	}
+

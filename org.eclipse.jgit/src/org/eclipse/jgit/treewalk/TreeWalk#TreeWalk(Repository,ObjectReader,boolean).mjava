@@ -1,0 +1,15 @@
+	private TreeWalk(final @Nullable Repository repo, final ObjectReader or,
+			final boolean closeReader) {
+		if (repo != null) {
+			config = repo.getConfig();
+			attributesNodeProvider = repo.createAttributesNodeProvider();
+		} else {
+			config = null;
+			attributesNodeProvider = null;
+		}
+		reader = or;
+		filter = TreeFilter.ALL;
+		trees = NO_TREES;
+		this.closeReader = closeReader;
+	}
+

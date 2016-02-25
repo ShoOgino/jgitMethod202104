@@ -1,0 +1,75 @@
+	/**
+	 * Test stream type detection based on stream content.
+	 * <p>
+	 * Tests three things with the output text:
+	 * <p>
+	 * 1) conversion if output was declared as text
+	 * <p>
+	 * 2) conversion if output was declared as potentially text (AUTO_...) and
+	 * is in fact text
+	 * <p>
+	 * 3) conversion if modified output (now with binary characters) was
+	 * declared as potentially text but now contains binary characters
+	 * <p>
+	 *
+	 * @param streamTypeText
+	 *            is the enum meaning that the output is definitely text (no
+	 *            binary check at all)
+	 * @param streamTypeWithBinaryCheck
+	 *            is the enum meaning that the output may be text (binary check
+	 *            is done)
+	 * @param output
+	 *            is a text output without binary characters
+	 * @param expectedConversion
+	 *            is the expected converted output without binary characters
+	 * @throws Exception
+	 */
+	private void testCheckout(EolStreamType streamTypeText,
+			EolStreamType streamTypeWithBinaryCheck, String output,
+			String expectedConversion) throws Exception {
+		ByteArrayOutputStream b;
+		byte[] outputBytes = output.getBytes(StandardCharsets.UTF_8);
+		byte[] expectedConversionBytes = expectedConversion
+				.getBytes(StandardCharsets.UTF_8);
+
+		// test using output text and assuming it was declared TEXT
+		b = new ByteArrayOutputStream();
+		try (OutputStream out = EolStreamTypeUtil.wrapOutputStream(b,
+				streamTypeText)) {
+			out.write(outputBytes);
+		}
+		assertArrayEquals(expectedConversionBytes, b.toByteArray());
+
+		// test using ouput text and assuming it was declared AUTO, using binary
+		// detection
+		b = new ByteArrayOutputStream();
+		try (OutputStream out = EolStreamTypeUtil.wrapOutputStream(b,
+				streamTypeWithBinaryCheck)) {
+			out.write(outputBytes);
+		}
+		assertArrayEquals(expectedConversionBytes, b.toByteArray());
+
+		// now pollute output text with some binary bytes
+		outputBytes = extendWithBinaryData(outputBytes);
+		expectedConversionBytes = extendWithBinaryData(expectedConversionBytes);
+
+		// again, test using output text and assuming it was declared TEXT
+		b = new ByteArrayOutputStream();
+		try (OutputStream out = EolStreamTypeUtil.wrapOutputStream(b,
+				streamTypeText)) {
+			out.write(outputBytes);
+		}
+		assertArrayEquals(expectedConversionBytes, b.toByteArray());
+
+		// again, test using ouput text and assuming it was declared AUTO, using
+		// binary
+		// detection
+		b = new ByteArrayOutputStream();
+		try (OutputStream out = EolStreamTypeUtil.wrapOutputStream(b,
+				streamTypeWithBinaryCheck)) {
+			out.write(outputBytes);
+		}
+		// expect no conversion
+		assertArrayEquals(outputBytes, b.toByteArray());
+	}
+

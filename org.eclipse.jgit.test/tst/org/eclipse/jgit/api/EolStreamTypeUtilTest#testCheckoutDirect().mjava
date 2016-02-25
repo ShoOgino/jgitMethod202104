@@ -1,0 +1,18 @@
+	@Test
+	public void testCheckoutDirect() throws Exception {
+		testCheckout(DIRECT, DIRECT, "", "");
+		testCheckout(DIRECT, DIRECT, "\r", "\r");
+		testCheckout(DIRECT, DIRECT, "\n", "\n");
+
+		testCheckout(DIRECT, DIRECT, "\r\n", "\r\n");
+		testCheckout(DIRECT, DIRECT, "\n\r", "\n\r");
+
+		testCheckout(DIRECT, DIRECT, "\n\r\n", "\n\r\n");
+		testCheckout(DIRECT, DIRECT, "\r\n\r", "\r\n\r");
+
+		testCheckout(DIRECT, DIRECT, "a\nb\n", "a\nb\n");
+		testCheckout(DIRECT, DIRECT, "a\rb\r", "a\rb\r");
+		testCheckout(DIRECT, DIRECT, "a\n\rb\n\r", "a\n\rb\n\r");
+		testCheckout(DIRECT, DIRECT, "a\r\nb\r\n", "a\r\nb\r\n");
+	}
+

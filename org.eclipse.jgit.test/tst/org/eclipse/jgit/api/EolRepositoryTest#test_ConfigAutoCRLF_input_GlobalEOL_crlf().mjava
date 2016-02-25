@@ -1,0 +1,10 @@
+	@Test
+	public void test_ConfigAutoCRLF_input_GlobalEOL_crlf() throws Exception {
+		setupGitAndDoHardReset(AutoCRLF.INPUT, EOL.LF, "*.txt eol=crlf", null, null);
+		collectRepositoryState();
+		assertEquals("eol=crlf", entryCRLF.attrs);
+		checkEntryContent(entryCRLF, CONTENT_CRLF, CONTENT_LF);
+		checkEntryContent(entryLF, CONTENT_CRLF, CONTENT_LF);
+		checkEntryContent(entryMixed, CONTENT_CRLF, CONTENT_LF);
+	}
+

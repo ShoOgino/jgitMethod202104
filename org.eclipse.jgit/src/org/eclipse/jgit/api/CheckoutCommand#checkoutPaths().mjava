@@ -9,7 +9,8 @@
 			RefNotFoundException {
 		DirCache dc = repo.lockDirCache();
 		try (RevWalk revWalk = new RevWalk(repo);
-				TreeWalk treeWalk = new TreeWalk(revWalk.getObjectReader())) {
+				TreeWalk treeWalk = new TreeWalk(repo,
+						revWalk.getObjectReader())) {
 			treeWalk.setRecursive(true);
 			if (!checkoutAllPaths)
 				treeWalk.setFilter(PathFilterGroup.createFromStrings(paths));

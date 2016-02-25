@@ -1,0 +1,16 @@
+	// create a file and add it to the repo
+	private File createAndAddFile(Git git, String path, String content)
+			throws Exception {
+		File f;
+		int pos = path.lastIndexOf('/');
+		if (pos < 0) {
+			f = writeTrashFile(path, content);
+		} else {
+			f = writeTrashFile(path.substring(0, pos), path.substring(pos + 1),
+					content);
+		}
+		gitAdd(git, path);
+		Assert.assertTrue(f.exists());
+		return f;
+	}
+

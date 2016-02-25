@@ -1,0 +1,15 @@
+	private void recreateWorktree(Git git)
+			throws GitAPIException, CheckoutConflictException,
+			InterruptedException, IOException, NoFilepatternException {
+		// re-create file from the repo
+		for (File f : new File[] { dotGitattributes, fileCRLF, fileLF, fileMixed }) {
+			if (f == null)
+				continue;
+			f.delete();
+			Assert.assertFalse(f.exists());
+		}
+		gitResetHard(git);
+		fsTick(db.getIndexFile());
+		gitAdd(git, ".");
+	}
+

@@ -1,0 +1,71 @@
+	private static EolStreamType checkOutStreamType(WorkingTreeOptions options,
+			Attributes attrs) {
+		// old git system
+		if (attrs.isSet("crlf")) {//$NON-NLS-1$
+			return FORCE_EOL_LF_ON_CHECKOUT ? EolStreamType.TEXT_LF
+					: EolStreamType.DIRECT;
+		} else if (attrs.isUnset("crlf")) {//$NON-NLS-1$
+			return EolStreamType.DIRECT;
+		} else if ("input".equals(attrs.getValue("crlf"))) {//$NON-NLS-1$ //$NON-NLS-2$
+			return EolStreamType.DIRECT;
+		}
+
+		// new git system
+		if (attrs.isUnset("text")) {//$NON-NLS-1$
+			return EolStreamType.DIRECT;
+		}
+		String eol = attrs.getValue("eol"); //$NON-NLS-1$
+		if (eol != null && "crlf".equals(eol)) //$NON-NLS-1$
+			return EolStreamType.TEXT_CRLF;
+		if (eol != null && "lf".equals(eol)) //$NON-NLS-1$
+			return FORCE_EOL_LF_ON_CHECKOUT ? EolStreamType.TEXT_LF
+					: EolStreamType.DIRECT;
+
+		if (attrs.isSet("text")) { //$NON-NLS-1$
+			switch (options.getAutoCRLF()) {
+			case TRUE:
+				return EolStreamType.TEXT_CRLF;
+			default:
+				// no decision
+			}
+			switch (options.getEOL()) {
+			case CRLF:
+				return EolStreamType.TEXT_CRLF;
+			case LF:
+				return FORCE_EOL_LF_ON_CHECKOUT ? EolStreamType.TEXT_LF
+						: EolStreamType.DIRECT;
+			case NATIVE:
+			default:
+				return EolStreamType.DIRECT;
+			}
+		}
+
+		if ("auto".equals(attrs.getValue("text"))) { //$NON-NLS-1$ //$NON-NLS-2$
+			switch (options.getAutoCRLF()) {
+			case TRUE:
+				return EolStreamType.AUTO_CRLF;
+			default:
+				// no decision
+			}
+			switch (options.getEOL()) {
+			case CRLF:
+				return EolStreamType.AUTO_CRLF;
+			case LF:
+				return FORCE_EOL_LF_ON_CHECKOUT ? EolStreamType.TEXT_LF
+						: EolStreamType.DIRECT;
+			case NATIVE:
+			default:
+				return EolStreamType.DIRECT;
+			}
+		}
+
+		switch (options.getAutoCRLF()) {
+		case TRUE:
+			return EolStreamType.AUTO_CRLF;
+		default:
+			// no decision
+		}
+
+		return EolStreamType.DIRECT;
+	}
+

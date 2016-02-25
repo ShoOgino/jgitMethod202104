@@ -1,0 +1,11 @@
+	@Test
+	public void test_ConfigAutoCRLF_true() throws Exception {
+		// for EOL to work, the text attribute must be set
+		setupGitAndDoHardReset(AutoCRLF.TRUE, null, null, null, "* text=auto");
+		collectRepositoryState();
+		assertEquals("text=auto", entryCRLF.attrs);
+		checkEntryContent(entryCRLF, CONTENT_CRLF, CONTENT_LF);
+		checkEntryContent(entryLF, CONTENT_CRLF, CONTENT_LF);
+		checkEntryContent(entryMixed, CONTENT_CRLF, CONTENT_LF);
+	}
+

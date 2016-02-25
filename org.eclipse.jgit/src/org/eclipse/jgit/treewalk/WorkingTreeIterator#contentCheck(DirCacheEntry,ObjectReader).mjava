@@ -34,10 +34,11 @@
 			// Content differs: that's a real change, perhaps
 			if (reader == null) // deprecated use, do no further checks
 				return true;
-			switch (getOptions().getAutoCRLF()) {
-			case INPUT:
-			case TRUE:
-				InputStream dcIn = null;
+
+			switch (getEolStreamType()) {
+			case DIRECT:
+				return true;
+			default:
 				try {
 					ObjectLoader loader = reader.open(entry.getObjectId());
 					if (loader == null)
@@ -45,37 +46,26 @@
 
 					// We need to compute the length, but only if it is not
 					// a binary stream.
-					dcIn = new EolCanonicalizingInputStream(
-							loader.openStream(), true, true /* abort if binary */);
 					long dcInLen;
-					try {
+					try (InputStream dcIn = new AutoLFInputStream(
+							loader.openStream(), true,
+							true /* abort if binary */)) {
 						dcInLen = computeLength(dcIn);
-					} catch (EolCanonicalizingInputStream.IsBinaryException e) {
+					} catch (AutoLFInputStream.IsBinaryException e) {
 						return true;
-					} finally {
-						dcIn.close();
 					}
 
-					dcIn = new EolCanonicalizingInputStream(
-							loader.openStream(), true);
-					byte[] autoCrLfHash = computeHash(dcIn, dcInLen);
-					boolean changed = getEntryObjectId().compareTo(
-							autoCrLfHash, 0) != 0;
-					return changed;
+					try (InputStream dcIn = new AutoLFInputStream(
+							loader.openStream(), true)) {
+						byte[] autoCrLfHash = computeHash(dcIn, dcInLen);
+						boolean changed = getEntryObjectId()
+								.compareTo(autoCrLfHash, 0) != 0;
+						return changed;
+					}
 				} catch (IOException e) {
 					return true;
-				} finally {
-					if (dcIn != null)
-						try {
-							dcIn.close();
-						} catch (IOException e) {
-							// empty
-						}
 				}
-			case FALSE:
-				break;
 			}
-			return true;
 		}
 	}
 

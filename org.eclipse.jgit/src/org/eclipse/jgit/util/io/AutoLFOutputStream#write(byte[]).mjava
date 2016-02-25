@@ -1,0 +1,8 @@
+	@Override
+	public void write(byte[] b) throws IOException {
+		int overflow = buffer(b, 0, b.length);
+		if (overflow > 0) {
+			write(b, b.length - overflow, overflow);
+		}
+	}
+

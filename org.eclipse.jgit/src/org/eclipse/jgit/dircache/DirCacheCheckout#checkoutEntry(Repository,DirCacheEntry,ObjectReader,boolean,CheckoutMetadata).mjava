@@ -25,16 +25,22 @@
 	 * @param deleteRecursive
 	 *            true to recursively delete final path if it exists on the file
 	 *            system
-	 * @param smudgeFilterCommand
-	 *            the filter command to be run for smudging the entry to be
-	 *            checked out
+	 * @param checkoutMetadata
+	 *            containing
+	 *            <ul>
+	 *            <li>smudgeFilterCommand to be run for smudging the entry to be
+	 *            checked out</li>
+	 *            <li>eolStreamType used for stream conversion</li>
+	 *            </ul>
 	 *
 	 * @throws IOException
 	 * @since 4.2
 	 */
 	public static void checkoutEntry(Repository repo, DirCacheEntry entry,
 			ObjectReader or, boolean deleteRecursive,
-			String smudgeFilterCommand) throws IOException {
+			CheckoutMetadata checkoutMetadata) throws IOException {
+		if (checkoutMetadata == null)
+			checkoutMetadata = CheckoutMetadata.EMPTY;
 		ObjectLoader ol = or.open(entry.getObjectId());
 		File f = new File(repo.getWorkTree(), entry.getPathString());
 		File parentDir = f.getParentFile();
@@ -56,12 +62,19 @@
 
 		File tmpFile = File.createTempFile(
 				"._" + f.getName(), null, parentDir); //$NON-NLS-1$
-		OutputStream channel = new FileOutputStream(tmpFile);
-		if (opt.getAutoCRLF() == AutoCRLF.TRUE)
-			channel = new AutoCRLFOutputStream(channel);
-		if (smudgeFilterCommand != null) {
-			ProcessBuilder filterProcessBuilder = fs
-					.runInShell(smudgeFilterCommand, new String[0]);
+		EolStreamType nonNullEolStreamType;
+		if (checkoutMetadata.eolStreamType != null) {
+			nonNullEolStreamType = checkoutMetadata.eolStreamType;
+		} else if (opt.getAutoCRLF() == AutoCRLF.TRUE) {
+			nonNullEolStreamType = EolStreamType.AUTO_CRLF;
+		} else {
+			nonNullEolStreamType = EolStreamType.DIRECT;
+		}
+		OutputStream channel = EolStreamTypeUtil.wrapOutputStream(
+				new FileOutputStream(tmpFile), nonNullEolStreamType);
+		if (checkoutMetadata.smudgeFilterCommand != null) {
+			ProcessBuilder filterProcessBuilder = fs.runInShell(
+					checkoutMetadata.smudgeFilterCommand, new String[0]);
 			filterProcessBuilder.directory(repo.getWorkTree());
 			filterProcessBuilder.environment().put(Constants.GIT_DIR_KEY,
 					repo.getDirectory().getAbsolutePath());
@@ -77,14 +90,16 @@
 				}
 			} catch (IOException | InterruptedException e) {
 				throw new IOException(new FilterFailedException(e,
-						smudgeFilterCommand, entry.getPathString()));
+						checkoutMetadata.smudgeFilterCommand,
+						entry.getPathString()));
 
 			} finally {
 				channel.close();
 			}
 			if (rc != 0) {
 				throw new IOException(new FilterFailedException(rc,
-						smudgeFilterCommand, entry.getPathString(),
+						checkoutMetadata.smudgeFilterCommand,
+						entry.getPathString(),
 						result.getStdout().toByteArray(MAX_EXCEPTION_TEXT_SIZE),
 						RawParseUtils.decode(result.getStderr()
 								.toByteArray(MAX_EXCEPTION_TEXT_SIZE))));
@@ -100,10 +115,11 @@
 		// was filtered (either by autocrlf handling or smudge filters) ask the
 		// filesystem again for the length. Otherwise the objectloader knows the
 		// size
-		if (opt.getAutoCRLF() == AutoCRLF.TRUE || smudgeFilterCommand != null) {
-			entry.setLength(tmpFile.length());
-		} else {
+		if (checkoutMetadata.eolStreamType == EolStreamType.DIRECT
+				&& checkoutMetadata.smudgeFilterCommand == null) {
 			entry.setLength(ol.getSize());
+		} else {
+			entry.setLength(tmpFile.length());
 		}
 
 		if (opt.isFileMode() && fs.supportsExecute()) {

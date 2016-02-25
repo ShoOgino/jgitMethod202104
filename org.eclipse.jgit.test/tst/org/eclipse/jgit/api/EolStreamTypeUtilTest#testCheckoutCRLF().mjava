@@ -1,0 +1,18 @@
+	@Test
+	public void testCheckoutCRLF() throws Exception {
+		testCheckout(TEXT_CRLF, AUTO_CRLF, "", "");
+		testCheckout(TEXT_CRLF, AUTO_CRLF, "\r", "\r");
+		testCheckout(TEXT_CRLF, AUTO_CRLF, "\n", "\r\n");
+
+		testCheckout(TEXT_CRLF, AUTO_CRLF, "\r\n", "\r\n");
+		testCheckout(TEXT_CRLF, AUTO_CRLF, "\n\r", "\r\n\r");
+
+		testCheckout(TEXT_CRLF, AUTO_CRLF, "\n\r\n", "\r\n\r\n");
+		testCheckout(TEXT_CRLF, AUTO_CRLF, "\r\n\r", "\r\n\r");
+
+		testCheckout(TEXT_CRLF, AUTO_CRLF, "a\nb\n", "a\r\nb\r\n");
+		testCheckout(TEXT_CRLF, AUTO_CRLF, "a\rb\r", "a\rb\r");
+		testCheckout(TEXT_CRLF, AUTO_CRLF, "a\n\rb\n\r", "a\r\n\rb\r\n\r");
+		testCheckout(TEXT_CRLF, AUTO_CRLF, "a\r\nb\r\n", "a\r\nb\r\n");
+	}
+

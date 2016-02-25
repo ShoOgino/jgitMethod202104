@@ -6,11 +6,13 @@
 		while (treeWalk.next()) {
 			final ObjectId blobId = treeWalk.getObjectId(0);
 			final FileMode mode = treeWalk.getFileMode(0);
+			final EolStreamType eolStreamType = treeWalk.getEolStreamType();
 			editor.add(new PathEdit(treeWalk.getPathString()) {
 				public void apply(DirCacheEntry ent) {
 					ent.setObjectId(blobId);
 					ent.setFileMode(mode);
-					checkoutPath(ent, r);
+					checkoutPath(ent, r,
+							new CheckoutMetadata(eolStreamType, null));
 				}
 			});
 		}

@@ -1,0 +1,11 @@
+	@Test
+	public void test_ConfigAutoCRLF_input_ConfigEOL_lf() throws Exception {
+		// for EOL to work, the text attribute must be set
+		setupGitAndDoHardReset(AutoCRLF.INPUT, EOL.LF, "*.txt text", null, null);
+		collectRepositoryState();
+		assertEquals("text", entryCRLF.attrs);
+		checkEntryContent(entryCRLF, CONTENT_LF, CONTENT_LF);
+		checkEntryContent(entryLF, CONTENT_LF, CONTENT_LF);
+		checkEntryContent(entryMixed, CONTENT_LF, CONTENT_LF);
+	}
+

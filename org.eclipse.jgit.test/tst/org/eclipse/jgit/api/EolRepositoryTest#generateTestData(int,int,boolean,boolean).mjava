@@ -1,0 +1,23 @@
+	static String generateTestData(int size, int lineSize, boolean withCRLF,
+			boolean withLF) {
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < size; i++) {
+			if (i > 0 && i % lineSize == 0) {
+				// newline
+				if (withCRLF && withLF) {
+					// mixed
+					if (i % 2 == 0)
+						sb.append("\r\n");
+					else
+						sb.append("\n");
+				} else if (withCRLF) {
+					sb.append("\r\n");
+				} else if (withLF) {
+					sb.append("\n");
+				}
+			}
+			sb.append("A");
+		}
+		return sb.toString();
+	}
+

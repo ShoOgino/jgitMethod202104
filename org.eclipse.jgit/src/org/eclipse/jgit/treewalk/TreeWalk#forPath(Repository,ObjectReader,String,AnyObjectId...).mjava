@@ -1,0 +1,50 @@
+	/**
+	 * Open a tree walk and filter to exactly one path.
+	 * <p>
+	 * The returned tree walk is already positioned on the requested path, so
+	 * the caller should not need to invoke {@link #next()} unless they are
+	 * looking for a possible directory/file name conflict.
+	 *
+	 * @param repo
+	 *            repository to read config data and
+	 *            {@link AttributesNodeProvider} from.
+	 * @param reader
+	 *            the reader the walker will obtain tree data from.
+	 * @param path
+	 *            single path to advance the tree walk instance into.
+	 * @param trees
+	 *            one or more trees to walk through, all with the same root.
+	 * @return a new tree walk configured for exactly this one path; null if no
+	 *         path was found in any of the trees.
+	 * @throws IOException
+	 *             reading a pack file or loose object failed.
+	 * @throws CorruptObjectException
+	 *             an tree object could not be read as its data stream did not
+	 *             appear to be a tree, or could not be inflated.
+	 * @throws IncorrectObjectTypeException
+	 *             an object we expected to be a tree was not a tree.
+	 * @throws MissingObjectException
+	 *             a tree object was not found.
+	 * @since 4.3
+	 */
+	public static TreeWalk forPath(final @Nullable Repository repo,
+			final ObjectReader reader, final String path,
+			final AnyObjectId... trees)
+					throws MissingObjectException, IncorrectObjectTypeException,
+					CorruptObjectException, IOException {
+		TreeWalk tw = new TreeWalk(repo, reader);
+		PathFilter f = PathFilter.create(path);
+		tw.setFilter(f);
+		tw.reset(trees);
+		tw.setRecursive(false);
+
+		while (tw.next()) {
+			if (f.isDone(tw)) {
+				return tw;
+			} else if (tw.isSubtree()) {
+				tw.enterSubtree();
+			}
+		}
+		return null;
+	}
+

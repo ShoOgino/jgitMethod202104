@@ -13,20 +13,23 @@
 			if (path.equals(previousPath))
 				continue;
 
+			final EolStreamType eolStreamType = treeWalk.getEolStreamType();
 			editor.add(new PathEdit(path) {
 				public void apply(DirCacheEntry ent) {
 					int stage = ent.getStage();
 					if (stage > DirCacheEntry.STAGE_0) {
 						if (checkoutStage != null) {
 							if (stage == checkoutStage.number)
-								checkoutPath(ent, r);
+								checkoutPath(ent, r, new CheckoutMetadata(
+										eolStreamType, null));
 						} else {
 							UnmergedPathException e = new UnmergedPathException(
 									ent);
 							throw new JGitInternalException(e.getMessage(), e);
 						}
 					} else {
-						checkoutPath(ent, r);
+						checkoutPath(ent, r,
+								new CheckoutMetadata(eolStreamType, null));
 					}
 				}
 			});

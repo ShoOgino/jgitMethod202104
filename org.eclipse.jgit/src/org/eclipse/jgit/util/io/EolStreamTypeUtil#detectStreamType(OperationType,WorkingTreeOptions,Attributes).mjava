@@ -1,0 +1,33 @@
+	/**
+	 * Convenience method used to detect if CRLF conversion has been configured
+	 * using the
+	 * <ul>
+	 * <li>global repo options</li>
+	 * <li>global attributes</li>
+	 * <li>info attributes</li>
+	 * <li>working tree .gitattributes</li>
+	 *
+	 * @param op
+	 *            is the {@link OperationType} of the current traversal
+	 * @param options
+	 *            are the {@link Config} options with key
+	 *            {@link WorkingTreeOptions#KEY}
+	 * @param attrs
+	 *            are the {@link Attributes} of the file for which the
+	 *            {@link EolStreamType} is to be detected
+	 *
+	 * @return the stream conversion {@link EolStreamType} to be performed for
+	 *         the selected {@link OperationType}
+	 */
+	public static EolStreamType detectStreamType(OperationType op,
+			WorkingTreeOptions options, Attributes attrs) {
+		switch (op) {
+		case CHECKIN_OP:
+			return checkInStreamType(options, attrs);
+		case CHECKOUT_OP:
+			return checkOutStreamType(options, attrs);
+		default:
+			throw new IllegalArgumentException("unknown OperationType " + op); //$NON-NLS-1$
+		}
+	}
+

@@ -1,0 +1,36 @@
+	@Test
+	public void test_switchToBranchWithBinaryAttributes() throws Exception {
+		Git git = Git.wrap(db);
+
+		// for EOL to work, the text attribute must be set
+		setupGitAndDoHardReset(AutoCRLF.FALSE, EOL.LF, null, null,
+				"file1.txt binary\nfile2.txt binary\nfile3.txt binary");
+		collectRepositoryState();
+		assertEquals("binary -diff -merge -text", entryCRLF.attrs);
+		checkEntryContent(entryCRLF, CONTENT_CRLF, CONTENT_CRLF);
+		checkEntryContent(entryLF, CONTENT_LF, CONTENT_LF);
+		checkEntryContent(entryMixed, CONTENT_MIXED, CONTENT_MIXED);
+
+		// switch to text for file1
+		dotGitattributes = createAndAddFile(git, Constants.DOT_GIT_ATTRIBUTES,
+				"file1.txt text\nfile2.txt binary\nfile3.txt binary");
+		gitCommit(git, "switchedToTextFor1");
+		recreateWorktree(git);
+		collectRepositoryState();
+		assertEquals("text", entryCRLF.attrs);
+		checkEntryContent(entryCRLF, CONTENT_CRLF, CONTENT_LF);
+		assertEquals("binary -diff -merge -text", entryLF.attrs);
+		checkEntryContent(entryLF, CONTENT_LF, CONTENT_LF);
+		assertEquals("binary -diff -merge -text", entryMixed.attrs);
+		checkEntryContent(entryMixed, CONTENT_MIXED, CONTENT_MIXED);
+
+		// checkout the commit which has text for file1
+		gitCheckout(git, "HEAD^");
+		recreateWorktree(git);
+		collectRepositoryState();
+		assertEquals("binary -diff -merge -text", entryCRLF.attrs);
+		checkEntryContent(entryCRLF, CONTENT_CRLF, CONTENT_CRLF);
+		checkEntryContent(entryLF, CONTENT_LF, CONTENT_LF);
+		checkEntryContent(entryMixed, CONTENT_MIXED, CONTENT_MIXED);
+	}
+

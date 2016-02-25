@@ -1,0 +1,10 @@
+	@Override
+	public void close() throws IOException {
+		flush();
+		if (buf == '\r') {
+			out.write(buf);
+			buf = -1;
+		}
+		out.close();
+	}
+

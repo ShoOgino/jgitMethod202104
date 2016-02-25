@@ -1,0 +1,77 @@
+	/**
+	 * Test stream type detection based on stream content.
+	 * <p>
+	 * Tests three things with the input text:
+	 * <p>
+	 * 1) conversion if input was declared as text
+	 * <p>
+	 * 2) conversion if input was declared as potentially text (AUTO_...) and is
+	 * in fact text
+	 * <p>
+	 * 3) conversion if modified input (now with binary characters) was declared
+	 * as potentially text but now contains binary characters
+	 * <p>
+	 *
+	 * @param streamTypeText
+	 *            is the enum meaning that the input is definitely text (no
+	 *            binary check at all)
+	 * @param streamTypeWithBinaryCheck
+	 *            is the enum meaning that the input may be text (binary check
+	 *            is done)
+	 * @param input
+	 *            is a text input without binary characters
+	 * @param expectedConversion
+	 *            is the expected converted input without binary characters
+	 * @throws Exception
+	 */
+	private void testCheckin(EolStreamType streamTypeText,
+			EolStreamType streamTypeWithBinaryCheck, String input,
+			String expectedConversion) throws Exception {
+		byte[] inputBytes = input.getBytes(StandardCharsets.UTF_8);
+		byte[] expectedConversionBytes = expectedConversion
+				.getBytes(StandardCharsets.UTF_8);
+
+		// test using input text and assuming it was declared TEXT
+		try (InputStream in = EolStreamTypeUtil.wrapInputStream(
+				new ByteArrayInputStream(inputBytes),
+				streamTypeText)) {
+			byte[] b = new byte[1024];
+			int len = IO.readFully(in, b, 0);
+			assertArrayEquals(expectedConversionBytes, Arrays.copyOf(b, len));
+		}
+
+		// test using input text and assuming it was declared AUTO, using binary
+		// detection
+		try (InputStream in = EolStreamTypeUtil.wrapInputStream(
+				new ByteArrayInputStream(inputBytes),
+				streamTypeWithBinaryCheck)) {
+			byte[] b = new byte[1024];
+			int len = IO.readFully(in, b, 0);
+			assertArrayEquals(expectedConversionBytes, Arrays.copyOf(b, len));
+		}
+
+		// now pollute input text with some binary bytes
+		inputBytes = extendWithBinaryData(inputBytes);
+		expectedConversionBytes = extendWithBinaryData(expectedConversionBytes);
+
+		// again, test using input text and assuming it was declared TEXT
+		try (InputStream in = EolStreamTypeUtil.wrapInputStream(
+				new ByteArrayInputStream(inputBytes), streamTypeText)) {
+			byte[] b = new byte[1024];
+			int len = IO.readFully(in, b, 0);
+			assertArrayEquals(expectedConversionBytes, Arrays.copyOf(b, len));
+		}
+
+		// again, test using input text and assuming it was declared AUTO, using
+		// binary
+		// detection
+		try (InputStream in = EolStreamTypeUtil.wrapInputStream(
+				new ByteArrayInputStream(inputBytes),
+				streamTypeWithBinaryCheck)) {
+			byte[] b = new byte[1024];
+			int len = IO.readFully(in, b, 0);
+			// expect no conversion
+			assertArrayEquals(inputBytes, Arrays.copyOf(b, len));
+		}
+	}
+

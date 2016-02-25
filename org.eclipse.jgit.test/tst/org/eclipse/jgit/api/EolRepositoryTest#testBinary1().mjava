@@ -1,0 +1,12 @@
+	@Test
+	public void testBinary1() throws Exception {
+		setupGitAndDoHardReset(AutoCRLF.TRUE, EOL.CRLF, "*.txt text", "*.txt binary",
+				"*.txt eol=crlf");
+		// info overrides all
+		collectRepositoryState();
+		assertEquals("binary -diff -merge -text eol=crlf", entryCRLF.attrs);
+		checkEntryContent(entryCRLF, CONTENT_CRLF, CONTENT_CRLF);
+		checkEntryContent(entryLF, CONTENT_LF, CONTENT_LF);
+		checkEntryContent(entryMixed, CONTENT_MIXED, CONTENT_MIXED);
+	}
+

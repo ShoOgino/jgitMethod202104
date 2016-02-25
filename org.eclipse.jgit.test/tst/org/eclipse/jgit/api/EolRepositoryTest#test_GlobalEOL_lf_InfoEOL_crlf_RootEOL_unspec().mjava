@@ -1,0 +1,13 @@
+	@Test
+	public void test_GlobalEOL_lf_InfoEOL_crlf_RootEOL_unspec()
+			throws Exception {
+		setupGitAndDoHardReset(null, null, "*.txt eol=lf", "*.txt eol=crlf",
+				"*.txt text !eol");
+		// info overrides all
+		collectRepositoryState();
+		assertEquals("eol=crlf text", entryCRLF.attrs);
+		checkEntryContent(entryCRLF, CONTENT_CRLF, CONTENT_LF);
+		checkEntryContent(entryLF, CONTENT_CRLF, CONTENT_LF);
+		checkEntryContent(entryMixed, CONTENT_CRLF, CONTENT_LF);
+	}
+

@@ -16,9 +16,10 @@
 	 */
 	public InputStream openEntryStream() throws IOException {
 		InputStream rawis = current().openInputStream();
-		if (mightNeedCleaning())
-			return filterClean(rawis);
-		else
+		if (getCleanFilterCommand() == null
+				&& getEolStreamType() == EolStreamType.DIRECT)
 			return rawis;
+		else
+			return filterClean(rawis);
 	}
 

@@ -15,6 +15,7 @@
 					// Not in commit, don't create untracked
 					continue;
 
+				final EolStreamType eolStreamType = walk.getEolStreamType();
 				final DirCacheEntry entry = new DirCacheEntry(walk.getRawPath());
 				entry.setFileMode(cIter.getEntryFileMode());
 				entry.setObjectIdFromRaw(cIter.idBuffer(), cIter.idOffset());
@@ -29,7 +30,8 @@
 					}
 				}
 
-				checkoutPath(entry, reader);
+				checkoutPath(entry, reader,
+						new CheckoutMetadata(eolStreamType, null));
 			}
 		}
 	}

@@ -1,0 +1,25 @@
+	private void collectEntryContentAndAttributes(FileMode type, String pathName,
+			ActualEntry e) throws IOException {
+		assertTrue("walk has entry", walk.next());
+
+		assertEquals(pathName, walk.getPathString());
+		assertEquals(type, walk.getFileMode(0));
+
+		if (e != null) {
+			e.attrs = "";
+			for (Attribute a : walk.getAttributes().getAll()) {
+				e.attrs += " " + a.toString();
+			}
+			e.attrs = e.attrs.trim();
+			e.file = new String(
+					IO.readFully(new File(db.getWorkTree(), pathName)));
+			DirCacheEntry dce = dc.getEntry(pathName);
+			ObjectLoader open = walk.getObjectReader().open(dce.getObjectId());
+			e.index = new String(open.getBytes());
+			e.indexContentLength = dce.getLength();
+		}
+
+		if (D.equals(type))
+			walk.enterSubtree();
+	}
+

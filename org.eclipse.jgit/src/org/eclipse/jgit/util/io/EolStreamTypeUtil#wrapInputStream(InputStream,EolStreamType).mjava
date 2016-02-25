@@ -1,0 +1,23 @@
+	/**
+	 * @param in
+	 *            original stream
+	 * @param conversion
+	 *            to be performed
+	 * @return the converted stream depending on {@link EolStreamType}
+	 */
+	public static InputStream wrapInputStream(InputStream in,
+			EolStreamType conversion) {
+		switch (conversion) {
+		case TEXT_CRLF:
+			return new AutoCRLFInputStream(in, false);
+		case TEXT_LF:
+			return new AutoLFInputStream(in, false);
+		case AUTO_CRLF:
+			return new AutoCRLFInputStream(in, true);
+		case AUTO_LF:
+			return new AutoLFInputStream(in, true);
+		default:
+			return in;
+		}
+	}
+

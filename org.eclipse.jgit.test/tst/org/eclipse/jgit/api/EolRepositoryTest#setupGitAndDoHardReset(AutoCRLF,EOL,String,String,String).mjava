@@ -1,0 +1,55 @@
+	// create new repo with
+	// global .gitattributes
+	// info .git/config/info/.gitattributes
+	// workdir root .gitattributes
+	// text file lf.txt CONTENT_LF
+	// text file crlf.txt CONTENT_CRLF
+	//
+	// commit files (checkin)
+	// delete working dir files
+	// reset hard (checkout)
+	private void setupGitAndDoHardReset(AutoCRLF autoCRLF, EOL eol,
+			String globalAttributesContent, String infoAttributesContent,
+			String workDirRootAttributesContent) throws Exception {
+		Git git = new Git(db);
+		FileBasedConfig config = db.getConfig();
+		if (autoCRLF != null) {
+			config.setEnum(ConfigConstants.CONFIG_CORE_SECTION, null,
+					ConfigConstants.CONFIG_KEY_AUTOCRLF, autoCRLF);
+		}
+		if (eol != null) {
+			config.setEnum(ConfigConstants.CONFIG_CORE_SECTION, null,
+					ConfigConstants.CONFIG_KEY_EOL, eol);
+		}
+		if (globalAttributesContent != null) {
+			File f = new File(db.getDirectory(), "global/attrs");
+			write(f, globalAttributesContent);
+			config.setString(ConfigConstants.CONFIG_CORE_SECTION, null,
+					ConfigConstants.CONFIG_KEY_ATTRIBUTESFILE,
+					f.getAbsolutePath());
+
+		}
+		if (infoAttributesContent != null) {
+			File f = new File(db.getDirectory(), Constants.INFO_ATTRIBUTES);
+			write(f, infoAttributesContent);
+		}
+		config.save();
+
+		if (workDirRootAttributesContent != null) {
+			dotGitattributes = createAndAddFile(git,
+					Constants.DOT_GIT_ATTRIBUTES, workDirRootAttributesContent);
+		} else {
+			dotGitattributes = null;
+		}
+
+		fileCRLF = createAndAddFile(git, "file1.txt", CONTENT_CRLF);
+
+		fileLF = createAndAddFile(git, "file2.txt", CONTENT_LF);
+
+		fileMixed = createAndAddFile(git, "file3.txt", CONTENT_MIXED);
+
+		gitCommit(git, "addFiles");
+
+		recreateWorktree(git);
+	}
+

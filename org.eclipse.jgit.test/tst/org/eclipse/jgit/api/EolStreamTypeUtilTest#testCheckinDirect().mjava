@@ -1,0 +1,18 @@
+	@Test
+	public void testCheckinDirect() throws Exception {
+		testCheckin(DIRECT, DIRECT, "", "");
+		testCheckin(DIRECT, DIRECT, "\r", "\r");
+		testCheckin(DIRECT, DIRECT, "\n", "\n");
+
+		testCheckin(DIRECT, DIRECT, "\r\n", "\r\n");
+		testCheckin(DIRECT, DIRECT, "\n\r", "\n\r");
+
+		testCheckin(DIRECT, DIRECT, "\n\r\n", "\n\r\n");
+		testCheckin(DIRECT, DIRECT, "\r\n\r", "\r\n\r");
+
+		testCheckin(DIRECT, DIRECT, "a\nb\n", "a\nb\n");
+		testCheckin(DIRECT, DIRECT, "a\rb\r", "a\rb\r");
+		testCheckin(DIRECT, DIRECT, "a\n\rb\n\r", "a\n\rb\n\r");
+		testCheckin(DIRECT, DIRECT, "a\r\nb\r\n", "a\r\nb\r\n");
+	}
+
