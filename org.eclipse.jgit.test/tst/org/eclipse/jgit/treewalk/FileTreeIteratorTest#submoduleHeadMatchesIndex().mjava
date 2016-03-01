@@ -9,7 +9,7 @@
 			DirCache cache = db.lockDirCache();
 			DirCacheEditor editor = cache.editor();
 			editor.add(new PathEdit(path) {
-	
+
 				public void apply(DirCacheEntry ent) {
 					ent.setFileMode(FileMode.GITLINK);
 					ent.setObjectId(id);
@@ -26,7 +26,7 @@
 			walk.addTree(indexIter);
 			walk.addTree(workTreeIter);
 			walk.setFilter(PathFilter.create(path));
-	
+
 			assertTrue(walk.next());
 			assertTrue(indexIter.idEqual(workTreeIter));
 		}
