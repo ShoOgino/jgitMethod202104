@@ -57,22 +57,29 @@
 				for (RepoProject proj : bareProjects) {
 					String name = proj.getPath();
 					String nameUri = proj.getName();
-					cfg.setString("submodule", name, "path", name); //$NON-NLS-1$ //$NON-NLS-2$
-					cfg.setString("submodule", name, "url", nameUri); //$NON-NLS-1$ //$NON-NLS-2$
-					// create gitlink
-					DirCacheEntry dcEntry = new DirCacheEntry(name);
 					ObjectId objectId;
-					if (ObjectId.isId(proj.getRevision())) {
+					if (ObjectId.isId(proj.getRevision())
+							&& !ignoreRemoteFailures) {
 						objectId = ObjectId.fromString(proj.getRevision());
 					} else {
 						objectId = callback.sha1(nameUri, proj.getRevision());
-						if (recordRemoteBranch)
+						if (objectId == null) {
+							if (ignoreRemoteFailures) {
+								continue;
+							}
+							throw new RemoteUnavailableException(nameUri);
+						}
+						if (recordRemoteBranch) {
 							// can be branch or tag
 							cfg.setString("submodule", name, "branch", //$NON-NLS-1$ //$NON-NLS-2$
 									proj.getRevision());
+						}
 					}
-					if (objectId == null)
-						throw new RemoteUnavailableException(nameUri);
+					cfg.setString("submodule", name, "path", name); //$NON-NLS-1$ //$NON-NLS-2$
+					cfg.setString("submodule", name, "url", nameUri); //$NON-NLS-1$ //$NON-NLS-2$
+
+					// create gitlink
+					DirCacheEntry dcEntry = new DirCacheEntry(name);
 					dcEntry.setObjectId(objectId);
 					dcEntry.setFileMode(FileMode.GITLINK);
 					builder.add(dcEntry);
