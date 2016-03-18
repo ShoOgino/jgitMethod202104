@@ -1,0 +1,10 @@
+	@Test
+	public void testTagDeleteFail() throws Exception {
+		try {
+			assertEquals("fatal: error: tag 'test' not found.",
+					executeUnchecked("git tag -d test")[0]);
+		} catch (Die e) {
+			assertEquals("fatal: error: tag 'test' not found", e.getMessage());
+		}
+	}
+
