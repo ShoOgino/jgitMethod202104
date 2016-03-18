@@ -1,0 +1,11 @@
+	@Test
+	public void testCleanRequiresForceConfig() throws Exception {
+		try (Git git = new Git(db)) {
+			git.getRepository().getConfig().setBoolean("clean", null,
+					"requireForce", false);
+			assertArrayOfLinesEquals(
+					new String[] { "" },
+					execute("git clean"));
+		}
+	}
+

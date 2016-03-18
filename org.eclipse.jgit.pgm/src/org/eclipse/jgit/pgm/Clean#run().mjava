@@ -1,0 +1,22 @@
+	@Override
+	protected void run() throws Exception {
+		try (Git git = new Git(db)) {
+			boolean requireForce = git.getRepository().getConfig()
+					.getBoolean("clean", "requireForce", true); //$NON-NLS-1$ //$NON-NLS-2$
+			if (requireForce && !(force || dryRun)) {
+				throw die(CLIText.fatalError(CLIText.get().cleanRequireForce));
+			}
+			// Note that CleanCommand's setForce(true) will delete
+			// .git folders. In the cgit cli, this behavior
+			// requires setting "-f" twice, not sure how to do
+			// this with args4j, so this feature is unimplemented
+			// for now.
+			Set<String> removedFiles = git.clean().setCleanDirectories(dirs)
+					.setDryRun(dryRun).call();
+			for (String removedFile : removedFiles) {
+				outw.println(MessageFormat.format(CLIText.get().removing,
+						removedFile));
+			}
+		}
+	}
+
