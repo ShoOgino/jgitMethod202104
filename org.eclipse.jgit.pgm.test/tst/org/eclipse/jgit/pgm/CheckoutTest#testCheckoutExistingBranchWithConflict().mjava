@@ -14,7 +14,8 @@
 			writeTrashFile("a", "New Hello world a");
 			git.add().addFilepattern(".").call();
 
-			String[] execute = execute("git checkout branch_1");
+			String[] execute = executeExpectingException(
+					"git checkout branch_1");
 			assertEquals(
 					"error: Your local changes to the following files would be overwritten by checkout:",
 					execute[0]);
