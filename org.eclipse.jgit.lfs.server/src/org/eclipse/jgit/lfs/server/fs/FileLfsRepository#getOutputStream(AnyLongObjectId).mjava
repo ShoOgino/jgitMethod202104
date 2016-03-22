@@ -1,0 +1,7 @@
+	AtomicObjectOutputStream getOutputStream(AnyLongObjectId id)
+			throws IOException {
+		Path path = getPath(id);
+		Files.createDirectories(path.getParent());
+		return new AtomicObjectOutputStream(path, id);
+	}
+

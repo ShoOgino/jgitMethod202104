@@ -12,12 +12,12 @@
 			AsyncContext context, HttpServletRequest request,
 			HttpServletResponse response, AnyLongObjectId id)
 					throws FileNotFoundException, IOException {
-		this.repository = repository;
 		this.context = context;
 		this.response = response;
 		this.in = request.getInputStream();
 		this.inChannel = Channels.newChannel(in);
-		this.out = repository.getWriteChannel(id);
+		this.out = repository.getOutputStream(id);
+		this.channel = Channels.newChannel(out);
 		response.setContentType(Constants.CONTENT_TYPE_GIT_LFS_JSON);
 	}
 

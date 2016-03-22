@@ -8,12 +8,12 @@
 		while (in.isReady()) {
 			if (inChannel.read(buffer) > 0) {
 				buffer.flip();
-				out.write(buffer);
+				channel.write(buffer);
 				buffer.compact();
 			} else {
 				buffer.flip();
 				while (buffer.hasRemaining()) {
-					out.write(buffer);
+					channel.write(buffer);
 				}
 				close();
 				return;
