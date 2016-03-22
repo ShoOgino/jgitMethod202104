@@ -5,9 +5,9 @@
 	@Override
 	public void onError(Throwable e) {
 		try {
-			repository.abortWrite();
+			out.abort();
 			inChannel.close();
-			out.close();
+			channel.close();
 			int status;
 			if (e instanceof CorruptLongObjectException) {
 				status = HttpStatus.SC_BAD_REQUEST;
