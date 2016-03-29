@@ -52,7 +52,8 @@
 			}
 			currentCommits = nextCommitCount;
 
-			gc.setExpireAgeMillis(0); // immediately delete old packs
+			gc.setPackExpireAgeMillis(0); // immediately delete old packs
+			gc.setExpireAgeMillis(0);
 			gc.gc();
 			assertEquals(currentCommits + " commits: ", expectedBitmapCount,
 					gc.getStatistics().numberOfBitmaps);
