@@ -11,7 +11,7 @@
 	 */
 	private void deleteOldPacks(Collection<PackFile> oldPacks,
 			Collection<PackFile> newPacks) throws ParseException {
-		long expireDate = getExpireDate();
+		long packExpireDate = getPackExpireDate();
 		oldPackLoop: for (PackFile oldPack : oldPacks) {
 			String oldName = oldPack.getPackName();
 			// check whether an old pack file is also among the list of new
@@ -21,7 +21,7 @@
 					continue oldPackLoop;
 
 			if (!oldPack.shouldBeKept()
-					&& oldPack.getPackFile().lastModified() < expireDate) {
+					&& oldPack.getPackFile().lastModified() < packExpireDate) {
 				oldPack.close();
 				prunePack(oldName);
 			}
