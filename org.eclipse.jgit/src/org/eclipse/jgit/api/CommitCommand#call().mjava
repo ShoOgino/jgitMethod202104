@@ -116,7 +116,7 @@
 				RevCommit revCommit = rw.parseCommit(commitId);
 				RefUpdate ru = repo.updateRef(Constants.HEAD);
 				ru.setNewObjectId(commitId);
-				if (reflogComment != null) {
+				if (!useDefaultReflogMessage) {
 					ru.setRefLogMessage(reflogComment, false);
 				} else {
 					String prefix = amend ? "commit (amend): " //$NON-NLS-1$
