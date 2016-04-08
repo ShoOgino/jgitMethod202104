@@ -14,6 +14,8 @@
 				continue;
 
 			final EolStreamType eolStreamType = treeWalk.getEolStreamType();
+			final String filterCommand = treeWalk
+					.getFilterCommand(Constants.ATTR_FILTER_TYPE_SMUDGE);
 			editor.add(new PathEdit(path) {
 				public void apply(DirCacheEntry ent) {
 					int stage = ent.getStage();
@@ -21,15 +23,15 @@
 						if (checkoutStage != null) {
 							if (stage == checkoutStage.number)
 								checkoutPath(ent, r, new CheckoutMetadata(
-										eolStreamType, null));
+										eolStreamType, filterCommand));
 						} else {
 							UnmergedPathException e = new UnmergedPathException(
 									ent);
 							throw new JGitInternalException(e.getMessage(), e);
 						}
 					} else {
-						checkoutPath(ent, r,
-								new CheckoutMetadata(eolStreamType, null));
+						checkoutPath(ent, r, new CheckoutMetadata(eolStreamType,
+								filterCommand));
 					}
 				}
 			});

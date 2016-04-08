@@ -1,0 +1,22 @@
+	private void createNestedRepo(String path) throws IOException {
+		File gitLinkDir = new File(db.getWorkTree(), path);
+		FileUtils.mkdir(gitLinkDir);
+
+		FileRepositoryBuilder nestedBuilder = new FileRepositoryBuilder();
+		nestedBuilder.setWorkTree(gitLinkDir);
+
+		Repository nestedRepo = nestedBuilder.build();
+		nestedRepo.create();
+
+		writeTrashFile(path, "README1.md", "content");
+		writeTrashFile(path, "README2.md", "content");
+
+		// Commit these changes in the subrepo
+		try (Git git = new Git(nestedRepo)) {
+			git.add().addFilepattern(".").call();
+			git.commit().setMessage("subrepo commit").call();
+		} catch (GitAPIException e) {
+			throw new RuntimeException(e);
+		}
+	}
+

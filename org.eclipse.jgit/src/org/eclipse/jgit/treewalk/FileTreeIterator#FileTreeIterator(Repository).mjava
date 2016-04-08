@@ -5,6 +5,9 @@
 	 *            the repository whose working tree will be scanned.
 	 */
 	public FileTreeIterator(Repository repo) {
-		this(repo, DefaultFileModeStrategy.INSTANCE);
+		this(repo,
+				repo.getConfig().get(WorkingTreeOptions.KEY).isDirNoGitLinks() ?
+						NoGitlinksStrategy.INSTANCE :
+						DefaultFileModeStrategy.INSTANCE);
 	}
 

@@ -1,0 +1,41 @@
+	@Test
+	public void testAddSubrepoWithDirNoGitlinks() throws Exception {
+		createNestedRepo("nested-repo");
+
+		// Set DIR_NO_GITLINKS
+		StoredConfig config = db.getConfig();
+		config.setBoolean(ConfigConstants.CONFIG_CORE_SECTION, null,
+				ConfigConstants.CONFIG_KEY_DIRNOGITLINKS, true);
+		config.save();
+
+		assert (db.getConfig().get(WorkingTreeOptions.KEY).isDirNoGitLinks());
+
+		try (Git git = new Git(db)) {
+			git.add().addFilepattern("nested-repo").call();
+
+			assertEquals(
+					"[nested-repo/README1.md, mode:100644]" +
+							"[nested-repo/README2.md, mode:100644]",
+					indexState(0));
+		}
+
+		// Turn off DIR_NO_GITLINKS, ensure nested-repo is still treated as
+		// a normal directory
+		// Set DIR_NO_GITLINKS
+		config.setBoolean(ConfigConstants.CONFIG_CORE_SECTION, null,
+				ConfigConstants.CONFIG_KEY_DIRNOGITLINKS, false);
+		config.save();
+
+		writeTrashFile("nested-repo", "README3.md", "content");
+
+		try (Git git = new Git(db)) {
+			git.add().addFilepattern("nested-repo").call();
+
+			assertEquals(
+					"[nested-repo/README1.md, mode:100644]" +
+							"[nested-repo/README2.md, mode:100644]" +
+							"[nested-repo/README3.md, mode:100644]",
+					indexState(0));
+		}
+	}
+
