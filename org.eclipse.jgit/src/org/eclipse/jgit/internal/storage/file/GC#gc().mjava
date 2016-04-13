@@ -7,6 +7,10 @@
 	 * <li>prune all loose objects which are now reachable by packs</li>
 	 * </ul>
 	 *
+	 * If {@link #setAuto(boolean)} was set to {@code true} {@code gc} will
+	 * first check whether any housekeeping is required; if not, it exits
+	 * without performing any work.
+	 *
 	 * @return the collection of {@link PackFile}'s which are newly created
 	 * @throws IOException
 	 * @throws ParseException
@@ -14,6 +18,9 @@
 	 *             parsed
 	 */
 	public Collection<PackFile> gc() throws IOException, ParseException {
+		if (automatic && !needGc()) {
+			return Collections.emptyList();
+		}
 		pm.start(6 /* tasks */);
 		packRefs();
 		// TODO: implement reflog_expire(pm, repo);

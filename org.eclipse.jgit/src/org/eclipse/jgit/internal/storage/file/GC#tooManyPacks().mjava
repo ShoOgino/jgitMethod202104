@@ -1,0 +1,16 @@
+	/**
+	 * @return {@code true} if number of packs > gc.autopacklimit (default 50)
+	 */
+	private boolean tooManyPacks() {
+		int autopacklimit = repo.getConfig().getInt(
+				ConfigConstants.CONFIG_GC_SECTION,
+				ConfigConstants.CONFIG_KEY_AUTOPACKLIMIT,
+				DEFAULT_AUTOPACKLIMIT);
+		if (autopacklimit <= 0) {
+			return false;
+		}
+		// JGit always creates two packfiles, one for the objects reachable from
+		// branches, and another one for the rest
+		return repo.getObjectDatabase().getPacks().size() > (autopacklimit + 1);
+	}
+

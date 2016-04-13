@@ -1,0 +1,40 @@
+	/**
+	 * Set the {@code gc --auto} option.
+	 *
+	 * With this option, gc checks whether any housekeeping is required; if not,
+	 * it exits without performing any work. Some JGit commands run
+	 * {@code gc --auto} after performing operations that could create many
+	 * loose objects.
+	 * <p/>
+	 * Housekeeping is required if there are too many loose objects or too many
+	 * packs in the repository. If the number of loose objects exceeds the value
+	 * of the gc.auto option JGit GC consolidates all existing packs into a
+	 * single pack (equivalent to {@code -A} option), whereas git-core would
+	 * combine all loose objects into a single pack using {@code repack -d -l}.
+	 * Setting the value of {@code gc.auto} to 0 disables automatic packing of
+	 * loose objects.
+	 * <p/>
+	 * If the number of packs exceeds the value of {@code gc.autoPackLimit},
+	 * then existing packs (except those marked with a .keep file) are
+	 * consolidated into a single pack by using the {@code -A} option of repack.
+	 * Setting {@code gc.autoPackLimit} to 0 disables automatic consolidation of
+	 * packs.
+	 * <p/>
+	 * Like git the following jgit commands run auto gc:
+	 * <ul>
+	 * <li>fetch</li>
+	 * <li>merge</li>
+	 * <li>rebase</li>
+	 * <li>receive-pack</li>
+	 * </ul>
+	 * The auto gc for receive-pack can be suppressed by setting the config
+	 * option {@code receive.autogc = false}
+	 *
+	 * @param auto
+	 *            defines whether gc should do automatic housekeeping
+	 * @since 4.5
+	 */
+	public void setAuto(boolean auto) {
+		this.automatic = auto;
+	}
+

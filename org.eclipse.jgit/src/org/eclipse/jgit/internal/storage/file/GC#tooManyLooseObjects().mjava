@@ -1,0 +1,39 @@
+	/**
+	 * Quickly estimate number of loose objects, SHA1 is distributed evenly so
+	 * counting objects in one directory (bucket 17) is sufficient
+	 *
+	 * @return {@code true} if number of loose objects > gc.auto (default 6700)
+	 */
+	private boolean tooManyLooseObjects() {
+		int auto = repo.getConfig().getInt(ConfigConstants.CONFIG_GC_SECTION,
+				ConfigConstants.CONFIG_KEY_AUTO, DEFAULT_AUTOLIMIT);
+		if (auto <= 0) {
+			return false;
+		}
+		int n = 0;
+		int threshold = (auto + 255) / 256;
+		Path dir = repo.getObjectsDirectory().toPath().resolve("17"); //$NON-NLS-1$
+		if (!Files.exists(dir)) {
+			return false;
+		}
+		try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir,
+				new DirectoryStream.Filter<Path>() {
+
+					public boolean accept(Path file) throws IOException {
+						return Files.isRegularFile(file) && PATTERN_LOOSE_OBJECT
+								.matcher(file.getFileName().toString())
+								.matches();
+					}
+				})) {
+			Iterator<Path> iter = stream.iterator();
+			while (iter.hasNext()) {
+				if (n++ > threshold) {
+					return true;
+				}
+			}
+		} catch (IOException e) {
+			LOG.error(e.getMessage(), e);
+		}
+		return false;
+	}
+
