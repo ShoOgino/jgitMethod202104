@@ -1,6 +1,6 @@
-	private Map<String, Ref> getAdvertisedOrDefaultRefs() {
+	private Map<String, Ref> getAdvertisedOrDefaultRefs() throws IOException {
 		if (refs == null)
-			setAdvertisedRefs(null);
+			setAdvertisedRefs(db.getRefDatabase().getRefs(RefDatabase.ALL));
 		return refs;
 	}
 

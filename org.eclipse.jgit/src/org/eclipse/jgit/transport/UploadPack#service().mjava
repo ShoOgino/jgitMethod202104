@@ -1,13 +1,13 @@
 	private void service() throws IOException {
-		if (biDirectionalPipe)
-			sendAdvertisedRefs(new PacketLineOutRefAdvertiser(pckOut));
-		else if (requestValidator instanceof AnyRequestValidator)
-			advertised = Collections.emptySet();
-		else
-			advertised = refIdSet(getAdvertisedOrDefaultRefs().values());
-
 		boolean sendPack;
 		try {
+			if (biDirectionalPipe)
+				sendAdvertisedRefs(new PacketLineOutRefAdvertiser(pckOut));
+			else if (requestValidator instanceof AnyRequestValidator)
+				advertised = Collections.emptySet();
+			else
+				advertised = refIdSet(getAdvertisedOrDefaultRefs().values());
+
 			recvWants();
 			if (wantIds.isEmpty()) {
 				preUploadHook.onBeginNegotiateRound(this, wantIds, 0);
