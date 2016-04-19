@@ -3,6 +3,10 @@
 	 * <p>
 	 * The default implementation of this method performs a sequential reference
 	 * update over each reference.
+	 * <p>
+	 * Implementations must respect the atomicity requirements of the underlying
+	 * database as described in {@link #setAtomic(boolean)} and {@link
+	 * RefDatabase#performsAtomicTransactions()}.
 	 *
 	 * @param walk
 	 *            a RevWalk to parse tags in case the storage system wants to
@@ -16,6 +20,17 @@
 	 */
 	public void execute(RevWalk walk, ProgressMonitor monitor)
 			throws IOException {
+
+		if (atomic && !refdb.performsAtomicTransactions()) {
+			for (ReceiveCommand c : commands) {
+				if (c.getResult() == NOT_ATTEMPTED) {
+					c.setResult(REJECTED_OTHER_REASON,
+							JGitText.get().atomicRefUpdatesNotSupported);
+				}
+			}
+			return;
+		}
+
 		monitor.beginTask(JGitText.get().updatingReferences, commands.size());
 		List<ReceiveCommand> commands2 = new ArrayList<ReceiveCommand>(
 				commands.size());
