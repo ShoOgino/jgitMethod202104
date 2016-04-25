@@ -9,6 +9,7 @@
 		assertFalse(abbr1.equals(abbr2));
 
 		ObjectReader reader = ins.newReader();
+		assertSame(ins, reader.getCreatedFromInserter());
 		Collection<ObjectId> objs;
 		objs = reader.resolve(AbbreviatedObjectId.fromString(abbr1));
 		assertEquals(1, objs.size());

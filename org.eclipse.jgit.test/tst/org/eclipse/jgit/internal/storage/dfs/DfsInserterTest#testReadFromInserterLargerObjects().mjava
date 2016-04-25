@@ -12,6 +12,7 @@
 		assertEquals(0, db.getObjectDatabase().listPacks().size());
 
 		ObjectReader reader = ins.newReader();
+		assertSame(ins, reader.getCreatedFromInserter());
 		assertTrue(Arrays.equals(data, readStream(reader.open(id1))));
 		assertEquals(0, db.getObjectDatabase().listPacks().size());
 		ins.flush();
