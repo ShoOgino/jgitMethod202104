@@ -1,0 +1,11 @@
+	@Test
+	public void testToExternalStringTrimsAllWhitespace() {
+		String ws = "  \u0001 \n ";
+		PersonIdent personIdent = new PersonIdent(ws, ws);
+		assertEquals(ws, personIdent.getName());
+		assertEquals(ws, personIdent.getEmailAddress());
+
+		String externalString = personIdent.toExternalString();
+		assertTrue(externalString.startsWith(" <>"));
+	}
+

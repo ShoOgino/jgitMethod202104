@@ -1,10 +1,10 @@
 	@Test
 	public void testToExternalStringTrimsNameAndEmail() throws Exception {
-		PersonIdent personIdent = new PersonIdent("  A U Thor  ",
-				"  author@example.com  ");
+		PersonIdent personIdent = new PersonIdent(" \u0010A U Thor  ",
+				"  author@example.com \u0009");
 
-		assertEquals("  A U Thor  ", personIdent.getName());
-		assertEquals("  author@example.com  ", personIdent.getEmailAddress());
+		assertEquals(" \u0010A U Thor  ", personIdent.getName());
+		assertEquals("  author@example.com \u0009", personIdent.getEmailAddress());
 
 		String externalString = personIdent.toExternalString();
 		assertTrue(externalString.startsWith("A U Thor <author@example.com>"));

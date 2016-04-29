@@ -1,0 +1,12 @@
+	@Test
+	public void testToExternalStringTrimsOtherBadCharacters() {
+		String name = " Foo\r\n<Bar> ";
+		String email = " Baz>\n\u1234<Quux ";
+		PersonIdent personIdent = new PersonIdent(name, email);
+		assertEquals(name, personIdent.getName());
+		assertEquals(email, personIdent.getEmailAddress());
+
+		String externalString = personIdent.toExternalString();
+		assertTrue(externalString.startsWith("Foo\rBar <Baz\u1234Quux>"));
+	}
+
