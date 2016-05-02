@@ -1,0 +1,9 @@
+	@Test
+	public void testAddM1() throws Exception {
+		ApplyResult result = init("M1", false, true);
+		assertEquals(1, result.getUpdatedFiles().size());
+		assertTrue(result.getUpdatedFiles().get(0).canExecute());
+		checkFile(new File(db.getWorkTree(), "M1"),
+				b.getString(0, b.size(), false));
+	}
+

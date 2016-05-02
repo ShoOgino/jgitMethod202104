@@ -1,0 +1,9 @@
+	@Test
+	public void testModifyM3() throws Exception {
+		ApplyResult result = init("M3", true, true);
+		assertEquals(1, result.getUpdatedFiles().size());
+		assertFalse(result.getUpdatedFiles().get(0).canExecute());
+		checkFile(new File(db.getWorkTree(), "M3"),
+				b.getString(0, b.size(), false));
+	}
+
