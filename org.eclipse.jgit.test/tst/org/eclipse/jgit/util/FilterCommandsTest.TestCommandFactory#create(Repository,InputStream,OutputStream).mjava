@@ -1,0 +1,19 @@
+		@Override
+		public FilterCommand create(Repository repo, InputStream in,
+				final OutputStream out) {
+			FilterCommand cmd = new FilterCommand(in, out) {
+
+				@Override
+				public int run() throws IOException {
+					int b = in.read();
+					if (b == -1) {
+						return b;
+					}
+					out.write(prefix);
+					out.write(b);
+					return 1;
+				}
+			};
+			return cmd;
+		}
+

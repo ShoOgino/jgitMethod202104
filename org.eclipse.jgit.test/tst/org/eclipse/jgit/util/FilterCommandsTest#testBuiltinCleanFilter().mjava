@@ -1,0 +1,38 @@
+	@Test
+	public void testBuiltinCleanFilter()
+			throws IOException, GitAPIException {
+		String builtinCommandName = "jgit://builtin/test/clean";
+		FilterCommandRegistry.register(builtinCommandName,
+				new TestCommandFactory('c'));
+		StoredConfig config = git.getRepository().getConfig();
+		config.setString("filter", "test", "clean", builtinCommandName);
+		config.save();
+
+		writeTrashFile(".gitattributes", "*.txt filter=test");
+		git.add().addFilepattern(".gitattributes").call();
+		git.commit().setMessage("add filter").call();
+
+		writeTrashFile("Test.txt", "Hello again");
+		git.add().addFilepattern("Test.txt").call();
+		assertEquals(
+				"[.gitattributes, mode:100644, content:*.txt filter=test][Test.txt, mode:100644, content:cHceclclcoc cacgcacicn]",
+				indexState(CONTENT));
+
+		writeTrashFile("Test.bin", "Hello again");
+		git.add().addFilepattern("Test.bin").call();
+		assertEquals(
+				"[.gitattributes, mode:100644, content:*.txt filter=test][Test.bin, mode:100644, content:Hello again][Test.txt, mode:100644, content:cHceclclcoc cacgcacicn]",
+				indexState(CONTENT));
+
+		config.setString("filter", "test", "clean", null);
+		config.save();
+
+		git.add().addFilepattern("Test.txt").call();
+		assertEquals(
+				"[.gitattributes, mode:100644, content:*.txt filter=test][Test.bin, mode:100644, content:Hello again][Test.txt, mode:100644, content:Hello again]",
+				indexState(CONTENT));
+
+		config.setString("filter", "test", "clean", null);
+		config.save();
+	}
+

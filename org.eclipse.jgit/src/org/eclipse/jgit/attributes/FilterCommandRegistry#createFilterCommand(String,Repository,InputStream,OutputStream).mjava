@@ -1,0 +1,26 @@
+	/**
+	 * Creates a new {@link FilterCommand} for the given name. A factory must be
+	 * registered for the name in advance.
+	 *
+	 * @param filterCommandName
+	 *            The name for which a new {@link FilterCommand} should be
+	 *            created
+	 * @param db
+	 *            the repository this command should work on
+	 * @param in
+	 *            the {@link InputStream} this {@link FilterCommand} should read
+	 *            from
+	 * @param out
+	 *            the {@link OutputStream} this {@link FilterCommand} should
+	 *            write to
+	 * @return the command if a command could be created or <code>null</code> if
+	 *         there was no factory registered for that name
+	 * @throws IOException
+	 */
+	public static FilterCommand createFilterCommand(String filterCommandName,
+			Repository db, InputStream in, OutputStream out)
+			throws IOException {
+		FilterCommandFactory cf = filterCommandRegistry.get(filterCommandName);
+		return (cf == null) ? null : cf.create(db, in, out);
+	}
+

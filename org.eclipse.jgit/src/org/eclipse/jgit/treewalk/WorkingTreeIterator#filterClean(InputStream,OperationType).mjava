@@ -3,6 +3,16 @@
 		in = handleAutoCRLF(in, opType);
 		String filterCommand = getCleanFilterCommand();
 		if (filterCommand != null) {
+			if (FilterCommandRegistry.isRegistered(filterCommand)) {
+				LocalFile buffer = new TemporaryBuffer.LocalFile(null);
+				FilterCommand command = FilterCommandRegistry
+						.createFilterCommand(filterCommand, repository, in,
+								buffer);
+				while (command.run() != -1) {
+					// loop as long as command.run() tells there is work to do
+				}
+				return buffer.openInputStream();
+			}
 			FS fs = repository.getFS();
 			ProcessBuilder filterProcessBuilder = fs.runInShell(filterCommand,
 					new String[0]);
