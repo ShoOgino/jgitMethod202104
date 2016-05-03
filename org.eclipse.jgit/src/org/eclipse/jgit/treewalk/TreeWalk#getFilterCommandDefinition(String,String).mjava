@@ -22,8 +22,19 @@
 			return filterCommand;
 		filterCommand = config.getString(Constants.ATTR_FILTER,
 				filterDriverName, filterCommandType);
-		if (filterCommand != null)
+		boolean useBuiltin = config.getBoolean(Constants.ATTR_FILTER,
+				filterDriverName, Constants.ATTR_FILTER_USE_BUILTIN, false);
+		if (useBuiltin) {
+			String builtinFilterCommand = Constants.BUILTIN_FILTER_PREFIX
+					+ filterDriverName + '/' + filterCommandType;
+			if (filterCommands != null
+					&& filterCommands.contains(builtinFilterCommand)) {
+				filterCommand = builtinFilterCommand;
+			}
+		}
+		if (filterCommand != null) {
 			filterCommandsByNameDotType.put(key, filterCommand);
+		}
 		return filterCommand;
 	}
 
