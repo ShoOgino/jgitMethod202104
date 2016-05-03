@@ -1,0 +1,22 @@
+	// Run a builtin filter command
+	private static void runBuiltinFilterCommand(Repository repo,
+			CheckoutMetadata checkoutMetadata, ObjectLoader ol,
+			OutputStream channel) throws MissingObjectException, IOException {
+		FilterCommand command = null;
+		try {
+			command = FilterCommandRegistry.createFilterCommand(
+					checkoutMetadata.smudgeFilterCommand, repo, ol.openStream(),
+					channel);
+		} catch (IOException e) {
+			LOG.error(JGitText.get().failedToDetermineFilterDefinition, e);
+			// In case an IOException occurred during creating of the command
+			// then proceed as if there would not have been a builtin filter.
+			ol.copyTo(channel);
+		}
+		if (command != null) {
+			while (command.run() != -1) {
+				// loop as long as command.run() tells there is work to do
+			}
+		}
+	}
+
