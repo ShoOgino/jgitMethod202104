@@ -1,0 +1,25 @@
+	/**
+	 * Delete a reference.
+	 *
+	 * @param ref
+	 *	      the name of the reference to delete. This is normalized
+	 *	      in the same way as {@link #update(String, T)}.
+	 * @throws Exception
+	 * @since 4.4
+	 */
+	public void delete(String ref) throws Exception {
+		ref = normalizeRef(ref);
+		RefUpdate u = db.updateRef(ref);
+		switch (u.delete()) {
+		case FAST_FORWARD:
+		case FORCED:
+		case NEW:
+		case NO_CHANGE:
+			updateServerInfo();
+			return;
+
+		default:
+			throw new IOException("Cannot delete " + ref + " " + u.getResult());
+		}
+	}
+
