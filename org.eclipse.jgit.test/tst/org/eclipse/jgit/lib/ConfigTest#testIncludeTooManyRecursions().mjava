@@ -1,0 +1,16 @@
+	@Test
+	public void testIncludeTooManyRecursions() throws IOException {
+		File config = tmp.newFile("config");
+		String include = "[include]\npath=" + config.toPath() + "\n";
+		Files.write(config.toPath(), include.getBytes());
+		FileBasedConfig fbConfig = new FileBasedConfig(null, config,
+				FS.DETECTED);
+		try {
+			fbConfig.load();
+			fail();
+		} catch (ConfigInvalidException cie) {
+			assertEquals(JGitText.get().tooManyIncludeRecursions,
+					cie.getCause().getMessage());
+		}
+	}
+
