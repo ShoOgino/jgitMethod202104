@@ -7,7 +7,8 @@
 				state.initializeDigestAndReadBuffer();
 
 				final long len = e.getLength();
-				InputStream filteredIs = possiblyFilteredInputStream(e, is, len);
+				InputStream filteredIs = possiblyFilteredInputStream(e, is, len,
+						OperationType.CHECKIN_OP);
 				return computeHash(filteredIs, canonLen);
 			} finally {
 				safeClose(is);
