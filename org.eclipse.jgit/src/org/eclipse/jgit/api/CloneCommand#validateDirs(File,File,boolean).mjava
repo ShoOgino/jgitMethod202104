@@ -1,6 +1,15 @@
 	private static void validateDirs(File directory, File gitDir, boolean bare)
 			throws IllegalStateException {
 		if (directory != null) {
+			if (directory.exists() && !directory.isDirectory()) {
+				throw new IllegalStateException(MessageFormat.format(
+						JGitText.get().initFailedDirIsNoDirectory, directory));
+			}
+			if (gitDir != null && gitDir.exists() && !gitDir.isDirectory()) {
+				throw new IllegalStateException(MessageFormat.format(
+						JGitText.get().initFailedGitDirIsNoDirectory,
+						gitDir));
+			}
 			if (bare) {
 				if (gitDir != null && !gitDir.equals(directory))
 					throw new IllegalStateException(MessageFormat.format(
