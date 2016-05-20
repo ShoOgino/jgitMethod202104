@@ -70,7 +70,7 @@
 		updateRef(stashRef, entryId);
 
 		try {
-			Ref newStashRef = repo.getRef(R_STASH);
+			Ref newStashRef = repo.exactRef(R_STASH);
 			return newStashRef != null ? newStashRef.getObjectId() : null;
 		} catch (IOException e) {
 			throw new InvalidRefNameException(MessageFormat.format(
