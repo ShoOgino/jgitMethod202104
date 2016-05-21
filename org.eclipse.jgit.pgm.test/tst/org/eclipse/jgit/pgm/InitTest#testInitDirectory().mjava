@@ -1,0 +1,15 @@
+	@Test
+	public void testInitDirectory() throws Exception {
+		File workDirectory = tempFolder.getRoot();
+		File gitDirectory = new File(workDirectory, Constants.DOT_GIT);
+
+		String[] result = execute(
+				"git init '" + workDirectory.getCanonicalPath() + "'");
+
+		String[] expecteds = new String[] {
+				"Initialized empty Git repository in "
+						+ gitDirectory.getCanonicalPath(),
+				"" };
+		assertArrayEquals(expecteds, result);
+	}
+

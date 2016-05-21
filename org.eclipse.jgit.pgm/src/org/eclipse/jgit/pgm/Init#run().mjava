@@ -2,8 +2,12 @@
 	protected void run() throws Exception {
 		InitCommand command = Git.init();
 		command.setBare(bare);
-		if (gitdir != null)
+		if (gitdir != null) {
 			command.setDirectory(new File(gitdir));
+		}
+		if (directory != null) {
+			command.setDirectory(new File(directory));
+		}
 		Repository repository = command.call().getRepository();
 		outw.println(MessageFormat.format(
 				CLIText.get().initializedEmptyGitRepositoryIn, repository
