@@ -14,8 +14,9 @@
 
 		addTree(walk, headCommitTree);
 		addTree(walk, mergeCommitTree);
-		walk.addTree(new DirCacheBuildIterator(builder));
+		int dciPos = walk.addTree(new DirCacheBuildIterator(builder));
 		walk.addTree(workingTree);
+		workingTree.setDirCacheIterator(walk, dciPos);
 
 		while (walk.next()) {
 			processEntry(walk.getTree(0, CanonicalTreeParser.class),
