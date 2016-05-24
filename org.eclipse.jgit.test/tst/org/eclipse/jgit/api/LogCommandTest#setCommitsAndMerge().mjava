@@ -1,0 +1,24 @@
+	private void setCommitsAndMerge() throws Exception {
+		Git git = Git.wrap(db);
+		writeTrashFile("file1", "1\n2\n3\n4\n");
+		git.add().addFilepattern("file1").call();
+		RevCommit masterCommit0 = git.commit().setMessage("m0").call();
+
+		createBranch(masterCommit0, "refs/heads/side");
+		checkoutBranch("refs/heads/side");
+
+		writeTrashFile("file2", "1\n2\n3\n4\n5\n6\n7\n8\n");
+		git.add().addFilepattern("file2").call();
+		RevCommit c = git.commit().setMessage("s0").call();
+
+		checkoutBranch("refs/heads/master");
+
+		writeTrashFile("file3", "1\n2\n");
+		git.add().addFilepattern("file3").call();
+		git.commit().setMessage("m1").call();
+
+		git.merge().include(c.getId())
+				.setStrategy(MergeStrategy.RESOLVE)
+				.setMessage("merge s0 with m1").call();
+	}
+

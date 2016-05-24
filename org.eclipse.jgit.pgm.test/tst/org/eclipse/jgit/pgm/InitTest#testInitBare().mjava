@@ -1,0 +1,14 @@
+	@Test
+	public void testInitBare() throws Exception {
+		File directory = tempFolder.getRoot();
+
+		String[] result = execute(
+				"git init '" + directory.getCanonicalPath() + "' --bare");
+
+		String[] expecteds = new String[] {
+				"Initialized empty Git repository in "
+						+ directory.getCanonicalPath(),
+				"" };
+		assertArrayEquals(expecteds, result);
+	}
+
