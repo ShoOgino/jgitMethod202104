@@ -1,0 +1,11 @@
+	@Override
+	public Statement apply(Statement statement, Description description) {
+		Statement result = statement;
+		Repeat repeat = description.getAnnotation(Repeat.class);
+		if (repeat != null) {
+			int n = repeat.n();
+			result = new RepeatStatement(n, statement);
+		}
+		return result;
+	}
+
