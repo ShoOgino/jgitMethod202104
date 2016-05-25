@@ -66,7 +66,7 @@
 							newLoose = curLoose.remove(idx);
 						} while (!looseRefs.compareAndSet(curLoose, newLoose));
 						int levels = levelsIn(refName) - 2;
-						delete(fileFor(refName), levels);
+						delete(refFile, levels, rLck);
 					}
 				} finally {
 					rLck.unlock();

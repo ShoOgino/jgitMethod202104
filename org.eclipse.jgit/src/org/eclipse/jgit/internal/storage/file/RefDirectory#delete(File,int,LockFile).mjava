@@ -1,0 +1,19 @@
+	private static void delete(final File file, final int depth, LockFile rLck)
+			throws IOException {
+		if (!file.delete() && file.isFile()) {
+			throw new IOException(MessageFormat.format(
+					JGitText.get().fileCannotBeDeleted, file));
+		}
+
+		if (rLck != null) {
+			rLck.unlock(); // otherwise cannot delete dir below
+		}
+		File dir = file.getParentFile();
+		for (int i = 0; i < depth; ++i) {
+			if (!dir.delete()) {
+				break; // ignore problem here
+			}
+			dir = dir.getParentFile();
+		}
+	}
+

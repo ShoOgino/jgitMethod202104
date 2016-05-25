@@ -1,12 +1,4 @@
 	static void delete(final File file, final int depth) throws IOException {
-		if (!file.delete() && file.isFile())
-			throw new IOException(MessageFormat.format(JGitText.get().fileCannotBeDeleted, file));
-
-		File dir = file.getParentFile();
-		for (int i = 0; i < depth; ++i) {
-			if (!dir.delete())
-				break; // ignore problem here
-			dir = dir.getParentFile();
-		}
+		delete(file, depth, null);
 	}
 
