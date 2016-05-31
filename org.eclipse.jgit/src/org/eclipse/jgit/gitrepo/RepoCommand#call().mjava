@@ -35,7 +35,8 @@
 							proj.getPath(),
 							proj.getRevision(),
 							proj.getCopyFiles(),
-							proj.getGroups());
+							proj.getGroups(),
+							proj.getRecommendShallow());
 				}
 			} catch (GitAPIException | IOException e) {
 				throw new ManifestErrorException(e);
@@ -75,6 +76,16 @@
 							// can be branch or tag
 							cfg.setString("submodule", name, "branch", //$NON-NLS-1$ //$NON-NLS-2$
 									proj.getRevision());
+						}
+
+						if (recordShallowSubmodules && proj.getRecommendShallow() != null) {
+							// The shallow recommendation is losing information.
+							// As the repo manifests stores the recommended
+							// depth in the 'clone-depth' field, while
+							// git core only uses a binary 'shallow = true/false'
+							// hint, we'll map any depth to 'shallow = true'
+							cfg.setBoolean("submodule", name, "shallow", //$NON-NLS-1$ //$NON-NLS-2$
+									true);
 						}
 					}
 					if (recordSubmoduleLabels) {
