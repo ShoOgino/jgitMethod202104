@@ -8,12 +8,22 @@
 	 * @param remote
 	 *            name of the remote definition
 	 * @param groups
-	 *            comma separated group list
+	 *            set of groups
+	 * @since 4.4
 	 */
 	public RepoProject(String name, String path, String revision,
-			String remote, String groups) {
-		this(name, path, revision, remote, new HashSet<String>());
-		if (groups != null && groups.length() > 0)
-			this.setGroups(groups);
+			String remote, Set<String> groups) {
+		if (name == null) {
+			throw new NullPointerException();
+		}
+		this.name = name;
+		if (path != null)
+			this.path = path;
+		else
+			this.path = name;
+		this.revision = revision;
+		this.remote = remote;
+		this.groups = groups;
+		copyfiles = new ArrayList<CopyFile>();
 	}
 
