@@ -1,7 +1,8 @@
 	private void addSubmodule(String url, String name, String revision,
-			List<CopyFile> copyfiles) throws GitAPIException, IOException {
+			List<CopyFile> copyfiles, Set<String> groups, String recommendShallow)
+			throws GitAPIException, IOException {
 		if (repo.isBare()) {
-			RepoProject proj = new RepoProject(url, name, revision, null, null);
+			RepoProject proj = new RepoProject(url, name, revision, null, groups, recommendShallow);
 			proj.addCopyFiles(copyfiles);
 			bareProjects.add(proj);
 		} else {

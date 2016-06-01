@@ -25,7 +25,7 @@
 				refSpecs.addAll(config.getPushRefSpecs());
 			}
 			if (refSpecs.isEmpty()) {
-				Ref head = repo.getRef(Constants.HEAD);
+				Ref head = repo.exactRef(Constants.HEAD);
 				if (head != null && head.isSymbolic())
 					refSpecs.add(new RefSpec(head.getLeaf().getName()));
 			}
@@ -54,6 +54,9 @@
 
 				} catch (TooLargePackException e) {
 					throw new org.eclipse.jgit.api.errors.TooLargePackException(
+							e.getMessage(), e);
+				} catch (TooLargeObjectInPackException e) {
+					throw new org.eclipse.jgit.api.errors.TooLargeObjectInPackException(
 							e.getMessage(), e);
 				} catch (TransportException e) {
 					throw new org.eclipse.jgit.api.errors.TransportException(

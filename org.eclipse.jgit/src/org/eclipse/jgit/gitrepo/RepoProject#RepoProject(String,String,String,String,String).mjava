@@ -12,19 +12,8 @@
 	 */
 	public RepoProject(String name, String path, String revision,
 			String remote, String groups) {
-		if (name == null) {
-			throw new NullPointerException();
-		}
-		this.name = name;
-		if (path != null)
-			this.path = path;
-		else
-			this.path = name;
-		this.revision = revision;
-		this.remote = remote;
-		this.groups = new HashSet<String>();
+		this(name, path, revision, remote, new HashSet<String>(), null);
 		if (groups != null && groups.length() > 0)
-			this.groups.addAll(Arrays.asList(groups.split(","))); //$NON-NLS-1$
-		copyfiles = new ArrayList<CopyFile>();
+			this.setGroups(groups);
 	}
 

@@ -1,0 +1,33 @@
+	/**
+	 * @param name
+	 *            the relative path to the {@code remote}
+	 * @param path
+	 *            the relative path to the super project
+	 * @param revision
+	 *            a SHA-1 or branch name or tag name
+	 * @param remote
+	 *            name of the remote definition
+	 * @param groups
+	 *            set of groups
+	 * @param recommendShallow
+	 *            recommendation for shallowness
+	 * @since 4.4
+	 */
+	public RepoProject(String name, String path, String revision,
+			String remote, Set<String> groups,
+			String recommendShallow) {
+		if (name == null) {
+			throw new NullPointerException();
+		}
+		this.name = name;
+		if (path != null)
+			this.path = path;
+		else
+			this.path = name;
+		this.revision = revision;
+		this.remote = remote;
+		this.groups = groups;
+		this.recommendShallow = recommendShallow;
+		copyfiles = new ArrayList<CopyFile>();
+	}
+

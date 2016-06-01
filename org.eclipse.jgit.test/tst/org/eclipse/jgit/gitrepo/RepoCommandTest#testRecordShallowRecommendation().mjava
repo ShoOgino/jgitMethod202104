@@ -1,5 +1,5 @@
 	@Test
-	public void testRecordRemoteBranch() throws Exception {
+	public void testRecordShallowRecommendation() throws Exception {
 		try (
 				Repository remoteDb = createBareRepository();
 				Repository tempDb = createWorkRepository()) {
@@ -9,11 +9,10 @@
 				.append("<manifest>")
 				.append("<remote name=\"remote1\" fetch=\".\" />")
 				.append("<default revision=\"master\" remote=\"remote1\" />")
-				.append("<project path=\"with-branch\" ")
-					.append("revision=\"master\" ")
-					.append("name=\"").append(notDefaultUri).append("\" />")
-				.append("<project path=\"with-long-branch\" ")
-					.append("revision=\"refs/heads/master\" ")
+				.append("<project path=\"shallow-please\" ")
+					.append("name=\"").append(defaultUri).append("\" ")
+					.append("clone-depth=\"1\" />")
+				.append("<project path=\"non-shallow\" ")
 					.append("name=\"").append(defaultUri).append("\" />")
 				.append("</manifest>");
 			JGitTestUtil.writeTrashFile(tempDb, "manifest.xml",
@@ -22,7 +21,7 @@
 			RepoCommand command = new RepoCommand(remoteDb);
 			command.setPath(tempDb.getWorkTree().getAbsolutePath() + "/manifest.xml")
 				.setURI(rootUri)
-				.setRecordRemoteBranch(true)
+				.setRecommendShallow(true)
 				.call();
 			// Clone it
 			File directory = createTempDirectory("testBareRepo");
@@ -38,10 +37,10 @@
 				FileBasedConfig c = new FileBasedConfig(gitmodules,
 						FS.DETECTED);
 				c.load();
-				assertEquals("Recording remote branches should work for short branch descriptions", "master",
-						c.getString("submodule", "with-branch", "branch"));
-				assertEquals("Recording remote branches should work for full ref specs", "refs/heads/master",
-						c.getString("submodule", "with-long-branch", "branch"));
+				assertEquals("Recording shallow configuration should work", "true",
+						c.getString("submodule", "shallow-please", "shallow"));
+				assertNull("Recording non shallow configuration should work",
+						c.getString("submodule", "non-shallow", "shallow"));
 			}
 		}
 	}

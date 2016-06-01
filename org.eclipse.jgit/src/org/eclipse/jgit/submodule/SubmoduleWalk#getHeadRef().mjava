@@ -9,7 +9,7 @@
 		if (subRepo == null)
 			return null;
 		try {
-			Ref head = subRepo.getRef(Constants.HEAD);
+			Ref head = subRepo.exactRef(Constants.HEAD);
 			return head != null ? head.getLeaf().getName() : null;
 		} finally {
 			subRepo.close();
