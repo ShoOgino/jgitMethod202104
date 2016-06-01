@@ -5,7 +5,7 @@
 		if (objectMap != null && objectMap.contains(id))
 			return id;
 		// Ignore unreachable (garbage) objects here.
-		if (db.has(id, true))
+		if (checkExisting && db.has(id, true))
 			return id;
 
 		long offset = beginObject(type, len);
