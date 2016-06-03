@@ -1,0 +1,14 @@
+	@Test
+	public void testTimeUnitDefaultValue() throws ConfigInvalidException {
+		// value not present
+		assertEquals(20, parse("[a]\na=0\n").getTimeUnit("a", null, "b", 20,
+				MILLISECONDS));
+		// value is empty
+		assertEquals(20, parse("[a]\na=\" \"\n").getTimeUnit("a", null, "a", 20,
+				MILLISECONDS));
+
+		// value is not numeric
+		assertEquals(20, parse("[a]\na=test\n").getTimeUnit("a", null, "a", 20,
+				MILLISECONDS));
+	}
+
