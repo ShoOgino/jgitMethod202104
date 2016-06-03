@@ -1,0 +1,47 @@
+	@Test
+	public void testTimeUnit() throws ConfigInvalidException {
+		assertEquals(0, parseTime("0", MILLISECONDS));
+		assertEquals(2, parseTime("2ms", MILLISECONDS));
+		assertEquals(200, parseTime("200 milliseconds", MILLISECONDS));
+
+		assertEquals(0, parseTime("0s", SECONDS));
+		assertEquals(2, parseTime("2s", SECONDS));
+		assertEquals(231, parseTime("231sec", SECONDS));
+		assertEquals(1, parseTime("1second", SECONDS));
+		assertEquals(300, parseTime("300 seconds", SECONDS));
+
+		assertEquals(2, parseTime("2m", MINUTES));
+		assertEquals(2, parseTime("2min", MINUTES));
+		assertEquals(1, parseTime("1 minute", MINUTES));
+		assertEquals(10, parseTime("10 minutes", MINUTES));
+
+		assertEquals(5, parseTime("5h", HOURS));
+		assertEquals(5, parseTime("5hr", HOURS));
+		assertEquals(1, parseTime("1hour", HOURS));
+		assertEquals(48, parseTime("48hours", HOURS));
+
+		assertEquals(5, parseTime("5 h", HOURS));
+		assertEquals(5, parseTime("5 hr", HOURS));
+		assertEquals(1, parseTime("1 hour", HOURS));
+		assertEquals(48, parseTime("48 hours", HOURS));
+		assertEquals(48, parseTime("48 \t \r hours", HOURS));
+
+		assertEquals(4, parseTime("4d", DAYS));
+		assertEquals(1, parseTime("1day", DAYS));
+		assertEquals(14, parseTime("14days", DAYS));
+
+		assertEquals(7, parseTime("1w", DAYS));
+		assertEquals(7, parseTime("1week", DAYS));
+		assertEquals(14, parseTime("2w", DAYS));
+		assertEquals(14, parseTime("2weeks", DAYS));
+
+		assertEquals(30, parseTime("1mon", DAYS));
+		assertEquals(30, parseTime("1month", DAYS));
+		assertEquals(60, parseTime("2mon", DAYS));
+		assertEquals(60, parseTime("2months", DAYS));
+
+		assertEquals(365, parseTime("1y", DAYS));
+		assertEquals(365, parseTime("1year", DAYS));
+		assertEquals(365 * 2, parseTime("2years", DAYS));
+	}
+
