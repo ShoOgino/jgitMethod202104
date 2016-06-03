@@ -1,0 +1,30 @@
+	@Before
+	public void setUp() throws Exception {
+		super.setUp();
+
+		server = newRepo("server");
+		client = newRepo("client");
+
+		testProtocol = new TestProtocol<>(null,
+				new ReceivePackFactory<Object>() {
+					@Override
+					public ReceivePack create(Object req, Repository database)
+							throws ServiceNotEnabledException,
+							ServiceNotAuthorizedException {
+						ReceivePack receivePack = new ReceivePack(database);
+						receivePack.setAllowPushOptions(true);
+						receivePack.setAtomic(true);
+						baseReceivePack = receivePack;
+						return receivePack;
+					}
+				});
+
+		uri = testProtocol.register(ctx, server);
+
+		try (ObjectInserter ins = client.newObjectInserter()) {
+			obj1 = ins.insert(Constants.OBJ_BLOB, Constants.encode("test"));
+			obj2 = ins.insert(Constants.OBJ_BLOB, Constants.encode("file"));
+			ins.flush();
+		}
+	}
+

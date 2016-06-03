@@ -17,6 +17,7 @@
 		this.transport = transport;
 		this.toPush = new HashMap<String, RemoteRefUpdate>();
 		this.out = out;
+		this.pushOptions = transport.getPushOptions();
 		for (final RemoteRefUpdate rru : toPush) {
 			if (this.toPush.put(rru.getRemoteName(), rru) != null)
 				throw new TransportException(MessageFormat.format(

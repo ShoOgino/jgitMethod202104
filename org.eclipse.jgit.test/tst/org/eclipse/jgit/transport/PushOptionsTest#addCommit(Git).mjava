@@ -1,0 +1,7 @@
+	private RevCommit addCommit(Git git)
+			throws IOException, NoFilepatternException, GitAPIException {
+		writeTrashFile("f", "content of f");
+		git.add().addFilepattern("f").call();
+		return git.commit().setMessage("adding f").call();
+	}
+

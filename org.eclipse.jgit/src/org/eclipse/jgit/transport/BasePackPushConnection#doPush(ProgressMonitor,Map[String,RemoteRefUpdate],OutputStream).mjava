@@ -16,6 +16,9 @@
 			OutputStream outputStream) throws TransportException {
 		try {
 			writeCommands(refUpdates.values(), monitor, outputStream);
+
+			if (pushOptions != null && capablePushOptions)
+				transmitOptions();
 			if (writePack)
 				writePack(refUpdates, monitor);
 			if (sentCommand) {
