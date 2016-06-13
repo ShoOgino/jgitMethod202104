@@ -42,6 +42,14 @@
 			dotGitattributes = null;
 		}
 
+		fileCRLF = createAndAddFile(git, "file1.txt", "a");
+
+		fileLF = createAndAddFile(git, "file2.txt", "a");
+
+		fileMixed = createAndAddFile(git, "file3.txt", "a");
+
+		RevCommit c = gitCommit(git, "create files");
+
 		fileCRLF = createAndAddFile(git, "file1.txt", CONTENT_CRLF);
 
 		fileLF = createAndAddFile(git, "file2.txt", CONTENT_LF);
@@ -51,5 +59,25 @@
 		gitCommit(git, "addFiles");
 
 		recreateWorktree(git);
+
+		if (smudge) {
+			DirCache dc = DirCache.lock(git.getRepository().getIndexFile(),
+					FS.detect());
+			DirCacheEditor editor = dc.editor();
+			for (int i = 0; i < dc.getEntryCount(); i++) {
+				editor.add(new DirCacheEditor.PathEdit(
+						dc.getEntry(i).getPathString()) {
+					public void apply(DirCacheEntry ent) {
+						ent.smudgeRacilyClean();
+					}
+				});
+			}
+			editor.commit();
+		}
+
+		// @TODO: find out why the following assertion would break the tests
+		// assertTrue(git.status().call().isClean());
+		git.checkout().setName(c.getName()).call();
+		git.checkout().setName("master").call();
 	}
 

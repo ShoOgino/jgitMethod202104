@@ -1,0 +1,35 @@
+	/**
+	 * @param opType
+	 *            The operationtype (checkin/checkout) which should be used
+	 * @return the eol stream type for the current entry or <code>null</code> if
+	 *         it cannot be determined. When state or state.walk is null or the
+	 *         {@link TreeWalk} is not based on a {@link Repository} then null
+	 *         is returned.
+	 * @throws IOException
+	 */
+	private EolStreamType getEolStreamType(OperationType opType)
+			throws IOException {
+		if (eolStreamTypeHolder == null) {
+			EolStreamType type=null;
+			if (state.walk != null) {
+				if (opType != null) {
+					type = state.walk.getEolStreamType(opType);
+				} else {
+					type=state.walk.getEolStreamType();
+				}
+			} else {
+				switch (getOptions().getAutoCRLF()) {
+				case FALSE:
+					type = EolStreamType.DIRECT;
+					break;
+				case TRUE:
+				case INPUT:
+					type = EolStreamType.AUTO_LF;
+					break;
+				}
+			}
+			eolStreamTypeHolder = new Holder<EolStreamType>(type);
+		}
+		return eolStreamTypeHolder.get();
+	}
+
