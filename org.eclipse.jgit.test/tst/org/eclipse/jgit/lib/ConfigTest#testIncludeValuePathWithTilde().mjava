@@ -1,0 +1,10 @@
+	@Test
+	public void testIncludeValuePathWithTilde() throws ConfigInvalidException {
+		// we do not expect an exception, included path not supported are
+		// ignored
+		String notSupported = "~/someFile";
+		Config parsed = parse("[include]\npath=" + notSupported + "\n");
+		assertEquals(1, parsed.getSections().size());
+		assertEquals(notSupported, parsed.getString("include", null, "path"));
+	}
+

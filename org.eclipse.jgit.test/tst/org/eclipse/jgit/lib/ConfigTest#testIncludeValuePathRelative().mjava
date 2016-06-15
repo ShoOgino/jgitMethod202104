@@ -1,0 +1,10 @@
+	@Test
+	public void testIncludeValuePathRelative() throws ConfigInvalidException {
+		// we do not expect an exception, included path not supported are
+		// ignored
+		String notSupported = "someRelativeFile";
+		Config parsed = parse("[include]\npath=" + notSupported + "\n");
+		assertEquals(1, parsed.getSections().size());
+		assertEquals(notSupported, parsed.getString("include", null, "path"));
+	}
+
