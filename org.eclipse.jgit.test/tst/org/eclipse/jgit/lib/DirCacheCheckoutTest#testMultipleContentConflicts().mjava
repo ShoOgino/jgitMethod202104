@@ -1,0 +1,24 @@
+	@Test
+	public void testMultipleContentConflicts() throws Exception {
+		commitFile("a", "initial content", "master");
+		RevCommit headCommit = commitFile("b", "initial content", "master");
+		commitFile("a", "side content", "side");
+		RevCommit checkoutCommit = commitFile("b", "side content", "side");
+		writeTrashFile("a", "changed content");
+		writeTrashFile("b", "changed content");
+
+		try {
+			new DirCacheCheckout(db, headCommit.getTree(), db.lockDirCache(),
+					checkoutCommit.getTree()).checkout();
+			fail();
+		} catch (CheckoutConflictException expected) {
+			assertEquals(2, expected.getConflictingFiles().length);
+			assertTrue(Arrays.asList(expected.getConflictingFiles())
+					.contains("a"));
+			assertTrue(Arrays.asList(expected.getConflictingFiles())
+					.contains("b"));
+			assertEquals("changed content", read("a"));
+			assertEquals("changed content", read("b"));
+		}
+	}
+
