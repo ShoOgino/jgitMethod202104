@@ -1,0 +1,19 @@
+	/**
+	 * Set the time to live for garbage objects.
+	 * <p>
+	 * Any UNREACHABLE_GARBAGE older than this limit will be pruned at the end
+	 * of the run.
+	 * <p>
+	 * If timeToLiveMillis is set to 0, UNREACHABLE_GARBAGE purging is disabled.
+	 *
+	 * @param ttl
+	 *            Time to live whatever unit is specified.
+	 * @param unit
+	 *            The specified time unit.
+	 * @return {@code this}
+	 */
+	public DfsGarbageCollector setGarbageTtl(long ttl, TimeUnit unit) {
+		garbageTtlMillis = unit.toMillis(ttl);
+		return this;
+	}
+
