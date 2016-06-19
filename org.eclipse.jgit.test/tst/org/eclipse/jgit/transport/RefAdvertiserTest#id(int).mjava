@@ -1,0 +1,8 @@
+	private static ObjectId id(int i) {
+		try (ObjectInserter.Formatter f = new ObjectInserter.Formatter()) {
+			byte[] tmp = new byte[4];
+			NB.encodeInt32(tmp, 0, i);
+			return f.idFor(Constants.OBJ_BLOB, tmp);
+		}
+	}
+

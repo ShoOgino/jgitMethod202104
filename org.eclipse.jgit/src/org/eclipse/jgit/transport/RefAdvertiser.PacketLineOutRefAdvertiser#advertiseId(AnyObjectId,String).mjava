@@ -1,0 +1,21 @@
+		@Override
+		public void advertiseId(AnyObjectId id, String refName)
+				throws IOException {
+			id.copyTo(binArr, 0);
+			binArr[OBJECT_ID_STRING_LENGTH] = ' ';
+			binBuf.position(OBJECT_ID_STRING_LENGTH + 1);
+			append(refName);
+			if (first) {
+				first = false;
+				if (!capablities.isEmpty()) {
+					append('\0');
+					for (String cap : capablities) {
+						append(' ');
+						append(cap);
+					}
+				}
+			}
+			append('\n');
+			pckOut.writePacket(binArr, 0, binBuf.position());
+		}
+

@@ -1,0 +1,39 @@
+	@Test
+	public void advertiser() throws IOException {
+		ByteArrayOutputStream buf = new ByteArrayOutputStream();
+		PacketLineOut pckOut = new PacketLineOut(buf);
+		PacketLineOutRefAdvertiser adv = new PacketLineOutRefAdvertiser(pckOut);
+
+		// Advertisement of capability and id both happen in order of call,
+		// which may not match Git standards. Callers are responsible for
+		// making calls in the correct ordering. Here in this test we do them
+		// in a "wrong" order to assert the method just writes to the network.
+
+		adv.advertiseCapability("test-1");
+		adv.advertiseCapability("sideband");
+		adv.advertiseId(id(1), "refs/heads/master");
+		adv.advertiseId(id(4), "refs/" + padStart("F", 987));
+		adv.advertiseId(id(2), "refs/heads/next");
+		adv.advertiseId(id(3), "refs/Iñtërnâtiônàlizætiøn☃💩");
+		adv.end();
+		assertFalse(adv.isEmpty());
+
+		PacketLineIn pckIn = new PacketLineIn(
+				new ByteArrayInputStream(buf.toByteArray()));
+		String s = pckIn.readStringRaw();
+		assertEquals(id(1).name() + " refs/heads/master\0 test-1 sideband\n",
+				s);
+
+		s = pckIn.readStringRaw();
+		assertEquals(id(4).name() + " refs/" + padStart("F", 987) + '\n', s);
+
+		s = pckIn.readStringRaw();
+		assertEquals(id(2).name() + " refs/heads/next\n", s);
+
+		s = pckIn.readStringRaw();
+		assertEquals(id(3).name() + " refs/Iñtërnâtiônàlizætiøn☃💩\n", s);
+
+		s = pckIn.readStringRaw();
+		assertSame(PacketLineIn.END, s);
+	}
+
