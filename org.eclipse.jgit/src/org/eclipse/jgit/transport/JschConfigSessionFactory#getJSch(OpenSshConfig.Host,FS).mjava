@@ -25,6 +25,7 @@
 		JSch jsch = byIdentityFile.get(identityKey);
 		if (jsch == null) {
 			jsch = new JSch();
+			configureJSch(jsch);
 			jsch.setHostKeyRepository(defaultJSch.getHostKeyRepository());
 			jsch.addIdentity(identityKey);
 			byIdentityFile.put(identityKey, jsch);
