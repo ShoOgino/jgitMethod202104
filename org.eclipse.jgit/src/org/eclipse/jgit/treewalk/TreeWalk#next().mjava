@@ -21,7 +21,6 @@
 	public boolean next() throws MissingObjectException,
 			IncorrectObjectTypeException, CorruptObjectException, IOException {
 		try {
-			attrs = null;
 			if (advance) {
 				advance = false;
 				postChildren = false;
@@ -29,6 +28,7 @@
 			}
 
 			for (;;) {
+				attrs = null;
 				final AbstractTreeIterator t = min();
 				if (t.eof()) {
 					if (depth > 0) {
