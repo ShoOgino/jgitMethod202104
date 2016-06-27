@@ -1,8 +1,12 @@
 	private List<DfsPackDescription> toPrune() {
 		int cnt = packsBefore.size();
 		List<DfsPackDescription> all = new ArrayList<DfsPackDescription>(cnt);
-		for (DfsPackFile pack : packsBefore)
+		for (DfsPackFile pack : packsBefore) {
 			all.add(pack.getPackDescription());
+		}
+		for (DfsPackFile pack : expiredGarbagePacks) {
+			all.add(pack.getPackDescription());
+		}
 		return all;
 	}
 

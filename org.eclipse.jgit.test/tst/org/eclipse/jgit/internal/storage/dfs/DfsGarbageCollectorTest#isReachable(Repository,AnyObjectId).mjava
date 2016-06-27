@@ -1,0 +1,15 @@
+	private static boolean isReachable(Repository repo, AnyObjectId id)
+			throws IOException {
+		try (RevWalk rw = new RevWalk(repo)) {
+			for (Ref ref : repo.getAllRefs().values()) {
+				rw.markStart(rw.parseCommit(ref.getObjectId()));
+			}
+			for (RevCommit next; (next = rw.next()) != null;) {
+				if (AnyObjectId.equals(next, id)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
