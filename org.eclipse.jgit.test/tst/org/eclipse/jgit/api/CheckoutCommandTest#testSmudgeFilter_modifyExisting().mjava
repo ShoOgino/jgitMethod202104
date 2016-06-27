@@ -2,11 +2,11 @@
 	public void testSmudgeFilter_modifyExisting() throws IOException, GitAPIException {
 		File script = writeTempFile("sed s/o/e/g");
 		StoredConfig config = git.getRepository().getConfig();
-		config.setString("filter", "tstFilter", "smudge",
+		config.setString("filter", "lfs", "smudge",
 				"sh " + slashify(script.getPath()));
 		config.save();
 
-		writeTrashFile(".gitattributes", "*.txt filter=tstFilter");
+		writeTrashFile(".gitattributes", "*.txt filter=lfs");
 		git.add().addFilepattern(".gitattributes").call();
 		git.commit().setMessage("add filter").call();
 
@@ -28,7 +28,7 @@
 		git.checkout().setName(content2.getName()).call();
 
 		assertEquals(
-				"[.gitattributes, mode:100644, content:*.txt filter=tstFilter][Test.txt, mode:100644, content:Some change][src/a.tmp, mode:100644, content:foo][src/a.txt, mode:100644, content:foo\n]",
+				"[.gitattributes, mode:100644, content:*.txt filter=lfs][Test.txt, mode:100644, content:Some change][src/a.tmp, mode:100644, content:foo][src/a.txt, mode:100644, content:foo\n]",
 				indexState(CONTENT));
 		assertEquals(Sets.of("src/a.txt"), git.status().call().getModified());
 		assertEquals("foo", read("src/a.tmp"));

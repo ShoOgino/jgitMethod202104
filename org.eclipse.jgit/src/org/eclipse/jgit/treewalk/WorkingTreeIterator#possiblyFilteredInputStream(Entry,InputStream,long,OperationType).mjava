@@ -9,15 +9,9 @@
 
 		if (len <= MAXIMUM_FILE_SIZE_TO_READ_FULLY) {
 			ByteBuffer rawbuf = IO.readWholeStream(is, (int) len);
-			byte[] raw = rawbuf.array();
-			int n = rawbuf.limit();
-			if (!isBinary(raw, n)) {
-				rawbuf = filterClean(raw, n, opType);
-				raw = rawbuf.array();
-				n = rawbuf.limit();
-			}
-			canonLen = n;
-			return new ByteArrayInputStream(raw, 0, n);
+			rawbuf = filterClean(rawbuf.array(), rawbuf.limit(), opType);
+			canonLen = rawbuf.limit();
+			return new ByteArrayInputStream(rawbuf.array(), 0, (int) canonLen);
 		}
 
 		if (getCleanFilterCommand() == null && isBinary(e)) {

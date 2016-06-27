@@ -1,5 +1,5 @@
 	@Theory
-	public void testBuiltinFilter(boolean doSmudge)
+	public void testBuiltinFilters(boolean sleepBeforeAdd)
 			throws IOException,
 			GitAPIException, InterruptedException {
 		writeTrashFile(".gitattributes", "*.txt filter=lfs");
@@ -10,7 +10,7 @@
 		File f = writeTrashFile("src/a.txt", "foo\n");
 
 		try (Git git = new Git(db)) {
-			if (!doSmudge) {
+			if (!sleepBeforeAdd) {
 				fsTick(f);
 			}
 			git.add().addFilepattern(".gitattributes").call();
@@ -22,7 +22,7 @@
 			config.setBoolean("filter", "lfs", "useJGitBuiltin", true);
 			config.save();
 
-			if (!doSmudge) {
+			if (!sleepBeforeAdd) {
 				fsTick(f);
 			}
 			git.add().addFilepattern("src/a.txt").addFilepattern("src/a.tmp")
@@ -35,7 +35,7 @@
 			RevCommit c1 = git.commit().setMessage("c1").call();
 			assertTrue(git.status().call().isClean());
 			f = writeTrashFile("src/a.txt", "foobar\n");
-			if (!doSmudge) {
+			if (!sleepBeforeAdd) {
 				fsTick(f);
 			}
 			git.add().addFilepattern("src/a.txt").call();
@@ -49,14 +49,8 @@
 			assertEquals(
 					"[.gitattributes, mode:100644, content:*.txt filter=lfs][src/a.tmp, mode:100644, content:foo][src/a.txt, mode:100644, content:version https://git-lfs.github.com/spec/v1\noid sha256:b5bb9d8014a0f9b1d61e21e796d78dccdf1352f23cd32812f4850b878ae4944c\nsize 4\n]",
 					indexState(CONTENT));
-			// due to lfs clean filter but dummy smudge filter we expect strange
-			// content. The smudge filter converts from real content to pointer
-			// file content (starting with "version ") but the smudge filter
-			// replaces 'o' by 'e' which results in a text starting with
-			// "versien "
 			assertEquals(
-					"versien https://git-lfs.github.cem/spec/v1\neid sha256:b5bb9d8014a0f9b1d61e21e796d78dccdf1352f23cd32812f4850b878ae4944c\nsize 4\n",
-					read("src/a.txt"));
+					"foo\n", read("src/a.txt"));
 		}
 	}
 

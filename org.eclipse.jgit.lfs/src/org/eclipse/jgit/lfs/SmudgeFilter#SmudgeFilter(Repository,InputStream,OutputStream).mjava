@@ -1,0 +1,19 @@
+	/**
+	 * @param db
+	 * @param in
+	 * @param out
+	 * @throws IOException
+	 */
+	public SmudgeFilter(Repository db, InputStream in, OutputStream out)
+			throws IOException {
+		super(in, out);
+		lfs = new Lfs(db.getDirectory().toPath().resolve(Constants.LFS));
+		LfsPointer res = LfsPointer.parseLfsPointer(in);
+		if (res != null) {
+			Path mediaFile = lfs.getMediaFile(res.getOid());
+			if (Files.exists(mediaFile)) {
+				this.in = Files.newInputStream(mediaFile);
+			}
+		}
+	}
+
