@@ -1,0 +1,13 @@
+	/**
+	 * @param id
+	 *            the id of the mediafile
+	 * @return the file which stores the original content. This will be files
+	 *         underneath
+	 *         "<repo>/.git/lfs/objects/<firstTwoLettersOfID>/<remainingLettersOfID>"
+	 */
+	public Path getMediaFile(LongObjectId id) {
+		String idStr = LongObjectId.toString(id);
+		return getLfsObjDir().resolve(idStr.substring(0, 2))
+				.resolve(idStr.substring(2));
+	}
+

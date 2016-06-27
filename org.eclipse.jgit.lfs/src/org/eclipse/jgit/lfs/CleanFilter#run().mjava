@@ -1,0 +1,35 @@
+	public int run() throws IOException {
+		try {
+			int b = in.read();
+			if (b != -1) {
+				dOut.write(b);
+				size++;
+				return 1;
+			} else {
+				dOut.close();
+				tmpOut.close();
+				LongObjectId loid = LongObjectId
+						.fromRaw(dOut.getMessageDigest().digest());
+				Path mediaFile = lfsUtil.getMediaFile(loid);
+				if (Files.isRegularFile(mediaFile)) {
+					long fsSize = Files.size(mediaFile);
+					if (fsSize != size) {
+						throw new CorruptMediaFile(mediaFile, size, fsSize);
+					}
+				} else {
+					FileUtils.mkdirs(mediaFile.getParent().toFile(), true);
+					FileUtils.rename(tmpFile.toFile(), mediaFile.toFile());
+				}
+				LfsPointer lfsPointer = new LfsPointer(loid, size);
+				lfsPointer.encode(out);
+				out.close();
+				return -1;
+			}
+		} catch (IOException e) {
+			out.close();
+			dOut.close();
+			tmpOut.close();
+			throw e;
+		}
+	}
+

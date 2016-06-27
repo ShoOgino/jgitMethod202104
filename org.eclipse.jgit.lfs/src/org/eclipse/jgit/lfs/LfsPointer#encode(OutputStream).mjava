@@ -1,0 +1,18 @@
+	/**
+	 * Encode this object into the LFS format defined by {@link #VERSION}
+	 *
+	 * @param out
+	 *            the {@link OutputStream} into which the encoded data should be
+	 *            written
+	 */
+	public void encode(OutputStream out) {
+		try (PrintStream ps = new PrintStream(out)) {
+			ps.print("version "); //$NON-NLS-1$
+			ps.println(VERSION);
+			ps.print("oid " + HASH_FUNCTION_NAME + ":"); //$NON-NLS-1$ //$NON-NLS-2$
+			ps.println(LongObjectId.toString(oid));
+			ps.print("size "); //$NON-NLS-1$
+			ps.println(size);
+		}
+	}
+
