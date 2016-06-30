@@ -1,0 +1,8 @@
+	private FastForwardMode getFastForwardMode() {
+		Config config = repo.getConfig();
+		Merge ffMode = config.getEnum(Merge.values(),
+				ConfigConstants.CONFIG_PULL_SECTION, null,
+				ConfigConstants.CONFIG_KEY_FF, null);
+		return ffMode != null ? FastForwardMode.valueOf(ffMode) : null;
+	}
+
