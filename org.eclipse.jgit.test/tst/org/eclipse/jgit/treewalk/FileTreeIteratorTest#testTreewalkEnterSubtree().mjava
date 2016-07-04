@@ -1,6 +1,6 @@
 	@Test
 	public void testTreewalkEnterSubtree() throws Exception {
-		try (Git git = new Git(db)) {
+		try (Git git = new Git(db); TreeWalk tw = new TreeWalk(db)) {
 			writeTrashFile("b/c", "b/c");
 			writeTrashFile("z/.git", "gitdir: /tmp/somewhere");
 			git.add().addFilepattern(".").call();
@@ -11,7 +11,6 @@
 			FileUtils.delete(new File(db.getWorkTree(), "b"),
 					FileUtils.RECURSIVE);
 
-			TreeWalk tw = new TreeWalk(db);
 			tw.addTree(new DirCacheIterator(db.readDirCache()));
 			tw.addTree(new FileTreeIterator(db));
 			assertTrue(tw.next());
