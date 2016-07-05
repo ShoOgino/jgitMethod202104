@@ -7,6 +7,12 @@
 					true);
 			allowPushOptions = config.getBoolean("receive", "pushoptions", //$NON-NLS-1$ //$NON-NLS-2$
 					false);
+			maxCommandBytes = config.getLong("receive", //$NON-NLS-1$
+					"maxCommandBytes", //$NON-NLS-1$
+					3 << 20);
+			maxDiscardBytes = config.getLong("receive", //$NON-NLS-1$
+					"maxCommandDiscardBytes", //$NON-NLS-1$
+					-1);
 			signedPush = SignedPushConfig.KEY.parse(config);
 		}
 

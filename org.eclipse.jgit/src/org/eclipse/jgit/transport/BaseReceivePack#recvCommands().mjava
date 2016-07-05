@@ -4,13 +4,16 @@
 	 * @throws IOException
 	 */
 	protected void recvCommands() throws IOException {
+		PacketLineIn pck = maxCommandBytes > 0
+				? new PacketLineIn(rawIn, maxCommandBytes)
+				: pckIn;
 		PushCertificateParser certParser = getPushCertificateParser();
 		boolean firstPkt = true;
 		try {
 			for (;;) {
 				String line;
 				try {
-					line = pckIn.readString();
+					line = pck.readString();
 				} catch (EOFException eof) {
 					if (commands.isEmpty())
 						return;
@@ -33,13 +36,13 @@
 					enableCapabilities();
 
 					if (line.equals(GitProtocolConstants.OPTION_PUSH_CERT)) {
-						certParser.receiveHeader(pckIn, !isBiDirectionalPipe());
+						certParser.receiveHeader(pck, !isBiDirectionalPipe());
 						continue;
 					}
 				}
 
 				if (line.equals(PushCertificateParser.BEGIN_SIGNATURE)) {
-					certParser.receiveSignature(pckIn);
+					certParser.receiveSignature(pck);
 					continue;
 				}
 
@@ -56,18 +59,17 @@
 			}
 			pushCert = certParser.build();
 			if (hasCommands()) {
-				readPostCommands(pckIn);
+				readPostCommands(pck);
 			}
 		} catch (PackProtocolException e) {
-			if (sideBand) {
-				try {
-					pckIn.discardUntilEnd();
-				} catch (IOException e2) {
-					// Ignore read failures attempting to discard.
-				}
-			}
+			discardCommands();
 			fatalError(e.getMessage());
 			throw e;
+		} catch (InputOverLimitIOException e) {
+			String msg = JGitText.get().tooManyCommands;
+			discardCommands();
+			fatalError(msg);
+			throw new PackProtocolException(msg);
 		}
 	}
 

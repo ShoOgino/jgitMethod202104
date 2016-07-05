@@ -1,0 +1,14 @@
+	private void discardCommands() {
+		if (sideBand) {
+			long max = maxDiscardBytes;
+			if (max < 0) {
+				max = Math.max(3 * maxCommandBytes, 3L << 20);
+			}
+			try {
+				new PacketLineIn(rawIn, max).discardUntilEnd();
+			} catch (IOException e) {
+				// Ignore read failures attempting to discard.
+			}
+		}
+	}
+

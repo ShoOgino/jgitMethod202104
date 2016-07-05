@@ -1,14 +1,32 @@
 	int readLength() throws IOException {
 		IO.readFully(in, lineBuffer, 0, 4);
+		int len;
 		try {
-			final int len = RawParseUtils.parseHexInt16(lineBuffer, 0);
-			if (len != 0 && len < 4)
-				throw new ArrayIndexOutOfBoundsException();
-			return len;
+			len = RawParseUtils.parseHexInt16(lineBuffer, 0);
 		} catch (ArrayIndexOutOfBoundsException err) {
-			throw new IOException(MessageFormat.format(JGitText.get().invalidPacketLineHeader,
-					"" + (char) lineBuffer[0] + (char) lineBuffer[1] //$NON-NLS-1$
-					+ (char) lineBuffer[2] + (char) lineBuffer[3]));
+			throw invalidHeader();
 		}
+
+		if (len == 0) {
+			return 0;
+		} else if (len < 4) {
+			throw invalidHeader();
+		}
+
+		if (limit != 0) {
+			int n = len - 4;
+			if (limit < n) {
+				limit = -1;
+				try {
+					IO.skipFully(in, n);
+				} catch (IOException e) {
+					// Ignore failure discarding packet over limit.
+				}
+				throw new InputOverLimitIOException();
+			}
+			// if set limit must not be 0 (means unlimited).
+			limit = n < limit ? limit - n : -1;
+		}
+		return len;
 	}
 

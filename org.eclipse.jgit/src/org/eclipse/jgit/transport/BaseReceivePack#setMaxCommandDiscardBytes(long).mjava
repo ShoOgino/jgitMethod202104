@@ -1,0 +1,21 @@
+	/**
+	 * Set the maximum number of command bytes to discard from the client.
+	 * <p>
+	 * Discarding remaining bytes allows this instance to consume the rest of
+	 * the command block and send a human readable over-limit error via the
+	 * side-band channel. If the client sends an excessive number of bytes this
+	 * limit kicks in and the instance disconnects, resulting in a non-specific
+	 * 'pipe closed', 'end of stream', or similar generic error at the client.
+	 * <p>
+	 * When the limit is set to {@code -1} the implementation will default to
+	 * the larger of {@code 3 * maxCommandBytes} or {@code 3 MiB}.
+	 *
+	 * @param limit
+	 *            discard limit in bytes; if 0 there is no limit; if -1 the
+	 *            implementation tries to set a reasonable default.
+	 * @since 4.7
+	 */
+	public void setMaxCommandDiscardBytes(long limit) {
+		maxDiscardBytes = limit;
+	}
+
