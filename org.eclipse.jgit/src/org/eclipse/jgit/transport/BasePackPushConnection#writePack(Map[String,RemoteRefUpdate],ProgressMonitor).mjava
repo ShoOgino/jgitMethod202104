@@ -25,7 +25,12 @@
 			writer.setReuseValidatingObjects(false);
 			writer.setDeltaBaseAsOffset(capableOfsDelta);
 			writer.preparePack(monitor, newObjects, remoteObjects);
-			writer.writePack(monitor, monitor, out);
+
+			OutputStream packOut = out;
+			if (capableSideBand) {
+				packOut = new CheckingSideBandOutputStream(in, out);
+			}
+			writer.writePack(monitor, monitor, packOut);
 
 			packTransferTime = writer.getStatistics().getTimeWriting();
 		}
