@@ -56,7 +56,14 @@
 			}
 			pushCert = certParser.build();
 		} catch (PackProtocolException e) {
-			sendError(e.getMessage());
+			if (sideBand) {
+				try {
+					pckIn.discardUntilEnd();
+				} catch (IOException e2) {
+					// Ignore read failures attempting to discard.
+				}
+			}
+			fatalError(e.getMessage());
 			throw e;
 		}
 	}
