@@ -1,0 +1,8 @@
+	@Test
+	public void testAutoCleanupDelay() {
+		config.setExpireAfter(TimeUnit.MINUTES.toMillis(20));
+		config.setCleanupDelay(AUTO_CLEANUP_DELAY);
+		assertEquals(TimeUnit.MINUTES.toMillis(20), config.getExpireAfter());
+		assertEquals(config.getExpireAfter() / 10, config.getCleanupDelay());
+	}
+

@@ -1,0 +1,10 @@
+	@Test
+	public void testFromConfig() throws ConfigInvalidException {
+		Config otherConfig = new Config();
+		otherConfig.fromText("[core]\nrepositoryCacheExpireAfter=1000\n"
+				+ "repositoryCacheCleanupDelay=500");
+		config.fromConfig(otherConfig);
+		assertEquals(1000, config.getExpireAfter());
+		assertEquals(500, config.getCleanupDelay());
+	}
+

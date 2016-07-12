@@ -1,8 +1,9 @@
 	@Test
 	public void testIncludeValuePathNotFound() throws ConfigInvalidException {
+		// we do not expect an exception, included path not found are ignored
 		String notFound = "/not/found";
-		expectedEx.expect(ConfigInvalidException.class);
-		expectedEx.expectMessage(notFound);
-		parse("[include]\npath=" + notFound + "\n");
+		Config parsed = parse("[include]\npath=" + notFound + "\n");
+		assertEquals(1, parsed.getSections().size());
+		assertEquals(notFound, parsed.getString("include", null, "path"));
 	}
 

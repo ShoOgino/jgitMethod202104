@@ -1,0 +1,34 @@
+	@Test
+	public void testRepositoryUnregisteringWhenExpired() throws Exception {
+		Repository repoA = createBareRepository();
+		Repository repoB = createBareRepository();
+		Repository repoC = createBareRepository();
+		RepositoryCache.register(repoA);
+		RepositoryCache.register(repoB);
+		RepositoryCache.register(repoC);
+
+		assertEquals(3, RepositoryCache.getRegisteredKeys().size());
+		assertTrue(RepositoryCache.isCached(repoA));
+		assertTrue(RepositoryCache.isCached(repoB));
+		assertTrue(RepositoryCache.isCached(repoC));
+
+		// fake that repoA was closed more than 1 hour ago (default expiration
+		// time)
+		repoA.close();
+		repoA.closedAt.set(System.currentTimeMillis() - 65 * 60 * 1000);
+		// close repoB but this one will not be expired
+		repoB.close();
+
+		assertEquals(3, RepositoryCache.getRegisteredKeys().size());
+		assertTrue(RepositoryCache.isCached(repoA));
+		assertTrue(RepositoryCache.isCached(repoB));
+		assertTrue(RepositoryCache.isCached(repoC));
+
+		RepositoryCache.clearExpired();
+
+		assertEquals(2, RepositoryCache.getRegisteredKeys().size());
+		assertFalse(RepositoryCache.isCached(repoA));
+		assertTrue(RepositoryCache.isCached(repoB));
+		assertTrue(RepositoryCache.isCached(repoC));
+	}
+

@@ -16,9 +16,15 @@
 				decoded = RawParseUtils.decode(bytes);
 			}
 			newEntries.addAll(fromTextRecurse(decoded, depth + 1));
+		} catch (FileNotFoundException fnfe) {
+			if (path.exists()) {
+				throw new ConfigInvalidException(MessageFormat
+						.format(JGitText.get().cannotReadFile, path), fnfe);
+			}
 		} catch (IOException ioe) {
-			throw new ConfigInvalidException(MessageFormat.format(
-					JGitText.get().invalidIncludedPathInConfigFile, path));
+			throw new ConfigInvalidException(
+					MessageFormat.format(JGitText.get().cannotReadFile, path),
+					ioe);
 		}
 	}
 

@@ -1,7 +1,9 @@
 	private RepositoryCache() {
 		cacheMap = new ConcurrentHashMap<Key, Reference<Repository>>();
 		openLocks = new Lock[4];
-		for (int i = 0; i < openLocks.length; i++)
+		for (int i = 0; i < openLocks.length; i++) {
 			openLocks[i] = new Lock();
+		}
+		configureEviction(new RepositoryCacheConfig());
 	}
 
