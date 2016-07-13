@@ -7,7 +7,10 @@
 		if (oldValue == null && checkConflicting && getRefDatabase().isNameConflicting(getName()))
 			return Result.LOCK_FAILURE;
 		try {
-			if (!tryLock(true))
+			// If we're detaching a symbolic reference, we should update the reference
+			// itself. Otherwise, we will update the leaf reference, which should be
+			// an ObjectIdRef.
+			if (!tryLock(!detachingSymbolicRef))
 				return Result.LOCK_FAILURE;
 			if (expValue != null) {
 				final ObjectId o;
