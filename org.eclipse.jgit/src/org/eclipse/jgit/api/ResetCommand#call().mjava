@@ -48,8 +48,12 @@
 				ru.setNewObjectId(commitId);
 
 				String refName = Repository.shortenRefName(getRefOrHEAD());
-				String message = refName + ": updating " + Constants.HEAD; //$NON-NLS-1$
-				ru.setRefLogMessage(message, false);
+				if (isReflogDisabled) {
+					ru.disableRefLog();
+				} else {
+					String message = refName + ": updating " + Constants.HEAD; //$NON-NLS-1$
+					ru.setRefLogMessage(message, false);
+				}
 				if (ru.forceUpdate() == RefUpdate.Result.LOCK_FAILURE)
 					throw new JGitInternalException(MessageFormat.format(
 							JGitText.get().cannotLock, ru.getName()));

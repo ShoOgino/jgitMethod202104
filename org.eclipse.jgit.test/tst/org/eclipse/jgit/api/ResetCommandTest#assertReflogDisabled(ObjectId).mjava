@@ -1,0 +1,19 @@
+	private void assertReflogDisabled(ObjectId head)
+			throws IOException {
+		// Check the reflog for HEAD
+		String actualHeadMessage = db.getReflogReader(Constants.HEAD)
+				.getLastEntry().getComment();
+		String expectedHeadMessage = "commit: adding a.txt and dir/b.txt";
+		assertEquals(expectedHeadMessage, actualHeadMessage);
+		assertEquals(head.getName(), db.getReflogReader(Constants.HEAD)
+				.getLastEntry().getOldId().getName());
+
+		// The reflog for master contains the same as the one for HEAD
+		String actualMasterMessage = db.getReflogReader("refs/heads/master")
+				.getLastEntry().getComment();
+		String expectedMasterMessage = "commit: adding a.txt and dir/b.txt";
+		assertEquals(expectedMasterMessage, actualMasterMessage);
+		assertEquals(head.getName(), db.getReflogReader(Constants.HEAD)
+				.getLastEntry().getOldId().getName());
+	}
+
