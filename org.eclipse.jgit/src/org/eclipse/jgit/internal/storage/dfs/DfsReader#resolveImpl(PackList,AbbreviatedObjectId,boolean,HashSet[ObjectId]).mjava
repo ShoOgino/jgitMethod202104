@@ -1,0 +1,13 @@
+	private void resolveImpl(PackList packList, AbbreviatedObjectId id,
+			boolean noGarbage, HashSet<ObjectId> matches) throws IOException {
+		for (DfsPackFile pack : packList.packs) {
+			if (noGarbage && pack.isGarbage()) {
+				continue;
+			}
+			pack.resolve(this, matches, id, MAX_RESOLVE_MATCHES);
+			if (matches.size() >= MAX_RESOLVE_MATCHES) {
+				break;
+			}
+		}
+	}
+

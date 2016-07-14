@@ -2,19 +2,22 @@
 	public ObjectLoader open(AnyObjectId objectId, int typeHint)
 			throws MissingObjectException, IncorrectObjectTypeException,
 			IOException {
+		ObjectLoader ldr;
 		if (last != null) {
-			ObjectLoader ldr = last.get(this, objectId);
+			ldr = last.get(this, objectId);
 			if (ldr != null)
 				return ldr;
 		}
 
+		PackList packList = db.getPackList();
 		boolean noGarbage = avoidUnreachable;
-		for (DfsPackFile pack : db.getPacks()) {
-			if (pack == last || (noGarbage && pack.isGarbage()))
-				continue;
-			ObjectLoader ldr = pack.get(this, objectId);
+		ldr = openImpl(packList, objectId, noGarbage);
+		if (ldr != null) {
+			return ldr;
+		}
+		if (packList.dirty()) {
+			ldr = openImpl(db.scanPacks(packList), objectId, noGarbage);
 			if (ldr != null) {
-				last = pack;
 				return ldr;
 			}
 		}
