@@ -5,12 +5,10 @@
 			return Collections.singleton(id.toObjectId());
 		boolean noGarbage = avoidUnreachable;
 		HashSet<ObjectId> matches = new HashSet<ObjectId>(4);
-		for (DfsPackFile pack : db.getPacks()) {
-			if (noGarbage && pack.isGarbage())
-				continue;
-			pack.resolve(this, matches, id, 256);
-			if (256 <= matches.size())
-				break;
+		PackList packList = db.getPackList();
+		resolveImpl(packList, id, noGarbage, matches);
+		if (matches.size() < MAX_RESOLVE_MATCHES && packList.dirty()) {
+			resolveImpl(db.scanPacks(packList), id, noGarbage, matches);
 		}
 		return matches;
 	}
