@@ -1,0 +1,76 @@
+	/**
+	 * Parse a ref specification for use during transport operations.
+	 * <p>
+	 * Specifications are typically one of the following forms:
+	 * <ul>
+	 * <li><code>refs/heads/master</code></li>
+	 * <li><code>refs/heads/master:refs/remotes/origin/master</code></li>
+	 * <li><code>refs/heads/*:refs/remotes/origin/*</code></li>
+	 * <li><code>+refs/heads/master</code></li>
+	 * <li><code>+refs/heads/master:refs/remotes/origin/master</code></li>
+	 * <li><code>+refs/heads/*:refs/remotes/origin/*</code></li>
+	 * <li><code>+refs/pull/&#42;/head:refs/remotes/origin/pr/*</code></li>
+	 * <li><code>:refs/heads/master</code></li>
+	 * </ul>
+	 *
+	 * If the wildcard mode allows mismatches, then these ref specs are also
+	 * valid:
+	 * <ul>
+	 * <li><code>refs/heads/*</code></li>
+	 * <li><code>refs/heads/*:refs/heads/master</code></li>
+	 * </ul>
+	 *
+	 * @param spec
+	 *            string describing the specification.
+	 * @param mode
+	 *            whether to allow a wildcard on one side without a wildcard on
+	 *            the other.
+	 * @throws IllegalArgumentException
+	 *             the specification is invalid.
+	 * @since 4.5
+	 */
+	public RefSpec(String spec, WildcardMode mode) {
+		this.allowMismatchedWildcards = mode;
+		String s = spec;
+		if (s.startsWith("+")) { //$NON-NLS-1$
+			force = true;
+			s = s.substring(1);
+		}
+
+		final int c = s.lastIndexOf(':');
+		if (c == 0) {
+			s = s.substring(1);
+			if (isWildcard(s)) {
+				wildcard = true;
+				if (mode == WildcardMode.REQUIRE_MATCH) {
+					throw new IllegalArgumentException(MessageFormat
+							.format(JGitText.get().invalidWildcards, spec));
+				}
+			}
+			dstName = checkValid(s);
+		} else if (c > 0) {
+			String src = s.substring(0, c);
+			String dst = s.substring(c + 1);
+			if (isWildcard(src) && isWildcard(dst)) {
+				// Both contain wildcard
+				wildcard = true;
+			} else if (isWildcard(src) || isWildcard(dst)) {
+				wildcard = true;
+				if (mode == WildcardMode.REQUIRE_MATCH)
+					throw new IllegalArgumentException(MessageFormat
+							.format(JGitText.get().invalidWildcards, spec));
+			}
+			srcName = checkValid(src);
+			dstName = checkValid(dst);
+		} else {
+			if (isWildcard(s)) {
+				if (mode == WildcardMode.REQUIRE_MATCH) {
+					throw new IllegalArgumentException(MessageFormat
+							.format(JGitText.get().invalidWildcards, spec));
+				}
+				wildcard = true;
+			}
+			srcName = checkValid(s);
+		}
+	}
+

@@ -1,0 +1,8 @@
+	@Test
+	public void sourceOnlywithWildcard() {
+		RefSpec a = new RefSpec("refs/heads/*",
+				WildcardMode.ALLOW_MISMATCH);
+		assertTrue(a.matchSource("refs/heads/master"));
+		assertNull(a.getDestination());
+	}
+
