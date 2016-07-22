@@ -2,14 +2,15 @@
 	public void testDownloadInvalidPathInfo()
 			throws ClientProtocolException, IOException {
 		String TEXT = "test";
-		AnyLongObjectId id = putContent(TEXT);
+		String id = putContent(TEXT).name().substring(0, 60);
 		Path f = Paths.get(getTempDirectory().toString(), "download");
 		try {
-			getContent(id.name().substring(0, 60), f);
+			getContent(id, f);
 			fail("expected RuntimeException");
 		} catch (RuntimeException e) {
-			assertEquals("Status: 422 Unprocessable Entity",
-					e.getMessage());
+			String error = String.format(
+					"Invalid pathInfo '/%s' does not match '/{SHA-256}'", id);
+			assertEquals(formatErrorMessage(422, error), e.getMessage());
 		}
 	}
 

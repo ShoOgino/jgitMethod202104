@@ -2,14 +2,14 @@
 	public void testDownloadInvalidId()
 			throws ClientProtocolException, IOException {
 		String TEXT = "test";
-		AnyLongObjectId id = putContent(TEXT);
+		String id = putContent(TEXT).name().replace('f', 'z');
 		Path f = Paths.get(getTempDirectory().toString(), "download");
 		try {
-			getContent(id.name().replace('f', 'z'), f);
+			getContent(id, f);
 			fail("expected RuntimeException");
 		} catch (RuntimeException e) {
-			assertEquals("Status: 422 Unprocessable Entity",
-					e.getMessage());
+			String error = String.format("Invalid id: : %s", id);
+			assertEquals(formatErrorMessage(422, error), e.getMessage());
 		}
 	}
 
