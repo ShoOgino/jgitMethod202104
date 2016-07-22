@@ -1,0 +1,12 @@
+	private void connectLocalToRemote(Git local, Git remote)
+			throws URISyntaxException, IOException {
+		StoredConfig config = local.getRepository().getConfig();
+		RemoteConfig remoteConfig = new RemoteConfig(config, "test");
+		remoteConfig.addURI(new URIish(
+				remote.getRepository().getDirectory().toURI().toURL()));
+		remoteConfig.addFetchRefSpec(
+				new RefSpec("+refs/heads/*:refs/remotes/origin/*"));
+		remoteConfig.update(config);
+		config.save();
+	}
+

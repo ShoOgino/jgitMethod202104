@@ -6,6 +6,12 @@
 					JGitText.get().atomicPushNotSupported);
 		}
 
+		if (pushOptions != null && !capablePushOptions) {
+			throw new TransportException(uri,
+					MessageFormat.format(JGitText.get().pushOptionsNotSupported,
+							pushOptions.toString()));
+		}
+
 		for (final RemoteRefUpdate rru : refUpdates) {
 			if (!capableDeleteRefs && rru.isDelete()) {
 				rru.setStatus(Status.REJECTED_NODELETE);

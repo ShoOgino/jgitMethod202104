@@ -1,0 +1,23 @@
+	@Test
+	public void testFailedAtomicPushWithOptions() throws Exception {
+		PushResult r;
+		server.setPerformsAtomicTransactions(true);
+		List<String> pushOptions = Arrays.asList("Hello", "World!");
+
+		try (Transport tn = testProtocol.open(uri, client, "server")) {
+			tn.setPushAtomic(true);
+			tn.setPushOptions(pushOptions);
+
+			r = tn.push(NullProgressMonitor.INSTANCE, commands(false));
+		}
+
+		RemoteRefUpdate one = r.getRemoteUpdate("refs/heads/one");
+		RemoteRefUpdate two = r.getRemoteUpdate("refs/heads/two");
+
+		assertSame(RemoteRefUpdate.Status.REJECTED_OTHER_REASON,
+				one.getStatus());
+		assertSame(RemoteRefUpdate.Status.REJECTED_REMOTE_CHANGED,
+				two.getStatus());
+		assertEquals(new ArrayList<String>(), baseReceivePack.getPushOptions());
+	}
+

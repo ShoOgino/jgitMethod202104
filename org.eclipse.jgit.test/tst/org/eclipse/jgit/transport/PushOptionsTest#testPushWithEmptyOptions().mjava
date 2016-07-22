@@ -1,0 +1,30 @@
+	@Test
+	public void testPushWithEmptyOptions() throws Exception {
+		try (Git local = new Git(db);
+				Git remote = new Git(createBareRepository())) {
+			connectLocalToRemote(local, remote);
+
+			final StoredConfig config2 = remote.getRepository().getConfig();
+			config2.setBoolean("receive", null, "pushoptions", true);
+			config2.save();
+
+			RevCommit commit = addCommit(local);
+
+			local.checkout().setName("not-pushed").setCreateBranch(true).call();
+			local.checkout().setName("branchtopush").setCreateBranch(true).call();
+			assertNull(remote.getRepository().resolve("refs/heads/branchtopush"));
+			assertNull(remote.getRepository().resolve("refs/heads/not-pushed"));
+			assertNull(remote.getRepository().resolve("refs/heads/master"));
+
+			List<String> pushOptions = new ArrayList<>();
+			PushCommand pushCommand = local.push().setRemote("test")
+					.setPushOptions(pushOptions);
+			pushCommand.call();
+
+			assertEquals(commit.getId(),
+					remote.getRepository().resolve("refs/heads/branchtopush"));
+			assertNull(remote.getRepository().resolve("refs/heads/not-pushed"));
+			assertNull(remote.getRepository().resolve("refs/heads/master"));
+		}
+	}
+
