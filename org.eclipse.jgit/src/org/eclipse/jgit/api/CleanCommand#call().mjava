@@ -39,19 +39,13 @@
 
 			for (String file : notIgnoredFiles)
 				if (paths.isEmpty() || paths.contains(file)) {
-					if (!dryRun)
-						FileUtils.delete(new File(repo.getWorkTree(), file));
-					files.add(file);
+					files = cleanPath(file, files);
 				}
 
-			if (directories)
-				for (String dir : notIgnoredDirs)
-					if (paths.isEmpty() || paths.contains(dir)) {
-						if (!dryRun)
-							FileUtils.delete(new File(repo.getWorkTree(), dir),
-									FileUtils.RECURSIVE);
-						files.add(dir + "/"); //$NON-NLS-1$
-					}
+			for (String dir : notIgnoredDirs)
+				if (paths.isEmpty() || paths.contains(dir)) {
+					files = cleanPath(dir, files);
+				}
 		} catch (IOException e) {
 			throw new JGitInternalException(e.getMessage(), e);
 		}
