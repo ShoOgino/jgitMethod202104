@@ -8,7 +8,22 @@
 		LfsRequest request = gson.fromJson(r, LfsRequest.class);
 		String path = req.getPathInfo();
 
-		LargeFileRepository repo = getLargeFileRepository(request, path);
+		LargeFileRepository repo = null;
+		try {
+			repo = getLargeFileRepository(request, path);
+		} catch (LfsValidationError e) {
+			sendError(res, SC_UNPROCESSABLE_ENTITY, e.getMessage());
+			return;
+		} catch (LfsRepositoryNotFound e) {
+			sendError(res, SC_NOT_FOUND, e.getMessage());
+			return;
+		} catch (LfsRepositoryReadOnly e) {
+			sendError(res, SC_FORBIDDEN, e.getMessage());
+			return;
+		} catch (LfsException e) {
+			sendError(res, SC_SERVICE_UNAVAILABLE, e.getMessage());
+			return;
+		}
 		if (repo == null) {
 			res.setStatus(SC_SERVICE_UNAVAILABLE);
 			return;
