@@ -33,7 +33,8 @@
 		if (countingMonitor == null)
 			countingMonitor = NullProgressMonitor.INSTANCE;
 		if (shallowPack && !(walk instanceof DepthWalk.ObjectWalk))
-			walk = new DepthWalk.ObjectWalk(reader, depth);
+			throw new IllegalArgumentException(
+					JGitText.get().shallowPacksRequireDepthWalk);
 		findObjectsToPack(countingMonitor, walk, interestingObjects,
 				uninterestingObjects);
 	}
