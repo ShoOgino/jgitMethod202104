@@ -1,0 +1,21 @@
+	private void setReader(ObjectReader reader, Config cfg, boolean closeReader) {
+		close();
+		this.closeReader = closeReader;
+		this.reader = reader;
+		this.diffCfg = cfg.get(DiffConfig.KEY);
+
+		ContentSource cs = ContentSource.create(reader);
+		source = new ContentSource.Pair(cs, cs);
+
+		if (diffCfg.isNoPrefix()) {
+			setOldPrefix(""); //$NON-NLS-1$
+			setNewPrefix(""); //$NON-NLS-1$
+		}
+		setDetectRenames(diffCfg.isRenameDetectionEnabled());
+
+		diffAlgorithm = DiffAlgorithm.getAlgorithm(cfg.getEnum(
+				ConfigConstants.CONFIG_DIFF_SECTION, null,
+				ConfigConstants.CONFIG_KEY_ALGORITHM,
+				SupportedAlgorithm.HISTOGRAM));
+	}
+

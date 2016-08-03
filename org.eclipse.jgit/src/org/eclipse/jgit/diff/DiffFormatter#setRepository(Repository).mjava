@@ -8,27 +8,6 @@
 	 *            source repository holding referenced objects.
 	 */
 	public void setRepository(Repository repository) {
-		if (reader != null)
-			reader.close();
-
-		db = repository;
-		reader = db.newObjectReader();
-		diffCfg = db.getConfig().get(DiffConfig.KEY);
-
-		ContentSource cs = ContentSource.create(reader);
-		source = new ContentSource.Pair(cs, cs);
-
-		DiffConfig dc = db.getConfig().get(DiffConfig.KEY);
-		if (dc.isNoPrefix()) {
-			setOldPrefix(""); //$NON-NLS-1$
-			setNewPrefix(""); //$NON-NLS-1$
-		}
-		setDetectRenames(dc.isRenameDetectionEnabled());
-
-		diffAlgorithm = DiffAlgorithm.getAlgorithm(db.getConfig().getEnum(
-				ConfigConstants.CONFIG_DIFF_SECTION, null,
-				ConfigConstants.CONFIG_KEY_ALGORITHM,
-				SupportedAlgorithm.HISTOGRAM));
-
+		setReader(repository.newObjectReader(), repository.getConfig(), true);
 	}
 

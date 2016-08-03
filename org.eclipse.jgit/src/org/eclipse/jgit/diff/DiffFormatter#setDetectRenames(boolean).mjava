@@ -11,8 +11,8 @@
 	 */
 	public void setDetectRenames(boolean on) {
 		if (on && renameDetector == null) {
-			assertHaveRepository();
-			renameDetector = new RenameDetector(db);
+			assertHaveReader();
+			renameDetector = new RenameDetector(reader, diffCfg);
 		} else if (!on)
 			renameDetector = null;
 	}
