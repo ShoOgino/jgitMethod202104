@@ -28,7 +28,7 @@
 			@NonNull Set<? extends ObjectId> have) throws IOException {
 		ObjectWalk ow;
 		if (shallowPack)
-			ow = new DepthWalk.ObjectWalk(reader, depth);
+			ow = new DepthWalk.ObjectWalk(reader, depth - 1);
 		else
 			ow = new ObjectWalk(reader);
 		preparePack(countingMonitor, ow, want, have);
