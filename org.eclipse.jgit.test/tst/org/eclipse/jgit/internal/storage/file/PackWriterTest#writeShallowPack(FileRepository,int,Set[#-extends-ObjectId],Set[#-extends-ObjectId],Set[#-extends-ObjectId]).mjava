@@ -1,0 +1,10 @@
+	private static PackIndex writeShallowPack(FileRepository repo, int depth,
+			Set<? extends ObjectId> want, Set<? extends ObjectId> have,
+			Set<? extends ObjectId> shallow) throws IOException {
+		// During negotiation, UploadPack would have set up a DepthWalk and
+		// marked the client's "shallow" commits. Emulate that here.
+		DepthWalk.RevWalk walk = new DepthWalk.RevWalk(repo, depth);
+		walk.assumeShallow(shallow);
+		return writePack(repo, walk, depth, want, have, EMPTY_ID_SET);
+	}
+
