@@ -12,7 +12,9 @@
 							DirCacheIterator.class);
 			if (i != null) {
 				DirCacheEntry ent = i.getDirCacheEntry();
-				if (ent != null && compareMetadata(ent) == MetadataDiff.EQUAL) {
+				if (ent != null && compareMetadata(ent) == MetadataDiff.EQUAL
+						&& ((ent.getFileMode().getBits()
+								& FileMode.TYPE_MASK) != FileMode.TYPE_GITLINK)) {
 					contentIdOffset = i.idOffset();
 					contentIdFromPtr = ptr;
 					return contentId = i.idBuffer();

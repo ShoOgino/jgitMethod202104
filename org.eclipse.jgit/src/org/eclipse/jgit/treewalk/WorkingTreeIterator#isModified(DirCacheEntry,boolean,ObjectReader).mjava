@@ -36,6 +36,9 @@
 			// Lets do a content check
 			return contentCheck(entry, reader);
 		case EQUAL:
+			if (mode == FileMode.SYMLINK.getBits()) {
+				return contentCheck(entry, reader);
+			}
 			return false;
 		case DIFFER_BY_METADATA:
 			if (mode == FileMode.SYMLINK.getBits())
