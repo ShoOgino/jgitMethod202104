@@ -1,0 +1,38 @@
+	/**
+	 * Sets the {@link BranchRebaseMode} to use after fetching.
+	 *
+	 * <dl>
+	 * <dt>BranchRebaseMode.REBASE</dt>
+	 * <dd>Equivalent to {@code --rebase} on the command line: use rebase
+	 * instead of merge after fetching.</dd>
+	 * <dt>BranchRebaseMode.PRESERVE</dt>
+	 * <dd>Equivalent to {@code --preserve-merges} on the command line: rebase
+	 * preserving local merge commits.</dd>
+	 * <dt>BranchRebaseMode.INTERACTIVE</dt>
+	 * <dd>Equivalent to {@code --interactive} on the command line: use
+	 * interactive rebase.</dd>
+	 * <dt>BranchRebaseMode.NONE</dt>
+	 * <dd>Equivalent to {@code --no-rebase}: merge instead of rebasing.
+	 * <dt>{@code null}</dt>
+	 * <dd>Use the setting defined in the git configuration, either {@code
+	 * branch.[name].rebase} or, if not set, {@code pull.rebase}</dd>
+	 * </dl>
+	 *
+	 * This setting overrides the settings in the configuration file. By
+	 * default, the setting in the repository configuration file is used.
+	 * <p>
+	 * A branch can be configured to use rebase by default. See
+	 * {@code branch.[name].rebase}, {@code branch.autosetuprebase}, and
+	 * {@code pull.rebase}.
+	 *
+	 * @param rebaseMode
+	 *            the {@link BranchRebaseMode} to use
+	 * @return {@code this}
+	 * @since 4.5
+	 */
+	public PullCommand setRebase(BranchRebaseMode rebaseMode) {
+		checkCallable();
+		pullRebaseMode = rebaseMode;
+		return this;
+	}
+

@@ -151,12 +151,13 @@
 				Repository.shortenRefName(remoteBranchName), remoteUri);
 
 		PullResult result;
-		if (pullRebaseMode.rebase) {
+		if (pullRebaseMode != BranchRebaseMode.NONE) {
 			RebaseCommand rebase = new RebaseCommand(repo);
 			RebaseResult rebaseRes = rebase.setUpstream(commitToMerge)
 					.setUpstreamName(upstreamName).setProgressMonitor(monitor)
 					.setOperation(Operation.BEGIN).setStrategy(strategy)
-					.setPreserveMerges(pullRebaseMode.preserveMerges)
+					.setPreserveMerges(
+							pullRebaseMode == BranchRebaseMode.PRESERVE)
 					.call();
 			result = new PullResult(fetchRes, remote, rebaseRes);
 		} else {

@@ -1,18 +1,22 @@
 	@Test
 	public void renameBranchMultipleConfigValues() throws Exception {
 		StoredConfig config = git.getRepository().getConfig();
-		config.setBoolean(ConfigConstants.CONFIG_BRANCH_SECTION,
-				Constants.MASTER, ConfigConstants.CONFIG_KEY_REBASE, true);
+		config.setEnum(ConfigConstants.CONFIG_BRANCH_SECTION, Constants.MASTER,
+				ConfigConstants.CONFIG_KEY_REBASE, BranchRebaseMode.REBASE);
 		config.setBoolean(ConfigConstants.CONFIG_BRANCH_SECTION,
 				Constants.MASTER, ConfigConstants.CONFIG_KEY_MERGE, true);
 		config.save();
 
 		String branch = "b1";
 
-		assertTrue(config.getBoolean(ConfigConstants.CONFIG_BRANCH_SECTION,
-				Constants.MASTER, ConfigConstants.CONFIG_KEY_REBASE, true));
-		assertFalse(config.getBoolean(ConfigConstants.CONFIG_BRANCH_SECTION,
-				branch, ConfigConstants.CONFIG_KEY_REBASE, false));
+		assertEquals(BranchRebaseMode.REBASE,
+				config.getEnum(BranchRebaseMode.values(),
+						ConfigConstants.CONFIG_BRANCH_SECTION, Constants.MASTER,
+						ConfigConstants.CONFIG_KEY_REBASE,
+						BranchRebaseMode.NONE));
+		assertNull(config.getEnum(BranchRebaseMode.values(),
+				ConfigConstants.CONFIG_BRANCH_SECTION, branch,
+				ConfigConstants.CONFIG_KEY_REBASE, null));
 		assertTrue(config.getBoolean(ConfigConstants.CONFIG_BRANCH_SECTION,
 				Constants.MASTER, ConfigConstants.CONFIG_KEY_MERGE, true));
 		assertFalse(config.getBoolean(ConfigConstants.CONFIG_BRANCH_SECTION,
@@ -21,10 +25,14 @@
 		assertNotNull(git.branchRename().setNewName(branch).call());
 
 		config = git.getRepository().getConfig();
-		assertFalse(config.getBoolean(ConfigConstants.CONFIG_BRANCH_SECTION,
-				Constants.MASTER, ConfigConstants.CONFIG_KEY_REBASE, false));
-		assertTrue(config.getBoolean(ConfigConstants.CONFIG_BRANCH_SECTION,
-				branch, ConfigConstants.CONFIG_KEY_REBASE, false));
+		assertNull(config.getEnum(BranchRebaseMode.values(),
+				ConfigConstants.CONFIG_BRANCH_SECTION, Constants.MASTER,
+				ConfigConstants.CONFIG_KEY_REBASE, null));
+		assertEquals(BranchRebaseMode.REBASE,
+				config.getEnum(BranchRebaseMode.values(),
+						ConfigConstants.CONFIG_BRANCH_SECTION, branch,
+						ConfigConstants.CONFIG_KEY_REBASE,
+						BranchRebaseMode.NONE));
 		assertFalse(config.getBoolean(ConfigConstants.CONFIG_BRANCH_SECTION,
 				Constants.MASTER, ConfigConstants.CONFIG_KEY_MERGE, false));
 		assertTrue(config.getBoolean(ConfigConstants.CONFIG_BRANCH_SECTION,

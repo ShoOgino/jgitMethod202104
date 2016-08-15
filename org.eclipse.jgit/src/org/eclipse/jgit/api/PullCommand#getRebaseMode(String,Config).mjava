@@ -1,10 +1,26 @@
-	private static PullRebaseMode getRebaseMode(String branchName, Config config) {
-		PullRebaseMode mode = config.getEnum(PullRebaseMode.values(),
-				ConfigConstants.CONFIG_PULL_SECTION, null,
-				ConfigConstants.CONFIG_KEY_REBASE, PullRebaseMode.NO_REBASE);
-		mode = config.getEnum(PullRebaseMode.values(),
+	/**
+	 * Reads the rebase mode to use for a pull command from the repository
+	 * configuration. This is the value defined for the configurations
+	 * {@code branch.[branchName].rebase}, or,if not set, {@code pull.rebase}.
+	 * If neither is set, yields {@link BranchRebaseMode#NONE}.
+	 *
+	 * @param branchName
+	 *            name of the local branch
+	 * @param config
+	 *            the {@link Config} to read the value from
+	 * @return the {@link BranchRebaseMode}
+	 * @since 4.5
+	 */
+	public static BranchRebaseMode getRebaseMode(String branchName,
+			Config config) {
+		BranchRebaseMode mode = config.getEnum(BranchRebaseMode.values(),
 				ConfigConstants.CONFIG_BRANCH_SECTION,
-				branchName, ConfigConstants.CONFIG_KEY_REBASE, mode);
+				branchName, ConfigConstants.CONFIG_KEY_REBASE, null);
+		if (mode == null) {
+			mode = config.getEnum(BranchRebaseMode.values(),
+					ConfigConstants.CONFIG_PULL_SECTION, null,
+					ConfigConstants.CONFIG_KEY_REBASE, BranchRebaseMode.NONE);
+		}
 		return mode;
 	}
 

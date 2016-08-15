@@ -2,8 +2,8 @@
 	public void renameBranchExistingSection() throws Exception {
 		String branch = "b1";
 		StoredConfig config = git.getRepository().getConfig();
-		config.setBoolean(ConfigConstants.CONFIG_BRANCH_SECTION,
-				Constants.MASTER, ConfigConstants.CONFIG_KEY_REBASE, true);
+		config.setEnum(ConfigConstants.CONFIG_BRANCH_SECTION, Constants.MASTER,
+				ConfigConstants.CONFIG_KEY_REBASE, BranchRebaseMode.REBASE);
 		config.setString(ConfigConstants.CONFIG_BRANCH_SECTION,
 				Constants.MASTER, "a", "a");
 		config.setString(ConfigConstants.CONFIG_BRANCH_SECTION, branch, "a",
