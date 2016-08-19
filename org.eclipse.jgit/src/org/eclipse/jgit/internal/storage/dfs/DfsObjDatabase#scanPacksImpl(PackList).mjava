@@ -20,8 +20,10 @@
 			p.close();
 		if (list.isEmpty())
 			return new PackListImpl(NO_PACKS.packs);
-		if (!foundNew)
+		if (!foundNew) {
+			old.clearDirty();
 			return old;
+		}
 		return new PackListImpl(list.toArray(new DfsPackFile[list.size()]));
 	}
 
