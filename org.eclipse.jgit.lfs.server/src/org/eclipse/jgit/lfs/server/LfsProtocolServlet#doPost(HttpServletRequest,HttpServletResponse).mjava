@@ -28,6 +28,10 @@
 			sendError(res, w, SC_NOT_FOUND, e.getMessage());
 		} catch (LfsRepositoryReadOnly e) {
 			sendError(res, w, SC_FORBIDDEN, e.getMessage());
+		} catch (LfsRateLimitExceeded e) {
+			sendError(res, w, SC_RATE_LIMIT_EXCEEDED, e.getMessage());
+		} catch (LfsBandwidthLimitExceeded e) {
+			sendError(res, w, SC_BANDWIDTH_LIMIT_EXCEEDED, e.getMessage());
 		} catch (LfsException e) {
 			sendError(res, w, SC_SERVICE_UNAVAILABLE, e.getMessage());
 		} finally {
