@@ -32,6 +32,8 @@
 			sendError(res, w, SC_RATE_LIMIT_EXCEEDED, e.getMessage());
 		} catch (LfsBandwidthLimitExceeded e) {
 			sendError(res, w, SC_BANDWIDTH_LIMIT_EXCEEDED, e.getMessage());
+		} catch (LfsInsufficientStorage e) {
+			sendError(res, w, SC_INSUFFICIENT_STORAGE, e.getMessage());
 		} catch (LfsException e) {
 			sendError(res, w, SC_SERVICE_UNAVAILABLE, e.getMessage());
 		} finally {
