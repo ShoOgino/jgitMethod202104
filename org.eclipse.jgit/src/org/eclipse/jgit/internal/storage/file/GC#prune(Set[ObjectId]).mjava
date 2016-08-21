@@ -36,7 +36,7 @@
 						String fName = f.getName();
 						if (fName.length() != Constants.OBJECT_ID_STRING_LENGTH - 2)
 							continue;
-						if (f.lastModified() >= expireDate)
+						if (repo.getFS().lastModified(f) >= expireDate)
 							continue;
 						try {
 							ObjectId id = ObjectId.fromString(d + fName);
