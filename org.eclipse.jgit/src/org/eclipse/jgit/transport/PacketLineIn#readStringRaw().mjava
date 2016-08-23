@@ -10,8 +10,10 @@
 	 */
 	public String readStringRaw() throws IOException {
 		int len = readLength();
-		if (len == 0)
+		if (len == 0) {
+			log.debug("git< 0000"); //$NON-NLS-1$
 			return END;
+		}
 
 		len -= 4; // length header (4 bytes)
 
@@ -22,6 +24,9 @@
 			raw = new byte[len];
 
 		IO.readFully(in, raw, 0, len);
-		return RawParseUtils.decode(Constants.CHARSET, raw, 0, len);
+
+		String s = RawParseUtils.decode(Constants.CHARSET, raw, 0, len);
+		log.debug("git< " + s); //$NON-NLS-1$
+		return s;
 	}
 

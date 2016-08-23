@@ -12,12 +12,16 @@
 	 */
 	public String readString() throws IOException {
 		int len = readLength();
-		if (len == 0)
+		if (len == 0) {
+			log.debug("git< 0000"); //$NON-NLS-1$
 			return END;
+		}
 
 		len -= 4; // length header (4 bytes)
-		if (len == 0)
+		if (len == 0) {
+			log.debug("git< "); //$NON-NLS-1$
 			return ""; //$NON-NLS-1$
+		}
 
 		byte[] raw;
 		if (len <= lineBuffer.length)
@@ -28,6 +32,9 @@
 		IO.readFully(in, raw, 0, len);
 		if (raw[len - 1] == '\n')
 			len--;
-		return RawParseUtils.decode(Constants.CHARSET, raw, 0, len);
+
+		String s = RawParseUtils.decode(Constants.CHARSET, raw, 0, len);
+		log.debug("git< " + s); //$NON-NLS-1$
+		return s;
 	}
 
