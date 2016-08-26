@@ -1,0 +1,15 @@
+	@Test
+	public void nonRacingChange() throws Exception {
+		tr.branch("master").update(tr.branch("master").commit().create());
+		tr.branch("other").update(tr.branch("other").commit().create());
+		repo.updateRef("HEAD").link("refs/heads/master");
+
+		// Try to update HEAD.
+		RefUpdate refUpdate = repo.updateRef("HEAD");
+
+		// Proceed a master. This should not affect changing HEAD.
+		tr.branch("master").update(tr.branch("master").commit().create());
+
+		assertEquals(RefUpdate.Result.FORCED, refUpdate.link("refs/heads/other"));
+	}
+

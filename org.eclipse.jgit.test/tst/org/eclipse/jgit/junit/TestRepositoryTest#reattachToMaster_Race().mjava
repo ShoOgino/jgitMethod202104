@@ -1,0 +1,23 @@
+	@Test
+	public void reattachToMaster_Race() throws Exception {
+		RevCommit commit = tr.branch("master").commit().create();
+		tr.branch("master").update(commit);
+		tr.branch("other").update(commit);
+		repo.updateRef("HEAD").link("refs/heads/master");
+
+		// Create a detached HEAD that is not an .
+		tr.reset(commit);
+		Ref head = repo.exactRef("HEAD");
+		assertEquals(commit, head.getObjectId());
+		assertFalse(head.isSymbolic());
+
+		// Try to reattach to master.
+		RefUpdate refUpdate = repo.updateRef("HEAD");
+
+		// Make a change during reattachment.
+		repo.updateRef("HEAD").link("refs/heads/other");
+
+		assertEquals(
+				RefUpdate.Result.LOCK_FAILURE, refUpdate.link("refs/heads/master"));
+	}
+
