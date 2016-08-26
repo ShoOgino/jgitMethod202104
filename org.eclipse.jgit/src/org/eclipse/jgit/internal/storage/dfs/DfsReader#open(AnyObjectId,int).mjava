@@ -5,20 +5,21 @@
 		ObjectLoader ldr;
 		if (last != null) {
 			ldr = last.get(this, objectId);
-			if (ldr != null)
-				return ldr;
+			if (ldr != null) {
+				return checkType(ldr, objectId, typeHint);
+			}
 		}
 
 		PackList packList = db.getPackList();
 		boolean noGarbage = avoidUnreachable;
 		ldr = openImpl(packList, objectId, noGarbage);
 		if (ldr != null) {
-			return ldr;
+			return checkType(ldr, objectId, typeHint);
 		}
 		if (packList.dirty()) {
 			ldr = openImpl(db.scanPacks(packList), objectId, noGarbage);
 			if (ldr != null) {
-				return ldr;
+				return checkType(ldr, objectId, typeHint);
 			}
 		}
 
