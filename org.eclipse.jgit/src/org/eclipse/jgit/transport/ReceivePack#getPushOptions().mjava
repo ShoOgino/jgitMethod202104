@@ -13,16 +13,13 @@
 	 */
 	@Nullable
 	public List<String> getPushOptions() {
-		if (!allowPushOptions) {
+		if (!isAllowPushOptions()) {
 			// Reading push options without a prior setAllowPushOptions(true)
 			// call doesn't make sense.
 			throw new IllegalStateException();
 		}
-		if (enabledCapabilities == null) {
-			// Push options are not available until receive() has been called.
-			throw new RequestNotYetReadException();
-		}
-		if (pushOptions == null) {
+		checkRequestWasRead();
+		if (!usePushOptions) {
 			// The client doesn't support push options. Return null to
 			// distinguish this from the case where the client declared support
 			// for push options and sent an empty list of them.
