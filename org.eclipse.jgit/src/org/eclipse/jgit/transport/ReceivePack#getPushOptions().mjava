@@ -4,11 +4,6 @@
 	 * @return an unmodifiable view of pushOptions, or null (if pushOptions is).
 	 * @throws IllegalStateException
 	 *             if allowPushOptions has not been set to true.
-	 * @throws RequestNotYetReadException
-	 *             if the client's request has not yet been read from the wire,
-	 *             so we do not know if they expect push options. Note that the
-	 *             client may have already written the request, it just has not
-	 *             been read.
 	 * @since 4.5
 	 */
 	@Nullable
@@ -18,7 +13,6 @@
 			// call doesn't make sense.
 			throw new IllegalStateException();
 		}
-		checkRequestWasRead();
 		if (!usePushOptions) {
 			// The client doesn't support push options. Return null to
 			// distinguish this from the case where the client declared support
