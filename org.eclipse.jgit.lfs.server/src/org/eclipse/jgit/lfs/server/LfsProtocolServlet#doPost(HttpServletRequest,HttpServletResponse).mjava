@@ -14,14 +14,12 @@
 		try {
 			repo = getLargeFileRepository(request, path);
 			if (repo == null) {
-				sendError(res, w, SC_SERVICE_UNAVAILABLE,
-						"LFS is not available"); //$NON-NLS-1$
-			} else {
-				res.setStatus(SC_OK);
-				TransferHandler handler = TransferHandler
-						.forOperation(request.operation, repo, request.objects);
-				gson.toJson(handler.process(), w);
+				throw new LfsException("unexpected error"); //$NON-NLS-1$
 			}
+			res.setStatus(SC_OK);
+			TransferHandler handler = TransferHandler
+					.forOperation(request.operation, repo, request.objects);
+			gson.toJson(handler.process(), w);
 		} catch (LfsValidationError e) {
 			sendError(res, w, SC_UNPROCESSABLE_ENTITY, e.getMessage());
 		} catch (LfsRepositoryNotFound e) {
@@ -34,8 +32,10 @@
 			sendError(res, w, SC_BANDWIDTH_LIMIT_EXCEEDED, e.getMessage());
 		} catch (LfsInsufficientStorage e) {
 			sendError(res, w, SC_INSUFFICIENT_STORAGE, e.getMessage());
-		} catch (LfsException e) {
+		} catch (LfsUnavailable e) {
 			sendError(res, w, SC_SERVICE_UNAVAILABLE, e.getMessage());
+		} catch (LfsException e) {
+			sendError(res, w, SC_INTERNAL_SERVER_ERROR, e.getMessage());
 		} finally {
 			w.flush();
 		}
