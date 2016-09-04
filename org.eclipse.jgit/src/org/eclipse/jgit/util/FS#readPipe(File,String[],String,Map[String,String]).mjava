@@ -12,10 +12,14 @@
 	 *            current process
 	 * @return the one-line output of the command or {@code null} if there is
 	 *         none
+	 * @throws CommandFailedException
+	 *             thrown when the command failed (return code was non-zero)
 	 * @since 4.0
 	 */
 	@Nullable
-	protected static String readPipe(File dir, String[] command, String encoding, Map<String, String> env) {
+	protected static String readPipe(File dir, String[] command,
+			String encoding, Map<String, String> env)
+			throws CommandFailedException {
 		final boolean debug = LOG.isDebugEnabled();
 		try {
 			if (debug) {
@@ -51,11 +55,14 @@
 					gobbler.join();
 					if (rc == 0 && !gobbler.fail.get()) {
 						return r;
+					} else {
+						if (debug) {
+							LOG.debug("readpipe rc=" + rc); //$NON-NLS-1$
+						}
+						throw new CommandFailedException(rc,
+								gobbler.errorMessage.get(),
+								gobbler.exception.get());
 					}
-					if (debug) {
-						LOG.debug("readpipe rc=" + rc); //$NON-NLS-1$
-					}
-					break;
 				} catch (InterruptedException ie) {
 					// Stop bothering me, I have a zombie to reap.
 				}

@@ -9,9 +9,12 @@
 	 *            to be used to parse the command's output
 	 * @return the one-line output of the command or {@code null} if there is
 	 *         none
+	 * @throws CommandFailedException
+	 *             thrown when the command failed (return code was non-zero)
 	 */
 	@Nullable
-	protected static String readPipe(File dir, String[] command, String encoding) {
+	protected static String readPipe(File dir, String[] command,
+			String encoding) throws CommandFailedException {
 		return readPipe(dir, command, encoding, null);
 	}
 

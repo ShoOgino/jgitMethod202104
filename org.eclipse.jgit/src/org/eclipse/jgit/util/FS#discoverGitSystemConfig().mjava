@@ -10,10 +10,17 @@
 		}
 
 		// Bug 480782: Check if the discovered git executable is JGit CLI
-		String v = readPipe(gitExe.getParentFile(),
+		String v;
+		try {
+			v = readPipe(gitExe.getParentFile(),
 				new String[] { "git", "--version" }, //$NON-NLS-1$ //$NON-NLS-2$
 				Charset.defaultCharset().name());
-		if (v != null && v.startsWith("jgit")) { //$NON-NLS-1$
+		} catch (CommandFailedException e) {
+			LOG.warn(e.getMessage());
+			return null;
+		}
+		if (StringUtils.isEmptyOrNull(v)
+				|| (v != null && v.startsWith("jgit"))) { //$NON-NLS-1$
 			return null;
 		}
 
@@ -22,9 +29,15 @@
 		Map<String, String> env = new HashMap<>();
 		env.put("GIT_EDITOR", "echo"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		String w = readPipe(gitExe.getParentFile(),
+		String w;
+		try {
+			w = readPipe(gitExe.getParentFile(),
 				new String[] { "git", "config", "--system", "--edit" }, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 				Charset.defaultCharset().name(), env);
+		} catch (CommandFailedException e) {
+			LOG.warn(e.getMessage());
+			return null;
+		}
 		if (StringUtils.isEmptyOrNull(w)) {
 			return null;
 		}

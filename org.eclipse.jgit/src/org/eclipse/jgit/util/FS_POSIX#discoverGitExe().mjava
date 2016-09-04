@@ -9,11 +9,18 @@
 					// On MacOSX, PATH is shorter when Eclipse is launched from the
 					// Finder than from a terminal. Therefore try to launch bash as a
 					// login shell and search using that.
-					String w = readPipe(userHome(),
+					String w;
+					try {
+						w = readPipe(userHome(),
 							new String[]{"bash", "--login", "-c", "which git"}, // //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 							Charset.defaultCharset().name());
-					if (!StringUtils.isEmptyOrNull(w))
+					} catch (CommandFailedException e) {
+						LOG.warn(e.getMessage());
+						return null;
+					}
+					if (!StringUtils.isEmptyOrNull(w)) {
 						gitExe = new File(w);
+					}
 				}
 			}
 		}

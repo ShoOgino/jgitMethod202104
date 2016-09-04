@@ -1,3 +1,4 @@
+		@Override
 		public void run() {
 			StringBuilder err = new StringBuilder();
 			try (InputStream is = p.getErrorStream()) {
@@ -7,14 +8,17 @@
 				}
 			} catch (IOException e) {
 				if (p.exitValue() != 0) {
-					logError(e);
+					setError(e, e.getMessage());
 					fail.set(true);
 				} else {
-					// ignore. git terminated faster and stream was just closed
+					// ignore. command terminated faster and stream was just closed
 				}
 			} finally {
 				if (err.length() > 0) {
-					LOG.error(err.toString());
+					setError(null, err.toString());
+					if (p.exitValue() != 0) {
+						fail.set(true);
+					}
 				}
 			}
 		}
