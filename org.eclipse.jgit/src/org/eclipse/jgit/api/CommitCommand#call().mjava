@@ -35,7 +35,8 @@
 						state.name()));
 
 			if (!noVerify) {
-				Hooks.preCommit(repo, hookOutRedirect).call();
+				Hooks.preCommit(repo, hookOutRedirect.get(PreCommitHook.NAME))
+						.call();
 			}
 
 			processOptions(state, rw);
@@ -74,7 +75,9 @@
 				}
 
 			if (!noVerify) {
-				message = Hooks.commitMsg(repo, hookOutRedirect)
+				message = Hooks
+						.commitMsg(repo,
+								hookOutRedirect.get(CommitMsgHook.NAME))
 						.setCommitMessage(message).call();
 			}
 
@@ -148,6 +151,9 @@
 						repo.writeMergeCommitMsg(null);
 						repo.writeRevertHead(null);
 					}
+					Hooks.postCommit(repo,
+							hookOutRedirect.get(PostCommitHook.NAME)).call();
+
 					return revCommit;
 				}
 				case REJECTED:
