@@ -1,0 +1,20 @@
+	/**
+	 * Similar to {@link #testRevWalkCarryUninteresting_SlowClock()} but the
+	 * last merge commit is created with a inconsistent creationdate. The merge
+	 * commit has a older creationdate then one of the commits he is merging.
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void testRevWalkCarryUninteresting_WrongClock() throws Exception {
+		final RevCommit a = commit();
+		final RevCommit b = commit(a);
+		final RevCommit c = commit(a);
+		final RevCommit d = commit(c);
+		final RevCommit e = commit(-1, b, d);
+
+		markStart(d);
+		markUninteresting(e);
+		assertNull("Found an unexpected commit", rw.next());
+	}
+
