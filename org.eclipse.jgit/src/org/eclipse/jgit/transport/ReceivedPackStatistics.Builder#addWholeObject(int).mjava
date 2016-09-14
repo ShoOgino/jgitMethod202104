@@ -1,0 +1,27 @@
+		/**
+		 * Increment a whole object count.
+		 *
+		 * @param type OBJ_COMMIT, OBJ_TREE, OBJ_BLOB, or OBJ_TAG
+		 * @return this
+		 */
+		public Builder addWholeObject(int type) {
+			switch (type) {
+				case Constants.OBJ_COMMIT:
+					numWholeCommit++;
+					break;
+				case Constants.OBJ_TREE:
+					numWholeTree++;
+					break;
+				case Constants.OBJ_BLOB:
+					numWholeBlob++;
+					break;
+				case Constants.OBJ_TAG:
+					numWholeTag++;
+					break;
+				default:
+					throw new IllegalArgumentException(
+							type + " cannot be a whole object"); //$NON-NLS-1$
+			}
+			return this;
+		}
+

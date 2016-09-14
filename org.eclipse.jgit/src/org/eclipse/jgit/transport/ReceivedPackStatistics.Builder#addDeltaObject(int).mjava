@@ -1,0 +1,28 @@
+		/**
+		 * Increment a delta object count.
+		 *
+		 * @param type OBJ_COMMIT, OBJ_TREE, OBJ_BLOB, or OBJ_TAG
+		 * @return this
+		 */
+		public Builder addDeltaObject(int type) {
+			switch (type) {
+				case Constants.OBJ_COMMIT:
+					numDeltaCommit++;
+					break;
+				case Constants.OBJ_TREE:
+					numDeltaTree++;
+					break;
+				case Constants.OBJ_BLOB:
+					numDeltaBlob++;
+					break;
+				case Constants.OBJ_TAG:
+					numDeltaTag++;
+					break;
+				default:
+					throw new IllegalArgumentException(
+							"delta should be a delta to a whole object. " + //$NON-NLS-1$
+							type + " cannot be a whole object"); //$NON-NLS-1$
+			}
+			return this;
+		}
+
