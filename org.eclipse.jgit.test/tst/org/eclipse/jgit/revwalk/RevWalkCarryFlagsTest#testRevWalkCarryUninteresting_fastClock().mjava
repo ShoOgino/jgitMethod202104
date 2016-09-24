@@ -1,0 +1,20 @@
+	/**
+	 * Test that the uninteresting flag is carried over correctly. Every commit
+	 * should have the uninteresting flag resulting in a RevWalk returning no
+	 * commit.
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void testRevWalkCarryUninteresting_fastClock() throws Exception {
+		final RevCommit a = commit();
+		final RevCommit b = commit(a);
+		final RevCommit c = commit(a);
+		final RevCommit d = commit(c);
+		final RevCommit e = commit(b, d);
+
+		markStart(d);
+		markUninteresting(e);
+		assertNull("Found an unexpected commit", rw.next());
+	}
+
