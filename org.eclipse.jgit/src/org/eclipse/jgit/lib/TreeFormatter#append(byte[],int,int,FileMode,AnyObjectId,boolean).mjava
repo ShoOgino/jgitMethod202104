@@ -13,9 +13,28 @@
 	 *            mode describing the treatment of {@code id}.
 	 * @param id
 	 *            the ObjectId to store in this entry.
+	 * @param allowEmptyName
+	 *            allow an empty filename (creating a corrupt tree)
+	 * @since 4.6
 	 */
 	public void append(byte[] nameBuf, int namePos, int nameLen, FileMode mode,
-			AnyObjectId id) {
-		append(nameBuf, namePos, nameLen, mode, id, false);
+			AnyObjectId id, boolean allowEmptyName) {
+		if (nameLen == 0 && !allowEmptyName) {
+			throw new IllegalArgumentException(
+					JGitText.get().invalidTreeZeroLengthName);
+		}
+		if (fmtBuf(nameBuf, namePos, nameLen, mode)) {
+			id.copyRawTo(buf, ptr);
+			ptr += OBJECT_ID_LENGTH;
+
+		} else {
+			try {
+				fmtOverflowBuffer(nameBuf, namePos, nameLen, mode);
+				id.copyRawTo(overflowBuffer);
+			} catch (IOException badBuffer) {
+				// This should never occur.
+				throw new RuntimeException(badBuffer);
+			}
+		}
 	}
 
