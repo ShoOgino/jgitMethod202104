@@ -16,7 +16,7 @@
 	public CleanFilter(Repository db, InputStream in, OutputStream out)
 			throws IOException {
 		super(in, out);
-		lfsUtil = new Lfs(FileUtils.toPath(db.getDirectory()).resolve("lfs")); //$NON-NLS-1$
+		lfsUtil = new Lfs(db);
 		Files.createDirectories(lfsUtil.getLfsTmpDir());
 		tmpFile = lfsUtil.createTmpFile();
 		this.aOut = new AtomicObjectOutputStream(tmpFile.toAbsolutePath());

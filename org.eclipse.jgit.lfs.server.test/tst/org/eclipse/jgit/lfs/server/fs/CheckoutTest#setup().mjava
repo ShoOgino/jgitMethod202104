@@ -1,0 +1,29 @@
+	@Override
+	@Before
+	public void setup() throws Exception {
+		super.setup();
+
+		SmudgeFilter.register();
+		CleanFilter.register();
+
+		Path tmp = Files.createTempDirectory("jgit_test_");
+		Repository db = FileRepositoryBuilder
+				.create(tmp.resolve(".git").toFile());
+		db.create();
+		StoredConfig cfg = db.getConfig();
+		cfg.setString("filter", "lfs", "usejgitbuiltin", "true");
+		cfg.setString("lfs", null, "url", server.getURI().toString() + "/lfs");
+		cfg.save();
+
+		tdb = new TestRepository<>(db);
+		tdb.branch("test").commit()
+				.add(".gitattributes",
+						"*.bin filter=lfs diff=lfs merge=lfs -text ")
+				.add("a.bin",
+						"version https://git-lfs.github.com/spec/v1\noid sha256:8bb0cf6eb9b17d0f7d22b456f121257dc1254e1f01665370476383ea776df414\nsize 7\n")
+				.create();
+		git = Git.wrap(db);
+		tdb.branch("test2").commit().add(".gitattributes",
+				"*.bin filter=lfs diff=lfs merge=lfs -text ").create();
+	}
+

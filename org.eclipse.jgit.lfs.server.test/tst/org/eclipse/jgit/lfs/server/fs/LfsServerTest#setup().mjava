@@ -7,6 +7,26 @@
 		this.repository = new FileLfsRepository(null, dir);
 		servlet = new FileLfsServlet(repository, timeout);
 		app.addServlet(new ServletHolder(servlet), "/objects/*");
+
+		LfsProtocolServlet protocol = new LfsProtocolServlet() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			protected LargeFileRepository getLargeFileRepository(
+					LfsRequest request, String path) {
+				return repository;
+			}
+
+			@Override
+			protected LargeFileRepository getLargeFileRepository(
+					LfsRequest request, String path, String auth)
+					throws LfsException {
+				return repository;
+			}
+		};
+		app.addServlet(new ServletHolder(protocol), "/objects/batch");
+
 		server.setUp();
+		this.repository.setUrl(server.getURI() + "/lfs/objects/");
 	}
 

@@ -1,0 +1,30 @@
+	/** {@inheritDoc} */
+	@Override
+	public Void call() throws Exception {
+		StoredConfig cfg = null;
+		if (repository == null) {
+			cfg = loadUserConfig();
+		} else {
+			cfg = repository.getConfig();
+		}
+
+		cfg.setBoolean(ConfigConstants.CONFIG_FILTER_SECTION, Constants.LFS,
+				ConfigConstants.CONFIG_KEY_USEJGITBUILTIN, true);
+		cfg.setBoolean(ConfigConstants.CONFIG_FILTER_SECTION, Constants.LFS,
+				ConfigConstants.CONFIG_KEY_REQUIRED, true);
+
+		cfg.save();
+
+		// try to run git lfs install, we really don't care if it is present
+		// and/or works here (yet).
+		ProcessBuilder builder = FS.DETECTED.runInShell("git", //$NON-NLS-1$
+				repository == null ? ARGS_USER : ARGS_LOCAL);
+		if (repository != null) {
+			builder.directory(repository.isBare() ? repository.getDirectory()
+					: repository.getWorkTree());
+		}
+		FS.DETECTED.runProcess(builder, null, null, (String) null);
+
+		return null;
+	}
+

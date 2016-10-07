@@ -1,0 +1,15 @@
+	private Protocol.Request body(LfsPointer... resources) {
+		Protocol.Request req = new Protocol.Request();
+		req.operation = Protocol.OPERATION_DOWNLOAD;
+		if (resources != null) {
+			req.objects = new LinkedList<>();
+			for (LfsPointer res : resources) {
+				Protocol.ObjectSpec o = new Protocol.ObjectSpec();
+				o.oid = res.getOid().getName();
+				o.size = res.getSize();
+				req.objects.add(o);
+			}
+		}
+		return req;
+	}
+

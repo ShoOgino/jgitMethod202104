@@ -1,0 +1,26 @@
+	@Test
+	public void testKnownContent() throws Exception {
+		putContent(
+				LongObjectId.fromString(
+						"8bb0cf6eb9b17d0f7d22b456f121257dc1254e1f01665370476383ea776df414"),
+				"1234567");
+		git.checkout().setName("test").call();
+		// known content. we will see the actual content of the LFS blob.
+		assertEquals(
+				"1234567",
+				JGitTestUtil.read(git.getRepository(), "a.bin"));
+		assertEquals(
+				"[PUT /lfs/objects/8bb0cf6eb9b17d0f7d22b456f121257dc1254e1f01665370476383ea776df414 200"
+						+ ", POST /lfs/objects/batch 200"
+						+ ", GET /lfs/objects/8bb0cf6eb9b17d0f7d22b456f121257dc1254e1f01665370476383ea776df414 200]",
+				server.getRequests().toString());
+
+		git.checkout().setName("test2").call();
+		assertFalse(JGitTestUtil.check(git.getRepository(), "a.bin"));
+		git.checkout().setName("test").call();
+		// unknown content. We will see the pointer file
+		assertEquals("1234567",
+				JGitTestUtil.read(git.getRepository(), "a.bin"));
+		assertEquals(3, server.getRequests().size());
+	}
+

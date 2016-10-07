@@ -12,13 +12,15 @@
 	public SmudgeFilter(Repository db, InputStream in, OutputStream out)
 			throws IOException {
 		super(in, out);
-		lfs = new Lfs(FileUtils.toPath(db.getDirectory()).resolve(Constants.LFS));
+		lfs = new Lfs(db);
 		LfsPointer res = LfsPointer.parseLfsPointer(in);
 		if (res != null) {
-			Path mediaFile = lfs.getMediaFile(res.getOid());
-			if (Files.exists(mediaFile)) {
-				this.in = Files.newInputStream(mediaFile);
+			AnyLongObjectId oid = res.getOid();
+			Path mediaFile = lfs.getMediaFile(oid);
+			if (!Files.exists(mediaFile)) {
+				downloadLfsResource(db, res);
 			}
+			this.in = Files.newInputStream(mediaFile);
 		}
 	}
 
