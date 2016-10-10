@@ -1,0 +1,32 @@
+	@Test
+	public void testNonDeletableFilesOnWindows()
+			throws GitAPIException, IOException {
+		// Only on windows a FileInputStream blocks us from deleting a file
+		org.junit.Assume.assumeTrue(SystemReader.getInstance().isWindows());
+		writeTrashFile("toBeModified.txt", "a");
+		writeTrashFile("toBeDeleted.txt", "a");
+		git.add().addFilepattern(".").call();
+		RevCommit addFiles = git.commit().setMessage("add more files").call();
+
+		git.rm().setCached(false).addFilepattern("Test.txt")
+				.addFilepattern("toBeDeleted.txt").call();
+		writeTrashFile("toBeModified.txt", "b");
+		writeTrashFile("toBeCreated.txt", "a");
+		git.add().addFilepattern(".").call();
+		RevCommit crudCommit = git.commit().setMessage("delete, modify, add")
+				.call();
+		git.checkout().setName(addFiles.getName()).call();
+		try ( FileInputStream fis=new FileInputStream(new File(db.getWorkTree(), "Test.txt")) ) {
+			CheckoutCommand coCommand = git.checkout();
+			coCommand.setName(crudCommit.getName()).call();
+			CheckoutResult result = coCommand.getResult();
+			assertEquals(Status.NONDELETED, result.getStatus());
+			assertEquals("[Test.txt, toBeDeleted.txt]",
+					result.getRemovedList().toString());
+			assertEquals("[toBeCreated.txt, toBeModified.txt]",
+					result.getModifiedList().toString());
+			assertEquals("[Test.txt]", result.getUndeletedList().toString());
+			assertTrue(result.getConflictList().isEmpty());
+		}
+	}
+

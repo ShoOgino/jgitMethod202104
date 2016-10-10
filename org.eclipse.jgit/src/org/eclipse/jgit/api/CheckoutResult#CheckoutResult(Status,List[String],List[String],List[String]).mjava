@@ -10,8 +10,24 @@
 	 * @param fileList
 	 *            the list of files to store, status has to be either
 	 *            {@link Status#CONFLICTS} or {@link Status#NONDELETED}.
+	 * @param modified
+	 *            the modified files
+	 * @param removed
+	 *            the removed files.
 	 */
-	CheckoutResult(Status status, List<String> fileList) {
-		this(status, fileList, null, null);
+	CheckoutResult(Status status, List<String> fileList, List<String> modified,
+			List<String> removed) {
+		myStatus = status;
+		if (status == Status.CONFLICTS)
+			this.conflictList = fileList;
+		else
+			this.conflictList = new ArrayList<String>(0);
+		if (status == Status.NONDELETED)
+			this.undeletedList = fileList;
+		else
+			this.undeletedList = new ArrayList<String>(0);
+
+		this.modifiedList = modified;
+		this.removedList = removed;
 	}
 
