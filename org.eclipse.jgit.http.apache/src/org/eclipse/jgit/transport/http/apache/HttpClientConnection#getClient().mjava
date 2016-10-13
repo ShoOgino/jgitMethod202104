@@ -24,7 +24,9 @@
 				clientBuilder.setSSLSocketFactory(sslConnectionFactory);
 				Registry<ConnectionSocketFactory> registry = RegistryBuilder
 						.<ConnectionSocketFactory> create()
-						.register("https", sslConnectionFactory).build();
+						.register("https", sslConnectionFactory)
+						.register("http", PlainConnectionSocketFactory.INSTANCE)
+						.build();
 				clientBuilder.setConnectionManager(
 						new BasicHttpClientConnectionManager(registry));
 			}
