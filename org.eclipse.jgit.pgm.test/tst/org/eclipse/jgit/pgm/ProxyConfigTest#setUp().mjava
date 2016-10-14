@@ -1,0 +1,15 @@
+	@Before
+	public void setUp() {
+		String separator = System.getProperty("file.separator");
+		String classpath = System.getProperty("java.class.path");
+		String path = System.getProperty("java.home") + separator + "bin"
+				+ separator + "java";
+		processBuilder = new ProcessBuilder(path, "-cp", classpath,
+				ProxyPropertiesDumper.class.getName());
+		environment = processBuilder.environment();
+		environment.remove("http_proxy");
+		environment.remove("https_proxy");
+		environment.remove("HTTP_PROXY");
+		environment.remove("HTTPS_PROXY");
+	}
+
