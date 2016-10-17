@@ -1,0 +1,18 @@
+	@Test
+	public void testDontOverwriteHttp()
+			throws IOException, InterruptedException {
+		environment.put("http_proxy", "http://xx:1234");
+		environment.put("HTTP_PROXY", "http://XX:1234");
+		environment.put("https_proxy", "http://yy:1234");
+		environment.put("HTTPS_PROXY", "http://YY:1234");
+		List<String> command = processBuilder.command();
+		command.add(1, "-Dhttp.proxyHost=gondola");
+		command.add(2, "-Dhttp.proxyPort=5678");
+		command.add("dontClearProperties");
+		Process start = processBuilder.start();
+		start.waitFor();
+		assertEquals(
+				"http.proxyHost: gondola, http.proxyPort: 5678, https.proxyHost: yy, https.proxyPort: 1234",
+				getOutput(start));
+	}
+

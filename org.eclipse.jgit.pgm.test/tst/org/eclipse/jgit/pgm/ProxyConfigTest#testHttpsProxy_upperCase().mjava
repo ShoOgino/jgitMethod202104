@@ -1,0 +1,10 @@
+	@Test
+	public void testHttpsProxy_upperCase() throws Exception {
+		environment.put("HTTPS_PROXY", "http://XX:1234");
+		Process start = processBuilder.start();
+		start.waitFor();
+		assertEquals(
+				"http.proxyHost: null, http.proxyPort: null, https.proxyHost: XX, https.proxyPort: 1234",
+				getOutput(start));
+	}
+

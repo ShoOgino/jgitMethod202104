@@ -1,0 +1,21 @@
+	public static void main(String args[]) {
+		try {
+			if (args.length == 0 || !args[0].equals("dontClearProperties")) {
+				System.clearProperty("http.proxyHost");
+				System.clearProperty("http.proxyPort");
+				System.clearProperty("https.proxyHost");
+				System.clearProperty("https.proxyPort");
+			}
+			Main.configureHttpProxy();
+			System.out.printf(
+					"http.proxyHost: %s, http.proxyPort: %s, https.proxyHost: %s, https.proxyPort: %s",
+					System.getProperty("http.proxyHost"),
+					System.getProperty("http.proxyPort"),
+					System.getProperty("https.proxyHost"),
+					System.getProperty("https.proxyPort"));
+			System.out.flush();
+		} catch (MalformedURLException e) {
+			System.out.println("exception: " + e);
+		}
+	}
+
