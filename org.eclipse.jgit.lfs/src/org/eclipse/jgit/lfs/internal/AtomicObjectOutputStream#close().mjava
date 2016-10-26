@@ -2,7 +2,11 @@
 	public void close() throws IOException {
 		out.close();
 		if (!aborted) {
-			verifyHash();
+			if (id != null) {
+				verifyHash();
+			} else {
+				id = LongObjectId.fromRaw(out.getMessageDigest().digest());
+			}
 			locked.commit();
 		}
 	}
