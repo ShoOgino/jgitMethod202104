@@ -21,7 +21,8 @@
 					}
 				} else {
 					FileUtils.mkdirs(mediaFile.getParent().toFile(), true);
-					FileUtils.rename(tmpFile.toFile(), mediaFile.toFile());
+					FileUtils.rename(tmpFile.toFile(), mediaFile.toFile(),
+							StandardCopyOption.ATOMIC_MOVE);
 				}
 				LfsPointer lfsPointer = new LfsPointer(loid, size);
 				lfsPointer.encode(out);
