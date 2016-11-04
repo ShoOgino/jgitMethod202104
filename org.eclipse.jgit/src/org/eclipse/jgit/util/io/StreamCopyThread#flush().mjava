@@ -7,6 +7,8 @@
 	 */
 	public void flush() {
 		flushCount.incrementAndGet();
-		interrupt();
+		synchronized (writeLock) {
+			interrupt();
+		}
 	}
 
