@@ -1,0 +1,11 @@
+	@Test
+	public void testTooManyLooseObjects() throws Exception {
+		FileBasedConfig c = repo.getConfig();
+		c.setInt(ConfigConstants.CONFIG_GC_SECTION, null,
+				ConfigConstants.CONFIG_KEY_AUTO, 255);
+		c.save();
+		commitChain(10, 50);
+		assertTrue("should find too many loose objects",
+				gc.tooManyLooseObjects());
+	}
+

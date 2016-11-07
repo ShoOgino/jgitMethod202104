@@ -1,0 +1,11 @@
+	@Test
+	public void testTooManyPacks() throws Exception {
+		FileBasedConfig c = repo.getConfig();
+		c.setInt(ConfigConstants.CONFIG_GC_SECTION, null,
+				ConfigConstants.CONFIG_KEY_AUTOPACKLIMIT, 1);
+		c.save();
+		SampleDataRepositoryTestCase.copyCGitTestPacks(repo);
+
+		assertTrue("should find too many packs", gc.tooManyPacks());
+	}
+

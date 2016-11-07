@@ -4,7 +4,7 @@
 	 *
 	 * @return {@code true} if number of loose objects > gc.auto (default 6700)
 	 */
-	private boolean tooManyLooseObjects() {
+	boolean tooManyLooseObjects() {
 		int auto = repo.getConfig().getInt(ConfigConstants.CONFIG_GC_SECTION,
 				ConfigConstants.CONFIG_KEY_AUTO, DEFAULT_AUTOLIMIT);
 		if (auto <= 0) {
@@ -25,9 +25,9 @@
 								.matches();
 					}
 				})) {
-			Iterator<Path> iter = stream.iterator();
-			while (iter.hasNext()) {
-				if (n++ > threshold) {
+			for (Iterator<Path> iter = stream.iterator(); iter.hasNext();
+					iter.next()) {
+				if (++n > threshold) {
 					return true;
 				}
 			}
