@@ -1,16 +1,12 @@
-	@SuppressWarnings("resource")
 	private Repository openRepository(final Key location,
 			final boolean mustExist) throws IOException {
-		Reference<Repository> ref = cacheMap.get(location);
-		Repository db = ref != null ? ref.get() : null;
+		Repository db = cacheMap.get(location);
 		if (db == null) {
 			synchronized (lockFor(location)) {
-				ref = cacheMap.get(location);
-				db = ref != null ? ref.get() : null;
+				db = cacheMap.get(location);
 				if (db == null) {
 					db = location.open(mustExist);
-					ref = new SoftReference<Repository>(db);
-					cacheMap.put(location, ref);
+					cacheMap.put(location, db);
 				} else {
 					db.incrementOpen();
 				}
