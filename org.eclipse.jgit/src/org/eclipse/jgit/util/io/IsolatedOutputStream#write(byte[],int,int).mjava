@@ -1,0 +1,13 @@
+	@Override
+	public void write(final byte[] buf, final int pos, final int cnt)
+			throws IOException {
+		checkClosed();
+		execute(new Callable<Void>() {
+			@Override
+			public Void call() throws IOException {
+				dst.write(buf, pos, cnt);
+				return null;
+			}
+		});
+	}
+

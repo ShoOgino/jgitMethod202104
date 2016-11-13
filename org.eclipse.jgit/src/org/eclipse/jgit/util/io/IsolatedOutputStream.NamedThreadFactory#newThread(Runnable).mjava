@@ -1,0 +1,7 @@
+		@Override
+		public Thread newThread(Runnable r) {
+			int n = cnt.incrementAndGet();
+			String name = IsolatedOutputStream.class.getSimpleName() + '-' + n;
+			return new Thread(r, name);
+		}
+

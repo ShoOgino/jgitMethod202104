@@ -1,0 +1,10 @@
+	private static void checkedGet(Future<Void> future) throws IOException {
+		try {
+			future.get();
+		} catch (InterruptedException e) {
+			throw interrupted(e);
+		} catch (ExecutionException e) {
+			throw new IOException(e.getCause());
+		}
+	}
+

@@ -1,0 +1,15 @@
+	@Override
+	public void close() throws IOException {
+		if (!copier.isShutdown()) {
+			try {
+				if (pending == null || tryCleanClose()) {
+					cleanClose();
+				} else {
+					dirtyClose();
+				}
+			} finally {
+				copier.shutdown();
+			}
+		}
+	}
+

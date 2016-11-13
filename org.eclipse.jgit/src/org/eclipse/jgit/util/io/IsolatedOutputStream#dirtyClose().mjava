@@ -1,0 +1,30 @@
+	private void dirtyClose() throws IOException {
+		/*
+		 * Interrupt any still pending write or flush operation. This may cause
+		 * massive failures inside of the stream, but its going to be closed as
+		 * the next step.
+		 */
+		pending.cancel(true);
+
+		Future<Void> close;
+		try {
+			close = copier.submit(new Callable<Void>() {
+				@Override
+				public Void call() throws IOException {
+					dst.close();
+					return null;
+				}
+			});
+		} catch (RejectedExecutionException e) {
+			throw new IOException(e);
+		}
+		try {
+			close.get(200, TimeUnit.MILLISECONDS);
+		} catch (InterruptedException | TimeoutException e) {
+			close.cancel(true);
+			throw new IOException(e);
+		} catch (ExecutionException e) {
+			throw new IOException(e.getCause());
+		}
+	}
+
