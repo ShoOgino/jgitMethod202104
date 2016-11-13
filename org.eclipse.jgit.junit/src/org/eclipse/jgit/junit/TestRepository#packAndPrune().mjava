@@ -22,14 +22,14 @@
 
 				pack = nameFor(odb, name, ".pack");
 				try (OutputStream out =
-						new SafeBufferedOutputStream(new FileOutputStream(pack))) {
+						new BufferedOutputStream(new FileOutputStream(pack))) {
 					pw.writePack(m, m, out);
 				}
 				pack.setReadOnly();
 
 				idx = nameFor(odb, name, ".idx");
 				try (OutputStream out =
-						new SafeBufferedOutputStream(new FileOutputStream(idx))) {
+						new BufferedOutputStream(new FileOutputStream(idx))) {
 					pw.writeIndex(out);
 				}
 				idx.setReadOnly();

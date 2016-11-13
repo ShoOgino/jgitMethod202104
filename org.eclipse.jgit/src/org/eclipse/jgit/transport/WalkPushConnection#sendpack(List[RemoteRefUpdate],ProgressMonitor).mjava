@@ -45,21 +45,15 @@
 			// Write the pack file, then the index, as readers look the
 			// other direction (index, then pack file).
 			//
-			final String wt = "Put " + base.substring(0, 12); //$NON-NLS-1$
-			OutputStream os = dest.writeFile(pathPack, monitor, wt + "..pack"); //$NON-NLS-1$
-			try {
-				os = new SafeBufferedOutputStream(os);
+			String wt = "Put " + base.substring(0, 12); //$NON-NLS-1$
+			try (OutputStream os = new BufferedOutputStream(
+					dest.writeFile(pathPack, monitor, wt + "..pack"))) { //$NON-NLS-1$
 				writer.writePack(monitor, monitor, os);
-			} finally {
-				os.close();
 			}
 
-			os = dest.writeFile(pathIdx, monitor, wt + "..idx"); //$NON-NLS-1$
-			try {
-				os = new SafeBufferedOutputStream(os);
+			try (OutputStream os = new BufferedOutputStream(
+					dest.writeFile(pathIdx, monitor, wt + "..idx"))) { //$NON-NLS-1$
 				writer.writeIndex(os);
-			} finally {
-				os.close();
 			}
 
 			// Record the pack at the start of the pack info list. This

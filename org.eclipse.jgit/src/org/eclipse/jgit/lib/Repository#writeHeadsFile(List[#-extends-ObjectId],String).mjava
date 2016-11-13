@@ -12,15 +12,12 @@
 			throws FileNotFoundException, IOException {
 		File headsFile = new File(getDirectory(), filename);
 		if (heads != null) {
-			BufferedOutputStream bos = new SafeBufferedOutputStream(
-					new FileOutputStream(headsFile));
-			try {
+			try (OutputStream bos = new BufferedOutputStream(
+					new FileOutputStream(headsFile))) {
 				for (ObjectId id : heads) {
 					id.copyTo(bos);
 					bos.write('\n');
 				}
-			} finally {
-				bos.close();
 			}
 		} else {
 			FileUtils.delete(headsFile, FileUtils.SKIP_MISSING);

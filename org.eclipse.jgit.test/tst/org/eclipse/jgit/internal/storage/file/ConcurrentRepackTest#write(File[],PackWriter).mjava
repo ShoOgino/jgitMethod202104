@@ -2,20 +2,15 @@
 			throws IOException {
 		final long begin = files[0].getParentFile().lastModified();
 		NullProgressMonitor m = NullProgressMonitor.INSTANCE;
-		OutputStream out;
 
-		out = new SafeBufferedOutputStream(new FileOutputStream(files[0]));
-		try {
+		try (OutputStream out = new BufferedOutputStream(
+				new FileOutputStream(files[0]))) {
 			pw.writePack(m, m, out);
-		} finally {
-			out.close();
 		}
 
-		out = new SafeBufferedOutputStream(new FileOutputStream(files[1]));
-		try {
+		try (OutputStream out = new BufferedOutputStream(
+				new FileOutputStream(files[1]))) {
 			pw.writeIndex(out);
-		} finally {
-			out.close();
 		}
 
 		touch(begin, files[0].getParentFile());

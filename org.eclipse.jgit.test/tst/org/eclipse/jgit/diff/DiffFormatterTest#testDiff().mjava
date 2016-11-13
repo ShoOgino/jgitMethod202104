@@ -6,7 +6,7 @@
 		write(new File(folder, "folder.txt"), "folder");
 		try (Git git = new Git(db);
 				ByteArrayOutputStream os = new ByteArrayOutputStream();
-				DiffFormatter dfmt = new DiffFormatter(new SafeBufferedOutputStream(os))) {
+				DiffFormatter dfmt = new DiffFormatter(new BufferedOutputStream(os))) {
 			git.add().addFilepattern(".").call();
 			git.commit().setMessage("Initial commit").call();
 			write(new File(folder, "folder.txt"), "folder change");
