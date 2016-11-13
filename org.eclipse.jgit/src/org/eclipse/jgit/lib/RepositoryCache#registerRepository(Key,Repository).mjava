@@ -1,7 +1,5 @@
 	private void registerRepository(final Key location, final Repository db) {
-		SoftReference<Repository> newRef = new SoftReference<Repository>(db);
-		Reference<Repository> oldRef = cacheMap.put(location, newRef);
-		Repository oldDb = oldRef != null ? oldRef.get() : null;
+		Repository oldDb = cacheMap.put(location, db);
 		if (oldDb != null)
 			oldDb.close();
 	}

@@ -1,6 +1,5 @@
 	private void clearAllExpired() {
-		for (Reference<Repository> ref : cacheMap.values()) {
-			Repository db = ref.get();
+		for (Repository db : cacheMap.values()) {
 			if (isExpired(db)) {
 				RepositoryCache.close(db);
 			}
