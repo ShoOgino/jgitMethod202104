@@ -1,0 +1,12 @@
+	/**
+	 * Wraps an OutputStream.
+	 *
+	 * @param out
+	 *            stream to send all writes to.
+	 */
+	public IsolatedOutputStream(OutputStream out) {
+		dst = out;
+		copier = new ThreadPoolExecutor(1, 1, 0, TimeUnit.MILLISECONDS,
+				new ArrayBlockingQueue<Runnable>(1), new NamedThreadFactory());
+	}
+

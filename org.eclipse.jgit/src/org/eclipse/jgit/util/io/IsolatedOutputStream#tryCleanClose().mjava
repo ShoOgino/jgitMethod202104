@@ -1,0 +1,18 @@
+	private boolean tryCleanClose() {
+		/*
+		 * If the caller stopped waiting for a prior write or flush, they could
+		 * be trying to close a stream that is still in-use. Check if the prior
+		 * operation ended in a predictable way.
+		 */
+		try {
+			pending.get(0, TimeUnit.MILLISECONDS);
+			pending = null;
+			return true;
+		} catch (TimeoutException | InterruptedException e) {
+			return false;
+		} catch (ExecutionException e) {
+			pending = null;
+			return true;
+		}
+	}
+

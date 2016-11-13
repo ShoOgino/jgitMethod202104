@@ -1,0 +1,14 @@
+	private void execute(Callable<Void> task) throws IOException {
+		if (pending != null) {
+			// Check (and rethrow) any prior failed operation.
+			checkedGet(pending);
+		}
+		try {
+			pending = copier.submit(task);
+		} catch (RejectedExecutionException e) {
+			throw new IOException(e);
+		}
+		checkedGet(pending);
+		pending = null;
+	}
+
