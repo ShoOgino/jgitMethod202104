@@ -1,7 +1,7 @@
 		@Override
 		OutputStream encrypt(final OutputStream os) throws IOException {
 			try {
-				final Cipher cipher = Cipher.getInstance(cryptoAlg);
+				final Cipher cipher = InsecureCipherFactory.create(cryptoAlg);
 				cipher.init(Cipher.ENCRYPT_MODE, secretKey, paramSpec);
 				return new CipherOutputStream(os, cipher);
 			} catch (GeneralSecurityException e) {
