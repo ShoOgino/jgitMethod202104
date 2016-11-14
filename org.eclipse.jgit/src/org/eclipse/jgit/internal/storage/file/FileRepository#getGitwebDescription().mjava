@@ -1,0 +1,18 @@
+	@Override
+	@Nullable
+	public String getGitwebDescription() throws IOException {
+		String d;
+		try {
+			d = RawParseUtils.decode(IO.readFully(descriptionFile()));
+		} catch (FileNotFoundException err) {
+			return null;
+		}
+		if (d != null) {
+			d = d.trim();
+			if (d.isEmpty() || UNNAMED.equals(d)) {
+				return null;
+			}
+		}
+		return d;
+	}
+

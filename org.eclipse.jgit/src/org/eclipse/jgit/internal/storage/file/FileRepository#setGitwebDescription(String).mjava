@@ -1,0 +1,31 @@
+	@Override
+	public void setGitwebDescription(@Nullable String description)
+			throws IOException {
+		String old = getGitwebDescription();
+		if (Objects.equals(old, description)) {
+			return;
+		}
+
+		File path = descriptionFile();
+		LockFile lock = new LockFile(path);
+		if (!lock.lock()) {
+			throw new IOException(MessageFormat.format(JGitText.get().lockError,
+					path.getAbsolutePath()));
+		}
+		try {
+			String d = description;
+			if (d != null) {
+				d = d.trim();
+				if (!d.isEmpty()) {
+					d += '\n';
+				}
+			} else {
+				d = ""; //$NON-NLS-1$
+			}
+			lock.write(Constants.encode(d));
+			lock.commit();
+		} finally {
+			lock.unlock();
+		}
+	}
+
