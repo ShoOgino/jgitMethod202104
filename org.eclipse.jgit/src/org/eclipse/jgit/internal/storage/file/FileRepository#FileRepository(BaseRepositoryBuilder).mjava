@@ -16,10 +16,12 @@
 					getFS());
 		else
 			systemConfig = new FileBasedConfig(null, FS.DETECTED) {
+				@Override
 				public void load() {
 					// empty, do not load
 				}
 
+				@Override
 				public boolean isOutdated() {
 					// regular class would bomb here
 					return false;
@@ -36,6 +38,7 @@
 		loadRepoConfig();
 
 		repoConfig.addChangeListener(new ConfigChangedListener() {
+			@Override
 			public void onConfigChanged(ConfigChangedEvent event) {
 				fireEvent(event);
 			}
