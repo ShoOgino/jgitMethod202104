@@ -1,11 +1,18 @@
 	private void addSubmodule(String url, String path, String revision,
-			List<CopyFile> copyfiles, Set<String> groups, String recommendShallow)
+			List<CopyFile> copyfiles, List<LinkFile> linkfiles,
+			Set<String> groups, String recommendShallow)
 			throws GitAPIException, IOException {
 		if (repo.isBare()) {
 			RepoProject proj = new RepoProject(url, path, revision, null, groups, recommendShallow);
 			proj.addCopyFiles(copyfiles);
+			proj.addLinkFiles(linkfiles);
 			bareProjects.add(proj);
 		} else {
+			if (!linkfiles.isEmpty()) {
+				throw new UnsupportedOperationException(
+						JGitText.get().nonBareLinkFilesNotSupported);
+			}
+
 			SubmoduleAddCommand add = git
 				.submoduleAdd()
 				.setPath(path)

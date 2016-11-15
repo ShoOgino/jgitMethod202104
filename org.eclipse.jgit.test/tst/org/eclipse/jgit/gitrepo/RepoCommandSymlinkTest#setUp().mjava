@@ -1,0 +1,21 @@
+	@Override
+	public void setUp() throws Exception {
+		super.setUp();
+
+		defaultDb = createWorkRepository();
+		try (Git git = new Git(defaultDb)) {
+			JGitTestUtil.writeTrashFile(defaultDb, "hello.txt", "hello world");
+			git.add().addFilepattern("hello.txt").call();
+			git.commit().setMessage("Initial commit").call();
+			addRepoToClose(defaultDb);
+		}
+
+		defaultUri = defaultDb.getDirectory().toURI().toString();
+		int root = defaultUri.lastIndexOf("/",
+				defaultUri.lastIndexOf("/.git") - 1)
+				+ 1;
+		rootUri = defaultUri.substring(0, root)
+				+ "manifest";
+		defaultUri = defaultUri.substring(root);
+	}
+

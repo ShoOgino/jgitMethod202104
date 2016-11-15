@@ -1,0 +1,19 @@
+	private void removeNestedCopyAndLinkfiles() {
+		for (RepoProject proj : filteredProjects) {
+			List<CopyFile> copyfiles = new ArrayList<>(proj.getCopyFiles());
+			proj.clearCopyFiles();
+			for (CopyFile copyfile : copyfiles) {
+				if (!isNestedReferencefile(copyfile)) {
+					proj.addCopyFile(copyfile);
+				}
+			}
+			List<LinkFile> linkfiles = new ArrayList<>(proj.getLinkFiles());
+			proj.clearLinkFiles();
+			for (LinkFile linkfile : linkfiles) {
+				if (!isNestedReferencefile(linkfile)) {
+					proj.addLinkFile(linkfile);
+				}
+			}
+		}
+	}
+

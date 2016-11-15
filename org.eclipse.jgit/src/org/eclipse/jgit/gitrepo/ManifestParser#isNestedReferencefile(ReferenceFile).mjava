@@ -1,0 +1,18 @@
+	private boolean isNestedReferencefile(ReferenceFile referencefile) {
+		if (referencefile.dest.indexOf('/') == -1) {
+			// If the referencefile is at root level then it won't be nested.
+			return false;
+		}
+		for (RepoProject proj : filteredProjects) {
+			if (proj.getPath().compareTo(referencefile.dest) > 0) {
+				// Early return as remaining projects can't be ancestor of this
+				// referencefile config (filteredProjects is sorted).
+				return false;
+			}
+			if (proj.isAncestorOf(referencefile.dest)) {
+				return true;
+			}
+		}
+		return false;
+	}
+

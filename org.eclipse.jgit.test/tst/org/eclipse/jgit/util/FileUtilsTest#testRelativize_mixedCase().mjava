@@ -7,13 +7,13 @@
 		String expectedCaseSensitive = toOSPathString("..\\..\\Git\\test\\d\\f.txt");
 
 		if (systemReader.isWindows()) {
-			String actual = FileUtils.relativize(base, other);
+			String actual = FileUtils.relativizeNativePath(base, other);
 			assertEquals(expectedCaseInsensitive, actual);
 		} else if (systemReader.isMacOS()) {
-			String actual = FileUtils.relativize(base, other);
+			String actual = FileUtils.relativizeNativePath(base, other);
 			assertEquals(expectedCaseInsensitive, actual);
 		} else {
-			String actual = FileUtils.relativize(base, other);
+			String actual = FileUtils.relativizeNativePath(base, other);
 			assertEquals(expectedCaseSensitive, actual);
 		}
 	}
