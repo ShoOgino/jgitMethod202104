@@ -2,9 +2,11 @@
 	void start() throws IOException {
 		ObjectId id;
 		try (Repository git = leader.openRepository();
+				ProposedTimestamp ts = getSystem().getClock().propose();
 				ObjectInserter inserter = git.newObjectInserter()) {
-			id = bumpTerm(git, inserter);
+			id = bumpTerm(git, ts, inserter);
 			inserter.flush();
+			blockUntil(ts);
 		}
 		runAsync(id);
 	}

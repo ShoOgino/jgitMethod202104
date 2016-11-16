@@ -1,0 +1,11 @@
+	private static long nowMicros() {
+		long now = MILLISECONDS.toMicros(System.currentTimeMillis());
+		for (;;) {
+			long o = before.get();
+			long n = Math.max(o + 1, now);
+			if (before.compareAndSet(o, n)) {
+				return n;
+			}
+		}
+	}
+

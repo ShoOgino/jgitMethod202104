@@ -1,0 +1,15 @@
+	/**
+	 * Advance the time returned by future calls to {@link #propose()}.
+	 *
+	 * @param add
+	 *            amount of time to add; must be {@code > 0}.
+	 * @param unit
+	 *            unit of {@code add}.
+	 */
+	public void tick(long add, TimeUnit unit) {
+		if (add <= 0) {
+			throw new IllegalArgumentException();
+		}
+		now += unit.toMillis(add);
+	}
+

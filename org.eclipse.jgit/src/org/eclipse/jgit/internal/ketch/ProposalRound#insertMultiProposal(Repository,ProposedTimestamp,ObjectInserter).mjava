@@ -1,4 +1,4 @@
-	private ObjectId insertMultiProposal(Repository git,
+	private ObjectId insertMultiProposal(Repository git, ProposedTimestamp ts,
 			ObjectInserter inserter) throws IOException, NoOp {
 		// The tree was not passed in, or there are multiple proposals
 		// each needing their own commit. Reset the tree and replay each
@@ -17,7 +17,7 @@
 			}
 		}
 
-		PersonIdent committer = leader.getSystem().newCommitter();
+		PersonIdent committer = leader.getSystem().newCommitter(ts);
 		for (Proposal p : todo) {
 			if (!tree.apply(p.getCommands())) {
 				// This should not occur, previously during queuing the

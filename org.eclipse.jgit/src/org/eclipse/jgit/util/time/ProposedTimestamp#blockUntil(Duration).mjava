@@ -1,0 +1,19 @@
+	/**
+	 * Wait for this proposed timestamp to be certainly in the recent past.
+	 * <p>
+	 * This method forces the caller to wait up to {@code timeout} for
+	 * {@code this} to pass sufficiently into the past such that the creating
+	 * {@link MonotonicClock} instance will not create an earlier timestamp.
+	 *
+	 * @param maxWait
+	 *            how long the implementation may block the caller.
+	 * @throws InterruptedException
+	 *             current thread was interrupted before the waiting process
+	 *             completed normally.
+	 * @throws TimeoutException
+	 *             the timeout was reached without the proposed timestamp
+	 *             becoming certainly in the past.
+	 */
+	public abstract void blockUntil(Duration maxWait)
+			throws InterruptedException, TimeoutException;
+

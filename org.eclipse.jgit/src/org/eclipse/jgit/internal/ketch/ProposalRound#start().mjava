@@ -4,8 +4,10 @@
 		}
 		try {
 			ObjectId id;
-			try (Repository git = leader.openRepository()) {
-				id = insertProposals(git);
+			try (Repository git = leader.openRepository();
+					ProposedTimestamp ts = getSystem().getClock().propose()) {
+				id = insertProposals(git, ts);
+				blockUntil(ts);
 			}
 			runAsync(id);
 		} catch (NoOp e) {

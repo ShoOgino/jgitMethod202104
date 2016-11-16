@@ -1,0 +1,27 @@
+	/**
+	 * Wait for timestamps to be in the past, aborting commands on timeout.
+	 *
+	 * @param maxWait
+	 *            maximum amount of time to wait for timestamps to resolve.
+	 * @return true if timestamps were successfully waited for; false if
+	 *         commands were aborted.
+	 * @since 4.6
+	 */
+	protected boolean blockUntilTimestamps(Duration maxWait) {
+		if (timestamps == null) {
+			return true;
+		}
+		try {
+			ProposedTimestamp.blockUntil(timestamps, maxWait);
+			return true;
+		} catch (TimeoutException | InterruptedException e) {
+			String msg = JGitText.get().timeIsUncertain;
+			for (ReceiveCommand c : commands) {
+				if (c.getResult() == NOT_ATTEMPTED) {
+					c.setResult(REJECTED_OTHER_REASON, msg);
+				}
+			}
+			return false;
+		}
+	}
+

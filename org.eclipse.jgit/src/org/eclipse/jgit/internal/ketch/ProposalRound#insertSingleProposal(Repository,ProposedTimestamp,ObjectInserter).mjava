@@ -1,4 +1,4 @@
-	private ObjectId insertSingleProposal(Repository git,
+	private ObjectId insertSingleProposal(Repository git, ProposedTimestamp ts,
 			ObjectInserter inserter) throws IOException, NoOp {
 		// Fast path: tree is passed in with all proposals applied.
 		ObjectId treeId = queuedTree.writeTree(inserter);
@@ -20,7 +20,7 @@
 		if (!ObjectId.zeroId().equals(acceptedOldIndex)) {
 			b.setParentId(acceptedOldIndex);
 		}
-		b.setCommitter(leader.getSystem().newCommitter());
+		b.setCommitter(leader.getSystem().newCommitter(ts));
 		b.setAuthor(p.getAuthor() != null ? p.getAuthor() : b.getCommitter());
 		b.setMessage(message(p));
 		return inserter.insert(b);

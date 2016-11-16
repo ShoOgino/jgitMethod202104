@@ -1,13 +1,13 @@
-	private ObjectId insertProposals(Repository git)
+	private ObjectId insertProposals(Repository git, ProposedTimestamp ts)
 			throws IOException, NoOp {
 		ObjectId id;
 		try (ObjectInserter inserter = git.newObjectInserter()) {
 			// TODO(sop) Process signed push certificates.
 
 			if (queuedTree != null) {
-				id = insertSingleProposal(git, inserter);
+				id = insertSingleProposal(git, ts, inserter);
 			} else {
-				id = insertMultiProposal(git, inserter);
+				id = insertMultiProposal(git, ts, inserter);
 			}
 
 			stageCommands = makeStageList(git, inserter);

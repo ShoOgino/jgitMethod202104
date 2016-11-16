@@ -1,0 +1,23 @@
+	/**
+	 * Obtain a timestamp close to "now".
+	 * <p>
+	 * Proposed times are close to "now", but may not yet be certainly in the
+	 * past. This allows the calling thread to interleave other useful work
+	 * while waiting for the clock instance to create an assurance it will never
+	 * in the future propose a time earlier than the returned time.
+	 * <p>
+	 * A hypothetical implementation could read the local system clock (managed
+	 * by NTP) and return that proposal, concurrently sending network messages
+	 * to closely collaborating peers in the same cluster to also ensure their
+	 * system clocks are ahead of this time. In such an implementation the
+	 * {@link ProposedTimestamp#blockUntil(Duration)} method would wait for
+	 * replies from the peers indicating their own system clocks have moved past
+	 * the proposed time.
+	 *
+	 * @return "now". The value can be immediately accessed by
+	 *         {@link ProposedTimestamp#read(TimeUnit)} and friends, but the
+	 *         caller must use {@link ProposedTimestamp#blockUntil(Duration)} to
+	 *         ensure ordering holds.
+	 */
+	ProposedTimestamp propose();
+

@@ -3,9 +3,11 @@
 		getSystem().getExecutor().execute(new Runnable() {
 			@Override
 			public void run() {
-				try (Repository git = getLeader().openRepository()) {
+				MonotonicClock clk = getSystem().getClock();
+				try (Repository git = getLeader().openRepository();
+						ProposedTimestamp ts = clk.propose()) {
 					try {
-						update(git, req);
+						update(git, req, ts);
 						req.done(git);
 					} catch (Throwable err) {
 						req.setException(git, err);

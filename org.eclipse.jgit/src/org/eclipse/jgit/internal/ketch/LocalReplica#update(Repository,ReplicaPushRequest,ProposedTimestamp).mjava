@@ -1,5 +1,5 @@
-	private void update(Repository git, ReplicaPushRequest req)
-			throws IOException {
+	private void update(Repository git, ReplicaPushRequest req,
+			ProposedTimestamp ts) throws IOException {
 		RefDatabase refdb = git.getRefDatabase();
 		CommitMethod method = getCommitMethod();
 
@@ -15,7 +15,8 @@
 		}
 
 		BatchRefUpdate batch = refdb.newBatchUpdate();
-		batch.setRefLogIdent(getSystem().newCommitter());
+		batch.addProposedTimestamp(ts);
+		batch.setRefLogIdent(getSystem().newCommitter(ts));
 		batch.setRefLogMessage("ketch", false); //$NON-NLS-1$
 		batch.setAllowNonFastForwards(true);
 

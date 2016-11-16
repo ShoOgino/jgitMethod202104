@@ -1,0 +1,16 @@
+	@Override
+	public ProposedTimestamp propose() {
+		long t = now++;
+		return new ProposedTimestamp() {
+			@Override
+			public long read(TimeUnit unit) {
+				return unit.convert(t, TimeUnit.MILLISECONDS);
+			}
+
+			@Override
+			public void blockUntil(Duration maxWait) {
+				// Nothing to do, since fake time does not go backwards.
+			}
+		};
+	}
+

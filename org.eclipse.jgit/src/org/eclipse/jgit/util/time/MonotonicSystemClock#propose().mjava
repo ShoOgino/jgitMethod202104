@@ -1,0 +1,16 @@
+	@Override
+	public ProposedTimestamp propose() {
+		final long u = nowMicros();
+		return new ProposedTimestamp() {
+			@Override
+			public long read(TimeUnit unit) {
+				return unit.convert(u, MICROSECONDS);
+			}
+
+			@Override
+			public void blockUntil(Duration maxWait) {
+				// Assume system clock never goes backwards.
+			}
+		};
+	}
+

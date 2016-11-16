@@ -1,0 +1,37 @@
+	/**
+	 * Wait for several timestamps.
+	 *
+	 * @param times
+	 *            timestamps to wait on.
+	 * @param maxWait
+	 *            how long to wait for the timestamps.
+	 * @throws InterruptedException
+	 *             current thread was interrupted before the waiting process
+	 *             completed normally.
+	 * @throws TimeoutException
+	 *             the timeout was reached without the proposed timestamp become
+	 *             certainly in the past.
+	 */
+	public static void blockUntil(Iterable<ProposedTimestamp> times,
+			Duration maxWait) throws TimeoutException, InterruptedException {
+		Iterator<ProposedTimestamp> itr = times.iterator();
+		if (!itr.hasNext()) {
+			return;
+		}
+
+		long now = System.currentTimeMillis();
+		long deadline = now + maxWait.toMillis();
+		for (;;) {
+			long w = deadline - now;
+			if (w < 0) {
+				throw new TimeoutException();
+			}
+			itr.next().blockUntil(Duration.ofMillis(w));
+			if (itr.hasNext()) {
+				now = System.currentTimeMillis();
+			} else {
+				break;
+			}
+		}
+	}
+
