@@ -1,7 +1,7 @@
 	final InputStream openInputStream(HttpConnection conn)
 			throws IOException {
 		InputStream input = conn.getInputStream();
-		if (ENCODING_GZIP.equals(conn.getHeaderField(HDR_CONTENT_ENCODING)))
+		if (isGzipContent(conn))
 			input = new GZIPInputStream(input);
 		return input;
 	}
