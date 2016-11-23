@@ -1,25 +1,5 @@
 		@Override
 		FileStream open(final String path) throws IOException {
-			final URL base = httpObjectsUrl;
-			final URL u = new URL(base, path);
-			final HttpConnection c = httpOpen(u);
-			switch (HttpSupport.response(c)) {
-			case HttpConnection.HTTP_OK:
-				final InputStream in = openInputStream(c);
-				// If content is being gzipped and then transferred, the content
-				// length in the header is the zipped content length, not the
-				// actual content length.
-				if (!isGzipContent(c)) {
-					final int len = c.getContentLength();
-					return new FileStream(in, len);
-				}
-				return new FileStream(in);
-			case HttpConnection.HTTP_NOT_FOUND:
-				throw new FileNotFoundException(u.toString());
-			default:
-				throw new IOException(u.toString() + ": " //$NON-NLS-1$
-						+ HttpSupport.response(c) + " " //$NON-NLS-1$
-						+ c.getResponseMessage());
-			}
+			return open(path, AcceptEncoding.UNSPECIFIED);
 		}
 

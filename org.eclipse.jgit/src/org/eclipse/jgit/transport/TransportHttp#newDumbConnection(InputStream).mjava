@@ -9,12 +9,15 @@
 			br.close();
 		}
 
-		if (!refs.containsKey(Constants.HEAD)) {
+		if (!refs.containsKey(HEAD)) {
 			// If HEAD was not published in the info/refs file (it usually
 			// is not there) download HEAD by itself as a loose file and do
 			// the resolution by hand.
 			//
-			HttpConnection conn = httpOpen(new URL(baseUrl, Constants.HEAD));
+			HttpConnection conn = httpOpen(
+					METHOD_GET,
+					new URL(baseUrl, HEAD),
+					AcceptEncoding.GZIP);
 			int status = HttpSupport.response(conn);
 			switch (status) {
 			case HttpConnection.HTTP_OK: {
@@ -26,11 +29,11 @@
 						Ref r = refs.get(target);
 						if (r == null)
 							r = new ObjectIdRef.Unpeeled(Ref.Storage.NEW, target, null);
-						r = new SymbolicRef(Constants.HEAD, r);
+						r = new SymbolicRef(HEAD, r);
 						refs.put(r.getName(), r);
 					} else if (line != null && ObjectId.isId(line)) {
 						Ref r = new ObjectIdRef.Unpeeled(Ref.Storage.NETWORK,
-								Constants.HEAD, ObjectId.fromString(line));
+								HEAD, ObjectId.fromString(line));
 						refs.put(r.getName(), r);
 					}
 				} finally {

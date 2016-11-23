@@ -1,0 +1,8 @@
+		@Override
+		BufferedReader openReader(String path) throws IOException {
+			// Line oriented readable content is likely to compress well.
+			// Request gzip encoding.
+			InputStream is = open(path, AcceptEncoding.GZIP).in;
+			return new BufferedReader(new InputStreamReader(is, Constants.CHARSET));
+		}
+
