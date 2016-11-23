@@ -1,4 +1,4 @@
-	void init(final AbstractRevQueue p) {
+	void init(final AbstractRevQueue p) throws IOException {
 		try {
 			for (;;) {
 				final RevCommit c = p.next();
@@ -6,17 +6,25 @@
 					break;
 				add(c);
 			}
-		} finally {
-			// Always free the flags immediately. This ensures the flags
-			// will be available for reuse when the walk resets.
-			//
-			walker.freeFlag(branchMask);
-
 			// Setup the condition used by carryOntoOne to detect a late
 			// merge base and produce it on the next round.
 			//
 			recarryTest = branchMask | POPPED;
 			recarryMask = branchMask | POPPED | MERGE_BASE;
+			mergeBaseAncestor = walker.allocFlag();
+
+			for (;;) {
+				RevCommit c = _next();
+				if (c == null) {
+					break;
+				}
+				ret.add(c);
+			}
+		} finally {
+			// Always free the flags immediately. This ensures the flags
+			// will be available for reuse when the walk resets.
+			//
+			walker.freeFlag(branchMask | mergeBaseAncestor);
 		}
 	}
 
