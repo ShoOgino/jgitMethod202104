@@ -40,7 +40,11 @@
 		clone.setURI(resolvedUri);
 		if (monitor != null)
 			clone.setProgressMonitor(monitor);
-		Repository subRepo = clone.call().getRepository();
+		Repository subRepo = null;
+		try (Git git = clone.call()) {
+			subRepo = git.getRepository();
+			subRepo.incrementOpen();
+		}
 
 		// Save submodule URL to parent repository's config
 		StoredConfig config = repo.getConfig();
