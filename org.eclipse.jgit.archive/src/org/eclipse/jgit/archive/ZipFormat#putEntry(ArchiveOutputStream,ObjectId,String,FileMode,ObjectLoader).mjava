@@ -1,0 +1,44 @@
+	/**
+	 * @since 4.7
+	 */
+	@Override
+	public void putEntry(ArchiveOutputStream out,
+			ObjectId tree, String path, FileMode mode, ObjectLoader loader)
+			throws IOException {
+		// ZipArchiveEntry detects directories by checking
+		// for '/' at the end of the filename.
+		if (path.endsWith("/") && mode != FileMode.TREE) //$NON-NLS-1$
+			throw new IllegalArgumentException(MessageFormat.format(
+					ArchiveText.get().pathDoesNotMatchMode, path, mode));
+		if (!path.endsWith("/") && mode == FileMode.TREE) //$NON-NLS-1$
+			path = path + "/"; //$NON-NLS-1$
+
+		final ZipArchiveEntry entry = new ZipArchiveEntry(path);
+
+		if(tree instanceof RevCommit){
+			long commitTime = ((RevCommit) tree).getCommitTime();
+			entry.setTime(commitTime);
+		}
+
+		if (mode == FileMode.TREE) {
+			out.putArchiveEntry(entry);
+			out.closeArchiveEntry();
+			return;
+		}
+
+		if (mode == FileMode.REGULAR_FILE) {
+			// ok
+		} else if (mode == FileMode.EXECUTABLE_FILE
+				|| mode == FileMode.SYMLINK) {
+			entry.setUnixMode(mode.getBits());
+		} else {
+			// Unsupported mode (e.g., GITLINK).
+			throw new IllegalArgumentException(MessageFormat.format(
+					ArchiveText.get().unsupportedMode, mode));
+		}
+		entry.setSize(loader.getSize());
+		out.putArchiveEntry(entry);
+		loader.copyTo(out);
+		out.closeArchiveEntry();
+	}
+
