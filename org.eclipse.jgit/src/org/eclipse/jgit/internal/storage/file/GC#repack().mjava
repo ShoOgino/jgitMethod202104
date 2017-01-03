@@ -29,7 +29,7 @@
 			nonHeads.addAll(listRefLogObjects(ref, 0));
 			if (ref.isSymbolic() || ref.getObjectId() == null)
 				continue;
-			if (ref.getName().startsWith(Constants.R_HEADS))
+			if (isHead(ref) || isTag(ref))
 				allHeads.add(ref.getObjectId());
 			else if (RefTreeNames.isRefTree(refdb, ref.getName()))
 				txnHeads.add(ref.getObjectId());
