@@ -17,7 +17,7 @@
 			for (PackExt ext : extensions)
 				if (PackExt.PACK.equals(ext)) {
 					File f = nameFor(packName, "." + ext.getExtension()); //$NON-NLS-1$
-					FileUtils.delete(f, deleteOptions);
+					removeOldPack(f, packName, ext, deleteOptions);
 					break;
 				}
 			// The .pack file has been deleted. Delete as many as the other
@@ -26,7 +26,7 @@
 			for (PackExt ext : extensions) {
 				if (!PackExt.PACK.equals(ext)) {
 					File f = nameFor(packName, "." + ext.getExtension()); //$NON-NLS-1$
-					FileUtils.delete(f, deleteOptions);
+					removeOldPack(f, packName, ext, deleteOptions);
 				}
 			}
 		} catch (IOException e) {

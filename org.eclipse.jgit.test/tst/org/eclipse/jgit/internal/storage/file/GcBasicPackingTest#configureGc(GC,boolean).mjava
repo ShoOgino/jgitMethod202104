@@ -1,4 +1,4 @@
-	private void configureGc(GC myGc, boolean aggressive) {
+	private PackConfig configureGc(GC myGc, boolean aggressive) {
 		PackConfig pconfig = new PackConfig(repo);
 		if (aggressive) {
 			pconfig.setDeltaSearchWindowSize(250);
@@ -7,5 +7,6 @@
 		} else
 			pconfig = new PackConfig(repo);
 		myGc.setPackConfig(pconfig);
+		return pconfig;
 	}
 

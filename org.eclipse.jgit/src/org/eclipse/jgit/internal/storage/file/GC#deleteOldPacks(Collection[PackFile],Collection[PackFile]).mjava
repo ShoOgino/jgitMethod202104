@@ -1,9 +1,10 @@
 	/**
 	 * Delete old pack files. What is 'old' is defined by specifying a set of
 	 * old pack files and a set of new pack files. Each pack file contained in
-	 * old pack files but not contained in new pack files will be deleted. If an
-	 * expirationDate is set then pack files which are younger than the
-	 * expirationDate will not be deleted.
+	 * old pack files but not contained in new pack files will be deleted. If
+	 * preserveOldPacks is set, keep a copy of the pack file in the preserve
+	 * directory. If an expirationDate is set then pack files which are younger
+	 * than the expirationDate will not be deleted nor preserved.
 	 *
 	 * @param oldPacks
 	 * @param newPacks
@@ -12,6 +13,7 @@
 	 */
 	private void deleteOldPacks(Collection<PackFile> oldPacks,
 			Collection<PackFile> newPacks) throws ParseException, IOException {
+		prunePreserved();
 		long packExpireDate = getPackExpireDate();
 		oldPackLoop: for (PackFile oldPack : oldPacks) {
 			String oldName = oldPack.getPackName();
@@ -28,7 +30,7 @@
 				prunePack(oldName);
 			}
 		}
-		// close the complete object database. Thats my only chance to force
+		// close the complete object database. That's my only chance to force
 		// rescanning and to detect that certain pack files are now deleted.
 		repo.getObjectDatabase().close();
 	}

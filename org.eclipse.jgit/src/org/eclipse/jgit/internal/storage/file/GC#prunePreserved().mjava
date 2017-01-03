@@ -1,0 +1,14 @@
+	/**
+	 * Delete the preserved directory including all pack files within
+	 */
+	private void prunePreserved() {
+		if (pconfig != null && pconfig.isPrunePreserved()) {
+			try {
+				FileUtils.delete(repo.getObjectDatabase().getPreservedDirectory(),
+						FileUtils.RECURSIVE | FileUtils.RETRY | FileUtils.SKIP_MISSING);
+			} catch (IOException e) {
+				// Deletion of the preserved pack files failed. Silently return.
+			}
+		}
+	}
+

@@ -2,6 +2,8 @@
 	protected void run() throws Exception {
 		Git git = Git.wrap(db);
 		git.gc().setAggressive(aggressive)
+				.setPreserveOldPacks(preserveOldPacks)
+				.setPrunePreserved(prunePreserved)
 				.setProgressMonitor(new TextProgressMonitor(errw)).call();
 	}
 

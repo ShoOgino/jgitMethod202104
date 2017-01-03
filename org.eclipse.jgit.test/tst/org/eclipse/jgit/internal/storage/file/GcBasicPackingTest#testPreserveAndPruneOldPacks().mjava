@@ -1,0 +1,9 @@
+	@Test
+	public void testPreserveAndPruneOldPacks() throws Exception {
+		testPreserveOldPacks();
+		configureGc(gc, false).setPrunePreserved(true);
+		gc.gc();
+
+		assertFalse(repo.getObjectDatabase().getPreservedDirectory().exists());
+	}
+

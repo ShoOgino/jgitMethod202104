@@ -1,0 +1,24 @@
+	/**
+	 * Deletes old pack file, unless 'preserve-oldpacks' is set, in which case it
+	 * moves the pack file to the preserved directory
+	 *
+	 * @param packFile
+	 * @param packName
+	 * @param ext
+	 * @param deleteOptions
+	 * @throws IOException
+	 */
+	private void removeOldPack(File packFile, String packName, PackExt ext,
+			int deleteOptions) throws IOException {
+		if (pconfig != null && pconfig.isPreserveOldPacks()) {
+			File oldPackDir = repo.getObjectDatabase().getPreservedDirectory();
+			FileUtils.mkdir(oldPackDir, true);
+
+			String oldPackName = "pack-" + packName + ".old-" + ext.getExtension();  //$NON-NLS-1$ //$NON-NLS-2$
+			File oldPackFile = new File(oldPackDir, oldPackName);
+			FileUtils.rename(packFile, oldPackFile);
+		} else {
+			FileUtils.delete(packFile, deleteOptions);
+		}
+	}
+
