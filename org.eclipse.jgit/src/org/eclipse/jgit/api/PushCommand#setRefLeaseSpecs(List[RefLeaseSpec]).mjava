@@ -1,0 +1,17 @@
+	/**
+	 * The ref lease specs to be used in the push operation,
+	 * for a force-with-lease push operation.
+	 *
+	 * @param specs
+	 * @return {@code this}
+	 * @since 4.7
+	 */
+	public PushCommand setRefLeaseSpecs(List<RefLeaseSpec> specs) {
+		checkCallable();
+		this.refLeaseSpecs.clear();
+		for (RefLeaseSpec spec : specs) {
+			refLeaseSpecs.put(spec.getRef(), spec);
+		}
+		return this;
+	}
+
