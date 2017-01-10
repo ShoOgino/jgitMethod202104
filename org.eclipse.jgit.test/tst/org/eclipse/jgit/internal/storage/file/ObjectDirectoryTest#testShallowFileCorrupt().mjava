@@ -1,0 +1,18 @@
+	@Test
+	public void testShallowFileCorrupt()
+			throws Exception {
+		FileRepository repository = createBareRepository();
+		ObjectDirectory dir = repository.getObjectDatabase();
+
+		String commit = "X3148f9410b071edd4a4c85d2a43d1fa2574b0d2";
+		try (PrintWriter writer = new PrintWriter(
+				new File(repository.getDirectory(), Constants.SHALLOW))) {
+			writer.println(commit);
+		}
+
+		expectedEx.expect(IOException.class);
+		expectedEx.expectMessage(MessageFormat
+				.format(JGitText.get().badShallowLine, commit));
+		dir.getShallowCommits();
+	}
+
