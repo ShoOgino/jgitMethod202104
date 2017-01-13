@@ -14,7 +14,10 @@
 		try {
 			repo = getLargeFileRepository(request, path);
 			if (repo == null) {
-				throw new LfsException("unexpected error"); //$NON-NLS-1$
+				String error = MessageFormat
+						.format(LfsText.get().lfsFailedToGetRepository, path);
+				LOG.error(error);
+				throw new LfsException(error);
 			}
 			res.setStatus(SC_OK);
 			TransferHandler handler = TransferHandler
