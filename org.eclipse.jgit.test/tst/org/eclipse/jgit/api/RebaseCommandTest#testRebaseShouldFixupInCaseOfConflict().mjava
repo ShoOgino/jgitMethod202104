@@ -26,6 +26,7 @@
 		RebaseResult result = git.rebase().setUpstream("HEAD~3")
 				.runInteractively(new InteractiveHandler() {
 
+					@Override
 					public void prepareSteps(List<RebaseTodoLine> steps) {
 						try {
 							steps.get(0).setAction(Action.PICK);
@@ -36,6 +37,7 @@
 						}
 					}
 
+					@Override
 					public String modifyCommitMessage(String commit) {
 						return commit;
 					}
@@ -44,6 +46,7 @@
 		git.add().addFilepattern(FILE1).call();
 		result = git.rebase().runInteractively(new InteractiveHandler() {
 
+			@Override
 			public void prepareSteps(List<RebaseTodoLine> steps) {
 				try {
 					steps.get(0).setAction(Action.PICK);
@@ -54,6 +57,7 @@
 				}
 			}
 
+			@Override
 			public String modifyCommitMessage(String commit) {
 				return "commit";
 			}

@@ -20,6 +20,7 @@
 		RebaseResult result = git.rebase().setUpstream("HEAD~2")
 				.runInteractively(new InteractiveHandler() {
 
+					@Override
 					public void prepareSteps(List<RebaseTodoLine> steps) {
 						steps.remove(0);
 						try {
@@ -29,6 +30,7 @@
 						}
 					}
 
+					@Override
 					public String modifyCommitMessage(String commit) {
 						return "rewritten commit message";
 					}
@@ -37,6 +39,7 @@
 		git.add().addFilepattern(FILE1).call();
 		result = git.rebase().runInteractively(new InteractiveHandler() {
 
+			@Override
 			public void prepareSteps(List<RebaseTodoLine> steps) {
 				steps.remove(0);
 				try {
@@ -46,6 +49,7 @@
 				}
 			}
 
+			@Override
 			public String modifyCommitMessage(String commit) {
 				return "rewritten commit message";
 			}

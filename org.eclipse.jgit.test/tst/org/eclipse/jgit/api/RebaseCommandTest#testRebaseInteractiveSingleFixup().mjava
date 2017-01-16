@@ -24,6 +24,7 @@
 		git.rebase().setUpstream("HEAD~3")
 				.runInteractively(new InteractiveHandler() {
 
+					@Override
 					public void prepareSteps(List<RebaseTodoLine> steps) {
 						try {
 							steps.get(1).setAction(Action.FIXUP);
@@ -32,6 +33,7 @@
 						}
 					}
 
+					@Override
 					public String modifyCommitMessage(String commit) {
 						fail("No callback to modify commit message expected for single fixup");
 						return commit;

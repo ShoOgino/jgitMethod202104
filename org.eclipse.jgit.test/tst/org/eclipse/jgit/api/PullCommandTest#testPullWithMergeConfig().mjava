@@ -2,6 +2,7 @@
 	/** the branch local config should win over the global config */
 	public void testPullWithMergeConfig() throws Exception {
 		Callable<PullResult> setup = new Callable<PullResult>() {
+			@Override
 			public PullResult call() throws Exception {
 				StoredConfig config = dbTarget.getConfig();
 				config.setString("pull", null, "rebase", "true");

@@ -35,6 +35,7 @@
 			if (reportStatus) {
 				if (echoCommandFailures && msgOut != null) {
 					sendStatusReport(false, unpackError, new Reporter() {
+						@Override
 						void sendString(final String s) throws IOException {
 							msgOut.write(Constants.encode(s + "\n")); //$NON-NLS-1$
 						}
@@ -47,6 +48,7 @@
 					}
 				}
 				sendStatusReport(true, unpackError, new Reporter() {
+					@Override
 					void sendString(final String s) throws IOException {
 						pckOut.writeString(s + "\n"); //$NON-NLS-1$
 					}
@@ -54,6 +56,7 @@
 				pckOut.end();
 			} else if (msgOut != null) {
 				sendStatusReport(false, unpackError, new Reporter() {
+					@Override
 					void sendString(final String s) throws IOException {
 						msgOut.write(Constants.encode(s + "\n")); //$NON-NLS-1$
 					}

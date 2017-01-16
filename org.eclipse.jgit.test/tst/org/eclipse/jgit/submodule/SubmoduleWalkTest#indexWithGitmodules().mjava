@@ -20,6 +20,7 @@
 		DirCacheEditor editor = cache.editor();
 		editor.add(new PathEdit(path) {
 
+			@Override
 			public void apply(DirCacheEntry ent) {
 				ent.setFileMode(FileMode.GITLINK);
 				ent.setObjectId(subId);
@@ -27,6 +28,7 @@
 		});
 		editor.add(new PathEdit(DOT_GIT_MODULES) {
 
+			@Override
 			public void apply(DirCacheEntry ent) {
 				ent.setFileMode(FileMode.REGULAR_FILE);
 				ent.setObjectId(gitmodulesBlob);

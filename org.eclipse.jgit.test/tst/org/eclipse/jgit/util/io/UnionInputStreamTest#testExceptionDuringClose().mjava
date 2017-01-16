@@ -2,6 +2,7 @@
 	public void testExceptionDuringClose() {
 		final UnionInputStream u = new UnionInputStream();
 		u.add(new ByteArrayInputStream(new byte[] { 1 }) {
+			@Override
 			public void close() throws IOException {
 				throw new IOException("I AM A TEST");
 			}

@@ -11,6 +11,7 @@
 				private int type;
 				private IntIterator cached = dynamic;
 
+				@Override
 				public boolean hasNext() {
 					if (!cached.hasNext()) {
 						if (commits.hasNext()) {
@@ -32,6 +33,7 @@
 					return true;
 				}
 
+				@Override
 				public BitmapObject next() {
 					if (!hasNext())
 						throw new NoSuchElementException();
@@ -49,6 +51,7 @@
 					return out;
 				}
 
+				@Override
 				public void remove() {
 					throw new UnsupportedOperationException();
 				}

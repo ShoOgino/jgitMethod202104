@@ -1,3 +1,4 @@
+	@Override
 	public Iterator<Entry> iterator() {
 		if (oldPackIndex == null)
 			return Collections.<Entry> emptyList().iterator();
@@ -6,6 +7,7 @@
 		return new Iterator<Entry>() {
 			private Entry entry;
 
+			@Override
 			public boolean hasNext() {
 				while (entry == null && it.hasNext()) {
 					StoredBitmap sb = it.next();
@@ -15,6 +17,7 @@
 				return entry != null;
 			}
 
+			@Override
 			public Entry next() {
 				if (!hasNext())
 					throw new NoSuchElementException();
@@ -24,6 +27,7 @@
 				return res;
 			}
 
+			@Override
 			public void remove() {
 				throw new UnsupportedOperationException();
 			}

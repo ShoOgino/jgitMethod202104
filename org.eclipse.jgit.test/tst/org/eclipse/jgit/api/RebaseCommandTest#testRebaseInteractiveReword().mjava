@@ -24,6 +24,7 @@
 		RebaseResult res = git.rebase().setUpstream("HEAD~2")
 				.runInteractively(new InteractiveHandler() {
 
+					@Override
 					public void prepareSteps(List<RebaseTodoLine> steps) {
 						try {
 							steps.get(0).setAction(Action.REWORD);
@@ -32,6 +33,7 @@
 						}
 					}
 
+					@Override
 					public String modifyCommitMessage(String commit) {
 						return "rewritten commit message";
 					}

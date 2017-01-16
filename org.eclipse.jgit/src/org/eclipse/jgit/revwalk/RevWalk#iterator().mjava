@@ -13,6 +13,7 @@
 	 * @return an iterator over this walker's commits.
 	 * @see RevWalkException
 	 */
+	@Override
 	public Iterator<RevCommit> iterator() {
 		final RevCommit first;
 		try {
@@ -28,10 +29,12 @@
 		return new Iterator<RevCommit>() {
 			RevCommit next = first;
 
+			@Override
 			public boolean hasNext() {
 				return next != null;
 			}
 
+			@Override
 			public RevCommit next() {
 				try {
 					final RevCommit r = next;
@@ -46,6 +49,7 @@
 				}
 			}
 
+			@Override
 			public void remove() {
 				throw new UnsupportedOperationException();
 			}

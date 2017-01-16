@@ -3,14 +3,17 @@
 		// Add order is from oldest to newest. The reverse add order is the
 		// output order.
 		return new Iterable<StoredEntry>() {
+			@Override
 			public Iterator<StoredEntry> iterator() {
 				return new Iterator<StoredEntry>() {
 					private int index = byAddOrder.size() - 1;
 
+					@Override
 					public boolean hasNext() {
 						return index >= 0;
 					}
 
+					@Override
 					public StoredEntry next() {
 						if (!hasNext())
 							throw new NoSuchElementException();
@@ -44,6 +47,7 @@
 								bestXorOffset, item.getFlags());
 					}
 
+					@Override
 					public void remove() {
 						throw new UnsupportedOperationException();
 					}

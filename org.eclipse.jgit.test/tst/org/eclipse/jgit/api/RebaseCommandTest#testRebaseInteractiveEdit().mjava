@@ -23,6 +23,7 @@
 
 		RebaseResult res = git.rebase().setUpstream("HEAD~2")
 				.runInteractively(new InteractiveHandler() {
+					@Override
 					public void prepareSteps(List<RebaseTodoLine> steps) {
 						try {
 							steps.get(0).setAction(Action.EDIT);
@@ -31,6 +32,7 @@
 						}
 					}
 
+					@Override
 					public String modifyCommitMessage(String commit) {
 						return ""; // not used
 					}

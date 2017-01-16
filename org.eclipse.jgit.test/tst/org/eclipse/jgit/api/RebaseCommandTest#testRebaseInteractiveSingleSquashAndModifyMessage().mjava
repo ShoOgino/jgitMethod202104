@@ -24,6 +24,7 @@
 		git.rebase().setUpstream("HEAD~3")
 				.runInteractively(new InteractiveHandler() {
 
+					@Override
 					public void prepareSteps(List<RebaseTodoLine> steps) {
 						try {
 							steps.get(1).setAction(Action.SQUASH);
@@ -32,6 +33,7 @@
 						}
 					}
 
+					@Override
 					public String modifyCommitMessage(String commit) {
 						final File messageSquashFile = new File(db
 								.getDirectory(), "rebase-merge/message-squash");

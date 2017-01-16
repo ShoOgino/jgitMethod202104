@@ -15,6 +15,7 @@
 		return new AsyncObjectLoaderQueue<T>() {
 			private FoundObject<T> cur;
 
+			@Override
 			public boolean next() throws MissingObjectException, IOException {
 				if (idItr.hasNext()) {
 					cur = idItr.next();
@@ -26,14 +27,17 @@
 				}
 			}
 
+			@Override
 			public T getCurrent() {
 				return cur.id;
 			}
 
+			@Override
 			public ObjectId getObjectId() {
 				return cur.id;
 			}
 
+			@Override
 			public ObjectLoader open() throws IOException {
 				if (cur.pack == null)
 					throw new MissingObjectException(cur.id,
@@ -41,10 +45,12 @@
 				return cur.pack.load(DfsReader.this, cur.offset);
 			}
 
+			@Override
 			public boolean cancel(boolean mayInterruptIfRunning) {
 				return true;
 			}
 
+			@Override
 			public void release() {
 				// Nothing to clean up.
 			}

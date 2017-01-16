@@ -1,3 +1,4 @@
+	@Override
 	@Before
 	public void setUp() throws Exception {
 		super.setUp();
@@ -8,6 +9,7 @@
 		ServletContextHandler app = server.addContext("/git");
 		GitServlet gs = new GitServlet();
 		gs.setRepositoryResolver(new RepositoryResolver<HttpServletRequest>() {
+			@Override
 			public Repository open(HttpServletRequest req, String name)
 					throws RepositoryNotFoundException,
 					ServiceNotEnabledException {
@@ -20,6 +22,7 @@
 			}
 		});
 		gs.setReceivePackFactory(new DefaultReceivePackFactory() {
+			@Override
 			public ReceivePack create(HttpServletRequest req, Repository db)
 					throws ServiceNotEnabledException,
 					ServiceNotAuthorizedException {
