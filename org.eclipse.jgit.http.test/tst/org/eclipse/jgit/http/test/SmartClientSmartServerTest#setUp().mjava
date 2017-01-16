@@ -9,40 +9,20 @@
 				.setBoolean(ConfigConstants.CONFIG_CORE_SECTION, null,
 						ConfigConstants.CONFIG_KEY_LOGALLREFUPDATES, true);
 
-		ServletContextHandler app = server.addContext("/git");
 		GitServlet gs = new GitServlet();
-		gs.setRepositoryResolver(new TestRepoResolver(src, srcName));
-		app.addServlet(new ServletHolder(gs), "/*");
 
-		ServletContextHandler broken = server.addContext("/bad");
-		broken.addFilter(new FilterHolder(new Filter() {
-			public void doFilter(ServletRequest request,
-					ServletResponse response, FilterChain chain)
-					throws IOException, ServletException {
-				final HttpServletResponse r = (HttpServletResponse) response;
-				r.setContentType("text/plain");
-				r.setCharacterEncoding("UTF-8");
-				PrintWriter w = r.getWriter();
-				w.print("OK");
-				w.close();
-			}
+		ServletContextHandler app = addNormalContext(gs, src, srcName);
 
-			public void init(FilterConfig filterConfig) throws ServletException {
-				//
-			}
+		ServletContextHandler broken = addBrokenContext(gs, src, srcName);
 
-			public void destroy() {
-				//
-			}
-		}), "/" + srcName + "/git-upload-pack",
-				EnumSet.of(DispatcherType.REQUEST));
-		broken.addServlet(new ServletHolder(gs), "/*");
+		ServletContextHandler redirect = addRedirectContext(gs, src, srcName);
 
 		server.setUp();
 
 		remoteRepository = src.getRepository();
 		remoteURI = toURIish(app, srcName);
 		brokenURI = toURIish(broken, srcName);
+		redirectURI = toURIish(redirect, srcName);
 
 		A_txt = src.blob("A");
 		A = src.commit().add("A_txt", A_txt).create();

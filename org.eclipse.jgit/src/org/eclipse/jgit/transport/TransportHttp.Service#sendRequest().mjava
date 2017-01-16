@@ -1,27 +1,4 @@
 		void sendRequest() throws IOException {
-			// Try to compress the content, but only if that is smaller.
-			TemporaryBuffer buf = new TemporaryBuffer.Heap(http.postBuffer);
-			try {
-				GZIPOutputStream gzip = new GZIPOutputStream(buf);
-				out.writeTo(gzip, null);
-				gzip.close();
-				if (out.length() < buf.length())
-					buf = out;
-			} catch (IOException err) {
-				// Most likely caused by overflowing the buffer, meaning
-				// its larger if it were compressed. Don't compress.
-				buf = out;
-			}
-
-			openStream();
-			if (buf != out)
-				conn.setRequestProperty(HDR_CONTENT_ENCODING, ENCODING_GZIP);
-			conn.setFixedLengthStreamingMode((int) buf.length());
-			final OutputStream httpOut = conn.getOutputStream();
-			try {
-				buf.writeTo(httpOut, null);
-			} finally {
-				httpOut.close();
-			}
+			sendRequest(null);
 		}
 

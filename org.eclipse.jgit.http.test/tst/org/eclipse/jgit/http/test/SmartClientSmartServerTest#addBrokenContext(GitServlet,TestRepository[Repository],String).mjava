@@ -1,0 +1,30 @@
+	@SuppressWarnings("unused")
+	private ServletContextHandler addBrokenContext(GitServlet gs, TestRepository<Repository> src, String srcName) {
+		ServletContextHandler broken = server.addContext("/bad");
+		broken.addFilter(new FilterHolder(new Filter() {
+
+			public void doFilter(ServletRequest request,
+					ServletResponse response, FilterChain chain)
+					throws IOException, ServletException {
+				final HttpServletResponse r = (HttpServletResponse) response;
+				r.setContentType("text/plain");
+				r.setCharacterEncoding("UTF-8");
+				PrintWriter w = r.getWriter();
+				w.print("OK");
+				w.close();
+			}
+
+			public void init(FilterConfig filterConfig)
+					throws ServletException {
+				// empty
+			}
+
+			public void destroy() {
+				// empty
+			}
+		}), "/" + srcName + "/git-upload-pack",
+				EnumSet.of(DispatcherType.REQUEST));
+		broken.addServlet(new ServletHolder(gs), "/*");
+		return broken;
+	}
+

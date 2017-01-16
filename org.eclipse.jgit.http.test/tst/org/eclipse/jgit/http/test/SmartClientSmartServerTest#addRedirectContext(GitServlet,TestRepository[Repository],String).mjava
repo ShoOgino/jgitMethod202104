@@ -1,0 +1,38 @@
+	@SuppressWarnings("unused")
+	private ServletContextHandler addRedirectContext(GitServlet gs,
+			TestRepository<Repository> src, String srcName) {
+		ServletContextHandler redirect = server.addContext("/redirect");
+		redirect.addFilter(new FilterHolder(new Filter() {
+
+			@Override
+			public void init(FilterConfig filterConfig)
+					throws ServletException {
+				// empty
+			}
+
+			@Override
+			public void doFilter(ServletRequest request,
+					ServletResponse response, FilterChain chain)
+					throws IOException, ServletException {
+				final HttpServletResponse httpServletResponse = (HttpServletResponse) response;
+				final HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+				final StringBuffer fullUrl = httpServletRequest.getRequestURL();
+				if (httpServletRequest.getQueryString() != null) {
+					fullUrl.append("?")
+							.append(httpServletRequest.getQueryString());
+				}
+				httpServletResponse
+						.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
+				httpServletResponse.setHeader(HttpSupport.HDR_LOCATION,
+						fullUrl.toString().replace("/redirect", "/git"));
+			}
+
+			@Override
+			public void destroy() {
+				// empty
+			}
+		}), "/*", EnumSet.of(DispatcherType.REQUEST));
+		redirect.addServlet(new ServletHolder(gs), "/*");
+		return redirect;
+	}
+

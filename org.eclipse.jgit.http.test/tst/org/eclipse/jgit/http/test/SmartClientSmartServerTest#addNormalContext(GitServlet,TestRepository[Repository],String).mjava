@@ -1,0 +1,7 @@
+	private ServletContextHandler addNormalContext(GitServlet gs, TestRepository<Repository> src, String srcName) {
+		ServletContextHandler app = server.addContext("/git");
+		gs.setRepositoryResolver(new TestRepoResolver(src, srcName));
+		app.addServlet(new ServletHolder(gs), "/*");
+		return app;
+	}
+
