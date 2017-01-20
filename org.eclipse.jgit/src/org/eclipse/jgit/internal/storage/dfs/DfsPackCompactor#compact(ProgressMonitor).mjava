@@ -35,7 +35,8 @@
 				}
 
 				boolean rollback = true;
-				DfsPackDescription pack = objdb.newPack(COMPACT);
+				DfsPackDescription pack = objdb.newPack(COMPACT,
+						estimatePackSize());
 				try {
 					writePack(objdb, pack, pw, pm);
 					writeIndex(objdb, pack, pw);

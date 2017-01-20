@@ -10,21 +10,29 @@
 			pw.setDeltaBaseAsOffset(true);
 			pw.setReuseDeltaCommits(true);
 			pm.beginTask(JGitText.get().findingGarbage, objectsBefore());
+			long estimatedPackSize = 12 + 20; // header and trailer sizes.
 			for (DfsPackFile oldPack : packsBefore) {
 				PackIndex oldIdx = oldPack.getPackIndex(ctx);
+				PackReverseIndex oldRevIdx = oldPack.getReverseIdx(ctx);
+				long maxOffset = oldPack.getPackDescription().getFileSize(PACK)
+						- 20; // pack size - trailer size.
 				for (PackIndex.MutableEntry ent : oldIdx) {
 					pm.update(1);
 					ObjectId id = ent.toObjectId();
 					if (pool.lookupOrNull(id) != null || anyPackHas(id))
 						continue;
 
-					int type = oldPack.getObjectType(ctx, ent.getOffset());
+					long offset = ent.getOffset();
+					int type = oldPack.getObjectType(ctx, offset);
 					pw.addObject(pool.lookupAny(id, type));
+					long objSize = oldRevIdx.findNextOffset(offset, maxOffset)
+							- offset;
+					estimatedPackSize += objSize;
 				}
 			}
 			pm.endTask();
 			if (0 < pw.getObjectCount())
-				writePack(UNREACHABLE_GARBAGE, pw, pm);
+				writePack(UNREACHABLE_GARBAGE, pw, pm, estimatedPackSize);
 		}
 	}
 

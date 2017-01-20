@@ -1,0 +1,39 @@
+	@Test
+	public void testEstimateGcPackSizeWithAnExistingGcPack() throws Exception {
+		RevCommit commit0 = commit().message("0").create();
+		RevCommit commit1 = commit().message("1").parent(commit0).create();
+		git.update("master", commit1);
+
+		gcNoTtl();
+
+		RevCommit commit2 = commit().message("2").parent(commit1).create();
+		git.update("master", commit2);
+
+		// There will be one INSERT pack and one GC pack.
+		assertEquals(2, odb.getPacks().length);
+		boolean gcPackFound = false;
+		boolean insertPackFound = false;
+		long inputPacksSize = 32;
+		for (DfsPackFile pack : odb.getPacks()) {
+			DfsPackDescription d = pack.getPackDescription();
+			if (d.getPackSource() == GC) {
+				gcPackFound = true;
+			} else if (d.getPackSource() == INSERT) {
+				insertPackFound = true;
+			} else {
+				fail("unexpected " + d.getPackSource());
+			}
+			inputPacksSize += d.getFileSize(PACK) - 32;
+		}
+		assertTrue(gcPackFound);
+		assertTrue(insertPackFound);
+
+		gcNoTtl();
+
+		// INSERT pack is combined into the GC pack.
+		DfsPackFile pack = odb.getPacks()[0];
+		assertEquals(GC, pack.getPackDescription().getPackSource());
+		assertEquals(inputPacksSize,
+				pack.getPackDescription().getEstimatedPackSize());
+	}
+

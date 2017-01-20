@@ -1,0 +1,40 @@
+	@Test
+	public void testEstimateGcRestPackSizeWithAnExistingGcPack()
+			throws Exception {
+		RevCommit commit0 = commit().message("0").create();
+		RevCommit commit1 = commit().message("1").parent(commit0).create();
+		git.update("refs/notes/note1", commit1);
+
+		gcNoTtl();
+
+		RevCommit commit2 = commit().message("2").parent(commit1).create();
+		git.update("refs/notes/note2", commit2);
+
+		// There will be one INSERT pack and one GC_REST pack.
+		assertEquals(2, odb.getPacks().length);
+		boolean gcRestPackFound = false;
+		boolean insertPackFound = false;
+		long inputPacksSize = 32;
+		for (DfsPackFile pack : odb.getPacks()) {
+			DfsPackDescription d = pack.getPackDescription();
+			if (d.getPackSource() == GC_REST) {
+				gcRestPackFound = true;
+			} else if (d.getPackSource() == INSERT) {
+				insertPackFound = true;
+			} else {
+				fail("unexpected " + d.getPackSource());
+			}
+			inputPacksSize += d.getFileSize(PACK) - 32;
+		}
+		assertTrue(gcRestPackFound);
+		assertTrue(insertPackFound);
+
+		gcNoTtl();
+
+		// INSERT pack is combined into the GC_REST pack.
+		DfsPackFile pack = odb.getPacks()[0];
+		assertEquals(GC_REST, pack.getPackDescription().getPackSource());
+		assertEquals(inputPacksSize,
+				pack.getPackDescription().getEstimatedPackSize());
+	}
+
