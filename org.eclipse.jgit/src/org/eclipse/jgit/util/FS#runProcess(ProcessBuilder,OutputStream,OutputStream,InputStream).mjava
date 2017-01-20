@@ -37,16 +37,13 @@
 		IOException ioException = null;
 		try {
 			process = processBuilder.start();
-			final Callable<Void> errorGobbler = new StreamGobbler(
-					process.getErrorStream(), errRedirect);
-			final Callable<Void> outputGobbler = new StreamGobbler(
-					process.getInputStream(), outRedirect);
-			executor.submit(errorGobbler);
-			executor.submit(outputGobbler);
+			executor.execute(
+					new StreamGobbler(process.getErrorStream(), errRedirect));
+			executor.execute(
+					new StreamGobbler(process.getInputStream(), outRedirect));
 			OutputStream outputStream = process.getOutputStream();
 			if (inRedirect != null) {
-				new StreamGobbler(inRedirect, outputStream)
-						.call();
+				new StreamGobbler(inRedirect, outputStream).copy();
 			}
 			try {
 				outputStream.close();
