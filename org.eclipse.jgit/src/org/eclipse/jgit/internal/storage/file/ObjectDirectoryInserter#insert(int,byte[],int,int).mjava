@@ -1,12 +1,6 @@
 	@Override
 	public ObjectId insert(int type, byte[] data, int off, int len)
 			throws IOException {
-		ObjectId id = idFor(type, data, off, len);
-		if (db.has(id)) {
-			return id;
-		} else {
-			File tmp = toTemp(type, data, off, len);
-			return insertOneObject(tmp, id);
-		}
+		return insert(type, data, off, len, false);
 	}
 

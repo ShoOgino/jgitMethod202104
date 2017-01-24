@@ -5,6 +5,9 @@
 	 * preserveOldPacks is set, keep a copy of the pack file in the preserve
 	 * directory. If an expirationDate is set then pack files which are younger
 	 * than the expirationDate will not be deleted nor preserved.
+	 * <p>
+	 * If we're not immediately expiring loose objects, loosen any objects
+	 * in the old pack files which aren't in the new pack files.
 	 *
 	 * @param oldPacks
 	 * @param newPacks
@@ -13,6 +16,17 @@
 	 */
 	private void deleteOldPacks(Collection<PackFile> oldPacks,
 			Collection<PackFile> newPacks) throws ParseException, IOException {
+		HashSet<ObjectId> ids = new HashSet<>();
+		for (PackFile pack : newPacks) {
+			for (PackIndex.MutableEntry entry : pack) {
+				ids.add(entry.toObjectId());
+			}
+		}
+		ObjectReader reader = repo.newObjectReader();
+		ObjectDirectory dir = repo.getObjectDatabase();
+		ObjectDirectoryInserter inserter = dir.newInserter();
+		boolean shouldLoosen = getExpireDate() < Long.MAX_VALUE;
+
 		prunePreserved();
 		long packExpireDate = getPackExpireDate();
 		oldPackLoop: for (PackFile oldPack : oldPacks) {
@@ -27,6 +41,9 @@
 					&& repo.getFS().lastModified(
 							oldPack.getPackFile()) < packExpireDate) {
 				oldPack.close();
+				if (shouldLoosen) {
+					loosen(inserter, reader, oldPack, ids);
+				}
 				prunePack(oldName);
 			}
 		}

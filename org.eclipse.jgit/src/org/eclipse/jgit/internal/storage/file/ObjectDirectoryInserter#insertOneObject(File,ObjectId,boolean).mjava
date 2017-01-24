@@ -1,6 +1,7 @@
-	private ObjectId insertOneObject(final File tmp, final ObjectId id)
+	private ObjectId insertOneObject(
+			File tmp, ObjectId id, boolean createDuplicate)
 			throws IOException, ObjectWritingException {
-		switch (db.insertUnpackedObject(tmp, id, false /* no duplicate */)) {
+		switch (db.insertUnpackedObject(tmp, id, createDuplicate)) {
 		case INSERTED:
 		case EXISTS_PACKED:
 		case EXISTS_LOOSE:
