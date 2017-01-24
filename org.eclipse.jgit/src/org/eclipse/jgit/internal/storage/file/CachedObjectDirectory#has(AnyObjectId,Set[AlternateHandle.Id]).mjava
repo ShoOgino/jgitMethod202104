@@ -1,0 +1,19 @@
+	private boolean has(final AnyObjectId objectId, Set<AlternateHandle.Id> skips)
+			throws IOException {
+		if (unpackedObjects.contains(objectId)) {
+			return true;
+		}
+		if (wrapped.hasPackedObject(objectId)) {
+			return true;
+		}
+		skips = skipMe(skips);
+		for (CachedObjectDirectory alt : myAlternates()) {
+			if (!skips.contains(alt.getAlternateId())) {
+				if (alt.has(objectId, skips)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+

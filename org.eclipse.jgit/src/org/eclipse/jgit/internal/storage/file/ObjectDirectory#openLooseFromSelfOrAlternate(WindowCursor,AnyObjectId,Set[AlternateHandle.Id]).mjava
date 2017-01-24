@@ -1,0 +1,19 @@
+	private ObjectLoader openLooseFromSelfOrAlternate(WindowCursor curs,
+			AnyObjectId objectId, Set<AlternateHandle.Id> skips)
+					throws IOException {
+		ObjectLoader ldr = openLooseObject(curs, objectId);
+		if (ldr != null) {
+			return ldr;
+		}
+		skips = addMe(skips);
+		for (AlternateHandle alt : myAlternates()) {
+			if (!skips.contains(alt.getId())) {
+				ldr = alt.db.openLooseFromSelfOrAlternate(curs, objectId, skips);
+				if (ldr != null) {
+					return ldr;
+				}
+			}
+		}
+		return null;
+	}
+

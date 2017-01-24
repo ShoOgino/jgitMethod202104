@@ -3,12 +3,14 @@
 			throws IOException {
 		if (unpackedObjectCache.isUnpacked(objectId)) {
 			ObjectLoader ldr = openLooseObject(curs, objectId);
-			if (ldr != null)
+			if (ldr != null) {
 				return ldr;
+			}
 		}
-		ObjectLoader ldr = openPackedFromSelfOrAlternate(curs, objectId);
-		if (ldr != null)
+		ObjectLoader ldr = openPackedFromSelfOrAlternate(curs, objectId, null);
+		if (ldr != null) {
 			return ldr;
-		return openLooseFromSelfOrAlternate(curs, objectId);
+		}
+		return openLooseFromSelfOrAlternate(curs, objectId, null);
 	}
 

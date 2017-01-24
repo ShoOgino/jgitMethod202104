@@ -1,0 +1,18 @@
+	private long getPackedSizeFromSelfOrAlternate(WindowCursor curs,
+			AnyObjectId id, Set<AlternateHandle.Id> skips) {
+		long len = getPackedObjectSize(curs, id);
+		if (0 <= len) {
+			return len;
+		}
+		skips = addMe(skips);
+		for (AlternateHandle alt : myAlternates()) {
+			if (!skips.contains(alt.getId())) {
+				len = alt.db.getPackedSizeFromSelfOrAlternate(curs, id, skips);
+				if (0 <= len) {
+					return len;
+				}
+			}
+		}
+		return -1;
+	}
+

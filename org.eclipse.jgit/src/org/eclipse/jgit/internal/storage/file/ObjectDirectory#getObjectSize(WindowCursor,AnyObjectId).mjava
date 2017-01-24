@@ -3,12 +3,14 @@
 			throws IOException {
 		if (unpackedObjectCache.isUnpacked(id)) {
 			long len = getLooseObjectSize(curs, id);
-			if (0 <= len)
+			if (0 <= len) {
 				return len;
+			}
 		}
-		long len = getPackedSizeFromSelfOrAlternate(curs, id);
-		if (0 <= len)
+		long len = getPackedSizeFromSelfOrAlternate(curs, id, null);
+		if (0 <= len) {
 			return len;
-		return getLooseSizeFromSelfOrAlternate(curs, id);
+		}
+		return getLooseSizeFromSelfOrAlternate(curs, id, null);
 	}
 

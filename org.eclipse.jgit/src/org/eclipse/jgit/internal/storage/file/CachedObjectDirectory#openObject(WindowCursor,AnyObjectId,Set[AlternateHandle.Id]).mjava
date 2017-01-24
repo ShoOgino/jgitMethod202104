@@ -1,0 +1,23 @@
+	private ObjectLoader openObject(final WindowCursor curs,
+			final AnyObjectId objectId, Set<AlternateHandle.Id> skips)
+			throws IOException {
+		ObjectLoader ldr = openLooseObject(curs, objectId);
+		if (ldr != null) {
+			return ldr;
+		}
+		ldr = wrapped.openPackedObject(curs, objectId);
+		if (ldr != null) {
+			return ldr;
+		}
+		skips = skipMe(skips);
+		for (CachedObjectDirectory alt : myAlternates()) {
+			if (!skips.contains(alt.getAlternateId())) {
+				ldr = alt.openObject(curs, objectId, skips);
+				if (ldr != null) {
+					return ldr;
+				}
+			}
+		}
+		return null;
+	}
+

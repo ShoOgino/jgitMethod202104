@@ -1,27 +1,6 @@
 	@Override
 	void selectObjectRepresentation(PackWriter packer, ObjectToPack otp,
-			WindowCursor curs) throws IOException {
-		PackList pList = packList.get();
-		SEARCH: for (;;) {
-			for (final PackFile p : pList.packs) {
-				try {
-					LocalObjectRepresentation rep = p.representation(curs, otp);
-					p.resetTransientErrorCount();
-					if (rep != null)
-						packer.select(otp, rep);
-				} catch (PackMismatchException e) {
-					// Pack was modified; refresh the entire pack list.
-					//
-					pList = scanPacks(pList);
-					continue SEARCH;
-				} catch (IOException e) {
-					handlePackError(e, p);
-				}
-			}
-			break SEARCH;
-		}
-
-		for (AlternateHandle h : myAlternates())
-			h.db.selectObjectRepresentation(packer, otp, curs);
+																	WindowCursor curs) throws IOException {
+		selectObjectRepresentation(packer, otp, curs, null);
 	}
 
