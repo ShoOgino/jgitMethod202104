@@ -26,6 +26,7 @@
 		RefDatabase refdb = repo.getRefDatabase();
 
 		for (Ref ref : refsBefore) {
+			checkCancelled();
 			nonHeads.addAll(listRefLogObjects(ref, 0));
 			if (ref.isSymbolic() || ref.getObjectId() == null)
 				continue;
@@ -40,9 +41,11 @@
 		}
 
 		List<ObjectIdSet> excluded = new LinkedList<ObjectIdSet>();
-		for (final PackFile f : repo.getObjectDatabase().getPacks())
+		for (final PackFile f : repo.getObjectDatabase().getPacks()) {
+			checkCancelled();
 			if (f.shouldBeKept())
 				excluded.add(f.getIndex());
+		}
 
 		tagTargets.addAll(allHeads);
 		nonHeads.addAll(indexObjects);

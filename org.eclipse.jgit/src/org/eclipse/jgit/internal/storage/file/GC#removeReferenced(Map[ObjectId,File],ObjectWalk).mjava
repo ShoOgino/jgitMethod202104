@@ -13,6 +13,7 @@
 			IncorrectObjectTypeException, IOException {
 		RevObject ro = w.next();
 		while (ro != null) {
+			checkCancelled();
 			if (id2File.remove(ro.getId()) != null)
 				if (id2File.isEmpty())
 					return;
@@ -20,6 +21,7 @@
 		}
 		ro = w.nextObject();
 		while (ro != null) {
+			checkCancelled();
 			if (id2File.remove(ro.getId()) != null)
 				if (id2File.isEmpty())
 					return;

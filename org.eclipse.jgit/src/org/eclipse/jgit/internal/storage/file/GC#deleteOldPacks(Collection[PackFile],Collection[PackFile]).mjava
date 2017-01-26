@@ -30,6 +30,7 @@
 		prunePreserved();
 		long packExpireDate = getPackExpireDate();
 		oldPackLoop: for (PackFile oldPack : oldPacks) {
+			checkCancelled();
 			String oldName = oldPack.getPackName();
 			// check whether an old pack file is also among the list of new
 			// pack files. Then we must not delete it.

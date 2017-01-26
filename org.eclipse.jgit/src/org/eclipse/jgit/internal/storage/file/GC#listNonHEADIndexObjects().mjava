@@ -26,6 +26,7 @@
 			Set<ObjectId> ret = new HashSet<ObjectId>();
 
 			while (treeWalk.next()) {
+				checkCancelled();
 				ObjectId objectId = treeWalk.getObjectId(0);
 				switch (treeWalk.getRawMode(0) & FileMode.TYPE_MASK) {
 				case FileMode.TYPE_MISSING:

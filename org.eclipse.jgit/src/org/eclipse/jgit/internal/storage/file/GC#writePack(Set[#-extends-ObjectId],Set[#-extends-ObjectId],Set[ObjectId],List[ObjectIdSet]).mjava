@@ -1,6 +1,7 @@
 	private PackFile writePack(@NonNull Set<? extends ObjectId> want,
 			@NonNull Set<? extends ObjectId> have, Set<ObjectId> tagTargets,
 			List<ObjectIdSet> excludeObjects) throws IOException {
+		checkCancelled();
 		File tmpPack = null;
 		Map<PackExt, File> tmpExts = new TreeMap<PackExt, File>(
 				new Comparator<PackExt>() {
@@ -32,6 +33,7 @@
 			pw.preparePack(pm, want, have);
 			if (pw.getObjectCount() == 0)
 				return null;
+			checkCancelled();
 
 			// create temporary files
 			String id = pw.computeName().getName();

@@ -9,6 +9,7 @@
 		pm.beginTask(JGitText.get().packRefs, refs.size());
 		try {
 			for (Ref ref : refs) {
+				checkCancelled();
 				if (!ref.isSymbolic() && ref.getStorage().isLoose())
 					refsToBePacked.add(ref.getName());
 				pm.update(1);

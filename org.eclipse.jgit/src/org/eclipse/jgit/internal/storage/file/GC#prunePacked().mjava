@@ -15,6 +15,7 @@
 			pm.beginTask(JGitText.get().pruneLoosePackedObjects, fanout.length);
 			try {
 				for (String d : fanout) {
+					checkCancelled();
 					pm.update(1);
 					if (d.length() != 2)
 						continue;
@@ -22,6 +23,7 @@
 					if (entries == null)
 						continue;
 					for (String e : entries) {
+						checkCancelled();
 						if (e.length() != Constants.OBJECT_ID_STRING_LENGTH - 2)
 							continue;
 						ObjectId id;
@@ -33,11 +35,13 @@
 							continue;
 						}
 						boolean found = false;
-						for (PackFile p : packs)
+						for (PackFile p : packs) {
+							checkCancelled();
 							if (p.hasObject(id)) {
 								found = true;
 								break;
 							}
+						}
 						if (found)
 							FileUtils.delete(objdb.fileFor(id), FileUtils.RETRY
 									| FileUtils.SKIP_MISSING
