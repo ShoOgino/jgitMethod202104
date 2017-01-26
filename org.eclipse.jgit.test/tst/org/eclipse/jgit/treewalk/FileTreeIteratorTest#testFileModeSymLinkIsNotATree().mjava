@@ -7,6 +7,9 @@
 		fs.createSymLink(new File(trash, "länk"), "mål");
 		FileTreeIterator fti = new FileTreeIterator(db);
 		assertFalse(fti.eof());
+		while (!fti.getEntryPathString().equals("länk")) {
+			fti.next(1);
+		}
 		assertEquals("länk", fti.getEntryPathString());
 		assertEquals(FileMode.SYMLINK, fti.getEntryFileMode());
 		fti.next(1);
