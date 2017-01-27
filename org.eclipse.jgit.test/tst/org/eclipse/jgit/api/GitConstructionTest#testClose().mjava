@@ -12,7 +12,6 @@
 	public void testClose() throws IOException, JGitInternalException,
 			GitAPIException {
 		File workTree = db.getWorkTree();
-		db.close();
 		Git git = Git.open(workTree);
 		git.gc().setExpire(null).call();
 		git.checkout().setName(git.getRepository().resolve("HEAD^").getName())
