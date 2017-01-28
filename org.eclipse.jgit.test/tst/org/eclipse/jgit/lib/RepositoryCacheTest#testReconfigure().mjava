@@ -1,9 +1,10 @@
 	@Test
-	public void testReconfigure() throws InterruptedException {
-		RepositoryCache.register(db);
-		assertTrue(RepositoryCache.isCached(db));
-		db.close();
-		assertTrue(RepositoryCache.isCached(db));
+	public void testReconfigure() throws InterruptedException, IOException {
+		Repository repo = createRepository(false, false);
+		RepositoryCache.register(repo);
+		assertTrue(RepositoryCache.isCached(repo));
+		repo.close();
+		assertTrue(RepositoryCache.isCached(repo));
 
 		// Actually, we would only need to validate that
 		// WorkQueue.getExecutor().scheduleWithFixedDelay is called with proper
@@ -21,7 +22,7 @@
 		// This wait will time out after 2048 ms
 		for (int i = 0; i <= 10; i++) {
 			Thread.sleep(1 << i);
-			if (!RepositoryCache.isCached(db)) {
+			if (!RepositoryCache.isCached(repo)) {
 				return;
 			}
 		}

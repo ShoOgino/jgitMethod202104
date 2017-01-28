@@ -4,12 +4,21 @@
 	 * @param bare
 	 *            true to create a bare repository; false to make a repository
 	 *            within its working directory
+	 * @param autoClose
+	 *            auto close the repository in #tearDown
 	 * @return the newly created repository, opened for access
 	 * @throws IOException
 	 *             the repository could not be created in the temporary area
 	 */
-	private FileRepository createRepository(boolean bare)
+	public FileRepository createRepository(boolean bare, boolean autoClose)
 			throws IOException {
-		return createRepository(bare, true);
+		File gitdir = createUniqueTestGitDir(bare);
+		FileRepository db = new FileRepository(gitdir);
+		assertFalse(gitdir.exists());
+		db.create(bare);
+		if (autoClose) {
+			addRepoToClose(db);
+		}
+		return db;
 	}
 

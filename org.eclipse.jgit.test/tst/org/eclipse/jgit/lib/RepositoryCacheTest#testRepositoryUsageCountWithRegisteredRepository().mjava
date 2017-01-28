@@ -1,9 +1,11 @@
 	@Test
-	public void testRepositoryUsageCountWithRegisteredRepository() {
-		assertEquals(1, ((Repository) db).useCnt.get());
-		RepositoryCache.register(db);
-		assertEquals(1, ((Repository) db).useCnt.get());
-		db.close();
-		assertEquals(0, ((Repository) db).useCnt.get());
+	public void testRepositoryUsageCountWithRegisteredRepository()
+			throws IOException {
+		Repository repo = createRepository(false, false);
+		assertEquals(1, repo.useCnt.get());
+		RepositoryCache.register(repo);
+		assertEquals(1, repo.useCnt.get());
+		repo.close();
+		assertEquals(0, repo.useCnt.get());
 	}
 
