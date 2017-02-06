@@ -20,14 +20,8 @@
 		if (packConfig.getIndexVersion() != 2)
 			throw new IllegalStateException(
 					JGitText.get().supportOnlyPackIndexVersion2);
-		if (garbageTtlMillis > 0) {
-			// We disable coalescing because the coalescing step will keep
-			// refreshing the UNREACHABLE_GARBAGE pack and we wouldn't
-			// actually prune anything.
-			coalesceGarbageLimit = 0;
-		}
 
-		startTimeMillis = System.currentTimeMillis();
+		startTimeMillis = SystemReader.getInstance().getCurrentTime();
 		ctx = (DfsReader) objdb.newReader();
 		try {
 			refdb.refresh();
