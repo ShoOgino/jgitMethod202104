@@ -13,13 +13,11 @@
 				ObjectId.fromString("c59759f143fb1fe21c197981df75a7ee00290799"),
 				ObjectId.fromString("aabf2ffaec9b497f0950352b3e582d73035c2035"),
 				ObjectId.fromString("902d5476fa249b7abc9d84c611577a81381f0327"),
-				ObjectId.fromString("5b6e7c66c276e7610d4a73c70ec1a1f7c1003259"),
-				ObjectId.fromString("6ff87c4664981e4397625791c8ea3bbb5f2279a3") };
-		if (deltaReuse) {
-			// objects order influenced (swapped) by delta-base first rule
-			ObjectId temp = expectedOrder[4];
-			expectedOrder[4] = expectedOrder[5];
-			expectedOrder[5] = temp;
+				ObjectId.fromString("6ff87c4664981e4397625791c8ea3bbb5f2279a3") ,
+				ObjectId.fromString("5b6e7c66c276e7610d4a73c70ec1a1f7c1003259") };
+		if (!config.isReuseDeltas() && !config.isDeltaCompress()) {
+			// If no deltas are in the file the final two entries swap places.
+			swap(expectedOrder, 4, 5);
 		}
 		assertEquals(expectedOrder.length, writer.getObjectCount());
 		verifyObjectsOrder(expectedOrder);
