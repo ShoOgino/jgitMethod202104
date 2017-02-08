@@ -1,0 +1,13 @@
+	private Collection<PackFile> doGc() throws IOException, ParseException {
+		if (automatic && !needGc()) {
+			return Collections.emptyList();
+		}
+		pm.start(6 /* tasks */);
+		packRefs();
+		// TODO: implement reflog_expire(pm, repo);
+		Collection<PackFile> newPacks = repack();
+		prune(Collections.<ObjectId> emptySet());
+		// TODO: implement rerere_gc(pm);
+		return newPacks;
+	}
+

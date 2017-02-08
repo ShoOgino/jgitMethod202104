@@ -5,8 +5,7 @@
 	 * @return {@code true} if number of loose objects > gc.auto (default 6700)
 	 */
 	boolean tooManyLooseObjects() {
-		int auto = repo.getConfig().getInt(ConfigConstants.CONFIG_GC_SECTION,
-				ConfigConstants.CONFIG_KEY_AUTO, DEFAULT_AUTOLIMIT);
+		int auto = getLooseObjectLimit();
 		if (auto <= 0) {
 			return false;
 		}
