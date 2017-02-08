@@ -1,13 +1,8 @@
-	private void gcWithTtl() throws InterruptedException, IOException {
-		// Wait for the system clock to move by at least 1 millisecond.
-		// This allows the DfsGarbageCollector to recognize the boundary.
-		long start = System.currentTimeMillis();
-		do {
-			Thread.sleep(10);
-		} while (System.currentTimeMillis() <= start);
-
+	private void gcWithTtl() throws IOException {
+		// Move the clock forward by 1 minute and use the same as ttl.
+		mockSystemReader.tick(60);
 		DfsGarbageCollector gc = new DfsGarbageCollector(repo);
-		gc.setGarbageTtl(1, TimeUnit.MILLISECONDS);
+		gc.setGarbageTtl(1, TimeUnit.MINUTES);
 		run(gc);
 	}
 

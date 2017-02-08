@@ -1,0 +1,26 @@
+	@Test
+	public void testCollectionWithGarbageCoalescenceWithShortTtl()
+			throws Exception {
+		RevCommit commit0 = commit().message("0").create();
+		RevCommit commit1 = commit().message("1").parent(commit0).create();
+		git.update("master", commit0);
+
+		// Create commits at 1 minute intervals with 1 hour ttl.
+		for (int i = 0; i < 100; i++) {
+			mockSystemReader.tick(60);
+			commit1 = commit().message("g" + i).parent(commit1).create();
+
+			DfsGarbageCollector gc = new DfsGarbageCollector(repo);
+			gc.setGarbageTtl(1, TimeUnit.HOURS);
+			run(gc);
+
+			// Make sure we don't have more than 4 UNREACHABLE_GARBAGE packs
+			// because all the packs that are created in a 20 minutes interval
+			// should be coalesced and the packs older than 60 minutes should be
+			// removed due to ttl.
+			int count = countPacks(UNREACHABLE_GARBAGE);
+			assertTrue("Garbage pack count should not exceed 4, but found "
+					+ count, count <= 4);
+		}
+	}
+
