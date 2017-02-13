@@ -2,12 +2,11 @@
 	public boolean has(AnyObjectId objectId) throws IOException {
 		if (last != null && last.hasObject(this, objectId))
 			return true;
-		boolean noGarbage = avoidUnreachable;
 		PackList packList = db.getPackList();
-		if (hasImpl(packList, objectId, noGarbage)) {
+		if (hasImpl(packList, objectId)) {
 			return true;
 		} else if (packList.dirty()) {
-			return hasImpl(db.scanPacks(packList), objectId, noGarbage);
+			return hasImpl(db.scanPacks(packList), objectId);
 		}
 		return false;
 	}

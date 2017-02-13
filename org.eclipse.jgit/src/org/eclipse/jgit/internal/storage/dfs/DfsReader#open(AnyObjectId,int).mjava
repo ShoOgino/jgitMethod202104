@@ -11,13 +11,12 @@
 		}
 
 		PackList packList = db.getPackList();
-		boolean noGarbage = avoidUnreachable;
-		ldr = openImpl(packList, objectId, noGarbage);
+		ldr = openImpl(packList, objectId);
 		if (ldr != null) {
 			return checkType(ldr, objectId, typeHint);
 		}
 		if (packList.dirty()) {
-			ldr = openImpl(db.scanPacks(packList), objectId, noGarbage);
+			ldr = openImpl(db.scanPacks(packList), objectId);
 			if (ldr != null) {
 				return checkType(ldr, objectId, typeHint);
 			}

@@ -1,0 +1,13 @@
+	private boolean hasImpl(PackList packList, AnyObjectId objectId)
+			throws IOException {
+		for (DfsPackFile pack : packList.packs) {
+			if (pack == last || skipGarbagePack(pack))
+				continue;
+			if (pack.hasObject(this, objectId)) {
+				last = pack;
+				return true;
+			}
+		}
+		return false;
+	}
+

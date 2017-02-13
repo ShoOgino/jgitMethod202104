@@ -1,7 +1,7 @@
-	private ObjectLoader openImpl(PackList packList, AnyObjectId objectId,
-			boolean noGarbage) throws IOException {
+	private ObjectLoader openImpl(PackList packList, AnyObjectId objectId)
+			throws IOException {
 		for (DfsPackFile pack : packList.packs) {
-			if (pack == last || (noGarbage && pack.isGarbage())) {
+			if (pack == last || skipGarbagePack(pack)) {
 				continue;
 			}
 			ObjectLoader ldr = pack.get(this, objectId);

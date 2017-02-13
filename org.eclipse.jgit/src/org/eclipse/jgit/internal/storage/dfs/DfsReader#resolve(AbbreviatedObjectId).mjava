@@ -3,12 +3,11 @@
 			throws IOException {
 		if (id.isComplete())
 			return Collections.singleton(id.toObjectId());
-		boolean noGarbage = avoidUnreachable;
 		HashSet<ObjectId> matches = new HashSet<ObjectId>(4);
 		PackList packList = db.getPackList();
-		resolveImpl(packList, id, noGarbage, matches);
+		resolveImpl(packList, id, matches);
 		if (matches.size() < MAX_RESOLVE_MATCHES && packList.dirty()) {
-			resolveImpl(db.scanPacks(packList), id, noGarbage, matches);
+			resolveImpl(db.scanPacks(packList), id, matches);
 		}
 		return matches;
 	}

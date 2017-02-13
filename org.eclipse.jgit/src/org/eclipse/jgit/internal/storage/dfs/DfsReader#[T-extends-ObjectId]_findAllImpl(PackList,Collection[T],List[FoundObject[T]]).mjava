@@ -6,7 +6,6 @@
 		}
 		int lastIdx = 0;
 		DfsPackFile lastPack = packs[lastIdx];
-		boolean noGarbage = avoidUnreachable;
 
 		OBJECT_SCAN: for (Iterator<T> it = pending.iterator(); it.hasNext();) {
 			T t = it.next();
@@ -25,7 +24,7 @@
 				if (i == lastIdx)
 					continue;
 				DfsPackFile pack = packs[i];
-				if (noGarbage && pack.isGarbage())
+				if (skipGarbagePack(pack))
 					continue;
 				try {
 					long p = pack.findOffset(this, t);
