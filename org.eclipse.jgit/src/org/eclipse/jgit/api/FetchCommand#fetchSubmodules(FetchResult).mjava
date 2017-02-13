@@ -1,0 +1,45 @@
+	private void fetchSubmodules(FetchResult results)
+			throws org.eclipse.jgit.api.errors.TransportException,
+			GitAPIException, InvalidConfigurationException {
+		try (SubmoduleWalk walk = new SubmoduleWalk(repo);
+				RevWalk revWalk = new RevWalk(repo)) {
+			// Walk over submodules in the parent repository's FETCH_HEAD.
+			walk.setTree(revWalk.parseTree(repo.resolve(Constants.FETCH_HEAD)));
+			while (walk.next()) {
+				Repository submoduleRepo = walk.getRepository();
+
+				// Skip submodules that don't exist locally (have not been
+				// cloned), are not registered in the .gitmodules file, or
+				// not registered in the parent repository's config.
+				if (submoduleRepo == null || walk.getModulesPath() == null
+						|| walk.getConfigUrl() == null) {
+					continue;
+				}
+
+				FetchRecurseSubmodulesMode recurseMode = getRecurseMode(
+						submoduleRepo, walk.getPath());
+
+				// When the fetch mode is "yes" we always fetch. When the mode
+				// is "on demand", we only fetch if the submodule's revision was
+				// updated to an object that is not currently present in the
+				// submodule.
+				if ((recurseMode == FetchRecurseSubmodulesMode.ON_DEMAND
+						&& !submoduleRepo.hasObject(walk.getObjectId()))
+						|| recurseMode == FetchRecurseSubmodulesMode.YES) {
+					FetchCommand f = new FetchCommand(submoduleRepo)
+							.setProgressMonitor(monitor).setTagOpt(tagOption)
+							.setCheckFetchedObjects(checkFetchedObjects)
+							.setRemoveDeletedRefs(isRemoveDeletedRefs())
+							.setThin(thin).setRefSpecs(refSpecs)
+							.setDryRun(dryRun)
+							.setRecurseSubmodules(recurseMode);
+					results.addSubmodule(walk.getPath(), f.call());
+				}
+			}
+		} catch (IOException e) {
+			throw new JGitInternalException(e.getMessage(), e);
+		} catch (ConfigInvalidException e) {
+			throw new InvalidConfigurationException(e.getMessage(), e);
+		}
+	}
+
