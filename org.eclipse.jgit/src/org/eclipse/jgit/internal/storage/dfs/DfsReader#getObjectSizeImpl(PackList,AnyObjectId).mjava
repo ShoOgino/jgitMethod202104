@@ -1,7 +1,7 @@
 	private long getObjectSizeImpl(PackList packList, AnyObjectId objectId)
 			throws IOException {
 		for (DfsPackFile pack : packList.packs) {
-			if (pack == last) {
+			if (pack == last || skipGarbagePack(pack)) {
 				continue;
 			}
 			long sz = pack.getObjectSize(this, objectId);

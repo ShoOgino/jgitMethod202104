@@ -2,7 +2,7 @@
 	public long getObjectSize(AnyObjectId objectId, int typeHint)
 			throws MissingObjectException, IncorrectObjectTypeException,
 			IOException {
-		if (last != null) {
+		if (last != null && !skipGarbagePack(last)) {
 			long sz = last.getObjectSize(this, objectId);
 			if (0 <= sz) {
 				return sz;

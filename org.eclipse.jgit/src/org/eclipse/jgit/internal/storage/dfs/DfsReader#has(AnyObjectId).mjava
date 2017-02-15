@@ -1,6 +1,8 @@
 	@Override
 	public boolean has(AnyObjectId objectId) throws IOException {
-		if (last != null && last.hasObject(this, objectId))
+		if (last != null
+				&& !skipGarbagePack(last)
+				&& last.hasObject(this, objectId))
 			return true;
 		PackList packList = db.getPackList();
 		if (hasImpl(packList, objectId)) {

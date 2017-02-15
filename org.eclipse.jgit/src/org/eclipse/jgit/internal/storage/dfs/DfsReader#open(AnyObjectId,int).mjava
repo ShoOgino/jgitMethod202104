@@ -3,7 +3,7 @@
 			throws MissingObjectException, IncorrectObjectTypeException,
 			IOException {
 		ObjectLoader ldr;
-		if (last != null) {
+		if (last != null && !skipGarbagePack(last)) {
 			ldr = last.get(this, objectId);
 			if (ldr != null) {
 				return checkType(ldr, objectId, typeHint);
