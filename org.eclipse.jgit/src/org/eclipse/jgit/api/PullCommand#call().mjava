@@ -95,9 +95,8 @@
 						JGitText.get().operationCanceled,
 						JGitText.get().pullTaskName));
 
-			FetchCommand fetch = new FetchCommand(repo);
-			fetch.setRemote(remote);
-			fetch.setProgressMonitor(monitor);
+			FetchCommand fetch = new FetchCommand(repo).setRemote(remote)
+					.setProgressMonitor(monitor).setTagOpt(tagOption);
 			configure(fetch);
 
 			fetchRes = fetch.call();
