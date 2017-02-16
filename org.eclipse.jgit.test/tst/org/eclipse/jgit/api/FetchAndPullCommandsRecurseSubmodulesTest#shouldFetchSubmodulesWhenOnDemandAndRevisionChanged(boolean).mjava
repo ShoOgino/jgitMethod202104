@@ -1,8 +1,9 @@
-	@Test
-	public void shouldFetchSubmodulesWhenOnDemandAndRevisionChanged()
-			throws Exception {
+	@Theory
+	public void shouldFetchSubmodulesWhenOnDemandAndRevisionChanged(
+			boolean fetch) throws Exception {
 		RevCommit update = updateSubmoduleRevision();
-		FetchResult result = fetch(FetchRecurseSubmodulesMode.ON_DEMAND);
+		FetchResult result = execute(FetchRecurseSubmodulesMode.ON_DEMAND,
+				fetch);
 
 		// The first submodule should have been updated
 		assertTrue(result.submoduleResults().containsKey("sub"));

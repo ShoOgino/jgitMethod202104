@@ -1,0 +1,9 @@
+	@Theory
+	public void shouldNotFetchSubmodulesWhenOnDemandAndRevisionNotChanged(
+			boolean fetch) throws Exception {
+		FetchResult result = execute(FetchRecurseSubmodulesMode.ON_DEMAND,
+				fetch);
+		assertTrue(result.submoduleResults().isEmpty());
+		assertSubmoduleFetchHeads(submodule1Head, submodule2Head);
+	}
+

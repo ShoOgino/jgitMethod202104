@@ -1,12 +1,12 @@
-	@Test
-	public void shouldFetchSubmodulesWhenSubmoduleConfigurationSetToYes()
-			throws Exception {
+	@Theory
+	public void shouldFetchSubmodulesWhenFetchConfigurationSetToYes(
+			boolean fetch) throws Exception {
 		StoredConfig config = git2.getRepository().getConfig();
-		config.setEnum(ConfigConstants.CONFIG_SUBMODULE_SECTION, PATH,
-				ConfigConstants.CONFIG_KEY_FETCH_RECURSE_SUBMODULES,
+		config.setEnum(ConfigConstants.CONFIG_FETCH_SECTION, null,
+				ConfigConstants.CONFIG_KEY_RECURSE_SUBMODULES,
 				FetchRecurseSubmodulesMode.YES);
 		config.save();
-		FetchResult result = fetch(null);
+		FetchResult result = execute(null, fetch);
 		assertTrue(result.submoduleResults().containsKey("sub"));
 		FetchResult subResult = result.submoduleResults().get("sub");
 		assertTrue(subResult.submoduleResults().containsKey("sub"));

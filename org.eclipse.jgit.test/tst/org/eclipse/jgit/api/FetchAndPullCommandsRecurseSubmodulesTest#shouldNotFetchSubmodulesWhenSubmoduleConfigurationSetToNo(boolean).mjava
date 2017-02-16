@@ -1,13 +1,13 @@
-	@Test
-	public void shouldNotFetchSubmodulesWhenSubmoduleConfigurationSetToNo()
-			throws Exception {
+	@Theory
+	public void shouldNotFetchSubmodulesWhenSubmoduleConfigurationSetToNo(
+			boolean fetch) throws Exception {
 		StoredConfig config = git2.getRepository().getConfig();
 		config.setEnum(ConfigConstants.CONFIG_SUBMODULE_SECTION, PATH,
 				ConfigConstants.CONFIG_KEY_FETCH_RECURSE_SUBMODULES,
 				FetchRecurseSubmodulesMode.NO);
 		config.save();
 		updateSubmoduleRevision();
-		FetchResult result = fetch(null);
+		FetchResult result = execute(null, fetch);
 		assertTrue(result.submoduleResults().isEmpty());
 		assertSubmoduleFetchHeads(submodule1Head, submodule2Head);
 	}

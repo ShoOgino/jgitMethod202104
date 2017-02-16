@@ -1,0 +1,22 @@
+	private FetchResult execute(FetchRecurseSubmodulesMode mode, boolean fetch)
+			throws Exception {
+		FetchResult result;
+
+		if (fetch) {
+			result = git2.fetch().setRemote(REMOTE).setRefSpecs(REFSPEC)
+					.setRecurseSubmodules(mode).call();
+		} else {
+			// For the purposes of this test we don't need to care about the
+			// pull result, or the result of pull with merge. We are only
+			// interested in checking whether or not the submodules were updated
+			// as expected. Setting to rebase makes it easier to assert about
+			// the state of the parent repository head, i.e. we know it should
+			// be at the submodule update commit, and don't need to consider a
+			// merge commit created by the pull.
+			result = git2.pull().setRemote(REMOTE).setRebase(true)
+					.setRecurseSubmodules(mode).call().getFetchResult();
+		}
+		assertNotNull(result);
+		return result;
+	}
+
