@@ -25,7 +25,8 @@
 		ObjectReader reader = repo.newObjectReader();
 		ObjectDirectory dir = repo.getObjectDatabase();
 		ObjectDirectoryInserter inserter = dir.newInserter();
-		boolean shouldLoosen = getExpireDate() < Long.MAX_VALUE;
+		boolean shouldLoosen = !"now".equals(getPruneExpireStr()) && //$NON-NLS-1$
+			getExpireDate() < Long.MAX_VALUE;
 
 		prunePreserved();
 		long packExpireDate = getPackExpireDate();
@@ -48,6 +49,7 @@
 				prunePack(oldName);
 			}
 		}
+
 		// close the complete object database. That's my only chance to force
 		// rescanning and to detect that certain pack files are now deleted.
 		repo.getObjectDatabase().close();
