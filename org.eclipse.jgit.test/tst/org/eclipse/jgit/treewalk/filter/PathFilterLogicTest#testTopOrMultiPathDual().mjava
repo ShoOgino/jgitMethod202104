@@ -1,0 +1,11 @@
+	@Test
+	public void testTopOrMultiPathDual() throws IOException {
+		List<String> expected = Arrays.asList("sub1.txt", "sub2");
+
+		TreeFilter[] tf = new TreeFilter[] {PathFilter.create("sub1.txt"),
+				PathFilter.create("sub2")};
+		List<String> paths = getMatchingPathsFlat(treeId, OrTreeFilter.create(tf));
+
+		assertEquals(expected, paths);
+	}
+

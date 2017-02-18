@@ -1,0 +1,12 @@
+	@Test
+	public void testOrMultiTwoSubPath() throws IOException {
+		List<String> expected = Arrays.asList("sub1/subb/b.txt",
+				"sub2/suba/a.txt");
+
+		TreeFilter[] tf = new TreeFilter[] {PathFilter.create("sub1/subb"),
+				PathFilter.create("sub2/suba")};
+		List<String> paths = getMatchingPaths(treeId, OrTreeFilter.create(tf));
+
+		assertEquals(expected, paths);
+	}
+

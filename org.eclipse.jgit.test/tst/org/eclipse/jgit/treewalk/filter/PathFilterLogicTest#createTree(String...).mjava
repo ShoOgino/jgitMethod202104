@@ -1,0 +1,14 @@
+	private ObjectId createTree(String... paths) throws IOException {
+		final ObjectInserter odi = db.newObjectInserter();
+		final DirCache dc = db.readDirCache();
+		final DirCacheBuilder builder = dc.builder();
+		for (String path : paths) {
+			DirCacheEntry entry = createEntry(path, FileMode.REGULAR_FILE);
+			builder.add(entry);
+		}
+		builder.finish();
+		final ObjectId objId = dc.writeTree(odi);
+		odi.flush();
+		return objId;
+	}
+

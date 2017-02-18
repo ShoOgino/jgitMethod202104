@@ -1,0 +1,11 @@
+	@Test
+	public void testAndMultiSubPath() throws IOException {
+		List<String> expected = Collections.emptyList();
+
+		TreeFilter[] tf = new TreeFilter[] {PathFilter.create("sub1"),
+				PathFilter.create("sub2/suba")};
+		List<String> paths = getMatchingPaths(treeId, AndTreeFilter.create(tf));
+
+		assertEquals(expected, paths);
+	}
+

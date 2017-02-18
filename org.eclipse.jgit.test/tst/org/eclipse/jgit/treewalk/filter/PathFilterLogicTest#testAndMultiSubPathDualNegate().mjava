@@ -1,0 +1,12 @@
+	@Test
+	public void testAndMultiSubPathDualNegate() throws IOException {
+		List<String> expected = Arrays.asList("a.txt", "sub1.txt",
+				"sub1/subb/b.txt");
+
+		TreeFilter[] tf = new TreeFilter[] {PathFilter.create("sub1/suba").negate(),
+				PathFilter.create("sub2").negate()};
+		List<String> paths = getMatchingPaths(treeId, AndTreeFilter.create(tf));
+
+		assertEquals(expected, paths);
+	}
+

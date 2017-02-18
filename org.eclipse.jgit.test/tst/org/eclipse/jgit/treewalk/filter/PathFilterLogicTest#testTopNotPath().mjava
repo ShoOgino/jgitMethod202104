@@ -1,0 +1,10 @@
+	@Test
+	public void testTopNotPath() throws IOException {
+		List<String> expected = Arrays.asList("a.txt", "sub1.txt", "sub2");
+
+		TreeFilter tf = PathFilter.create("sub1");
+		List<String> paths = getMatchingPathsFlat(treeId, NotTreeFilter.create(tf));
+
+		assertEquals(expected, paths);
+	}
+

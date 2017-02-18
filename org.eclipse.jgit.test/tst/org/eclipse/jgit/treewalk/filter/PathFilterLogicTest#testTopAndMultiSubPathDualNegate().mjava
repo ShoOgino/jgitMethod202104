@@ -1,0 +1,15 @@
+	@Test
+	public void testTopAndMultiSubPathDualNegate() throws IOException {
+		List<String> expected = Arrays.asList("a.txt", "sub1.txt", "sub1");
+
+		// Filter on 'sub1/suba' is kind of silly for a non-recursive walk.
+		// The result is interesting though as the 'sub1' path should be
+		// returned, due to the fact that there may be hits once the pattern
+		// is tested with one of the leaf paths.
+		TreeFilter[] tf = new TreeFilter[] {PathFilter.create("sub1/suba").negate(),
+				PathFilter.create("sub2").negate()};
+		List<String> paths = getMatchingPathsFlat(treeId, AndTreeFilter.create(tf));
+
+		assertEquals(expected, paths);
+	}
+

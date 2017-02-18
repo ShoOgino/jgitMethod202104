@@ -1,0 +1,12 @@
+	@Test
+	public void testAndMultiThreeSubPathNegate() throws IOException {
+		List<String> expected = Collections.singletonList("sub1/subb/b.txt");
+
+		TreeFilter[] tf = new TreeFilter[]{PathFilter.create("sub1"),
+				PathFilter.create("sub1/suba").negate(),
+				PathFilter.create("no/path").negate()};
+		List<String> paths = getMatchingPaths(treeId, AndTreeFilter.create(tf));
+
+		assertEquals(expected, paths);
+	}
+

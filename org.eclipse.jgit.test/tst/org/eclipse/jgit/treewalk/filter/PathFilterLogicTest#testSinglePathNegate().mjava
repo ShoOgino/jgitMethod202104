@@ -1,0 +1,11 @@
+	@Test
+	public void testSinglePathNegate() throws IOException {
+		List<String> expected = Arrays.asList("a.txt", "sub1.txt",
+				"sub2/suba/a.txt");
+
+		TreeFilter tf = PathFilter.create("sub1").negate();
+		List<String> paths = getMatchingPaths(treeId, tf);
+
+		assertEquals(expected, paths);
+	}
+
