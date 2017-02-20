@@ -33,14 +33,6 @@
 			rawOut = o;
 		}
 
-		if (maxPackSizeLimit >= 0)
-			rawIn = new LimitedInputStream(rawIn, maxPackSizeLimit) {
-				@Override
-				protected void limitExceeded() throws TooLargePackException {
-					throw new TooLargePackException(limit);
-				}
-			};
-
 		pckIn = new PacketLineIn(rawIn);
 		pckOut = new PacketLineOut(rawOut);
 		pckOut.setFlushOnEnd(false);
