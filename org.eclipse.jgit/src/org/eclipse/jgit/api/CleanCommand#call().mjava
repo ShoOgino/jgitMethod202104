@@ -10,14 +10,14 @@
 	 */
 	@Override
 	public Set<String> call() throws NoWorkTreeException, GitAPIException {
-		Set<String> files = new TreeSet<String>();
+		Set<String> files = new TreeSet<>();
 		try {
 			StatusCommand command = new StatusCommand(repo);
 			Status status = command.call();
 
-			Set<String> untrackedAndIgnoredFiles = new TreeSet<String>(
+			Set<String> untrackedAndIgnoredFiles = new TreeSet<>(
 					status.getUntracked());
-			Set<String> untrackedAndIgnoredDirs = new TreeSet<String>(
+			Set<String> untrackedAndIgnoredDirs = new TreeSet<>(
 					status.getUntrackedFolders());
 
 			FS fs = getRepository().getFS();

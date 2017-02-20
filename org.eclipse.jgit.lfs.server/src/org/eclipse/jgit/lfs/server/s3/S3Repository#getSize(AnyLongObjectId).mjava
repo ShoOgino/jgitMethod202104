@@ -1,10 +1,10 @@
 	@Override
 	public long getSize(AnyLongObjectId oid) throws IOException {
 		URL endpointUrl = getObjectUrl(oid);
-		Map<String, String> queryParams = new HashMap<String, String>();
+		Map<String, String> queryParams = new HashMap<>();
 		queryParams.put(X_AMZ_EXPIRES,
 				Integer.toString(s3Config.getExpirationSeconds()));
-		Map<String, String> headers = new HashMap<String, String>();
+		Map<String, String> headers = new HashMap<>();
 
 		String authorizationQueryParameters = SignerV4.createAuthorizationQuery(
 				s3Config, endpointUrl, METHOD_HEAD, headers, queryParams,

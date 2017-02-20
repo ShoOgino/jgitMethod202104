@@ -7,7 +7,7 @@
 		FileResolver<RepositoryResolver> resolver;
 
 		assertFalse("no git-daemon-export-ok", export.exists());
-		resolver = new FileResolver<RepositoryResolver>(base, false /*
+		resolver = new FileResolver<>(base, false /*
 																	 * require
 																	 * flag
 																	 */);
@@ -18,7 +18,7 @@
 			assertEquals("Service not enabled", e.getMessage());
 		}
 
-		resolver = new FileResolver<RepositoryResolver>(base, true /*
+		resolver = new FileResolver<>(base, true /*
 																	 * export
 																	 * all
 																	 */);
@@ -29,7 +29,7 @@
 		}
 
 		FileUtils.createNewFile(export);
-		resolver = new FileResolver<RepositoryResolver>(base, false /*
+		resolver = new FileResolver<>(base, false /*
 																	 * require
 																	 * flag
 																	 */);

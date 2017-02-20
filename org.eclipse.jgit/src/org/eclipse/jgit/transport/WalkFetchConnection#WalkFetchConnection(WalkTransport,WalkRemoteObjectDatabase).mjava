@@ -5,20 +5,20 @@
 		inserter = local.newObjectInserter();
 		reader = inserter.newReader();
 
-		remotes = new ArrayList<WalkRemoteObjectDatabase>();
+		remotes = new ArrayList<>();
 		remotes.add(w);
 
-		unfetchedPacks = new LinkedList<RemotePack>();
-		packsConsidered = new HashSet<String>();
+		unfetchedPacks = new LinkedList<>();
+		packsConsidered = new HashSet<>();
 
-		noPacksYet = new LinkedList<WalkRemoteObjectDatabase>();
+		noPacksYet = new LinkedList<>();
 		noPacksYet.add(w);
 
-		noAlternatesYet = new LinkedList<WalkRemoteObjectDatabase>();
+		noAlternatesYet = new LinkedList<>();
 		noAlternatesYet.add(w);
 
-		fetchErrors = new HashMap<ObjectId, List<Throwable>>();
-		packLocks = new ArrayList<PackLock>(4);
+		fetchErrors = new HashMap<>();
+		packLocks = new ArrayList<>(4);
 
 		revWalk = new RevWalk(reader);
 		revWalk.setRetainBody(false);
@@ -28,6 +28,6 @@
 		LOCALLY_SEEN = revWalk.newFlag("LOCALLY_SEEN"); //$NON-NLS-1$
 
 		localCommitQueue = new DateRevQueue();
-		workQueue = new LinkedList<ObjectId>();
+		workQueue = new LinkedList<>();
 	}
 

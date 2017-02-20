@@ -26,7 +26,7 @@
 			diff = new IndexDiff(db, Constants.HEAD,
 					new FileTreeIterator(db));
 			diff.diff();
-			assertEquals(new HashSet<String>(Arrays.asList("target")),
+			assertEquals(new HashSet<>(Arrays.asList("target")),
 					diff.getUntrackedFolders());
 
 			writeTrashFile("src/tst/A.java", "");
@@ -34,7 +34,7 @@
 
 			diff = new IndexDiff(db, Constants.HEAD, new FileTreeIterator(db));
 			diff.diff();
-			assertEquals(new HashSet<String>(Arrays.asList("target", "src/tst")),
+			assertEquals(new HashSet<>(Arrays.asList("target", "src/tst")),
 					diff.getUntrackedFolders());
 
 			git.rm().addFilepattern("src/com/B.java").addFilepattern("src/org")
@@ -45,7 +45,7 @@
 			diff = new IndexDiff(db, Constants.HEAD, new FileTreeIterator(db));
 			diff.diff();
 			assertEquals(
-					new HashSet<String>(Arrays.asList("src/org", "src/tst",
+					new HashSet<>(Arrays.asList("src/org", "src/tst",
 							"target")),
 					diff.getUntrackedFolders());
 		}

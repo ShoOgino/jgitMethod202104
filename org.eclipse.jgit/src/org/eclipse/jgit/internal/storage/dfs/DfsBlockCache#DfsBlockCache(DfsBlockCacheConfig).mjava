@@ -4,7 +4,7 @@
 		if (tableSize < 1)
 			throw new IllegalArgumentException(JGitText.get().tSizeMustBeGreaterOrEqual1);
 
-		table = new AtomicReferenceArray<HashEntry>(tableSize);
+		table = new AtomicReferenceArray<>(tableSize);
 		loadLocks = new ReentrantLock[cfg.getConcurrencyLevel()];
 		for (int i = 0; i < loadLocks.length; i++)
 			loadLocks[i] = new ReentrantLock(true /* fair */);
@@ -15,10 +15,10 @@
 		blockSizeShift = Integer.numberOfTrailingZeros(blockSize);
 
 		clockLock = new ReentrantLock(true /* fair */);
-		clockHand = new Ref<Object>(new DfsPackKey(), -1, 0, null);
+		clockHand = new Ref<>(new DfsPackKey(), -1, 0, null);
 		clockHand.next = clockHand;
 
-		packCache = new ConcurrentHashMap<DfsPackDescription, DfsPackFile>(
+		packCache = new ConcurrentHashMap<>(
 				16, 0.75f, 1);
 		packFiles = Collections.unmodifiableCollection(packCache.values());
 

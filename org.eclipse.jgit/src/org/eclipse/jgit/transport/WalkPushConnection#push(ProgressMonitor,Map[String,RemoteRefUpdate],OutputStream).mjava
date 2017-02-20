@@ -4,14 +4,14 @@
 			throws TransportException {
 		markStartedOperation();
 		packNames = null;
-		newRefs = new TreeMap<String, Ref>(getRefsMap());
-		packedRefUpdates = new ArrayList<RemoteRefUpdate>(refUpdates.size());
+		newRefs = new TreeMap<>(getRefsMap());
+		packedRefUpdates = new ArrayList<>(refUpdates.size());
 
 		// Filter the commands and issue all deletes first. This way we
 		// can correctly handle a directory being cleared out and a new
 		// ref using the directory name being created.
 		//
-		final List<RemoteRefUpdate> updates = new ArrayList<RemoteRefUpdate>();
+		final List<RemoteRefUpdate> updates = new ArrayList<>();
 		for (final RemoteRefUpdate u : refUpdates.values()) {
 			final String n = u.getRemoteName();
 			if (!n.startsWith("refs/") || !Repository.isValidRefName(n)) { //$NON-NLS-1$

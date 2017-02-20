@@ -4,7 +4,7 @@
 	@NonNull
 	public Map<AnyObjectId, Set<Ref>> getAllRefsByPeeledObjectId() {
 		Map<String, Ref> allRefs = getAllRefs();
-		Map<AnyObjectId, Set<Ref>> ret = new HashMap<AnyObjectId, Set<Ref>>(allRefs.size());
+		Map<AnyObjectId, Set<Ref>> ret = new HashMap<>(allRefs.size());
 		for (Ref ref : allRefs.values()) {
 			ref = peel(ref);
 			AnyObjectId target = ref.getPeeledObjectId();
@@ -16,7 +16,7 @@
 				// that was not the case (rare)
 				if (oset.size() == 1) {
 					// Was a read-only singleton, we must copy to a new Set
-					oset = new HashSet<Ref>(oset);
+					oset = new HashSet<>(oset);
 				}
 				ret.put(target, oset);
 				oset.add(ref);

@@ -6,8 +6,8 @@
 		try (final PackWriter writer = new PackWriter(transport.getPackConfig(),
 				local.newObjectReader())) {
 
-			final Set<ObjectId> need = new HashSet<ObjectId>();
-			final Set<ObjectId> have = new HashSet<ObjectId>();
+			final Set<ObjectId> need = new HashSet<>();
+			final Set<ObjectId> have = new HashSet<>();
 			for (final RemoteRefUpdate r : updates)
 				need.add(r.getNewObjectId());
 			for (final Ref r : getRefs()) {
@@ -24,7 +24,7 @@
 			if (writer.getObjectCount() == 0)
 				return;
 
-			packNames = new LinkedHashMap<String, String>();
+			packNames = new LinkedHashMap<>();
 			for (final String n : dest.getPackNames())
 				packNames.put(n, n);
 
@@ -60,7 +60,7 @@
 			// way clients are likely to consult the newest pack first,
 			// and discover the most recent objects there.
 			//
-			final ArrayList<String> infoPacks = new ArrayList<String>();
+			final ArrayList<String> infoPacks = new ArrayList<>();
 			infoPacks.add(packName);
 			infoPacks.addAll(packNames.keySet());
 			dest.writeInfoPacks(infoPacks);

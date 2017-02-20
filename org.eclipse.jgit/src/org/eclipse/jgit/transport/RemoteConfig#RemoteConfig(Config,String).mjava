@@ -22,24 +22,24 @@
 
 		vlst = rc.getStringList(SECTION, name, KEY_URL);
 		Map<String, String> insteadOf = getReplacements(rc, KEY_INSTEADOF);
-		uris = new ArrayList<URIish>(vlst.length);
+		uris = new ArrayList<>(vlst.length);
 		for (final String s : vlst)
 			uris.add(new URIish(replaceUri(s, insteadOf)));
 
 		Map<String, String> pushInsteadOf = getReplacements(rc,
 				KEY_PUSHINSTEADOF);
 		vlst = rc.getStringList(SECTION, name, KEY_PUSHURL);
-		pushURIs = new ArrayList<URIish>(vlst.length);
+		pushURIs = new ArrayList<>(vlst.length);
 		for (final String s : vlst)
 			pushURIs.add(new URIish(replaceUri(s, pushInsteadOf)));
 
 		vlst = rc.getStringList(SECTION, name, KEY_FETCH);
-		fetch = new ArrayList<RefSpec>(vlst.length);
+		fetch = new ArrayList<>(vlst.length);
 		for (final String s : vlst)
 			fetch.add(new RefSpec(s));
 
 		vlst = rc.getStringList(SECTION, name, KEY_PUSH);
-		push = new ArrayList<RefSpec>(vlst.length);
+		push = new ArrayList<>(vlst.length);
 		for (final String s : vlst)
 			push.add(new RefSpec(s));
 

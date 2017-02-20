@@ -30,7 +30,7 @@
 		pm.endTask();
 
 		int totCommits = selectionHelper.getCommitCount();
-		BlockList<BitmapCommit> selections = new BlockList<BitmapCommit>(
+		BlockList<BitmapCommit> selections = new BlockList<>(
 				totCommits / recentCommitSpan + 1);
 		for (BitmapCommit reuse : selectionHelper.reusedCommits) {
 			selections.add(reuse);
@@ -57,7 +57,7 @@
 			// better compression/on the run-length encoding of the XORs between
 			// them.
 			List<List<BitmapCommit>> chains =
-					new ArrayList<List<BitmapCommit>>();
+					new ArrayList<>();
 
 			// Mark the current branch as inactive if its tip commit isn't
 			// recent and there are an excessive number of branches, to
@@ -149,7 +149,7 @@
 				}
 
 				if (longestAncestorChain == null) {
-					longestAncestorChain = new ArrayList<BitmapCommit>();
+					longestAncestorChain = new ArrayList<>();
 					chains.add(longestAncestorChain);
 				}
 				longestAncestorChain.add(new BitmapCommit(

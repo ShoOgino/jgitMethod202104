@@ -2,7 +2,7 @@
 	public Response.Action getUploadAction(AnyLongObjectId oid, long size) {
 		cacheObjectMetaData(oid, size);
 		URL objectUrl = getObjectUrl(oid);
-		Map<String, String> headers = new HashMap<String, String>();
+		Map<String, String> headers = new HashMap<>();
 		headers.put(X_AMZ_CONTENT_SHA256, oid.getName());
 		headers.put(HDR_CONTENT_LENGTH, Long.toString(size));
 		headers.put(X_AMZ_STORAGE_CLASS, s3Config.getStorageClass());

@@ -21,7 +21,7 @@
 			int expectedCommitCount) throws IncorrectObjectTypeException,
 					IOException, MissingObjectException {
 		BitmapBuilder reuse = commitBitmapIndex.newBitmapBuilder();
-		List<BitmapCommit> reuseCommits = new ArrayList<BitmapCommit>();
+		List<BitmapCommit> reuseCommits = new ArrayList<>();
 		for (PackBitmapIndexRemapper.Entry entry : bitmapRemapper) {
 			// More recent commits did not have the reuse flag set, so skip them
 			if ((entry.getFlags() & FLAG_REUSE) != FLAG_REUSE) {
@@ -43,9 +43,9 @@
 
 		// Add branch tips that are not represented in old bitmap indices. Set
 		// up the RevWalk to walk the new commits not in the old packs.
-		List<BitmapBuilderEntry> tipCommitBitmaps = new ArrayList<BitmapBuilderEntry>(
+		List<BitmapBuilderEntry> tipCommitBitmaps = new ArrayList<>(
 				want.size());
-		Set<RevCommit> peeledWant = new HashSet<RevCommit>(want.size());
+		Set<RevCommit> peeledWant = new HashSet<>(want.size());
 		for (AnyObjectId objectId : want) {
 			RevObject ro = rw.peel(rw.parseAny(objectId));
 			if (!(ro instanceof RevCommit) || reuse.contains(ro)) {

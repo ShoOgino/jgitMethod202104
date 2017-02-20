@@ -24,7 +24,7 @@
 			}
 		}
 
-		List<ObjectId> all = new ArrayList<ObjectId>(want.size() + have.size());
+		List<ObjectId> all = new ArrayList<>(want.size() + have.size());
 		all.addAll(want);
 		all.addAll(have);
 
@@ -42,9 +42,9 @@
 				walker.sort(RevSort.BOUNDARY, true);
 		}
 
-		List<RevObject> wantObjs = new ArrayList<RevObject>(want.size());
-		List<RevObject> haveObjs = new ArrayList<RevObject>(haveEst);
-		List<RevTag> wantTags = new ArrayList<RevTag>(want.size());
+		List<RevObject> wantObjs = new ArrayList<>(want.size());
+		List<RevObject> haveObjs = new ArrayList<>(haveEst);
+		List<RevTag> wantTags = new ArrayList<>(want.size());
 
 		// Retrieve the RevWalk's versions of "want" and "have" objects to
 		// maintain any state previously set in the RevWalk.
@@ -75,7 +75,7 @@
 		}
 
 		if (!wantTags.isEmpty()) {
-			all = new ArrayList<ObjectId>(wantTags.size());
+			all = new ArrayList<>(wantTags.size());
 			for (RevTag tag : wantTags)
 				all.add(tag.getObject());
 			q = walker.parseAny(all, true);
@@ -118,8 +118,8 @@
 			walker.markUninteresting(obj);
 
 		final int maxBases = config.getDeltaSearchWindowSize();
-		Set<RevTree> baseTrees = new HashSet<RevTree>();
-		BlockList<RevCommit> commits = new BlockList<RevCommit>();
+		Set<RevTree> baseTrees = new HashSet<>();
+		BlockList<RevCommit> commits = new BlockList<>();
 		Set<ObjectId> roots = new HashSet<>();
 		RevCommit c;
 		while ((c = walker.next()) != null) {

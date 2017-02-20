@@ -5,7 +5,7 @@
 			LogCommand cmd = git.log().addRange(upstreamCommit, headCommit);
 			commitsToUse = cmd.call();
 		}
-		List<RevCommit> cherryPickList = new ArrayList<RevCommit>();
+		List<RevCommit> cherryPickList = new ArrayList<>();
 		for (RevCommit commit : commitsToUse) {
 			if (preserveMerges || commit.getParentCount() == 1)
 				cherryPickList.add(commit);

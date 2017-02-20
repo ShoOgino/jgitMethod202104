@@ -1,7 +1,7 @@
 	@Override
 	public Map<ObjectId, String> call() throws GitAPIException {
 		try {
-			Map<ObjectId, String> nonCommits = new HashMap<ObjectId, String>();
+			Map<ObjectId, String> nonCommits = new HashMap<>();
 			FIFORevQueue pending = new FIFORevQueue();
 			if (refs != null) {
 				for (Ref ref : refs)
@@ -34,7 +34,7 @@
 			}
 
 			Map<ObjectId, String> result =
-				new LinkedHashMap<ObjectId, String>(revs.size());
+				new LinkedHashMap<>(revs.size());
 			for (ObjectId id : revs) {
 				RevObject o = walk.parseAny(id);
 				if (o instanceof NameRevCommit) {

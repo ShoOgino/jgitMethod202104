@@ -1,6 +1,6 @@
 	private void recreateCommitGraph() throws IOException {
-		final Map<ObjectId, ToRewrite> toRewrite = new HashMap<ObjectId, ToRewrite>();
-		List<ToRewrite> queue = new ArrayList<ToRewrite>();
+		final Map<ObjectId, ToRewrite> toRewrite = new HashMap<>();
+		List<ToRewrite> queue = new ArrayList<>();
 		try (RevWalk rw = new RevWalk(db);
 				final BufferedReader br = new BufferedReader(
 						new InputStreamReader(new FileInputStream(graph),
@@ -38,7 +38,7 @@
 			while (!queue.isEmpty()) {
 				final ListIterator<ToRewrite> itr = queue
 						.listIterator(queue.size());
-				queue = new ArrayList<ToRewrite>();
+				queue = new ArrayList<>();
 				REWRITE: while (itr.hasPrevious()) {
 					final ToRewrite t = itr.previous();
 					final ObjectId[] newParents = new ObjectId[t.oldParents.length];

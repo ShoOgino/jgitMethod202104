@@ -7,8 +7,8 @@
 		HashMap<AbbreviatedObjectId, Object> deletedMap = populateMap(deleted, pm);
 		HashMap<AbbreviatedObjectId, Object> addedMap = populateMap(added, pm);
 
-		ArrayList<DiffEntry> uniqueAdds = new ArrayList<DiffEntry>(added.size());
-		ArrayList<List<DiffEntry>> nonUniqueAdds = new ArrayList<List<DiffEntry>>();
+		ArrayList<DiffEntry> uniqueAdds = new ArrayList<>(added.size());
+		ArrayList<List<DiffEntry>> nonUniqueAdds = new ArrayList<>();
 
 		for (Object o : addedMap.values()) {
 			if (o instanceof DiffEntry)
@@ -17,7 +17,7 @@
 				nonUniqueAdds.add((List<DiffEntry>) o);
 		}
 
-		ArrayList<DiffEntry> left = new ArrayList<DiffEntry>(added.size());
+		ArrayList<DiffEntry> left = new ArrayList<>(added.size());
 
 		for (DiffEntry a : uniqueAdds) {
 			Object del = deletedMap.get(a.newId);
@@ -126,7 +126,7 @@
 		}
 		added = left;
 
-		deleted = new ArrayList<DiffEntry>(deletedMap.size());
+		deleted = new ArrayList<>(deletedMap.size());
 		for (Object o : deletedMap.values()) {
 			if (o instanceof DiffEntry) {
 				DiffEntry e = (DiffEntry) o;
