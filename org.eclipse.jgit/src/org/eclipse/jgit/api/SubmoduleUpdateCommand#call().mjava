@@ -36,6 +36,9 @@
 				Repository submoduleRepo = generator.getRepository();
 				// Clone repository is not present
 				if (submoduleRepo == null) {
+					if (callback != null) {
+						callback.cloningSubmodule(generator.getPath());
+					}
 					CloneCommand clone = Git.cloneRepository();
 					configure(clone);
 					clone.setURI(url);
@@ -76,6 +79,10 @@
 								Constants.HEAD, true);
 						refUpdate.setNewObjectId(commit);
 						refUpdate.forceUpdate();
+						if (callback != null) {
+							callback.checkingOut(commit,
+									generator.getPath());
+						}
 					}
 				} finally {
 					submoduleRepo.close();

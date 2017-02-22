@@ -22,13 +22,15 @@
 
 		CloneCommand command = Git.cloneRepository();
 		command.setURI(sourceUri).setRemote(remoteName).setBare(isBare)
-				.setNoCheckout(noCheckout).setBranch(branch);
+				.setNoCheckout(noCheckout).setBranch(branch)
+				.setCloneSubmodules(cloneSubmodules);
 
 		command.setGitDir(gitdir == null ? null : new File(gitdir));
 		command.setDirectory(localNameF);
 		boolean msgs = quiet == null || !quiet.booleanValue();
 		if (msgs) {
-			command.setProgressMonitor(new TextProgressMonitor(errw));
+			command.setProgressMonitor(new TextProgressMonitor(errw))
+					.setCallback(this);
 			outw.println(MessageFormat.format(
 					CLIText.get().cloningInto, localName));
 			outw.flush();

@@ -1,12 +1,18 @@
 	private void cloneSubmodules(Repository clonedRepo) throws IOException,
 			GitAPIException {
 		SubmoduleInitCommand init = new SubmoduleInitCommand(clonedRepo);
-		if (init.call().isEmpty())
+		Collection<String> submodules = init.call();
+		if (submodules.isEmpty()) {
 			return;
+		}
+		if (callback != null) {
+			callback.initializedSubmodules(submodules);
+		}
 
 		SubmoduleUpdateCommand update = new SubmoduleUpdateCommand(clonedRepo);
 		configure(update);
 		update.setProgressMonitor(monitor);
+		update.setCallback(callback);
 		if (!update.call().isEmpty()) {
 			SubmoduleWalk walk = SubmoduleWalk.forIndex(clonedRepo);
 			while (walk.next()) {
