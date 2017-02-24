@@ -5,6 +5,8 @@
 	 *            the request
 	 * @param path
 	 *            the path
+	 * @param auth
+	 *            the Authorization HTTP header
 	 *
 	 * @return the large file repository storing large files.
 	 * @throws LfsException
@@ -31,13 +33,8 @@
 	 *             <dt>{@link LfsException}</dt>
 	 *             <dd>when an unexpected internal server error occurred</dd>
 	 *             </dl>
-	 * @since 4.5
-	 * @deprecated use
-	 *             {@link #getLargeFileRepository(LfsRequest, String, String)}
+	 * @since 4.7
 	 */
-	@Deprecated
-	protected LargeFileRepository getLargeFileRepository(LfsRequest request,
-			String path) throws LfsException {
-		return getLargeFileRepository(request, path, null);
-	}
+	protected abstract LargeFileRepository getLargeFileRepository(
+			LfsRequest request, String path, String auth) throws LfsException;
 

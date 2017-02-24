@@ -12,7 +12,8 @@
 		res.setContentType(CONTENTTYPE_VND_GIT_LFS_JSON);
 		LargeFileRepository repo = null;
 		try {
-			repo = getLargeFileRepository(request, path);
+			repo = getLargeFileRepository(request, path,
+					req.getHeader(HDR_AUTHORIZATION));
 			if (repo == null) {
 				String error = MessageFormat
 						.format(LfsText.get().lfsFailedToGetRepository, path);
