@@ -1,0 +1,36 @@
+	/**
+	 * Update the digest computation by adding bytes to the message.
+	 *
+	 * @param in
+	 *            input array of bytes.
+	 * @param p
+	 *            offset to start at from {@code in}.
+	 * @param len
+	 *            number of bytes to hash.
+	 */
+	public void update(byte[] in, int p, int len) {
+		// SHA-1 compress can only process whole 64 byte blocks.
+		// Hold partial updates in buffer, whose length is the low bits.
+		int bufferLen = (int) (length & 63);
+		length += len;
+
+		if (bufferLen > 0) {
+			int n = Math.min(64 - bufferLen, len);
+			System.arraycopy(in, p, buffer, bufferLen, n);
+			p += n;
+			len -= n;
+			if (bufferLen + n < 64) {
+				return;
+			}
+			compress(buffer, 0);
+		}
+		while (len >= 64) {
+			compress(in, p);
+			p += 64;
+			len -= 64;
+		}
+		if (len > 0) {
+			System.arraycopy(in, p, buffer, 0, len);
+		}
+	}
+

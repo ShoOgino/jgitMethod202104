@@ -1,0 +1,19 @@
+	/**
+	 * Finish the digest and return the resulting hash.
+	 * <p>
+	 * Once {@code digest()} is called, this instance should be discarded.
+	 *
+	 * @return the bytes for the resulting hash.
+	 */
+	public byte[] digest() {
+		finish();
+
+		byte[] b = new byte[20];
+		NB.encodeInt32(b, 0, h0);
+		NB.encodeInt32(b, 4, h1);
+		NB.encodeInt32(b, 8, h2);
+		NB.encodeInt32(b, 12, h3);
+		NB.encodeInt32(b, 16, h4);
+		return b;
+	}
+
