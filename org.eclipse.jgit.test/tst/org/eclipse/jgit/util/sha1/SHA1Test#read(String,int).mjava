@@ -1,0 +1,9 @@
+	private byte[] read(String name, int sizeHint) throws IOException {
+		try (InputStream in = getClass().getResourceAsStream(name)) {
+			ByteBuffer buf = IO.readWholeStream(in, sizeHint);
+			byte[] r = new byte[buf.remaining()];
+			buf.get(r);
+			return r;
+		}
+	}
+

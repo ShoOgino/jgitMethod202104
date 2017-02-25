@@ -1,0 +1,96 @@
+	private void compress() {
+		// Method 1 from RFC 3174 section 6.1.
+		// Method 2 (circular queue of 16 words) is slower.
+		int a = h.a, b = h.b, c = h.c, d = h.d, e = h.e;
+
+		// @formatter:off
+		 e += s1(a, b, c, d,w[ 0]);  b = rotateLeft( b, 30);
+		 d += s1(e, a, b, c,w[ 1]);  a = rotateLeft( a, 30);
+		 c += s1(d, e, a, b,w[ 2]);  e = rotateLeft( e, 30);
+		 b += s1(c, d, e, a,w[ 3]);  d = rotateLeft( d, 30);
+		 a += s1(b, c, d, e,w[ 4]);  c = rotateLeft( c, 30);
+		 e += s1(a, b, c, d,w[ 5]);  b = rotateLeft( b, 30);
+		 d += s1(e, a, b, c,w[ 6]);  a = rotateLeft( a, 30);
+		 c += s1(d, e, a, b,w[ 7]);  e = rotateLeft( e, 30);
+		 b += s1(c, d, e, a,w[ 8]);  d = rotateLeft( d, 30);
+		 a += s1(b, c, d, e,w[ 9]);  c = rotateLeft( c, 30);
+		 e += s1(a, b, c, d,w[ 10]);  b = rotateLeft( b, 30);
+		 d += s1(e, a, b, c,w[ 11]);  a = rotateLeft( a, 30);
+		 c += s1(d, e, a, b,w[ 12]);  e = rotateLeft( e, 30);
+		 b += s1(c, d, e, a,w[ 13]);  d = rotateLeft( d, 30);
+		 a += s1(b, c, d, e,w[ 14]);  c = rotateLeft( c, 30);
+		 e += s1(a, b, c, d,w[ 15]);  b = rotateLeft( b, 30);
+		 d += s1(e, a, b, c,w[ 16]);  a = rotateLeft( a, 30);
+		 c += s1(d, e, a, b,w[ 17]);  e = rotateLeft( e, 30);
+		 b += s1(c, d, e, a,w[ 18]);  d = rotateLeft( d, 30);
+		 a += s1(b, c, d, e,w[ 19]);  c = rotateLeft( c, 30);
+
+		 e += s2(a, b, c, d,w[ 20]);  b = rotateLeft( b, 30);
+		 d += s2(e, a, b, c,w[ 21]);  a = rotateLeft( a, 30);
+		 c += s2(d, e, a, b,w[ 22]);  e = rotateLeft( e, 30);
+		 b += s2(c, d, e, a,w[ 23]);  d = rotateLeft( d, 30);
+		 a += s2(b, c, d, e,w[ 24]);  c = rotateLeft( c, 30);
+		 e += s2(a, b, c, d,w[ 25]);  b = rotateLeft( b, 30);
+		 d += s2(e, a, b, c,w[ 26]);  a = rotateLeft( a, 30);
+		 c += s2(d, e, a, b,w[ 27]);  e = rotateLeft( e, 30);
+		 b += s2(c, d, e, a,w[ 28]);  d = rotateLeft( d, 30);
+		 a += s2(b, c, d, e,w[ 29]);  c = rotateLeft( c, 30);
+		 e += s2(a, b, c, d,w[ 30]);  b = rotateLeft( b, 30);
+		 d += s2(e, a, b, c,w[ 31]);  a = rotateLeft( a, 30);
+		 c += s2(d, e, a, b,w[ 32]);  e = rotateLeft( e, 30);
+		 b += s2(c, d, e, a,w[ 33]);  d = rotateLeft( d, 30);
+		 a += s2(b, c, d, e,w[ 34]);  c = rotateLeft( c, 30);
+		 e += s2(a, b, c, d,w[ 35]);  b = rotateLeft( b, 30);
+		 d += s2(e, a, b, c,w[ 36]);  a = rotateLeft( a, 30);
+		 c += s2(d, e, a, b,w[ 37]);  e = rotateLeft( e, 30);
+		 b += s2(c, d, e, a,w[ 38]);  d = rotateLeft( d, 30);
+		 a += s2(b, c, d, e,w[ 39]);  c = rotateLeft( c, 30);
+
+		 e += s3(a, b, c, d,w[ 40]);  b = rotateLeft( b, 30);
+		 d += s3(e, a, b, c,w[ 41]);  a = rotateLeft( a, 30);
+		 c += s3(d, e, a, b,w[ 42]);  e = rotateLeft( e, 30);
+		 b += s3(c, d, e, a,w[ 43]);  d = rotateLeft( d, 30);
+		 a += s3(b, c, d, e,w[ 44]);  c = rotateLeft( c, 30);
+		 e += s3(a, b, c, d,w[ 45]);  b = rotateLeft( b, 30);
+		 d += s3(e, a, b, c,w[ 46]);  a = rotateLeft( a, 30);
+		 c += s3(d, e, a, b,w[ 47]);  e = rotateLeft( e, 30);
+		 b += s3(c, d, e, a,w[ 48]);  d = rotateLeft( d, 30);
+		 a += s3(b, c, d, e,w[ 49]);  c = rotateLeft( c, 30);
+		 e += s3(a, b, c, d,w[ 50]);  b = rotateLeft( b, 30);
+		 d += s3(e, a, b, c,w[ 51]);  a = rotateLeft( a, 30);
+		 c += s3(d, e, a, b,w[ 52]);  e = rotateLeft( e, 30);
+		 b += s3(c, d, e, a,w[ 53]);  d = rotateLeft( d, 30);
+		 a += s3(b, c, d, e,w[ 54]);  c = rotateLeft( c, 30);
+		 e += s3(a, b, c, d,w[ 55]);  b = rotateLeft( b, 30);
+		 d += s3(e, a, b, c,w[ 56]);  a = rotateLeft( a, 30);
+		 c += s3(d, e, a, b,w[ 57]);  e = rotateLeft( e, 30);
+		state58.save(a, b, c, d, e);
+		 b += s3(c, d, e, a,w[ 58]);  d = rotateLeft( d, 30);
+		 a += s3(b, c, d, e,w[ 59]);  c = rotateLeft( c, 30);
+
+		 e += s4(a, b, c, d,w[ 60]);  b = rotateLeft( b, 30);
+		 d += s4(e, a, b, c,w[ 61]);  a = rotateLeft( a, 30);
+		 c += s4(d, e, a, b,w[ 62]);  e = rotateLeft( e, 30);
+		 b += s4(c, d, e, a,w[ 63]);  d = rotateLeft( d, 30);
+		 a += s4(b, c, d, e,w[ 64]);  c = rotateLeft( c, 30);
+		state65.save(a, b, c, d, e);
+		 e += s4(a, b, c, d,w[ 65]);  b = rotateLeft( b, 30);
+		 d += s4(e, a, b, c,w[ 66]);  a = rotateLeft( a, 30);
+		 c += s4(d, e, a, b,w[ 67]);  e = rotateLeft( e, 30);
+		 b += s4(c, d, e, a,w[ 68]);  d = rotateLeft( d, 30);
+		 a += s4(b, c, d, e,w[ 69]);  c = rotateLeft( c, 30);
+		 e += s4(a, b, c, d,w[ 70]);  b = rotateLeft( b, 30);
+		 d += s4(e, a, b, c,w[ 71]);  a = rotateLeft( a, 30);
+		 c += s4(d, e, a, b,w[ 72]);  e = rotateLeft( e, 30);
+		 b += s4(c, d, e, a,w[ 73]);  d = rotateLeft( d, 30);
+		 a += s4(b, c, d, e,w[ 74]);  c = rotateLeft( c, 30);
+		 e += s4(a, b, c, d,w[ 75]);  b = rotateLeft( b, 30);
+		 d += s4(e, a, b, c,w[ 76]);  a = rotateLeft( a, 30);
+		 c += s4(d, e, a, b,w[ 77]);  e = rotateLeft( e, 30);
+		 b += s4(c, d, e, a,w[ 78]);  d = rotateLeft( d, 30);
+		 a += s4(b, c, d, e,w[ 79]);  c = rotateLeft( c, 30);
+
+		// @formatter:on
+		h.save(h.a + a, h.b + b, h.c + c, h.d + d, h.e + e);
+	}
+

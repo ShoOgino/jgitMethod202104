@@ -1,0 +1,9 @@
+	private static ObjectId blob(byte[] pdf1, SHA1 s) {
+		s.update(Constants.encodedTypeString(Constants.OBJ_BLOB));
+		s.update((byte) ' ');
+		s.update(Constants.encodeASCII(pdf1.length));
+		s.update((byte) 0);
+		s.update(pdf1);
+		return s.toObjectId();
+	}
+
