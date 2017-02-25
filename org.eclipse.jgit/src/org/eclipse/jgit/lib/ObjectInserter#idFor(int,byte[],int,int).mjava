@@ -12,12 +12,12 @@
 	 * @return the name of the object.
 	 */
 	public ObjectId idFor(int type, byte[] data, int off, int len) {
-		MessageDigest md = digest();
+		SHA1 md = SHA1.newInstance();
 		md.update(Constants.encodedTypeString(type));
 		md.update((byte) ' ');
 		md.update(Constants.encodeASCII(len));
 		md.update((byte) 0);
 		md.update(data, off, len);
-		return ObjectId.fromRaw(md.digest());
+		return md.toObjectId();
 	}
 
