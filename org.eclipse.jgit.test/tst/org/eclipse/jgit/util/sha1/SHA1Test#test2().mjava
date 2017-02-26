@@ -11,7 +11,12 @@
 		s.update(TEST2.getBytes(StandardCharsets.UTF_8));
 		ObjectId s1 = ObjectId.fromRaw(s.digest());
 
+		s.reset();
+		s.update(TEST2.getBytes(StandardCharsets.UTF_8));
+		ObjectId s2 = s.toObjectId();
+
 		assertEquals(m1, s1);
 		assertEquals(exp, s1);
+		assertEquals(exp, s2);
 	}
 

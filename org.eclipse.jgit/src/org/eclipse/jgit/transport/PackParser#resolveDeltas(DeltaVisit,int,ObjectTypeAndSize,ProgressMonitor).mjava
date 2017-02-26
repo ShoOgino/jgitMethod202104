@@ -27,7 +27,7 @@
 						JGitText.get().corruptionDetectedReReadingAt,
 						Long.valueOf(visit.delta.position)));
 
-			SHA1 objectDigest = SHA1.newInstance();
+			SHA1 objectDigest = objectHasher.reset();
 			objectDigest.update(Constants.encodedTypeString(type));
 			objectDigest.update((byte) ' ');
 			objectDigest.update(Constants.encodeASCII(visit.data.length));
