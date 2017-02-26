@@ -1,8 +1,7 @@
 	private byte[] computeHash(InputStream in, long length) throws IOException {
-		final MessageDigest contentDigest = state.contentDigest;
+		SHA1 contentDigest = SHA1.newInstance();
 		final byte[] contentReadBuffer = state.contentReadBuffer;
 
-		contentDigest.reset();
 		contentDigest.update(hblob);
 		contentDigest.update((byte) ' ');
 

@@ -1,5 +1,5 @@
 	@SuppressWarnings("resource" /* java 7 */)
-	private File toTemp(final MessageDigest md, final int type, long len,
+	private File toTemp(final SHA1 md, final int type, long len,
 			final InputStream is) throws IOException, FileNotFoundException,
 			Error {
 		boolean delete = true;
@@ -11,7 +11,7 @@
 				if (config.getFSyncObjectFiles())
 					out = Channels.newOutputStream(fOut.getChannel());
 				DeflaterOutputStream cOut = compress(out);
-				DigestOutputStream dOut = new DigestOutputStream(cOut, md);
+				SHA1OutputStream dOut = new SHA1OutputStream(cOut, md);
 				writeHeader(dOut, type, len);
 
 				final byte[] buf = buffer();

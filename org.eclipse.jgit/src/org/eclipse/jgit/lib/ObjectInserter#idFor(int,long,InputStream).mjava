@@ -14,7 +14,7 @@
 	 */
 	public ObjectId idFor(int objectType, long length, InputStream in)
 			throws IOException {
-		MessageDigest md = digest();
+		SHA1 md = SHA1.newInstance();
 		md.update(Constants.encodedTypeString(objectType));
 		md.update((byte) ' ');
 		md.update(Constants.encodeASCII(length));
@@ -27,6 +27,6 @@
 			md.update(buf, 0, n);
 			length -= n;
 		}
-		return ObjectId.fromRaw(md.digest());
+		return md.toObjectId();
 	}
 

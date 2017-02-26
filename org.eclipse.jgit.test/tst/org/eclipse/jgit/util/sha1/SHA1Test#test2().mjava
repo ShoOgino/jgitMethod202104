@@ -1,0 +1,17 @@
+	@Test
+	public void test2() throws NoSuchAlgorithmException {
+		ObjectId exp = ObjectId
+				.fromString("84983e441c3bd26ebaae4aa1f95129e5e54670f1");
+
+		MessageDigest m = MessageDigest.getInstance("SHA-1");
+		m.update(TEST2.getBytes(StandardCharsets.UTF_8));
+		ObjectId m1 = ObjectId.fromRaw(m.digest());
+
+		SHA1 s = SHA1.newInstance();
+		s.update(TEST2.getBytes(StandardCharsets.UTF_8));
+		ObjectId s1 = ObjectId.fromRaw(s.digest());
+
+		assertEquals(m1, s1);
+		assertEquals(exp, s1);
+	}
+

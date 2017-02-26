@@ -1,0 +1,14 @@
+	/**
+	 * Update the digest computation by adding a byte.
+	 *
+	 * @param b
+	 */
+	public void update(byte b) {
+		int bufferLen = (int) (length & 63);
+		length++;
+		buffer[bufferLen] = b;
+		if (bufferLen == 63) {
+			compress(buffer, 0);
+		}
+	}
+

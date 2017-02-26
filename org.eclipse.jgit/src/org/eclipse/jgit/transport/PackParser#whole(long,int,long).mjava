@@ -1,5 +1,6 @@
 	private void whole(final long pos, final int type, final long sz)
 			throws IOException {
+		SHA1 objectDigest = SHA1.newInstance();
 		objectDigest.update(Constants.encodedTypeString(type));
 		objectDigest.update((byte) ' ');
 		objectDigest.update(Constants.encodeASCII(sz));
@@ -19,7 +20,7 @@
 				cnt += r;
 			}
 			inf.close();
-			tempObjectId.fromRaw(objectDigest.digest(), 0);
+			objectDigest.digest(tempObjectId);
 			checkContentLater = isCheckObjectCollisions()
 					&& readCurs.has(tempObjectId);
 			data = null;
@@ -27,7 +28,7 @@
 		} else {
 			data = inflateAndReturn(Source.INPUT, sz);
 			objectDigest.update(data);
-			tempObjectId.fromRaw(objectDigest.digest(), 0);
+			objectDigest.digest(tempObjectId);
 			verifySafeObject(tempObjectId, type, data);
 		}
 

@@ -8,7 +8,7 @@
 		}
 
 		long offset = beginObject(type, len);
-		MessageDigest md = digest();
+		SHA1 md = SHA1.newInstance();
 		md.update(Constants.encodedTypeString(type));
 		md.update((byte) ' ');
 		md.update(Constants.encodeASCII(len));
@@ -23,6 +23,6 @@
 			len -= n;
 		}
 		packOut.compress.finish();
-		return endObject(ObjectId.fromRaw(md.digest()), offset);
+		return endObject(md.toObjectId(), offset);
 	}
 
