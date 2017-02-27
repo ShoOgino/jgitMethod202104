@@ -1,6 +1,6 @@
 	private void whole(final long pos, final int type, final long sz)
 			throws IOException {
-		SHA1 objectDigest = SHA1.newInstance();
+		SHA1 objectDigest = objectHasher.reset();
 		objectDigest.update(Constants.encodedTypeString(type));
 		objectDigest.update((byte) ' ');
 		objectDigest.update(Constants.encodeASCII(sz));
