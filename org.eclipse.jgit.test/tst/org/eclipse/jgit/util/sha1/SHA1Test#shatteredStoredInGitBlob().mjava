@@ -1,0 +1,20 @@
+	@Test
+	public void shatteredStoredInGitBlob() throws IOException {
+		byte[] pdf1 = read("shattered-1.pdf", 422435);
+		byte[] pdf2 = read("shattered-2.pdf", 422435);
+
+		// Although the prior test detects the chance of a collision, adding
+		// the Git blob header permutes the data enough for this specific
+		// attack example to not be detected as a collision. (A different file
+		// pair that takes the Git header into account however, would.)
+		ObjectId id1 = blob(pdf1, SHA1.newInstance().setDetectCollision(true));
+		ObjectId id2 = blob(pdf2, SHA1.newInstance().setDetectCollision(true));
+
+		assertEquals(
+				ObjectId.fromString("ba9aaa145ccd24ef760cf31c74d8f7ca1a2e47b0"),
+				id1);
+		assertEquals(
+				ObjectId.fromString("b621eeccd5c7edac9b7dcba35a8d5afd075e24f2"),
+				id2);
+	}
+

@@ -4,16 +4,18 @@
 	 * Once {@code digest()} is called, this instance should be discarded.
 	 *
 	 * @return the bytes for the resulting hash.
+	 * @throws Sha1CollisionException
+	 *             if a collision was detected and safeHash is false.
 	 */
-	public byte[] digest() {
+	public byte[] digest() throws Sha1CollisionException {
 		finish();
 
 		byte[] b = new byte[20];
-		NB.encodeInt32(b, 0, h0);
-		NB.encodeInt32(b, 4, h1);
-		NB.encodeInt32(b, 8, h2);
-		NB.encodeInt32(b, 12, h3);
-		NB.encodeInt32(b, 16, h4);
+		NB.encodeInt32(b, 0, h.a);
+		NB.encodeInt32(b, 4, h.b);
+		NB.encodeInt32(b, 8, h.c);
+		NB.encodeInt32(b, 12, h.d);
+		NB.encodeInt32(b, 16, h.e);
 		return b;
 	}
 

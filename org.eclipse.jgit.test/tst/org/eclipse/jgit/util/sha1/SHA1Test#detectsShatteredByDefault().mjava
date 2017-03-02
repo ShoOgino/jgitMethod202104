@@ -1,0 +1,16 @@
+	@Test
+	public void detectsShatteredByDefault() throws IOException {
+		assumeTrue(System.getProperty("org.eclipse.jgit.util.sha1.detectCollision") == null);
+		assumeTrue(System.getProperty("org.eclipse.jgit.util.sha1.safeHash") == null);
+
+		byte[] pdf1 = read("shattered-1.pdf", 422435);
+		SHA1 s = SHA1.newInstance();
+		s.update(pdf1);
+		try {
+			s.digest();
+			fail("expected " + Sha1CollisionException.class.getSimpleName());
+		} catch (Sha1CollisionException e) {
+			assertTrue("shattered-1 detected", true);
+		}
+	}
+

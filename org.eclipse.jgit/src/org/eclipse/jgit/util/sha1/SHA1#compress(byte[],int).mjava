@@ -1,80 +1,20 @@
 	private void compress(byte[] block, int p) {
-		// Method 1 from RFC 3174 section 6.1.
-		// Method 2 (circular queue of 16 words) is slower.
-		int a = h0, b = h1, c = h2, d = h3, e = h4;
+		initBlock(block, p);
+		int ubcDvMask = detectCollision ? UbcCheck.check(w) : 0;
+		compress();
 
-		// Round 1: 0 <= t <= 15 comes from the input block.
-		for (int t = 0; t < 16; t++) {
-			int temp = NB.decodeInt32(block, p + (t << 2));
-			w[t] = temp;
-			temp += ((a << 5) | (a >>> 27)) // S^5(A)
-					+ (((c ^ d) & b) ^ d) // f: 0 <= t <= 19
-					+ e + 0x5A827999;
-			e = d;
-			d = c;
-			c = (b << 30) | (b >>> 2); // S^30(B)
-			b = a;
-			a = temp;
+		while (ubcDvMask != 0) {
+			int b = numberOfTrailingZeros(lowestOneBit(ubcDvMask));
+			UbcCheck.DvInfo dv = UbcCheck.DV[b];
+			for (int i = 0; i < 80; i++) {
+				w2[i] = w[i] ^ dv.dm[i];
+			}
+			recompress(dv.testt);
+			if (eq(hTmp, h)) {
+				foundCollision = true;
+				break;
+			}
+			ubcDvMask &= ~(1 << b);
 		}
-
-		// RFC 3174 6.1.b, extend state vector to 80 words.
-		for (int t = 16; t < 80; t++) {
-			int x = w[t - 3] ^ w[t - 8] ^ w[t - 14] ^ w[t - 16];
-			w[t] = (x << 1) | (x >>> 31); // S^1(...)
-		}
-
-		// Round 1: tail
-		for (int t = 16; t < 20; t++) {
-			int temp = ((a << 5) | (a >>> 27)) // S^5(A)
-					+ (((c ^ d) & b) ^ d) // f: 0 <= t <= 19
-					+ e + w[t] + 0x5A827999;
-			e = d;
-			d = c;
-			c = (b << 30) | (b >>> 2); // S^30(B)
-			b = a;
-			a = temp;
-		}
-
-		// Round 2
-		for (int t = 20; t < 40; t++) {
-			int temp = ((a << 5) | (a >>> 27)) // S^5(A)
-					+ (b ^ c ^ d) // f: 20 <= t <= 39
-					+ e + w[t] + 0x6ED9EBA1;
-			e = d;
-			d = c;
-			c = (b << 30) | (b >>> 2); // S^30(B)
-			b = a;
-			a = temp;
-		}
-
-		// Round 3
-		for (int t = 40; t < 60; t++) {
-			int temp = ((a << 5) | (a >>> 27)) // S^5(A)
-					+ ((b & c) | (d & (b | c))) // f: 40 <= t <= 59
-					+ e + w[t] + 0x8F1BBCDC;
-			e = d;
-			d = c;
-			c = (b << 30) | (b >>> 2); // S^30(B)
-			b = a;
-			a = temp;
-		}
-
-		// Round 4
-		for (int t = 60; t < 80; t++) {
-			int temp = ((a << 5) | (a >>> 27)) // S^5(A)
-					+ (b ^ c ^ d) // f: 60 <= t <= 79
-					+ e + w[t] + 0xCA62C1D6;
-			e = d;
-			d = c;
-			c = (b << 30) | (b >>> 2); // S^30(B)
-			b = a;
-			a = temp;
-		}
-
-		h0 += a;
-		h1 += b;
-		h2 += c;
-		h3 += d;
-		h4 += e;
 	}
 

@@ -4,9 +4,11 @@
 	 * Once {@code digest()} is called, this instance should be discarded.
 	 *
 	 * @return the ObjectId for the resulting hash.
+	 * @throws Sha1CollisionException
+	 *             if a collision was detected and safeHash is false.
 	 */
-	public ObjectId toObjectId() {
+	public ObjectId toObjectId() throws Sha1CollisionException {
 		finish();
-		return new ObjectId(h0, h1, h2, h3, h4);
+		return h.toObjectId();
 	}
 

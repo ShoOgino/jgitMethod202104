@@ -1,0 +1,49 @@
+	@Test
+	public void shatteredCollision()
+			throws IOException, NoSuchAlgorithmException {
+		byte[] pdf1 = read("shattered-1.pdf", 422435);
+		byte[] pdf2 = read("shattered-2.pdf", 422435);
+		MessageDigest md;
+		SHA1 s;
+
+		// SHAttered attack generated these PDFs to have identical SHA-1.
+		ObjectId bad = ObjectId
+				.fromString("38762cf7f55934b34d179ae6a4c80cadccbb7f0a");
+		md = MessageDigest.getInstance("SHA-1");
+		md.update(pdf1);
+		assertEquals("shattered-1 collides", bad,
+				ObjectId.fromRaw(md.digest()));
+		s = SHA1.newInstance().setDetectCollision(false);
+		s.update(pdf1);
+		assertEquals("shattered-1 collides", bad, s.toObjectId());
+
+		md = MessageDigest.getInstance("SHA-1");
+		md.update(pdf2);
+		assertEquals("shattered-2 collides", bad,
+				ObjectId.fromRaw(md.digest()));
+		s = SHA1.newInstance().setDetectCollision(false);
+		s.update(pdf2);
+		assertEquals("shattered-2 collides", bad, s.toObjectId());
+
+		// SHA1 with detectCollision shouldn't be fooled.
+		s = SHA1.newInstance().setDetectCollision(true);
+		s.update(pdf1);
+		try {
+			s.digest();
+			fail("expected " + Sha1CollisionException.class.getSimpleName());
+		} catch (Sha1CollisionException e) {
+			assertEquals(e.getMessage(),
+					"SHA-1 collision detected on " + bad.name());
+		}
+
+		s = SHA1.newInstance().setDetectCollision(true);
+		s.update(pdf2);
+		try {
+			s.digest();
+			fail("expected " + Sha1CollisionException.class.getSimpleName());
+		} catch (Sha1CollisionException e) {
+			assertEquals(e.getMessage(),
+					"SHA-1 collision detected on " + bad.name());
+		}
+	}
+

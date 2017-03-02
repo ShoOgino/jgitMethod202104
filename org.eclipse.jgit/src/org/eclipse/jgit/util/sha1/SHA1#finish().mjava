@@ -19,5 +19,11 @@
 		NB.encodeInt32(buffer, 56, (int) (length >>> (32 - 3)));
 		NB.encodeInt32(buffer, 60, (int) (length << 3));
 		compress(buffer, 0);
+
+		if (foundCollision) {
+			ObjectId id = h.toObjectId();
+			LOG.warn("possible SHA-1 collision " + id.name()); //$NON-NLS-1$
+			throw new Sha1CollisionException(id);
+		}
 	}
 

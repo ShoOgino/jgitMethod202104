@@ -1,0 +1,12 @@
+	private void initBlock(byte[] block, int p) {
+		for (int t = 0; t < 16; t++) {
+			w[t] = NB.decodeInt32(block, p + (t << 2));
+		}
+
+		// RFC 3174 6.1.b, extend state vector to 80 words.
+		for (int t = 16; t < 80; t++) {
+			int x = w[t - 3] ^ w[t - 8] ^ w[t - 14] ^ w[t - 16];
+			w[t] = rotateLeft(x, 1); // S^1(...)
+		}
+	}
+
