@@ -14,11 +14,11 @@
 		this.defaultBranch = defaultBranch;
 		this.rootRepo = rootRepo;
 
-		// Strip trailing /s to match repo behavior.
-		int lastIndex = baseUrl.length() - 1;
-		while (lastIndex >= 0 && baseUrl.charAt(lastIndex) == '/')
-			lastIndex--;
-		this.baseUrl = baseUrl.substring(0, lastIndex + 1);
+		// Strip trailing '/' to match repo behavior.
+		while (baseUrl.endsWith("/")) { //$NON-NLS-1$
+			baseUrl = baseUrl.substring(0, baseUrl.length()-1);
+		}
+		this.baseUrl = URI.create(baseUrl);
 
 		plusGroups = new HashSet<>();
 		minusGroups = new HashSet<>();
