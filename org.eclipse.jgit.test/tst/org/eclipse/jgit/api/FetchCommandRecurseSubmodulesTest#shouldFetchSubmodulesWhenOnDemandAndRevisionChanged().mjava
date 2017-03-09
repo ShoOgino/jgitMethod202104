@@ -1,34 +1,7 @@
 	@Test
 	public void shouldFetchSubmodulesWhenOnDemandAndRevisionChanged()
 			throws Exception {
-		// Fetch the submodule in the original git and reset it to
-		// the commit that was created
-		try (SubmoduleWalk w = SubmoduleWalk.forIndex(git.getRepository())) {
-			assertTrue(w.next());
-			try (Git g = new Git(w.getRepository())) {
-				g.fetch().setRemote(REMOTE).setRefSpecs(REFSPEC).call();
-				g.reset().setMode(ResetType.HARD).setRef(commit1.name()).call();
-			}
-		}
-
-		// Submodule index Id should be same as before, but head Id should be
-		// updated to the new commit, and status should be "checked out".
-		SubmoduleStatus subStatus = git.submoduleStatus().call().get("sub");
-		assertEquals(submodule1Head, subStatus.getIndexId());
-		assertEquals(commit1, subStatus.getHeadId());
-		assertEquals(SubmoduleStatusType.REV_CHECKED_OUT, subStatus.getType());
-
-		// Add and commit the submodule status
-		git.add().addFilepattern("sub").call();
-		RevCommit update = git.commit().setMessage("update sub").call();
-
-		// Both submodule index and head should now be at the new commit, and
-		// the status should be "initialized".
-		subStatus = git.submoduleStatus().call().get("sub");
-		assertEquals(commit1, subStatus.getIndexId());
-		assertEquals(commit1, subStatus.getHeadId());
-		assertEquals(SubmoduleStatusType.INITIALIZED, subStatus.getType());
-
+		RevCommit update = updateSubmoduleRevision();
 		FetchResult result = fetch(FetchRecurseSubmodulesMode.ON_DEMAND);
 
 		// The first submodule should have been updated

@@ -4,7 +4,11 @@
 		try (SubmoduleWalk walk = new SubmoduleWalk(repo);
 				RevWalk revWalk = new RevWalk(repo)) {
 			// Walk over submodules in the parent repository's FETCH_HEAD.
-			walk.setTree(revWalk.parseTree(repo.resolve(Constants.FETCH_HEAD)));
+			ObjectId fetchHead = repo.resolve(Constants.FETCH_HEAD);
+			if (fetchHead == null) {
+				return;
+			}
+			walk.setTree(revWalk.parseTree(fetchHead));
 			while (walk.next()) {
 				Repository submoduleRepo = walk.getRepository();
 
@@ -17,7 +21,7 @@
 				}
 
 				FetchRecurseSubmodulesMode recurseMode = getRecurseMode(
-						submoduleRepo, walk.getPath());
+						walk.getPath());
 
 				// When the fetch mode is "yes" we always fetch. When the mode
 				// is "on demand", we only fetch if the submodule's revision was
