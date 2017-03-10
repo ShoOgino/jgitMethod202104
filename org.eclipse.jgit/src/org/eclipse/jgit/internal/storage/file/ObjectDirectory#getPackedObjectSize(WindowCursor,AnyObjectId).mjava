@@ -6,6 +6,7 @@
 				for (PackFile p : pList.packs) {
 					try {
 						long len = p.getObjectSize(curs, id);
+						p.resetTransientErrorCount();
 						if (0 <= len)
 							return len;
 					} catch (PackMismatchException e) {
