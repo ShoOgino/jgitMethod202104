@@ -1,14 +1,14 @@
-	private void addSubmodule(String url, String name, String revision,
+	private void addSubmodule(String url, String path, String revision,
 			List<CopyFile> copyfiles, Set<String> groups, String recommendShallow)
 			throws GitAPIException, IOException {
 		if (repo.isBare()) {
-			RepoProject proj = new RepoProject(url, name, revision, null, groups, recommendShallow);
+			RepoProject proj = new RepoProject(url, path, revision, null, groups, recommendShallow);
 			proj.addCopyFiles(copyfiles);
 			bareProjects.add(proj);
 		} else {
 			SubmoduleAddCommand add = git
 				.submoduleAdd()
-				.setPath(name)
+				.setPath(path)
 				.setURI(url);
 			if (monitor != null)
 				add.setProgressMonitor(monitor);
@@ -20,7 +20,7 @@
 							.call();
 				}
 				subRepo.close();
-				git.add().addFilepattern(name).call();
+				git.add().addFilepattern(path).call();
 			}
 			for (CopyFile copyfile : copyfiles) {
 				copyfile.copy();
