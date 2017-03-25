@@ -17,15 +17,19 @@
 			// max open files)
 			openFail(!packFile.exists());
 			throw fn;
-		} catch (IOException ioe) {
+		} catch (EOFException | AccessDeniedException | NoSuchFileException
+				| CorruptObjectException | NoPackSignatureException
+				| PackMismatchException | UnpackException
+				| UnsupportedPackIndexVersionException
+				| UnsupportedPackVersionException pe) {
+			// exceptions signaling permanent problems with a pack
 			openFail(true);
-			throw ioe;
-		} catch (RuntimeException re) {
-			openFail(true);
-			throw re;
-		} catch (Error re) {
-			openFail(true);
-			throw re;
+			throw pe;
+		} catch (IOException | RuntimeException ge) {
+			// generic exceptions could be transient so we should not mark the
+			// pack invalid to avoid false MissingObjectExceptions
+			openFail(false);
+			throw ge;
 		}
 	}
 
