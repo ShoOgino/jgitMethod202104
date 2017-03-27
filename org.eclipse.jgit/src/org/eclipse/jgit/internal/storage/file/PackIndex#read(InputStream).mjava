@@ -25,9 +25,7 @@
 			case 2:
 				return new PackIndexV2(fd);
 			default:
-				throw new IOException(MessageFormat.format(
-						JGitText.get().unsupportedPackIndexVersion,
-						Integer.valueOf(v)));
+				throw new UnsupportedPackIndexVersionException(v);
 			}
 		}
 		return new PackIndexV1(fd, hdr);
