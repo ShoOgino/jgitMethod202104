@@ -5,7 +5,7 @@
 			return;
 
 		// Only do the following after we finished reading everything.
-		Map<String, String> remoteUrls = new HashMap<>();
+		Map<String, URI> remoteUrls = new HashMap<>();
 		if (defaultRevision == null && defaultRemote != null) {
 			Remote remote = remotes.get(defaultRemote);
 			if (remote != null) {
@@ -35,20 +35,18 @@
 					revision = r.revision;
 				}
 			}
-			String remoteUrl = remoteUrls.get(remote);
+			URI remoteUrl = remoteUrls.get(remote);
 			if (remoteUrl == null) {
 				String fetch = remotes.get(remote).fetch;
 				if (fetch == null) {
 					throw new SAXException(MessageFormat
 							.format(RepoText.get().errorNoFetch, remote));
 				}
-				remoteUrl = baseUrl.resolve(fetch).toString();
-				if (!remoteUrl.endsWith("/")) //$NON-NLS-1$
-					remoteUrl = remoteUrl + "/"; //$NON-NLS-1$
+				remoteUrl = normalizeEmptyPath(baseUrl.resolve(fetch));
 				remoteUrls.put(remote, remoteUrl);
 			}
-			proj.setUrl(remoteUrl + proj.getName())
-					.setDefaultRevision(revision);
+			proj.setUrl(remoteUrl.resolve(proj.getName()).toString())
+				.setDefaultRevision(revision);
 		}
 
 		filteredProjects.addAll(projects);
