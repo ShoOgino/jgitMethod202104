@@ -2,9 +2,8 @@
 	public RevCommit call() throws GitAPIException {
 		try {
 			checkCallable();
-			if (uri == null || uri.length() == 0) {
-				throw new IllegalArgumentException(
-					JGitText.get().uriNotConfigured);
+			if (baseUri == null) {
+				baseUri = ""; //$NON-NLS-1$
 			}
 			if (inputStream == null) {
 				if (manifestPath == null || manifestPath.length() == 0)
@@ -28,7 +27,7 @@
 				git = new Git(repo);
 
 			ManifestParser parser = new ManifestParser(
-					includedReader, manifestPath, branch, uri, groupsParam, repo);
+					includedReader, manifestPath, branch, baseUri, groupsParam, repo);
 			try {
 				parser.read(inputStream);
 				for (RepoProject proj : parser.getFilteredProjects()) {
@@ -100,8 +99,13 @@
 						rec.append("\n"); //$NON-NLS-1$
 						attributes.append(rec.toString());
 					}
+
+					URI submodUrl = URI.create(nameUri);
+					if (targetUri != null) {
+						submodUrl = relativize(targetUri, submodUrl);
+					}
 					cfg.setString("submodule", path, "path", path); //$NON-NLS-1$ //$NON-NLS-2$
-					cfg.setString("submodule", path, "url", nameUri); //$NON-NLS-1$ //$NON-NLS-2$
+					cfg.setString("submodule", path, "url", submodUrl.toString()); //$NON-NLS-1$ //$NON-NLS-2$
 
 					// create gitlink
 					DirCacheEntry dcEntry = new DirCacheEntry(path);

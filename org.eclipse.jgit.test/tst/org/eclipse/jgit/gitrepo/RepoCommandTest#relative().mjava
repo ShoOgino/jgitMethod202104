@@ -1,0 +1,15 @@
+	@Test
+	public void relative() {
+		testRelative("a/b/", "a/", "../");
+		// Normalization:
+		testRelative("a/p/..//b/", "a/", "../");
+		testRelative("a/b", "a/", "");
+		testRelative("a/", "a/b/", "b/");
+		testRelative("a/", "a/b", "b");
+		testRelative("/a/b/c", "/b/c", "../../b/c");
+		testRelative("/abc", "bcd", "bcd");
+		testRelative("abc", "/bcd", "/bcd");
+		testRelative("http://a", "a/b", "a/b");
+		testRelative("http://base.com/a/", "http://child.com/a/b", "http://child.com/a/b");
+	}
+
