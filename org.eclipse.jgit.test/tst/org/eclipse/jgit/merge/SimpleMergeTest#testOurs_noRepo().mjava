@@ -1,0 +1,10 @@
+	@Test
+	public void testOurs_noRepo() throws IOException {
+		try (ObjectInserter ins = db.newObjectInserter()) {
+			Merger ourMerger = MergeStrategy.OURS.newMerger(ins, db.getConfig());
+			boolean merge = ourMerger.merge(new ObjectId[] { db.resolve("a"), db.resolve("c") });
+			assertTrue(merge);
+			assertEquals(db.resolve("a^{tree}"), ourMerger.getResultTreeId());
+		}
+	}
+

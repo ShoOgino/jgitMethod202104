@@ -1,0 +1,15 @@
+	/**
+	 * Create a new in-core merge instance from an inserter.
+	 *
+	 * @param oi
+	 *            the inserter to write objects to. Will be closed at the
+	 *            conclusion of {@code merge}, unless {@code flush} is false.
+	 * @since 4.8
+	 */
+	protected Merger(ObjectInserter oi) {
+		db = null;
+		inserter = oi;
+		reader = oi.newReader();
+		walk = new RevWalk(reader);
+	}
+

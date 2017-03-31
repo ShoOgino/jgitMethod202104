@@ -1,7 +1,7 @@
 	@Override
 	protected boolean mergeImpl() throws IOException {
 		if (implicitDirCache)
-			dircache = getRepository().lockDirCache();
+			dircache = nonNullRepo().lockDirCache();
 
 		try {
 			return mergeTrees(mergeBase(), sourceTrees[0], sourceTrees[1],

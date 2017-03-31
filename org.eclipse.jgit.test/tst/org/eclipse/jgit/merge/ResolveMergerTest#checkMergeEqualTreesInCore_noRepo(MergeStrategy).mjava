@@ -1,12 +1,12 @@
 	/**
 	 * Merging two equal subtrees with an incore merger should lead to a merged
-	 * state.
+	 * state, without using a Repository (the 'Gerrit' use case).
 	 *
 	 * @param strategy
 	 * @throws Exception
 	 */
 	@Theory
-	public void checkMergeEqualTreesInCore(MergeStrategy strategy)
+	public void checkMergeEqualTreesInCore_noRepo(MergeStrategy strategy)
 			throws Exception {
 		Git git = Git.wrap(db);
 
@@ -27,9 +27,11 @@
 		git.rm().addFilepattern("d/1").call();
 		git.rm().addFilepattern("d").call();
 
-		ThreeWayMerger resolveMerger = (ThreeWayMerger) strategy.newMerger(db,
-				true);
-		boolean noProblems = resolveMerger.merge(masterCommit, sideCommit);
-		assertTrue(noProblems);
+		try (ObjectInserter ins = db.newObjectInserter()) {
+			ThreeWayMerger resolveMerger =
+					(ThreeWayMerger) strategy.newMerger(ins, db.getConfig());
+			boolean noProblems = resolveMerger.merge(masterCommit, sideCommit);
+			assertTrue(noProblems);
+		}
 	}
 

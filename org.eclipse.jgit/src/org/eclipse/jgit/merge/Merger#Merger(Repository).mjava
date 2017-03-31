@@ -5,8 +5,11 @@
 	 *            the repository this merger will read and write data on.
 	 */
 	protected Merger(final Repository local) {
+		if (local == null) {
+			throw new NullPointerException(JGitText.get().repositoryIsRequired);
+		}
 		db = local;
-		inserter = db.newObjectInserter();
+		inserter = local.newObjectInserter();
 		reader = inserter.newReader();
 		walk = new RevWalk(reader);
 	}

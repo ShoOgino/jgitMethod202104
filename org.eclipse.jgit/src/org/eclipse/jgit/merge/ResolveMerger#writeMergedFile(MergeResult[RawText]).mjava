@@ -9,8 +9,8 @@
 	 */
 	private File writeMergedFile(MergeResult<RawText> result)
 			throws FileNotFoundException, IOException {
-		File workTree = db.getWorkTree();
-		FS fs = db.getFS();
+		File workTree = nonNullRepo().getWorkTree();
+		FS fs = nonNullRepo().getFS();
 		File of = new File(workTree, tw.getPathString());
 		File parentFolder = of.getParentFile();
 		if (!fs.exists(parentFolder))
