@@ -24,6 +24,12 @@
 			path = path + "/"; //$NON-NLS-1$
 
 		final TarArchiveEntry entry = new TarArchiveEntry(path);
+
+		if (tree instanceof RevCommit) {
+			long t = ((RevCommit) tree).getCommitTime() * 1000L;
+			entry.setModTime(t);
+		}
+
 		if (mode == FileMode.TREE) {
 			out.putArchiveEntry(entry);
 			out.closeArchiveEntry();
