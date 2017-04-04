@@ -1,5 +1,7 @@
 	private void service() throws IOException {
 		boolean sendPack;
+		// If it's a non-bidi request, we need to read the entire request before
+		// writing a response. Buffer the response until then.
 		try {
 			if (biDirectionalPipe)
 				sendAdvertisedRefs(new PacketLineOutRefAdvertiser(pckOut));
@@ -55,6 +57,8 @@
 				throw new UploadPackInternalServerErrorException(err);
 			}
 			throw err;
+		} finally {
+			rawOut.stopBuffering();
 		}
 
 		if (sendPack)
