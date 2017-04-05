@@ -1,7 +1,6 @@
 		void stopBuffering() throws IOException {
-			if (buffer != null) {
-				buffer.writeTo(rawOut);
-				buffer = null;
+			if (out != rawOut) {
+				((ByteArrayOutputStream) out).writeTo(rawOut);
 				out = rawOut;
 			}
 		}
