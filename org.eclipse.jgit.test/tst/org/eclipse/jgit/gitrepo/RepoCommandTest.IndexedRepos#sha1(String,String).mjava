@@ -1,0 +1,19 @@
+		@Override
+		public ObjectId sha1(String uri, String refname) throws GitAPIException {
+			if (!uriRepoMap.containsKey(uri)) {
+				return null;
+			}
+
+			Repository r = uriRepoMap.get(uri);
+			try {
+				Ref ref = r.findRef(refname);
+				if (ref == null) return null;
+
+				ref = r.peel(ref);
+				ObjectId id = ref.getObjectId();
+				return id;
+			} catch (IOException e) {
+				throw new InvalidRemoteException("", e);
+			}
+		}
+

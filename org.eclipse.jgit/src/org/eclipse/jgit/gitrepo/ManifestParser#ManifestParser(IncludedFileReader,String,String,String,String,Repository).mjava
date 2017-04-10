@@ -13,12 +13,7 @@
 		this.filename = filename;
 		this.defaultBranch = defaultBranch;
 		this.rootRepo = rootRepo;
-
-		// Strip trailing '/' to match repo behavior.
-		while (baseUrl.endsWith("/")) { //$NON-NLS-1$
-			baseUrl = baseUrl.substring(0, baseUrl.length()-1);
-		}
-		this.baseUrl = URI.create(baseUrl);
+		this.baseUrl = normalizeEmptyPath(URI.create(baseUrl));
 
 		plusGroups = new HashSet<>();
 		minusGroups = new HashSet<>();
