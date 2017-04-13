@@ -1,0 +1,33 @@
+	@Test
+	public void testCustomObjectReader() throws Exception {
+		String refName = "refs/heads/blob";
+		String data = "unflushed data";
+		ObjectId id;
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		try (Repository repo = new InMemoryRepository(
+					new DfsRepositoryDescription("repo"));
+				ObjectInserter ins = repo.newObjectInserter();
+				ObjectReader or = ins.newReader()) {
+			id = ins.insert(OBJ_BLOB, Constants.encode(data));
+			BundleWriter bw = new BundleWriter(or);
+			bw.include(refName, id);
+			bw.writeBundle(NullProgressMonitor.INSTANCE, out);
+			assertNull(repo.exactRef(refName));
+			try {
+				repo.open(id, OBJ_BLOB);
+				fail("We should not be able to open the unflushed blob");
+			} catch (MissingObjectException e) {
+				// Expected.
+			}
+		}
+
+		try (Repository repo = new InMemoryRepository(
+					new DfsRepositoryDescription("copy"))) {
+			fetchFromBundle(repo, out.toByteArray());
+			Ref ref = repo.exactRef(refName);
+			assertNotNull(ref);
+			assertEquals(id, ref.getObjectId());
+			assertEquals(data, new String(repo.open(id, OBJ_BLOB).getBytes(), UTF_8));
+		}
+	}
+
