@@ -1,0 +1,11 @@
+	private RevCommit createCommit() throws IOException, GitAPIException,
+			NoFilepatternException, NoHeadException, NoMessageException,
+			UnmergedPathsException, ConcurrentRefUpdateException,
+			WrongRepositoryStateException, AbortedByHookException {
+		JGitTestUtil.writeTrashFile(db, "test", "test");
+		Git git = Git.wrap(db2);
+		git.add().addFilepattern("test").call();
+		RevCommit c = git.commit().setMessage("adding test").call();
+		return c;
+	}
+

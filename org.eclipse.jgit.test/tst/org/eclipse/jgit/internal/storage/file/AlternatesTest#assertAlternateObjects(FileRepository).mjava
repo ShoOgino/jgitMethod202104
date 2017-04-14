@@ -1,0 +1,18 @@
+	private void assertAlternateObjects(FileRepository repo) {
+		// check some objects in alternate
+		final ObjectId alternateObjects[] = new ObjectId[] {
+				ObjectId.fromString("49322bb17d3acc9146f98c97d078513228bbf3c0"),
+				ObjectId.fromString("d0114ab8ac326bab30e3a657a0397578c5a1af88"),
+				ObjectId.fromString("f73b95671f326616d66b2afb3bdfcdbbce110b44"),
+				ObjectId.fromString("6020a3b8d5d636e549ccbd0c53e2764684bb3125"),
+				ObjectId.fromString("0a3d7772488b6b106fb62813c4d6d627918d9181"),
+				ObjectId.fromString("da0f8ed91a8f2f0f067b3bdf26265d5ca48cf82c"),
+				ObjectId.fromString(
+						"cd4bcfc27da62c6b840de700be1c60a7e69952a5") };
+		ObjectDirectory od = repo.getObjectDatabase();
+		for (ObjectId o : alternateObjects) {
+			assertTrue(String.format("can't find object %s in alternate",
+					o.getName()), od.has(o));
+		}
+	}
+
