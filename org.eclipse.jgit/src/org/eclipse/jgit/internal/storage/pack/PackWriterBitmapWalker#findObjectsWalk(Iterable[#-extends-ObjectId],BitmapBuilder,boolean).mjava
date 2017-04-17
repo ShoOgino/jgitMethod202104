@@ -1,0 +1,57 @@
+	private BitmapBuilder findObjectsWalk(Iterable<? extends ObjectId> start, BitmapBuilder seen, boolean ignoreMissingStart)
+			throws MissingObjectException, IncorrectObjectTypeException,
+			IOException {
+		final BitmapBuilder bitmapResult = bitmapIndex.newBitmapBuilder();
+
+		for (ObjectId obj : start) {
+			Bitmap bitmap = bitmapIndex.getBitmap(obj);
+			if (bitmap != null)
+				bitmapResult.or(bitmap);
+		}
+
+		boolean marked = false;
+		for (ObjectId obj : start) {
+			try {
+				if (!bitmapResult.contains(obj)) {
+					walker.markStart(walker.parseAny(obj));
+					marked = true;
+				}
+			} catch (MissingObjectException e) {
+				if (ignoreMissingStart)
+					continue;
+				throw e;
+			}
+		}
+
+		if (marked) {
+			if (seen == null) {
+				walker.setRevFilter(new AddToBitmapFilter(bitmapResult));
+			} else {
+				walker.setRevFilter(
+						new AddUnseenToBitmapFilter(seen, bitmapResult));
+			}
+
+			while (walker.next() != null) {
+				// Iterate through all of the commits. The BitmapRevFilter does
+				// the work.
+				//
+				// filter.include returns true for commits that do not have
+				// a bitmap in bitmapIndex and are not reachable from a
+				// bitmap in bitmapIndex encountered earlier in the walk.
+				// Thus the number of commits returned by next() measures how
+				// much history was traversed without being able to make use
+				// of bitmaps.
+				pm.update(1);
+				countOfBitmapIndexMisses++;
+			}
+
+			RevObject ro;
+			while ((ro = walker.nextObject()) != null) {
+				bitmapResult.addObject(ro, ro.getType());
+				pm.update(1);
+			}
+		}
+
+		return bitmapResult;
+	}
+
