@@ -1,0 +1,18 @@
+	private long getLooseSizeFromSelfOrAlternate(WindowCursor curs,
+			AnyObjectId id, Set<AlternateHandle.Id> skips) throws IOException {
+		long len = getLooseObjectSize(curs, id);
+		if (0 <= len) {
+			return len;
+		}
+		skips = addMe(skips);
+		for (AlternateHandle alt : myAlternates()) {
+			if (!skips.contains(alt.getId())) {
+				len = alt.db.getLooseSizeFromSelfOrAlternate(curs, id, skips);
+				if (0 <= len) {
+					return len;
+				}
+			}
+		}
+		return -1;
+	}
+

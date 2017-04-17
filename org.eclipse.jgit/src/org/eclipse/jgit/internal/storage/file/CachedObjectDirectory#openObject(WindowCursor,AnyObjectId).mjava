@@ -1,17 +1,6 @@
 	@Override
-	ObjectLoader openObject(final WindowCursor curs,
-			final AnyObjectId objectId) throws IOException {
-		ObjectLoader ldr = openLooseObject(curs, objectId);
-		if (ldr != null)
-			return ldr;
-		ldr = wrapped.openPackedObject(curs, objectId);
-		if (ldr != null)
-			return ldr;
-		for (CachedObjectDirectory alt : myAlternates()) {
-			ldr = alt.openObject(curs, objectId);
-			if (ldr != null)
-				return ldr;
-		}
-		return null;
+	ObjectLoader openObject(final WindowCursor curs, final AnyObjectId objectId)
+			throws IOException {
+		return openObject(curs, objectId, null);
 	}
 
