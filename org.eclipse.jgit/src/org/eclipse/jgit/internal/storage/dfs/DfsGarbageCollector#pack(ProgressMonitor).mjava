@@ -30,13 +30,6 @@
 			Collection<Ref> refsBefore = getAllRefs();
 			readPacksBefore();
 
-			if (packsBefore.isEmpty()) {
-				if (!expiredGarbagePacks.isEmpty()) {
-					objdb.commitPack(noPacks(), toPrune());
-				}
-				return true;
-			}
-
 			allHeads = new HashSet<>();
 			nonHeads = new HashSet<>();
 			txnHeads = new HashSet<>();

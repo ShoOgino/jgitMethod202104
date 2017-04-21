@@ -1,0 +1,11 @@
+	private boolean packIsExpiredGarbage(DfsPackDescription d, long now) {
+		// Consider the garbage pack as expired when it's older than
+		// garbagePackTtl. This check gives concurrent inserter threads
+		// sufficient time to identify an object is not in the graph and should
+		// have a new copy written, rather than relying on something from an
+		// UNREACHABLE_GARBAGE pack.
+		return d.getPackSource() == UNREACHABLE_GARBAGE
+				&& garbageTtlMillis > 0
+				&& now - d.getLastModified() >= garbageTtlMillis;
+	}
+

@@ -1,5 +1,5 @@
 	@Test
-	public void testCollectionWithGarbageAndGarbagePacksPurged()
+	public void testCollectionWithGarbageAndRereferencingGarbage()
 			throws Exception {
 		RevCommit commit0 = commit().message("0").create();
 		RevCommit commit1 = commit().message("1").parent(commit0).create();
@@ -28,13 +28,16 @@
 		assertTrue("gc pack found", gcPackFound);
 		assertTrue("garbage pack found", garbagePackFound);
 
+		git.update("master", commit1);
+
 		gcWithTtl();
-		// The gc operation should have removed UNREACHABLE_GARBAGE pack along with commit1.
+		// The gc operation should have removed the UNREACHABLE_GARBAGE pack and
+		// moved commit1 into GC pack.
 		DfsPackFile[] packs = odb.getPacks();
 		assertEquals(1, packs.length);
 
 		assertEquals(GC, packs[0].getPackDescription().getPackSource());
 		assertTrue("has commit0", isObjectInPack(commit0, packs[0]));
-		assertFalse("no commit1", isObjectInPack(commit1, packs[0]));
+		assertTrue("has commit1", isObjectInPack(commit1, packs[0]));
 	}
 

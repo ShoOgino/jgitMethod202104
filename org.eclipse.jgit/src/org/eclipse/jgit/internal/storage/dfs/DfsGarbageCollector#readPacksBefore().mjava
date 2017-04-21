@@ -3,13 +3,12 @@
 		packsBefore = new ArrayList<>(packs.length);
 		expiredGarbagePacks = new ArrayList<>(packs.length);
 
-		long mostRecentGC = mostRecentGC(packs);
 		long now = SystemReader.getInstance().getCurrentTime();
 		for (DfsPackFile p : packs) {
 			DfsPackDescription d = p.getPackDescription();
 			if (d.getPackSource() != UNREACHABLE_GARBAGE) {
 				packsBefore.add(p);
-			} else if (packIsExpiredGarbage(d, mostRecentGC, now)) {
+			} else if (packIsExpiredGarbage(d, now)) {
 				expiredGarbagePacks.add(p);
 			} else if (packIsCoalesceableGarbage(d, now)) {
 				packsBefore.add(p);
