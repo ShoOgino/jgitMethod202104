@@ -1,0 +1,26 @@
+	private void carryOntoHistoryInnerLoop(RevCommit c, int carry) {
+		for (;;) {
+			RevCommit[] parents = c.parents;
+			if (parents == null || parents.length == 0) {
+				break;
+			}
+
+			int e = parents.length - 1;
+			for (int i = 0; i < e; i++) {
+				RevCommit p = parents[i];
+				if (carryOntoOne(p, carry) == CONTINUE) {
+					// Walking p will be required, buffer p on stack.
+					stack = new CarryStack(stack, p, carry);
+				}
+				// For other results from carryOntoOne:
+				// HAVE_ALL: p has all bits, do nothing to skip that path.
+				// CONTINUE_ON_STACK: callee pushed StackElement for p.
+			}
+
+			c = parents[e];
+			if (carryOntoOne(c, carry) != CONTINUE) {
+				break;
+			}
+		}
+	}
+

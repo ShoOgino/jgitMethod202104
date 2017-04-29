@@ -1,5 +1,10 @@
-	private boolean carryOntoOne(final RevCommit p, final int carry) {
-		final boolean haveAll = (p.flags & carry) == carry;
+	private int carryOntoOne(RevCommit p, int carry) {
+		// If we already had all carried flags, our parents do too.
+		// Return HAVE_ALL to stop caller from running down this leg
+		// of the revision graph any further.
+		//
+		// Otherwise return CONTINUE to ask the caller to walk history.
+		int rc = (p.flags & carry) == carry ? HAVE_ALL : CONTINUE;
 		p.flags |= carry;
 
 		if ((p.flags & recarryMask) == recarryTest) {
@@ -7,17 +12,11 @@
 			// voted to be one. Inject ourselves back at the front of the
 			// pending queue and tell all of our ancestors they are within
 			// the merge base now.
-			//
 			p.flags &= ~POPPED;
 			pending.add(p);
-			carryOntoHistory(p, branchMask | MERGE_BASE);
-			return true;
+			stack = new CarryStack(stack, p, branchMask | MERGE_BASE);
+			return CONTINUE_ON_STACK;
 		}
-
-		// If we already had all carried flags, our parents do too.
-		// Return true to stop the caller from running down this leg
-		// of the revision graph any further.
-		//
-		return haveAll;
+		return rc;
 	}
 
