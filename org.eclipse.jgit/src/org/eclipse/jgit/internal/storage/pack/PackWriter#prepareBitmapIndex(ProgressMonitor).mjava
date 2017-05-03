@@ -44,11 +44,9 @@
 		PackWriterBitmapWalker walker = bitmapPreparer.newBitmapWalker();
 		AnyObjectId last = null;
 		for (PackWriterBitmapPreparer.BitmapCommit cmit : selectedCommits) {
-			if (cmit.isReuseWalker())
-				walker.reset();
-			else
+			if (!cmit.isReuseWalker()) {
 				walker = bitmapPreparer.newBitmapWalker();
-
+			}
 			BitmapBuilder bitmap = walker.findObjects(
 					Collections.singleton(cmit), null, false);
 
