@@ -1,0 +1,12 @@
+	private Repository init() throws GitAPIException {
+		InitCommand command = Git.init();
+		command.setBare(bare);
+		if (directory != null) {
+			command.setDirectory(directory);
+		}
+		if (gitDir != null) {
+			command.setGitDir(gitDir);
+		}
+		return command.call().getRepository();
+	}
+

@@ -1,9 +1,9 @@
-	private Repository init(URIish u) throws GitAPIException {
-		InitCommand command = Git.init();
-		command.setBare(bare);
+	private void verifyDirectories(URIish u) {
 		if (directory == null && gitDir == null) {
 			directory = new File(u.getHumanishName(), Constants.DOT_GIT);
 		}
+		directoryExistsInitially = directory != null && directory.exists();
+		gitDirExistsInitially = gitDir != null && gitDir.exists();
 		validateDirs(directory, gitDir, bare);
 		if (isNonEmptyDirectory(directory)) {
 			throw new JGitInternalException(MessageFormat.format(
@@ -13,12 +13,5 @@
 			throw new JGitInternalException(MessageFormat.format(
 					JGitText.get().cloneNonEmptyDirectory, gitDir.getName()));
 		}
-		if (directory != null) {
-			command.setDirectory(directory);
-		}
-		if (gitDir != null) {
-			command.setGitDir(gitDir);
-		}
-		return command.call().getRepository();
 	}
 
