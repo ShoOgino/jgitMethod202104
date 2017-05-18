@@ -5,7 +5,7 @@
 		try (PackWriter pw = newPackWriter()) {
 			for (ObjectIdSet packedObjs : newPackObj)
 				pw.excludeObjects(packedObjs);
-			pw.preparePack(pm, nonHeads, allHeads);
+			pw.preparePack(pm, nonHeads, allHeadsAndTags);
 			if (0 < pw.getObjectCount())
 				writePack(GC_REST, pw, pm,
 						estimateGcPackSize(INSERT, RECEIVE, COMPACT, GC_REST));

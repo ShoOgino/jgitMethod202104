@@ -1,6 +1,7 @@
 	private PackFile writePack(@NonNull Set<? extends ObjectId> want,
-			@NonNull Set<? extends ObjectId> have, Set<ObjectId> tagTargets,
-			List<ObjectIdSet> excludeObjects) throws IOException {
+			@NonNull Set<? extends ObjectId> have, @NonNull Set<ObjectId> tags,
+			Set<ObjectId> tagTargets, List<ObjectIdSet> excludeObjects)
+			throws IOException {
 		checkCancelled();
 		File tmpPack = null;
 		Map<PackExt, File> tmpExts = new TreeMap<>(
@@ -26,12 +27,13 @@
 			// prepare the PackWriter
 			pw.setDeltaBaseAsOffset(true);
 			pw.setReuseDeltaCommits(false);
-			if (tagTargets != null)
+			if (tagTargets != null) {
 				pw.setTagTargets(tagTargets);
+			}
 			if (excludeObjects != null)
 				for (ObjectIdSet idx : excludeObjects)
 					pw.excludeObjects(idx);
-			pw.preparePack(pm, want, have);
+			pw.preparePack(pm, want, have, PackWriter.NONE, tags);
 			if (pw.getObjectCount() == 0)
 				return null;
 			checkCancelled();

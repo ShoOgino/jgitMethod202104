@@ -30,23 +30,36 @@
 			Collection<Ref> refsBefore = getAllRefs();
 			readPacksBefore();
 
-			allHeads = new HashSet<>();
+			Set<ObjectId> allHeads = new HashSet<>();
+			allHeadsAndTags = new HashSet<>();
+			allTags = new HashSet<>();
 			nonHeads = new HashSet<>();
 			txnHeads = new HashSet<>();
 			tagTargets = new HashSet<>();
 			for (Ref ref : refsBefore) {
-				if (ref.isSymbolic() || ref.getObjectId() == null)
+				if (ref.isSymbolic() || ref.getObjectId() == null) {
 					continue;
-				if (isHead(ref) || isTag(ref))
+				}
+				if (isHead(ref)) {
 					allHeads.add(ref.getObjectId());
-				else if (RefTreeNames.isRefTree(refdb, ref.getName()))
+				} else if (isTag(ref)) {
+					allTags.add(ref.getObjectId());
+				} else if (RefTreeNames.isRefTree(refdb, ref.getName())) {
 					txnHeads.add(ref.getObjectId());
-				else
+				} else {
 					nonHeads.add(ref.getObjectId());
-				if (ref.getPeeledObjectId() != null)
+				}
+				if (ref.getPeeledObjectId() != null) {
 					tagTargets.add(ref.getPeeledObjectId());
+				}
 			}
-			tagTargets.addAll(allHeads);
+			// Don't exclude tags that are also branch tips.
+			allTags.removeAll(allHeads);
+			allHeadsAndTags.addAll(allHeads);
+			allHeadsAndTags.addAll(allTags);
+
+			// Hoist all branch tips and tags earlier in the pack file
+			tagTargets.addAll(allHeadsAndTags);
 
 			boolean rollback = true;
 			try {

@@ -24,13 +24,20 @@
 	 *            {@code shallow} commits and earlier generations will be
 	 *            included in the pack if requested by {@code want}. Must not be
 	 *            {@code null}.
+	 * @param noBitmaps
+	 *            collection of objects to be excluded from bitmap commit
+	 *            selection.
 	 * @throws IOException
 	 *             an I/O problem occurred while reading objects.
 	 */
 	public void preparePack(ProgressMonitor countingMonitor,
 			@NonNull Set<? extends ObjectId> want,
 			@NonNull Set<? extends ObjectId> have,
-			@NonNull Set<? extends ObjectId> shallow) throws IOException {
-		preparePack(countingMonitor, want, have, shallow, NONE);
+			@NonNull Set<? extends ObjectId> shallow,
+			@NonNull Set<? extends ObjectId> noBitmaps) throws IOException {
+		try (ObjectWalk ow = getObjectWalk()) {
+			ow.assumeShallow(shallow);
+			preparePack(countingMonitor, ow, want, have, noBitmaps);
+		}
 	}
 
