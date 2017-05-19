@@ -8,6 +8,7 @@
 		if (hasImpl(packList, objectId)) {
 			return true;
 		} else if (packList.dirty()) {
+			stats.scanPacks++;
 			return hasImpl(db.scanPacks(packList), objectId);
 		}
 		return false;
