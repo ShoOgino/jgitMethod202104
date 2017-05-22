@@ -1,0 +1,59 @@
+	@Test
+	public void mergeBinaryFile_UnsetMerge_Conflict()
+			throws IllegalStateException,
+			IOException, NoHeadException, ConcurrentRefUpdateException,
+			CheckoutConflictException, InvalidMergeHeadsException,
+			WrongRepositoryStateException, NoMessageException, GitAPIException {
+
+		RevCommit disableCheckedCommit;
+		FileInputStream mergeResultFile = null;
+		// Set up a git whith conflict commits on images
+		try (Git git = new Git(db)) {
+			// First commit
+			write(new File(db.getWorkTree(), ".gitattributes"), "*.gif -merge");
+			git.add().addFilepattern(".gitattributes").call();
+			RevCommit firstCommit = git.commit()
+					.setMessage("initial commit adding git attribute file")
+					.call();
+
+			// Create branch and add an icon Checked_Boxe (enabled_checked)
+			createBranch(firstCommit, ENABLE_CHECKED_BRANCH);
+			checkoutBranch(ENABLE_CHECKED_BRANCH);
+			copy(ENABLED_CHECKED_GIF, ENABLED_CHECKED_GIF, "");
+			git.add().addFilepattern(ENABLED_CHECKED_GIF).call();
+			git.commit().setMessage("enabled_checked commit").call();
+
+			// Create a second branch from master Unchecked_Boxe
+			checkoutBranch(REFS_HEADS_MASTER);
+			createBranch(firstCommit, DISABLE_CHECK_BRANCH);
+			checkoutBranch(DISABLE_CHECK_BRANCH);
+			copy("disabled_checked.gif", ENABLED_CHECKED_GIF, "");
+			git.add().addFilepattern(ENABLED_CHECKED_GIF).call();
+			disableCheckedCommit = git.commit()
+					.setMessage("disabled_checked commit").call();
+
+			// Check that the merge attribute is unset
+			assertAddMergeAttributeUnset(ENABLE_CHECKED_BRANCH,
+					ENABLED_CHECKED_GIF);
+			assertAddMergeAttributeUnset(DISABLE_CHECK_BRANCH,
+					ENABLED_CHECKED_GIF);
+
+			checkoutBranch(ENABLE_CHECKED_BRANCH);
+			// Merge refs/heads/enabled_checked -> refs/heads/disabled_checked
+			MergeResult mergeResult = git.merge().include(disableCheckedCommit)
+					.call();
+			assertEquals(MergeStatus.CONFLICTING, mergeResult.getMergeStatus());
+
+			// Check that the image was not modified (not conflict marker added)
+			mergeResultFile = new FileInputStream(db.getWorkTree().toPath()
+					.resolve(ENABLED_CHECKED_GIF).toFile());
+			assertTrue(contentEquals(
+					getClass().getResourceAsStream(ENABLED_CHECKED_GIF),
+					mergeResultFile));
+		} finally {
+			if (mergeResultFile != null) {
+				mergeResultFile.close();
+			}
+		}
+	}
+

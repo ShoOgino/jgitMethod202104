@@ -1,0 +1,40 @@
+	@Test
+	public void mergeTextualFile_NoAttr() throws NoWorkTreeException,
+			NoFilepatternException, GitAPIException, IOException {
+		try (Git git = createRepositoryBinaryConflict(g -> {
+			try {
+				writeTrashFile("main.cat", "A\n" + "B\n" + "C\n" + "D\n");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}, g -> {
+			try {
+				writeTrashFile("main.cat", "A\n" + "B\n" + "C\n" + "F\n");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}, g -> {
+			try {
+				writeTrashFile("main.cat", "A\n" + "E\n" + "C\n" + "D\n");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		})) {
+			checkoutBranch(REFS_HEADS_LEFT);
+			// Merge refs/heads/enabled_checked -> refs/heads/disabled_checked
+
+			MergeResult mergeResult = git.merge()
+					.include(git.getRepository().resolve(REFS_HEADS_RIGHT))
+					.call();
+			assertEquals(MergeStatus.MERGED, mergeResult.getMergeStatus());
+
+			assertNull(mergeResult.getConflicts());
+
+			// Check that the image was not modified (not conflict marker added)
+			String result = read(
+					writeTrashFile("res.cat", "A\n" + "E\n" + "C\n" + "F\n"));
+			assertEquals(result, read(git.getRepository().getWorkTree().toPath()
+					.resolve("main.cat").toFile()));
+		}
+	}
+

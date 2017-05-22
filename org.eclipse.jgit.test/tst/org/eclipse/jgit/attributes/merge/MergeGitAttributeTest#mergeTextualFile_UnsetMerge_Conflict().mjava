@@ -1,0 +1,45 @@
+	@Test
+	public void mergeTextualFile_UnsetMerge_Conflict()
+			throws NoWorkTreeException, NoFilepatternException, GitAPIException,
+			IOException {
+		try (Git git = createRepositoryBinaryConflict(g -> {
+			try {
+				writeTrashFile(".gitattributes", "*.cat -merge");
+				writeTrashFile("main.cat", "A\n" + "B\n" + "C\n" + "D\n");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}, g -> {
+			try {
+				writeTrashFile("main.cat", "A\n" + "B\n" + "C\n" + "F\n");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}, g -> {
+			try {
+				writeTrashFile("main.cat", "A\n" + "E\n" + "C\n" + "D\n");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		})) {
+			// Check that the merge attribute is unset
+			assertAddMergeAttributeUnset(REFS_HEADS_LEFT, "main.cat");
+			assertAddMergeAttributeUnset(REFS_HEADS_RIGHT, "main.cat");
+
+			checkoutBranch(REFS_HEADS_LEFT);
+			// Merge refs/heads/enabled_checked -> refs/heads/disabled_checked
+
+			String catContent = read(git.getRepository().getWorkTree().toPath()
+					.resolve("main.cat").toFile());
+
+			MergeResult mergeResult = git.merge()
+					.include(git.getRepository().resolve(REFS_HEADS_RIGHT))
+					.call();
+			assertEquals(MergeStatus.CONFLICTING, mergeResult.getMergeStatus());
+
+			// Check that the image was not modified (not conflict marker added)
+			assertEquals(catContent, read(git.getRepository().getWorkTree()
+					.toPath().resolve("main.cat").toFile()));
+		}
+	}
+
