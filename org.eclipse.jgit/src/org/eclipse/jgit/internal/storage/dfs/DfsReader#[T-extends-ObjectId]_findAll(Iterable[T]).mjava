@@ -9,6 +9,7 @@
 		List<FoundObject<T>> r = new ArrayList<>();
 		findAllImpl(packList, pending, r);
 		if (!pending.isEmpty() && packList.dirty()) {
+			stats.scanPacks++;
 			findAllImpl(db.scanPacks(packList), pending, r);
 		}
 		for (T t : pending) {

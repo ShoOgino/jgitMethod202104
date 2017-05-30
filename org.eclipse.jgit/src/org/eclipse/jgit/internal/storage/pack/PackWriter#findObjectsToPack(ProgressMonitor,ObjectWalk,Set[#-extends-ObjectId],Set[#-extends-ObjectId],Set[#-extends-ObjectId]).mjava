@@ -1,11 +1,13 @@
 	private void findObjectsToPack(@NonNull ProgressMonitor countingMonitor,
 			@NonNull ObjectWalk walker, @NonNull Set<? extends ObjectId> want,
-			@NonNull Set<? extends ObjectId> have) throws IOException {
+			@NonNull Set<? extends ObjectId> have,
+			@NonNull Set<? extends ObjectId> noBitmaps) throws IOException {
 		final long countingStart = System.currentTimeMillis();
 		beginPhase(PackingPhase.COUNTING, countingMonitor, ProgressMonitor.UNKNOWN);
 
 		stats.interestingObjects = Collections.unmodifiableSet(new HashSet<ObjectId>(want));
 		stats.uninterestingObjects = Collections.unmodifiableSet(new HashSet<ObjectId>(have));
+		excludeFromBitmapSelection = noBitmaps;
 
 		canBuildBitmaps = config.isBuildBitmaps()
 				&& !shallowPack

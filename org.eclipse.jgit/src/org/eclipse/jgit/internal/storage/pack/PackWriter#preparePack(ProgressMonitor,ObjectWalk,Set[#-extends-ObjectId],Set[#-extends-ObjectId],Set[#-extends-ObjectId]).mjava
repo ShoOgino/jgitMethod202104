@@ -22,13 +22,17 @@
 	 *            points of graph traversal). Pass {@link #NONE} if all objects
 	 *            reachable from {@code want} are desired, such as when serving
 	 *            a clone.
+	 * @param noBitmaps
+	 *            collection of objects to be excluded from bitmap commit
+	 *            selection.
 	 * @throws IOException
 	 *             when some I/O problem occur during reading objects.
 	 */
 	public void preparePack(ProgressMonitor countingMonitor,
 			@NonNull ObjectWalk walk,
 			@NonNull Set<? extends ObjectId> interestingObjects,
-			@NonNull Set<? extends ObjectId> uninterestingObjects)
+			@NonNull Set<? extends ObjectId> uninterestingObjects,
+			@NonNull Set<? extends ObjectId> noBitmaps)
 			throws IOException {
 		if (countingMonitor == null)
 			countingMonitor = NullProgressMonitor.INSTANCE;
@@ -36,6 +40,6 @@
 			throw new IllegalArgumentException(
 					JGitText.get().shallowPacksRequireDepthWalk);
 		findObjectsToPack(countingMonitor, walk, interestingObjects,
-				uninterestingObjects);
+				uninterestingObjects, noBitmaps);
 	}
 

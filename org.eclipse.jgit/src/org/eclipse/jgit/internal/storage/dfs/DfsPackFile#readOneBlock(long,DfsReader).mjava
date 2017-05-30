@@ -3,6 +3,8 @@
 		if (invalid)
 			throw new PackInvalidException(getPackName());
 
+		ctx.stats.readBlock++;
+		long start = System.nanoTime();
 		ReadableChannel rc = ctx.db.openFile(packDesc, PACK);
 		try {
 			int size = blockSize(rc);
@@ -29,6 +31,7 @@
 			byte[] buf = new byte[size];
 			rc.position(pos);
 			int cnt = read(rc, ByteBuffer.wrap(buf, 0, size));
+			ctx.stats.readBlockBytes += cnt;
 			if (cnt != size) {
 				if (0 <= len) {
 					throw new EOFException(MessageFormat.format(
@@ -50,10 +53,10 @@
 				length = len = rc.size();
 			}
 
-			DfsBlock v = new DfsBlock(key, pos, buf);
-			return v;
+			return new DfsBlock(key, pos, buf);
 		} finally {
 			rc.close();
+			ctx.stats.readBlockMicros += elapsedMicros(start);
 		}
 	}
 

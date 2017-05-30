@@ -1,10 +1,10 @@
 	private void packHeads(ProgressMonitor pm) throws IOException {
-		if (allHeads.isEmpty())
+		if (allHeadsAndTags.isEmpty())
 			return;
 
 		try (PackWriter pw = newPackWriter()) {
 			pw.setTagTargets(tagTargets);
-			pw.preparePack(pm, allHeads, PackWriter.NONE);
+			pw.preparePack(pm, allHeadsAndTags, NONE, NONE, allTags);
 			if (0 < pw.getObjectCount())
 				writePack(GC, pw, pm,
 						estimateGcPackSize(INSERT, RECEIVE, COMPACT, GC));

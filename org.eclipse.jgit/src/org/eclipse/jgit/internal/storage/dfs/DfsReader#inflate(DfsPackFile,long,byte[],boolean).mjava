@@ -27,9 +27,10 @@
 		for (int dstoff = 0;;) {
 			int n = inf.inflate(dstbuf, dstoff, dstbuf.length - dstoff);
 			dstoff += n;
-			if (inf.finished() || (headerOnly && dstoff == dstbuf.length))
+			if (inf.finished() || (headerOnly && dstoff == dstbuf.length)) {
+				stats.inflatedBytes += dstoff;
 				return dstoff;
-			if (inf.needsInput()) {
+			} else if (inf.needsInput()) {
 				pin(pack, position);
 				position += block.setInput(position, inf);
 			} else if (n == 0)

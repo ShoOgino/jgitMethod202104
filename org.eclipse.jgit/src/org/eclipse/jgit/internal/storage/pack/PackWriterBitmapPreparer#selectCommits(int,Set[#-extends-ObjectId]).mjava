@@ -3,6 +3,8 @@
 	 *
 	 * @param expectedCommitCount
 	 *            count of commits in the pack
+	 * @param excludeFromBitmapSelection
+	 *            commits that should be excluded from bitmap selection
 	 * @return commit objects for which bitmap indices should be built
 	 * @throws IncorrectObjectTypeException
 	 *             if any of the processed objects is not a commit
@@ -11,7 +13,8 @@
 	 * @throws MissingObjectException
 	 *             if an expected object is missing
 	 */
-	Collection<BitmapCommit> selectCommits(int expectedCommitCount)
+	Collection<BitmapCommit> selectCommits(int expectedCommitCount,
+			Set<? extends ObjectId> excludeFromBitmapSelection)
 			throws IncorrectObjectTypeException, IOException,
 			MissingObjectException {
 		/*
@@ -26,7 +29,7 @@
 		RevWalk rw = new RevWalk(reader);
 		rw.setRetainBody(false);
 		CommitSelectionHelper selectionHelper = setupTipCommitBitmaps(rw,
-				expectedCommitCount);
+				expectedCommitCount, excludeFromBitmapSelection);
 		pm.endTask();
 
 		int totCommits = selectionHelper.getCommitCount();
