@@ -1,10 +1,17 @@
 	private void expandSingle(final RefSpec spec, final Set<Ref> matched)
 			throws TransportException {
-		final Ref src = conn.getRef(spec.getSource());
-		if (src == null) {
-			throw new TransportException(MessageFormat.format(JGitText.get().remoteDoesNotHaveSpec, spec.getSource()));
+		String want = spec.getSource();
+		if (ObjectId.isId(want)) {
+			want(ObjectId.fromString(want));
+			return;
 		}
-		if (matched.add(src))
+
+		Ref src = conn.getRef(want);
+		if (src == null) {
+			throw new TransportException(MessageFormat.format(JGitText.get().remoteDoesNotHaveSpec, want));
+		}
+		if (matched.add(src)) {
 			want(src, spec);
+		}
 	}
 
