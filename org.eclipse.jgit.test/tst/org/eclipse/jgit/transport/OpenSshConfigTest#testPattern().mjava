@@ -1,0 +1,10 @@
+	@Test
+	public void testPattern() throws Exception {
+		config("Host repo.or.cz\nIdentityFile ~/foo/bar\nHOST *.or.cz\nIdentityFile /foo/baz");
+		final Host h = osc.lookup("repo.or.cz");
+		assertNotNull(h);
+		assertEquals(new File(home, "foo/bar"), h.getIdentityFile());
+		assertArrayEquals(new Object[] { "~/foo/bar", "/foo/baz" },
+				h.getConfig().getValues("IdentityFile"));
+	}
+

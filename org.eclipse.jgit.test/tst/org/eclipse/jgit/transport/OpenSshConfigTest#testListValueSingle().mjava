@@ -1,0 +1,8 @@
+	@Test
+	public void testListValueSingle() throws Exception {
+		config("Host orcz\nUserKnownHostsFile /foo/bar\n");
+		final ConfigRepository.Config c = osc.getConfig("orcz");
+		assertNotNull(c);
+		assertEquals("/foo/bar", c.getValue("UserKnownHostsFile"));
+	}
+

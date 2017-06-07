@@ -8,30 +8,23 @@
 	 * @return r configuration for the requested name. Never null.
 	 */
 	public Host lookup(final String hostName) {
-		final Map<String, Host> cache = refresh();
-		Host h = cache.get(hostName);
-		if (h == null)
-			h = new Host();
-		if (h.patternsApplied)
+		final State cache = refresh();
+		Host h = cache.hosts.get(hostName);
+		if (h != null) {
 			return h;
-
-		for (final Map.Entry<String, Host> e : cache.entrySet()) {
-			if (!isHostPattern(e.getKey()))
-				continue;
-			if (!isHostMatch(e.getKey(), hostName))
-				continue;
-			h.copyFrom(e.getValue());
 		}
-
-		if (h.hostName == null)
-			h.hostName = hostName;
-		if (h.user == null)
-			h.user = OpenSshConfig.userName();
-		if (h.port == 0)
-			h.port = OpenSshConfig.SSH_PORT;
-		if (h.connectionAttempts == 0)
-			h.connectionAttempts = 1;
-		h.patternsApplied = true;
+		HostEntry fullConfig = new HostEntry();
+		// Initialize with default entries at the top of the file, before the
+		// first Host block.
+		fullConfig.merge(cache.entries.get(HostEntry.DEFAULT_NAME));
+		for (final Map.Entry<String, HostEntry> e : cache.entries.entrySet()) {
+			String key = e.getKey();
+			if (isHostMatch(key, hostName)) {
+				fullConfig.merge(e.getValue());
+			}
+		}
+		h = new Host(fullConfig, hostName, home);
+		cache.hosts.put(hostName, h);
 		return h;
 	}
 

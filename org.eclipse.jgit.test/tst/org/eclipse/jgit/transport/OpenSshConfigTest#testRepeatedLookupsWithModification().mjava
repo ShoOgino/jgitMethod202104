@@ -1,0 +1,15 @@
+	@Test
+	public void testRepeatedLookupsWithModification() throws Exception {
+		config("Host orcz\n" + "\tConnectionAttempts -1\n");
+		final Host h1 = osc.lookup("orcz");
+		assertNotNull(h1);
+		assertEquals(1, h1.getConnectionAttempts());
+		config("Host orcz\n" + "\tConnectionAttempts 5\n");
+		final Host h2 = osc.lookup("orcz");
+		assertNotNull(h2);
+		assertNotSame(h1, h2);
+		assertEquals(5, h2.getConnectionAttempts());
+		assertEquals(1, h1.getConnectionAttempts());
+		assertNotSame(h1.getConfig(), h2.getConfig());
+	}
+

@@ -1,0 +1,11 @@
+	@Test
+	public void testMissingArgument() throws Exception {
+		config("Host=orcz\n\tSendEnv\nIdentityFile\t\nForwardX11\n\tUser=\t  foobar\t\n");
+		final Host h = osc.lookup("orcz");
+		assertNotNull(h);
+		assertEquals("foobar", h.getUser());
+		assertArrayEquals(new String[0], h.getConfig().getValues("SendEnv"));
+		assertNull(h.getIdentityFile());
+		assertNull(h.getConfig().getValue("ForwardX11"));
+	}
+

@@ -1,0 +1,15 @@
+	@Test
+	public void testMultiIdentityFile() throws Exception {
+		config("IdentityFile \"~/foo/ba z\"\nHost orcz\nIdentityFile /foo/bar\nHOST *\nIdentityFile /foo/baz");
+		final Host h = osc.lookup("orcz");
+		assertNotNull(h);
+		File f = h.getIdentityFile();
+		assertNotNull(f);
+		// Host does tilde replacement
+		assertEquals(new File(home, "foo/ba z"), f);
+		final ConfigRepository.Config c = h.getConfig();
+		// Config doesn't
+		assertArrayEquals(new Object[] { "~/foo/ba z", "/foo/bar", "/foo/baz" },
+				c.getValues("IdentityFile"));
+	}
+

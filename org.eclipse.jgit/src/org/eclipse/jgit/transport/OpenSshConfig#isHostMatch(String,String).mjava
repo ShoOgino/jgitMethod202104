@@ -1,11 +1,9 @@
-	private static boolean isHostMatch(final String pattern, final String name) {
-		final FileNameMatcher fn;
-		try {
-			fn = new FileNameMatcher(pattern, null);
-		} catch (InvalidPatternException e) {
-			return false;
+	private static boolean isHostMatch(final String pattern,
+			final String name) {
+		if (pattern.startsWith("!")) { //$NON-NLS-1$
+			return !patternMatchesHost(pattern.substring(1), name);
+		} else {
+			return patternMatchesHost(pattern, name);
 		}
-		fn.append(name);
-		return fn.isMatch();
 	}
 

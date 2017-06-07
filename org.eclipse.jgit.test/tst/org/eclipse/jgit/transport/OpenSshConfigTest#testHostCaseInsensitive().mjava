@@ -1,0 +1,8 @@
+	@Test
+	public void testHostCaseInsensitive() throws Exception {
+		config("hOsT orcz\nConnectionAttempts 3\n");
+		final Host h = osc.lookup("orcz");
+		assertNotNull(h);
+		assertEquals(3, h.getConnectionAttempts());
+	}
+

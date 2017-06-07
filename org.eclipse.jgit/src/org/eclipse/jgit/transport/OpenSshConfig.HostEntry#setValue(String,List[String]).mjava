@@ -1,0 +1,33 @@
+		public void setValue(String key, List<String> values) {
+			if (values.isEmpty()) {
+				// Can occur only on a missing argument: ignore.
+				return;
+			}
+			String k = key.toUpperCase(Locale.ROOT);
+			// Check multi-valued keys first; because of the replacement
+			// strategy, they must take precedence over list-valued keys
+			// which always follow the "first occurrence wins" strategy.
+			//
+			// Note that SendEnv is a multi-valued list-valued key. (It's
+			// rather immaterial for JGit, though.)
+			if (MULTI_KEYS.contains(k)) {
+				if (multiOptions == null) {
+					multiOptions = new HashMap<>(2 * MULTI_KEYS.size());
+				}
+				List<String> items = multiOptions.get(k);
+				if (items == null) {
+					items = new ArrayList<>(values);
+					multiOptions.put(k, items);
+				} else {
+					items.addAll(values);
+				}
+			} else {
+				if (listOptions == null) {
+					listOptions = new HashMap<>(2 * LIST_KEYS.size());
+				}
+				if (!listOptions.containsKey(k)) {
+					listOptions.put(k, values);
+				}
+			}
+		}
+

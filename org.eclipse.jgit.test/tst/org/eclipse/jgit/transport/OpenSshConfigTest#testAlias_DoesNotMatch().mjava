@@ -1,11 +1,16 @@
 	@Test
 	public void testAlias_DoesNotMatch() throws Exception {
-		config("Host orcz\n" + "\tHostName repo.or.cz\n");
+		config("Host orcz\n" + "Port 29418\n" + "\tHostName repo.or.cz\n");
 		final Host h = osc.lookup("repo.or.cz");
 		assertNotNull(h);
 		assertEquals("repo.or.cz", h.getHostName());
 		assertEquals("jex_junit", h.getUser());
 		assertEquals(22, h.getPort());
+		assertNull(h.getIdentityFile());
+		final Host h2 = osc.lookup("orcz");
+		assertEquals("repo.or.cz", h.getHostName());
+		assertEquals("jex_junit", h.getUser());
+		assertEquals(29418, h2.getPort());
 		assertNull(h.getIdentityFile());
 	}
 

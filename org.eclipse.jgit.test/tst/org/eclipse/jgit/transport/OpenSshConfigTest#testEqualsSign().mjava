@@ -1,0 +1,9 @@
+	@Test
+	public void testEqualsSign() throws Exception {
+		config("Host=orcz\n\tConnectionAttempts = 5\n\tUser=\t  foobar\t\n");
+		final Host h = osc.lookup("orcz");
+		assertNotNull(h);
+		assertEquals(5, h.getConnectionAttempts());
+		assertEquals("foobar", h.getUser());
+	}
+

@@ -1,0 +1,26 @@
+		private String findValue(String key) {
+			String k = mapKey(key);
+			String result = options != null ? options.get(k) : null;
+			if (result == null) {
+				// Also check the list and multi options. Modern OpenSSH treats
+				// UserKnownHostsFile and GlobalKnownHostsFile as list-valued,
+				// and so does this parser. Jsch 0.1.54 in general doesn't know
+				// about list-valued options (it _does_ know multi-valued
+				// options, though), and will ask for a single value for such
+				// options.
+				//
+				// Let's be lenient and return at least the first value from
+				// a list-valued or multi-valued key for which Jsch asks for a
+				// single value.
+				List<String> values = listOptions != null ? listOptions.get(k)
+						: null;
+				if (values == null) {
+					values = multiOptions != null ? multiOptions.get(k) : null;
+				}
+				if (values != null && !values.isEmpty()) {
+					result = values.get(0);
+				}
+			}
+			return result;
+		}
+

@@ -1,0 +1,15 @@
+	@Test
+	public void testMultiHost() throws Exception {
+		config("Host orcz *.or.cz\nIdentityFile ~/foo/bar\nHOST *.or.cz\nIdentityFile /foo/baz");
+		final Host h1 = osc.lookup("repo.or.cz");
+		assertNotNull(h1);
+		assertEquals(new File(home, "foo/bar"), h1.getIdentityFile());
+		assertArrayEquals(new Object[] { "~/foo/bar", "/foo/baz" },
+				h1.getConfig().getValues("IdentityFile"));
+		final Host h2 = osc.lookup("orcz");
+		assertNotNull(h2);
+		assertEquals(new File(home, "foo/bar"), h2.getIdentityFile());
+		assertArrayEquals(new Object[] { "~/foo/bar" },
+				h2.getConfig().getValues("IdentityFile"));
+	}
+

@@ -1,0 +1,35 @@
+		private void complete(String initialHostName, File homeDir) {
+			// Try to set values from the options.
+			hostName = config.getHostname();
+			user = config.getUser();
+			port = config.getPort();
+			connectionAttempts = positive(
+					config.getValue("ConnectionAttempts")); //$NON-NLS-1$
+			strictHostKeyChecking = config.getValue("StrictHostKeyChecking"); //$NON-NLS-1$
+			String value = config.getValue("BatchMode"); //$NON-NLS-1$
+			if (value != null) {
+				batchMode = yesno(value);
+			}
+			value = config.getValue("PreferredAuthentications"); //$NON-NLS-1$
+			if (value != null) {
+				preferredAuthentications = nows(value);
+			}
+			// Fill in defaults if still not set
+			if (hostName == null) {
+				hostName = initialHostName;
+			}
+			if (user == null) {
+				user = OpenSshConfig.userName();
+			}
+			if (port <= 0) {
+				port = OpenSshConfig.SSH_PORT;
+			}
+			if (connectionAttempts <= 0) {
+				connectionAttempts = 1;
+			}
+			String[] identityFiles = config.getValues("IdentityFile"); //$NON-NLS-1$
+			if (identityFiles != null && identityFiles.length > 0) {
+				identityFile = toFile(identityFiles[0], homeDir);
+			}
+		}
+

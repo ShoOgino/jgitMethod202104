@@ -1,0 +1,17 @@
+	private static boolean patternMatchesHost(final String pattern,
+			final String name) {
+		if (pattern.indexOf('*') >= 0 || pattern.indexOf('?') >= 0) {
+			final FileNameMatcher fn;
+			try {
+				fn = new FileNameMatcher(pattern, null);
+			} catch (InvalidPatternException e) {
+				return false;
+			}
+			fn.append(name);
+			return fn.isMatch();
+		} else {
+			// Not a pattern but a full host name
+			return pattern.equals(name);
+		}
+	}
+

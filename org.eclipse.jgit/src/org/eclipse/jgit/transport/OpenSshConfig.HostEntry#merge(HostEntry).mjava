@@ -1,0 +1,45 @@
+		protected void merge(HostEntry entry) {
+			if (entry == null) {
+				// Can occur if we could not read the config file
+				return;
+			}
+			if (entry.options != null) {
+				if (options == null) {
+					options = new HashMap<>();
+				}
+				for (Map.Entry<String, String> item : entry.options
+						.entrySet()) {
+					if (!options.containsKey(item.getKey())) {
+						options.put(item.getKey(), item.getValue());
+					}
+				}
+			}
+			if (entry.listOptions != null) {
+				if (listOptions == null) {
+					listOptions = new HashMap<>(2 * LIST_KEYS.size());
+				}
+				for (Map.Entry<String, List<String>> item : entry.listOptions
+						.entrySet()) {
+					if (!listOptions.containsKey(item.getKey())) {
+						listOptions.put(item.getKey(), item.getValue());
+					}
+				}
+
+			}
+			if (entry.multiOptions != null) {
+				if (multiOptions == null) {
+					multiOptions = new HashMap<>(2 * MULTI_KEYS.size());
+				}
+				for (Map.Entry<String, List<String>> item : entry.multiOptions
+						.entrySet()) {
+					List<String> values = multiOptions.get(item.getKey());
+					if (values == null) {
+						values = new ArrayList<>(item.getValue());
+						multiOptions.put(item.getKey(), values);
+					} else {
+						values.addAll(item.getValue());
+					}
+				}
+			}
+		}
+

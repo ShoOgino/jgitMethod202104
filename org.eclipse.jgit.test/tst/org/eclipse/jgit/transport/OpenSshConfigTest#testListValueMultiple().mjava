@@ -1,0 +1,10 @@
+	@Test
+	public void testListValueMultiple() throws Exception {
+		// Tilde expansion doesn't occur within the parser
+		config("Host orcz\nUserKnownHostsFile \"~/foo/ba z\" /foo/bar \n");
+		final ConfigRepository.Config c = osc.getConfig("orcz");
+		assertNotNull(c);
+		assertArrayEquals(new Object[] { "~/foo/ba z", "/foo/bar" },
+				c.getValues("UserKnownHostsFile"));
+	}
+

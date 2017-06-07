@@ -1,0 +1,22 @@
+		public void setValue(String key, String value) {
+			String k = key.toUpperCase(Locale.ROOT);
+			if (MULTI_KEYS.contains(k)) {
+				if (multiOptions == null) {
+					multiOptions = new HashMap<>();
+				}
+				List<String> values = multiOptions.get(k);
+				if (values == null) {
+					values = new ArrayList<>(4);
+					multiOptions.put(k, values);
+				}
+				values.add(value);
+			} else {
+				if (options == null) {
+					options = new HashMap<>();
+				}
+				if (!options.containsKey(k)) {
+					options.put(k, value);
+				}
+			}
+		}
+

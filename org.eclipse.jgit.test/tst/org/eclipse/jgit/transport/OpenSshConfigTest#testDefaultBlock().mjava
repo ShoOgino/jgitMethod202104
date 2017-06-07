@@ -1,0 +1,8 @@
+	@Test
+	public void testDefaultBlock() throws Exception {
+		config("ConnectionAttempts 5\n\nHost orcz\nConnectionAttempts 3\n");
+		final Host h = osc.lookup("orcz");
+		assertNotNull(h);
+		assertEquals(5, h.getConnectionAttempts());
+	}
+
