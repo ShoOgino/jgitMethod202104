@@ -3,7 +3,7 @@
 		commitFoo();
 		byte[] result = CLIGitCommand.executeRaw(
 				"git archive --prefix=x// --format=zip master", db).outBytes();
-		String[] expect = { "x//foo" };
+		String[] expect = { "x/", "x//foo" };
 		assertArrayEquals(expect, listZipEntries(result));
 	}
 
