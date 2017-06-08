@@ -1,0 +1,36 @@
+	private void checkObjectCollision(PackedObjectInfo obj)
+			throws IOException {
+		ObjectTypeAndSize info = openDatabase(obj, new ObjectTypeAndSize());
+		final byte[] readBuffer = buffer();
+		final byte[] curBuffer = new byte[readBuffer.length];
+		long sz = info.size;
+		InputStream pck = null;
+		try (ObjectStream cur = readCurs.open(obj, info.type).openStream()) {
+			if (cur.getSize() != sz) {
+				throw new IOException(MessageFormat.format(
+						JGitText.get().collisionOn, obj.name()));
+			}
+			pck = inflate(Source.DATABASE, sz);
+			while (0 < sz) {
+				int n = (int) Math.min(readBuffer.length, sz);
+				IO.readFully(cur, curBuffer, 0, n);
+				IO.readFully(pck, readBuffer, 0, n);
+				for (int i = 0; i < n; i++) {
+					if (curBuffer[i] != readBuffer[i]) {
+						throw new IOException(MessageFormat.format(JGitText
+								.get().collisionOn, obj.name()));
+					}
+				}
+				sz -= n;
+			}
+		} catch (MissingObjectException notLocal) {
+			// This is OK, we don't have a copy of the object locally
+			// but the API throws when we try to read it as usually its
+			// an error to read something that doesn't exist.
+		} finally {
+			if (pck != null) {
+				pck.close();
+			}
+		}
+	}
+

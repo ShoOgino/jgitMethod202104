@@ -7,7 +7,6 @@
 		objectDigest.update((byte) 0);
 
 		final byte[] data;
-		boolean checkContentLater = false;
 		if (type == Constants.OBJ_BLOB) {
 			byte[] readBuffer = buffer();
 			InputStream inf = inflate(Source.INPUT, sz);
@@ -21,10 +20,7 @@
 			}
 			inf.close();
 			objectDigest.digest(tempObjectId);
-			checkContentLater = isCheckObjectCollisions()
-					&& readCurs.has(tempObjectId);
 			data = null;
-
 		} else {
 			data = inflateAndReturn(Source.INPUT, sz);
 			objectDigest.update(data);
@@ -38,7 +34,9 @@
 		if (data != null)
 			onInflatedObjectData(obj, type, data);
 		addObjectAndTrack(obj);
-		if (checkContentLater)
-			deferredCheckBlobs.add(obj);
+
+		if (isCheckObjectCollisions()) {
+			collisionCheckObjs.add(obj);
+		}
 	}
 

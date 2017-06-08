@@ -28,7 +28,7 @@
 			entries = new PackedObjectInfo[(int) objectCount];
 			baseById = new ObjectIdOwnerMap<>();
 			baseByPos = new LongMap<>();
-			deferredCheckBlobs = new BlockList<>();
+			collisionCheckObjs = new BlockList<>();
 
 			receiving.beginTask(JGitText.get().receivingObjects,
 					(int) objectCount);
@@ -45,8 +45,10 @@
 				receiving.endTask();
 			}
 
-			if (!deferredCheckBlobs.isEmpty())
-				doDeferredCheckBlobs();
+			if (!collisionCheckObjs.isEmpty()) {
+				checkObjectCollision();
+			}
+
 			if (deltaCount > 0) {
 				if (resolving instanceof BatchingProgressMonitor) {
 					((BatchingProgressMonitor) resolving).setDelayStart(

@@ -36,6 +36,9 @@
 			objectDigest.digest(tempObjectId);
 
 			verifySafeObject(tempObjectId, type, visit.data);
+			if (isCheckObjectCollisions() && readCurs.has(tempObjectId)) {
+				checkObjectCollision(tempObjectId, type, visit.data);
+			}
 
 			PackedObjectInfo oe;
 			oe = newInfo(tempObjectId, visit.delta, visit.parent.id);
