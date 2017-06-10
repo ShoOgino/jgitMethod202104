@@ -1,0 +1,16 @@
+	/**
+	 * Commit changes to the gc log, if there have been any writes. Otherwise,
+	 * just unlock and delete the existing file (if any)
+	 *
+	 * @return true if committing (or unlocking/deleting) succeeds.
+	 */
+	boolean commit() {
+		if (nonEmpty) {
+			return lock.commit();
+		} else {
+			logFile.delete();
+			lock.unlock();
+			return true;
+		}
+	}
+

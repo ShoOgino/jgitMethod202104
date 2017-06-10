@@ -1,0 +1,15 @@
+	/**
+	 * Write to the pending gc log. Content will be committed upon a call to
+	 * commit()
+	 *
+	 * @param content
+	 *            The content to write
+	 * @throws IOException
+	 */
+	void write(String content) throws IOException {
+		if (content.length() > 0) {
+			nonEmpty = true;
+		}
+		lock.write(content.getBytes(UTF_8));
+	}
+

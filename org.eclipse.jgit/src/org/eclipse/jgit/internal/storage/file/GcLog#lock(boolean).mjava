@@ -1,0 +1,22 @@
+	/**
+	 * Lock the GC log file for updates
+	 *
+	 * @param background
+	 *            If true, and if gc.log already exists, unlock and return false
+	 * @return {@code true} if we hold the lock
+	 */
+	boolean lock(boolean background) {
+		try {
+			if (!lock.lock()) {
+				return false;
+			}
+		} catch (IOException e) {
+			throw new JGitInternalException(e.getMessage(), e);
+		}
+		if (autoGcBlockedByOldLockFile(background)) {
+			lock.unlock();
+			return false;
+		}
+		return true;
+	}
+
