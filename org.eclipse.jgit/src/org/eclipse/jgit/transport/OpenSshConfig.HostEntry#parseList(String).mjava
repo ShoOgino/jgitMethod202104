@@ -19,12 +19,12 @@
 					continue;
 				}
 				if (argument.charAt(start) == '"') {
-					int stop = argument.indexOf('"', start + 1);
-					if (stop <= start) {
+					int stop = argument.indexOf('"', ++start);
+					if (stop < start) {
 						// No closing double quote: skip
 						break;
 					}
-					result.add(argument.substring(start + 1, stop));
+					result.add(argument.substring(start, stop));
 					start = stop + 1;
 				} else {
 					int stop = start + 1;

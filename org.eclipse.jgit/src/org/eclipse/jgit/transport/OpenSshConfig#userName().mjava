@@ -2,7 +2,8 @@
 		return AccessController.doPrivileged(new PrivilegedAction<String>() {
 			@Override
 			public String run() {
-				return System.getProperty("user.name"); //$NON-NLS-1$
+				return SystemReader.getInstance()
+						.getProperty(Constants.OS_USER_NAME_KEY);
 			}
 		});
 	}

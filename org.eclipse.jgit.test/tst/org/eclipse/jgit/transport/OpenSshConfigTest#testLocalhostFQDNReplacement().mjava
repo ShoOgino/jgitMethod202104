@@ -1,0 +1,11 @@
+	@Test
+	public void testLocalhostFQDNReplacement() throws Exception {
+		String localhost = SystemReader.getInstance().getHostname();
+		config("Host=orcz\n\tIdentityFile ~/.ssh/%l_id_dsa");
+		final Host h = osc.lookup("orcz");
+		assertNotNull(h);
+		assertEquals(
+				new File(new File(home, ".ssh"), localhost + "_id_dsa"),
+				h.getIdentityFile());
+	}
+

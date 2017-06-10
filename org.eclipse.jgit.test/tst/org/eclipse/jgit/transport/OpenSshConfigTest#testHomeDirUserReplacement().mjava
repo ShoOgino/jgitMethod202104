@@ -1,0 +1,9 @@
+	@Test
+	public void testHomeDirUserReplacement() throws Exception {
+		config("Host=orcz\n\tIdentityFile %d/.ssh/%u_id_dsa");
+		final Host h = osc.lookup("orcz");
+		assertNotNull(h);
+		assertEquals(new File(new File(home, ".ssh"), "jex_junit_id_dsa"),
+				h.getIdentityFile());
+	}
+

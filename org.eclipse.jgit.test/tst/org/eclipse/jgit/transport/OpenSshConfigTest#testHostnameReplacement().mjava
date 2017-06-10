@@ -1,0 +1,8 @@
+	@Test
+	public void testHostnameReplacement() throws Exception {
+		config("Host=orcz\nHost *.*\n\tHostname %h\nHost *\n\tHostname %h.example.org");
+		final Host h = osc.lookup("orcz");
+		assertNotNull(h);
+		assertEquals("orcz.example.org", h.getHostName());
+	}
+

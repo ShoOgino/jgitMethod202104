@@ -1,0 +1,28 @@
+			public Replacer(String originalHostName, File home) {
+				replacements.put(Character.valueOf('%'), "%"); //$NON-NLS-1$
+				replacements.put(Character.valueOf('d'), home.getPath());
+				// Needs special treatment...
+				String host = getValue("HOSTNAME"); //$NON-NLS-1$
+				replacements.put(Character.valueOf('h'), originalHostName);
+				if (host != null && host.indexOf('%') >= 0) {
+					host = substitute(host, "h"); //$NON-NLS-1$
+					options.put("HOSTNAME", host); //$NON-NLS-1$
+				}
+				if (host != null) {
+					replacements.put(Character.valueOf('h'), host);
+				}
+				String localhost = SystemReader.getInstance().getHostname();
+				replacements.put(Character.valueOf('l'), localhost);
+				int period = localhost.indexOf('.');
+				if (period > 0) {
+					localhost = localhost.substring(0, period);
+				}
+				replacements.put(Character.valueOf('L'), localhost);
+				replacements.put(Character.valueOf('n'), originalHostName);
+				replacements.put(Character.valueOf('p'), getValue("PORT")); //$NON-NLS-1$
+				replacements.put(Character.valueOf('r'), getValue("USER")); //$NON-NLS-1$
+				replacements.put(Character.valueOf('u'), userName());
+				replacements.put(Character.valueOf('C'),
+						substitute("%l%h%p%r", "hlpr")); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+
