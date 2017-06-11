@@ -20,9 +20,11 @@
 				fetch.setThin(thin.booleanValue());
 			if (quiet == null || !quiet.booleanValue())
 				fetch.setProgressMonitor(new TextProgressMonitor(errw));
+			fetch.setRecurseSubmodules(recurseSubmodules).setCallback(this);
 
 			FetchResult result = fetch.call();
-			if (result.getTrackingRefUpdates().isEmpty())
+			if (result.getTrackingRefUpdates().isEmpty()
+					&& result.submoduleResults().isEmpty())
 				return;
 
 			showFetchResult(result);
