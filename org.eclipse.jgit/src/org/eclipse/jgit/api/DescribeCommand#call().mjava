@@ -72,9 +72,9 @@
 			List<Candidate> candidates = new ArrayList<>();    // all the candidates we find
 
 			// is the target already pointing to a tag? if so, we are done!
-			Ref lucky = tags.get(target);
-			if (lucky != null) {
-				return longDesc ? longDescription(lucky, 0, target) : lucky
+			Ref tagOnTarget = tags.get(target);
+			if (tagMatches(tagOnTarget)) {
+				return longDesc ? longDescription(tagOnTarget, 0, target) : tagOnTarget
 						.getName().substring(R_TAGS.length());
 			}
 
@@ -88,7 +88,7 @@
 					// then there's no point in picking a tag on this commit
 					// since the one that dominates it is always more preferable
 					Ref t = tags.get(c);
-					if (t != null) {
+					if (tagMatches(t)) {
 						Candidate cd = new Candidate(c, t);
 						candidates.add(cd);
 						cd.depth = seen;
