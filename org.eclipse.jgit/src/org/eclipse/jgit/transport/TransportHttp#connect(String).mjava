@@ -39,9 +39,10 @@
 						throw new TransportException(uri,
 								JGitText.get().noCredentialsProvider);
 					if (authAttempts > 1)
-						credentialsProvider.reset(uri);
+						credentialsProvider.reset(currentUri);
 					if (3 < authAttempts
-							|| !authMethod.authorize(uri, credentialsProvider)) {
+							|| !authMethod.authorize(currentUri,
+									credentialsProvider)) {
 						throw new TransportException(uri,
 								JGitText.get().notAuthorized);
 					}

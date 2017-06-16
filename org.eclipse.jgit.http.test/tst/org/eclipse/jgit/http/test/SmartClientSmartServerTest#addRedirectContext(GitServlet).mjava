@@ -1,6 +1,4 @@
-	@SuppressWarnings("unused")
-	private ServletContextHandler addRedirectContext(GitServlet gs,
-			TestRepository<Repository> src, String srcName) {
+	private ServletContextHandler addRedirectContext(GitServlet gs) {
 		ServletContextHandler redirect = server.addContext("/redirect");
 		redirect.addFilter(new FilterHolder(new Filter() {
 
@@ -9,6 +7,11 @@
 			// redirect status code that should be used
 			private Pattern responsePattern = Pattern
 					.compile("/response/(\\d+)/(30[1237])/");
+
+			// Enables tests to specify the context that the request should be
+			// redirected to in the end. If not present, redirects got to the
+			// normal /git context.
+			private Pattern targetPattern = Pattern.compile("/target(/\\w+)/");
 
 			@Override
 			public void init(FilterConfig filterConfig)
@@ -49,18 +52,25 @@
 							.parseUnsignedInt(matcher.group(1));
 					responseCode = Integer.parseUnsignedInt(matcher.group(2));
 					if (--nofRedirects <= 0) {
-						urlString = fullUrl.substring(0, matcher.start()) + '/'
-								+ fullUrl.substring(matcher.end());
+						urlString = urlString.substring(0, matcher.start())
+								+ '/' + urlString.substring(matcher.end());
 					} else {
-						urlString = fullUrl.substring(0, matcher.start())
+						urlString = urlString.substring(0, matcher.start())
 								+ "/response/" + nofRedirects + "/"
 								+ responseCode + '/'
-								+ fullUrl.substring(matcher.end());
+								+ urlString.substring(matcher.end());
 					}
 				}
 				httpServletResponse.setStatus(responseCode);
 				if (nofRedirects <= 0) {
-					urlString = urlString.replace("/redirect", "/git");
+					String targetContext = "/git";
+					matcher = targetPattern.matcher(urlString);
+					if (matcher.find()) {
+						urlString = urlString.substring(0, matcher.start())
+								+ '/' + urlString.substring(matcher.end());
+						targetContext = matcher.group(1);
+					}
+					urlString = urlString.replace("/redirect", targetContext);
 				}
 				httpServletResponse.setHeader(HttpSupport.HDR_LOCATION,
 						urlString);

@@ -1,0 +1,69 @@
+	@Test
+	public void testInitialClone_WithAuthenticationAfterRedirect()
+			throws Exception {
+		Repository dst = createBareRepository();
+		assertFalse(dst.hasObject(A_txt));
+
+		URIish cloneFrom = extendPath(redirectURI, "/target/auth");
+		CredentialsProvider uriSpecificCredentialsProvider = new UsernamePasswordCredentialsProvider(
+				"unknown", "none") {
+			@Override
+			public boolean get(URIish uri, CredentialItem... items)
+					throws UnsupportedCredentialItem {
+				// Only return the true credentials if the uri path starts with
+				// /auth. This ensures that we do provide the correct
+				// credentials only for the URi after the redirect, making the
+				// test fail if we should be asked for the credentials for the
+				// original URI.
+				if (uri.getPath().startsWith("/auth")) {
+					return testCredentials.get(uri, items);
+				}
+				return super.get(uri, items);
+			}
+		};
+		try (Transport t = Transport.open(dst, cloneFrom)) {
+			t.setCredentialsProvider(uriSpecificCredentialsProvider);
+			t.fetch(NullProgressMonitor.INSTANCE, mirror(master));
+		}
+
+		assertTrue(dst.hasObject(A_txt));
+		assertEquals(B, dst.exactRef(master).getObjectId());
+		fsck(dst, B);
+
+		List<AccessEvent> requests = getRequests();
+		assertEquals(4, requests.size());
+
+		AccessEvent redirect = requests.get(0);
+		assertEquals("GET", redirect.getMethod());
+		assertEquals(join(cloneFrom, "info/refs"), redirect.getPath());
+		assertEquals(301, redirect.getStatus());
+
+		AccessEvent info = requests.get(1);
+		assertEquals("GET", info.getMethod());
+		assertEquals(join(authURI, "info/refs"), info.getPath());
+		assertEquals(401, info.getStatus());
+
+		info = requests.get(2);
+		assertEquals("GET", info.getMethod());
+		assertEquals(join(authURI, "info/refs"), info.getPath());
+		assertEquals(1, info.getParameters().size());
+		assertEquals("git-upload-pack", info.getParameter("service"));
+		assertEquals(200, info.getStatus());
+		assertEquals("application/x-git-upload-pack-advertisement",
+				info.getResponseHeader(HDR_CONTENT_TYPE));
+		assertEquals("gzip", info.getResponseHeader(HDR_CONTENT_ENCODING));
+
+		AccessEvent service = requests.get(3);
+		assertEquals("POST", service.getMethod());
+		assertEquals(join(authURI, "git-upload-pack"), service.getPath());
+		assertEquals(0, service.getParameters().size());
+		assertNotNull("has content-length",
+				service.getRequestHeader(HDR_CONTENT_LENGTH));
+		assertNull("not chunked",
+				service.getRequestHeader(HDR_TRANSFER_ENCODING));
+
+		assertEquals(200, service.getStatus());
+		assertEquals("application/x-git-upload-pack-result",
+				service.getResponseHeader(HDR_CONTENT_TYPE));
+	}
+
