@@ -16,9 +16,9 @@
 		if (vers != 2 && vers != 3)
 			throw new IOException(MessageFormat.format(
 					JGitText.get().unsupportedPackVersion, Long.valueOf(vers)));
-		objectCount = NB.decodeUInt32(buf, p + 8);
+		final long objectCount = NB.decodeUInt32(buf, p + 8);
 		use(hdrln);
-
+		setExpectedObjectCount(objectCount);
 		onPackHeader(objectCount);
 	}
 

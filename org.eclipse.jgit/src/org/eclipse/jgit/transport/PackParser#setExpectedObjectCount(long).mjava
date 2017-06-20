@@ -1,0 +1,16 @@
+	/**
+	 * Set the expected number of objects in the pack stream.
+	 * <p>
+	 * The object count in the pack header is not always correct for some Dfs
+	 * pack files. e.g. INSERT pack always assume 1 object in the header since
+	 * the actual object count is unknown when the pack is written.
+	 * <p>
+	 * If external implementation wants to overwrite the expectedObjectCount,
+	 * they should call this method during {@link #onPackHeader(long)}.
+	 *
+	 * @param expectedObjectCount
+	 */
+	protected void setExpectedObjectCount(long expectedObjectCount) {
+		this.expectedObjectCount = expectedObjectCount;
+	}
+

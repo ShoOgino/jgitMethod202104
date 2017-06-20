@@ -25,15 +25,15 @@
 		try {
 			readPackHeader();
 
-			entries = new PackedObjectInfo[(int) objectCount];
+			entries = new PackedObjectInfo[(int) expectedObjectCount];
 			baseById = new ObjectIdOwnerMap<>();
 			baseByPos = new LongMap<>();
 			collisionCheckObjs = new BlockList<>();
 
 			receiving.beginTask(JGitText.get().receivingObjects,
-					(int) objectCount);
+					(int) expectedObjectCount);
 			try {
-				for (int done = 0; done < objectCount; done++) {
+				for (int done = 0; done < expectedObjectCount; done++) {
 					indexOneObject();
 					receiving.update(1);
 					if (receiving.isCancelled())
@@ -57,19 +57,19 @@
 				}
 				resolving.beginTask(JGitText.get().resolvingDeltas, deltaCount);
 				resolveDeltas(resolving);
-				if (entryCount < objectCount) {
+				if (entryCount < expectedObjectCount) {
 					if (!isAllowThin()) {
 						throw new IOException(MessageFormat.format(
 								JGitText.get().packHasUnresolvedDeltas,
-								Long.valueOf(objectCount - entryCount)));
+								Long.valueOf(expectedObjectCount - entryCount)));
 					}
 
 					resolveDeltasWithExternalBases(resolving);
 
-					if (entryCount < objectCount) {
+					if (entryCount < expectedObjectCount) {
 						throw new IOException(MessageFormat.format(
 								JGitText.get().packHasUnresolvedDeltas,
-								Long.valueOf(objectCount - entryCount)));
+								Long.valueOf(expectedObjectCount - entryCount)));
 					}
 				}
 				resolving.endTask();
