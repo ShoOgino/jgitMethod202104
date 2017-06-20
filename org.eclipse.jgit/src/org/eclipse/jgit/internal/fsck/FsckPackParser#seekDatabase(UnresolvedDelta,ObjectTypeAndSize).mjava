@@ -1,0 +1,8 @@
+	@Override
+	protected ObjectTypeAndSize seekDatabase(UnresolvedDelta delta,
+			ObjectTypeAndSize info) throws IOException {
+		crc.reset();
+		offset = delta.getOffset();
+		return readObjectHeader(info);
+	}
+

@@ -1,0 +1,11 @@
+	@Override
+	protected int readDatabase(byte[] dst, int pos, int cnt)
+			throws IOException {
+		// read from input instead of database.
+		int n = read(offset, dst, pos, cnt);
+		if (n > 0) {
+			offset += n;
+		}
+		return n;
+	}
+

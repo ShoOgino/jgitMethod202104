@@ -1,0 +1,8 @@
+	@Override
+	protected ObjectTypeAndSize seekDatabase(PackedObjectInfo obj,
+			ObjectTypeAndSize info) throws IOException {
+		crc.reset();
+		offset = obj.getOffset();
+		return readObjectHeader(info);
+	}
+

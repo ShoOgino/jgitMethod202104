@@ -1,0 +1,16 @@
+	int read(long channelPosition, byte[] dst, int pos, int cnt)
+			throws IOException {
+		long block = channelPosition / blockSize;
+		byte[] bytes = readFromChannel(block);
+		if (bytes == null) {
+			return -1;
+		}
+		int offset = (int) (channelPosition - block * blockSize);
+		int bytesToCopy = Math.min(cnt, bytes.length - offset);
+		if (bytesToCopy < 1) {
+			return -1;
+		}
+		System.arraycopy(bytes, offset, dst, pos, bytesToCopy);
+		return bytesToCopy;
+	}
+

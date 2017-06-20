@@ -1,0 +1,16 @@
+	@Test
+	public void testTreeWithNullSha() throws Exception {
+		byte[] data = concat(encodeASCII("100644 A"), new byte[] { '\0' },
+				new byte[OBJECT_ID_LENGTH]);
+		ObjectId id = ins.insert(Constants.OBJ_TREE, data);
+		ins.flush();
+
+		DfsFsck fsck = new DfsFsck(repo);
+		FsckError errors = fsck.check(null);
+
+		assertEquals(errors.getCorruptObjects().size(), 1);
+		CorruptObject o = errors.getCorruptObjects().iterator().next();
+		assertTrue(o.getId().equals(id));
+		assertEquals(o.getErrorType(), ErrorType.NULL_SHA1);
+	}
+

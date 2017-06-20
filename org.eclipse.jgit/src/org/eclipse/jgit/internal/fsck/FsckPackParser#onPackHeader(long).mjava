@@ -1,0 +1,11 @@
+	@Override
+	protected void onPackHeader(long objCnt) throws IOException {
+		if (expectedObjectCount >= 0) {
+			// Some DFS pack files don't contain the correct object count, e.g.
+			// INSERT/RECEIVE packs don't always contain the correct object
+			// count in their headers. Overwrite the expected object count
+			// after parsing the pack header.
+			setExpectedObjectCount(expectedObjectCount);
+		}
+	}
+

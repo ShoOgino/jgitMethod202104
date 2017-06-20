@@ -26,10 +26,9 @@
 			visit.id = baseId;
 			final int typeCode = ldr.getType();
 			final PackedObjectInfo oe = newInfo(baseId, null, null);
-
+			oe.setType(typeCode);
 			if (onAppendBase(typeCode, visit.data, oe))
 				entries[entryCount++] = oe;
-
 			visit.nextChild = firstChildOf(oe);
 			resolveDeltas(visit.next(), typeCode,
 					new ObjectTypeAndSize(), progress);

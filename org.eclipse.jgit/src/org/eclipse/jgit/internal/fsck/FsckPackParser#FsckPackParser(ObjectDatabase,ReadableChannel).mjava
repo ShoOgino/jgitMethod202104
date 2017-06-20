@@ -1,0 +1,14 @@
+	/**
+	 * @param db
+	 *            the object database which stores repository's data.
+	 * @param channel
+	 *            readable channel of the pack file.
+	 */
+	public FsckPackParser(ObjectDatabase db, ReadableChannel channel) {
+		super(db, Channels.newInputStream(channel));
+		this.channel = channel;
+		setCheckObjectCollisions(false);
+		this.crc = new CRC32();
+		this.blockSize = channel.blockSize() > 0 ? channel.blockSize() : 65536;
+	}
+

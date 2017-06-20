@@ -1,0 +1,15 @@
+	@Override
+	protected void verifySafeObject(final AnyObjectId id, final int type,
+			final byte[] data) {
+		try {
+			super.verifySafeObject(id, type, data);
+		} catch (CorruptObjectException e) {
+			// catch the exception and continue parse the pack file
+			CorruptObject o = new CorruptObject(id.toObjectId(), type);
+			if (e.getErrorType() != null) {
+				o.setErrorType(e.getErrorType());
+			}
+			corruptObjects.add(o);
+		}
+	}
+

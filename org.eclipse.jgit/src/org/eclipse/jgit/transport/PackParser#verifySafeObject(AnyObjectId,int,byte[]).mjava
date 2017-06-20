@@ -1,5 +1,18 @@
-	private void verifySafeObject(final AnyObjectId id, final int type,
-			final byte[] data) throws IOException {
+	/**
+	 * Verify the integrity of the object.
+	 *
+	 * @param id
+	 *            identity of the object to be checked.
+	 * @param type
+	 *            the type of the object.
+	 * @param data
+	 *            raw content of the object.
+	 * @throws CorruptObjectException
+	 * @since 4.9
+	 *
+	 */
+	protected void verifySafeObject(final AnyObjectId id, final int type,
+			final byte[] data) throws CorruptObjectException {
 		if (objCheck != null) {
 			try {
 				objCheck.check(id, type, data);
@@ -7,11 +20,11 @@
 				if (e.getErrorType() != null) {
 					throw e;
 				}
-				throw new CorruptObjectException(MessageFormat.format(
-						JGitText.get().invalidObject,
-						Constants.typeString(type),
-						id.name(),
-						e.getMessage()), e);
+				throw new CorruptObjectException(
+						MessageFormat.format(JGitText.get().invalidObject,
+								Constants.typeString(type), id.name(),
+								e.getMessage()),
+						e);
 			}
 		}
 	}

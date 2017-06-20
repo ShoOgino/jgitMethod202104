@@ -1,0 +1,33 @@
+	@Test
+	public void testMultipleInvalidObjects() throws Exception {
+		StringBuilder b = new StringBuilder();
+		b.append("tree ");
+		b.append("be9bfa841874ccc9f2ef7c48d0c76226f89b7189");
+		b.append('\n');
+		b.append("parent ");
+		b.append("\n");
+		byte[] data = encodeASCII(b.toString());
+		ObjectId id1 = ins.insert(Constants.OBJ_COMMIT, data);
+
+		b = new StringBuilder();
+		b.append("100644");
+		data = encodeASCII(b.toString());
+		ObjectId id2 = ins.insert(Constants.OBJ_TREE, data);
+
+		ins.flush();
+
+		DfsFsck fsck = new DfsFsck(repo);
+		FsckError errors = fsck.check(null);
+
+		assertEquals(errors.getCorruptObjects().size(), 2);
+		for (CorruptObject o : errors.getCorruptObjects()) {
+			if (o.getId().equals(id1)) {
+				assertEquals(o.getErrorType(), ErrorType.BAD_PARENT_SHA1);
+			} else if (o.getId().equals(id2)) {
+				assertNull(o.getErrorType());
+			} else {
+				fail();
+			}
+		}
+	}
+

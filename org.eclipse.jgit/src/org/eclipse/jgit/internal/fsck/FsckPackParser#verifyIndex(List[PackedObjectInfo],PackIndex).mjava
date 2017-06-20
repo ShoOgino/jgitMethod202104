@@ -1,0 +1,51 @@
+	/**
+	 * Verify the existing index file with all objects from the pack.
+	 *
+	 * @param entries
+	 *            all the entries that are expected in the index file
+	 * @param idx
+	 *            index file associate with the pack
+	 * @throws CorruptPackIndexException
+	 *             when the index file is corrupt.
+	 */
+	public void verifyIndex(List<PackedObjectInfo> entries, PackIndex idx)
+			throws CorruptPackIndexException {
+		Set<String> all = new HashSet<>();
+		for (PackedObjectInfo entry : entries) {
+			all.add(entry.getName());
+			long offset = idx.findOffset(entry);
+			if (offset == -1) {
+				throw new CorruptPackIndexException(
+						MessageFormat.format(JGitText.get().missingObject,
+								entry.getType(), entry.getName()),
+						ErrorType.MISSING_OBJ);
+			} else if (offset != entry.getOffset()) {
+				throw new CorruptPackIndexException(MessageFormat
+						.format(JGitText.get().mismatchOffset, entry.getName()),
+						ErrorType.MISMATCH_OFFSET);
+			}
+
+			try {
+				if (idx.hasCRC32Support()
+						&& (int) idx.findCRC32(entry) != entry.getCRC()) {
+					throw new CorruptPackIndexException(
+							MessageFormat.format(JGitText.get().mismatchCRC,
+									entry.getName()),
+							ErrorType.MISMATCH_CRC);
+				}
+			} catch (MissingObjectException e) {
+				throw new CorruptPackIndexException(MessageFormat
+						.format(JGitText.get().missingCRC, entry.getName()),
+						ErrorType.MISSING_CRC);
+			}
+		}
+
+		for (MutableEntry entry : idx) {
+			if (!all.contains(entry.name())) {
+				throw new CorruptPackIndexException(MessageFormat.format(
+						JGitText.get().unknownObjectInIndex, entry.name()),
+						ErrorType.UNKNOWN_OBJ);
+			}
+		}
+	}
+

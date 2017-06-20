@@ -1,0 +1,17 @@
+	private byte[] readFromChannel(long block) throws IOException {
+		channel.position(block * blockSize);
+		ByteBuffer buf = ByteBuffer.allocate(blockSize);
+		int totalBytesRead = 0;
+		while (totalBytesRead < blockSize) {
+			int bytesRead = channel.read(buf);
+			if (bytesRead == -1) {
+				if (totalBytesRead == 0) {
+					return null;
+				}
+				return Arrays.copyOf(buf.array(), totalBytesRead);
+			}
+			totalBytesRead += bytesRead;
+		}
+		return buf.array();
+	}
+
