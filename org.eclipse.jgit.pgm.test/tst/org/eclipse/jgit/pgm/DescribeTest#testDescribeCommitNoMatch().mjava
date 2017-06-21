@@ -1,0 +1,14 @@
+	@Test
+	public void testDescribeCommitNoMatch() throws Exception {
+		initialCommitAndTag();
+		writeTrashFile("greeting", "Hello, world!");
+		secondCommit();
+		try {
+			execute("git describe --match 1.*");
+			fail("git describe should not find any tag matching 1.*");
+		} catch (Die e) {
+			assertEquals("No names found, cannot describe anything.",
+					e.getMessage());
+		}
+	}
+

@@ -1,0 +1,9 @@
+	@Test
+	public void testDescribeCommitMatch2() throws Exception {
+		initialCommitAndTag();
+		secondCommit();
+		git.tag().setName("v2.0").call();
+		assertArrayEquals(new String[] { "v1.0-1-g56f6ceb", "" },
+				execute("git describe --match v1.*"));
+	}
+

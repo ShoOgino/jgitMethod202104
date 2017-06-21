@@ -1,0 +1,10 @@
+	@Test
+	public void testDescribeCommitMultiMatch() throws Exception {
+		initialCommitAndTag();
+		secondCommit();
+		git.tag().setName("v2.0.0").call();
+		git.tag().setName("v2.1.1").call();
+		assertArrayEquals("git yields v2.0.0", new String[] { "v2.0.0", "" },
+				execute("git describe --match v2.0* --match v2.1.*"));
+	}
+
