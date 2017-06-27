@@ -1,11 +1,13 @@
-	DfsBlock readOneBlock(long pos, DfsReader ctx)
-			throws IOException {
+	DfsBlock readOneBlock(long pos, DfsReader ctx,
+			@Nullable ReadableChannel packChannel) throws IOException {
 		if (invalid)
 			throw new PackInvalidException(getPackName());
 
 		ctx.stats.readBlock++;
 		long start = System.nanoTime();
-		ReadableChannel rc = ctx.db.openFile(packDesc, PACK);
+		ReadableChannel rc = packChannel != null
+				? packChannel
+				: ctx.db.openFile(packDesc, PACK);
 		try {
 			int size = blockSize(rc);
 			pos = (pos / size) * size;
@@ -55,7 +57,9 @@
 
 			return new DfsBlock(key, pos, buf);
 		} finally {
-			rc.close();
+			if (rc != packChannel) {
+				rc.close();
+			}
 			ctx.stats.readBlockMicros += elapsedMicros(start);
 		}
 	}
