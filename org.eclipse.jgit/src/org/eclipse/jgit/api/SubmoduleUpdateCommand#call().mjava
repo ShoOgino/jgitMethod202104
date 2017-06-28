@@ -34,7 +34,7 @@
 					continue;
 
 				Repository submoduleRepo = generator.getRepository();
-				// Clone repository is not present
+				// Clone repository if not present
 				if (submoduleRepo == null) {
 					if (callback != null) {
 						callback.cloningSubmodule(generator.getPath());
@@ -48,6 +48,18 @@
 					if (monitor != null)
 						clone.setProgressMonitor(monitor);
 					submoduleRepo = clone.call().getRepository();
+				} else if (this.fetch) {
+					if (callback != null) {
+						// FIXME: Do we need a new callback to tell them we're
+						// fetching?
+						callback.cloningSubmodule(generator.getPath());
+					}
+					FetchCommand fetchCommand = Git.wrap(submoduleRepo).fetch();
+					if (monitor != null) {
+						fetchCommand.setProgressMonitor(monitor);
+					}
+					configure(fetchCommand);
+					fetchCommand.call();
 				}
 
 				try (RevWalk walk = new RevWalk(submoduleRepo)) {
