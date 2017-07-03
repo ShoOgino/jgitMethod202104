@@ -1,0 +1,16 @@
+	private void assertAddMergeAttributeUnset(String branch, String fileName)
+			throws IllegalStateException, IOException {
+		checkoutBranch(branch);
+
+		try (TreeWalk treeWaklEnableChecked = new TreeWalk(db)) {
+			treeWaklEnableChecked.addTree(new FileTreeIterator(db));
+			treeWaklEnableChecked.setFilter(PathFilter.create(fileName));
+
+			assertTrue(treeWaklEnableChecked.next());
+			Attributes attributes = treeWaklEnableChecked.getAttributes();
+			Attribute mergeAttribute = attributes.get("merge");
+			assertNotNull(mergeAttribute);
+			assertEquals(Attribute.State.UNSET, mergeAttribute.getState());
+		}
+	}
+

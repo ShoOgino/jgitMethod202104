@@ -13,6 +13,8 @@
 	protected boolean mergeTreeWalk(TreeWalk treeWalk, boolean ignoreConflicts)
 			throws IOException {
 		boolean hasWorkingTreeIterator = tw.getTreeCount() > T_FILE;
+		boolean hasAttributeNodeProvider = treeWalk
+				.getAttributesNodeProvider() != null;
 		while (treeWalk.next()) {
 			if (!processEntry(
 					treeWalk.getTree(T_BASE, CanonicalTreeParser.class),
@@ -20,7 +22,9 @@
 					treeWalk.getTree(T_THEIRS, CanonicalTreeParser.class),
 					treeWalk.getTree(T_INDEX, DirCacheBuildIterator.class),
 					hasWorkingTreeIterator ? treeWalk.getTree(T_FILE,
-							WorkingTreeIterator.class) : null, ignoreConflicts)) {
+							WorkingTreeIterator.class) : null,
+					ignoreConflicts, hasAttributeNodeProvider
+							? treeWalk.getAttributes() : new Attributes())) {
 				cleanUp();
 				return false;
 			}

@@ -1,0 +1,33 @@
+	public Git createRepositoryBinaryConflict(Consumer<Git> initialCommit,
+			Consumer<Git> leftCommit, Consumer<Git> rightCommit)
+			throws NoFilepatternException, GitAPIException, NoWorkTreeException,
+			IOException {
+		// Set up a git whith conflict commits on images
+		Git git = new Git(db);
+
+		// First commit
+		initialCommit.accept(git);
+		git.add().addFilepattern(".").call();
+		RevCommit firstCommit = git.commit().setAll(true)
+				.setMessage("initial commit adding git attribute file").call();
+
+		// Create branch and add an icon Checked_Boxe (enabled_checked)
+		createBranch(firstCommit, REFS_HEADS_LEFT);
+		checkoutBranch(REFS_HEADS_LEFT);
+		leftCommit.accept(git);
+		git.add().addFilepattern(".").call();
+		git.commit().setMessage("Left").call();
+
+		// Create a second branch from master Unchecked_Boxe
+		checkoutBranch(REFS_HEADS_MASTER);
+		createBranch(firstCommit, REFS_HEADS_RIGHT);
+		checkoutBranch(REFS_HEADS_RIGHT);
+		rightCommit.accept(git);
+		git.add().addFilepattern(".").call();
+		git.commit().setMessage("Right").call();
+
+		checkoutBranch(REFS_HEADS_LEFT);
+		return git;
+
+	}
+

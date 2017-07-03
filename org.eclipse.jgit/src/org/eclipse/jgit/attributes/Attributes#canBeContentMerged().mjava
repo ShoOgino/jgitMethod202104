@@ -1,0 +1,20 @@
+	/**
+	 * Test if the given attributes implies to handle the related entry as a
+	 * binary file (i.e. if the entry has an -merge or a merge=binary attribute)
+	 * or if it can be content merged.
+	 *
+	 * @return <code>true</code> if the entry can be content merged,
+	 *         <code>false</code> otherwise
+	 * @since 4.9
+	 */
+	public boolean canBeContentMerged() {
+		if (isUnset(Constants.ATTR_MERGE)) {
+			return false;
+		} else if (isCustom(Constants.ATTR_MERGE)
+				&& getValue(Constants.ATTR_MERGE)
+						.equals(Constants.ATTR_BUILTIN_BINARY_MERGER)) {
+			return false;
+		}
+		return true;
+	}
+

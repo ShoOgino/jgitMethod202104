@@ -1,0 +1,7 @@
+	private void copy(String resourcePath, String resourceNewName,
+			String pathInRepo) throws IOException {
+		InputStream input = getClass().getResourceAsStream(resourcePath);
+		Files.copy(input, db.getWorkTree().toPath().resolve(pathInRepo)
+				.resolve(resourceNewName));
+	}
+
