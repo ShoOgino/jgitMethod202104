@@ -1,4 +1,4 @@
-	DfsPackFile getOrCreate(DfsPackDescription dsc, DfsPackKey key) {
+	DfsPackFile getOrCreate(DfsPackDescription dsc, DfsStreamKey key) {
 		// TODO This table grows without bound. It needs to clean up
 		// entries that aren't in cache anymore, and aren't being used
 		// by a live DfsObjDatabase reference.
@@ -15,7 +15,7 @@
 				return v;                    // another thread
 			} else {
 				return new DfsPackFile(
-						this, dsc, key != null ? key : new DfsPackKey());
+						this, dsc, key != null ? key : new DfsStreamKey());
 			}
 		});
 	}
