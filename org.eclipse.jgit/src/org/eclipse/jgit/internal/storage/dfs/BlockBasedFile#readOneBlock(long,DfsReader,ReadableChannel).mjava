@@ -1,13 +1,12 @@
 	DfsBlock readOneBlock(long pos, DfsReader ctx,
-			@Nullable ReadableChannel packChannel) throws IOException {
+			@Nullable ReadableChannel fileChannel) throws IOException {
 		if (invalid)
-			throw new PackInvalidException(getPackName());
+			throw new PackInvalidException(getFileName());
 
 		ctx.stats.readBlock++;
 		long start = System.nanoTime();
-		ReadableChannel rc = packChannel != null
-				? packChannel
-				: ctx.db.openFile(packDesc, PACK);
+		ReadableChannel rc = fileChannel != null ? fileChannel
+				: ctx.db.openFile(packDesc, ext);
 		try {
 			int size = blockSize(rc);
 			pos = (pos / size) * size;
@@ -28,7 +27,7 @@
 			if (size <= 0)
 				throw new EOFException(MessageFormat.format(
 						DfsText.get().shortReadOfBlock, Long.valueOf(pos),
-						getPackName(), Long.valueOf(0), Long.valueOf(0)));
+						getFileName(), Long.valueOf(0), Long.valueOf(0)));
 
 			byte[] buf = new byte[size];
 			rc.position(pos);
@@ -37,11 +36,9 @@
 			if (cnt != size) {
 				if (0 <= len) {
 					throw new EOFException(MessageFormat.format(
-						    DfsText.get().shortReadOfBlock,
-						    Long.valueOf(pos),
-						    getPackName(),
-						    Integer.valueOf(size),
-						    Integer.valueOf(cnt)));
+							DfsText.get().shortReadOfBlock, Long.valueOf(pos),
+							getFileName(), Integer.valueOf(size),
+							Integer.valueOf(cnt)));
 				}
 
 				// Assume the entire thing was read in a single shot, compact
@@ -57,7 +54,7 @@
 
 			return new DfsBlock(key, pos, buf);
 		} finally {
-			if (rc != packChannel) {
+			if (rc != fileChannel) {
 				rc.close();
 			}
 			ctx.stats.readBlockMicros += elapsedMicros(start);
