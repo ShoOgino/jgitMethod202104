@@ -2,7 +2,7 @@
 	 * Create a new command for {@link BaseReceivePack}.
 	 *
 	 * @param oldId
-	 *            the old object id; must not be null. Use
+	 *            the expected old object id; must not be null. Use
 	 *            {@link ObjectId#zeroId()} to indicate a ref creation.
 	 * @param newId
 	 *            the new object id; must not be null. Use
@@ -12,14 +12,22 @@
 	 */
 	public ReceiveCommand(final ObjectId oldId, final ObjectId newId,
 			final String name) {
+		if (oldId == null) {
+			throw new IllegalArgumentException(JGitText.get().oldIdMustNotBeNull);
+		}
+		if (newId == null) {
+			throw new IllegalArgumentException(JGitText.get().newIdMustNotBeNull);
+		}
 		this.oldId = oldId;
 		this.newId = newId;
 		this.name = name;
 
 		type = Type.UPDATE;
-		if (ObjectId.zeroId().equals(oldId))
+		if (ObjectId.zeroId().equals(oldId)) {
 			type = Type.CREATE;
-		if (ObjectId.zeroId().equals(newId))
+		}
+		if (ObjectId.zeroId().equals(newId)) {
 			type = Type.DELETE;
+		}
 	}
 
