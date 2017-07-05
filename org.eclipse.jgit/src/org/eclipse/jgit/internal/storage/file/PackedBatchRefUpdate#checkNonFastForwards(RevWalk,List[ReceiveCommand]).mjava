@@ -1,0 +1,15 @@
+	private boolean checkNonFastForwards(RevWalk walk,
+			List<ReceiveCommand> commands) throws IOException {
+		if (isAllowNonFastForwards()) {
+			return true;
+		}
+		for (ReceiveCommand cmd : commands) {
+			cmd.updateType(walk);
+			if (cmd.getType() == ReceiveCommand.Type.UPDATE_NONFASTFORWARD) {
+				reject(cmd, REJECTED_NONFASTFORWARD, commands);
+				return false;
+			}
+		}
+		return true;
+	}
+

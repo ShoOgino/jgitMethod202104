@@ -1,5 +1,6 @@
 	@Test
-	public void testBatchRefUpdateConflict() throws IOException {
+	public void testBatchRefUpdateFileDirectoryConflictAtomic()
+			throws IOException {
 		writeLooseRef("refs/heads/master", A);
 		writeLooseRef("refs/heads/masters", B);
 		List<ReceiveCommand> commands = Arrays.asList(
@@ -10,19 +11,21 @@
 				new ReceiveCommand(zeroId(), A, "refs/heads",
 						ReceiveCommand.Type.CREATE));
 		BatchRefUpdate batchUpdate = refdir.newBatchUpdate();
+		assertTrue(batchUpdate.isAtomic());
 		batchUpdate.setAllowNonFastForwards(true);
 		batchUpdate.addCommand(commands);
 		batchUpdate
 				.execute(new RevWalk(diskRepo), NullProgressMonitor.INSTANCE);
 		Map<String, Ref> refs = refdir.getRefs(RefDatabase.ALL);
-		assertEquals(ReceiveCommand.Result.OK, commands.get(0).getResult());
-		assertEquals(ReceiveCommand.Result.LOCK_FAILURE, commands.get(1)
-				.getResult());
-		assertEquals(ReceiveCommand.Result.LOCK_FAILURE, commands.get(2)
-				.getResult());
+		// Atomic update sees that master and master/x are conflicting, then marks
+		// the first one in the list as LOCK_FAILURE and aborts the rest.
+		assertEquals(ReceiveCommand.Result.LOCK_FAILURE,
+				commands.get(0).getResult());
+		assertTrue(ReceiveCommand.isTransactionAborted(commands.get(1)));
+		assertTrue(ReceiveCommand.isTransactionAborted(commands.get(2)));
 		assertEquals("[HEAD, refs/heads/master, refs/heads/masters]", refs
 				.keySet().toString());
-		assertEquals(B.getId(), refs.get("refs/heads/master").getObjectId());
+		assertEquals(A.getId(), refs.get("refs/heads/master").getObjectId());
 		assertEquals(B.getId(), refs.get("refs/heads/masters").getObjectId());
 	}
 

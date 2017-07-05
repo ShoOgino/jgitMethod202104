@@ -1,0 +1,72 @@
+	@Override
+	public void execute(RevWalk walk, ProgressMonitor monitor,
+			List<String> options) throws IOException {
+		if (!isAtomic()) {
+			// Use default one-by-one implementation.
+			super.execute(walk, monitor, options);
+			return;
+		}
+		List<ReceiveCommand> pending =
+				ReceiveCommand.filter(getCommands(), NOT_ATTEMPTED);
+		if (pending.isEmpty()) {
+			return;
+		}
+		if (pending.size() == 1) {
+			// Single-ref updates are always atomic, no need for packed-refs.
+			super.execute(walk, monitor, options);
+			return;
+		}
+
+		// Required implementation details copied from super.execute.
+		if (!blockUntilTimestamps(MAX_WAIT)) {
+			return;
+		}
+		if (options != null) {
+			setPushOptions(options);
+		}
+		// End required implementation details.
+
+		// Check for conflicting names before attempting to acquire locks, since
+		// lockfile creation may fail on file/directory conflicts.
+		if (!checkConflictingNames(pending)) {
+			return;
+		}
+
+		if (!checkObjectExistence(walk, pending)) {
+			return;
+		}
+
+		if (!checkNonFastForwards(walk, pending)) {
+			return;
+		}
+
+		// Pack refs normally, so we can create lock files even in the case where
+		// refs/x is deleted and refs/x/y is created in this batch.
+		refdb.pack(
+				pending.stream().map(ReceiveCommand::getRefName).collect(toList()));
+
+		Map<String, LockFile> locks = new HashMap<>();
+		try {
+			if (!lockLooseRefs(pending, locks)) {
+				return;
+			}
+			PackedRefList oldPackedList = refdb.pack(locks);
+			RefList<Ref> newRefs = applyUpdates(walk, oldPackedList, pending);
+			if (newRefs == null) {
+				return;
+			}
+			LockFile packedRefsLock = new LockFile(refdb.packedRefsFile);
+			try {
+				packedRefsLock.lock();
+				refdb.commitPackedRefs(packedRefsLock, newRefs, oldPackedList);
+			} finally {
+				packedRefsLock.unlock();
+			}
+		} finally {
+			locks.values().forEach(LockFile::unlock);
+		}
+
+		refdb.fireRefsChanged();
+		pending.forEach(c -> c.setResult(ReceiveCommand.Result.OK));
+	}
+

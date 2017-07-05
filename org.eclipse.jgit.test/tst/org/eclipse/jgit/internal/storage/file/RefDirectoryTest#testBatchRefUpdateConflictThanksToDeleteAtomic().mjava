@@ -1,5 +1,6 @@
 	@Test
-	public void testBatchRefUpdateConflictThanksToDelete() throws IOException {
+	public void testBatchRefUpdateConflictThanksToDeleteAtomic()
+			throws IOException {
 		writeLooseRef("refs/heads/master", A);
 		writeLooseRef("refs/heads/masters", B);
 		List<ReceiveCommand> commands = Arrays.asList(
@@ -10,6 +11,7 @@
 				new ReceiveCommand(B, zeroId(), "refs/heads/masters",
 						ReceiveCommand.Type.DELETE));
 		BatchRefUpdate batchUpdate = refdir.newBatchUpdate();
+		assertTrue(batchUpdate.isAtomic());
 		batchUpdate.setAllowNonFastForwards(true);
 		batchUpdate.addCommand(commands);
 		batchUpdate.execute(new RevWalk(diskRepo), new StrictWorkMonitor());

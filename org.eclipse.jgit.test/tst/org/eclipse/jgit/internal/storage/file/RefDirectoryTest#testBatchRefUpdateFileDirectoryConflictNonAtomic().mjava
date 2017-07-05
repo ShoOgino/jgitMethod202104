@@ -1,0 +1,32 @@
+	@Test
+	public void testBatchRefUpdateFileDirectoryConflictNonAtomic()
+			throws IOException {
+		writeLooseRef("refs/heads/master", A);
+		writeLooseRef("refs/heads/masters", B);
+		List<ReceiveCommand> commands = Arrays.asList(
+				new ReceiveCommand(A, B, "refs/heads/master",
+						ReceiveCommand.Type.UPDATE),
+				new ReceiveCommand(zeroId(), A, "refs/heads/master/x",
+						ReceiveCommand.Type.CREATE),
+				new ReceiveCommand(zeroId(), A, "refs/heads",
+						ReceiveCommand.Type.CREATE));
+		BatchRefUpdate batchUpdate = refdir.newBatchUpdate();
+		batchUpdate.setAtomic(false);
+		batchUpdate.setAllowNonFastForwards(true);
+		batchUpdate.addCommand(commands);
+		batchUpdate
+				.execute(new RevWalk(diskRepo), NullProgressMonitor.INSTANCE);
+		Map<String, Ref> refs = refdir.getRefs(RefDatabase.ALL);
+		// Non-atomic updates are applied in order: master succeeds, then master/x
+		// fails due to conflict.
+		assertEquals(ReceiveCommand.Result.OK, commands.get(0).getResult());
+		assertEquals(ReceiveCommand.Result.LOCK_FAILURE, commands.get(1)
+				.getResult());
+		assertEquals(ReceiveCommand.Result.LOCK_FAILURE, commands.get(2)
+				.getResult());
+		assertEquals("[HEAD, refs/heads/master, refs/heads/masters]", refs
+				.keySet().toString());
+		assertEquals(B.getId(), refs.get("refs/heads/master").getObjectId());
+		assertEquals(B.getId(), refs.get("refs/heads/masters").getObjectId());
+	}
+

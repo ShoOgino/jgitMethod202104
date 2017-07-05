@@ -1,0 +1,19 @@
+	private boolean checkObjectExistence(RevWalk walk,
+			List<ReceiveCommand> commands) throws IOException {
+		for (ReceiveCommand cmd : commands) {
+			try {
+				if (!cmd.getNewId().equals(ObjectId.zeroId())) {
+					walk.parseAny(cmd.getNewId());
+				}
+			} catch (MissingObjectException e) {
+				// ReceiveCommand#setResult(Result) converts REJECTED to
+				// REJECTED_NONFASTFORWARD, even though that result is also used for a
+				// missing object. Eagerly handle this case so we can set the right
+				// result.
+				reject(cmd, ReceiveCommand.Result.REJECTED_MISSING_OBJECT, commands);
+				return false;
+			}
+		}
+		return true;
+	}
+

@@ -1,5 +1,8 @@
-	private void commitPackedRefs(final LockFile lck, final RefList<Ref> refs,
+	PackedRefList commitPackedRefs(final LockFile lck, final RefList<Ref> refs,
 			final PackedRefList oldPackedList) throws IOException {
+		// Can't just return packedRefs.get() from this method; it might have been
+		// updated again after writePackedRefs() returns.
+		AtomicReference<PackedRefList> result = new AtomicReference<>();
 		new RefWriter(refs) {
 			@Override
 			protected void writeFile(String name, byte[] content)
@@ -39,7 +42,9 @@
 					throw new ObjectWritingException(
 							MessageFormat.format(JGitText.get().unableToWrite, name));
 				}
+				result.set(newPackedList);
 			}
 		}.writePackedRefs();
+		return result.get();
 	}
 

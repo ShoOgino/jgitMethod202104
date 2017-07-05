@@ -1,0 +1,12 @@
+	private static Ref peeledRef(RevWalk walk, ReceiveCommand cmd)
+			throws IOException {
+		ObjectId newId = cmd.getNewId().copy();
+		RevObject obj = walk.parseAny(newId);
+		if (obj instanceof RevTag) {
+			return new ObjectIdRef.PeeledTag(
+					Ref.Storage.PACKED, cmd.getRefName(), newId, walk.peel(obj).copy());
+		}
+		return new ObjectIdRef.PeeledNonTag(
+				Ref.Storage.PACKED, cmd.getRefName(), newId);
+	}
+

@@ -1,8 +1,18 @@
-	static void addPrefixesTo(String s, Collection<String> out) {
-		int p1 = s.indexOf('/');
+	/**
+	 * Add prefixes of a ref name to an existing collection.
+	 *
+	 * @param name
+	 *            ref name.
+	 * @param out
+	 *            path prefixes of the ref name. For {@code refs/heads/foo},
+	 *            returns {@code refs} and {@code refs/heads}.
+	 * @since 4.9
+	 */
+	protected static void addPrefixesTo(String name, Collection<String> out) {
+		int p1 = name.indexOf('/');
 		while (p1 > 0) {
-			out.add(s.substring(0, p1));
-			p1 = s.indexOf('/', p1 + 1);
+			out.add(name.substring(0, p1));
+			p1 = name.indexOf('/', p1 + 1);
 		}
 	}
 

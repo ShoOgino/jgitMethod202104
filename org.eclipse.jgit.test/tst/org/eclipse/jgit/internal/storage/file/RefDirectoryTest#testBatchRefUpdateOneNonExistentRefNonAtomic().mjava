@@ -1,10 +1,8 @@
 	@Test
-	public void testBatchRefUpdateUpdateToMissingObject() throws IOException {
-		writeLooseRef("refs/heads/master", A);
-		ObjectId bad =
-				ObjectId.fromString("deadbeefdeadbeefdeadbeefdeadbeefdeadbeef");
+	public void testBatchRefUpdateOneNonExistentRefNonAtomic()
+			throws IOException {
 		List<ReceiveCommand> commands = Arrays.asList(
-				new ReceiveCommand(A, bad, "refs/heads/master",
+				new ReceiveCommand(A, B, "refs/heads/foo1",
 						ReceiveCommand.Type.UPDATE),
 				new ReceiveCommand(zeroId(), B, "refs/heads/foo2",
 						ReceiveCommand.Type.CREATE));
@@ -12,14 +10,12 @@
 		batchUpdate.setAtomic(false);
 		batchUpdate.setAllowNonFastForwards(true);
 		batchUpdate.addCommand(commands);
-		batchUpdate.execute(new RevWalk(diskRepo), NullProgressMonitor.INSTANCE);
+		batchUpdate.execute(new RevWalk(diskRepo), new StrictWorkMonitor());
 		Map<String, Ref> refs = refdir.getRefs(RefDatabase.ALL);
-		assertEquals(ReceiveCommand.Result.REJECTED_MISSING_OBJECT,
+		assertEquals(ReceiveCommand.Result.LOCK_FAILURE,
 				commands.get(0).getResult());
 		assertEquals(ReceiveCommand.Result.OK, commands.get(1).getResult());
-		assertEquals("[HEAD, refs/heads/foo2, refs/heads/master]", refs.keySet()
-				.toString());
-		assertEquals(A.getId(), refs.get("refs/heads/master").getObjectId());
+		assertEquals("[refs/heads/foo2]", refs.keySet().toString());
 		assertEquals(B.getId(), refs.get("refs/heads/foo2").getObjectId());
 	}
 

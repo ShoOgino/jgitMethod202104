@@ -1,0 +1,64 @@
+	private static RefList<Ref> applyUpdates(RevWalk walk, RefList<Ref> refs,
+			List<ReceiveCommand> commands) throws IOException {
+		int nDeletes = 0;
+		List<ReceiveCommand> adds = new ArrayList<>(commands.size());
+		for (ReceiveCommand c : commands) {
+			if (c.getType() == ReceiveCommand.Type.CREATE) {
+				adds.add(c);
+			} else if (c.getType() == ReceiveCommand.Type.DELETE) {
+				nDeletes++;
+			}
+		}
+		int addIdx = 0;
+
+		// Construct a new RefList by linearly scanning the old list, and merging in
+		// any updates.
+		Map<String, ReceiveCommand> byName = byName(commands);
+		RefList.Builder<Ref> b =
+				new RefList.Builder<>(refs.size() - nDeletes + adds.size());
+		for (Ref ref : refs) {
+			String name = ref.getName();
+			ReceiveCommand cmd = byName.remove(name);
+			if (cmd == null) {
+				b.add(ref);
+				continue;
+			}
+			if (!cmd.getOldId().equals(ref.getObjectId())) {
+				lockFailure(cmd, commands);
+				return null;
+			}
+
+			// Consume any adds between the last and current ref.
+			while (addIdx < adds.size()) {
+				ReceiveCommand currAdd = adds.get(addIdx);
+				if (currAdd.getRefName().compareTo(name) < 0) {
+					b.add(peeledRef(walk, currAdd));
+					byName.remove(currAdd.getRefName());
+				} else {
+					break;
+				}
+				addIdx++;
+			}
+
+			if (cmd.getType() != ReceiveCommand.Type.DELETE) {
+				b.add(peeledRef(walk, cmd));
+			}
+		}
+
+		// All remaining adds are valid, since the refs didn't exist.
+		while (addIdx < adds.size()) {
+			ReceiveCommand cmd = adds.get(addIdx++);
+			byName.remove(cmd.getRefName());
+			b.add(peeledRef(walk, cmd));
+		}
+
+		// Any remaining updates/deletes do not correspond to any existing refs, so
+		// they are lock failures.
+		if (!byName.isEmpty()) {
+			lockFailure(byName.values().iterator().next(), commands);
+			return null;
+		}
+
+		return b.toRefList();
+	}
+

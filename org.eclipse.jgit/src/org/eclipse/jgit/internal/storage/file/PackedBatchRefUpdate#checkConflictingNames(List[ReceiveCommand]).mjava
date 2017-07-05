@@ -1,0 +1,44 @@
+	private boolean checkConflictingNames(List<ReceiveCommand> commands)
+			throws IOException {
+		Set<String> takenNames = new HashSet<>();
+		Set<String> takenPrefixes = new HashSet<>();
+		Set<String> deletes = new HashSet<>();
+		for (ReceiveCommand cmd : commands) {
+			if (cmd.getType() != ReceiveCommand.Type.DELETE) {
+				takenNames.add(cmd.getRefName());
+				addPrefixesTo(cmd.getRefName(), takenPrefixes);
+			} else {
+				deletes.add(cmd.getRefName());
+			}
+		}
+		Set<String> initialRefs = refdb.getRefs(RefDatabase.ALL).keySet();
+		for (String name : initialRefs) {
+			if (!deletes.contains(name)) {
+				takenNames.add(name);
+				addPrefixesTo(name, takenPrefixes);
+			}
+		}
+
+		for (ReceiveCommand cmd : commands) {
+			if (cmd.getType() != ReceiveCommand.Type.DELETE &&
+					takenPrefixes.contains(cmd.getRefName())) {
+				// This ref is a prefix of some other ref. This check doesn't apply when
+				// this command is a delete, because if the ref is deleted nobody will
+				// ever be creating a loose ref with that name.
+				lockFailure(cmd, commands);
+				return false;
+			}
+			for (String prefix : getPrefixes(cmd.getRefName())) {
+				if (takenNames.contains(prefix)) {
+					// A prefix of this ref is already a refname. This check does apply
+					// when this command is a delete, because we would need to create the
+					// refname as a directory in order to create a lockfile for the
+					// to-be-deleted ref.
+					lockFailure(cmd, commands);
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+

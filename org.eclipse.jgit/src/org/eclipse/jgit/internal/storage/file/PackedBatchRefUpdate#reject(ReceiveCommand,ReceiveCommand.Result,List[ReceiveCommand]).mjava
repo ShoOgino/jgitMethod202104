@@ -1,0 +1,13 @@
+	private static void reject(ReceiveCommand cmd, ReceiveCommand.Result result,
+			List<ReceiveCommand> commands) {
+		cmd.setResult(result);
+		for (ReceiveCommand c2 : commands) {
+			if (c2.getResult() == ReceiveCommand.Result.OK) {
+				// Undo OK status so ReceiveCommand#abort aborts it. Assumes this method
+				// is always called before committing any updates to disk.
+				c2.setResult(ReceiveCommand.Result.NOT_ATTEMPTED);
+			}
+		}
+		ReceiveCommand.abort(commands);
+	}
+
