@@ -3,6 +3,7 @@
 		String path = "untracked.txt";
 		writeTrashFile(path, "untracked");
 		git.stashCreate().setIncludeUntracked(true).call();
+		recorder.assertEvent(ChangeRecorder.EMPTY, new String[] { path });
 
 		writeTrashFile(path, "committed");
 		head = git.commit().setMessage("add file").call();
@@ -16,5 +17,6 @@
 			assertEquals(e.getMessage(), JGitText.get().stashApplyConflict);
 		}
 		assertEquals("committed", read(path));
+		recorder.assertNoEvent();
 	}
 

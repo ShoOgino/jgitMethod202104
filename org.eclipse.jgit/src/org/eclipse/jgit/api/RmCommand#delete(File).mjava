@@ -1,5 +1,9 @@
-	private void delete(File p) {
-		while (p != null && !p.equals(repo.getWorkTree()) && p.delete())
+	private boolean delete(File p) {
+		boolean deleted = false;
+		while (p != null && !p.equals(repo.getWorkTree()) && p.delete()) {
+			deleted = true;
 			p = p.getParentFile();
+		}
+		return deleted;
 	}
 

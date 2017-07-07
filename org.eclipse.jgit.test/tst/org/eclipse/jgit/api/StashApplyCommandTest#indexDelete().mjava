@@ -1,14 +1,17 @@
 	@Test
 	public void indexDelete() throws Exception {
 		git.rm().addFilepattern("file.txt").call();
+		recorder.assertEvent(ChangeRecorder.EMPTY, new String[] { "file.txt" });
 
 		RevCommit stashed = git.stashCreate().call();
 		assertNotNull(stashed);
 		assertEquals("content", read(committedFile));
+		recorder.assertEvent(new String[] { "file.txt" }, ChangeRecorder.EMPTY);
 
 		ObjectId unstashed = git.stashApply().call();
 		assertEquals(stashed, unstashed);
 		assertFalse(committedFile.exists());
+		recorder.assertEvent(ChangeRecorder.EMPTY, new String[] { "file.txt" });
 
 		Status status = git.status().call();
 		assertTrue(status.getAdded().isEmpty());

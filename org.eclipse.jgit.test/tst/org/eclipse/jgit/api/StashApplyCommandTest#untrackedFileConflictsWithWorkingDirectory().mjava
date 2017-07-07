@@ -4,6 +4,7 @@
 		String path = "untracked.txt";
 		writeTrashFile(path, "untracked");
 		git.stashCreate().setIncludeUntracked(true).call();
+		recorder.assertEvent(ChangeRecorder.EMPTY, new String[] { path });
 
 		writeTrashFile(path, "working-directory");
 		try {
@@ -13,5 +14,6 @@
 			assertEquals(e.getMessage(), JGitText.get().stashApplyConflict);
 		}
 		assertEquals("working-directory", read(path));
+		recorder.assertNoEvent();
 	}
 

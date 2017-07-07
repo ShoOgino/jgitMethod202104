@@ -5,11 +5,14 @@
 		git.commit().setMessage("x").call();
 		file.delete();
 		git.rm().addFilepattern("file").call();
+		recorder.assertNoEvent();
 		git.stashCreate().call();
+		recorder.assertEvent(new String[] { "file" }, ChangeRecorder.EMPTY);
 		file.delete();
 
 		git.stashApply().setStashRef("stash@{0}").call();
 
 		assertFalse(file.exists());
+		recorder.assertEvent(ChangeRecorder.EMPTY, new String[] { "file" });
 	}
 

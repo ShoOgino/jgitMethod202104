@@ -3,6 +3,7 @@
 		writeTrashFile(PATH, "content\nmore content\n");
 		git.add().addFilepattern(PATH).call();
 		git.commit().setMessage("more content").call();
+		recorder.assertNoEvent();
 
 		writeTrashFile(PATH, "content\nstashed change\nmore content\n");
 
@@ -10,14 +11,17 @@
 		assertNotNull(stashed);
 		assertEquals("content\nmore content\n", read(committedFile));
 		assertTrue(git.status().call().isClean());
+		recorder.assertEvent(new String[] { PATH }, ChangeRecorder.EMPTY);
 
 		writeTrashFile(PATH, "content\nmore content\ncommitted change\n");
 		git.add().addFilepattern(PATH).call();
 		git.commit().setMessage("committed change").call();
+		recorder.assertNoEvent();
 
 		git.stashApply().call();
 		assertEquals(
 				"content\nstashed change\nmore content\ncommitted change\n",
 				read(committedFile));
+		recorder.assertEvent(new String[] { PATH }, ChangeRecorder.EMPTY);
 	}
 

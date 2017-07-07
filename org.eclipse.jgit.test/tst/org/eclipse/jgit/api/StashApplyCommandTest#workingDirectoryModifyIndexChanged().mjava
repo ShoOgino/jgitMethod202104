@@ -7,10 +7,12 @@
 		RevCommit stashed = git.stashCreate().call();
 		assertNotNull(stashed);
 		assertEquals("content", read(committedFile));
+		recorder.assertEvent(new String[] { "file.txt" }, ChangeRecorder.EMPTY);
 
 		ObjectId unstashed = git.stashApply().call();
 		assertEquals(stashed, unstashed);
 		assertEquals("content3", read(committedFile));
+		recorder.assertEvent(new String[] { "file.txt" }, ChangeRecorder.EMPTY);
 
 		Status status = git.status().call();
 		assertTrue(status.getAdded().isEmpty());

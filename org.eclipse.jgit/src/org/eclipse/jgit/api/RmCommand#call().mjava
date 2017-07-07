@@ -14,6 +14,7 @@
 		checkCallable();
 		DirCache dc = null;
 
+		List<String> actuallyDeletedFiles = new ArrayList<>();
 		try (final TreeWalk tw = new TreeWalk(repo)) {
 			dc = repo.lockDirCache();
 			DirCacheBuilder builder = dc.builder();
@@ -26,11 +27,14 @@
 				if (!cached) {
 					final FileMode mode = tw.getFileMode(0);
 					if (mode.getObjectType() == Constants.OBJ_BLOB) {
+						String relativePath = tw.getPathString();
 						final File path = new File(repo.getWorkTree(),
-								tw.getPathString());
+								relativePath);
 						// Deleting a blob is simply a matter of removing
 						// the file or symlink named by the tree entry.
-						delete(path);
+						if (delete(path)) {
+							actuallyDeletedFiles.add(relativePath);
+						}
 					}
 				}
 			}
@@ -40,8 +44,16 @@
 			throw new JGitInternalException(
 					JGitText.get().exceptionCaughtDuringExecutionOfRmCommand, e);
 		} finally {
-			if (dc != null)
-				dc.unlock();
+			try {
+				if (dc != null) {
+					dc.unlock();
+				}
+			} finally {
+				if (!actuallyDeletedFiles.isEmpty()) {
+					repo.fireEvent(new WorkingTreeModifiedEvent(null,
+							actuallyDeletedFiles));
+				}
+			}
 		}
 
 		return dc;

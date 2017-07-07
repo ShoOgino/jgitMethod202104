@@ -11,12 +11,15 @@
 		RevCommit stashed = git.stashCreate().call();
 		assertNotNull(stashed);
 		assertTrue(git.status().call().isClean());
+		recorder.assertEvent(ChangeRecorder.EMPTY,
+				new String[] { subdir, path });
 
 		git.branchCreate().setName(otherBranch).call();
 		git.checkout().setName(otherBranch).call();
 
 		ObjectId unstashed = git.stashApply().call();
 		assertEquals(stashed, unstashed);
+		recorder.assertEvent(new String[] { path }, ChangeRecorder.EMPTY);
 
 		Status status = git.status().call();
 		assertTrue(status.getChanged().isEmpty());

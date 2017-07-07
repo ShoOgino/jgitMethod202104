@@ -15,10 +15,12 @@
 		assertEquals("content\nhead change\nmore content\n",
 				read(committedFile));
 		assertTrue(git.status().call().isClean());
+		recorder.assertEvent(new String[] { PATH }, ChangeRecorder.EMPTY);
 
 		writeTrashFile(PATH, "content\nmore content\ncommitted change\n");
 		git.add().addFilepattern(PATH).call();
 		git.commit().setMessage("committed change").call();
+		recorder.assertNoEvent();
 
 		try {
 			git.stashApply().call();
@@ -26,6 +28,7 @@
 		} catch (StashApplyFailureException e) {
 			// expected
 		}
+		recorder.assertEvent(new String[] { PATH }, ChangeRecorder.EMPTY);
 		Status status = new StatusCommand(db).call();
 		assertEquals(1, status.getConflicting().size());
 		assertEquals(

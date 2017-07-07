@@ -22,9 +22,11 @@
 					int stage = ent.getStage();
 					if (stage > DirCacheEntry.STAGE_0) {
 						if (checkoutStage != null) {
-							if (stage == checkoutStage.number)
+							if (stage == checkoutStage.number) {
 								checkoutPath(ent, r, new CheckoutMetadata(
 										eolStreamType, filterCommand));
+								actuallyModifiedPaths.add(path);
+							}
 						} else {
 							UnmergedPathException e = new UnmergedPathException(
 									ent);
@@ -33,6 +35,7 @@
 					} else {
 						checkoutPath(ent, r, new CheckoutMetadata(eolStreamType,
 								filterCommand));
+						actuallyModifiedPaths.add(path);
 					}
 				}
 			});

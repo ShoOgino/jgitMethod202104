@@ -1,5 +1,6 @@
 	/**
-	 * Checkout paths into index and working directory
+	 * Checkout paths into index and working directory, firing a
+	 * {@link WorkingTreeModifiedEvent} if the working tree was modified.
 	 *
 	 * @return this instance
 	 * @throws IOException
@@ -7,6 +8,7 @@
 	 */
 	protected CheckoutCommand checkoutPaths() throws IOException,
 			RefNotFoundException {
+		actuallyModifiedPaths = new HashSet<>();
 		DirCache dc = repo.lockDirCache();
 		try (RevWalk revWalk = new RevWalk(repo);
 				TreeWalk treeWalk = new TreeWalk(repo,
@@ -21,7 +23,16 @@
 				checkoutPathsFromCommit(treeWalk, dc, commit);
 			}
 		} finally {
-			dc.unlock();
+			try {
+				dc.unlock();
+			} finally {
+				WorkingTreeModifiedEvent event = new WorkingTreeModifiedEvent(
+						actuallyModifiedPaths, null);
+				actuallyModifiedPaths = null;
+				if (!event.isEmpty()) {
+					repo.fireEvent(event);
+				}
+			}
 		}
 		return this;
 	}

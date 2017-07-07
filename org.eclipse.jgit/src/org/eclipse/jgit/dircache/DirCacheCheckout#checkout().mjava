@@ -1,5 +1,6 @@
 	/**
-	 * Execute this checkout
+	 * Execute this checkout. A {@link WorkingTreeModifiedEvent} is fired if the
+	 * working tree was modified; even if the checkout fails.
 	 *
 	 * @return <code>false</code> if this method could not delete all the files
 	 *         which should be deleted (e.g. because of of the files was
@@ -15,7 +16,17 @@
 		try {
 			return doCheckout();
 		} finally {
-			dc.unlock();
+			try {
+				dc.unlock();
+			} finally {
+				if (performingCheckout) {
+					WorkingTreeModifiedEvent event = new WorkingTreeModifiedEvent(
+							getUpdated().keySet(), getRemoved());
+					if (!event.isEmpty()) {
+						repo.fireEvent(event);
+					}
+				}
+			}
 		}
 	}
 

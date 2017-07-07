@@ -10,13 +10,18 @@
 	@Test
 	public void testResetHardFromIndexEntryWithoutFileToTreeWithoutFile()
 			throws Exception {
+		ChangeRecorder recorder = new ChangeRecorder();
+		ListenerHandle handle = null;
 		try (Git git = new Git(db)) {
+			handle = db.getListenerList()
+					.addWorkingTreeModifiedListener(recorder);
 			writeTrashFile("x", "x");
 			git.add().addFilepattern("x").call();
 			RevCommit id1 = git.commit().setMessage("c1").call();
 
 			writeTrashFile("f/g", "f/g");
 			git.rm().addFilepattern("x").call();
+			recorder.assertEvent(ChangeRecorder.EMPTY, new String[] { "x" });
 			git.add().addFilepattern("f/g").call();
 			git.commit().setMessage("c2").call();
 			deleteTrashFile("f/g");
@@ -25,6 +30,11 @@
 			// The actual test
 			git.reset().setMode(ResetType.HARD).setRef(id1.getName()).call();
 			assertIndex(mkmap("x", "x"));
+			recorder.assertEvent(new String[] { "x" }, ChangeRecorder.EMPTY);
+		} finally {
+			if (handle != null) {
+				handle.remove();
+			}
 		}
 	}
 

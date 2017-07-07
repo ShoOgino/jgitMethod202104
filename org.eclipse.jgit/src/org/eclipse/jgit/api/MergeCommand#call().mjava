@@ -137,6 +137,10 @@
 							.getMergeResults();
 					failingPaths = resolveMerger.getFailingPaths();
 					unmergedPaths = resolveMerger.getUnmergedPaths();
+					if (!resolveMerger.getModifiedFiles().isEmpty()) {
+						repo.fireEvent(new WorkingTreeModifiedEvent(
+								resolveMerger.getModifiedFiles(), null));
+					}
 				} else
 					noProblems = merger.merge(headCommit, srcCommit);
 				refLogMessage.append(": Merge made by "); //$NON-NLS-1$

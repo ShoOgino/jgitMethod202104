@@ -4,39 +4,51 @@
 		if (!FS.DETECTED.supportsExecute())
 			return;
 
-		Git git = Git.wrap(db);
+		ChangeRecorder recorder = new ChangeRecorder();
+		ListenerHandle handle = null;
+		try (Git git = new Git(db)) {
+			handle = db.getListenerList()
+					.addWorkingTreeModifiedListener(recorder);
+			// Add non-executable file
+			File file = writeTrashFile("file.txt", "a");
+			git.add().addFilepattern("file.txt").call();
+			git.commit().setMessage("commit1").call();
+			assertFalse(db.getFS().canExecute(file));
 
-		// Add non-executable file
-		File file = writeTrashFile("file.txt", "a");
-		git.add().addFilepattern("file.txt").call();
-		git.commit().setMessage("commit1").call();
-		assertFalse(db.getFS().canExecute(file));
+			// Create branch
+			git.branchCreate().setName("b1").call();
 
-		// Create branch
-		git.branchCreate().setName("b1").call();
+			// Create second commit and don't touch file
+			writeTrashFile("file2.txt", "");
+			git.add().addFilepattern("file2.txt").call();
+			git.commit().setMessage("commit2").call();
 
-		// Create second commit and don't touch file
-		writeTrashFile("file2.txt", "");
-		git.add().addFilepattern("file2.txt").call();
-		git.commit().setMessage("commit2").call();
+			// stage a mode change
+			writeTrashFile("file.txt", "a");
+			db.getFS().setExecute(file, true);
+			git.add().addFilepattern("file.txt").call();
 
-		// stage a mode change
-		writeTrashFile("file.txt", "a");
-		db.getFS().setExecute(file, true);
-		git.add().addFilepattern("file.txt").call();
+			// dirty the file
+			writeTrashFile("file.txt", "b");
 
-		// dirty the file
-		writeTrashFile("file.txt", "b");
+			assertEquals(
+					"[file.txt, mode:100755, content:a][file2.txt, mode:100644, content:]",
+					indexState(CONTENT));
+			assertWorkDir(mkmap("file.txt", "b", "file2.txt", ""));
+			recorder.assertNoEvent();
 
-		assertEquals(
-				"[file.txt, mode:100755, content:a][file2.txt, mode:100644, content:]",
-				indexState(CONTENT));
-		assertWorkDir(mkmap("file.txt", "b", "file2.txt", ""));
-
-		// Switch branches and check that the dirty file survived in worktree
-		// and index
-		git.checkout().setName("b1").call();
-		assertEquals("[file.txt, mode:100755, content:a]", indexState(CONTENT));
-		assertWorkDir(mkmap("file.txt", "b"));
+			// Switch branches and check that the dirty file survived in
+			// worktree and index
+			git.checkout().setName("b1").call();
+			assertEquals("[file.txt, mode:100755, content:a]",
+					indexState(CONTENT));
+			assertWorkDir(mkmap("file.txt", "b"));
+			recorder.assertEvent(ChangeRecorder.EMPTY,
+					new String[] { "file2.txt" });
+		} finally {
+			if (handle != null) {
+				handle.remove();
+			}
+		}
 	}
 

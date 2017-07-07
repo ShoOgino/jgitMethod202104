@@ -18,11 +18,13 @@
 			// update our index
 			builder.finish();
 
+			performingCheckout = true;
 			File file = null;
 			String last = null;
 			// when deleting files process them in the opposite order as they have
 			// been reported. This ensures the files are deleted before we delete
 			// their parent folders
+			IntList nonDeleted = new IntList();
 			for (int i = removed.size() - 1; i >= 0; i--) {
 				String r = removed.get(i);
 				file = new File(repo.getWorkTree(), r);
@@ -32,25 +34,47 @@
 					// a submodule, in which case we shall not attempt
 					// to delete it. A submodule is not empty, so it
 					// is safe to check this after a failed delete.
-					if (!repo.getFS().isDirectory(file))
+					if (!repo.getFS().isDirectory(file)) {
+						nonDeleted.add(i);
 						toBeDeleted.add(r);
+					}
 				} else {
 					if (last != null && !isSamePrefix(r, last))
 						removeEmptyParents(new File(repo.getWorkTree(), last));
 					last = r;
 				}
 			}
-			if (file != null)
+			if (file != null) {
 				removeEmptyParents(file);
-
-			for (Map.Entry<String, CheckoutMetadata> e : updated.entrySet()) {
-				String path = e.getKey();
-				CheckoutMetadata meta = e.getValue();
-				DirCacheEntry entry = dc.getEntry(path);
-				if (!FileMode.GITLINK.equals(entry.getRawMode()))
-					checkoutEntry(repo, entry, objectReader, false, meta);
 			}
-
+			removed = filterOut(removed, nonDeleted);
+			nonDeleted = null;
+			Iterator<Map.Entry<String, CheckoutMetadata>> toUpdate = updated
+					.entrySet().iterator();
+			Map.Entry<String, CheckoutMetadata> e = null;
+			try {
+				while (toUpdate.hasNext()) {
+					e = toUpdate.next();
+					String path = e.getKey();
+					CheckoutMetadata meta = e.getValue();
+					DirCacheEntry entry = dc.getEntry(path);
+					if (!FileMode.GITLINK.equals(entry.getRawMode())) {
+						checkoutEntry(repo, entry, objectReader, false, meta);
+					}
+					e = null;
+				}
+			} catch (Exception ex) {
+				// We didn't actually modify the current entry nor any that
+				// might follow.
+				if (e != null) {
+					toUpdate.remove();
+				}
+				while (toUpdate.hasNext()) {
+					e = toUpdate.next();
+					toUpdate.remove();
+				}
+				throw ex;
+			}
 			// commit the index builder - a new index is persisted
 			if (!builder.commit())
 				throw new IndexWriteException();

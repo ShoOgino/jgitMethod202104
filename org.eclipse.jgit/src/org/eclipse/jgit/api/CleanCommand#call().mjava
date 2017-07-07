@@ -49,6 +49,10 @@
 				}
 		} catch (IOException e) {
 			throw new JGitInternalException(e.getMessage(), e);
+		} finally {
+			if (!files.isEmpty()) {
+				repo.fireEvent(new WorkingTreeModifiedEvent(null, files));
+			}
 		}
 		return files;
 	}

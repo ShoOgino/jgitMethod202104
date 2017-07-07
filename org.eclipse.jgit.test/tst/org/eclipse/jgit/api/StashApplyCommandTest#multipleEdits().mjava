@@ -9,9 +9,13 @@
 		assertNotNull(stashed);
 		assertTrue(committedFile.exists());
 		assertFalse(addedFile.exists());
+		recorder.assertEvent(new String[] { PATH },
+				new String[] { "file2.txt" });
 
 		ObjectId unstashed = git.stashApply().call();
 		assertEquals(stashed, unstashed);
+		recorder.assertEvent(new String[] { "file2.txt" },
+				new String[] { PATH });
 
 		Status status = git.status().call();
 		assertTrue(status.getChanged().isEmpty());

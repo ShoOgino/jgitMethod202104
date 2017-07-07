@@ -1,38 +1,48 @@
 	@Test
 	public void testCheckoutChangeFileToNonEmptyDirs() throws Exception {
 		String fname = "was_file";
-		Git git = Git.wrap(db);
+		ChangeRecorder recorder = new ChangeRecorder();
+		ListenerHandle handle = null;
+		try (Git git = new Git(db)) {
+			handle = db.getListenerList()
+					.addWorkingTreeModifiedListener(recorder);
+			// Add a file
+			File file = writeTrashFile(fname, "a");
+			git.add().addFilepattern(fname).call();
+			git.commit().setMessage("Added file").call();
 
-		// Add a file
-		File file = writeTrashFile(fname, "a");
-		git.add().addFilepattern(fname).call();
-		git.commit().setMessage("Added file").call();
+			assertWorkDir(mkmap(fname, "a"));
 
-		assertWorkDir(mkmap(fname, "a"));
+			// replace file with directory containing only directories, no files
+			FileUtils.delete(file);
 
-		// replace file with directory containing only directories, no files
-		FileUtils.delete(file);
+			// create but do not add a file in the new directory to the index
+			writeTrashFile(fname + "/dir1", "file1", "c");
 
-		// create but do not add a file in the new directory to the index
-		writeTrashFile(fname + "/dir1", "file1", "c");
+			// create but do not add a file in the new directory to the index
+			writeTrashFile(fname + "/dir2", "file2", "d");
 
-		// create but do not add a file in the new directory to the index
-		writeTrashFile(fname + "/dir2", "file2", "d");
+			assertTrue("File must be a directory now", file.isDirectory());
+			assertFalse("Must not delete non empty directory", file.delete());
 
-		assertTrue("File must be a directory now", file.isDirectory());
-		assertFalse("Must not delete non empty directory", file.delete());
+			// 2 extra files are created
+			assertWorkDir(mkmap(fname + "/dir1/file1", "c",
+					fname + "/dir2/file2", "d"));
+			recorder.assertNoEvent();
 
-		// 2 extra files are created
-		assertWorkDir(
-				mkmap(fname + "/dir1/file1", "c", fname + "/dir2/file2", "d"));
+			// revert path to HEAD state
+			git.checkout().setStartPoint(Constants.HEAD).addPath(fname).call();
 
-		// revert path to HEAD state
-		git.checkout().setStartPoint(Constants.HEAD).addPath(fname).call();
+			// expect only the one added to the index
+			assertWorkDir(mkmap(fname, "a"));
+			recorder.assertEvent(new String[] { fname }, ChangeRecorder.EMPTY);
 
-		// expect only the one added to the index
-		assertWorkDir(mkmap(fname, "a"));
-
-		Status st = git.status().call();
-		assertTrue(st.isClean());
+			Status st = git.status().call();
+			assertTrue(st.isClean());
+		} finally {
+			if (handle != null) {
+				handle.remove();
+			}
+		}
 	}
 

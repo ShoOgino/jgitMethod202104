@@ -6,11 +6,14 @@
 				.call();
 		assertNotNull(stashedCommit);
 		assertFalse(untrackedFile.exists());
+		recorder.assertEvent(ChangeRecorder.EMPTY, new String[] { path });
+
 		deleteTrashFile("a/b"); // checkout should create parent dirs
 
 		git.stashApply().setStashRef("stash@{0}").call();
 		assertTrue(untrackedFile.exists());
 		assertEquals("content", read(path));
+		recorder.assertEvent(new String[] { path }, ChangeRecorder.EMPTY);
 
 		Status status = git.status().call();
 		assertEquals(1, status.getUntracked().size());

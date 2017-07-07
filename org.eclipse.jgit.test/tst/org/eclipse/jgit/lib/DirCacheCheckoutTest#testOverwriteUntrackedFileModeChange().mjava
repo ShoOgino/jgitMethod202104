@@ -2,44 +2,54 @@
 	public void testOverwriteUntrackedFileModeChange()
 			throws IOException, GitAPIException {
 		String fname = "file.txt";
-		Git git = Git.wrap(db);
+		ChangeRecorder recorder = new ChangeRecorder();
+		ListenerHandle handle = null;
+		try (Git git = new Git(db)) {
+			handle = db.getListenerList()
+					.addWorkingTreeModifiedListener(recorder);
+			// Add a file
+			File file = writeTrashFile(fname, "a");
+			git.add().addFilepattern(fname).call();
+			git.commit().setMessage("create file").call();
+			assertWorkDir(mkmap(fname, "a"));
 
-		// Add a file
-		File file = writeTrashFile(fname, "a");
-		git.add().addFilepattern(fname).call();
-		git.commit().setMessage("create file").call();
-		assertWorkDir(mkmap(fname, "a"));
+			// Create branch
+			git.branchCreate().setName("side").call();
 
-		// Create branch
-		git.branchCreate().setName("side").call();
+			// Switch branches
+			git.checkout().setName("side").call();
+			recorder.assertNoEvent();
 
-		// Switch branches
-		git.checkout().setName("side").call();
+			// replace file with directory containing files
+			FileUtils.delete(file);
 
-		// replace file with directory containing files
-		FileUtils.delete(file);
+			// create and add a file in the new directory to the index
+			writeTrashFile(fname + "/dir1", "file1", "c");
+			git.add().addFilepattern(fname + "/dir1/file1").call();
 
-		// create and add a file in the new directory to the index
-		writeTrashFile(fname + "/dir1", "file1", "c");
-		git.add().addFilepattern(fname + "/dir1/file1").call();
+			// create but do not add a file in the new directory to the index
+			writeTrashFile(fname + "/dir2", "file2", "d");
 
-		// create but do not add a file in the new directory to the index
-		writeTrashFile(fname + "/dir2", "file2", "d");
+			assertTrue("File must be a directory now", file.isDirectory());
+			assertFalse("Must not delete non empty directory", file.delete());
 
-		assertTrue("File must be a directory now", file.isDirectory());
-		assertFalse("Must not delete non empty directory", file.delete());
-
-		// 2 extra files are created
-		assertWorkDir(
-				mkmap(fname + "/dir1/file1", "c", fname + "/dir2/file2", "d"));
-
-		try {
-			git.checkout().setName("master").call();
-			fail("did not throw exception");
-		} catch (Exception e) {
-			// 2 extra files are still there
+			// 2 extra files are created
 			assertWorkDir(mkmap(fname + "/dir1/file1", "c",
 					fname + "/dir2/file2", "d"));
+
+			try {
+				git.checkout().setName("master").call();
+				fail("did not throw exception");
+			} catch (Exception e) {
+				// 2 extra files are still there
+				assertWorkDir(mkmap(fname + "/dir1/file1", "c",
+						fname + "/dir2/file2", "d"));
+			}
+			recorder.assertNoEvent();
+		} finally {
+			if (handle != null) {
+				handle.remove();
+			}
 		}
 	}
 

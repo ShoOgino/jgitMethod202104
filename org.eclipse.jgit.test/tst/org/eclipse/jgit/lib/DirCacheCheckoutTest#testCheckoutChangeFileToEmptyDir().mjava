@@ -1,26 +1,34 @@
 	@Test
 	public void testCheckoutChangeFileToEmptyDir() throws Exception {
 		String fname = "was_file";
-		Git git = Git.wrap(db);
+		ChangeRecorder recorder = new ChangeRecorder();
+		ListenerHandle handle = null;
+		try (Git git = new Git(db)) {
+			handle = db.getListenerList()
+					.addWorkingTreeModifiedListener(recorder);
+			// Add a file
+			File file = writeTrashFile(fname, "a");
+			git.add().addFilepattern(fname).call();
+			git.commit().setMessage("Added file").call();
 
-		// Add a file
-		File file = writeTrashFile(fname, "a");
-		git.add().addFilepattern(fname).call();
-		git.commit().setMessage("Added file").call();
+			// replace file with empty directory
+			FileUtils.delete(file);
+			FileUtils.mkdir(file);
+			assertTrue("File must be a directory now", file.isDirectory());
+			assertWorkDir(mkmap(fname, "/"));
+			recorder.assertNoEvent();
 
-		// replace file with empty directory
-		FileUtils.delete(file);
-		FileUtils.mkdir(file);
-		assertTrue("File must be a directory now", file.isDirectory());
+			// revert path to HEAD state
+			git.checkout().setStartPoint(Constants.HEAD).addPath(fname).call();
+			assertWorkDir(mkmap(fname, "a"));
+			recorder.assertEvent(new String[] { fname }, ChangeRecorder.EMPTY);
 
-		assertWorkDir(mkmap(fname, "/"));
-
-		// revert path to HEAD state
-		git.checkout().setStartPoint(Constants.HEAD).addPath(fname).call();
-
-		assertWorkDir(mkmap(fname, "a"));
-
-		Status st = git.status().call();
-		assertTrue(st.isClean());
+			Status st = git.status().call();
+			assertTrue(st.isClean());
+		} finally {
+			if (handle != null) {
+				handle.remove();
+			}
+		}
 	}
 

@@ -9,13 +9,15 @@
 			final EolStreamType eolStreamType = treeWalk.getEolStreamType();
 			final String filterCommand = treeWalk
 					.getFilterCommand(Constants.ATTR_FILTER_TYPE_SMUDGE);
-			editor.add(new PathEdit(treeWalk.getPathString()) {
+			final String path = treeWalk.getPathString();
+			editor.add(new PathEdit(path) {
 				@Override
 				public void apply(DirCacheEntry ent) {
 					ent.setObjectId(blobId);
 					ent.setFileMode(mode);
 					checkoutPath(ent, r,
 							new CheckoutMetadata(eolStreamType, filterCommand));
+					actuallyModifiedPaths.add(path);
 				}
 			});
 		}

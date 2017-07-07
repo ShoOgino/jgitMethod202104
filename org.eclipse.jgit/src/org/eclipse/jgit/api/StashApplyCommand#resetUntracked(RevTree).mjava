@@ -1,5 +1,6 @@
 	private void resetUntracked(RevTree tree) throws CheckoutConflictException,
 			IOException {
+		Set<String> actuallyModifiedPaths = new HashSet<>();
 		// TODO maybe NameConflictTreeWalk ?
 		try (TreeWalk walk = new TreeWalk(repo)) {
 			walk.addTree(tree);
@@ -32,6 +33,12 @@
 
 				checkoutPath(entry, reader,
 						new CheckoutMetadata(eolStreamType, null));
+				actuallyModifiedPaths.add(entry.getPathString());
+			}
+		} finally {
+			if (!actuallyModifiedPaths.isEmpty()) {
+				repo.fireEvent(new WorkingTreeModifiedEvent(
+						actuallyModifiedPaths, null));
 			}
 		}
 	}

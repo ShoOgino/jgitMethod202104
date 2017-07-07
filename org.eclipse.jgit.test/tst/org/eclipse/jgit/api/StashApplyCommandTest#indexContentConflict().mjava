@@ -6,6 +6,7 @@
 		assertNotNull(stashed);
 		assertEquals("content", read(committedFile));
 		assertTrue(git.status().call().isClean());
+		recorder.assertEvent(new String[] { PATH }, ChangeRecorder.EMPTY);
 
 		writeTrashFile(PATH, "content3");
 		git.add().addFilepattern(PATH).call();
@@ -17,6 +18,7 @@
 		} catch (StashApplyFailureException e) {
 			// expected
 		}
+		recorder.assertNoEvent();
 		assertEquals("content2", read(PATH));
 	}
 

@@ -7,9 +7,11 @@
 		git.add().addFilepattern(PATH).call();
 		git.stashCreate().call();
 		assertTrue(untrackedFile.exists());
+		recorder.assertEvent(new String[] { PATH }, ChangeRecorder.EMPTY);
 
 		git.stashApply().setStashRef("stash@{0}").call();
 		assertTrue(untrackedFile.exists());
+		recorder.assertEvent(new String[] { PATH }, ChangeRecorder.EMPTY);
 
 		Status status = git.status().call();
 		assertEquals(1, status.getUntracked().size());

@@ -1,0 +1,15 @@
+	public void assertEvent(String[] expectedModified,
+			String[] expectedDeleted) {
+		String[] actuallyModified = getModified();
+		String[] actuallyDeleted = getDeleted();
+		Arrays.sort(actuallyModified);
+		Arrays.sort(expectedModified);
+		Arrays.sort(actuallyDeleted);
+		Arrays.sort(expectedDeleted);
+		assertArrayEquals("Unexpected modifications reported", expectedModified,
+				actuallyModified);
+		assertArrayEquals("Unexpected deletions reported", expectedDeleted,
+				actuallyDeleted);
+		reset();
+	}
+

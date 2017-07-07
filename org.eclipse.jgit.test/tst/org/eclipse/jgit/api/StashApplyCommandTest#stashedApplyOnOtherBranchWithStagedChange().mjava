@@ -15,12 +15,15 @@
 		writeTrashFile(PATH, "master content");
 		git.add().addFilepattern(PATH).call();
 		git.commit().setMessage("even content").call();
+		recorder.assertNoEvent();
 
 		git.checkout().setName(otherBranch).call();
+		recorder.assertEvent(new String[] { PATH }, ChangeRecorder.EMPTY);
 
 		writeTrashFile(PATH, "otherBranch content");
 		git.add().addFilepattern(PATH).call();
 		git.commit().setMessage("even more content").call();
+		recorder.assertNoEvent();
 
 		writeTrashFile(path2,
 				"content\nstashed change in index\nmore content\n");
@@ -33,8 +36,10 @@
 		assertEquals("content\nmore content\n", read(file2));
 		assertEquals("otherBranch content", read(committedFile));
 		assertTrue(git.status().call().isClean());
+		recorder.assertEvent(new String[] { path2 }, ChangeRecorder.EMPTY);
 
 		git.checkout().setName("master").call();
+		recorder.assertEvent(new String[] { PATH }, ChangeRecorder.EMPTY);
 		git.stashApply().call();
 		assertEquals("content\nstashed change\nmore content\n", read(file2));
 		assertEquals(
@@ -42,5 +47,6 @@
 						+ "[file2.txt, mode:100644, content:content\nstashed change in index\nmore content\n]",
 				indexState(CONTENT));
 		assertEquals("master content", read(committedFile));
+		recorder.assertEvent(new String[] { path2 }, ChangeRecorder.EMPTY);
 	}
 

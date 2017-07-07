@@ -6,6 +6,7 @@
 		assertNotNull(stashed);
 		assertEquals("content", read(committedFile));
 		assertTrue(git.status().call().isClean());
+		recorder.assertEvent(new String[] { PATH }, ChangeRecorder.EMPTY);
 
 		String path2 = "file2.txt";
 		writeTrashFile(path2, "content3");
@@ -14,6 +15,7 @@
 
 		ObjectId unstashed = git.stashApply().call();
 		assertEquals(stashed, unstashed);
+		recorder.assertEvent(new String[] { PATH }, ChangeRecorder.EMPTY);
 
 		Status status = git.status().call();
 		assertTrue(status.getAdded().isEmpty());

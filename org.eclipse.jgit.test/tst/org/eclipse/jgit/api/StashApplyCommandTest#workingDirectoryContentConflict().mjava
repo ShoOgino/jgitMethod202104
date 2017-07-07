@@ -6,6 +6,7 @@
 		assertNotNull(stashed);
 		assertEquals("content", read(committedFile));
 		assertTrue(git.status().call().isClean());
+		recorder.assertEvent(new String[] { PATH }, ChangeRecorder.EMPTY);
 
 		writeTrashFile(PATH, "content3");
 
@@ -16,5 +17,6 @@
 			// expected
  		}
 		assertEquals("content3", read(PATH));
+		recorder.assertNoEvent();
 	}
 
