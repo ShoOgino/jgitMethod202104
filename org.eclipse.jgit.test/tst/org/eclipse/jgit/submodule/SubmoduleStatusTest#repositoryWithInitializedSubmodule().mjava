@@ -1,9 +1,14 @@
 	@Test
-	public void repositoryWithInitializedSubmodule() throws IOException,
-			GitAPIException {
-		final ObjectId id = ObjectId
-				.fromString("abcd1234abcd1234abcd1234abcd1234abcd1234");
-		final String path = "sub";
+	public void repositoryWithInitializedSubmodule() throws Exception {
+		String path = "sub";
+		Repository subRepo = Git.init().setBare(false)
+				.setDirectory(new File(db.getWorkTree(), path)).call()
+				.getRepository();
+		assertNotNull(subRepo);
+
+		TestRepository<?> subTr = new TestRepository<>(subRepo);
+		ObjectId id = subTr.branch(Constants.HEAD).commit().create().copy();
+
 		DirCache cache = db.lockDirCache();
 		DirCacheEditor editor = cache.editor();
 		editor.add(new PathEdit(path) {
@@ -29,15 +34,6 @@
 		modulesConfig.setString(ConfigConstants.CONFIG_SUBMODULE_SECTION, path,
 				ConfigConstants.CONFIG_KEY_URL, url);
 		modulesConfig.save();
-
-		Repository subRepo = Git.init().setBare(false)
-				.setDirectory(new File(db.getWorkTree(), path)).call()
-				.getRepository();
-		assertNotNull(subRepo);
-
-		RefUpdate update = subRepo.updateRef(Constants.HEAD, true);
-		update.setNewObjectId(id);
-		update.forceUpdate();
 
 		SubmoduleStatusCommand command = new SubmoduleStatusCommand(db);
 		Map<String, SubmoduleStatus> statuses = command.call();

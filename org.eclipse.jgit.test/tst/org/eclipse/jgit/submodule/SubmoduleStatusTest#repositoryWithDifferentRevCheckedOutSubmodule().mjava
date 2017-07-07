@@ -1,9 +1,14 @@
 	@Test
-	public void repositoryWithDifferentRevCheckedOutSubmodule()
-			throws IOException, GitAPIException {
-		final ObjectId id = ObjectId
-				.fromString("abcd1234abcd1234abcd1234abcd1234abcd1234");
-		final String path = "sub";
+	public void repositoryWithDifferentRevCheckedOutSubmodule() throws Exception {
+		String path = "sub";
+		Repository subRepo = Git.init().setBare(false)
+				.setDirectory(new File(db.getWorkTree(), path)).call()
+				.getRepository();
+		assertNotNull(subRepo);
+
+		TestRepository<?> subTr = new TestRepository<>(subRepo);
+		ObjectId id = subTr.branch(Constants.HEAD).commit().create().copy();
+
 		DirCache cache = db.lockDirCache();
 		DirCacheEditor editor = cache.editor();
 		editor.add(new PathEdit(path) {
@@ -30,15 +35,7 @@
 				ConfigConstants.CONFIG_KEY_URL, url);
 		modulesConfig.save();
 
-		Repository subRepo = Git.init().setBare(false)
-				.setDirectory(new File(db.getWorkTree(), path)).call()
-				.getRepository();
-		assertNotNull(subRepo);
-
-		RefUpdate update = subRepo.updateRef(Constants.HEAD, true);
-		update.setNewObjectId(ObjectId
-				.fromString("aaaa0000aaaa0000aaaa0000aaaa0000aaaa0000"));
-		update.forceUpdate();
+		ObjectId newId = subTr.branch(Constants.HEAD).commit().create().copy();
 
 		SubmoduleStatusCommand command = new SubmoduleStatusCommand(db);
 		Map<String, SubmoduleStatus> statuses = command.call();
@@ -52,7 +49,7 @@
 		assertNotNull(status);
 		assertEquals(path, status.getPath());
 		assertEquals(id, status.getIndexId());
-		assertEquals(update.getNewObjectId(), status.getHeadId());
+		assertEquals(newId, status.getHeadId());
 		assertEquals(SubmoduleStatusType.REV_CHECKED_OUT, status.getType());
 	}
 

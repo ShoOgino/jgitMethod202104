@@ -1,0 +1,13 @@
+	private static boolean isMissing(RevWalk walk, ObjectId id)
+			throws IOException {
+		if (id.equals(ObjectId.zeroId())) {
+			return false; // Explicit add or delete is not missing.
+		}
+		try {
+			walk.parseAny(id);
+			return false;
+		} catch (MissingObjectException e) {
+			return true;
+		}
+	}
+

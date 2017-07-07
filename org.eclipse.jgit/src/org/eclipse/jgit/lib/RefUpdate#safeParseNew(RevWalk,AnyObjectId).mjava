@@ -1,0 +1,8 @@
+	private static RevObject safeParseNew(RevWalk rw, AnyObjectId newId)
+			throws IOException {
+		if (newId == null || ObjectId.zeroId().equals(newId)) {
+			return null;
+		}
+		return rw.parseAny(newId);
+	}
+

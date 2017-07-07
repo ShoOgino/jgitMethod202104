@@ -49,6 +49,11 @@
 		for (ReceiveCommand cmd : commands) {
 			try {
 				if (cmd.getResult() == NOT_ATTEMPTED) {
+					if (isMissing(walk, cmd.getOldId())
+							|| isMissing(walk, cmd.getNewId())) {
+						cmd.setResult(ReceiveCommand.Result.REJECTED_MISSING_OBJECT);
+						continue;
+					}
 					cmd.updateType(walk);
 					switch (cmd.getType()) {
 					case CREATE:
