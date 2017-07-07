@@ -1,0 +1,27 @@
+	@Test
+	public void testDeleteSymref() throws IOException {
+		RefUpdate dst = updateRef("refs/heads/abc");
+		assertEquals(Result.NEW, dst.update());
+		ObjectId id = dst.getNewObjectId();
+
+		RefUpdate u = db.updateRef("refs/symref");
+		assertEquals(Result.NEW, u.link(dst.getName()));
+
+		Ref ref = db.exactRef(u.getName());
+		assertNotNull(ref);
+		assertTrue(ref.isSymbolic());
+		assertEquals(dst.getName(), ref.getLeaf().getName());
+		assertEquals(id, ref.getLeaf().getObjectId());
+
+		u = db.updateRef(u.getName());
+		u.setDetachingSymbolicRef();
+		u.setForceUpdate(true);
+		assertEquals(Result.FORCED, u.delete());
+
+		assertNull(db.exactRef(u.getName()));
+		ref = db.exactRef(dst.getName());
+		assertNotNull(ref);
+		assertFalse(ref.isSymbolic());
+		assertEquals(id, ref.getObjectId());
+	}
+
