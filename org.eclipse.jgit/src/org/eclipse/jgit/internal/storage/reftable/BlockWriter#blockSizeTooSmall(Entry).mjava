@@ -1,0 +1,6 @@
+	private BlockSizeTooSmallException blockSizeTooSmall(Entry entry) {
+		// Compute size required to fit this entry by itself.
+		int min = FILE_HEADER_LEN + computeBlockBytes(entry.sizeBytes(), 1);
+		return new BlockSizeTooSmallException(min);
+	}
+

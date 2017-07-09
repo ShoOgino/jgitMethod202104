@@ -1,0 +1,22 @@
+		private List<IndexEntry> writeOneLevel(List<IndexEntry> keys)
+				throws IOException {
+			Section thisLevel = new Section(keyType);
+			for (Entry e : keys) {
+				thisLevel.write(e);
+			}
+			if (!thisLevel.idx.entries.isEmpty()) {
+				thisLevel.flushCurBlock();
+				if (cur.padBetweenBlocks()) {
+					out.padBetweenBlocksToNextBlock();
+				}
+				cur = null;
+				return thisLevel.idx.entries;
+			}
+
+			// The current block fit entire level; make it the root.
+			rootPosition = out.size();
+			cur.writeTo(out);
+			cur = null;
+			return null;
+		}
+

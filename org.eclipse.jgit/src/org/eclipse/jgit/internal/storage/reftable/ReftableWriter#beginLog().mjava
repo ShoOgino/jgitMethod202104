@@ -1,0 +1,9 @@
+	private void beginLog() throws IOException {
+		if (logs == null) {
+			finishRefAndObjSections(); // close prior ref blocks and their index, if present.
+			out.flushFileHeader();
+			out.setBlockSize(logBlockSize);
+			logs = new Section(LOG_BLOCK_TYPE);
+		}
+	}
+

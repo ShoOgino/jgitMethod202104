@@ -1,0 +1,14 @@
+	static int compare(
+			byte[] a, int ai, int aLen,
+			byte[] b, int bi, int bLen) {
+		int aEnd = ai + aLen;
+		int bEnd = bi + bLen;
+		while (ai < aEnd && bi < bEnd) {
+			int c = (a[ai++] & 0xff) - (b[bi++] & 0xff);
+			if (c != 0) {
+				return c;
+			}
+		}
+		return aLen - bLen;
+	}
+

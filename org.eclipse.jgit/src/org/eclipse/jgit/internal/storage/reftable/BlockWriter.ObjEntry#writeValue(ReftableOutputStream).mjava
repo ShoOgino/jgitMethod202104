@@ -1,0 +1,19 @@
+		@Override
+		void writeValue(ReftableOutputStream os) throws IOException {
+			int cnt = blockPos.size();
+			if (cnt == 0) {
+				os.writeVarint(0);
+				return;
+			}
+
+			if (cnt > VALUE_TYPE_MASK) {
+				os.writeVarint(cnt);
+			}
+			os.writeVarint(blockPos.get(0));
+			for (int j = 1; j < cnt; j++) {
+				long prior = blockPos.get(j - 1);
+				long b = blockPos.get(j);
+				os.writeVarint(b - prior);
+			}
+		}
+

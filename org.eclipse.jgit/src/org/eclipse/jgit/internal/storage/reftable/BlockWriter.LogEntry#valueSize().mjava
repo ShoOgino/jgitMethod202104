@@ -1,0 +1,10 @@
+		@Override
+		int valueSize() {
+			return 2 * OBJECT_ID_LENGTH
+					+ computeVarintSize(name.length) + name.length
+					+ computeVarintSize(email.length) + email.length
+					+ computeVarintSize(timeSecs)
+					+ 2 // tz
+					+ computeVarintSize(msg.length) + msg.length;
+		}
+

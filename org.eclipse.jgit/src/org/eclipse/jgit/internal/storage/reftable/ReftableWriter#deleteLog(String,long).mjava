@@ -1,0 +1,24 @@
+	/**
+	 * Record deletion of one reflog entry in this reftable.
+	 *
+	 * <p>
+	 * The deletion can shadow an entry stored in a lower table in the stack.
+	 * This is useful for {@code refs/stash} and dropping an entry from its
+	 * reflog.
+	 * <p>
+	 * Deletion must be properly interleaved in sorted updateIndex order with
+	 * any other logs written by
+	 * {@link #writeLog(String, long, PersonIdent, ObjectId, ObjectId, String)}.
+	 *
+	 * @param ref
+	 *            the ref to delete (hide) a reflog entry from.
+	 * @param updateIndex
+	 *            the update index that must be hidden.
+	 * @throws IOException
+	 *             if reftable cannot be written.
+	 */
+	public void deleteLog(String ref, long updateIndex) throws IOException {
+		beginLog();
+		logs.write(new DeleteLogEntry(ref, updateIndex));
+	}
+

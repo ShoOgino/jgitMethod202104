@@ -1,0 +1,33 @@
+	private boolean tryAdd(Entry entry, boolean tryRestart) {
+		byte[] key = entry.key;
+		int prefixLen = 0;
+		boolean restart = tryRestart && nextShouldBeRestart();
+		if (!restart) {
+			Entry priorEntry = entries.get(entries.size() - 1);
+			byte[] prior = priorEntry.key;
+			prefixLen = commonPrefix(prior, prior.length, key);
+			if (prefixLen <= 5 /* "refs/" */ && keyType == REF_BLOCK_TYPE) {
+				// Force restart points at transitions between namespaces
+				// such as "refs/heads/" to "refs/tags/".
+				restart = true;
+				prefixLen = 0;
+			} else if (prefixLen == 0) {
+				restart = true;
+			}
+		}
+
+		entry.restart = restart;
+		entry.prefixLen = prefixLen;
+		int entryBytes = entry.sizeBytes();
+		if (computeBlockBytes(entryBytes, restart) > blockLimitBytes) {
+			return false;
+		}
+
+		entriesSumBytes += entryBytes;
+		entries.add(entry);
+		if (restart) {
+			restartCnt++;
+		}
+		return true;
+	}
+

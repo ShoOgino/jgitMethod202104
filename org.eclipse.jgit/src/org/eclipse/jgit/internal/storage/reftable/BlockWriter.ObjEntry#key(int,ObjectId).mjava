@@ -1,0 +1,9 @@
+		private static byte[] key(int idLen, ObjectId id) {
+			byte[] key = new byte[OBJECT_ID_LENGTH];
+			id.copyRawTo(key, 0);
+			if (idLen < OBJECT_ID_LENGTH) {
+				return Arrays.copyOf(key, idLen);
+			}
+			return key;
+		}
+

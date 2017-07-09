@@ -1,0 +1,11 @@
+	void finishFile() throws IOException {
+		// File footer doesn't need patching for the block start.
+		// Just flush what has been buffered.
+		out.write(blockBuf, 0, cur);
+		cur = 0;
+
+		if (deflater != null) {
+			deflater.end();
+		}
+	}
+

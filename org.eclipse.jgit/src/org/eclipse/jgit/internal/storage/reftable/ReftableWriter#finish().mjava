@@ -1,0 +1,23 @@
+	/**
+	 * Finish writing the reftable by writing its trailer.
+	 *
+	 * @return {@code this}
+	 * @throws IOException
+	 *             if reftable cannot be written.
+	 */
+	public ReftableWriter finish() throws IOException {
+		finishRefAndObjSections();
+		finishLogSection();
+		writeFileFooter();
+		out.finishFile();
+
+		stats = new Stats(this, out);
+		out = null;
+		obj2ref = null;
+		cur = null;
+		refs = null;
+		objs = null;
+		logs = null;
+		return this;
+	}
+

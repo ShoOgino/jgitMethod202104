@@ -1,0 +1,10 @@
+	private void finishRefAndObjSections() throws IOException {
+		if (cur != null && cur.blockType() == REF_BLOCK_TYPE) {
+			refs.finishSectionMaybeWriteIndex();
+			if (indexObjects && !obj2ref.isEmpty() && refs.idx.bytes > 0) {
+				writeObjBlocks();
+			}
+			obj2ref = null;
+		}
+	}
+

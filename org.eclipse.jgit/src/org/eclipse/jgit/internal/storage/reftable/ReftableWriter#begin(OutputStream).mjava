@@ -1,0 +1,39 @@
+	/**
+	 * Begin writing the reftable.
+	 *
+	 * @param os
+	 *            stream to write the table to. Caller is responsible for
+	 *            closing the stream after invoking {@link #finish()}.
+	 * @return {@code this}
+	 * @throws IOException
+	 *             if reftable header cannot be written.
+	 */
+	public ReftableWriter begin(OutputStream os) throws IOException {
+		refBlockSize = config.getRefBlockSize();
+		logBlockSize = config.getLogBlockSize();
+		restartInterval = config.getRestartInterval();
+		maxIndexLevels = config.getMaxIndexLevels();
+		alignBlocks = config.isAlignBlocks();
+		indexObjects = config.isIndexObjects();
+
+		if (refBlockSize <= 0) {
+			refBlockSize = 4 << 10;
+		} else if (refBlockSize > MAX_BLOCK_SIZE) {
+			throw new IllegalArgumentException();
+		}
+		if (logBlockSize <= 0) {
+			logBlockSize = 2 * refBlockSize;
+		}
+		if (restartInterval <= 0) {
+			restartInterval = refBlockSize < (60 << 10) ? 16 : 64;
+		}
+
+		out = new ReftableOutputStream(os, refBlockSize, alignBlocks);
+		refs = new Section(REF_BLOCK_TYPE);
+		if (indexObjects) {
+			obj2ref = new ObjectIdSubclassMap<>();
+		}
+		writeFileHeader();
+		return this;
+	}
+

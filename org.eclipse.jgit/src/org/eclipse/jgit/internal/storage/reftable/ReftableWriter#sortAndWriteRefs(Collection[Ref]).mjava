@@ -1,0 +1,23 @@
+	/**
+	 * Sort a collection of references and write them to the reftable.
+	 *
+	 * @param refsToPack
+	 *            references to sort and write.
+	 * @return {@code this}
+	 * @throws IOException
+	 *             if reftable cannot be written.
+	 */
+	public ReftableWriter sortAndWriteRefs(Collection<Ref> refsToPack)
+			throws IOException {
+		Iterator<RefEntry> itr = refsToPack.stream()
+				.map(RefEntry::new)
+				.sorted(Entry::compare)
+				.iterator();
+		while (itr.hasNext()) {
+			RefEntry entry = itr.next();
+			long blockPos = refs.write(entry);
+			indexRef(entry.ref, blockPos);
+		}
+		return this;
+	}
+

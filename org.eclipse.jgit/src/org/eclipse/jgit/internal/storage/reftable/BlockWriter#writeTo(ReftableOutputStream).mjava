@@ -1,0 +1,20 @@
+	void writeTo(ReftableOutputStream os) throws IOException {
+		os.beginBlock(blockType);
+		IntList restarts = new IntList(restartCnt);
+		for (Entry entry : entries) {
+			if (entry.restart) {
+				restarts.add(os.bytesWrittenInBlock());
+			}
+			entry.writeKey(os);
+			entry.writeValue(os);
+		}
+		if (restarts.size() == 0 || restarts.size() > MAX_RESTARTS) {
+			throw new IllegalStateException();
+		}
+		for (int i = 0; i < restarts.size(); i++) {
+			os.writeInt24(restarts.get(i));
+		}
+		os.writeInt16(restarts.size());
+		os.flushBlock();
+	}
+

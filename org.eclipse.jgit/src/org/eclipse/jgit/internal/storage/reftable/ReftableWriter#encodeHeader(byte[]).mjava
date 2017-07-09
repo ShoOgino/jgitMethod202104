@@ -1,0 +1,8 @@
+	private void encodeHeader(byte[] hdr) {
+		System.arraycopy(FILE_HEADER_MAGIC, 0, hdr, 0, 4);
+		int bs = alignBlocks ? refBlockSize : 0;
+		NB.encodeInt32(hdr, 4, (VERSION_1 << 24) | bs);
+		NB.encodeInt64(hdr, 8, minUpdateIndex);
+		NB.encodeInt64(hdr, 16, maxUpdateIndex);
+	}
+

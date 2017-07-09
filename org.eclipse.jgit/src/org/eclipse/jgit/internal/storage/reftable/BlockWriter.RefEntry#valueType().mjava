@@ -1,0 +1,13 @@
+		@Override
+		int valueType() {
+			if (ref.isSymbolic()) {
+				return VALUE_SYMREF;
+			} else if (ref.getStorage() == NEW && ref.getObjectId() == null) {
+				return VALUE_NONE;
+			} else if (ref.getPeeledObjectId() != null) {
+				return VALUE_2ID;
+			} else {
+				return VALUE_1ID;
+			}
+		}
+

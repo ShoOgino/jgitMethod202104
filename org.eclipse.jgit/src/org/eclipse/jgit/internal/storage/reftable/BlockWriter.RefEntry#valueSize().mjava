@@ -1,0 +1,18 @@
+		@Override
+		int valueSize() {
+			switch (valueType()) {
+			case VALUE_NONE:
+				return 0;
+			case VALUE_1ID:
+				return OBJECT_ID_LENGTH;
+			case VALUE_2ID:
+				return 2 * OBJECT_ID_LENGTH;
+			case VALUE_SYMREF:
+				if (ref.isSymbolic()) {
+					int nameLen = nameUtf8(ref.getTarget()).length;
+					return computeVarintSize(nameLen) + nameLen;
+				}
+			}
+			throw new IllegalStateException();
+		}
+

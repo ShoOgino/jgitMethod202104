@@ -1,0 +1,29 @@
+		Stats(ReftableWriter w, ReftableOutputStream o) {
+			refBlockSize = w.refBlockSize;
+			logBlockSize = w.logBlockSize;
+			restartInterval = w.restartInterval;
+
+			minUpdateIndex = w.minUpdateIndex;
+			maxUpdateIndex = w.maxUpdateIndex;
+			paddingUsed = o.paddingUsed();
+			totalBytes = o.size();
+
+			refCnt = w.refs.entryCnt;
+			refBytes = w.refs.bytes;
+
+			objCnt = w.objs != null ? w.objs.entryCnt : 0;
+			objBytes = w.objs != null ? w.objs.bytes : 0;
+			objIdLen = w.objIdLen;
+
+			logCnt = w.logs != null ? w.logs.entryCnt : 0;
+			logBytes = w.logs != null ? w.logs.bytes : 0;
+
+			IndexBuilder refIdx = w.refs.idx;
+			refIndexSize = refIdx.bytes;
+			refIndexLevels = refIdx.levels;
+
+			IndexBuilder objIdx = w.objs != null ? w.objs.idx : null;
+			objIndexSize = objIdx != null ? objIdx.bytes : 0;
+			objIndexLevels = objIdx != null ? objIdx.levels : 0;
+		}
+

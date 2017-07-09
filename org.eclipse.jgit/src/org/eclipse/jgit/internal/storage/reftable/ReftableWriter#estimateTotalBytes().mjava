@@ -1,0 +1,33 @@
+	/**
+	 * @return an estimate of the current size in bytes of the reftable, if it
+	 *         was finished right now. Estimate is only accurate if
+	 *         {@link ReftableConfig#setIndexObjects(boolean)} is {@code false}
+	 *         and {@link ReftableConfig#setMaxIndexLevels(int)} is {@code 1}.
+	 */
+	public long estimateTotalBytes() {
+		long bytes = out.size();
+		if (bytes == 0) {
+			bytes += FILE_HEADER_LEN;
+		}
+		if (cur != null) {
+			long curBlockPos = out.size();
+			int sz = cur.currentSize();
+			bytes += sz;
+
+			IndexBuilder idx = null;
+			if (cur.blockType() == REF_BLOCK_TYPE) {
+				idx = refs.idx;
+			} else if (cur.blockType() == LOG_BLOCK_TYPE) {
+				idx = logs.idx;
+			}
+			if (idx != null && shouldHaveIndex(idx)) {
+				if (idx == refs.idx) {
+					bytes += out.estimatePadBetweenBlocks(sz);
+				}
+				bytes += idx.estimateBytes(curBlockPos);
+			}
+		}
+		bytes += FILE_FOOTER_LEN;
+		return bytes;
+	}
+

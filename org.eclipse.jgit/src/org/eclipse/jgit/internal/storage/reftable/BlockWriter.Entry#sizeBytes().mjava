@@ -1,0 +1,9 @@
+		int sizeBytes() {
+			int sfxLen = key.length - prefixLen;
+			int sfx = encodeSuffixAndType(sfxLen, valueType());
+			return computeVarintSize(prefixLen)
+					+ computeVarintSize(sfx)
+					+ sfxLen
+					+ valueSize();
+		}
+

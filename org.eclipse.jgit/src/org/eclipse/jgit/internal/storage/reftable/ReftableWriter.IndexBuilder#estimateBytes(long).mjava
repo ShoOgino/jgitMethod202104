@@ -1,0 +1,18 @@
+		int estimateBytes(long curBlockPos) {
+			BlockWriter b = new BlockWriter(
+					INDEX_BLOCK_TYPE, keyType,
+					MAX_BLOCK_SIZE,
+					Math.max(restartInterval, entries.size() / MAX_RESTARTS));
+			try {
+				for (Entry e : entries) {
+					b.mustAdd(e);
+				}
+				if (cur != null) {
+					b.mustAdd(new IndexEntry(cur.lastKey(), curBlockPos));
+				}
+			} catch (BlockSizeTooSmallException e) {
+				return b.currentSize();
+			}
+			return b.currentSize();
+		}
+

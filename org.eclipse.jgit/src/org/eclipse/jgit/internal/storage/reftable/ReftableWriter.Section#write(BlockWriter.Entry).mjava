@@ -1,0 +1,14 @@
+		long write(BlockWriter.Entry entry) throws IOException {
+			if (cur == null) {
+				beginBlock(entry);
+			} else if (!cur.tryAdd(entry)) {
+				flushCurBlock();
+				if (cur.padBetweenBlocks()) {
+					out.padBetweenBlocksToNextBlock();
+				}
+				beginBlock(entry);
+			}
+			entryCnt++;
+			return out.size();
+		}
+

@@ -1,0 +1,24 @@
+		private void writeMultiLevelIndex(List<IndexEntry> keys)
+				throws IOException {
+			levels = 1;
+			while (maxIndexLevels == 0 || levels < maxIndexLevels) {
+				keys = writeOneLevel(keys);
+				if (keys == null) {
+					return;
+				}
+				levels++;
+			}
+
+			// When maxIndexLevels has restricted the writer, write one
+			// index block with the entire remaining set of keys.
+			BlockWriter b = new BlockWriter(
+					INDEX_BLOCK_TYPE, keyType,
+					MAX_BLOCK_SIZE,
+					Math.max(restartInterval, keys.size() / MAX_RESTARTS));
+			for (Entry e : keys) {
+				b.mustAdd(e);
+			}
+			rootPosition = out.size();
+			b.writeTo(out);
+		}
+

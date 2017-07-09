@@ -1,0 +1,13 @@
+	void padBetweenBlocksToNextBlock() throws IOException {
+		if (alignBlocks) {
+			long m = size() % blockSize;
+			if (m > 0) {
+				int pad = blockSize - (int) m;
+				ensureBytesAvailableInBlockBuf(pad);
+				Arrays.fill(blockBuf, 0, pad, (byte) 0);
+				out.write(blockBuf, 0, pad);
+				paddingUsed += pad;
+			}
+		}
+	}
+

@@ -1,0 +1,9 @@
+	void writeVarint(long val) {
+		int n = tmp.length;
+		tmp[--n] = (byte) (val & 0x7f);
+		while ((val >>>= 7) != 0) {
+			tmp[--n] = (byte) (0x80 | (--val & 0x7F));
+		}
+		write(tmp, n, tmp.length - n);
+	}
+

@@ -1,0 +1,13 @@
+		LogEntry(String refName, long updateIndex, PersonIdent who,
+				ObjectId oldId, ObjectId newId, String message) {
+			super(key(refName, updateIndex));
+
+			this.oldId = oldId;
+			this.newId = newId;
+			this.timeSecs = who.getWhen().getTime() / 1000L;
+			this.tz = (short) who.getTimeZoneOffset();
+			this.name = who.getName().getBytes(UTF_8);
+			this.email = who.getEmailAddress().getBytes(UTF_8);
+			this.msg = message.getBytes(UTF_8);
+		}
+

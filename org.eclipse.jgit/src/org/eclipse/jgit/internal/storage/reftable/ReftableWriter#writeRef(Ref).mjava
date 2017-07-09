@@ -1,0 +1,15 @@
+	/**
+	 * Write one reference to the reftable.
+	 * <p>
+	 * References must be passed in sorted order.
+	 *
+	 * @param ref
+	 *            the reference to store.
+	 * @throws IOException
+	 *             if reftable cannot be written.
+	 */
+	public void writeRef(Ref ref) throws IOException {
+		long blockPos = refs.write(new RefEntry(ref));
+		indexRef(ref, blockPos);
+	}
+

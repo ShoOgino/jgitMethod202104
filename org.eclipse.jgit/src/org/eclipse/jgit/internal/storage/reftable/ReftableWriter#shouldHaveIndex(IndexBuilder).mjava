@@ -1,0 +1,10 @@
+	private boolean shouldHaveIndex(IndexBuilder idx) {
+		int threshold;
+		if (idx == refs.idx && alignBlocks) {
+			threshold = 4;
+		} else {
+			threshold = 1;
+		}
+		return idx.entries.size() + (cur != null ? 1 : 0) > threshold;
+	}
+

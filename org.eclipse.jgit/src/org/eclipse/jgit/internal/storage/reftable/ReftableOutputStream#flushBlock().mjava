@@ -1,0 +1,27 @@
+	void flushBlock() throws IOException {
+		if (cur > blockSize && blockType != INDEX_BLOCK_TYPE) {
+			throw new IOException(JGitText.get().overflowedReftableBlock);
+		}
+		NB.encodeInt32(blockBuf, blockStart, (blockType << 24) | cur);
+
+		if (blockType == LOG_BLOCK_TYPE) {
+			// Log blocks are deflated after the block header.
+			out.write(blockBuf, 0, 4);
+			if (deflater != null) {
+				deflater.reset();
+			} else {
+				deflater = new Deflater(Deflater.BEST_COMPRESSION);
+				compressor = new DeflaterOutputStream(out, deflater);
+			}
+			compressor.write(blockBuf, 4, cur - 4);
+			compressor.finish();
+		} else {
+			// Other blocks are uncompressed.
+			out.write(blockBuf, 0, cur);
+		}
+
+		cur = 0;
+		blockType = 0;
+		blockStart = 0;
+	}
+

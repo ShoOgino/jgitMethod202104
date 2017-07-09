@@ -1,0 +1,10 @@
+		void writeIndex() throws IOException {
+			if (padBetweenBlocks(keyType)) {
+				out.padBetweenBlocksToNextBlock();
+			}
+			long startPos = out.size();
+			writeMultiLevelIndex(entries);
+			bytes = (int) (out.size() - startPos);
+			entries = null;
+		}
+

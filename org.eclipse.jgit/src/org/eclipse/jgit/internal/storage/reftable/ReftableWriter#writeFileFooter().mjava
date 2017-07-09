@@ -1,0 +1,18 @@
+	private void writeFileFooter() {
+		int ftrLen = FILE_FOOTER_LEN;
+		byte[] ftr = new byte[ftrLen];
+		encodeHeader(ftr);
+
+		NB.encodeInt64(ftr, 24, indexPosition(refs));
+		NB.encodeInt64(ftr, 32, (firstBlockPosition(objs) << 5) | objIdLen);
+		NB.encodeInt64(ftr, 40, indexPosition(objs));
+		NB.encodeInt64(ftr, 48, firstBlockPosition(logs));
+		NB.encodeInt64(ftr, 56, indexPosition(logs));
+
+		CRC32 crc = new CRC32();
+		crc.update(ftr, 0, ftrLen - 4);
+		NB.encodeInt32(ftr, ftrLen - 4, (int) crc.getValue());
+
+		out.write(ftr, 0, ftrLen);
+	}
+

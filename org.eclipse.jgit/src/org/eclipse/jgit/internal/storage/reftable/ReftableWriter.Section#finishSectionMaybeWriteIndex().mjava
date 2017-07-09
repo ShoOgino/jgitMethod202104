@@ -1,0 +1,9 @@
+		void finishSectionMaybeWriteIndex() throws IOException {
+			flushCurBlock();
+			cur = null;
+			if (shouldHaveIndex(idx)) {
+				idx.writeIndex();
+			}
+			bytes = out.size() - firstBlockPosition;
+		}
+

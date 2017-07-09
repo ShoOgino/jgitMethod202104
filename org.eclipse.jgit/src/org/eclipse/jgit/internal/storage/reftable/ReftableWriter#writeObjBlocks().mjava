@@ -1,0 +1,14 @@
+	private void writeObjBlocks() throws IOException {
+		List<RefList> sorted = sortById(obj2ref);
+		obj2ref = null;
+		objIdLen = shortestUniqueAbbreviation(sorted);
+
+		out.padBetweenBlocksToNextBlock();
+		objs = new Section(OBJ_BLOCK_TYPE);
+		objs.entryCnt = sorted.size();
+		for (RefList l : sorted) {
+			objs.write(new ObjEntry(objIdLen, l, l.blockPos));
+		}
+		objs.finishSectionMaybeWriteIndex();
+	}
+

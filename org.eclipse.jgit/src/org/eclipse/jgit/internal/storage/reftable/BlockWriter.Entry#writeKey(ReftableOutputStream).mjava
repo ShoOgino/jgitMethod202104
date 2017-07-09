@@ -1,0 +1,7 @@
+		void writeKey(ReftableOutputStream os) {
+			int sfxLen = key.length - prefixLen;
+			os.writeVarint(prefixLen);
+			os.writeVarint(encodeSuffixAndType(sfxLen, valueType()));
+			os.write(key, prefixLen, sfxLen);
+		}
+

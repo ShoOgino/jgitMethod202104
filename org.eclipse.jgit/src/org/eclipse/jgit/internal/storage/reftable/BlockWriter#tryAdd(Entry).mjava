@@ -1,0 +1,23 @@
+	boolean tryAdd(Entry entry) {
+		if (entry instanceof ObjEntry
+				&& computeBlockBytes(entry.sizeBytes(), 1) > blockLimitBytes) {
+			// If the ObjEntry has so many ref block pointers that its
+			// encoding overflows any block, reconfigure it to tell readers to
+			// instead scan all refs for this ObjectId. That significantly
+			// shrinks the entry to a very small size, which may now fit into
+			// this block.
+			((ObjEntry) entry).markScanRequired();
+		}
+
+		if (tryAdd(entry, true)) {
+			return true;
+		} else if (nextShouldBeRestart()) {
+			// It was time for another restart, but the entry doesn't fit
+			// with its complete key, as the block is nearly full. Try to
+			// force it to fit with prefix compression rather than waste
+			// the tail of the block with padding.
+			return tryAdd(entry, false);
+		}
+		return false;
+	}
+

@@ -1,0 +1,20 @@
+		@Override
+		int valueSize() {
+			int cnt = blockPos.size();
+			if (cnt == 0) {
+				return computeVarintSize(0);
+			}
+
+			int n = 0;
+			if (cnt > VALUE_TYPE_MASK) {
+				n += computeVarintSize(cnt);
+			}
+			n += computeVarintSize(blockPos.get(0));
+			for (int j = 1; j < cnt; j++) {
+				long prior = blockPos.get(j - 1);
+				long b = blockPos.get(j);
+				n += computeVarintSize(b - prior);
+			}
+			return n;
+		}
+

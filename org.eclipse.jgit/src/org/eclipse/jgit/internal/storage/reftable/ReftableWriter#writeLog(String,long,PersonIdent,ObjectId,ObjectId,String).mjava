@@ -1,0 +1,32 @@
+	/**
+	 * Write one reflog entry to the reftable.
+	 * <p>
+	 * Reflog entries must be written in reference name and descending
+	 * {@code updateIndex} (highest first) order.
+	 *
+	 * @param ref
+	 *            name of the reference.
+	 * @param updateIndex
+	 *            identifier of the transaction that created the log record. The
+	 *            {@code updateIndex} must be unique within the scope of
+	 *            {@code ref}, and must be within the bounds defined by
+	 *            {@code minUpdateIndex <= updateIndex <= maxUpdateIndex}.
+	 * @param who
+	 *            committer of the reflog entry.
+	 * @param oldId
+	 *            prior id; pass {@link ObjectId#zeroId()} for creations.
+	 * @param newId
+	 *            new id; pass {@link ObjectId#zeroId()} for deletions.
+	 * @param message
+	 *            optional message (may be null).
+	 * @throws IOException
+	 *             if reftable cannot be written.
+	 */
+	public void writeLog(String ref, long updateIndex, PersonIdent who,
+			ObjectId oldId, ObjectId newId, @Nullable String message)
+					throws IOException {
+		String msg = message != null ? message : ""; //$NON-NLS-1$
+		beginLog();
+		logs.write(new LogEntry(ref, updateIndex, who, oldId, newId, msg));
+	}
+

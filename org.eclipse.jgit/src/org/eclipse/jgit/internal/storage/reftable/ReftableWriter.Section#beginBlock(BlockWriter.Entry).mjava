@@ -1,0 +1,8 @@
+		private void beginBlock(BlockWriter.Entry entry)
+				throws BlockSizeTooSmallException {
+			byte blockType = entry.blockType();
+			int bs = out.bytesAvailableInBlock();
+			cur = new BlockWriter(blockType, idx.keyType, bs, restartInterval);
+			cur.mustAdd(entry);
+		}
+
