@@ -1,0 +1,39 @@
+	/**
+	 * Read from a {@code FileChannel}.
+	 * <p>
+	 * The returned {@code BlockSource} is not thread-safe, as it must seek the
+	 * file channel to read a block.
+	 *
+	 * @param ch
+	 *            the file. The {@code BlockSource} will close {@code ch}.
+	 * @return wrapper for {@code ch}.
+	 */
+	public static BlockSource from(FileChannel ch) {
+		return new BlockSource() {
+			@Override
+			public ByteBuffer read(long pos, int blockSize) throws IOException {
+				ByteBuffer b = ByteBuffer.allocate(blockSize);
+				ch.position(pos);
+				int n;
+				do {
+					n = ch.read(b);
+				} while (n > 0 && b.position() < blockSize);
+				return b;
+			}
+
+			@Override
+			public long size() throws IOException {
+				return ch.size();
+			}
+
+			@Override
+			public void close() {
+				try {
+					ch.close();
+				} catch (IOException e) {
+					// Ignore close failures of read-only files.
+				}
+			}
+		};
+	}
+

@@ -1,0 +1,34 @@
+	private long inflateBuf(BlockSource src, long pos, int blockLen,
+			int fileBlockSize) throws IOException {
+		byte[] dst = new byte[blockLen];
+		System.arraycopy(buf, 0, dst, 0, 4);
+
+		long deflatedSize = 0;
+		Inflater inf = InflaterCache.get();
+		try {
+			inf.setInput(buf, ptr, bufLen - ptr);
+			for (int o = 4;;) {
+				int n = inf.inflate(dst, o, dst.length - o);
+				o += n;
+				if (inf.finished()) {
+					deflatedSize = inf.getBytesRead();
+					break;
+				} else if (n <= 0 && inf.needsInput()) {
+					long p = pos + 4 + inf.getBytesRead();
+					readBlockIntoBuf(src, p, fileBlockSize);
+					inf.setInput(buf, 0, bufLen);
+				} else if (n <= 0) {
+					throw invalidBlock();
+				}
+			}
+		} catch (DataFormatException e) {
+			throw invalidBlock(e);
+		} finally {
+			InflaterCache.release(inf);
+		}
+
+		buf = dst;
+		bufLen = dst.length;
+		return deflatedSize;
+	}
+

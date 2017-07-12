@@ -1,0 +1,8 @@
+	private BlockReader readIndex(long pos) throws IOException {
+		int sz = readBlockLen(pos);
+		BlockReader i = new BlockReader();
+		i.readBlock(src, pos, sz);
+		i.verifyIndex();
+		return i;
+	}
+

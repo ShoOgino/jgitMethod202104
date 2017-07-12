@@ -1,0 +1,12 @@
+	@Override
+	public RefCursor byObjectId(AnyObjectId id) throws IOException {
+		initObjIndex();
+		ObjCursorImpl i = new ObjCursorImpl(refEnd, id);
+		if (objIndex != null) {
+			i.initSeek();
+		} else {
+			i.initScan();
+		}
+		return i;
+	}
+

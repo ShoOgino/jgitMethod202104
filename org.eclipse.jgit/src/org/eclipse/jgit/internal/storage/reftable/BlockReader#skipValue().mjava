@@ -1,0 +1,50 @@
+	void skipValue() {
+		switch (blockType) {
+		case REF_BLOCK_TYPE:
+			switch (valueType & VALUE_TYPE_MASK) {
+			case VALUE_NONE:
+				return;
+			case VALUE_1ID:
+				ptr += OBJECT_ID_LENGTH;
+				return;
+			case VALUE_2ID:
+				ptr += 2 * OBJECT_ID_LENGTH;
+				return;
+			case VALUE_SYMREF:
+				skipString();
+				return;
+			}
+			break;
+
+		case OBJ_BLOCK_TYPE: {
+			int n = valueType & VALUE_TYPE_MASK;
+			if (n == 0) {
+				n = readVarint32();
+			}
+			while (n-- > 0) {
+				readVarint32();
+			}
+			return;
+		}
+
+		case INDEX_BLOCK_TYPE:
+			readVarint32();
+			return;
+
+		case LOG_BLOCK_TYPE:
+			if ((valueType & VALUE_TYPE_MASK) == LOG_NONE) {
+				return;
+			} else if ((valueType & VALUE_TYPE_MASK) == LOG_DATA) {
+				ptr += 2 * OBJECT_ID_LENGTH; // oldId, newId
+				skipString(); // name
+				skipString(); // email
+				readVarint64(); // time
+				ptr += 2; // tz
+				skipString(); // msg
+				return;
+			}
+		}
+
+		throw new IllegalStateException();
+	}
+

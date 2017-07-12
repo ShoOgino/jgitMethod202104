@@ -1,0 +1,16 @@
+	/**
+	 * Test if any reference directly refers to the object.
+	 *
+	 * @param id
+	 *            ObjectId to find.
+	 * @return {@code true} if any reference exists directly referencing
+	 *         {@code id}, or a annotated tag that peels to {@code id}.
+	 * @throws IOException
+	 *             if references cannot be read.
+	 */
+	public boolean hasId(AnyObjectId id) throws IOException {
+		try (RefCursor rc = byObjectId(id)) {
+			return rc.next();
+		}
+	}
+

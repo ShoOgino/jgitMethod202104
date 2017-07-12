@@ -1,0 +1,28 @@
+		@Override
+		public boolean next() throws IOException {
+			for (;;) {
+				if (block == null || block.type() != REF_BLOCK_TYPE) {
+					return false;
+				} else if (!block.next()) {
+					long pos = block.endPosition();
+					if (pos >= scanEnd) {
+						return false;
+					}
+					block = readBlock(pos, scanEnd);
+					continue;
+				}
+
+				block.parseKey();
+				if (match != null && !block.match(match, prefix)) {
+					block.skipValue();
+					return false;
+				}
+
+				ref = block.readRef();
+				if (!includeDeletes && wasDeleted()) {
+					continue;
+				}
+				return true;
+			}
+		}
+

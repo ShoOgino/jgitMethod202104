@@ -1,0 +1,36 @@
+		void initSeek() throws IOException {
+			byte[] rawId = new byte[OBJECT_ID_LENGTH];
+			match.copyRawTo(rawId, 0);
+			byte[] key = Arrays.copyOf(rawId, objIdLen);
+
+			BlockReader b = objIndex;
+			do {
+				if (b.seekKey(key) > 0) {
+					blockPos = EMPTY_LONG_LIST;
+					return;
+				}
+				long pos = b.readPositionFromIndex();
+				b = readBlock(pos, objEnd);
+			} while (b.type() == INDEX_BLOCK_TYPE);
+			b.seekKey(key);
+			while (b.next()) {
+				b.parseKey();
+				if (b.match(key, false)) {
+					blockPos = b.readBlockPositionList();
+					if (blockPos == null) {
+						initScan();
+						return;
+					}
+					break;
+				}
+				b.skipValue();
+			}
+			if (blockPos == null) {
+				blockPos = EMPTY_LONG_LIST;
+			}
+			if (blockPos.size() > 0) {
+				long pos = blockPos.get(listIdx++);
+				block = readBlock(pos, scanEnd);
+			}
+		}
+

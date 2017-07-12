@@ -1,0 +1,21 @@
+	private int readBlockLen(long pos) throws IOException {
+		int sz = pos == 0 ? FILE_HEADER_LEN + 4 : 4;
+		ByteBuffer tmp = src.read(pos, sz);
+		if (tmp.position() < sz) {
+			throw new IOException(JGitText.get().invalidReftableFile);
+		}
+		byte[] buf;
+		if (tmp.hasArray() && tmp.arrayOffset() == 0) {
+			buf = tmp.array();
+		} else {
+			buf = new byte[sz];
+			tmp.flip();
+			tmp.get(buf);
+		}
+		if (pos == 0 && buf[FILE_HEADER_LEN] == FILE_BLOCK_TYPE) {
+			return FILE_HEADER_LEN;
+		}
+		int p = pos == 0 ? FILE_HEADER_LEN : 0;
+		return decodeBlockLen(NB.decodeInt32(buf, p));
+	}
+

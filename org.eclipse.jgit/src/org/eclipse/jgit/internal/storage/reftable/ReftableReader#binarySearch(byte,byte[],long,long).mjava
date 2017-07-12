@@ -1,0 +1,32 @@
+	private BlockReader binarySearch(byte blockType, byte[] key,
+			long startPos, long endPos) throws IOException {
+		if (blockSize == 0) {
+			BlockReader b = readBlock(startPos, endPos);
+			if (blockType != b.type()) {
+				return null;
+			}
+			b.seekKey(key);
+			return b;
+		}
+
+		int low = (int) (startPos / blockSize);
+		int end = blocksIn(startPos, endPos);
+		BlockReader block = null;
+		do {
+			int mid = (low + end) >>> 1;
+			block = readBlock(((long) mid) * blockSize, endPos);
+			if (blockType != block.type()) {
+				return null;
+			}
+			int cmp = block.seekKey(key);
+			if (cmp < 0) {
+				end = mid;
+			} else if (cmp == 0) {
+				break;
+			} else /* if (cmp > 0) */ {
+				low = mid + 1;
+			}
+		} while (low < end);
+		return block;
+	}
+

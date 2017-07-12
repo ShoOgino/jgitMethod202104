@@ -1,0 +1,11 @@
+	long readPositionFromIndex() throws IOException {
+		if (blockType != INDEX_BLOCK_TYPE) {
+			throw invalidBlock();
+		}
+
+		readVarint32(); // skip prefix length
+		int n = readVarint32() >>> 3;
+		ptr += n; // skip name
+		return readVarint64();
+	}
+

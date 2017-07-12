@@ -1,0 +1,28 @@
+	private byte[] readHeaderOrFooter(long pos, int len) throws IOException {
+		ByteBuffer buf = src.read(pos, len);
+		if (buf.position() != len) {
+			throw new IOException(JGitText.get().shortReadOfBlock);
+		}
+
+		byte[] tmp = new byte[len];
+		buf.flip();
+		buf.get(tmp);
+		if (!isFileHeaderMagic(tmp, 0, len)) {
+			throw new IOException(JGitText.get().invalidReftableFile);
+		}
+
+		int v = NB.decodeInt32(tmp, 4);
+		int version = v >>> 24;
+		if (VERSION_1 != version) {
+			throw new IOException(MessageFormat.format(
+					JGitText.get().unsupportedReftableVersion,
+					Integer.valueOf(version)));
+		}
+		if (blockSize == -1) {
+			blockSize = v & 0xffffff;
+		}
+		minUpdateIndex = NB.decodeInt64(tmp, 8);
+		maxUpdateIndex = NB.decodeInt64(tmp, 16);
+		return tmp;
+	}
+

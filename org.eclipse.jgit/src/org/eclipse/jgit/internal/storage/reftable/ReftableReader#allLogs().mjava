@@ -1,0 +1,12 @@
+	@Override
+	public LogCursor allLogs() throws IOException {
+		initLogIndex();
+		if (logPosition > 0) {
+			src.adviseSequentialRead(logPosition, logEnd);
+			LogCursorImpl i = new LogCursorImpl(logEnd, null);
+			i.block = readBlock(logPosition, logEnd);
+			return i;
+		}
+		return new EmptyLogCursor();
+	}
+

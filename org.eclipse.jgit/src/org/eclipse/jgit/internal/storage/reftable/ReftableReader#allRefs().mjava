@@ -1,0 +1,14 @@
+	@Override
+	public RefCursor allRefs() throws IOException {
+		if (blockSize == -1) {
+			readFileHeader();
+		}
+
+		long end = refEnd > 0 ? refEnd : (src.size() - FILE_FOOTER_LEN);
+		src.adviseSequentialRead(0, end);
+
+		RefCursorImpl i = new RefCursorImpl(end, null, false);
+		i.block = readBlock(0, end);
+		return i;
+	}
+

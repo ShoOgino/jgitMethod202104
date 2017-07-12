@@ -1,0 +1,39 @@
+	@Nullable
+	ReflogEntry readLogEntry() {
+		if ((valueType & VALUE_TYPE_MASK) == LOG_NONE) {
+			return null;
+		}
+
+		ObjectId oldId = readValueId();
+		ObjectId newId = readValueId();
+		PersonIdent who = readPersonIdent();
+		String msg = readValueString();
+
+		return new ReflogEntry() {
+			@Override
+			public ObjectId getOldId() {
+				return oldId;
+			}
+
+			@Override
+			public ObjectId getNewId() {
+				return newId;
+			}
+
+			@Override
+			public PersonIdent getWho() {
+				return who;
+			}
+
+			@Override
+			public String getComment() {
+				return msg;
+			}
+
+			@Override
+			public CheckoutEntry parseCheckout() {
+				return null;
+			}
+		};
+	}
+

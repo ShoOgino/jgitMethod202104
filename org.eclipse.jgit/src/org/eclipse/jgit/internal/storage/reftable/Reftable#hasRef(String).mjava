@@ -1,0 +1,21 @@
+	/**
+	 * Test if a reference or reference subtree exists.
+	 * <p>
+	 * If {@code refName} ends with {@code "/"}, the method tests if any
+	 * reference starts with {@code refName} as a prefix.
+	 * <p>
+	 * Otherwise, the method checks if {@code refName} exists.
+	 *
+	 * @param refName
+	 *            reference name or subtree to find.
+	 * @return {@code true} if the reference exists, or at least one reference
+	 *         exists in the subtree.
+	 * @throws IOException
+	 *             if references cannot be read.
+	 */
+	public boolean hasRef(String refName) throws IOException {
+		try (RefCursor rc = seekRef(refName)) {
+			return rc.next();
+		}
+	}
+

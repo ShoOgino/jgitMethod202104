@@ -1,0 +1,13 @@
+	void parseKey() {
+		int pfx = readVarint32();
+		valueType = readVarint32();
+		int sfx = valueType >>> 3;
+		if (pfx + sfx > nameBuf.length) {
+			int n = Math.max(pfx + sfx, nameBuf.length * 2);
+			nameBuf = Arrays.copyOf(nameBuf, n);
+		}
+		System.arraycopy(buf, ptr, nameBuf, pfx, sfx);
+		ptr += sfx;
+		nameLen = pfx + sfx;
+	}
+

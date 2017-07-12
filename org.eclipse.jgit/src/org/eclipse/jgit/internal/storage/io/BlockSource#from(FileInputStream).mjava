@@ -1,0 +1,14 @@
+	/**
+	 * Read from a {@code FileInputStream}.
+	 * <p>
+	 * The returned {@code BlockSource} is not thread-safe, as it must seek the
+	 * file channel to read a block.
+	 *
+	 * @param in
+	 *            the file. The {@code BlockSource} will close {@code in}.
+	 * @return wrapper for {@code in}.
+	 */
+	public static BlockSource from(FileInputStream in) {
+		return from(in.getChannel());
+	}
+

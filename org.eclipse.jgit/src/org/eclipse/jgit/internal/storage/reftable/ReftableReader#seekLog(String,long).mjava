@@ -1,0 +1,14 @@
+	@Override
+	public LogCursor seekLog(String refName, long updateIndex)
+			throws IOException {
+		initLogIndex();
+		if (logPosition > 0) {
+			byte[] key = LogEntry.key(refName, updateIndex);
+			byte[] match = refName.getBytes(UTF_8);
+			LogCursorImpl i = new LogCursorImpl(logEnd, match);
+			i.block = seek(LOG_BLOCK_TYPE, key, logIndex, logPosition, logEnd);
+			return i;
+		}
+		return new EmptyLogCursor();
+	}
+

@@ -1,0 +1,16 @@
+	/**
+	 * Lookup a reference, or null if not found.
+	 *
+	 * @param refName
+	 *            reference name to find.
+	 * @return the reference, or {@code null} if not found.
+	 * @throws IOException
+	 *             if references cannot be read.
+	 */
+	@Nullable
+	public Ref exactRef(String refName) throws IOException {
+		try (RefCursor rc = seekRef(refName)) {
+			return rc.next() ? rc.getRef() : null;
+		}
+	}
+

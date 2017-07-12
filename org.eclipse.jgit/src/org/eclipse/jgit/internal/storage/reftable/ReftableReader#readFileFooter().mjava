@@ -1,0 +1,47 @@
+	private void readFileFooter() throws IOException {
+		int ftrLen = FILE_FOOTER_LEN;
+		byte[] ftr = readHeaderOrFooter(src.size() - ftrLen, ftrLen);
+
+		CRC32 crc = new CRC32();
+		crc.update(ftr, 0, ftrLen - 4);
+		if (crc.getValue() != NB.decodeUInt32(ftr, ftrLen - 4)) {
+			throw new IOException(JGitText.get().invalidReftableCRC);
+		}
+
+		refIndexPosition = NB.decodeInt64(ftr, 24);
+		long p = NB.decodeInt64(ftr, 32);
+		objPosition = p >>> 5;
+		objIdLen = (int) (p & 0x1f);
+		objIndexPosition = NB.decodeInt64(ftr, 40);
+		logPosition = NB.decodeInt64(ftr, 48);
+		logIndexPosition = NB.decodeInt64(ftr, 56);
+
+		if (refIndexPosition > 0) {
+			refEnd = refIndexPosition;
+		} else if (objPosition > 0) {
+			refEnd = objPosition;
+		} else if (logPosition > 0) {
+			refEnd = logPosition;
+		} else {
+			refEnd = src.size() - ftrLen;
+		}
+
+		if (objPosition > 0) {
+			if (objIndexPosition > 0) {
+				objEnd = objIndexPosition;
+			} else if (logPosition > 0) {
+				objEnd = logPosition;
+			} else {
+				objEnd = src.size() - ftrLen;
+			}
+		}
+
+		if (logPosition > 0) {
+			if (logIndexPosition > 0) {
+				logEnd = logIndexPosition;
+			} else {
+				logEnd = src.size() - ftrLen;
+			}
+		}
+	}
+

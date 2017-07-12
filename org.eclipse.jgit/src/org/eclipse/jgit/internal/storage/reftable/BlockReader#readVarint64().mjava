@@ -1,0 +1,12 @@
+	private long readVarint64() {
+		byte c = buf[ptr++];
+		long val = c & 0x7f;
+		while ((c & 0x80) != 0) {
+			c = buf[ptr++];
+			val++;
+			val <<= 7;
+			val |= (c & 0x7f);
+		}
+		return val;
+	}
+

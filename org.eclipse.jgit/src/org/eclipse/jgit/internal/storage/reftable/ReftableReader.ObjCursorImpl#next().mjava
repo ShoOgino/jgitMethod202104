@@ -1,0 +1,32 @@
+		@Override
+		public boolean next() throws IOException {
+			for (;;) {
+				if (block == null || block.type() != REF_BLOCK_TYPE) {
+					return false;
+				} else if (!block.next()) {
+					long pos;
+					if (blockPos != null) {
+						if (listIdx >= blockPos.size()) {
+							return false;
+						}
+						pos = blockPos.get(listIdx++);
+					} else {
+						pos = block.endPosition();
+					}
+					if (pos >= scanEnd) {
+						return false;
+					}
+					block = readBlock(pos, scanEnd);
+					continue;
+				}
+
+				block.parseKey();
+				ref = block.readRef();
+				ObjectId id = ref.getObjectId();
+				if (id != null && match.equals(id)
+						&& (includeDeletes || !wasDeleted())) {
+					return true;
+				}
+			}
+		}
+

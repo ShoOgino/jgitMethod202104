@@ -1,0 +1,22 @@
+	/**
+	 * @param refs
+	 *            references to convert into a reftable; may be empty.
+	 * @return a reader for the supplied references.
+	 */
+	public static Reftable from(Collection<Ref> refs) {
+		try {
+			ReftableConfig cfg = new ReftableConfig();
+			cfg.setIndexObjects(false);
+			cfg.setAlignBlocks(false);
+			ByteArrayOutputStream buf = new ByteArrayOutputStream();
+			new ReftableWriter()
+				.setConfig(cfg)
+				.begin(buf)
+				.sortAndWriteRefs(refs)
+				.finish();
+			return new ReftableReader(BlockSource.from(buf.toByteArray()));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+

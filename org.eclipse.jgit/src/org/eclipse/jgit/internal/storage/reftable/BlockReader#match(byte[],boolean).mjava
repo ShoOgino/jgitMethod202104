@@ -1,0 +1,14 @@
+	boolean match(byte[] match, boolean matchIsPrefix) {
+		int len = nameLen;
+		if (blockType == LOG_BLOCK_TYPE) {
+			len -= 9;
+		}
+		if (matchIsPrefix) {
+			return len >= match.length
+					&& compare(
+							match, 0, match.length,
+							nameBuf, 0, match.length) == 0;
+		}
+		return compare(match, 0, match.length, nameBuf, 0, len) == 0;
+	}
+

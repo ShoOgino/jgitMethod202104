@@ -1,0 +1,18 @@
+	private BlockReader seek(byte blockType, byte[] key, BlockReader idx,
+			long startPos, long endPos) throws IOException {
+		if (idx != null) {
+			// Walk through a possibly multi-level index to a leaf block.
+			BlockReader block = idx;
+			do {
+				if (block.seekKey(key) > 0) {
+					return null;
+				}
+				long pos = block.readPositionFromIndex();
+				block = readBlock(pos, endPos);
+			} while (block.type() == INDEX_BLOCK_TYPE);
+			block.seekKey(key);
+			return block;
+		}
+		return binarySearch(blockType, key, startPos, endPos);
+	}
+

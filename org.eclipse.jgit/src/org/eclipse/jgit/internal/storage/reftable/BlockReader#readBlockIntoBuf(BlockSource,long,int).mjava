@@ -1,0 +1,17 @@
+	private void readBlockIntoBuf(BlockSource src, long pos, int size)
+			throws IOException {
+		ByteBuffer b = src.read(pos, size);
+		bufLen = b.position();
+		if (bufLen <= 0) {
+			throw invalidBlock();
+		}
+		if (b.hasArray() && b.arrayOffset() == 0) {
+			buf = b.array();
+		} else {
+			buf = new byte[bufLen];
+			b.flip();
+			b.get(buf);
+		}
+		endPosition = pos + bufLen;
+	}
+

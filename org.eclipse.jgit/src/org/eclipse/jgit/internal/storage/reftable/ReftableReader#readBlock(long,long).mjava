@@ -1,0 +1,26 @@
+	private BlockReader readBlock(long pos, long end) throws IOException {
+		if (indexCache != null) {
+			BlockReader b = indexCache.get(pos);
+			if (b != null) {
+				return b;
+			}
+		}
+
+		int sz = blockSize;
+		if (sz == 0) {
+			sz = readBlockLen(pos);
+		} else if (pos + sz > end) {
+			sz = (int) (end - pos); // last block may omit padding.
+		}
+
+		BlockReader b = new BlockReader();
+		b.readBlock(src, pos, sz);
+		if (b.type() == INDEX_BLOCK_TYPE && !b.truncated()) {
+			if (indexCache == null) {
+				indexCache = new LongMap<>();
+			}
+			indexCache.put(pos, b);
+		}
+		return b;
+	}
+

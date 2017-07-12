@@ -1,0 +1,44 @@
+	/**
+	 * Finds a key in the block and positions the current pointer on its record.
+	 * <p>
+	 * As a side-effect this method arranges for the current pointer to be near
+	 * or exactly on {@code key}, allowing other methods to access data from
+	 * that current record:
+	 * <ul>
+	 * <li>{@link #name()}
+	 * <li>{@link #match(byte[], boolean)}
+	 * <li>{@link #readRef()}
+	 * <li>{@link #readLogUpdateIndex()}
+	 * <li>{@link #readLogEntry()}
+	 * <li>{@link #readBlockPositionList()}
+	 * </ul>
+	 *
+	 * @param key
+	 *            key to find.
+	 * @return {@code <0} if the key occurs before the start of this block;
+	 *         {@code 0} if the block is positioned on the key; {@code >0} if
+	 *         the key occurs after the last key of this block.
+	 */
+	int seekKey(byte[] key) {
+		int low = 0;
+		int end = restartCnt;
+		for (;;) {
+			int mid = (low + end) >>> 1;
+			int p = NB.decodeUInt24(buf, restartTbl + mid * 3);
+			ptr = p + 1; // skip 0 prefix length
+			int n = readVarint32() >>> 3;
+			int cmp = compare(key, 0, key.length, buf, ptr, n);
+			if (cmp < 0) {
+				end = mid;
+			} else if (cmp == 0) {
+				ptr = p;
+				return 0;
+			} else /* if (cmp > 0) */ {
+				low = mid + 1;
+			}
+			if (low >= end) {
+				return scanToKey(key, p, low, cmp);
+			}
+		}
+	}
+

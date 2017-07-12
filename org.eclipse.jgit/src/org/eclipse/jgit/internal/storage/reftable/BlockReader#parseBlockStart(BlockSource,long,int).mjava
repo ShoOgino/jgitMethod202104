@@ -1,0 +1,45 @@
+	private void parseBlockStart(BlockSource src, long pos, int fileBlockSize)
+			throws IOException {
+		ptr = 0;
+		if (pos == 0) {
+			if (bufLen == FILE_HEADER_LEN) {
+				setupEmptyFileBlock();
+				return;
+			}
+			ptr += FILE_HEADER_LEN; // first block begins with file header
+		}
+
+		int typeAndSize = NB.decodeInt32(buf, ptr);
+		ptr += 4;
+
+		blockType = (byte) (typeAndSize >>> 24);
+		int blockLen = decodeBlockLen(typeAndSize);
+		if (blockType == LOG_BLOCK_TYPE) {
+			// Log blocks must be inflated after the header.
+			long deflatedSize = inflateBuf(src, pos, blockLen, fileBlockSize);
+			endPosition = pos + 4 + deflatedSize;
+		}
+		if (bufLen < blockLen) {
+			if (blockType != INDEX_BLOCK_TYPE) {
+				throw invalidBlock();
+			}
+			// Its OK during sequential scan for an index block to have been
+			// partially read and be truncated in-memory. This happens when
+			// the index block is larger than the file's blockSize. Caller
+			// will break out of its scan loop once it sees the blockType.
+			truncated = true;
+		} else if (bufLen > blockLen) {
+			bufLen = blockLen;
+		}
+
+		if (blockType != FILE_BLOCK_TYPE) {
+			restartCnt = NB.decodeUInt16(buf, bufLen - 2);
+			restartTbl = bufLen - (restartCnt * 3 + 2);
+			keysStart = ptr;
+			keysEnd = restartTbl;
+		} else {
+			keysStart = ptr;
+			keysEnd = ptr;
+		}
+	}
+
