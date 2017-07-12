@@ -1,0 +1,12 @@
+	@Test
+	public void namespaceNotFound() throws IOException {
+		Ref exp = ref(MASTER, 1);
+		ReftableReader t = read(write(exp));
+		try (RefCursor rc = t.seekRef("refs/changes/")) {
+			assertFalse(rc.next());
+		}
+		try (RefCursor rc = t.seekRef("refs/tags/")) {
+			assertFalse(rc.next());
+		}
+	}
+
