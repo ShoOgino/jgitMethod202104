@@ -1,0 +1,9 @@
+	public void unpeeledDoesNotWrite() {
+		try {
+			write(new ObjectIdRef.Unpeeled(PACKED, MASTER, id(1)));
+			fail("expected IOException");
+		} catch (IOException e) {
+			assertEquals(JGitText.get().peeledRefIsRequired, e.getMessage());
+		}
+	}
+

@@ -1,0 +1,21 @@
+	@Test
+	public void oneSymbolicRef() throws IOException {
+		Ref exp = sym(HEAD, MASTER);
+		byte[] table = write(exp);
+		assertEquals(
+				24 + 4 + 5 + 2 + HEAD.length() + 1 + MASTER.length() + 68,
+				table.length);
+
+		ReftableReader t = read(table);
+		try (RefCursor rc = t.allRefs()) {
+			assertTrue(rc.next());
+			Ref act = rc.getRef();
+			assertNotNull(act);
+			assertTrue(act.isSymbolic());
+			assertEquals(exp.getName(), act.getName());
+			assertNotNull(act.getLeaf());
+			assertEquals(MASTER, act.getTarget().getName());
+			assertNull(act.getObjectId());
+		}
+	}
+

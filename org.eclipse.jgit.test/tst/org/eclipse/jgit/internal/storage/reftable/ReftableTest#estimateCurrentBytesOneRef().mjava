@@ -1,0 +1,20 @@
+	@Test
+	public void estimateCurrentBytesOneRef() throws IOException {
+		Ref exp = ref(MASTER, 1);
+		int expBytes = 24 + 4 + 5 + 3 + MASTER.length() + 20 + 68;
+
+		byte[] table;
+		ReftableConfig cfg = new ReftableConfig();
+		cfg.setIndexObjects(false);
+		ReftableWriter writer = new ReftableWriter().setConfig(cfg);
+		try (ByteArrayOutputStream buf = new ByteArrayOutputStream()) {
+			writer.begin(buf);
+			assertEquals(92, writer.estimateTotalBytes());
+			writer.writeRef(exp);
+			assertEquals(expBytes, writer.estimateTotalBytes());
+			writer.finish();
+			table = buf.toByteArray();
+		}
+		assertEquals(expBytes, table.length);
+	}
+

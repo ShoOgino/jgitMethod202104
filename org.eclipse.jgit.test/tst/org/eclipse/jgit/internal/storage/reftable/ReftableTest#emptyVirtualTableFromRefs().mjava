@@ -1,0 +1,14 @@
+	@Test
+	public void emptyVirtualTableFromRefs() throws IOException {
+		Reftable t = Reftable.from(Collections.emptyList());
+		try (RefCursor rc = t.allRefs()) {
+			assertFalse(rc.next());
+		}
+		try (RefCursor rc = t.seekRef(HEAD)) {
+			assertFalse(rc.next());
+		}
+		try (LogCursor rc = t.allLogs()) {
+			assertFalse(rc.next());
+		}
+	}
+

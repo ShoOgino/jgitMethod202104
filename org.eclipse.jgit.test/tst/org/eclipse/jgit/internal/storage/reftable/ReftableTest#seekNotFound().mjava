@@ -1,0 +1,12 @@
+	@Test
+	public void seekNotFound() throws IOException {
+		Ref exp = ref(MASTER, 1);
+		ReftableReader t = read(write(exp));
+		try (RefCursor rc = t.seekRef("refs/heads/a")) {
+			assertFalse(rc.next());
+		}
+		try (RefCursor rc = t.seekRef("refs/heads/n")) {
+			assertFalse(rc.next());
+		}
+	}
+

@@ -1,0 +1,27 @@
+	@Test
+	public void emptyTable() throws IOException {
+		byte[] table = write();
+		assertEquals(92 /* header, footer */, table.length);
+		assertEquals('R', table[0]);
+		assertEquals('E', table[1]);
+		assertEquals('F', table[2]);
+		assertEquals('T', table[3]);
+		assertEquals(0x01, table[4]);
+		assertTrue(ReftableConstants.isFileHeaderMagic(table, 0, 8));
+		assertTrue(ReftableConstants.isFileHeaderMagic(table, 24, 92));
+
+		Reftable t = read(table);
+		try (RefCursor rc = t.allRefs()) {
+			assertFalse(rc.next());
+		}
+		try (RefCursor rc = t.seekRef(HEAD)) {
+			assertFalse(rc.next());
+		}
+		try (RefCursor rc = t.seekRef(R_HEADS)) {
+			assertFalse(rc.next());
+		}
+		try (LogCursor rc = t.allLogs()) {
+			assertFalse(rc.next());
+		}
+	}
+

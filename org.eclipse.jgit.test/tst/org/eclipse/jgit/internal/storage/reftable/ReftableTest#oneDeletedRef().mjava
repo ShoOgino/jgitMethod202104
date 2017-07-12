@@ -1,0 +1,25 @@
+	@Test
+	public void oneDeletedRef() throws IOException {
+		String name = "refs/heads/gone";
+		Ref exp = newRef(name);
+		byte[] table = write(exp);
+		assertEquals(24 + 4 + 5 + 2 + name.length() + 68, table.length);
+
+		ReftableReader t = read(table);
+		try (RefCursor rc = t.allRefs()) {
+			assertFalse(rc.next());
+		}
+
+		t.setIncludeDeletes(true);
+		try (RefCursor rc = t.allRefs()) {
+			assertTrue(rc.next());
+			Ref act = rc.getRef();
+			assertNotNull(act);
+			assertFalse(act.isSymbolic());
+			assertEquals(name, act.getName());
+			assertEquals(NEW, act.getStorage());
+			assertNull(act.getObjectId());
+			assertTrue(rc.wasDeleted());
+		}
+	}
+

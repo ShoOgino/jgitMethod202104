@@ -1,0 +1,13 @@
+	@Test
+	public void badCrc32() throws IOException {
+		byte[] table = write();
+		table[table.length - 1] = 0x42;
+
+		try {
+			read(table).seekRef(HEAD);
+			fail("expected IOException");
+		} catch (IOException e) {
+			assertEquals(JGitText.get().invalidReftableCRC, e.getMessage());
+		}
+	}
+

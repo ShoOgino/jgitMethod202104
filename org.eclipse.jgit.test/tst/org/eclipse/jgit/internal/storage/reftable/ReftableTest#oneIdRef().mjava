@@ -1,0 +1,29 @@
+	@Test
+	public void oneIdRef() throws IOException {
+		Ref exp = ref(MASTER, 1);
+		byte[] table = write(exp);
+		assertEquals(24 + 4 + 5 + 3 + MASTER.length() + 20 + 68, table.length);
+
+		ReftableReader t = read(table);
+		try (RefCursor rc = t.allRefs()) {
+			assertTrue(rc.next());
+			Ref act = rc.getRef();
+			assertNotNull(act);
+			assertEquals(PACKED, act.getStorage());
+			assertTrue(act.isPeeled());
+			assertFalse(act.isSymbolic());
+			assertEquals(exp.getName(), act.getName());
+			assertEquals(exp.getObjectId(), act.getObjectId());
+			assertNull(act.getPeeledObjectId());
+			assertFalse(rc.wasDeleted());
+			assertFalse(rc.next());
+		}
+		try (RefCursor rc = t.seekRef(MASTER)) {
+			assertTrue(rc.next());
+			Ref act = rc.getRef();
+			assertNotNull(act);
+			assertEquals(exp.getName(), act.getName());
+			assertFalse(rc.next());
+		}
+	}
+

@@ -1,0 +1,20 @@
+	@Test
+	public void oneTagRef() throws IOException {
+		Ref exp = tag(V1_0, 1, 2);
+		byte[] table = write(exp);
+		assertEquals(24 + 4 + 5 + 2 + V1_0.length() + 40 + 68, table.length);
+
+		ReftableReader t = read(table);
+		try (RefCursor rc = t.allRefs()) {
+			assertTrue(rc.next());
+			Ref act = rc.getRef();
+			assertNotNull(act);
+			assertEquals(PACKED, act.getStorage());
+			assertTrue(act.isPeeled());
+			assertFalse(act.isSymbolic());
+			assertEquals(exp.getName(), act.getName());
+			assertEquals(exp.getObjectId(), act.getObjectId());
+			assertEquals(exp.getPeeledObjectId(), act.getPeeledObjectId());
+		}
+	}
+

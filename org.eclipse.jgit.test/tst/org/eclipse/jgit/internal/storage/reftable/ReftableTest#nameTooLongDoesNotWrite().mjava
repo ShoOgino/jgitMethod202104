@@ -1,0 +1,16 @@
+	@Test
+	public void nameTooLongDoesNotWrite() throws IOException {
+		try {
+			ReftableConfig cfg = new ReftableConfig();
+			cfg.setRefBlockSize(64);
+
+			ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+			ReftableWriter writer = new ReftableWriter(cfg).begin(buffer);
+			writer.writeRef(ref("refs/heads/i-am-not-a-teapot", 1));
+			writer.finish();
+			fail("expected BlockSizeTooSmallException");
+		} catch (BlockSizeTooSmallException e) {
+			assertEquals(84, e.getMinimumBlockSize());
+		}
+	}
+
