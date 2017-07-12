@@ -1,0 +1,30 @@
+	static List<Ref> readRefs(String inputFile) throws IOException {
+		List<Ref> refs = new ArrayList<>();
+		try (BufferedReader br = new BufferedReader(
+				new InputStreamReader(new FileInputStream(inputFile), UTF_8))) {
+			String line;
+			while ((line = br.readLine()) != null) {
+				ObjectId id = ObjectId.fromString(line.substring(0, 40));
+				String name = line.substring(41, line.length());
+				if (name.endsWith("^{}")) { //$NON-NLS-1$
+					int lastIdx = refs.size() - 1;
+					Ref last = refs.get(lastIdx);
+					refs.set(lastIdx, new ObjectIdRef.PeeledTag(PACKED,
+							last.getName(), last.getObjectId(), id));
+					continue;
+				}
+
+				Ref ref;
+				if (name.equals(HEAD)) {
+					ref = new SymbolicRef(name, new ObjectIdRef.Unpeeled(NEW,
+							R_HEADS + MASTER, null));
+				} else {
+					ref = new ObjectIdRef.PeeledNonTag(PACKED, name, id);
+				}
+				refs.add(ref);
+			}
+		}
+		Collections.sort(refs, (a, b) -> a.getName().compareTo(b.getName()));
+		return refs;
+	}
+

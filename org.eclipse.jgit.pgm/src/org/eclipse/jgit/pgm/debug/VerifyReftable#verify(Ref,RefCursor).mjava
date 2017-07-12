@@ -1,0 +1,42 @@
+	@SuppressWarnings("nls")
+	private void verify(Ref exp, RefCursor rc) throws IOException {
+		if (!rc.next()) {
+			throw die("ended before " + exp.getName());
+		}
+
+		Ref act = rc.getRef();
+		if (!exp.getName().equals(act.getName())) {
+			throw die(String.format("expected %s, found %s",
+					exp.getName(),
+					act.getName()));
+		}
+
+		if (exp.isSymbolic()) {
+			if (!act.isSymbolic()) {
+				throw die("expected " + act.getName() + " to be symbolic");
+			}
+			if (!exp.getTarget().getName().equals(act.getTarget().getName())) {
+				throw die(String.format("expected %s to be %s, found %s",
+						exp.getName(),
+						exp.getLeaf().getName(),
+						act.getLeaf().getName()));
+			}
+			return;
+		}
+
+		if (!AnyObjectId.equals(exp.getObjectId(), act.getObjectId())) {
+			throw die(String.format("expected %s to be %s, found %s",
+					exp.getName(),
+					id(exp.getObjectId()),
+					id(act.getObjectId())));
+		}
+
+		if (exp.getPeeledObjectId() != null
+				&& !AnyObjectId.equals(exp.getPeeledObjectId(), act.getPeeledObjectId())) {
+			throw die(String.format("expected %s to be %s, found %s",
+					exp.getName(),
+					id(exp.getPeeledObjectId()),
+					id(act.getPeeledObjectId())));
+		}
+	}
+

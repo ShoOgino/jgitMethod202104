@@ -1,0 +1,80 @@
+	@SuppressWarnings({ "nls", "boxing" })
+	@Override
+	protected void run() throws Exception {
+		List<Ref> refs = readRefs(in);
+		List<LogEntry> logs = readLog(reflogIn);
+
+		ReftableWriter.Stats stats;
+		try (OutputStream os = new FileOutputStream(out)) {
+			ReftableConfig cfg = new ReftableConfig();
+			cfg.setIndexObjects(!noIndexObjects);
+			if (refBlockSize > 0) {
+				cfg.setRefBlockSize(refBlockSize);
+			}
+			if (logBlockSize > 0) {
+				cfg.setLogBlockSize(logBlockSize);
+			}
+			if (restartInterval > 0) {
+				cfg.setRestartInterval(restartInterval);
+			}
+			if (indexLevels > 0) {
+				cfg.setMaxIndexLevels(indexLevels);
+			}
+
+			ReftableWriter w = new ReftableWriter(cfg);
+			w.setMinUpdateIndex(min(logs)).setMaxUpdateIndex(max(logs));
+			w.begin(os);
+			w.sortAndWriteRefs(refs);
+			for (LogEntry e : logs) {
+				w.writeLog(e.ref, e.updateIndex, e.who,
+						e.oldId, e.newId, e.message);
+			}
+			stats = w.finish().getStats();
+		}
+
+		double fileMiB = ((double) stats.totalBytes()) / MIB;
+		printf("Summary:");
+		printf("  file sz : %.1f MiB (%d bytes)", fileMiB, stats.totalBytes());
+		printf("  padding : %d KiB", stats.paddingBytes() / KIB);
+		errw.println();
+
+		printf("Refs:");
+		printf("  ref blk : %d", stats.refBlockSize());
+		printf("  restarts: %d", stats.restartInterval());
+		printf("  refs    : %d", stats.refCount());
+		if (stats.refIndexLevels() > 0) {
+			int idxSize = (int) Math.round(((double) stats.refIndexSize()) / KIB);
+			printf("  idx sz  : %d KiB", idxSize);
+			printf("  idx lvl : %d", stats.refIndexLevels());
+		}
+		printf("  avg ref : %d bytes", stats.refBytes() / refs.size());
+		errw.println();
+
+		if (stats.objCount() > 0) {
+			int objMiB = (int) Math.round(((double) stats.objBytes()) / MIB);
+			int idLen = stats.objIdLength();
+			printf("Objects:");
+			printf("  obj blk : %d", stats.refBlockSize());
+			printf("  restarts: %d", stats.restartInterval());
+			printf("  objects : %d", stats.objCount());
+			printf("  obj sz  : %d MiB (%d bytes)", objMiB, stats.objBytes());
+			if (stats.objIndexSize() > 0) {
+				int s = (int) Math.round(((double) stats.objIndexSize()) / KIB);
+				printf("  idx sz  : %d KiB", s);
+				printf("  idx lvl : %d", stats.objIndexLevels());
+			}
+			printf("  id len  : %d bytes (%d hex digits)", idLen, 2 * idLen);
+			printf("  avg obj : %d bytes", stats.objBytes() / stats.objCount());
+			errw.println();
+		}
+		if (stats.logCount() > 0) {
+			int logMiB = (int) Math.round(((double) stats.logBytes()) / MIB);
+			printf("Log:");
+			printf("  log blk : %d", stats.logBlockSize());
+			printf("  logs    : %d", stats.logCount());
+			printf("  log sz  : %d MiB (%d bytes)", logMiB, stats.logBytes());
+			printf("  avg log : %d bytes", stats.logBytes() / logs.size());
+			errw.println();
+		}
+	}
+

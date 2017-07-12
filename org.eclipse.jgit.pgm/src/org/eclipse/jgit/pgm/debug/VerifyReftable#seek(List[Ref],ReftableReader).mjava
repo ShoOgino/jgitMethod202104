@@ -1,0 +1,20 @@
+	@SuppressWarnings("nls")
+	private void seek(List<Ref> refs, ReftableReader reader)
+			throws IOException {
+		List<Ref> rnd = new ArrayList<>(refs);
+		Collections.shuffle(rnd, new Random(SEED1));
+
+		TextProgressMonitor pm = new TextProgressMonitor(errw);
+		pm.beginTask("random seek", rnd.size());
+		for (Ref exp : rnd) {
+			try (RefCursor rc = reader.seekRef(exp.getName())) {
+				verify(exp, rc);
+				if (rc.next()) {
+					throw die("should not have ref after " + exp.getName());
+				}
+			}
+			pm.update(1);
+		}
+		pm.endTask();
+	}
+

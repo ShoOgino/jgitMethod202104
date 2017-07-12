@@ -1,0 +1,16 @@
+	@SuppressWarnings("nls")
+	private void scan(List<Ref> refs, ReftableReader reader)
+			throws IOException {
+		errw.print(String.format("%-20s", "sequential scan..."));
+		errw.flush();
+		try (RefCursor rc = reader.allRefs()) {
+			for (Ref exp : refs) {
+				verify(exp, rc);
+			}
+			if (rc.next()) {
+				throw die("expected end of table");
+			}
+		}
+		errw.println(" OK");
+	}
+

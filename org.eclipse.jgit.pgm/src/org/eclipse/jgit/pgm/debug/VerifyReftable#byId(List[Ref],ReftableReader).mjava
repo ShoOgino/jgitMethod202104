@@ -1,0 +1,22 @@
+	@SuppressWarnings("nls")
+	private void byId(List<Ref> refs, ReftableReader reader)
+			throws IOException {
+		Map<ObjectId, List<Ref>> want = groupById(refs);
+		List<List<Ref>> rnd = new ArrayList<>(want.values());
+		Collections.shuffle(rnd, new Random(SEED2));
+
+		TextProgressMonitor pm = new TextProgressMonitor(errw);
+		pm.beginTask("byObjectId", rnd.size());
+		for (List<Ref> exp : rnd) {
+			Collections.sort(exp, RefComparator.INSTANCE);
+			ObjectId id = exp.get(0).getObjectId();
+			try (RefCursor rc = reader.byObjectId(id)) {
+				for (Ref r : exp) {
+					verify(r, rc);
+				}
+			}
+			pm.update(1);
+		}
+		pm.endTask();
+	}
+

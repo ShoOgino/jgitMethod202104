@@ -1,0 +1,34 @@
+	@SuppressWarnings({ "nls", "boxing" })
+	private void byIdCold(ObjectId id) throws Exception {
+		long start, tot;
+
+		int lsTries = Math.min(tries, 64);
+		start = System.nanoTime();
+		for (int i = 0; i < lsTries; i++) {
+			for (Ref r : readLsRemote()) {
+				if (id.equals(r.getObjectId())) {
+					continue;
+				}
+			}
+		}
+		tot = System.nanoTime() - start;
+		printf("%12s %10d usec  %9.1f usec/run  %5d runs", "packed-refs",
+				tot / 1000, (((double) tot) / lsTries) / 1000, lsTries);
+
+		start = System.nanoTime();
+		for (int i = 0; i < tries; i++) {
+			try (FileInputStream in = new FileInputStream(reftablePath);
+					BlockSource src = BlockSource.from(in);
+					ReftableReader reader = new ReftableReader(src)) {
+				try (RefCursor rc = reader.byObjectId(id)) {
+					while (rc.next()) {
+						rc.getRef();
+					}
+				}
+			}
+		}
+		tot = System.nanoTime() - start;
+		printf("%12s %10d usec  %9.1f usec/run  %5d runs", "reftable",
+				tot / 1000, (((double) tot) / tries) / 1000, tries);
+	}
+

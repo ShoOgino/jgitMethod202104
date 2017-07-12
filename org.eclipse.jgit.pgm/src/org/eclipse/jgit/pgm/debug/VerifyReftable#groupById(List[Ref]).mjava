@@ -1,0 +1,16 @@
+	private static Map<ObjectId, List<Ref>> groupById(List<Ref> refs) {
+		Map<ObjectId, List<Ref>> m = new HashMap<>();
+		for (Ref r : refs) {
+			ObjectId id = r.getObjectId();
+			if (id != null) {
+				List<Ref> c = m.get(id);
+				if (c == null) {
+					c = new ArrayList<>(2);
+					m.put(id, c);
+				}
+				c.add(r);
+			}
+		}
+		return m;
+	}
+

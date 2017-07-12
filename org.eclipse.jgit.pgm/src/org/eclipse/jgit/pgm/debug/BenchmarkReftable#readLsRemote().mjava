@@ -1,0 +1,30 @@
+	private RefList<Ref> readLsRemote()
+			throws IOException, FileNotFoundException {
+		RefList.Builder<Ref> list = new RefList.Builder<>();
+		try (BufferedReader br = new BufferedReader(new InputStreamReader(
+				new FileInputStream(lsRemotePath), UTF_8))) {
+			Ref last = null;
+			String line;
+			while ((line = br.readLine()) != null) {
+				ObjectId id = ObjectId.fromString(line.substring(0, 40));
+				String name = line.substring(41, line.length());
+				if (last != null && name.endsWith("^{}")) { //$NON-NLS-1$
+					last = new ObjectIdRef.PeeledTag(PACKED, last.getName(),
+							last.getObjectId(), id);
+					list.set(list.size() - 1, last);
+					continue;
+				}
+
+				if (name.equals(HEAD)) {
+					last = new SymbolicRef(name, new ObjectIdRef.Unpeeled(NEW,
+							R_HEADS + MASTER, null));
+				} else {
+					last = new ObjectIdRef.PeeledNonTag(PACKED, name, id);
+				}
+				list.add(last);
+			}
+		}
+		list.sort();
+		return list.toRefList();
+	}
+
