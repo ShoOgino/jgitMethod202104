@@ -1,0 +1,13 @@
+	private static void assertSeek(List<Ref> refs, Reftable t)
+			throws IOException {
+		for (Ref exp : refs) {
+			try (RefCursor rc = t.seekRef(exp.getName())) {
+				assertTrue("has " + exp.getName(), rc.next());
+				Ref act = rc.getRef();
+				assertEquals(exp.getName(), act.getName());
+				assertEquals(exp.getObjectId(), act.getObjectId());
+				assertFalse(rc.next());
+			}
+		}
+	}
+
