@@ -1,0 +1,10 @@
+	@Override
+	public LogCursor seekLog(String refName, long updateIdx)
+			throws IOException {
+		MergedLogCursor m = new MergedLogCursor();
+		for (int i = 0; i < tables.length; i++) {
+			m.add(new LogQueueEntry(tables[i].seekLog(refName, updateIdx), i));
+		}
+		return m;
+	}
+

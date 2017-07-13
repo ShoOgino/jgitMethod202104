@@ -1,0 +1,24 @@
+	@Test
+	public void scanIncludeDeletes() throws IOException {
+		List<Ref> delta1 = Arrays.asList(ref("refs/heads/next", 4));
+		List<Ref> delta2 = Arrays.asList(delete("refs/heads/next"));
+		List<Ref> delta3 = Arrays.asList(ref("refs/heads/master", 8));
+
+		MergedReftable mr = merge(write(delta1), write(delta2), write(delta3));
+		mr.setIncludeDeletes(true);
+		try (RefCursor rc = mr.allRefs()) {
+			assertTrue(rc.next());
+			Ref r = rc.getRef();
+			assertEquals("refs/heads/master", r.getName());
+			assertEquals(id(8), r.getObjectId());
+
+			assertTrue(rc.next());
+			r = rc.getRef();
+			assertEquals("refs/heads/next", r.getName());
+			assertEquals(NEW, r.getStorage());
+			assertNull(r.getObjectId());
+
+			assertFalse(rc.next());
+		}
+	}
+

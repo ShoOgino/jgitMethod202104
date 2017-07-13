@@ -1,0 +1,16 @@
+	@Test
+	public void deleteIsHidden() throws IOException {
+		List<Ref> delta1 = Arrays.asList(
+				ref("refs/heads/apple", 1),
+				ref("refs/heads/master", 2));
+		List<Ref> delta2 = Arrays.asList(delete("refs/heads/apple"));
+
+		MergedReftable mr = merge(write(delta1), write(delta2));
+		try (RefCursor rc = mr.allRefs()) {
+			assertTrue(rc.next());
+			assertEquals("refs/heads/master", rc.getRef().getName());
+			assertEquals(id(2), rc.getRef().getObjectId());
+			assertFalse(rc.next());
+		}
+	}
+

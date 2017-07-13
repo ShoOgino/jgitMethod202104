@@ -1,0 +1,14 @@
+	@Test
+	public void noTables() throws IOException {
+		MergedReftable mr = merge(new byte[0][]);
+		try (RefCursor rc = mr.allRefs()) {
+			assertFalse(rc.next());
+		}
+		try (RefCursor rc = mr.seekRef(HEAD)) {
+			assertFalse(rc.next());
+		}
+		try (RefCursor rc = mr.seekRef(R_HEADS)) {
+			assertFalse(rc.next());
+		}
+	}
+

@@ -1,0 +1,11 @@
+		private void skipShadowedRefs(String name) throws IOException {
+			for (;;) {
+				RefQueueEntry t = head != null ? head : queue.peek();
+				if (t != null && name.equals(t.name())) {
+					add(poll());
+				} else {
+					break;
+				}
+			}
+		}
+

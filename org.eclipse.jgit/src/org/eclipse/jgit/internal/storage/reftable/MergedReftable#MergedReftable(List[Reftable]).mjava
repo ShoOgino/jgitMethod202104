@@ -1,0 +1,22 @@
+	/**
+	 * Initialize a merged table reader.
+	 * <p>
+	 * The tables in {@code tableStack} will be closed when this
+	 * {@code MergedReftable} is closed.
+	 *
+	 * @param tableStack
+	 *            stack of tables to read from. The base of the stack is at
+	 *            index 0, the most recent should be at the top of the stack at
+	 *            {@code tableStack.size() - 1}. The top of the stack (higher
+	 *            index) shadows the base of the stack (lower index).
+	 */
+	public MergedReftable(List<Reftable> tableStack) {
+		tables = tableStack.toArray(new Reftable[0]);
+
+		// Tables must expose deletes to this instance to correctly
+		// shadow references from lower tables.
+		for (Reftable t : tables) {
+			t.setIncludeDeletes(true);
+		}
+	}
+

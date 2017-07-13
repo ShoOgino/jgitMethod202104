@@ -1,0 +1,13 @@
+		static int compare(LogQueueEntry a, LogQueueEntry b) {
+			int cmp = a.name().compareTo(b.name());
+			if (cmp == 0) {
+				// higher update index sorts first.
+				cmp = Long.signum(b.index() - a.index());
+			}
+			if (cmp == 0) {
+				// higher index comes first.
+				cmp = b.stackIdx - a.stackIdx;
+			}
+			return cmp;
+		}
+

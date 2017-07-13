@@ -1,0 +1,23 @@
+		void add(RefQueueEntry t) throws IOException {
+			// Common case is many iterations over the same RefQueueEntry
+			// for the bottom of the stack (scanning all refs). Its almost
+			// always less than the top of the queue. Avoid the queue's
+			// O(log N) insertion and removal costs for this common case.
+			if (!t.rc.next()) {
+				t.rc.close();
+			} else if (head == null) {
+				RefQueueEntry p = queue.peek();
+				if (p == null || RefQueueEntry.compare(t, p) < 0) {
+					head = t;
+				} else {
+					head = queue.poll();
+					queue.add(t);
+				}
+			} else if (RefQueueEntry.compare(t, head) > 0) {
+				queue.add(t);
+			} else {
+				queue.add(head);
+				head = t;
+			}
+		}
+

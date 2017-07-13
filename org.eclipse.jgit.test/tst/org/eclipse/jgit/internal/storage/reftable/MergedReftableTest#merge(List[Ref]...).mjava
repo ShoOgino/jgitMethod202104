@@ -1,0 +1,18 @@
+	@SafeVarargs
+	private static List<Ref> merge(List<Ref>... tables) {
+		Map<String, Ref> expect = new HashMap<>();
+		for (List<Ref> t : tables) {
+			for (Ref r : t) {
+				if (r.getStorage() == NEW && r.getObjectId() == null) {
+					expect.remove(r.getName());
+				} else {
+					expect.put(r.getName(), r);
+				}
+			}
+		}
+
+		List<Ref> expected = new ArrayList<>(expect.values());
+		Collections.sort(expected, RefComparator.INSTANCE);
+		return expected;
+	}
+

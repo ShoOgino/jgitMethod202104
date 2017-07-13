@@ -1,0 +1,16 @@
+	@Test
+	public void twoTableSeek() throws IOException {
+		List<Ref> delta1 = Arrays.asList(
+				ref("refs/heads/apple", 1),
+				ref("refs/heads/master", 2));
+		List<Ref> delta2 = Arrays.asList(ref("refs/heads/banana", 3));
+
+		MergedReftable mr = merge(write(delta1), write(delta2));
+		try (RefCursor rc = mr.seekRef("refs/heads/master")) {
+			assertTrue(rc.next());
+			assertEquals("refs/heads/master", rc.getRef().getName());
+			assertEquals(id(2), rc.getRef().getObjectId());
+			assertFalse(rc.next());
+		}
+	}
+

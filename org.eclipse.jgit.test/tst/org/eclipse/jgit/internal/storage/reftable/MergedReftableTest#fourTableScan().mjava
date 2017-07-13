@@ -1,0 +1,36 @@
+	@SuppressWarnings("boxing")
+	@Test
+	public void fourTableScan() throws IOException {
+		List<Ref> base = new ArrayList<>();
+		for (int i = 1; i <= 567; i++) {
+			base.add(ref(String.format("refs/heads/%03d", i), i));
+		}
+
+		List<Ref> delta1 = Arrays.asList(
+				ref("refs/heads/next", 4),
+				ref(String.format("refs/heads/%03d", 55), 4096));
+		List<Ref> delta2 = Arrays.asList(
+				delete("refs/heads/next"),
+				ref(String.format("refs/heads/%03d", 55), 8192));
+		List<Ref> delta3 = Arrays.asList(
+				ref("refs/heads/master", 4242),
+				ref(String.format("refs/heads/%03d", 42), 5120),
+				ref(String.format("refs/heads/%03d", 98), 6120));
+
+		List<Ref> expected = merge(base, delta1, delta2, delta3);
+		MergedReftable mr = merge(
+				write(base),
+				write(delta1),
+				write(delta2),
+				write(delta3));
+		try (RefCursor rc = mr.allRefs()) {
+			for (Ref exp : expected) {
+				assertTrue("has " + exp.getName(), rc.next());
+				Ref act = rc.getRef();
+				assertEquals(exp.getName(), act.getName());
+				assertEquals(exp.getObjectId(), act.getObjectId());
+			}
+			assertFalse(rc.next());
+		}
+	}
+
