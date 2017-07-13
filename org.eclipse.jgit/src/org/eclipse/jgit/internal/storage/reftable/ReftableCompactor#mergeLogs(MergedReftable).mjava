@@ -1,0 +1,37 @@
+	private void mergeLogs(MergedReftable mr) throws IOException {
+		if (oldestReflogTimeMillis == Long.MAX_VALUE) {
+			return;
+		}
+
+		try (LogCursor lc = mr.allLogs()) {
+			while (lc.next()) {
+				long updateIndex = lc.getUpdateIndex();
+				if (updateIndex < minUpdateIndex
+						|| updateIndex > maxUpdateIndex) {
+					// Cannot merge log records outside the header's range.
+					continue;
+				}
+
+				String refName = lc.getRefName();
+				ReflogEntry log = lc.getReflogEntry();
+				if (log == null) {
+					if (includeDeletes) {
+						writer.deleteLog(refName, updateIndex);
+					}
+					continue;
+				}
+
+				PersonIdent who = log.getWho();
+				if (who.getWhen().getTime() >= oldestReflogTimeMillis) {
+					writer.writeLog(
+							refName,
+							updateIndex,
+							who,
+							log.getOldId(),
+							log.getNewId(),
+							log.getComment());
+				}
+			}
+		}
+	}
+
