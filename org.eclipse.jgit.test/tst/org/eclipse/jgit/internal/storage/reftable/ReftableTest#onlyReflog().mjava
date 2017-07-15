@@ -1,0 +1,48 @@
+	@Test
+	public void onlyReflog() throws IOException {
+		PersonIdent who = new PersonIdent("Log", "Ger", 1500079709, -8 * 60);
+		String msg = "test";
+
+		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+		ReftableWriter writer = new ReftableWriter()
+				.setMinUpdateIndex(1)
+				.setMaxUpdateIndex(1)
+				.begin(buffer);
+		writer.writeLog(MASTER, 1, who, ObjectId.zeroId(), id(1), msg);
+		writer.writeLog(NEXT, 1, who, ObjectId.zeroId(), id(2), msg);
+		writer.finish();
+		byte[] table = buffer.toByteArray();
+		stats = writer.getStats();
+		assertEquals(170, table.length);
+		assertEquals(0, stats.refCount());
+		assertEquals(0, stats.refBytes());
+		assertEquals(0, stats.refIndexLevels());
+
+		ReftableReader t = read(table);
+		try (RefCursor rc = t.allRefs()) {
+			assertFalse(rc.next());
+		}
+		try (RefCursor rc = t.seekRef("refs/heads/")) {
+			assertFalse(rc.next());
+		}
+		try (LogCursor lc = t.allLogs()) {
+			assertTrue(lc.next());
+			assertEquals(MASTER, lc.getRefName());
+			assertEquals(1, lc.getUpdateIndex());
+			assertEquals(ObjectId.zeroId(), lc.getReflogEntry().getOldId());
+			assertEquals(id(1), lc.getReflogEntry().getNewId());
+			assertEquals(who, lc.getReflogEntry().getWho());
+			assertEquals(msg, lc.getReflogEntry().getComment());
+
+			assertTrue(lc.next());
+			assertEquals(NEXT, lc.getRefName());
+			assertEquals(1, lc.getUpdateIndex());
+			assertEquals(ObjectId.zeroId(), lc.getReflogEntry().getOldId());
+			assertEquals(id(2), lc.getReflogEntry().getNewId());
+			assertEquals(who, lc.getReflogEntry().getWho());
+			assertEquals(msg, lc.getReflogEntry().getComment());
+
+			assertFalse(lc.next());
+		}
+	}
+
