@@ -1,0 +1,29 @@
+	@Test
+	public void oneRefWrongOldValue() throws IOException {
+		writeLooseRef("refs/heads/master", A);
+		List<ReceiveCommand> commands = Arrays.asList(
+				new ReceiveCommand(B, B, "refs/heads/master",
+						ReceiveCommand.Type.UPDATE),
+				new ReceiveCommand(zeroId(), B, "refs/heads/foo2",
+						ReceiveCommand.Type.CREATE));
+		BatchRefUpdate batchUpdate = newBatchUpdate();
+		batchUpdate.setAllowNonFastForwards(true);
+		batchUpdate.addCommand(commands);
+		batchUpdate.execute(new RevWalk(diskRepo), new StrictWorkMonitor());
+		Map<String, Ref> refs = refdir.getRefs(RefDatabase.ALL);
+		assertEquals(ReceiveCommand.Result.LOCK_FAILURE,
+				commands.get(0).getResult());
+
+		if (atomic) {
+			assertTrue(ReceiveCommand.isTransactionAborted(commands.get(1)));
+			assertEquals("[HEAD, refs/heads/master]", refs.keySet().toString());
+			assertEquals(A.getId(), refs.get("refs/heads/master").getObjectId());
+		} else {
+			assertEquals(ReceiveCommand.Result.OK, commands.get(1).getResult());
+			assertEquals("[HEAD, refs/heads/foo2, refs/heads/master]", refs
+					.keySet().toString());
+			assertEquals(A.getId(), refs.get("refs/heads/master").getObjectId());
+			assertEquals(B.getId(), refs.get("refs/heads/foo2").getObjectId());
+		}
+	}
+

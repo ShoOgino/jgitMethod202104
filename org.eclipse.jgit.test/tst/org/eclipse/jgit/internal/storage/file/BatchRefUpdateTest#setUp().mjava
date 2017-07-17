@@ -1,0 +1,13 @@
+	@Override
+	@Before
+	public void setUp() throws Exception {
+		super.setUp();
+
+		diskRepo = createBareRepository();
+		refdir = (RefDirectory) diskRepo.getRefDatabase();
+
+		repo = new TestRepository<>(diskRepo);
+		A = repo.commit().create();
+		B = repo.commit(repo.getRevWalk().parseCommit(A));
+	}
+

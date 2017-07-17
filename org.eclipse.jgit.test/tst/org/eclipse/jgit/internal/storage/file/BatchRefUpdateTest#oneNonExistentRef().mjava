@@ -1,21 +1,25 @@
 	@Test
-	public void testBatchRefUpdateOneNonExistentRefNonAtomic()
-			throws IOException {
+	public void oneNonExistentRef() throws IOException {
 		List<ReceiveCommand> commands = Arrays.asList(
 				new ReceiveCommand(A, B, "refs/heads/foo1",
 						ReceiveCommand.Type.UPDATE),
 				new ReceiveCommand(zeroId(), B, "refs/heads/foo2",
 						ReceiveCommand.Type.CREATE));
-		BatchRefUpdate batchUpdate = refdir.newBatchUpdate();
-		batchUpdate.setAtomic(false);
+		BatchRefUpdate batchUpdate = newBatchUpdate();
 		batchUpdate.setAllowNonFastForwards(true);
 		batchUpdate.addCommand(commands);
 		batchUpdate.execute(new RevWalk(diskRepo), new StrictWorkMonitor());
 		Map<String, Ref> refs = refdir.getRefs(RefDatabase.ALL);
 		assertEquals(ReceiveCommand.Result.LOCK_FAILURE,
 				commands.get(0).getResult());
-		assertEquals(ReceiveCommand.Result.OK, commands.get(1).getResult());
-		assertEquals("[refs/heads/foo2]", refs.keySet().toString());
-		assertEquals(B.getId(), refs.get("refs/heads/foo2").getObjectId());
+
+		if (atomic) {
+			assertTrue(ReceiveCommand.isTransactionAborted(commands.get(1)));
+			assertEquals("[]", refs.keySet().toString());
+		} else {
+			assertEquals(ReceiveCommand.Result.OK, commands.get(1).getResult());
+			assertEquals("[refs/heads/foo2]", refs.keySet().toString());
+			assertEquals(B.getId(), refs.get("refs/heads/foo2").getObjectId());
+		}
 	}
 
