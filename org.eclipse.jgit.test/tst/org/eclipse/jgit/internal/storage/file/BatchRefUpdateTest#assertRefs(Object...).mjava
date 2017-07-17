@@ -1,0 +1,30 @@
+	private void assertRefs(Object... args) throws IOException {
+		if (args.length % 2 != 0) {
+			throw new IllegalArgumentException(
+					"expected even number of args: " + Arrays.toString(args));
+		}
+
+		Map<String, AnyObjectId> expected = new LinkedHashMap<>();
+		for (int i = 0; i < args.length; i += 2) {
+			expected.put((String) args[i], (AnyObjectId) args[i + 1]);
+		}
+
+		Map<String, Ref> refs = refdir.getRefs(RefDatabase.ALL);
+		Ref actualHead = refs.remove(Constants.HEAD);
+		if (actualHead != null) {
+			String actualLeafName = actualHead.getLeaf().getName();
+			assertEquals(
+					"expected HEAD to point to refs/heads/master, got: " + actualLeafName,
+					"refs/heads/master", actualLeafName);
+			AnyObjectId expectedMaster = expected.get("refs/heads/master");
+			assertNotNull("expected master ref since HEAD exists", expectedMaster);
+			assertEquals(expectedMaster, actualHead.getObjectId());
+		}
+
+		Map<String, AnyObjectId> actual = new LinkedHashMap<>();
+		refs.forEach((n, r) -> actual.put(n, r.getObjectId()));
+
+		assertEquals(expected.keySet(), actual.keySet());
+		actual.forEach((n, a) -> assertEquals(n, expected.get(n), a));
+	}
+

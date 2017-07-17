@@ -1,10 +1,11 @@
-	private BatchRefUpdate newBatchUpdate() {
+	private BatchRefUpdate newBatchUpdate(List<ReceiveCommand> cmds) {
 		BatchRefUpdate u = refdir.newBatchUpdate();
 		if (atomic) {
 			assertTrue(u.isAtomic());
 		} else {
 			u.setAtomic(false);
 		}
+		u.addCommand(cmds);
 		return u;
 	}
 

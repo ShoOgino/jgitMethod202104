@@ -1,0 +1,19 @@
+	private void assertResults(
+			List<ReceiveCommand> cmds, Result... expected) {
+		if (expected.length != cmds.size()) {
+			throw new IllegalArgumentException(
+					"expected " + cmds.size() + " result args");
+		}
+		for (int i = 0; i < cmds.size(); i++) {
+			ReceiveCommand c = cmds.get(i);
+			Result r = expected[i];
+			assertTrue(
+					String.format(
+							"result of command (%d) should be %s: %s %s%s",
+							Integer.valueOf(i), r, c,
+							c.getResult(),
+							c.getMessage() != null ? " (" + c.getMessage() + ")" : ""),
+					r.p.test(c));
+		}
+	}
+

@@ -1,30 +1,20 @@
 	@Test
 	public void addMissingObject() throws IOException {
 		writeLooseRef("refs/heads/master", A);
+
 		ObjectId bad =
 				ObjectId.fromString("deadbeefdeadbeefdeadbeefdeadbeefdeadbeef");
-		List<ReceiveCommand> commands = Arrays.asList(
-				new ReceiveCommand(A, B, "refs/heads/master",
-						ReceiveCommand.Type.UPDATE),
-				new ReceiveCommand(zeroId(), bad, "refs/heads/foo2",
-						ReceiveCommand.Type.CREATE));
-		BatchRefUpdate batchUpdate = newBatchUpdate();
-		batchUpdate.setAllowNonFastForwards(true);
-		batchUpdate.addCommand(commands);
-		batchUpdate.execute(new RevWalk(diskRepo), NullProgressMonitor.INSTANCE);
-		Map<String, Ref> refs = refdir.getRefs(RefDatabase.ALL);
-		assertEquals(ReceiveCommand.Result.REJECTED_MISSING_OBJECT,
-				commands.get(1).getResult());
+		List<ReceiveCommand> cmds = Arrays.asList(
+				new ReceiveCommand(A, B, "refs/heads/master", UPDATE),
+				new ReceiveCommand(zeroId(), bad, "refs/heads/foo2", CREATE));
+		execute(newBatchUpdate(cmds).setAllowNonFastForwards(true), false);
 
 		if (atomic) {
-			assertTrue(ReceiveCommand.isTransactionAborted(commands.get(0)));
-			assertEquals("[HEAD, refs/heads/master]", refs.keySet().toString());
-			assertEquals(A.getId(), refs.get("refs/heads/master").getObjectId());
+			assertResults(cmds, TRANSACTION_ABORTED, REJECTED_MISSING_OBJECT);
+			assertRefs("refs/heads/master", A);
 		} else {
-			assertEquals(ReceiveCommand.Result.OK, commands.get(0).getResult());
-			assertEquals("[HEAD, refs/heads/master]", refs.keySet()
-					.toString());
-			assertEquals(B.getId(), refs.get("refs/heads/master").getObjectId());
+			assertResults(cmds, OK, REJECTED_MISSING_OBJECT);
+			assertRefs("refs/heads/master", B);
 		}
 	}
 
