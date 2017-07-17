@@ -8,7 +8,7 @@
 				return idx;
 		}
 
-		if (!packDesc.hasFileExt(PackExt.BITMAP_INDEX))
+		if (!desc.hasFileExt(BITMAP_INDEX))
 			return null;
 
 		synchronized (initLock) {
@@ -19,14 +19,14 @@
 					return idx;
 			}
 			if (bitmapKey == null) {
-				bitmapKey = new DfsStreamKey();
+				bitmapKey = desc.getStreamKey(BITMAP_INDEX);
 			}
 			long size;
 			PackBitmapIndex idx;
 			try {
 				ctx.stats.readBitmap++;
 				long start = System.nanoTime();
-				ReadableChannel rc = ctx.db.openFile(packDesc, BITMAP_INDEX);
+				ReadableChannel rc = ctx.db.openFile(desc, BITMAP_INDEX);
 				try {
 					InputStream in = Channels.newInputStream(rc);
 					int wantSize = 8192;
@@ -47,13 +47,13 @@
 			} catch (EOFException e) {
 				IOException e2 = new IOException(MessageFormat.format(
 						DfsText.get().shortReadOfIndex,
-						packDesc.getFileName(BITMAP_INDEX)));
+						desc.getFileName(BITMAP_INDEX)));
 				e2.initCause(e);
 				throw e2;
 			} catch (IOException e) {
 				IOException e2 = new IOException(MessageFormat.format(
 						DfsText.get().cannotReadIndex,
-						packDesc.getFileName(BITMAP_INDEX)));
+						desc.getFileName(BITMAP_INDEX)));
 				e2.initCause(e);
 				throw e2;
 			}

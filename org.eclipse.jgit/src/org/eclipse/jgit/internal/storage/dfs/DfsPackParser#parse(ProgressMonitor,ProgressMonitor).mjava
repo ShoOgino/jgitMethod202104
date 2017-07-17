@@ -21,7 +21,7 @@
 			objdb.commitPack(Collections.singletonList(packDsc), null);
 			rollback = false;
 
-			DfsPackFile p = blockCache.getOrCreate(packDsc, packKey);
+			DfsPackFile p = new DfsPackFile(blockCache, packDsc);
 			p.setBlockSize(blockSize);
 			if (packIndex != null)
 				p.setPackIndex(packIndex);

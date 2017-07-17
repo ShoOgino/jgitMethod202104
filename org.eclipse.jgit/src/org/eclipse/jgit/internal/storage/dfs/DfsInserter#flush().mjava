@@ -18,7 +18,7 @@
 		db.commitPack(Collections.singletonList(packDsc), null);
 		rollback = false;
 
-		DfsPackFile p = cache.getOrCreate(packDsc, packKey);
+		DfsPackFile p = new DfsPackFile(cache, packDsc);
 		if (index != null)
 			p.setPackIndex(index);
 		db.addPack(p);

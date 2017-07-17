@@ -5,11 +5,11 @@
 	 *            cache that owns the pack data.
 	 * @param desc
 	 *            description of the pack within the DFS.
-	 * @param key
-	 *            interned key used to identify blocks in the block cache.
 	 */
-	DfsPackFile(DfsBlockCache cache, DfsPackDescription desc, DfsStreamKey key) {
-		super(cache, key, desc, PACK);
+	DfsPackFile(DfsBlockCache cache, DfsPackDescription desc) {
+		super(cache, desc, PACK);
+		idxKey = desc.getStreamKey(INDEX);
+		reverseIdxKey = idxKey.derive("r"); //$NON-NLS-1$
 		length = desc.getFileSize(PACK);
 		if (length <= 0)
 			length = -1;

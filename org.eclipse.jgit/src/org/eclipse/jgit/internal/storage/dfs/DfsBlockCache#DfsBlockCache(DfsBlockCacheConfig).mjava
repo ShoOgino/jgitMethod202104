@@ -15,12 +15,8 @@
 		blockSizeShift = Integer.numberOfTrailingZeros(blockSize);
 
 		clockLock = new ReentrantLock(true /* fair */);
-		clockHand = new Ref<>(new DfsStreamKey(), -1, 0, null);
+		clockHand = new Ref<>(DfsStreamKey.of(""), -1, 0, null); //$NON-NLS-1$
 		clockHand.next = clockHand;
-
-		packCache = new ConcurrentHashMap<>(
-				16, 0.75f, 1);
-		packFiles = Collections.unmodifiableCollection(packCache.values());
 
 		statHit = new AtomicLong();
 		statMiss = new AtomicLong();

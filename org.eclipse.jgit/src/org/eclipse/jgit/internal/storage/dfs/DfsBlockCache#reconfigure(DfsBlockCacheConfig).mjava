@@ -11,13 +11,6 @@
 	 *             settings, usually too low of a limit.
 	 */
 	public static void reconfigure(DfsBlockCacheConfig cfg) {
-		DfsBlockCache nc = new DfsBlockCache(cfg);
-		DfsBlockCache oc = cache;
-		cache = nc;
-
-		if (oc != null) {
-			for (DfsPackFile pack : oc.getPackFiles())
-				pack.key.cachedSize.set(0);
-		}
+		cache = new DfsBlockCache(cfg);
 	}
 
