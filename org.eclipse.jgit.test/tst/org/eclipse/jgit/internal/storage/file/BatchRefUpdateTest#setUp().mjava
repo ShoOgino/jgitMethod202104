@@ -4,6 +4,12 @@
 		super.setUp();
 
 		diskRepo = createBareRepository();
+		StoredConfig cfg = diskRepo.getConfig();
+		cfg.load();
+		cfg.setBoolean(ConfigConstants.CONFIG_CORE_SECTION, null,
+				ConfigConstants.CONFIG_KEY_LOGALLREFUPDATES, true);
+		cfg.save();
+
 		refdir = (RefDirectory) diskRepo.getRefDatabase();
 
 		repo = new TestRepository<>(diskRepo);

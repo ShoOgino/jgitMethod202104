@@ -1,0 +1,20 @@
+	@Test
+	public void reflogDelete() throws IOException {
+		writeRef("refs/heads/master", A);
+		writeRef("refs/heads/branch", A);
+		assertEquals(
+				2, getLastReflogs("refs/heads/master", "refs/heads/branch").size());
+
+		List<ReceiveCommand> cmds = Arrays.asList(
+				new ReceiveCommand(A, zeroId(), "refs/heads/master", DELETE),
+				new ReceiveCommand(A, B, "refs/heads/branch", UPDATE));
+		execute(newBatchUpdate(cmds).setRefLogMessage("a reflog", false));
+
+		assertResults(cmds, OK, OK);
+		assertRefs("refs/heads/branch", B);
+		assertNull(getLastReflog("refs/heads/master"));
+		assertReflogEquals(
+				reflog(A, B, new PersonIdent(diskRepo), "a reflog"),
+				getLastReflog("refs/heads/branch"));
+	}
+

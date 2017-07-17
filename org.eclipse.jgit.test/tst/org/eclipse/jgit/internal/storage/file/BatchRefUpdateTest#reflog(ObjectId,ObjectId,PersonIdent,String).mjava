@@ -1,0 +1,30 @@
+	private static ReflogEntry reflog(ObjectId oldId, ObjectId newId,
+			PersonIdent who, String comment) {
+		return new ReflogEntry() {
+			@Override
+			public ObjectId getOldId() {
+				return oldId;
+			}
+
+			@Override
+			public ObjectId getNewId() {
+				return newId;
+			}
+
+			@Override
+			public PersonIdent getWho() {
+				return who;
+			}
+
+			@Override
+			public String getComment() {
+				return comment;
+			}
+
+			@Override
+			public CheckoutEntry parseCheckout() {
+				throw new UnsupportedOperationException();
+			}
+		};
+	}
+

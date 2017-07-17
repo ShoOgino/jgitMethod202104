@@ -1,0 +1,27 @@
+	@Test
+	public void reflogCustomIdent() throws IOException {
+		writeRef("refs/heads/master", A);
+
+		List<ReceiveCommand> cmds = Arrays.asList(
+				new ReceiveCommand(A, B, "refs/heads/master", UPDATE),
+				new ReceiveCommand(zeroId(), B, "refs/heads/branch", CREATE));
+		PersonIdent ident = new PersonIdent("A Reflog User", "reflog@example.com");
+		execute(
+				newBatchUpdate(cmds)
+						.setRefLogMessage("a reflog", false)
+						.setRefLogIdent(ident));
+
+		assertResults(cmds, OK, OK);
+		assertRefs(
+				"refs/heads/master", B,
+				"refs/heads/branch", B);
+		assertReflogEquals(
+				reflog(A, B, ident, "a reflog"),
+				getLastReflog("refs/heads/master"),
+				true);
+		assertReflogEquals(
+				reflog(zeroId(), B, ident, "a reflog"),
+				getLastReflog("refs/heads/branch"),
+				true);
+	}
+
