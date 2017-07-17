@@ -1,0 +1,10 @@
+		@Override
+		public long size() throws IOException {
+			long n = file.length;
+			if (n < 0) {
+				n = open().size();
+				file.length = n;
+			}
+			return n;
+		}
+

@@ -1,0 +1,17 @@
+		@Override
+		public ByteBuffer read(long pos, int cnt) throws IOException {
+			if (ch == null && readAhead > 0 && notInCache(pos)) {
+				open().setReadAheadBytes(readAhead);
+			}
+
+			DfsBlock block = cache.getOrLoad(file, pos, ctx, ch);
+			if (block.start == pos && block.size() >= cnt) {
+				return block.zeroCopyByteBuffer(cnt);
+			}
+
+			byte[] dst = new byte[cnt];
+			ByteBuffer buf = ByteBuffer.wrap(dst);
+			buf.position(ctx.copy(file, pos, dst, 0, cnt));
+			return buf;
+		}
+
