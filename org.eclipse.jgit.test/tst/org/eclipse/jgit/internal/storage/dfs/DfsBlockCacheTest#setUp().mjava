@@ -1,0 +1,9 @@
+	@Before
+	public void setUp() {
+		rng = new TestRng(testName.getMethodName());
+		DfsBlockCache.reconfigure(new DfsBlockCacheConfig()
+				.setBlockSize(512)
+				.setBlockLimit(1 << 20));
+		cache = DfsBlockCache.getInstance();
+	}
+

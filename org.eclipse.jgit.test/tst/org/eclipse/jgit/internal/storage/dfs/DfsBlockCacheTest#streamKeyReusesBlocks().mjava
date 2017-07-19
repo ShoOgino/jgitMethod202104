@@ -1,0 +1,26 @@
+	@Test
+	public void streamKeyReusesBlocks() throws Exception {
+		DfsRepositoryDescription repo = new DfsRepositoryDescription("test");
+		InMemoryRepository r1 = new InMemoryRepository(repo);
+		byte[] content = rng.nextBytes(424242);
+		ObjectId id;
+		try (ObjectInserter ins = r1.newObjectInserter()) {
+			id = ins.insert(OBJ_BLOB, content);
+			ins.flush();
+		}
+
+		long oldSize = cache.getCurrentSize();
+		assertTrue(oldSize > 2000);
+		assertEquals(0, cache.getHitCount());
+
+		List<DfsPackDescription> packs = r1.getObjectDatabase().listPacks();
+		InMemoryRepository r2 = new InMemoryRepository(repo);
+		r2.getObjectDatabase().commitPack(packs, Collections.emptyList());
+		try (ObjectReader rdr = r2.newObjectReader()) {
+			byte[] actual = rdr.open(id, OBJ_BLOB).getBytes();
+			assertTrue(Arrays.equals(content, actual));
+		}
+		assertEquals(0, cache.getMissCount());
+		assertEquals(oldSize, cache.getCurrentSize());
+	}
+
