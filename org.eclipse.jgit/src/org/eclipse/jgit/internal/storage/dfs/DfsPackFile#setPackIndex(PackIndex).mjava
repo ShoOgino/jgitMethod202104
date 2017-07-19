@@ -1,7 +1,7 @@
 	void setPackIndex(PackIndex idx) {
 		long objCnt = idx.getObjectCount();
 		int recSize = Constants.OBJECT_ID_LENGTH + 8;
-		int sz = (int) Math.min(objCnt * recSize, Integer.MAX_VALUE);
-		index = cache.put(desc.getStreamKey(INDEX), 0, sz, idx);
+		long sz = objCnt * recSize;
+		index = cache.putRef(desc.getStreamKey(INDEX), sz, idx);
 	}
 

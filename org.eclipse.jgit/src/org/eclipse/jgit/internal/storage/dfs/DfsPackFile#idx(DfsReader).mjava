@@ -20,6 +20,16 @@
 					return idx;
 			}
 
+			DfsStreamKey idxKey = desc.getStreamKey(INDEX);
+			idxref = cache.getRef(idxKey);
+			if (idxref != null) {
+				PackIndex idx = idxref.get();
+				if (idx != null) {
+					index = idxref;
+					return idx;
+				}
+			}
+
 			PackIndex idx;
 			try {
 				ctx.stats.readIdx++;
@@ -41,18 +51,14 @@
 				}
 			} catch (EOFException e) {
 				invalid = true;
-				IOException e2 = new IOException(MessageFormat.format(
+				throw new IOException(MessageFormat.format(
 						DfsText.get().shortReadOfIndex,
-						desc.getFileName(INDEX)));
-				e2.initCause(e);
-				throw e2;
+						desc.getFileName(INDEX)), e);
 			} catch (IOException e) {
 				invalid = true;
-				IOException e2 = new IOException(MessageFormat.format(
+				throw new IOException(MessageFormat.format(
 						DfsText.get().cannotReadIndex,
-						desc.getFileName(INDEX)));
-				e2.initCause(e);
-				throw e2;
+						desc.getFileName(INDEX)), e);
 			}
 
 			setPackIndex(idx);

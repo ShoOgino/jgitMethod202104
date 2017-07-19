@@ -14,13 +14,21 @@
 					return revidx;
 			}
 
+			DfsStreamKey revKey =
+					new DfsStreamKey.ForReverseIndex(desc.getStreamKey(INDEX));
+			revref = cache.getRef(revKey);
+			if (revref != null) {
+				PackReverseIndex idx = revref.get();
+				if (idx != null) {
+					reverseIndex = revref;
+					return idx;
+				}
+			}
+
 			PackIndex idx = idx(ctx);
 			PackReverseIndex revidx = new PackReverseIndex(idx);
-			int sz = (int) Math.min(
-					idx.getObjectCount() * 8, Integer.MAX_VALUE);
-			reverseIndex = cache.put(
-					new DfsStreamKey.ForReverseIndex(desc.getStreamKey(INDEX)),
-					0, sz, revidx);
+			long cnt = idx.getObjectCount();
+			reverseIndex = cache.putRef(revKey, cnt * 8, revidx);
 			return revidx;
 		}
 	}
