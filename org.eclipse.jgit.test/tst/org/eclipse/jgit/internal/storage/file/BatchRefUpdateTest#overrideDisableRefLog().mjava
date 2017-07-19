@@ -1,0 +1,20 @@
+	@Test
+	public void overrideDisableRefLog() throws Exception {
+		writeRef("refs/heads/master", A);
+
+		Map<String, ReflogEntry> oldLogs =
+				getLastReflogs("refs/heads/master", "refs/heads/branch");
+
+		List<ReceiveCommand> cmds = Arrays.asList(
+				new ReceiveCommand(A, B, "refs/heads/master", UPDATE),
+				new ReceiveCommand(zeroId(), B, "refs/heads/branch", CREATE));
+		cmds.get(0).disableRefLog();
+		execute(newBatchUpdate(cmds).setRefLogMessage("a reflog", true));
+
+		assertResults(cmds, OK, OK);
+		assertReflogUnchanged(oldLogs, "refs/heads/master");
+		assertReflogEquals(
+				reflog(zeroId(), B, new PersonIdent(diskRepo), "a reflog: created"),
+				getLastReflog("refs/heads/branch"));
+	}
+

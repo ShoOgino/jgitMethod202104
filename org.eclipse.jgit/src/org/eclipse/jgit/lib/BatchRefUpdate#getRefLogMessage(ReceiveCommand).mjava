@@ -1,0 +1,13 @@
+	/**
+	 * Get reflog message for a command.
+	 *
+	 * @param cmd
+	 *            specific command.
+	 * @return reflog message, taking into account the state from this instance as
+	 *         well as overrides in the given command.
+	 * @since 4.9
+	 */
+	protected String getRefLogMessage(ReceiveCommand cmd) {
+		return cmd.hasCustomRefLog() ? cmd.getRefLogMessage() : getRefLogMessage();
+	}
+

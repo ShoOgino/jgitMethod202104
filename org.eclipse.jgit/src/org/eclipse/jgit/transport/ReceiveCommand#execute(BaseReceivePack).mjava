@@ -11,6 +11,7 @@
 		try {
 			final RefUpdate ru = rp.getRepository().updateRef(getRefName());
 			ru.setRefLogIdent(rp.getRefLogIdent());
+			ru.setRefLogMessage(refLogMessage, refLogIncludeResult);
 			switch (getType()) {
 			case DELETE:
 				if (!ObjectId.zeroId().equals(getOldId())) {

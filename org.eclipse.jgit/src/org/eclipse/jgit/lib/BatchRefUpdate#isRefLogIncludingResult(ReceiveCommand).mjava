@@ -1,0 +1,15 @@
+	/**
+	 * Check whether the reflog message for a command should include the result.
+	 *
+	 * @param cmd
+	 *            specific command.
+	 * @return whether the reflog message should show the result, taking into
+	 *         account the state from this instance as well as overrides in the
+	 *         given command.
+	 * @since 4.9
+	 */
+	protected boolean isRefLogIncludingResult(ReceiveCommand cmd) {
+		return cmd.hasCustomRefLog()
+				? cmd.isRefLogIncludingResult() : isRefLogIncludingResult();
+	}
+
