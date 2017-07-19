@@ -4,7 +4,7 @@
 	 * @return size of the file, in bytes. If 0 the file size is not yet known.
 	 */
 	public long getFileSize(PackExt ext) {
-		Long size = sizeMap.get(ext);
-		return size == null ? 0 : size.longValue();
+		int i = ext.getPosition();
+		return i < sizeMap.length ? sizeMap[i] : 0;
 	}
 

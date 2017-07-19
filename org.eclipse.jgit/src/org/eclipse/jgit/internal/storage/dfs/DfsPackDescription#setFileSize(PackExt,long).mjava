@@ -7,7 +7,11 @@
 	 * @return {@code this}
 	 */
 	public DfsPackDescription setFileSize(PackExt ext, long bytes) {
-		sizeMap.put(ext, Long.valueOf(Math.max(0, bytes)));
+		int i = ext.getPosition();
+		if (i >= sizeMap.length) {
+			sizeMap = Arrays.copyOf(sizeMap, i + 1);
+		}
+		sizeMap[i] = Math.max(0, bytes);
 		return this;
 	}
 
