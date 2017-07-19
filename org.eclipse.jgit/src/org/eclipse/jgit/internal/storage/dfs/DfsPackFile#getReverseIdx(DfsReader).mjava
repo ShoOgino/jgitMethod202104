@@ -18,7 +18,9 @@
 			PackReverseIndex revidx = new PackReverseIndex(idx);
 			int sz = (int) Math.min(
 					idx.getObjectCount() * 8, Integer.MAX_VALUE);
-			reverseIndex = cache.put(reverseIdxKey, 0, sz, revidx);
+			reverseIndex = cache.put(
+					new DfsStreamKey.ForReverseIndex(desc.getStreamKey(INDEX)),
+					0, sz, revidx);
 			return revidx;
 		}
 	}

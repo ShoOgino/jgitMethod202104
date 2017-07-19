@@ -18,9 +18,7 @@
 				if (idx != null)
 					return idx;
 			}
-			if (bitmapKey == null) {
-				bitmapKey = desc.getStreamKey(BITMAP_INDEX);
-			}
+
 			long size;
 			PackBitmapIndex idx;
 			try {
@@ -58,8 +56,9 @@
 				throw e2;
 			}
 
-			bitmapIndex = cache.put(bitmapKey, 0,
-					(int) Math.min(size, Integer.MAX_VALUE), idx);
+			bitmapIndex = cache.put(
+					desc.getStreamKey(BITMAP_INDEX),
+					0, (int) Math.min(size, Integer.MAX_VALUE), idx);
 			return idx;
 		}
 	}
