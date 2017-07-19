@@ -10,7 +10,7 @@
 			DfsPackFile oldPack = forReuse.remove(dsc);
 			if (oldPack != null) {
 				list.add(oldPack);
-			} else {
+			} else if (dsc.hasFileExt(PackExt.PACK)) {
 				list.add(new DfsPackFile(cache, dsc));
 				foundNew = true;
 			}
