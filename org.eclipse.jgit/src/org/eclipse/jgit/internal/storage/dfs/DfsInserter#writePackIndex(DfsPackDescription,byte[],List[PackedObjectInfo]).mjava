@@ -14,13 +14,14 @@
 			packIndex = PackIndex.read(buf.openInputStream());
 		}
 
-		DfsOutputStream os = db.writeFile(pack, INDEX);
-		try (CountingOutputStream cnt = new CountingOutputStream(os)) {
+		try (DfsOutputStream os = db.writeFile(pack, INDEX)) {
+			CountingOutputStream cnt = new CountingOutputStream(os);
 			if (buf != null)
 				buf.writeTo(cnt, null);
 			else
 				index(cnt, packHash, list);
 			pack.addFileExt(INDEX);
+			pack.setBlockSize(INDEX, os.blockSize());
 			pack.setFileSize(INDEX, cnt.getCount());
 		} finally {
 			if (buf != null) {

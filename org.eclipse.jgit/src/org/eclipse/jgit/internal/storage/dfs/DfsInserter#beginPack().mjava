@@ -5,7 +5,9 @@
 
 		rollback = true;
 		packDsc = db.newPack(DfsObjDatabase.PackSource.INSERT);
-		packOut = new PackStream(db.writeFile(packDsc, PACK));
+		DfsOutputStream dfsOut = db.writeFile(packDsc, PACK);
+		packDsc.setBlockSize(PACK, dfsOut.blockSize());
+		packOut = new PackStream(dfsOut);
 		packKey = packDsc.getStreamKey(PACK);
 
 		// Write the header as though it were a single object pack.

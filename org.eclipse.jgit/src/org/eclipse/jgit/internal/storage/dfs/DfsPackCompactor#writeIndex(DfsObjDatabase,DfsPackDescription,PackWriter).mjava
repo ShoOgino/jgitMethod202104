@@ -1,15 +1,13 @@
 	private static void writeIndex(DfsObjDatabase objdb,
 			DfsPackDescription pack,
 			PackWriter pw) throws IOException {
-		DfsOutputStream out = objdb.writeFile(pack, INDEX);
-		try {
+		try (DfsOutputStream out = objdb.writeFile(pack, INDEX)) {
 			CountingOutputStream cnt = new CountingOutputStream(out);
 			pw.writeIndex(cnt);
 			pack.addFileExt(INDEX);
 			pack.setFileSize(INDEX, cnt.getCount());
+			pack.setBlockSize(INDEX, out.blockSize());
 			pack.setIndexVersion(pw.getIndexVersion());
-		} finally {
-			out.close();
 		}
 	}
 

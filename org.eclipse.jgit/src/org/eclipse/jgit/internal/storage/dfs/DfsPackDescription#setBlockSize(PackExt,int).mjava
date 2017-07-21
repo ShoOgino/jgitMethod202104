@@ -1,0 +1,17 @@
+	/**
+	 * @param ext
+	 *            the file extension.
+	 * @param blockSize
+	 *            blockSize of the file, in bytes. If 0 the blockSize is not
+	 *            known and will be determined on first read.
+	 * @return {@code this}
+	 */
+	public DfsPackDescription setBlockSize(PackExt ext, int blockSize) {
+		int i = ext.getPosition();
+		if (i >= blockSizeMap.length) {
+			blockSizeMap = Arrays.copyOf(blockSizeMap, i + 1);
+		}
+		blockSizeMap[i] = Math.max(0, blockSize);
+		return this;
+	}
+

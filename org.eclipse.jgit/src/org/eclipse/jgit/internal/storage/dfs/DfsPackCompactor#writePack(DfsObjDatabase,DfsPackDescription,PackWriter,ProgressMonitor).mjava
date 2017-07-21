@@ -1,12 +1,10 @@
 	private static void writePack(DfsObjDatabase objdb,
 			DfsPackDescription pack,
 			PackWriter pw, ProgressMonitor pm) throws IOException {
-		DfsOutputStream out = objdb.writeFile(pack, PACK);
-		try {
+		try (DfsOutputStream out = objdb.writeFile(pack, PACK)) {
 			pw.writePack(pm, pm, out);
 			pack.addFileExt(PACK);
-		} finally {
-			out.close();
+			pack.setBlockSize(PACK, out.blockSize());
 		}
 	}
 
