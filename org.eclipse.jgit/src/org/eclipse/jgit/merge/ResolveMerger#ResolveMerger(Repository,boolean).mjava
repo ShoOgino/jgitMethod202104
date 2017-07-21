@@ -4,7 +4,9 @@
 	 */
 	protected ResolveMerger(Repository local, boolean inCore) {
 		super(local);
-		mergeAlgorithm = getMergeAlgorithm(local.getConfig());
+		Config config = local.getConfig();
+		mergeAlgorithm = getMergeAlgorithm(config);
+		inCoreLimit = getInCoreLimit(config);
 		commitNames = defaultCommitNames();
 		this.inCore = inCore;
 
