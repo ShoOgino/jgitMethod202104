@@ -39,6 +39,13 @@
 				for (Ref r : repo.getAllRefs().values()) {
 					try {
 						RevObject tip = ow.parseAny(r.getObjectId());
+						if (r.getLeaf().getName().startsWith(Constants.R_HEADS)) {
+							// check if heads point to a commit object
+							if (tip.getType() != Constants.OBJ_COMMIT) {
+								errors.getNonCommitHeads()
+										.add(r.getLeaf().getName());
+							}
+						}
 						ow.markStart(tip);
 						ow.checkConnectivity();
 						ow.markUninteresting(tip);
