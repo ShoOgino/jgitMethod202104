@@ -1,7 +1,7 @@
 	private ObjectId insertMergeResult(MergeResult<RawText> result)
 			throws IOException {
 		TemporaryBuffer.LocalFile buf = new TemporaryBuffer.LocalFile(
-				db != null ? nonNullRepo().getDirectory() : null, 10 << 20);
+				db != null ? nonNullRepo().getDirectory() : null, inCoreLimit);
 		try {
 			new MergeFormatter().formatMerge(buf, result,
 					Arrays.asList(commitNames), CHARACTER_ENCODING);
