@@ -1,0 +1,20 @@
+	@Test
+	public void resolveSymbolicRef() throws IOException {
+		Reftable t = read(write(
+				sym(HEAD, "refs/heads/tmp"),
+				sym("refs/heads/tmp", MASTER),
+				ref(MASTER, 1)));
+
+		Ref head = t.exactRef(HEAD);
+		assertNull(head.getObjectId());
+		assertEquals("refs/heads/tmp", head.getTarget().getName());
+
+		head = t.resolve(head);
+		assertNotNull(head);
+		assertEquals(id(1), head.getObjectId());
+
+		Ref master = t.exactRef(MASTER);
+		assertNotNull(master);
+		assertSame(master, t.resolve(master));
+	}
+

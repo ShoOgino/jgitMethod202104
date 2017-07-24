@@ -1,0 +1,16 @@
+	@Test
+	public void failDeepChainOfSymbolicRef() throws IOException {
+		Reftable t = read(write(
+				sym(HEAD, "refs/heads/1"),
+				sym("refs/heads/1", "refs/heads/2"),
+				sym("refs/heads/2", "refs/heads/3"),
+				sym("refs/heads/3", "refs/heads/4"),
+				sym("refs/heads/4", "refs/heads/5"),
+				sym("refs/heads/5", MASTER),
+				ref(MASTER, 1)));
+
+		Ref head = t.exactRef(HEAD);
+		assertNull(head.getObjectId());
+		assertNull(t.resolve(head));
+	}
+

@@ -1,0 +1,22 @@
+	private Ref resolve(Ref ref, int depth) throws IOException {
+		if (!ref.isSymbolic()) {
+			return ref;
+		}
+
+		Ref dst = ref.getTarget();
+		if (MAX_SYMBOLIC_REF_DEPTH <= depth) {
+			return null; // claim it doesn't exist
+		}
+
+		dst = exactRef(dst.getName());
+		if (dst == null) {
+			return ref;
+		}
+
+		dst = resolve(dst, depth + 1);
+		if (dst == null) {
+			return null; // claim it doesn't exist
+		}
+		return new SymbolicRef(ref.getName(), dst);
+	}
+
