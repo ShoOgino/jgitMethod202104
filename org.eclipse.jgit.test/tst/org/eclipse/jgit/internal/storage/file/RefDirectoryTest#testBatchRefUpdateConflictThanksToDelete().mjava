@@ -3,11 +3,11 @@
 		writeLooseRef("refs/heads/master", A);
 		writeLooseRef("refs/heads/masters", B);
 		List<ReceiveCommand> commands = Arrays.asList(
-				newCommand(A, B, "refs/heads/master",
+				new ReceiveCommand(A, B, "refs/heads/master",
 						ReceiveCommand.Type.UPDATE),
-				newCommand(null, A, "refs/heads/masters/x",
+				new ReceiveCommand(zeroId(), A, "refs/heads/masters/x",
 						ReceiveCommand.Type.CREATE),
-				newCommand(B, null, "refs/heads/masters",
+				new ReceiveCommand(B, zeroId(), "refs/heads/masters",
 						ReceiveCommand.Type.DELETE));
 		BatchRefUpdate batchUpdate = refdir.newBatchUpdate();
 		batchUpdate.setAllowNonFastForwards(true);

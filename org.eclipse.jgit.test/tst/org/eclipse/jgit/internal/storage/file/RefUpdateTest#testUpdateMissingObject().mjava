@@ -1,0 +1,20 @@
+	@Test
+	public void testUpdateMissingObject() throws IOException {
+		String name = "refs/heads/abc";
+		RefUpdate ru = updateRef(name);
+		Result update = ru.update();
+		assertEquals(Result.NEW, update);
+		ObjectId oldId = ru.getNewObjectId();
+
+		ObjectId bad =
+				ObjectId.fromString("deadbeefdeadbeefdeadbeefdeadbeefdeadbeef");
+		ru = db.updateRef(name);
+		ru.setNewObjectId(bad);
+		update = ru.update();
+		assertEquals(Result.REJECTED, update);
+
+		Ref ref = db.exactRef(name);
+		assertNotNull(ref);
+		assertEquals(oldId, ref.getObjectId());
+	}
+
