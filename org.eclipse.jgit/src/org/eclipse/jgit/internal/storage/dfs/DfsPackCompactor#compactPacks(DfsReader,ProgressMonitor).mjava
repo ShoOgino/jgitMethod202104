@@ -1,0 +1,44 @@
+	private void compactPacks(DfsReader ctx, ProgressMonitor pm)
+			throws IOException, IncorrectObjectTypeException {
+		DfsObjDatabase objdb = repo.getObjectDatabase();
+		PackConfig pc = new PackConfig(repo);
+		pc.setIndexVersion(2);
+		pc.setDeltaCompress(false);
+		pc.setReuseDeltas(true);
+		pc.setReuseObjects(true);
+
+		PackWriter pw = new PackWriter(pc, ctx);
+		try {
+			pw.setDeltaBaseAsOffset(true);
+			pw.setReuseDeltaCommits(false);
+
+			addObjectsToPack(pw, ctx, pm);
+			if (pw.getObjectCount() == 0) {
+				return;
+			}
+
+			boolean rollback = true;
+			initOutDesc(objdb);
+			try {
+				writePack(objdb, outDesc, pw, pm);
+				writeIndex(objdb, outDesc, pw);
+
+				PackStatistics stats = pw.getStatistics();
+				pw.close();
+				pw = null;
+
+				outDesc.setPackStats(stats);
+				newStats = stats;
+				rollback = false;
+			} finally {
+				if (rollback) {
+					objdb.rollbackPack(Collections.singletonList(outDesc));
+				}
+			}
+		} finally {
+			if (pw != null) {
+				pw.close();
+			}
+		}
+	}
+

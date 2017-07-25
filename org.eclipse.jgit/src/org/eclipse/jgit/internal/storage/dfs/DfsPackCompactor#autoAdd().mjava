@@ -1,5 +1,5 @@
 	/**
-	 * Automatically select packs to be included, and add them.
+	 * Automatically select pack and reftables to be included, and add them.
 	 * <p>
 	 * Packs are selected based on size, smaller packs get included while bigger
 	 * ones are omitted.
@@ -16,6 +16,16 @@
 				add(pack);
 			else
 				exclude(pack);
+		}
+
+		if (reftableConfig != null) {
+			for (DfsReftable table : objdb.getReftables()) {
+				DfsPackDescription d = table.getPackDescription();
+				if (d.getPackSource() != GC
+						&& d.getFileSize(REFTABLE) < autoAddSize) {
+					add(table);
+				}
+			}
 		}
 		return this;
 	}

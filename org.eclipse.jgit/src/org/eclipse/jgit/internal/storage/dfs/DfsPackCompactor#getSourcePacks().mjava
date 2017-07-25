@@ -1,5 +1,12 @@
 	/** @return all of the source packs that fed into this compaction. */
-	public List<DfsPackDescription> getSourcePacks() {
-		return toPrune();
+	public Collection<DfsPackDescription> getSourcePacks() {
+		Set<DfsPackDescription> src = new HashSet<>();
+		for (DfsPackFile pack : srcPacks) {
+			src.add(pack.getPackDescription());
+		}
+		for (DfsReftable table : srcReftables) {
+			src.add(table.getPackDescription());
+		}
+		return src;
 	}
 

@@ -8,55 +8,21 @@
 	 *             the packs cannot be compacted.
 	 */
 	public void compact(ProgressMonitor pm) throws IOException {
-		if (pm == null)
+		if (pm == null) {
 			pm = NullProgressMonitor.INSTANCE;
+		}
 
 		DfsObjDatabase objdb = repo.getObjectDatabase();
 		try (DfsReader ctx = objdb.newReader()) {
-			PackConfig pc = new PackConfig(repo);
-			pc.setIndexVersion(2);
-			pc.setDeltaCompress(false);
-			pc.setReuseDeltas(true);
-			pc.setReuseObjects(true);
+			if (reftableConfig != null && !srcReftables.isEmpty()) {
+				compactReftables(ctx);
+			}
+			compactPacks(ctx, pm);
 
-			PackWriter pw = new PackWriter(pc, ctx);
-			try {
-				pw.setDeltaBaseAsOffset(true);
-				pw.setReuseDeltaCommits(false);
-
-				addObjectsToPack(pw, ctx, pm);
-				if (pw.getObjectCount() == 0) {
-					List<DfsPackDescription> remove = toPrune();
-					if (remove.size() > 0)
-						objdb.commitPack(
-								Collections.<DfsPackDescription>emptyList(),
-								remove);
-					return;
-				}
-
-				boolean rollback = true;
-				DfsPackDescription pack = objdb.newPack(COMPACT,
-						estimatePackSize());
-				try {
-					writePack(objdb, pack, pw, pm);
-					writeIndex(objdb, pack, pw);
-
-					PackStatistics stats = pw.getStatistics();
-					pw.close();
-					pw = null;
-
-					pack.setPackStats(stats);
-					objdb.commitPack(Collections.singletonList(pack), toPrune());
-					newPacks.add(pack);
-					newStats.add(stats);
-					rollback = false;
-				} finally {
-					if (rollback)
-						objdb.rollbackPack(Collections.singletonList(pack));
-				}
-			} finally {
-				if (pw != null)
-					pw.close();
+			List<DfsPackDescription> commit = getNewPacks();
+			Collection<DfsPackDescription> remove = toPrune();
+			if (!commit.isEmpty() || !remove.isEmpty()) {
+				objdb.commitPack(commit, remove);
 			}
 		} finally {
 			rw = null;

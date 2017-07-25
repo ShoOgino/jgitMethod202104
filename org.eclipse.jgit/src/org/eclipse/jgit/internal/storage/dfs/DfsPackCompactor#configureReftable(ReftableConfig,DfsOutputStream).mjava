@@ -1,0 +1,11 @@
+	static ReftableConfig configureReftable(ReftableConfig cfg,
+			DfsOutputStream out) {
+		int bs = out.blockSize();
+		if (bs > 0) {
+			cfg = new ReftableConfig(cfg);
+			cfg.setRefBlockSize(bs);
+			cfg.setAlignBlocks(true);
+		}
+		return cfg;
+	}
+
