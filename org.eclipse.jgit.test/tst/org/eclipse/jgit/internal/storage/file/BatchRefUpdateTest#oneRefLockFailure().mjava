@@ -1,0 +1,30 @@
+	@Test
+	public void oneRefLockFailure() throws Exception {
+		writeLooseRef("refs/heads/master", A);
+
+		List<ReceiveCommand> cmds = Arrays.asList(
+				new ReceiveCommand(zeroId(), B, "refs/heads/branch", CREATE),
+				new ReceiveCommand(A, B, "refs/heads/master", UPDATE));
+
+		LockFile myLock = new LockFile(refdir.fileFor("refs/heads/master"));
+		assertTrue(myLock.lock());
+		try {
+			execute(newBatchUpdate(cmds).setAllowNonFastForwards(true));
+
+			assertFalse(LockFile.getLockFile(refdir.packedRefsFile).exists());
+			assertFalse(getLockFile("refs/heads/branch").exists());
+
+			if (atomic) {
+				assertResults(cmds, TRANSACTION_ABORTED, LOCK_FAILURE);
+				assertRefs("refs/heads/master", A);
+			} else {
+				assertResults(cmds, OK, LOCK_FAILURE);
+				assertRefs(
+						"refs/heads/branch", B,
+						"refs/heads/master", A);
+			}
+		} finally {
+			myLock.unlock();
+		}
+	}
+

@@ -1,0 +1,27 @@
+	/**
+	 * Get times to sleep while retrying a possibly contentious operation.
+	 * <p>
+	 * For retrying an operation that might have high contention, such as locking
+	 * the {@code packed-refs} file, the caller may implement a retry loop using
+	 * the returned values:
+	 *
+	 * <pre>
+	 * for (int toSleepMs : getRetrySleepMs()) {
+	 *   sleep(toSleepMs);
+	 *   if (isSuccessful(doSomething())) {
+	 *     return success;
+	 *   }
+	 * }
+	 * return failure;
+	 * </pre>
+	 *
+	 * The first value in the returned iterable is 0, and the caller should treat
+	 * a fully-consumed iterator as a timeout.
+	 *
+	 * @return iterable of times, in milliseconds, that the caller should sleep
+	 *         before attempting an operation.
+	 */
+	Iterable<Integer> getRetrySleepMs() {
+		return retrySleepMs;
+	}
+

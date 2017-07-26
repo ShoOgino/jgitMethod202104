@@ -1,0 +1,30 @@
+	@Test
+	public void packedRefsLockFailure() throws Exception {
+		writeLooseRef("refs/heads/master", A);
+
+		List<ReceiveCommand> cmds = Arrays.asList(
+				new ReceiveCommand(A, B, "refs/heads/master", UPDATE),
+				new ReceiveCommand(zeroId(), B, "refs/heads/branch", CREATE));
+
+		LockFile myLock = refdir.lockPackedRefs();
+		try {
+			execute(newBatchUpdate(cmds).setAllowNonFastForwards(true));
+
+			assertFalse(getLockFile("refs/heads/master").exists());
+			assertFalse(getLockFile("refs/heads/branch").exists());
+
+			if (atomic) {
+				assertResults(cmds, LOCK_FAILURE, TRANSACTION_ABORTED);
+				assertRefs("refs/heads/master", A);
+			} else {
+				// Only operates on loose refs, doesn't care that packed-refs is locked.
+				assertResults(cmds, OK, OK);
+				assertRefs(
+						"refs/heads/master", B,
+						"refs/heads/branch", B);
+			}
+		} finally {
+			myLock.unlock();
+		}
+	}
+

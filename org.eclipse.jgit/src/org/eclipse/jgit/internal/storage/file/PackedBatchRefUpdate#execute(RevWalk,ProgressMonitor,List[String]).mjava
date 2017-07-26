@@ -42,12 +42,18 @@
 
 		// Pack refs normally, so we can create lock files even in the case where
 		// refs/x is deleted and refs/x/y is created in this batch.
-		refdb.pack(
-				pending.stream().map(ReceiveCommand::getRefName).collect(toList()));
-
-		Map<String, LockFile> locks = new HashMap<>();
 		try {
-			if (!lockLooseRefs(pending, locks)) {
+			refdb.pack(
+					pending.stream().map(ReceiveCommand::getRefName).collect(toList()));
+		} catch (LockFailedException e) {
+			lockFailure(pending.get(0), pending);
+			return;
+		}
+
+		Map<String, LockFile> locks = null;
+		try {
+			locks = lockLooseRefs(pending);
+			if (locks == null) {
 				return;
 			}
 			PackedRefList oldPackedList = refdb.pack(locks);
@@ -55,15 +61,15 @@
 			if (newRefs == null) {
 				return;
 			}
-			LockFile packedRefsLock = new LockFile(refdb.packedRefsFile);
-			try {
-				packedRefsLock.lock();
-				refdb.commitPackedRefs(packedRefsLock, newRefs, oldPackedList);
-			} finally {
-				packedRefsLock.unlock();
+			LockFile packedRefsLock = refdb.lockPackedRefs();
+			if (packedRefsLock == null) {
+				lockFailure(pending.get(0), pending);
+				return;
 			}
+			// commitPackedRefs removes lock file (by renaming over real file).
+			refdb.commitPackedRefs(packedRefsLock, newRefs, oldPackedList);
 		} finally {
-			locks.values().forEach(LockFile::unlock);
+			unlockAll(locks);
 		}
 
 		refdb.fireRefsChanged();

@@ -1,0 +1,22 @@
+	/**
+	 * Sleep with {@link Thread#sleep(long)}, converting {@link
+	 * InterruptedException} to {@link InterruptedIOException}.
+	 *
+	 * @param ms
+	 *            time to sleep, in milliseconds; zero or negative is a no-op.
+	 * @throws InterruptedIOException
+	 *             if sleeping was interrupted.
+	 */
+	static void sleep(long ms) throws InterruptedIOException {
+		if (ms <= 0) {
+			return;
+		}
+		try {
+			Thread.sleep(ms);
+		} catch (InterruptedException e) {
+			InterruptedIOException ie = new InterruptedIOException();
+			ie.initCause(e);
+			throw ie;
+		}
+	}
+

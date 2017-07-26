@@ -9,11 +9,7 @@
 		FS fs = parent.getFS();
 
 		// Lock the packed refs file and read the content
-		LockFile lck = new LockFile(packedRefsFile);
-		if (!lck.lock()) {
-			throw new IOException(MessageFormat.format(
-					JGitText.get().cannotLock, packedRefsFile));
-		}
+		LockFile lck = lockPackedRefsOrThrow();
 
 		try {
 			final PackedRefList packed = getPackedRefs();
