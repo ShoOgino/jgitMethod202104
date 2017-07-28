@@ -1,8 +1,8 @@
 	/**
 	 * Set the message to include in the reflog.
 	 * <p>
-	 * Describes the default for commands in this batch that do not override it
-	 * with {@link ReceiveCommand#setRefLogMessage(String, boolean)}.
+	 * Overrides the default set by {@code setRefLogMessage} on any containing
+	 * {@link org.eclipse.jgit.lib.BatchRefUpdate}.
 	 *
 	 * @param msg
 	 *            the message to describe this change. If null and appendStatus is
@@ -10,18 +10,18 @@
 	 * @param appendStatus
 	 *            true if the status of the ref change (fast-forward or
 	 *            forced-update) should be appended to the user supplied message.
-	 * @return {@code this}.
+	 * @since 4.9
 	 */
-	public BatchRefUpdate setRefLogMessage(String msg, boolean appendStatus) {
-		if (msg == null && !appendStatus)
+	public void setRefLogMessage(String msg, boolean appendStatus) {
+		customRefLog = true;
+		if (msg == null && !appendStatus) {
 			disableRefLog();
-		else if (msg == null && appendStatus) {
+		} else if (msg == null && appendStatus) {
 			refLogMessage = ""; //$NON-NLS-1$
 			refLogIncludeResult = true;
 		} else {
 			refLogMessage = msg;
 			refLogIncludeResult = appendStatus;
 		}
-		return this;
 	}
 

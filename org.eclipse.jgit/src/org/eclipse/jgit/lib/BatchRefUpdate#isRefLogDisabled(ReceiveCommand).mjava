@@ -1,0 +1,13 @@
+	/**
+	 * Check whether reflog is disabled for a command.
+	 *
+	 * @param cmd
+	 *            specific command.
+	 * @return whether the reflog is disabled, taking into account the state from
+	 *         this instance as well as overrides in the given command.
+	 * @since 4.9
+	 */
+	protected boolean isRefLogDisabled(ReceiveCommand cmd) {
+		return cmd.hasCustomRefLog() ? cmd.isRefLogDisabled() : isRefLogDisabled();
+	}
+

@@ -10,11 +10,11 @@
 	 */
 	protected RefUpdate newUpdate(ReceiveCommand cmd) throws IOException {
 		RefUpdate ru = refdb.newUpdate(cmd.getRefName(), false);
-		if (isRefLogDisabled())
+		if (isRefLogDisabled(cmd)) {
 			ru.disableRefLog();
-		else {
+		} else {
 			ru.setRefLogIdent(refLogIdent);
-			ru.setRefLogMessage(refLogMessage, refLogIncludeResult);
+			ru.setRefLogMessage(getRefLogMessage(cmd), isRefLogIncludingResult(cmd));
 		}
 		ru.setPushCertificate(pushCert);
 		switch (cmd.getType()) {
