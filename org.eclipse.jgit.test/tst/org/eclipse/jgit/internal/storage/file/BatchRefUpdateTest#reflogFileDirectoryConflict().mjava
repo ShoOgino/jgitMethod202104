@@ -1,0 +1,17 @@
+	@Test
+	public void reflogFileDirectoryConflict() throws IOException {
+		writeRef("refs/heads/master", A);
+
+		List<ReceiveCommand> cmds = Arrays.asList(
+				new ReceiveCommand(A, zeroId(), "refs/heads/master", DELETE),
+				new ReceiveCommand(zeroId(), A, "refs/heads/master/x", CREATE));
+		execute(newBatchUpdate(cmds).setRefLogMessage("a reflog", false));
+
+		assertResults(cmds, OK, OK);
+		assertRefs("refs/heads/master/x", A);
+		assertNull(getLastReflog("refs/heads/master"));
+		assertReflogEquals(
+				reflog(zeroId(), A, new PersonIdent(diskRepo), "a reflog"),
+				getLastReflog("refs/heads/master/x"));
+	}
+

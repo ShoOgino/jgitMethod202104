@@ -1,0 +1,12 @@
+	private Map<String, ReflogEntry> getLastReflogs(String... names)
+			throws IOException {
+		Map<String, ReflogEntry> result = new LinkedHashMap<>();
+		for (String name : names) {
+			ReflogEntry e = getLastReflog(name);
+			if (e != null) {
+				result.put(name, e);
+			}
+		}
+		return result;
+	}
+

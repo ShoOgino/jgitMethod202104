@@ -1,0 +1,29 @@
+	@Test
+	public void reflogDefaultIdent() throws IOException {
+		writeRef("refs/heads/master", A);
+		writeRef("refs/heads/branch2", A);
+
+		Map<String, ReflogEntry> oldLogs = getLastReflogs(
+				"refs/heads/master", "refs/heads/branch1", "refs/heads/branch2");
+		List<ReceiveCommand> cmds = Arrays.asList(
+				new ReceiveCommand(A, B, "refs/heads/master", UPDATE),
+				new ReceiveCommand(zeroId(), B, "refs/heads/branch1", CREATE));
+		execute(
+				newBatchUpdate(cmds)
+						.setAllowNonFastForwards(true)
+						.setRefLogMessage("a reflog", false));
+
+		assertResults(cmds, OK, OK);
+		assertRefs(
+				"refs/heads/master", B,
+				"refs/heads/branch1", B,
+				"refs/heads/branch2", A);
+		assertReflogEquals(
+				reflog(A, B, new PersonIdent(diskRepo), "a reflog"),
+				getLastReflog("refs/heads/master"));
+		assertReflogEquals(
+				reflog(zeroId(), B, new PersonIdent(diskRepo), "a reflog"),
+				getLastReflog("refs/heads/branch1"));
+		assertReflogUnchanged(oldLogs, "refs/heads/branch2");
+	}
+

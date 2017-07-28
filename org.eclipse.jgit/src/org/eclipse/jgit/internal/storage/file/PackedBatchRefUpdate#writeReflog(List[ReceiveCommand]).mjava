@@ -1,0 +1,54 @@
+	private void writeReflog(List<ReceiveCommand> commands) {
+		if (isRefLogDisabled()) {
+			return;
+		}
+
+		PersonIdent ident = getRefLogIdent();
+		if (ident == null) {
+			ident = new PersonIdent(refdb.getRepository());
+		}
+		ReflogWriter w = refdb.getLogWriter();
+		for (ReceiveCommand cmd : commands) {
+			// Assume any pending commands have already been executed atomically.
+			if (cmd.getResult() != ReceiveCommand.Result.OK) {
+				continue;
+			}
+			String name = cmd.getRefName();
+
+			if (cmd.getType() == ReceiveCommand.Type.DELETE) {
+				try {
+					RefDirectory.delete(w.logFor(name), RefDirectory.levelsIn(name));
+				} catch (IOException e) {
+					// Ignore failures, see below.
+				}
+				continue;
+			}
+
+			String msg = getRefLogMessage();
+			if (isRefLogIncludingResult()) {
+				String strResult = toResultString(cmd);
+				if (strResult != null) {
+					msg = msg.isEmpty()
+							? strResult : msg + ": " + strResult; //$NON-NLS-1$
+				}
+			}
+			try {
+				w.log(name, cmd.getOldId(), cmd.getNewId(), ident, msg);
+			} catch (IOException e) {
+				// Ignore failures, but continue attempting to write more reflogs.
+				//
+				// In this storage format, it is impossible to atomically write the
+				// reflog with the ref updates, so we have to choose between:
+				// a. Propagating this exception and claiming failure, even though the
+				//    actual ref updates succeeded.
+				// b. Ignoring failures writing the reflog, so we claim success if and
+				//    only if the ref updates succeeded.
+				// We choose (b) in order to surprise callers the least.
+				//
+				// Possible future improvements:
+				// * Log a warning to a logger.
+				// * Retry a fixed number of times in case the error was transient.
+			}
+		}
+	}
+

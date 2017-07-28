@@ -1,0 +1,21 @@
+	@Test
+	public void noRefLog() throws IOException {
+		writeRef("refs/heads/master", A);
+
+		Map<String, ReflogEntry> oldLogs =
+				getLastReflogs("refs/heads/master", "refs/heads/branch");
+		assertEquals(Collections.singleton("refs/heads/master"), oldLogs.keySet());
+
+		List<ReceiveCommand> cmds = Arrays.asList(
+				new ReceiveCommand(A, B, "refs/heads/master", UPDATE),
+				new ReceiveCommand(zeroId(), B, "refs/heads/branch", CREATE));
+		execute(newBatchUpdate(cmds).setAllowNonFastForwards(true));
+
+		assertResults(cmds, OK, OK);
+		assertRefs(
+				"refs/heads/master", B,
+				"refs/heads/branch", B);
+		assertReflogUnchanged(oldLogs, "refs/heads/master");
+		assertReflogUnchanged(oldLogs, "refs/heads/branch");
+	}
+

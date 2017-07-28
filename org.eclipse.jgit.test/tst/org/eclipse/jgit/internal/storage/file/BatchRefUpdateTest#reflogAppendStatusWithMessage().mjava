@@ -1,0 +1,21 @@
+	@Test
+	public void reflogAppendStatusWithMessage() throws IOException {
+		writeRef("refs/heads/master", A);
+
+		List<ReceiveCommand> cmds = Arrays.asList(
+				new ReceiveCommand(A, B, "refs/heads/master", UPDATE),
+				new ReceiveCommand(zeroId(), A, "refs/heads/branch", CREATE));
+		execute(newBatchUpdate(cmds).setRefLogMessage("a reflog", true));
+
+		assertResults(cmds, OK, OK);
+		assertRefs(
+				"refs/heads/master", B,
+				"refs/heads/branch", A);
+		assertReflogEquals(
+				reflog(A, B, new PersonIdent(diskRepo), "a reflog: fast-forward"),
+				getLastReflog("refs/heads/master"));
+		assertReflogEquals(
+				reflog(zeroId(), A, new PersonIdent(diskRepo), "a reflog: created"),
+				getLastReflog("refs/heads/branch"));
+	}
+

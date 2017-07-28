@@ -1,0 +1,15 @@
+	@Test
+	public void reflogAppendStatusFastForward() throws IOException {
+		writeRef("refs/heads/master", A);
+
+		List<ReceiveCommand> cmds = Arrays.asList(
+				new ReceiveCommand(A, B, "refs/heads/master", UPDATE));
+		execute(newBatchUpdate(cmds).setRefLogMessage(null, true));
+
+		assertResults(cmds, OK);
+		assertRefs("refs/heads/master", B);
+		assertReflogEquals(
+				reflog(A, B, new PersonIdent(diskRepo), "fast-forward"),
+				getLastReflog("refs/heads/master"));
+	}
+
