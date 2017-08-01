@@ -4,11 +4,7 @@
 		super.setUp();
 
 		diskRepo = createBareRepository();
-		StoredConfig cfg = diskRepo.getConfig();
-		cfg.load();
-		cfg.setBoolean(ConfigConstants.CONFIG_CORE_SECTION, null,
-				ConfigConstants.CONFIG_KEY_LOGALLREFUPDATES, true);
-		cfg.save();
+		setLogAllRefUpdates(true);
 
 		refdir = (RefDirectory) diskRepo.getRefDatabase();
 		refdir.setRetrySleepMs(Arrays.asList(0, 0));

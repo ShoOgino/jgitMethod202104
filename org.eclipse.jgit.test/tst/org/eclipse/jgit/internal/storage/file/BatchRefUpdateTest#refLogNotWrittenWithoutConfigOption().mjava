@@ -1,0 +1,19 @@
+	@Test
+	public void refLogNotWrittenWithoutConfigOption() throws Exception {
+		setLogAllRefUpdates(false);
+		writeRef("refs/heads/master", A);
+
+		Map<String, ReflogEntry> oldLogs =
+				getLastReflogs("refs/heads/master", "refs/heads/branch");
+		assertTrue(oldLogs.isEmpty());
+
+		List<ReceiveCommand> cmds = Arrays.asList(
+				new ReceiveCommand(A, B, "refs/heads/master", UPDATE),
+				new ReceiveCommand(zeroId(), B, "refs/heads/branch", CREATE));
+		execute(newBatchUpdate(cmds).setRefLogMessage("a reflog", false));
+
+		assertResults(cmds, OK, OK);
+		assertReflogUnchanged(oldLogs, "refs/heads/master");
+		assertReflogUnchanged(oldLogs, "refs/heads/branch");
+	}
+

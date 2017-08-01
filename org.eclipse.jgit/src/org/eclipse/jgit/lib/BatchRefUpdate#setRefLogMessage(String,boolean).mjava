@@ -1,6 +1,12 @@
 	/**
 	 * Set the message to include in the reflog.
 	 * <p>
+	 * Repository implementations may limit which reflogs are written by default,
+	 * based on the project configuration. If a repo is not configured to write
+	 * logs for this ref by default, setting the message alone may have no effect.
+	 * To indicate that the repo should write logs for this update in spite of
+	 * configured defaults, use {@link #setForceRefLog(boolean)}.
+	 * <p>
 	 * Describes the default for commands in this batch that do not override it
 	 * with {@link ReceiveCommand#setRefLogMessage(String, boolean)}.
 	 *

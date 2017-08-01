@@ -1,0 +1,15 @@
+	/**
+	 * Check whether the reflog for a command should be written regardless of repo
+	 * defaults.
+	 *
+	 * @param cmd
+	 *            specific command.
+	 * @return whether force writing is enabled.
+	 * @since 4.9
+	 */
+	protected boolean isForceRefLog(ReceiveCommand cmd) {
+		Boolean isForceRefLog = cmd.isForceRefLog();
+		return isForceRefLog != null ? isForceRefLog.booleanValue()
+				: isForceRefLog();
+	}
+
