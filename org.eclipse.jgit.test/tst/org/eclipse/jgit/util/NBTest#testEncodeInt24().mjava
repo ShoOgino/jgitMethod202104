@@ -1,0 +1,33 @@
+	@Test
+	public void testEncodeInt24() {
+		byte[] out = new byte[16];
+
+		prepareOutput(out);
+		NB.encodeInt24(out, 0, 0);
+		assertOutput(b(0, 0, 0), out, 0);
+
+		prepareOutput(out);
+		NB.encodeInt24(out, 3, 0);
+		assertOutput(b(0, 0, 0), out, 3);
+
+		prepareOutput(out);
+		NB.encodeInt24(out, 0, 3);
+		assertOutput(b(0, 0, 3), out, 0);
+
+		prepareOutput(out);
+		NB.encodeInt24(out, 3, 3);
+		assertOutput(b(0, 0, 3), out, 3);
+
+		prepareOutput(out);
+		NB.encodeInt24(out, 0, 0xc0deac);
+		assertOutput(b(0xc0, 0xde, 0xac), out, 0);
+
+		prepareOutput(out);
+		NB.encodeInt24(out, 3, 0xbadeac);
+		assertOutput(b(0xba, 0xde, 0xac), out, 3);
+
+		prepareOutput(out);
+		NB.encodeInt24(out, 3, -1);
+		assertOutput(b(0xff, 0xff, 0xff), out, 3);
+	}
+

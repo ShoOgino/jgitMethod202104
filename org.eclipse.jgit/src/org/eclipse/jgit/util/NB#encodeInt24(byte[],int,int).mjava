@@ -1,0 +1,23 @@
+	/**
+	 * Write a 24 bit integer as a sequence of 3 bytes (network byte order).
+	 *
+	 * @param intbuf
+	 *            buffer to write the 3 bytes of data into.
+	 * @param offset
+	 *            position within the buffer to begin writing to. This position
+	 *            and the next 2 bytes after it (for a total of 3 bytes) will be
+	 *            replaced.
+	 * @param v
+	 *            the value to write.
+	 * @since 4.9
+	 */
+	public static void encodeInt24(byte[] intbuf, int offset, int v) {
+		intbuf[offset + 2] = (byte) v;
+		v >>>= 8;
+
+		intbuf[offset + 1] = (byte) v;
+		v >>>= 8;
+
+		intbuf[offset] = (byte) v;
+	}
+
