@@ -1,9 +1,6 @@
 	@Test
 	public void testOneBlankLine() {
 		final IntList map = RawParseUtils.lineMap(new byte[] { '\n' }, 0, 1);
-		assertEquals(3, map.size());
-		assertEquals(Integer.MIN_VALUE, map.get(0));
-		assertEquals(0, map.get(1));
-		assertEquals(1, map.get(2));
+		assertArrayEquals(new int[]{Integer.MIN_VALUE, 0, 1}, asInts(map));
 	}
 
