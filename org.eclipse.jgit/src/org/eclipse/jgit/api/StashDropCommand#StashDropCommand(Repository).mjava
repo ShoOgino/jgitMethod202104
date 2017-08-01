@@ -3,5 +3,9 @@
 	 */
 	public StashDropCommand(Repository repo) {
 		super(repo);
+		if (!(repo.getRefDatabase() instanceof RefDirectory)) {
+			throw new UnsupportedOperationException(
+					JGitText.get().stashDropNotSupported);
+		}
 	}
 

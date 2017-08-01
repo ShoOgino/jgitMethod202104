@@ -39,10 +39,11 @@
 			return null;
 		}
 
-		ReflogWriter writer = new ReflogWriter(repo, true);
+		RefDirectory refdb = (RefDirectory) repo.getRefDatabase();
+		ReflogWriter writer = new ReflogWriter(refdb, true);
 		String stashLockRef = ReflogWriter.refLockFor(R_STASH);
-		File stashLockFile = writer.logFor(stashLockRef);
-		File stashFile = writer.logFor(R_STASH);
+		File stashLockFile = refdb.logFor(stashLockRef);
+		File stashFile = refdb.logFor(R_STASH);
 		if (stashLockFile.exists())
 			throw new JGitInternalException(JGitText.get().stashDropFailed,
 					new LockFailedException(stashFile));

@@ -1,12 +1,12 @@
 	private ReflogWriter log(String refName, byte[] rec) throws IOException {
-		File log = logFor(refName);
+		File log = refdb.logFor(refName);
 		boolean write = forceWrite
 				|| (isLogAllRefUpdates() && shouldAutoCreateLog(refName))
 				|| log.isFile();
 		if (!write)
 			return this;
 
-		WriteConfig wc = getRepository().getConfig().get(WriteConfig.KEY);
+		WriteConfig wc = refdb.getRepository().getConfig().get(WriteConfig.KEY);
 		FileOutputStream out;
 		try {
 			out = new FileOutputStream(log, true);
