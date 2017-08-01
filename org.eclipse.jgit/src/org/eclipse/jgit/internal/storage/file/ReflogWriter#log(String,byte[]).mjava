@@ -1,7 +1,6 @@
-	private ReflogWriter log(final String refName, final byte[] rec)
-			throws IOException {
-		final File log = logFor(refName);
-		final boolean write = forceWrite
+	private ReflogWriter log(String refName, byte[] rec) throws IOException {
+		File log = logFor(refName);
+		boolean write = forceWrite
 				|| (isLogAllRefUpdates() && shouldAutoCreateLog(refName))
 				|| log.isFile();
 		if (!write)
@@ -12,7 +11,7 @@
 		try {
 			out = new FileOutputStream(log, true);
 		} catch (FileNotFoundException err) {
-			final File dir = log.getParentFile();
+			File dir = log.getParentFile();
 			if (dir.exists())
 				throw err;
 			if (!dir.mkdirs() && !dir.isDirectory())

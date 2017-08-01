@@ -1,5 +1,5 @@
 	/**
-	 * Write the given ref update to the ref's log
+	 * Write the given ref update to the ref's log.
 	 *
 	 * @param update
 	 * @param msg
@@ -7,11 +7,11 @@
 	 * @return this writer
 	 * @throws IOException
 	 */
-	public ReflogWriter log(final RefUpdate update, final String msg,
-			final boolean deref) throws IOException {
-		final ObjectId oldId = update.getOldObjectId();
-		final ObjectId newId = update.getNewObjectId();
-		final Ref ref = update.getRef();
+	public ReflogWriter log(RefUpdate update, String msg,
+			boolean deref) throws IOException {
+		ObjectId oldId = update.getOldObjectId();
+		ObjectId newId = update.getNewObjectId();
+		Ref ref = update.getRef();
 
 		PersonIdent ident = update.getRefLogIdent();
 		if (ident == null)
@@ -19,7 +19,7 @@
 		else
 			ident = new PersonIdent(ident);
 
-		final byte[] rec = encode(oldId, newId, ident, msg);
+		byte[] rec = encode(oldId, newId, ident, msg);
 		if (deref && ref.isSymbolic()) {
 			log(ref.getName(), rec);
 			log(ref.getLeaf().getName(), rec);

@@ -9,9 +9,8 @@
 	 * @return this writer
 	 * @throws IOException
 	 */
-	public ReflogWriter log(final String refName, final ObjectId oldId,
-			final ObjectId newId, final PersonIdent ident, final String message)
-			throws IOException {
+	public ReflogWriter log(String refName, ObjectId oldId,
+			ObjectId newId, PersonIdent ident, String message) throws IOException {
 		byte[] encoded = encode(oldId, newId, ident, message);
 		return log(refName, encoded);
 	}
