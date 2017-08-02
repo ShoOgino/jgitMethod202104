@@ -5,9 +5,7 @@
 		git.add().addFilepattern("file.txt").call();
 		RevCommit commit = git.commit().setMessage("create file").call();
 
-		RefUpdate update = db.updateRef(Constants.R_STASH);
-		update.setNewObjectId(commit);
-		assertEquals(Result.NEW, update.update());
+		assertEquals(Result.NEW, newStashUpdate(commit).update());
 
 		StashListCommand command = git.stashList();
 		Collection<RevCommit> stashed = command.call();

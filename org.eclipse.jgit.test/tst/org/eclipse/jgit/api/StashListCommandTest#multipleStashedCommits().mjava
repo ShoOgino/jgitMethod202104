@@ -10,13 +10,8 @@
 		git.add().addFilepattern("file.txt").call();
 		RevCommit commit2 = git.commit().setMessage("edit file").call();
 
-		RefUpdate create = db.updateRef(Constants.R_STASH);
-		create.setNewObjectId(commit1);
-		assertEquals(Result.NEW, create.update());
-
-		RefUpdate update = db.updateRef(Constants.R_STASH);
-		update.setNewObjectId(commit2);
-		assertEquals(Result.FAST_FORWARD, update.update());
+		assertEquals(Result.NEW, newStashUpdate(commit1).update());
+		assertEquals(Result.FAST_FORWARD, newStashUpdate(commit2).update());
 
 		StashListCommand command = git.stashList();
 		Collection<RevCommit> stashed = command.call();
