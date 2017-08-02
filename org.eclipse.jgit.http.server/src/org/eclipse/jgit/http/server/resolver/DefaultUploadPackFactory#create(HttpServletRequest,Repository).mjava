@@ -1,7 +1,7 @@
 	@Override
 	public UploadPack create(final HttpServletRequest req, final Repository db)
 			throws ServiceNotEnabledException, ServiceNotAuthorizedException {
-		if (db.getConfig().get(CONFIG).enabled)
+		if (db.getConfig().get(ServiceConfig::new).enabled)
 			return new UploadPack(db);
 		else
 			throw new ServiceNotEnabledException();

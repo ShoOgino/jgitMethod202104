@@ -1,7 +1,7 @@
 	@Override
 	public ReceivePack create(final HttpServletRequest req, final Repository db)
 			throws ServiceNotEnabledException, ServiceNotAuthorizedException {
-		final ServiceConfig cfg = db.getConfig().get(CONFIG);
+		final ServiceConfig cfg = db.getConfig().get(ServiceConfig::new);
 		String user = req.getRemoteUser();
 
 		if (cfg.set) {
