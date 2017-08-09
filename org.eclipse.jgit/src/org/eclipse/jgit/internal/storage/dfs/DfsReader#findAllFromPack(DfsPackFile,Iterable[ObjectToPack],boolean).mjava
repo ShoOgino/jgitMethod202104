@@ -1,12 +1,17 @@
 	private List<DfsObjectToPack> findAllFromPack(DfsPackFile pack,
-			Iterable<ObjectToPack> objects) throws IOException {
+			Iterable<ObjectToPack> objects, boolean skipFound)
+					throws IOException {
 		List<DfsObjectToPack> tmp = new BlockList<>();
 		PackIndex idx = pack.getPackIndex(this);
-		for (ObjectToPack otp : objects) {
+		for (ObjectToPack obj : objects) {
+			DfsObjectToPack otp = (DfsObjectToPack) obj;
+			if (skipFound && otp.isFound()) {
+				continue;
+			}
 			long p = idx.findOffset(otp);
 			if (0 < p && !pack.isCorrupt(p)) {
 				otp.setOffset(p);
-				tmp.add((DfsObjectToPack) otp);
+				tmp.add(otp);
 			}
 		}
 		return tmp;

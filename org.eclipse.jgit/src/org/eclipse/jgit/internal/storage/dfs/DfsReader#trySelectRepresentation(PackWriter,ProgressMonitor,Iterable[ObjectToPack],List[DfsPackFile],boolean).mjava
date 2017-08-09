@@ -1,0 +1,22 @@
+	private void trySelectRepresentation(PackWriter packer,
+			ProgressMonitor monitor, Iterable<ObjectToPack> objects,
+			List<DfsPackFile> packs, boolean skipFound) throws IOException {
+		for (DfsPackFile pack : packs) {
+			List<DfsObjectToPack> tmp = findAllFromPack(pack, objects, skipFound);
+			if (tmp.isEmpty())
+				continue;
+			Collections.sort(tmp, OFFSET_SORT);
+			PackReverseIndex rev = pack.getReverseIdx(this);
+			DfsObjectRepresentation rep = new DfsObjectRepresentation(pack);
+			for (DfsObjectToPack otp : tmp) {
+				pack.representation(rep, otp.getOffset(), this, rev);
+				otp.setOffset(0);
+				packer.select(otp, rep);
+				if (!otp.isFound()) {
+					otp.setFound();
+					monitor.update(1);
+				}
+			}
+		}
+	}
+

@@ -2,24 +2,14 @@
 	public void selectObjectRepresentation(PackWriter packer,
 			ProgressMonitor monitor, Iterable<ObjectToPack> objects)
 			throws IOException, MissingObjectException {
-		// Don't check dirty bit on PackList; assume ObjectToPacks all came from the
-		// current list.
-		for (DfsPackFile pack : sortPacksForSelectRepresentation()) {
-			List<DfsObjectToPack> tmp = findAllFromPack(pack, objects);
-			if (tmp.isEmpty())
-				continue;
-			Collections.sort(tmp, OFFSET_SORT);
-			PackReverseIndex rev = pack.getReverseIdx(this);
-			DfsObjectRepresentation rep = new DfsObjectRepresentation(pack);
-			for (DfsObjectToPack otp : tmp) {
-				pack.representation(rep, otp.getOffset(), this, rev);
-				otp.setOffset(0);
-				packer.select(otp, rep);
-				if (!otp.isFound()) {
-					otp.setFound();
-					monitor.update(1);
-				}
-			}
+		// Don't check dirty bit on PackList; assume ObjectToPacks all came
+		// from the current list.
+		List<DfsPackFile> packs = sortPacksForSelectRepresentation();
+		trySelectRepresentation(packer, monitor, objects, packs, false);
+
+		List<DfsPackFile> garbage = garbagePacksForSelectRepresentation();
+		if (!garbage.isEmpty() && checkGarbagePacks(objects)) {
+			trySelectRepresentation(packer, monitor, objects, garbage, true);
 		}
 	}
 
