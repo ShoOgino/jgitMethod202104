@@ -27,7 +27,13 @@
 			checkTree(id, raw);
 			break;
 		case OBJ_BLOB:
-			checkBlob(raw);
+			BlobObjectChecker checker = newBlobObjectChecker();
+			if (checker == null) {
+				checkBlob(raw);
+			} else {
+				checker.update(raw, 0, raw.length);
+				checker.endBlob(id);
+			}
 			break;
 		default:
 			report(UNKNOWN_TYPE, id, MessageFormat.format(
