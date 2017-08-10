@@ -1,13 +1,18 @@
 	private void packHeads(ProgressMonitor pm) throws IOException {
-		if (allHeadsAndTags.isEmpty())
+		if (allHeadsAndTags.isEmpty()) {
+			writeReftable();
 			return;
+		}
 
 		try (PackWriter pw = newPackWriter()) {
 			pw.setTagTargets(tagTargets);
 			pw.preparePack(pm, allHeadsAndTags, NONE, NONE, allTags);
-			if (0 < pw.getObjectCount())
-				writePack(GC, pw, pm,
-						estimateGcPackSize(INSERT, RECEIVE, COMPACT, GC));
+			if (0 < pw.getObjectCount()) {
+				long estSize = estimateGcPackSize(INSERT, RECEIVE, COMPACT, GC);
+				writePack(GC, pw, pm, estSize);
+			} else {
+				writeReftable();
+			}
 		}
 	}
 

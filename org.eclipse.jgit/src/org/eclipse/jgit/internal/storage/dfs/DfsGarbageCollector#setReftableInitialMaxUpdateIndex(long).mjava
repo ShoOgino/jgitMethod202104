@@ -1,0 +1,20 @@
+	/**
+	 * Set maxUpdateIndex for the initial reftable created during conversion.
+	 * <p>
+	 * <b>Warning:</b> A setting {@code != 1} <b>disables cache refreshes</b>
+	 * normally performed at the start of {@link #pack(ProgressMonitor)}.
+	 * Callers must ensure the reference cache is current and will have been
+	 * read before the pack list.
+	 *
+	 * @param u
+	 *            maxUpdateIndex for the initial reftable created by scanning
+	 *            {@link DfsRefDatabase#getRefs(String)}. Ignored unless caller
+	 *            has also set {@link #setReftableConfig(ReftableConfig)}.
+	 *            Defaults to {@code 1}. Must be {@code u >= 0}.
+	 * @return {@code this}
+	 */
+	public DfsGarbageCollector setReftableInitialMaxUpdateIndex(long u) {
+		reftableInitialMaxUpdateIndex = Math.max(0, u);
+		return this;
+	}
+

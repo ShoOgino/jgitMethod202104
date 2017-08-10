@@ -1,12 +1,16 @@
-	private List<DfsPackDescription> toPrune() {
-		int cnt = packsBefore.size();
-		List<DfsPackDescription> all = new ArrayList<>(cnt);
+	private Set<DfsPackDescription> toPrune() {
+		Set<DfsPackDescription> toPrune = new HashSet<>();
 		for (DfsPackFile pack : packsBefore) {
-			all.add(pack.getPackDescription());
+			toPrune.add(pack.getPackDescription());
+		}
+		if (reftableConfig != null) {
+			for (DfsReftable table : reftablesBefore) {
+				toPrune.add(table.getPackDescription());
+			}
 		}
 		for (DfsPackFile pack : expiredGarbagePacks) {
-			all.add(pack.getPackDescription());
+			toPrune.add(pack.getPackDescription());
 		}
-		return all;
+		return toPrune;
 	}
 

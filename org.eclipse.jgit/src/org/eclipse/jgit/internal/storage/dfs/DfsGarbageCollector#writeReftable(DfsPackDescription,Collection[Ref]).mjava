@@ -1,0 +1,15 @@
+	private void writeReftable(DfsPackDescription pack, Collection<Ref> refs)
+			throws IOException {
+		try (DfsOutputStream out = objdb.writeFile(pack, REFTABLE)) {
+			ReftableConfig cfg = configureReftable(reftableConfig, out);
+			ReftableWriter writer = new ReftableWriter(cfg)
+					.setMinUpdateIndex(reftableInitialMinUpdateIndex)
+					.setMaxUpdateIndex(reftableInitialMaxUpdateIndex)
+					.begin(out)
+					.sortAndWriteRefs(refs)
+					.finish();
+			pack.addFileExt(REFTABLE);
+			pack.setReftableStats(writer.getStats());
+		}
+	}
+

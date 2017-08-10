@@ -4,6 +4,10 @@
 				estimatedPackSize);
 		newPackDesc.add(pack);
 
+		if (source == GC && reftableConfig != null) {
+			writeReftable(pack);
+		}
+
 		try (DfsOutputStream out = objdb.writeFile(pack, PACK)) {
 			pw.writePack(pm, pm, out);
 			pack.addFileExt(PACK);
