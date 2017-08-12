@@ -1,0 +1,16 @@
+	@Test
+	public void testStarPathMatch() throws Exception {
+		setupRepo(null, null, "sub/new/* bar", null);
+		writeTrashFile("sub/new/foo.txt", "1");
+		writeTrashFile("sub/new/lower/foo.txt", "2");
+		walk = beginWalk();
+		assertIteration(F, ".gitattributes");
+		assertIteration(D, "sub");
+		assertIteration(F, "sub/a.txt");
+		assertIteration(D, "sub/new");
+		assertIteration(F, "sub/new/foo.txt", attrs("bar"));
+		assertIteration(D, "sub/new/lower", attrs("bar"));
+		assertIteration(F, "sub/new/lower/foo.txt");
+		endWalk();
+	}
+

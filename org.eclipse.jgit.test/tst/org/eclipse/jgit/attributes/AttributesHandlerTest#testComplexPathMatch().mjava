@@ -1,0 +1,15 @@
+	@Test
+	public void testComplexPathMatch() throws Exception {
+		setupRepo(null, null, "s[t-v]b/n[de]w bar", null);
+		writeTrashFile("sub/new/foo.txt", "1");
+		writeTrashFile("sub/ndw", "2");
+		walk = beginWalk();
+		assertIteration(F, ".gitattributes");
+		assertIteration(D, "sub");
+		assertIteration(F, "sub/a.txt");
+		assertIteration(F, "sub/ndw", attrs("bar"));
+		assertIteration(D, "sub/new", attrs("bar"));
+		assertIteration(F, "sub/new/foo.txt");
+		endWalk();
+	}
+

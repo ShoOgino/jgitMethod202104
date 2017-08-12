@@ -44,16 +44,16 @@
 		pattern = "/src/ne?";
 		assertMatched(pattern, "/src/new/");
 		assertMatched(pattern, "/src/new");
-		assertMatched(pattern, "/src/new/a.c");
-		assertMatched(pattern, "/src/new/a/a.c");
+		assertNotMatched(pattern, "/src/new/a.c");
+		assertNotMatched(pattern, "/src/new/a/a.c");
 		assertNotMatched(pattern, "/src/new.c");
 
 		//Test name-only fnmatcher matches
 		pattern = "ne?";
 		assertMatched(pattern, "/src/new/");
 		assertMatched(pattern, "/src/new");
-		assertMatched(pattern, "/src/new/a.c");
-		assertMatched(pattern, "/src/new/a/a.c");
+		assertNotMatched(pattern, "/src/new/a.c");
+		assertNotMatched(pattern, "/src/new/a/a.c");
 		assertMatched(pattern, "/neb");
 		assertNotMatched(pattern, "/src/new.c");
 	}

@@ -9,51 +9,58 @@
 		assertMatched(pattern, "/src/test.stp");
 		assertNotMatched(pattern, "/test.stp1");
 		assertNotMatched(pattern, "/test.astp");
+		assertNotMatched(pattern, "test.stp/foo.bar");
+		assertMatched(pattern, "test.stp");
+		assertMatched(pattern, "test.stp/");
+		assertMatched(pattern, "test.stp/test.stp");
 
 		//Test matches for name-only, applies to file name or folder name
 		pattern = "src";
 		assertMatched(pattern, "/src");
 		assertMatched(pattern, "/src/");
-		assertMatched(pattern, "/src/a.c");
-		assertMatched(pattern, "/src/new/a.c");
-		assertMatched(pattern, "/new/src/a.c");
+		assertNotMatched(pattern, "/src/a.c");
+		assertNotMatched(pattern, "/src/new/a.c");
+		assertNotMatched(pattern, "/new/src/a.c");
 		assertMatched(pattern, "/file/src");
 
 		//Test matches for name-only, applies only to folder names
 		pattern = "src/";
-		assertMatched(pattern, "/src/");
-		assertMatched(pattern, "/src/a.c");
-		assertMatched(pattern, "/src/new/a.c");
-		assertMatched(pattern, "/new/src/a.c");
+		assertNotMatched(pattern, "/src/a.c");
+		assertNotMatched(pattern, "/src/new/a.c");
+		assertNotMatched(pattern, "/new/src/a.c");
 		assertNotMatched(pattern, "/src");
 		assertNotMatched(pattern, "/file/src");
+		assertMatched(pattern, "/file/src/");
 
 		//Test matches for name-only, applies to file name or folder name
 		//With a small wildcard
 		pattern = "?rc";
-		assertMatched(pattern, "/src/a.c");
-		assertMatched(pattern, "/src/new/a.c");
-		assertMatched(pattern, "/new/src/a.c");
+		assertNotMatched(pattern, "/src/a.c");
+		assertNotMatched(pattern, "/src/new/a.c");
+		assertNotMatched(pattern, "/new/src/a.c");
+		assertMatched(pattern, "/new/src/");
 		assertMatched(pattern, "/file/src");
 		assertMatched(pattern, "/src/");
 
 		//Test matches for name-only, applies to file name or folder name
 		//With a small wildcard
 		pattern = "?r[a-c]";
-		assertMatched(pattern, "/src/a.c");
-		assertMatched(pattern, "/src/new/a.c");
-		assertMatched(pattern, "/new/src/a.c");
+		assertNotMatched(pattern, "/src/a.c");
+		assertNotMatched(pattern, "/src/new/a.c");
+		assertNotMatched(pattern, "/new/src/a.c");
 		assertMatched(pattern, "/file/src");
 		assertMatched(pattern, "/src/");
-		assertMatched(pattern, "/srb/a.c");
-		assertMatched(pattern, "/grb/new/a.c");
-		assertMatched(pattern, "/new/crb/a.c");
+		assertNotMatched(pattern, "/srb/a.c");
+		assertNotMatched(pattern, "/grb/new/a.c");
+		assertNotMatched(pattern, "/new/crb/a.c");
 		assertMatched(pattern, "/file/3rb");
 		assertMatched(pattern, "/xrb/");
-		assertMatched(pattern, "/3ra/a.c");
-		assertMatched(pattern, "/5ra/new/a.c");
-		assertMatched(pattern, "/new/1ra/a.c");
+		assertNotMatched(pattern, "/3ra/a.c");
+		assertNotMatched(pattern, "/5ra/new/a.c");
+		assertNotMatched(pattern, "/new/1ra/a.c");
+		assertNotMatched(pattern, "/new/1ra/a.c/");
 		assertMatched(pattern, "/file/dra");
+		assertMatched(pattern, "/file/dra/");
 		assertMatched(pattern, "/era/");
 		assertNotMatched(pattern, "/crg");
 		assertNotMatched(pattern, "/cr3");

@@ -3,13 +3,16 @@
 			boolean assumeDirectory) {
 		// faster local access, same as in string.indexOf()
 		String s = subPattern;
-		if (s.length() != (endExcl - startIncl))
+		int length = s.length();
+		if (length != (endExcl - startIncl)) {
 			return false;
-		for (int i = 0; i < s.length(); i++) {
+		}
+		for (int i = 0; i < length; i++) {
 			char c1 = s.charAt(i);
 			char c2 = segment.charAt(i + startIncl);
-			if (c1 != c2)
+			if (c1 != c2) {
 				return false;
+			}
 		}
 		return true;
 	}

@@ -1,0 +1,9 @@
+	@Override
+	public boolean matches(String path, boolean assumeDirectory,
+			boolean pathMatch) {
+		if (matchers == null) {
+			return simpleMatch(path, assumeDirectory, pathMatch);
+		}
+		return iterate(path, 0, path.length(), assumeDirectory, pathMatch);
+	}
+

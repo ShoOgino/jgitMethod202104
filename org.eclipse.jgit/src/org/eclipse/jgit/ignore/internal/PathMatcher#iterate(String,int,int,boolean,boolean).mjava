@@ -1,5 +1,5 @@
-	boolean iterate(final String path, final int startIncl, final int endExcl,
-			boolean assumeDirectory) {
+	private boolean iterate(final String path, final int startIncl,
+			final int endExcl, boolean assumeDirectory, boolean pathMatch) {
 		int matcher = 0;
 		int right = startIncl;
 		boolean match = false;
@@ -37,14 +37,26 @@
 				continue;
 			}
 			if (match) {
-				if (matchers.get(matcher) == WILD) {
+				boolean wasWild = matchers.get(matcher) == WILD;
+				if (wasWild) {
 					lastWildmatch = matcher;
 					// ** can match *nothing*: a/**/b match also a/b
 					right = left - 1;
 				}
 				matcher++;
 				if (matcher == matchers.size()) {
-					return true;
+					// We had a prefix match here.
+					if (!pathMatch) {
+						return true;
+					} else {
+						if (right == endExcl - 1) {
+							// Extra slash at the end: actually a full match.
+							// Must meet directory expectations
+							return !dirOnly || assumeDirectory;
+						}
+						// Prefix matches only if pattern ended with /**
+						return wasWild;
+					}
 				}
 			} else if (lastWildmatch != -1) {
 				matcher = lastWildmatch + 1;

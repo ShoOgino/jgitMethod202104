@@ -2,10 +2,23 @@
 	public void testTrailingSlash() {
 		String pattern = "/src/";
 		assertMatched(pattern, "/src/");
-		assertMatched(pattern, "/src/new");
-		assertMatched(pattern, "/src/new/a.c");
-		assertMatched(pattern, "/src/a.c");
+		assertNotMatched(pattern, "/src/new");
+		assertNotMatched(pattern, "/src/new/a.c");
+		assertNotMatched(pattern, "/src/a.c");
 		assertNotMatched(pattern, "/src");
 		assertNotMatched(pattern, "/srcA/");
+
+		pattern = "src/";
+		assertMatched(pattern, "src/");
+		assertMatched(pattern, "/src/");
+		assertNotMatched(pattern, "src");
+		assertNotMatched(pattern, "/src/new");
+		assertNotMatched(pattern, "/src/new/a.c");
+		assertNotMatched(pattern, "/src/a.c");
+		assertNotMatched(pattern, "foo/src/a.c");
+		assertNotMatched(pattern, "foo/src/bar/a.c");
+		assertNotMatched(pattern, "foo/src/bar/src");
+		assertMatched(pattern, "foo/src/");
+		assertMatched(pattern, "foo/src/bar/src/");
 	}
 

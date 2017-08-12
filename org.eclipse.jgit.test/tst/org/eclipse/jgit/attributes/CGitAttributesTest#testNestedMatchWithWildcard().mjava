@@ -1,0 +1,10 @@
+	@Test
+	public void testNestedMatchWithWildcard() throws Exception {
+		// See above.
+		createFiles("foo/bar.jar", "foo/bar.xml", "sub/b.jar", "sub/b.xml",
+				"sub/foo/b.jar");
+		writeTrashFile(".gitattributes",
+				"**/foo/ xml\n" + "*/foo/ sub\n" + "*.jar jar\n");
+		assertSameAsCGit();
+	}
+

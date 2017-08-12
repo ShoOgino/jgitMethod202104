@@ -3,31 +3,31 @@
 	 * wildcards or single segments (mean: this is multi-segment path which must
 	 * be at the beginning of the another string)
 	 */
-	private boolean simpleMatch(String path, boolean assumeDirectory) {
+	private boolean simpleMatch(String path, boolean assumeDirectory,
+			boolean pathMatch) {
 		boolean hasSlash = path.indexOf(slash) == 0;
-		if (beginning && !hasSlash)
+		if (beginning && !hasSlash) {
 			path = slash + path;
-
-		if (!beginning && hasSlash)
+		}
+		if (!beginning && hasSlash) {
 			path = path.substring(1);
-
-		if (path.equals(pattern))
-			// Exact match
-			if (dirOnly && !assumeDirectory)
-				// Directory expectations not met
-				return false;
-			else
-				// Directory expectations met
-				return true;
-
+		}
+		if (path.equals(pattern)) {
+			// Exact match: must meet directory expectations
+			return !dirOnly || assumeDirectory;
+		}
 		/*
 		 * Add slashes for startsWith check. This avoids matching e.g.
 		 * "/src/new" to /src/newfile" but allows "/src/new" to match
 		 * "/src/new/newfile", as is the git standard
 		 */
-		if (path.startsWith(pattern + FastIgnoreRule.PATH_SEPARATOR))
+		String prefix = pattern + slash;
+		if (pathMatch) {
+			return path.equals(prefix) && (!dirOnly || assumeDirectory);
+		}
+		if (path.startsWith(prefix)) {
 			return true;
-
+		}
 		return false;
 	}
 

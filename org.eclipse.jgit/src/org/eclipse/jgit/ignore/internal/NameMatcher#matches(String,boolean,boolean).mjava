@@ -1,0 +1,49 @@
+	@Override
+	public boolean matches(String path, boolean assumeDirectory,
+			boolean pathMatch) {
+		// A NameMatcher's pattern does not contain a slash.
+		int start = 0;
+		int stop = path.length();
+		if (stop > 0 && path.charAt(0) == slash) {
+			start++;
+		}
+		if (pathMatch) {
+			// Can match only after the last slash
+			int lastSlash = path.lastIndexOf(slash, stop - 1);
+			if (lastSlash == stop - 1) {
+				// Skip trailing slash
+				lastSlash = path.lastIndexOf(slash, lastSlash - 1);
+				stop--;
+			}
+			boolean match;
+			if (lastSlash < start) {
+				match = matches(path, start, stop, assumeDirectory);
+			} else {
+				// Can't match if the path contains a slash if the pattern is
+				// anchored at the beginning
+				match = !beginning
+						&& matches(path, lastSlash + 1, stop, assumeDirectory);
+			}
+			if (match && dirOnly) {
+				match = assumeDirectory;
+			}
+			return match;
+		}
+		while (start < stop) {
+			int end = path.indexOf(slash, start);
+			if (end < 0) {
+				end = stop;
+			}
+			if (end > start && matches(path, start, end, assumeDirectory)) {
+				// make sure the directory matches: either if we are done with
+				// segment and there is next one, or if the directory is assumed
+				return !dirOnly || assumeDirectory || end < stop;
+			}
+			if (beginning) {
+				break;
+			}
+			start = end + 1;
+		}
+		return false;
+	}
+

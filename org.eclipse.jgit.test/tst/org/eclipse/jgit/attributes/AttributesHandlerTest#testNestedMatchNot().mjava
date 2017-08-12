@@ -1,0 +1,20 @@
+	@Test
+	public void testNestedMatchNot() throws Exception {
+		setupRepo(null, null, "*.xml xml\n*.jar jar", null);
+		writeTrashFile("foo.xml/bar.jar", "b");
+		writeTrashFile("foo.xml/bar.xml", "bx");
+		writeTrashFile("sub/b.jar", "bj");
+		writeTrashFile("sub/b.xml", "bx");
+		// On foo.xml/bar.jar we must not have 'xml'
+		walk = beginWalk();
+		assertIteration(F, ".gitattributes");
+		assertIteration(D, "foo.xml", attrs("xml"));
+		assertIteration(F, "foo.xml/bar.jar", attrs("jar"));
+		assertIteration(F, "foo.xml/bar.xml", attrs("xml"));
+		assertIteration(D, "sub");
+		assertIteration(F, "sub/a.txt");
+		assertIteration(F, "sub/b.jar", attrs("jar"));
+		assertIteration(F, "sub/b.xml", attrs("xml"));
+		endWalk();
+	}
+
