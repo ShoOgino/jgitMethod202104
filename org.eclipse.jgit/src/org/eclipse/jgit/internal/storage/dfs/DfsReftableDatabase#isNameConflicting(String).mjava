@@ -1,0 +1,22 @@
+	@Override
+	public boolean isNameConflicting(String refName) throws IOException {
+		lock.lock();
+		try {
+			Reftable table = reader();
+
+			// Cannot be nested within an existing reference.
+			int lastSlash = refName.lastIndexOf('/');
+			while (0 < lastSlash) {
+				if (table.hasRef(refName.substring(0, lastSlash))) {
+					return true;
+				}
+				lastSlash = refName.lastIndexOf('/', lastSlash - 1);
+			}
+
+			// Cannot be the container of an existing reference.
+			return table.hasRef(refName + '/');
+		} finally {
+			lock.unlock();
+		}
+	}
+

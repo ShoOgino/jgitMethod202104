@@ -1,0 +1,17 @@
+	/**
+	 * Initialize batch update.
+	 *
+	 * @param refdb
+	 *            database the update will modify.
+	 * @param odb
+	 *            object database to store the reftable.
+	 */
+	protected ReftableBatchRefUpdate(DfsReftableDatabase refdb,
+			DfsObjDatabase odb) {
+		super(refdb);
+		this.refdb = refdb;
+		this.odb = odb;
+		lock = refdb.getLock();
+		reftableConfig = new ReftableConfig(refdb.getRepository().getConfig());
+	}
+

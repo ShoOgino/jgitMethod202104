@@ -1,0 +1,19 @@
+	@Override
+	protected boolean compareAndPut(Ref oldRef, @Nullable Ref newRef)
+			throws IOException {
+		ReceiveCommand cmd = toCommand(oldRef, newRef);
+		try (RevWalk rw = new RevWalk(getRepository())) {
+			newBatchUpdate().setAllowNonFastForwards(true).addCommand(cmd)
+					.execute(rw, NullProgressMonitor.INSTANCE);
+		}
+		switch (cmd.getResult()) {
+		case OK:
+			return true;
+		case REJECTED_OTHER_REASON:
+			throw new IOException(cmd.getMessage());
+		case LOCK_FAILURE:
+		default:
+			return false;
+		}
+	}
+

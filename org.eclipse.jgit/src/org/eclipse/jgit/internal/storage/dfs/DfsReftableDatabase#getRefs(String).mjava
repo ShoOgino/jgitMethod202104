@@ -1,0 +1,23 @@
+	@Override
+	public Map<String, Ref> getRefs(String prefix) throws IOException {
+		RefList.Builder<Ref> all = new RefList.Builder<>();
+		lock.lock();
+		try {
+			Reftable table = reader();
+			try (RefCursor rc = ALL.equals(prefix) ? table.allRefs()
+					: table.seekRef(prefix)) {
+				while (rc.next()) {
+					Ref ref = table.resolve(rc.getRef());
+					if (ref != null) {
+						all.add(ref);
+					}
+				}
+			}
+		} finally {
+			lock.unlock();
+		}
+
+		RefList<Ref> none = RefList.emptyList();
+		return new RefMap(prefix, all.toRefList(), none, none);
+	}
+

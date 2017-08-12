@@ -1,0 +1,32 @@
+	private boolean checkConflicting(List<ReceiveCommand> pending)
+			throws IOException {
+		Set<String> names = new HashSet<>();
+		for (ReceiveCommand cmd : pending) {
+			names.add(cmd.getRefName());
+		}
+
+		boolean ok = true;
+		for (ReceiveCommand cmd : pending) {
+			String name = cmd.getRefName();
+			if (refdb.isNameConflicting(name)) {
+				cmd.setResult(LOCK_FAILURE);
+				ok = false;
+			} else {
+				int s = name.lastIndexOf('/');
+				while (0 < s) {
+					if (names.contains(name.substring(0, s))) {
+						cmd.setResult(LOCK_FAILURE);
+						ok = false;
+						break;
+					}
+					s = name.lastIndexOf('/', s - 1);
+				}
+			}
+		}
+		if (!ok && isAtomic()) {
+			ReceiveCommand.abort(pending);
+			return false;
+		}
+		return ok;
+	}
+
