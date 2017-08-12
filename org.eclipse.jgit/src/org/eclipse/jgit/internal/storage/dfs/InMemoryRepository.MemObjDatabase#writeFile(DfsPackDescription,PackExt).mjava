@@ -1,11 +1,11 @@
 		@Override
-		protected DfsOutputStream writeFile(
-				DfsPackDescription desc, final PackExt ext) throws IOException {
-			final MemPack memPack = (MemPack) desc;
+		protected DfsOutputStream writeFile(DfsPackDescription desc,
+				PackExt ext) throws IOException {
+			MemPack memPack = (MemPack) desc;
 			return new Out() {
 				@Override
 				public void flush() {
-					memPack.fileMap.put(ext, getData());
+					memPack.put(ext, getData());
 				}
 			};
 		}

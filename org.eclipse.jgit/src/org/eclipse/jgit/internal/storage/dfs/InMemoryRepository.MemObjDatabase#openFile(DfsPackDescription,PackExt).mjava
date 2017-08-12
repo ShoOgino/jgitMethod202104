@@ -2,7 +2,7 @@
 		protected ReadableChannel openFile(DfsPackDescription desc, PackExt ext)
 				throws FileNotFoundException, IOException {
 			MemPack memPack = (MemPack) desc;
-			byte[] file = memPack.fileMap.get(ext);
+			byte[] file = memPack.get(ext);
 			if (file == null)
 				throw new FileNotFoundException(desc.getFileName(ext));
 			return new ByteArrayReadableChannel(file, blockSize);
