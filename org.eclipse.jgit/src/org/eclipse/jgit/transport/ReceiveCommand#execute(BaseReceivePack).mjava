@@ -9,7 +9,18 @@
 	 */
 	public void execute(final BaseReceivePack rp) {
 		try {
-			final RefUpdate ru = rp.getRepository().updateRef(getRefName());
+			String expTarget = getOldSymref();
+			boolean detach = getNewSymref() != null
+					|| (type == Type.DELETE && expTarget != null);
+			RefUpdate ru = rp.getRepository().updateRef(getRefName(), detach);
+			if (expTarget != null) {
+				if (!ru.getRef().isSymbolic() || !ru.getRef().getTarget()
+						.getName().equals(expTarget)) {
+					setResult(Result.LOCK_FAILURE);
+					return;
+				}
+			}
+
 			ru.setRefLogIdent(rp.getRefLogIdent());
 			ru.setRefLogMessage(refLogMessage, refLogIncludeResult);
 			switch (getType()) {
@@ -30,9 +41,13 @@
 			case UPDATE_NONFASTFORWARD:
 				ru.setForceUpdate(rp.isAllowNonFastForwards());
 				ru.setExpectedOldObjectId(getOldId());
-				ru.setNewObjectId(getNewId());
 				ru.setRefLogMessage("push", true); //$NON-NLS-1$
-				setResult(ru.update(rp.getRevWalk()));
+				if (getNewSymref() != null) {
+					setResult(ru.link(getNewSymref()));
+				} else {
+					ru.setNewObjectId(getNewId());
+					setResult(ru.update(rp.getRevWalk()));
+				}
 				break;
 			}
 		} catch (IOException err) {

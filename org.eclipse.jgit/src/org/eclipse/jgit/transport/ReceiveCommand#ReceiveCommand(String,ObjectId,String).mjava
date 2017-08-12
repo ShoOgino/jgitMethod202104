@@ -1,0 +1,37 @@
+	/**
+	 * Create a command to switch a reference from symbolic to object.
+	 *
+	 * @param oldSymref
+	 *            expected old target. Use {@code null} to indicate a ref
+	 *            creation.
+	 * @param newId
+	 *            the new object id; must not be null. Use
+	 *            {@link ObjectId#zeroId()} to indicate a ref deletion.
+	 * @param name
+	 *            name of the reference to convert from symbolic.
+	 * @since 4.10
+	 */
+	private ReceiveCommand(String oldSymref, ObjectId newId, String name) {
+		if (newId == null) {
+			throw new IllegalArgumentException(
+					JGitText.get().newIdMustNotBeNull);
+		}
+		if (name == null || name.isEmpty()) {
+			throw new IllegalArgumentException(
+					JGitText.get().nameMustNotBeNullOrEmpty);
+		}
+		this.oldId = ObjectId.zeroId();
+		this.oldSymref = oldSymref;
+		this.newId = newId;
+		this.newSymref = null;
+		this.name = name;
+		if (oldSymref == null) {
+			type = Type.CREATE;
+		} else if (!AnyObjectId.equals(ObjectId.zeroId(), newId)) {
+			type = Type.UPDATE;
+		} else {
+			type = Type.DELETE;
+		}
+		typeIsCorrect = true;
+	}
+

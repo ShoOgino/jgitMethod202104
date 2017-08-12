@@ -12,8 +12,10 @@
 	 */
 	public Command(RevWalk rw, ReceiveCommand cmd)
 			throws MissingObjectException, IOException {
-		this.oldRef = toRef(rw, cmd.getOldId(), cmd.getRefName(), false);
-		this.newRef = toRef(rw, cmd.getNewId(), cmd.getRefName(), true);
+		this.oldRef = toRef(rw, cmd.getOldId(), cmd.getOldSymref(),
+				cmd.getRefName(), false);
+		this.newRef = toRef(rw, cmd.getNewId(), cmd.getNewSymref(),
+				cmd.getRefName(), true);
 		this.cmd = cmd;
 	}
 

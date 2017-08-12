@@ -16,6 +16,12 @@
 			super.execute(walk, monitor, options);
 			return;
 		}
+		if (containsSymrefs(pending)) {
+			// packed-refs file cannot store symrefs
+			reject(pending.get(0), REJECTED_OTHER_REASON,
+					JGitText.get().atomicSymRefNotSupported, pending);
+			return;
+		}
 
 		// Required implementation details copied from super.execute.
 		if (!blockUntilTimestamps(MAX_WAIT)) {

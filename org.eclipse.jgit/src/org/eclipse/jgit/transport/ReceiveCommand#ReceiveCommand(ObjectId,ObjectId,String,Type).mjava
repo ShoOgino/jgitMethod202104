@@ -11,19 +11,28 @@
 	 *            name of the ref being affected.
 	 * @param type
 	 *            type of the command. Must be {@link Type#CREATE} if {@code
-	 *            oldId} is zero, or {@link Type#DELETE} if {@code newId} is zero.
+	 *            oldId} is zero, or {@link Type#DELETE} if {@code newId} is
+	 *            zero.
 	 * @since 2.0
 	 */
 	public ReceiveCommand(final ObjectId oldId, final ObjectId newId,
 			final String name, final Type type) {
 		if (oldId == null) {
-			throw new IllegalArgumentException(JGitText.get().oldIdMustNotBeNull);
+			throw new IllegalArgumentException(
+					JGitText.get().oldIdMustNotBeNull);
 		}
 		if (newId == null) {
-			throw new IllegalArgumentException(JGitText.get().newIdMustNotBeNull);
+			throw new IllegalArgumentException(
+					JGitText.get().newIdMustNotBeNull);
+		}
+		if (name == null || name.isEmpty()) {
+			throw new IllegalArgumentException(
+					JGitText.get().nameMustNotBeNullOrEmpty);
 		}
 		this.oldId = oldId;
+		this.oldSymref = null;
 		this.newId = newId;
+		this.newSymref = null;
 		this.name = name;
 		switch (type) {
 		case CREATE:
@@ -47,7 +56,8 @@
 			}
 			break;
 		default:
-			throw new IllegalStateException(JGitText.get().enumValueNotSupported0);
+			throw new IllegalStateException(
+					JGitText.get().enumValueNotSupported0);
 		}
 		this.type = type;
 	}

@@ -13,13 +13,21 @@
 	public ReceiveCommand(final ObjectId oldId, final ObjectId newId,
 			final String name) {
 		if (oldId == null) {
-			throw new IllegalArgumentException(JGitText.get().oldIdMustNotBeNull);
+			throw new IllegalArgumentException(
+					JGitText.get().oldIdMustNotBeNull);
 		}
 		if (newId == null) {
-			throw new IllegalArgumentException(JGitText.get().newIdMustNotBeNull);
+			throw new IllegalArgumentException(
+					JGitText.get().newIdMustNotBeNull);
+		}
+		if (name == null || name.isEmpty()) {
+			throw new IllegalArgumentException(
+					JGitText.get().nameMustNotBeNullOrEmpty);
 		}
 		this.oldId = oldId;
+		this.oldSymref = null;
 		this.newId = newId;
+		this.newSymref = null;
 		this.name = name;
 
 		type = Type.UPDATE;
