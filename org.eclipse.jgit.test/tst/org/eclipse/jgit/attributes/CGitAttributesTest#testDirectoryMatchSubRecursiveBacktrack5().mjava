@@ -1,0 +1,8 @@
+	@Test
+	public void testDirectoryMatchSubRecursiveBacktrack5() throws Exception {
+		createFiles("x/a/a/b/foo.txt", "x/y/z/b/a/b/foo.txt",
+				"x/y/a/a/a/a/b/foo.txt", "x/y/a/a/a/a/b/a/b/foo.txt");
+		writeTrashFile(".gitattributes", "**/*/a/b bar\n");
+		assertSameAsCGit();
+	}
+
