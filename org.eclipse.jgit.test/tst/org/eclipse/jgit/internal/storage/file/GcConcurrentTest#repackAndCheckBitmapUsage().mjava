@@ -1,0 +1,35 @@
+	@Test
+	public void repackAndCheckBitmapUsage() throws Exception {
+		// create a test repository with one commit and pack all objects. After
+		// packing create loose objects to trigger creation of a new packfile on
+		// the next gc
+		TestRepository<FileRepository>.BranchBuilder test = tr.branch("test");
+		test.commit().add("a", "a").create();
+		FileRepository repository = tr.getRepository();
+		GC gc1 = new GC(repository);
+		gc1.setPackExpireAgeMillis(0);
+		gc1.gc();
+		String oldPackName = getSinglePack(repository).getPackName();
+		RevCommit b = test.commit().add("b", "b").create();
+
+		// start the garbage collection on a new repository instance,
+		FileRepository repository2 = new FileRepository(repository.getDirectory());
+		GC gc2 = new GC(repository2);
+		gc2.setPackExpireAgeMillis(0);
+		gc2.gc();
+		String newPackName = getSinglePack(repository2).getPackName();
+		// make sure gc() has caused creation of a new packfile
+		assertNotEquals(oldPackName, newPackName);
+
+		// Even when asking again for the set of packfiles outdated data
+		// will be returned. As long as the repository can work on cached data
+		// it will do so and not detect that a new packfile exists.
+		assertNotEquals(getSinglePack(repository).getPackName(), newPackName);
+
+		// Only when accessing object content it is required to rescan the pack
+		// directory and the new packfile will be detected.
+		repository.getObjectDatabase().open(b).getSize();
+		assertEquals(getSinglePack(repository).getPackName(), newPackName);
+		assertNotNull(getSinglePack(repository).getBitmapIndex());
+	}
+
