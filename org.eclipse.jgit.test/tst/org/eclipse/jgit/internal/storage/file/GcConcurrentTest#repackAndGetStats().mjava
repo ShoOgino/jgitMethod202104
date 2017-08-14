@@ -1,0 +1,21 @@
+	@Test
+	public void repackAndGetStats() throws Exception {
+		TestRepository<FileRepository>.BranchBuilder test = tr.branch("test");
+		test.commit().add("a", "a").create();
+		GC gc1 = new GC(tr.getRepository());
+		gc1.setPackExpireAgeMillis(0);
+		gc1.gc();
+		test.commit().add("b", "b").create();
+
+		// Create a new Repository instance and trigger a gc
+		// from that instance. Reusing the existing repo instance
+		// tr.getRepository() would not show the problem.
+		FileRepository r2 = new FileRepository(
+				tr.getRepository().getDirectory());
+		GC gc2 = new GC(r2);
+		gc2.setPackExpireAgeMillis(0);
+		gc2.gc();
+
+		new GC(tr.getRepository()).getStatistics();
+	}
+
