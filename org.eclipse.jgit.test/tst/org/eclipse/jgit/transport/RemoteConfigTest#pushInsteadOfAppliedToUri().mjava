@@ -1,0 +1,11 @@
+	@Test
+	public void pushInsteadOfAppliedToUri() throws Exception {
+		config.setString("remote", "origin", "url", "short:project.git");
+		config.setString("url", "https://server/repos/", "pushInsteadOf",
+				"short:");
+		RemoteConfig rc = new RemoteConfig(config, "origin");
+		assertFalse(rc.getPushURIs().isEmpty());
+		assertEquals("https://server/repos/project.git",
+				rc.getPushURIs().get(0).toASCIIString());
+	}
+
