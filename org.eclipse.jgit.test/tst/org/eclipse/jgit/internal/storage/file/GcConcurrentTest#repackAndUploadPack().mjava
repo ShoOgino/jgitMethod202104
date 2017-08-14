@@ -1,0 +1,31 @@
+	@Test
+	public void repackAndUploadPack() throws Exception {
+		TestRepository<FileRepository>.BranchBuilder test = tr.branch("test");
+		// RevCommit a = test.commit().add("a", "a").create();
+		test.commit().add("a", "a").create();
+
+		GC gc1 = new GC(tr.getRepository());
+		gc1.setPackExpireAgeMillis(0);
+		gc1.gc();
+
+		RevCommit b = test.commit().add("b", "b").create();
+
+		FileRepository r2 = new FileRepository(
+				tr.getRepository().getDirectory());
+		GC gc2 = new GC(r2);
+		gc2.setPackExpireAgeMillis(0);
+		gc2.gc();
+
+		// Simulate parts of an UploadPack. This is the situation on
+		// server side (e.g. gerrit) when when clients are
+		// cloning/fetching while the server side repo's
+		// are gc'ed by an external process (e.g. scheduled
+		// native git gc)
+		try (PackWriter pw = new PackWriter(tr.getRepository())) {
+			pw.setUseBitmaps(true);
+			pw.preparePack(NullProgressMonitor.INSTANCE, Sets.of(b),
+					Collections.<ObjectId> emptySet());
+			new GC(tr.getRepository()).getStatistics();
+		}
+	}
+
