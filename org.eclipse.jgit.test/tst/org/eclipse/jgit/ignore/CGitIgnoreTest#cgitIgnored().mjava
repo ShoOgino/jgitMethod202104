@@ -1,0 +1,17 @@
+	private String[] cgitIgnored() throws Exception {
+		FS fs = db.getFS();
+		ProcessBuilder builder = fs.runInShell("git", new String[] { "ls-files",
+				"--ignored", "--exclude-standard", "-o" });
+		builder.directory(db.getWorkTree());
+		ExecutionResult result = fs.execute(builder,
+				new ByteArrayInputStream(new byte[0]));
+		assertEquals("External git failed", 0, result.getRc());
+		assertEquals("External git reported errors", "",
+				toString(result.getStderr()));
+		try (BufferedReader r = new BufferedReader(new InputStreamReader(
+				new BufferedInputStream(result.getStdout().openInputStream()),
+				Constants.CHARSET))) {
+			return r.lines().toArray(String[]::new);
+		}
+	}
+

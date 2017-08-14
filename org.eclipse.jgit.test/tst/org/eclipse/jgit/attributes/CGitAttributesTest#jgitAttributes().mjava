@@ -1,0 +1,29 @@
+	private LinkedHashMap<String, Attributes> jgitAttributes()
+			throws IOException {
+		// Do a tree walk and return a list of all files and directories with
+		// their attributes
+		LinkedHashMap<String, Attributes> result = new LinkedHashMap<>();
+		try (TreeWalk walk = new TreeWalk(db)) {
+			walk.addTree(new FileTreeIterator(db));
+			walk.setFilter(new NotIgnoredFilter(0));
+			while (walk.next()) {
+				String path = walk.getPathString();
+				if (walk.isSubtree() && !path.endsWith("/")) {
+					// git check-attr expects directory paths to end with a
+					// slash
+					path += '/';
+				}
+				Attributes attrs = walk.getAttributes();
+				if (attrs != null && !attrs.isEmpty()) {
+					result.put(path, attrs);
+				} else {
+					result.put(path, null);
+				}
+				if (walk.isSubtree()) {
+					walk.enterSubtree();
+				}
+			}
+		}
+		return result;
+	}
+

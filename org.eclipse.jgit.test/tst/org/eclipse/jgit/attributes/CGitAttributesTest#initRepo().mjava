@@ -1,0 +1,17 @@
+	@Before
+	public void initRepo() throws IOException {
+		// Because we run C-git, we must ensure that global or user exclude
+		// files cannot influence the tests. So we set core.excludesFile to an
+		// empty file inside the repository.
+		StoredConfig config = db.getConfig();
+		File fakeUserGitignore = writeTrashFile(".fake_user_gitignore", "");
+		config.setString("core", null, "excludesFile",
+				fakeUserGitignore.getAbsolutePath());
+		// Disable case-insensitivity -- JGit doesn't handle that yet.
+		config.setBoolean("core", null, "ignoreCase", false);
+		// And try to switch off the global attributes file, too.
+		config.setString("core", null, "attributesFile",
+				fakeUserGitignore.getAbsolutePath());
+		config.save();
+	}
+

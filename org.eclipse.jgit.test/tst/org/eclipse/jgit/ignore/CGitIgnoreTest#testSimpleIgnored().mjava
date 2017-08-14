@@ -1,0 +1,10 @@
+	@Test
+	public void testSimpleIgnored() throws Exception {
+		createFiles("a.txt", "a.tmp", "src/sub/a.txt", "src/a.tmp",
+				"src/a.txt/b.tmp", "ignored/a.tmp", "ignored/not_ignored/a.tmp",
+				"ignored/other/a.tmp");
+		writeTrashFile(".gitignore",
+				"*.txt\n" + "/ignored/*\n" + "!/ignored/not_ignored");
+		assertSameAsCGit("ignored/not_ignored/a.tmp");
+	}
+

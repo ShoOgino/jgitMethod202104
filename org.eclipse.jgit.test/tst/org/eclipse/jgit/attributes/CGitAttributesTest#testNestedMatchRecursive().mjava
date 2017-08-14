@@ -1,0 +1,8 @@
+	@Test
+	public void testNestedMatchRecursive() throws Exception {
+		createFiles("foo/bar.jar", "foo/bar.xml", "sub/b.jar", "sub/b.xml",
+				"sub/foo/b.jar");
+		writeTrashFile(".gitattributes", "foo/** xml\n" + "*.jar jar\n");
+		assertSameAsCGit();
+	}
+

@@ -1,0 +1,16 @@
+	private LinkedHashSet<String> jgitIgnored() throws IOException {
+		// Do a tree walk that does descend into ignored directories and return
+		// a list of all ignored files
+		LinkedHashSet<String> result = new LinkedHashSet<>();
+		try (TreeWalk walk = new TreeWalk(db)) {
+			walk.addTree(new FileTreeIterator(db));
+			walk.setRecursive(true);
+			while (walk.next()) {
+				if (walk.getTree(WorkingTreeIterator.class).isEntryIgnored()) {
+					result.add(walk.getPathString());
+				}
+			}
+		}
+		return result;
+	}
+

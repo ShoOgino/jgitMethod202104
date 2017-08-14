@@ -1,0 +1,15 @@
+	private void assertNoIgnoredVisited(Set<String> ignored) throws Exception {
+		// Do a recursive tree walk with a NotIgnoredFilter and verify that none
+		// of the files visited is in the ignored set
+		try (TreeWalk walk = new TreeWalk(db)) {
+			walk.addTree(new FileTreeIterator(db));
+			walk.setFilter(new NotIgnoredFilter(0));
+			walk.setRecursive(true);
+			while (walk.next()) {
+				String path = walk.getPathString();
+				assertFalse("File " + path + " is ignored, should not appear",
+						ignored.contains(path));
+			}
+		}
+	}
+

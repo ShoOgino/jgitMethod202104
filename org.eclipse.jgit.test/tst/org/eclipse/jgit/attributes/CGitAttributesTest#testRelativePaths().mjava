@@ -1,0 +1,8 @@
+	@Test
+	public void testRelativePaths() throws Exception {
+		createFiles("sub/foo.txt", "sub/sub/bar", "foo/sub/a.txt",
+				"foo/sub/bar/a.tmp");
+		writeTrashFile(".gitattributes", "sub/** sub\n" + "*.txt txt\n");
+		assertSameAsCGit();
+	}
+

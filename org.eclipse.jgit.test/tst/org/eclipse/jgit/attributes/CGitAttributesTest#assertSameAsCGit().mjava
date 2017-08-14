@@ -1,0 +1,16 @@
+	private void assertSameAsCGit() throws Exception {
+		LinkedHashMap<String, Attributes> jgit = jgitAttributes();
+		LinkedHashMap<String, Attributes> cgit = cgitAttributes(jgit.keySet());
+		// remove all without attributes
+		Iterator<Map.Entry<String, Attributes>> iterator = jgit.entrySet()
+				.iterator();
+		while (iterator.hasNext()) {
+			Map.Entry<String, Attributes> entry = iterator.next();
+			if (entry.getValue() == null) {
+				iterator.remove();
+			}
+		}
+		assertArrayEquals("JGit attributes differ from C git",
+				cgit.entrySet().toArray(), jgit.entrySet().toArray());
+	}
+

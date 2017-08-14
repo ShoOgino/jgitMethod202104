@@ -1,0 +1,15 @@
+	@Before
+	public void initRepo() throws IOException {
+		// These tests focus on .gitignore files inside the repository. Because
+		// we run C-git, we must ensure that global or user exclude files cannot
+		// influence the tests. So we set core.excludesFile to an empty file
+		// inside the repository.
+		File fakeUserGitignore = writeTrashFile(".fake_user_gitignore", "");
+		StoredConfig config = db.getConfig();
+		config.setString("core", null, "excludesFile",
+				fakeUserGitignore.getAbsolutePath());
+		// Disable case-insensitivity -- JGit doesn't handle that yet.
+		config.setBoolean("core", null, "ignoreCase", false);
+		config.save();
+	}
+

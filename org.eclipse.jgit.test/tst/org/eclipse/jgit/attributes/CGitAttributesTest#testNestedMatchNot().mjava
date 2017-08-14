@@ -1,0 +1,8 @@
+	@Test
+	public void testNestedMatchNot() throws Exception {
+		createFiles("foo.xml/bar.jar", "foo.xml/bar.xml", "sub/b.jar",
+				"sub/b.xml");
+		writeTrashFile("sub/.gitattributes", "*.xml xml\n" + "*.jar jar\n");
+		assertSameAsCGit();
+	}
+
