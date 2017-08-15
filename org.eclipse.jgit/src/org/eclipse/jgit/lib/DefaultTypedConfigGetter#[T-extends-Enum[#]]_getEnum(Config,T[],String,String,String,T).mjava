@@ -1,0 +1,57 @@
+	@Override
+	public <T extends Enum<?>> T getEnum(Config config, T[] all, String section,
+			String subsection, String name, T defaultValue) {
+		String value = config.getString(section, subsection, name);
+		if (value == null) {
+			return defaultValue;
+		}
+		if (all[0] instanceof ConfigEnum) {
+			for (T t : all) {
+				if (((ConfigEnum) t).matchConfigValue(value)) {
+					return t;
+				}
+			}
+		}
+
+		String n = value.replace(' ', '_');
+
+		// Because of c98abc9c0586c73ef7df4172644b7dd21c979e9d being used in
+		// the real world before its breakage was fully understood, we must
+		// also accept '-' as though it were ' '.
+		n = n.replace('-', '_');
+
+		T trueState = null;
+		T falseState = null;
+		for (T e : all) {
+			if (StringUtils.equalsIgnoreCase(e.name(), n)) {
+				return e;
+			} else if (StringUtils.equalsIgnoreCase(e.name(), "TRUE")) { //$NON-NLS-1$
+				trueState = e;
+			} else if (StringUtils.equalsIgnoreCase(e.name(), "FALSE")) { //$NON-NLS-1$
+				falseState = e;
+			}
+		}
+
+		// This is an odd little fallback. C Git sometimes allows boolean
+		// values in a tri-state with other things. If we have both a true
+		// and a false value in our enumeration, assume its one of those.
+		//
+		if (trueState != null && falseState != null) {
+			try {
+				return StringUtils.toBoolean(n) ? trueState : falseState;
+			} catch (IllegalArgumentException err) {
+				// Fall through and use our custom error below.
+			}
+		}
+
+		if (subsection != null) {
+			throw new IllegalArgumentException(
+					MessageFormat.format(JGitText.get().enumValueNotSupported3,
+							section, subsection, name, value));
+		} else {
+			throw new IllegalArgumentException(
+					MessageFormat.format(JGitText.get().enumValueNotSupported2,
+							section, name, value));
+		}
+	}
+

@@ -1,0 +1,11 @@
+	@Override
+	public int getInt(Config config, String section, String subsection,
+			String name, int defaultValue) {
+		long val = config.getLong(section, subsection, name, defaultValue);
+		if (Integer.MIN_VALUE <= val && val <= Integer.MAX_VALUE) {
+			return (int) val;
+		}
+		throw new IllegalArgumentException(MessageFormat
+				.format(JGitText.get().integerValueOutOfRange, section, name));
+	}
+

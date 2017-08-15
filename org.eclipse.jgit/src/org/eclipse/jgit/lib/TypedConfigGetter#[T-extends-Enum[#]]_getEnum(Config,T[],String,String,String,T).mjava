@@ -1,8 +1,13 @@
 	/**
-	 * Parse an enumeration from the configuration.
+	 * Parse an enumeration from a git {@link Config}.
 	 *
 	 * @param <T>
 	 *            type of the enumeration object.
+	 * @param config
+	 *            to get the value from
+	 * @param all
+	 *            all possible values in the enumeration which should be
+	 *            recognized. Typically {@code EnumType.values()}.
 	 * @param section
 	 *            section the key is grouped within.
 	 * @param subsection
@@ -13,10 +18,6 @@
 	 *            default value to return if no value was present.
 	 * @return the selected enumeration value, or {@code defaultValue}.
 	 */
-	public <T extends Enum<?>> T getEnum(final String section,
-			final String subsection, final String name, final T defaultValue) {
-		final T[] all = allValuesOf(defaultValue);
-		return typedGetter.getEnum(this, all, section, subsection, name,
-				defaultValue);
-	}
+	<T extends Enum<?>> T getEnum(Config config, T[] all, String section,
+			String subsection, String name, T defaultValue);
 
