@@ -1,0 +1,18 @@
+	@Test
+	public void testCount() {
+		testString("", 0, 0);
+		testString("/", 1, 0);
+		testString("//", 2, 0);
+		testString("///", 3, 1);
+		testString("////", 4, 2);
+		testString("foo", 0, 0);
+		testString("/foo", 1, 0);
+		testString("foo/", 1, 0);
+		testString("/foo/", 2, 0);
+		testString("foo/bar", 1, 1);
+		testString("/foo/bar/", 3, 1);
+		testString("/foo/bar//", 4, 2);
+		testString("/foo//bar/", 4, 2);
+		testString(" /foo/ ", 2, 2);
+	}
+
