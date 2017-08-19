@@ -3,7 +3,7 @@
 		String name = "refs/heads/gone";
 		Ref exp = newRef(name);
 		byte[] table = write(exp);
-		assertEquals(24 + 4 + 5 + 2 + name.length() + 68, table.length);
+		assertEquals(24 + 4 + 5 + 3 + name.length() + 68, table.length);
 
 		ReftableReader t = read(table);
 		try (RefCursor rc = t.allRefs()) {

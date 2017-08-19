@@ -1,6 +1,10 @@
 		static int compare(RefQueueEntry a, RefQueueEntry b) {
 			int cmp = a.name().compareTo(b.name());
 			if (cmp == 0) {
+				// higher updateIndex shadows lower updateIndex.
+				cmp = Long.signum(b.updateIndex() - a.updateIndex());
+			}
+			if (cmp == 0) {
 				// higher index shadows lower index, so higher index first.
 				cmp = b.stackIdx - a.stackIdx;
 			}
