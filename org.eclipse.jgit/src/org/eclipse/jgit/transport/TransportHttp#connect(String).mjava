@@ -51,7 +51,8 @@
 
 				case HttpConnection.HTTP_FORBIDDEN:
 					throw new TransportException(uri, MessageFormat.format(
-							JGitText.get().serviceNotPermitted, service));
+							JGitText.get().serviceNotPermitted, baseUrl,
+							service));
 
 				case HttpConnection.HTTP_MOVED_PERM:
 				case HttpConnection.HTTP_MOVED_TEMP:
@@ -61,9 +62,10 @@
 					// and in general should occur only on POST requests. But it
 					// doesn't hurt to accept it here as a redirect.
 					if (http.followRedirects == HttpRedirectMode.FALSE) {
-						throw new TransportException(MessageFormat.format(
-								JGitText.get().redirectsOff, uri,
-								Integer.valueOf(status)));
+						throw new TransportException(uri,
+								MessageFormat.format(
+										JGitText.get().redirectsOff,
+										Integer.valueOf(status)));
 					}
 					URIish newUri = redirect(conn.getHeaderField(HDR_LOCATION),
 							Constants.INFO_REFS, redirects++);
