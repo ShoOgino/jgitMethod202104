@@ -1,5 +1,5 @@
 	private void service() throws IOException {
-		boolean sendPack;
+		boolean sendPack = false;
 		// If it's a non-bidi request, we need to read the entire request before
 		// writing a response. Buffer the response until then.
 		try {
@@ -32,6 +32,17 @@
 			if (!clientShallowCommits.isEmpty())
 				walk.assumeShallow(clientShallowCommits);
 			sendPack = negotiate();
+			if (sendPack && !biDirectionalPipe) {
+				// Ensure the request was fully consumed. Any remaining input must
+				// be a protocol error. If we aren't at EOF the implementation is broken.
+				int eof = rawIn.read();
+				if (0 <= eof) {
+					sendPack = false;
+					throw new CorruptObjectException(MessageFormat.format(
+							JGitText.get().expectedEOFReceived,
+							"\\x" + Integer.toHexString(eof))); //$NON-NLS-1$
+				}
+			}
 		} catch (ServiceMayNotContinueException err) {
 			if (!err.isOutput() && err.getMessage() != null) {
 				try {
@@ -58,6 +69,11 @@
 			}
 			throw err;
 		} finally {
+			if (!sendPack && !biDirectionalPipe) {
+				while (0 < rawIn.skip(2048) || 0 <= rawIn.read()) {
+					// Discard until EOF.
+				}
+			}
 			rawOut.stopBuffering();
 		}
 
