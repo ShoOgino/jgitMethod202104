@@ -1,0 +1,10 @@
+	@Test
+	public void testCloneRepositoryDefaultDirectory() throws IOException, URISyntaxException,
+			JGitInternalException, GitAPIException {
+		CloneCommand command = Git.cloneRepository().setURI(fileUri());
+
+		command.verifyDirectories(new URIish(fileUri()));
+		File directory = command.getDirectory();
+		assertEquals(git.getRepository().getWorkTree().getName(), directory.getName());
+	}
+
