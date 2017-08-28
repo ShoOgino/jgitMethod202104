@@ -19,13 +19,14 @@
 
 		writer.finish();
 		byte[] table = buffer.toByteArray();
-		assertEquals(245, table.length);
+		assertEquals(247, table.length);
 
 		ReftableReader t = read(table);
 		try (RefCursor rc = t.allRefs()) {
 			assertTrue(rc.next());
 			assertEquals(MASTER, rc.getRef().getName());
 			assertEquals(id(1), rc.getRef().getObjectId());
+			assertEquals(1, rc.getUpdateIndex());
 
 			assertTrue(rc.next());
 			assertEquals(NEXT, rc.getRef().getName());

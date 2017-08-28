@@ -1,0 +1,12 @@
+	private byte[] write(Collection<Ref> refs, long updateIndex)
+			throws IOException {
+		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+		new ReftableWriter()
+				.setMinUpdateIndex(updateIndex)
+				.setMaxUpdateIndex(updateIndex)
+				.begin(buffer)
+				.sortAndWriteRefs(refs)
+				.finish();
+		return buffer.toByteArray();
+	}
+

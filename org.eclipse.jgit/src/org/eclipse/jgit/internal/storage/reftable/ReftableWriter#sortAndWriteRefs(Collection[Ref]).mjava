@@ -10,7 +10,7 @@
 	public ReftableWriter sortAndWriteRefs(Collection<Ref> refsToPack)
 			throws IOException {
 		Iterator<RefEntry> itr = refsToPack.stream()
-				.map(RefEntry::new)
+				.map(r -> new RefEntry(r, maxUpdateIndex - minUpdateIndex))
 				.sorted(Entry::compare)
 				.iterator();
 		while (itr.hasNext()) {
