@@ -1,0 +1,14 @@
+	private void loadPathNames() {
+		pathToName = null;
+		if (modulesConfig != null) {
+			HashMap<String, String> pathNames = new HashMap<>();
+			for (String name : modulesConfig
+					.getSubsections(ConfigConstants.CONFIG_SUBMODULE_SECTION)) {
+				pathNames.put(modulesConfig.getString(
+						ConfigConstants.CONFIG_SUBMODULE_SECTION, name,
+						ConfigConstants.CONFIG_KEY_PATH), name);
+			}
+			pathToName = pathNames;
+		}
+	}
+

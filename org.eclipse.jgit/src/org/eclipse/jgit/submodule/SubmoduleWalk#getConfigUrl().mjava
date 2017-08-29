@@ -7,6 +7,10 @@
 	 * @throws IOException
 	 */
 	public String getConfigUrl() throws IOException, ConfigInvalidException {
+		// SubmoduleInitCommand copies the submodules.*.url and
+		// submodules.*.update values from .gitmodules to the config, and
+		// does so using the path defined in .gitmodules as the subsection
+		// name. So no path-to-name translation is necessary here.
 		return repoConfig.getString(ConfigConstants.CONFIG_SUBMODULE_SECTION,
 				path, ConfigConstants.CONFIG_KEY_URL);
 	}

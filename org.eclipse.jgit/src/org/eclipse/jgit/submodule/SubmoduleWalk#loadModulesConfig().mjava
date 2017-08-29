@@ -18,6 +18,7 @@
 					repository.getFS());
 			config.load();
 			modulesConfig = config;
+			loadPathNames();
 		} else {
 			try (TreeWalk configWalk = new TreeWalk(repository)) {
 				configWalk.addTree(rootTree);
@@ -37,10 +38,12 @@
 						if (filter.isDone(configWalk)) {
 							modulesConfig = new BlobBasedConfig(null, repository,
 									configWalk.getObjectId(0));
+							loadPathNames();
 							return this;
 						}
 					}
 					modulesConfig = new Config();
+					pathToName = null;
 				} finally {
 					if (idx > 0)
 						rootTree.next(idx);
