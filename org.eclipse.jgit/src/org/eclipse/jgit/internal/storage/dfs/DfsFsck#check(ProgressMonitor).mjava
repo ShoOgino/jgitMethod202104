@@ -9,54 +9,13 @@
 	 *             if encounters IO errors during the process.
 	 */
 	public FsckError check(ProgressMonitor pm) throws IOException {
-		FsckError errors = new FsckError();
-		try {
-			for (DfsPackFile pack : objdb.getPacks()) {
-				DfsPackDescription packDesc = pack.getPackDescription();
-				try (ReadableChannel channel = repo.getObjectDatabase()
-						.openFile(packDesc, PackExt.PACK)) {
-					List<PackedObjectInfo> objectsInPack;
-					FsckPackParser parser = new FsckPackParser(
-							repo.getObjectDatabase(), channel);
-					parser.setObjectChecker(objChecker);
-					parser.overwriteObjectCount(packDesc.getObjectCount());
-					parser.parse(pm);
-					errors.getCorruptObjects()
-							.addAll(parser.getCorruptObjects());
-					objectsInPack = parser.getSortedObjectList(null);
-					parser.verifyIndex(objectsInPack, pack.getPackIndex(ctx));
-				} catch (MissingObjectException e) {
-					errors.getMissingObjects().add(e.getObjectId());
-				} catch (CorruptPackIndexException e) {
-					errors.getCorruptIndices().add(new CorruptIndex(
-							pack.getPackDescription()
-									.getFileName(PackExt.INDEX),
-							e.getErrorType()));
-				}
-			}
-
-			try (ObjectWalk ow = new ObjectWalk(ctx)) {
-				for (Ref r : repo.getAllRefs().values()) {
-					try {
-						RevObject tip = ow.parseAny(r.getObjectId());
-						if (r.getLeaf().getName().startsWith(Constants.R_HEADS)) {
-							// check if heads point to a commit object
-							if (tip.getType() != Constants.OBJ_COMMIT) {
-								errors.getNonCommitHeads()
-										.add(r.getLeaf().getName());
-							}
-						}
-						ow.markStart(tip);
-						ow.checkConnectivity();
-						ow.markUninteresting(tip);
-					} catch (MissingObjectException e) {
-						errors.getMissingObjects().add(e.getObjectId());
-					}
-				}
-			}
-		} finally {
-			ctx.close();
+		if (pm == null) {
+			pm = NullProgressMonitor.INSTANCE;
 		}
+
+		FsckError errors = new FsckError();
+		checkPacks(pm, errors);
+		checkConnectivity(pm, errors);
 		return errors;
 	}
 

@@ -1,0 +1,12 @@
+	private void verifyPack(ProgressMonitor pm, FsckError errors, DfsReader ctx,
+			DfsPackFile pack, ReadableChannel ch)
+					throws IOException, CorruptPackIndexException {
+		FsckPackParser fpp = new FsckPackParser(objdb, ch);
+		fpp.setObjectChecker(objChecker);
+		fpp.overwriteObjectCount(pack.getPackDescription().getObjectCount());
+		fpp.parse(pm);
+		errors.getCorruptObjects().addAll(fpp.getCorruptObjects());
+
+		fpp.verifyIndex(pack.getPackIndex(ctx));
+	}
+
