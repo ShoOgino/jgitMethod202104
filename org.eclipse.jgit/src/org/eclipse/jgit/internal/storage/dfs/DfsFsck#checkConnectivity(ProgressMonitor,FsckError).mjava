@@ -1,7 +1,7 @@
 	private void checkConnectivity(ProgressMonitor pm, FsckError errors)
 			throws IOException {
 		pm.beginTask(JGitText.get().countingObjects, ProgressMonitor.UNKNOWN);
-		try (ObjectWalk ow = new ObjectWalk(ctx)) {
+		try (ObjectWalk ow = new ObjectWalk(repo)) {
 			for (Ref r : repo.getAllRefs().values()) {
 				RevObject tip;
 				try {
