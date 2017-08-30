@@ -1,0 +1,9 @@
+	@Test
+	public void testMatchCaseSensitivity() throws Exception {
+		config.fromText(DEFAULT + "[http \"http://exAMPle.com\"]\n"
+				+ "\tpostBuffer = 1024\n");
+		HttpConfig http = new HttpConfig(config,
+				new URIish("http://example.com/path/repo.git"));
+		assertEquals(1024, http.getPostBuffer());
+	}
+

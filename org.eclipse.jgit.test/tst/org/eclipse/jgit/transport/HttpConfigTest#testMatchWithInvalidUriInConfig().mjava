@@ -1,0 +1,9 @@
+	@Test
+	public void testMatchWithInvalidUriInConfig() throws Exception {
+		config.fromText(
+				DEFAULT + "[http \"///\"]\n" + "\tpostBuffer = 1024\n");
+		HttpConfig http = new HttpConfig(config,
+				new URIish("http://example.com/path/repo.git"));
+		assertEquals(1, http.getPostBuffer());
+	}
+

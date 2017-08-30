@@ -1,0 +1,19 @@
+	static int segmentCompare(String uriPath, String m) {
+		// Precondition: !uriPath.isEmpty() && !m.isEmpty(),and u must already
+		// be normalized
+		String matchPath = normalize(m);
+		if (matchPath == null || !uriPath.startsWith(matchPath)) {
+			return -1;
+		}
+		// We can match only on a segment boundary: either both paths are equal,
+		// or if matchPath does not end in '/', there is a '/' in uriPath right
+		// after the match.
+		int uLength = uriPath.length();
+		int mLength = matchPath.length();
+		if (mLength == uLength || matchPath.charAt(mLength - 1) == '/'
+				|| mLength < uLength && uriPath.charAt(mLength) == '/') {
+			return mLength;
+		}
+		return -1;
+	}
+

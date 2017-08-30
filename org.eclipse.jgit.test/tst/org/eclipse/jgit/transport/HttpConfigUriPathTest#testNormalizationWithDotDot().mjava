@@ -1,0 +1,37 @@
+	@Test
+	public void testNormalizationWithDotDot() {
+		assertEquals("/", HttpConfig.normalize("foo/.."));
+		assertEquals("/", HttpConfig.normalize("/foo/.."));
+		assertEquals("/", HttpConfig.normalize("/foo/../bar/.."));
+		assertEquals("/", HttpConfig.normalize("/foo/.././bar/.."));
+		assertEquals("/bar", HttpConfig.normalize("foo/../bar"));
+		assertEquals("/bar", HttpConfig.normalize("/foo/../bar"));
+		assertEquals("/bar", HttpConfig.normalize("/foo/./.././bar"));
+		assertEquals("/bar/", HttpConfig.normalize("/foo/../bar/"));
+		assertEquals("/bar/", HttpConfig.normalize("/foo/./.././bar/"));
+		assertEquals("/foo/bar", HttpConfig.normalize("/foo/bar/baz/.."));
+		assertEquals("/foo/bar/", HttpConfig.normalize("/foo/bar/baz/../"));
+		assertEquals("/foo", HttpConfig.normalize("/foo/bar/baz/../.."));
+		assertEquals("/foo", HttpConfig.normalize("/foo/bar/baz/../.."));
+		assertEquals("/foo", HttpConfig.normalize("/foo/bar/baz/.././.."));
+		assertEquals("/foo", HttpConfig.normalize("/foo/bar/baz/../././.."));
+		assertEquals("/foo/baz", HttpConfig.normalize("/foo/bar/../baz"));
+		assertEquals("/foo/baz/", HttpConfig.normalize("/foo/bar/../baz/"));
+		assertEquals("/foo/baz", HttpConfig.normalize("/foo/bar/../baz/."));
+		assertEquals("/foo/baz/", HttpConfig.normalize("/foo/bar/../baz/./"));
+		assertEquals("/foo", HttpConfig.normalize("/foo/bar/../baz/.."));
+		assertEquals("/foo/", HttpConfig.normalize("/foo/bar/../baz/../"));
+		assertEquals("/baz", HttpConfig.normalize("/foo/bar/../../baz"));
+		assertEquals("/baz/", HttpConfig.normalize("/foo/bar/../../baz/"));
+		assertEquals("/foo/.b/bar", HttpConfig.normalize("/foo/.b/bar"));
+		assertEquals("/.f/foo/.b/bar/", HttpConfig.normalize(".f/foo/.b/bar/"));
+		assertEquals("/foo/bar/..baz/bam",
+				HttpConfig.normalize("/foo/bar/..baz/bam"));
+		assertEquals("/foo/bar/..baz/bam/",
+				HttpConfig.normalize("/foo/bar/..baz/bam/"));
+		assertEquals("/foo/bar/.../baz/bam",
+				HttpConfig.normalize("/foo/bar/.../baz/bam"));
+		assertEquals("/foo/bar/.../baz/bam/",
+				HttpConfig.normalize("/foo/bar/.../baz/bam/"));
+	}
+

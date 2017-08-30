@@ -1,0 +1,11 @@
+	@Test
+	public void testNormalizationWithDoubleSlash() {
+		assertEquals("/", HttpConfig.normalize("//"));
+		assertEquals("/foo/", HttpConfig.normalize("///foo//"));
+		assertEquals("/foo", HttpConfig.normalize("///foo//."));
+		assertEquals("/foo/", HttpConfig.normalize("///foo//.////"));
+		assertEquals("/foo/bar", HttpConfig.normalize("/foo//bar"));
+		assertEquals("/foo/bar", HttpConfig.normalize("/foo//bar//."));
+		assertEquals("/foo/bar/", HttpConfig.normalize("/foo//bar//./"));
+	}
+

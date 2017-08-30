@@ -1,0 +1,19 @@
+	@Test
+	public void testNormalizationWithDot() {
+		assertEquals("/", HttpConfig.normalize("."));
+		assertEquals("/", HttpConfig.normalize("/."));
+		assertEquals("/", HttpConfig.normalize("/./"));
+		assertEquals("/foo", HttpConfig.normalize("foo/."));
+		assertEquals("/foo/bar", HttpConfig.normalize("/foo/./bar"));
+		assertEquals("/foo/bar", HttpConfig.normalize("/foo/bar/."));
+		assertEquals("/foo/bar/", HttpConfig.normalize("/foo/bar/./"));
+		assertEquals("/foo/bar", HttpConfig.normalize("/foo/./././bar"));
+		assertEquals("/foo/bar/", HttpConfig.normalize("/foo/./././bar/"));
+		assertEquals("/foo/bar", HttpConfig.normalize("/foo/bar/././."));
+		assertEquals("/foo/bar/", HttpConfig.normalize("/foo/bar/./././"));
+		assertEquals("/foo/bar/.baz/bam",
+				HttpConfig.normalize("/foo/bar/.baz/bam"));
+		assertEquals("/foo/bar/.baz/bam/",
+				HttpConfig.normalize("/foo/bar/.baz/bam/"));
+	}
+

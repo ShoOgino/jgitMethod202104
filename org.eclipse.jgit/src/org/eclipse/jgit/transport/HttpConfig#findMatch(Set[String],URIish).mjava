@@ -1,0 +1,78 @@
+	/**
+	 * Determines the best match from a set of subsection names (representing
+	 * prefix URLs) for the given {@link URIish}.
+	 *
+	 * @param names
+	 *            to match against the {@code uri}
+	 * @param uri
+	 *            to find a match for
+	 * @return the best matching subsection name, or {@code null} if no
+	 *         subsection matches
+	 */
+	private String findMatch(Set<String> names, URIish uri) {
+		String bestMatch = null;
+		int bestMatchLength = -1;
+		boolean withUser = false;
+		String uPath = uri.getPath();
+		boolean hasPath = !StringUtils.isEmptyOrNull(uPath);
+		if (hasPath) {
+			uPath = normalize(uPath);
+			if (uPath == null) {
+				// Normalization failed; warning was logged.
+				return null;
+			}
+		}
+		for (String s : names) {
+			try {
+				URIish candidate = new URIish(s);
+				// Scheme and host must match case-insensitively
+				if (!compare(uri.getScheme(), candidate.getScheme())
+						|| !compare(uri.getHost(), candidate.getHost())) {
+					continue;
+				}
+				// Ports must match after default ports have been substituted
+				if (defaultedPort(uri.getPort(),
+						uri.getScheme()) != defaultedPort(candidate.getPort(),
+								candidate.getScheme())) {
+					continue;
+				}
+				// User: if present in candidate, must match
+				boolean hasUser = false;
+				if (candidate.getUser() != null) {
+					if (!candidate.getUser().equals(uri.getUser())) {
+						continue;
+					}
+					hasUser = true;
+				}
+				// Path: prefix match, longer is better
+				String cPath = candidate.getPath();
+				int matchLength = -1;
+				if (StringUtils.isEmptyOrNull(cPath)) {
+					matchLength = 0;
+				} else {
+					if (!hasPath) {
+						continue;
+					}
+					// Paths can match only on segments
+					matchLength = segmentCompare(uPath, cPath);
+					if (matchLength < 0) {
+						continue;
+					}
+				}
+				// A longer path match is always preferred even over a user
+				// match. If the path matches are equal, a match with user wins
+				// over a match without user.
+				if (matchLength > bestMatchLength || !withUser && hasUser
+						&& matchLength >= 0 && matchLength == bestMatchLength) {
+					bestMatch = s;
+					bestMatchLength = matchLength;
+					withUser = hasUser;
+				}
+			} catch (URISyntaxException e) {
+				LOG.warn(MessageFormat
+						.format(JGitText.get().httpConfigInvalidURL, s));
+			}
+		}
+		return bestMatch;
+	}
+

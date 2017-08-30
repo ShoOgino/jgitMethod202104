@@ -5,10 +5,11 @@
 					MessageFormat.format(JGitText.get().redirectLocationMissing,
 							baseUrl));
 		}
-		if (redirects >= http.maxRedirects) {
+		if (redirects >= http.getMaxRedirects()) {
 			throw new TransportException(uri,
 					MessageFormat.format(JGitText.get().redirectLimitExceeded,
-					Integer.valueOf(http.maxRedirects), baseUrl, location));
+							Integer.valueOf(http.getMaxRedirects()), baseUrl,
+							location));
 		}
 		try {
 			if (!isValidRedirect(baseUrl, location, checkFor)) {

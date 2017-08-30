@@ -1,0 +1,9 @@
+	@Test
+	public void testMatchWithPrefixUriInConfig() throws Exception {
+		config.fromText(DEFAULT + "[http \"http://example\"]\n"
+				+ "\tpostBuffer = 1024\n");
+		HttpConfig http = new HttpConfig(config,
+				new URIish("http://example.com/path/repo.git"));
+		assertEquals(1, http.getPostBuffer());
+	}
+

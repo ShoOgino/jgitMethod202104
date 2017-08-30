@@ -1,0 +1,25 @@
+	@Test
+	public void testMatchLonger() throws Exception {
+		config.fromText(DEFAULT + "[http \"http://example.com/path\"]\n"
+				+ "\tpostBuffer = 1024\n"
+				+ "[http \"http://example.com/path/repo\"]\n"
+				+ "\tpostBuffer = 2048\n");
+		HttpConfig http = new HttpConfig(config,
+				new URIish("http://example.com/path/repo.git"));
+		assertEquals(1024, http.getPostBuffer());
+		http = new HttpConfig(config,
+				new URIish("http://example.com/foo/repo.git"));
+		assertEquals(1, http.getPostBuffer());
+		http = new HttpConfig(config,
+				new URIish("https://example.com/path/repo.git"));
+		assertEquals(1, http.getPostBuffer());
+		http = new HttpConfig(config,
+				new URIish("http://example.com/path/repo/.git"));
+		assertEquals(2048, http.getPostBuffer());
+		http = new HttpConfig(config, new URIish("http://example.com/path"));
+		assertEquals(1024, http.getPostBuffer());
+		http = new HttpConfig(config,
+				new URIish("http://user@example.com/path"));
+		assertEquals(1024, http.getPostBuffer());
+	}
+

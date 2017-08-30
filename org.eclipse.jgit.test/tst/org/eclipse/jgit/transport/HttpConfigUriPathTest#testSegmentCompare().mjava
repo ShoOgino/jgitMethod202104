@@ -1,0 +1,31 @@
+	@Test
+	public void testSegmentCompare() {
+		// 2nd parameter is the match, will be normalized
+		assertSuccess("/foo", "");
+		assertSuccess("/foo", "/");
+		assertSuccess("/foo", "//");
+		assertSuccess("/foo", "foo");
+		assertSuccess("/foo", "/foo");
+		assertSuccess("/foo/", "foo");
+		assertSuccess("/foo/", "/foo");
+		assertSuccess("/foo/", "foo/");
+		assertSuccess("/foo/", "/foo/");
+		assertSuccess("/foo/bar", "foo");
+		assertSuccess("/foo/bar", "foo/");
+		assertSuccess("/foo/bar", "foo/bar");
+		assertSuccess("/foo/bar/", "foo/bar");
+		assertSuccess("/foo/bar/", "foo/bar/");
+		assertSuccess("/foo/bar", "/foo/bar");
+		assertSuccess("/foo/bar/", "/foo/bar");
+		assertSuccess("/foo/bar/", "/foo/bar/");
+		assertSuccess("/foo/bar", "/foo/bar/..");
+		assertSuccess("/foo/bar/", "/foo/bar/..");
+		assertSuccess("/foo/bar/", "/foo/bar/../");
+		assertSuccess("/foo/bar", "/foo/./bar");
+		assertSuccess("/foo/bar/", "/foo/./bar/");
+		assertSuccess("/some/repo/.git", "/some/repo");
+		assertSuccess("/some/repo/bare.git", "/some/repo");
+		assertSuccess("/some/repo/.git", "/some/repo/.git");
+		assertSuccess("/some/repo/bare.git", "/some/repo/bare.git");
+	}
+

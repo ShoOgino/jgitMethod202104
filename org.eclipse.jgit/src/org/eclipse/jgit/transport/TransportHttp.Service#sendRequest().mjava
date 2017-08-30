@@ -1,6 +1,7 @@
 		void sendRequest() throws IOException {
 			// Try to compress the content, but only if that is smaller.
-			TemporaryBuffer buf = new TemporaryBuffer.Heap(http.postBuffer);
+			TemporaryBuffer buf = new TemporaryBuffer.Heap(
+					http.getPostBuffer());
 			try {
 				GZIPOutputStream gzip = new GZIPOutputStream(buf);
 				out.writeTo(gzip, null);
@@ -55,7 +56,7 @@
 					// SEE_OTHER after a POST doesn't make sense for a git
 					// server, so we don't handle it here and thus we'll
 					// report an error in openResponse() later on.
-					if (http.followRedirects != HttpRedirectMode.TRUE) {
+					if (http.getFollowRedirects() != HttpRedirectMode.TRUE) {
 						// Let openResponse() issue an error
 						return;
 					}

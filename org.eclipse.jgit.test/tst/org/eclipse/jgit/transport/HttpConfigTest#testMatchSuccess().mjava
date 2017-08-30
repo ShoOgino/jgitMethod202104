@@ -1,0 +1,21 @@
+	@Test
+	public void testMatchSuccess() throws Exception {
+		config.fromText(DEFAULT + "[http \"http://example.com\"]\n"
+				+ "\tpostBuffer = 1024\n");
+		HttpConfig http = new HttpConfig(config,
+				new URIish("http://example.com/path/repo.git"));
+		assertEquals(1024, http.getPostBuffer());
+		http = new HttpConfig(config,
+				new URIish("https://example.com/path/repo.git"));
+		assertEquals(1, http.getPostBuffer());
+		http = new HttpConfig(config,
+				new URIish("http://example.org/path/repo.git"));
+		assertEquals(1, http.getPostBuffer());
+		http = new HttpConfig(config,
+				new URIish("http://example.com:80/path/repo.git"));
+		assertEquals(1024, http.getPostBuffer());
+		http = new HttpConfig(config,
+				new URIish("http://example.com:8080/path/repo.git"));
+		assertEquals(1, http.getPostBuffer());
+	}
+

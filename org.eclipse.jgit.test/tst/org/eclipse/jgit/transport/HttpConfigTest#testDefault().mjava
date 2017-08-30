@@ -1,0 +1,10 @@
+	@Test
+	public void testDefault() throws Exception {
+		HttpConfig http = new HttpConfig(config,
+				new URIish("http://example.com/path/repo.git"));
+		assertEquals(1024 * 1024, http.getPostBuffer());
+		assertTrue(http.isSslVerify());
+		assertEquals(HttpConfig.HttpRedirectMode.INITIAL,
+				http.getFollowRedirects());
+	}
+

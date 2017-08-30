@@ -1,0 +1,31 @@
+	@Test
+	public void testSegmentCompareFailing() {
+		// 2nd parameter is the match, will be normalized
+		assertEquals(-1, HttpConfig.segmentCompare("/foo", "foo/"));
+		assertEquals(-1, HttpConfig.segmentCompare("/foo", "/foo/"));
+		assertEquals(-1, HttpConfig.segmentCompare("/foobar", "foo"));
+		assertEquals(-1, HttpConfig.segmentCompare("/foobar", "/foo"));
+		assertEquals(-1,
+				HttpConfig.segmentCompare("/foo/barbar/baz", "foo/bar"));
+		assertEquals(-1, HttpConfig.segmentCompare("/foo/barbar", "/foo/bar"));
+		assertEquals(-1,
+				HttpConfig.segmentCompare("/some/repo.git", "/some/repo"));
+		assertEquals(-1,
+				HttpConfig.segmentCompare("/some/repo.git", "/some/repo.g"));
+		assertEquals(-1, HttpConfig.segmentCompare("/some/repo/bare.git",
+				"/some/repo/bar"));
+		assertSuccess("/some/repo/bare.git", "/some/repo");
+		// Just to make sure we don't use the PathMatchers...
+		assertEquals(-1, HttpConfig.segmentCompare("/foo/barbar/baz", "**"));
+		assertEquals(-1,
+				HttpConfig.segmentCompare("/foo/barbar/baz", "**/foo"));
+		assertEquals(-1,
+				HttpConfig.segmentCompare("/foo/barbar/baz", "/*/barbar/**"));
+		assertEquals(-1, HttpConfig.segmentCompare("/foo", "/*"));
+		assertEquals(-1, HttpConfig.segmentCompare("/foo", "/???"));
+		assertEquals(-1, HttpConfig.segmentCompare("/foo/bar/baz", "bar"));
+		// Failing to normalize
+		assertEquals(-1,
+				HttpConfig.segmentCompare("/foo/bar/baz", "bar/../.."));
+	}
+

@@ -1,0 +1,44 @@
+	static String normalize(String path) {
+		// C-git resolves . and .. segments
+		int i = 0;
+		int length = path.length();
+		StringBuilder builder = new StringBuilder(length);
+		builder.append('/');
+		if (length > 0 && path.charAt(0) == '/') {
+			i = 1;
+		}
+		while (i < length) {
+			int slash = path.indexOf('/', i);
+			if (slash < 0) {
+				slash = length;
+			}
+			if (slash == i || slash == i + 1 && path.charAt(i) == '.') {
+				// Skip /. or also double slashes
+			} else if (slash == i + 2 && path.charAt(i) == '.'
+					&& path.charAt(i + 1) == '.') {
+				// Remove previous segment if we have "/.."
+				int l = builder.length() - 2; // Skip terminating slash.
+				while (l >= 0 && builder.charAt(l) != '/') {
+					l--;
+				}
+				if (l < 0) {
+					LOG.warn(MessageFormat.format(
+							JGitText.get().httpConfigCannotNormalizeURL, path));
+					return null;
+				}
+				builder.setLength(l + 1);
+			} else {
+				// Include the slash, if any
+				builder.append(path, i, Math.min(length, slash + 1));
+			}
+			i = slash + 1;
+		}
+		if (builder.length() > 1 && builder.charAt(builder.length() - 1) == '/'
+				&& length > 0 && path.charAt(length - 1) != '/') {
+			// . or .. normalization left a trailing slash when the original
+			// path had none at the end
+			builder.setLength(builder.length() - 1);
+		}
+		return builder.toString();
+	}
+

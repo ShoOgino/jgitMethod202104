@@ -1,0 +1,13 @@
+	@Test
+	public void testNormalizationWithDotDotFailing() {
+		assertNull(HttpConfig.normalize(".."));
+		assertNull(HttpConfig.normalize("/.."));
+		assertNull(HttpConfig.normalize("/../"));
+		assertNull(HttpConfig.normalize("/../foo"));
+		assertNull(HttpConfig.normalize("./../foo"));
+		assertNull(HttpConfig.normalize("/./../foo"));
+		assertNull(HttpConfig.normalize("/foo/./.././.."));
+		assertNull(HttpConfig.normalize("/foo/../bar/../.."));
+		assertNull(HttpConfig.normalize("/foo/../bar/../../baz"));
+	}
+
