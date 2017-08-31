@@ -5,12 +5,12 @@
 		if (bytes == null) {
 			return -1;
 		}
-		int offset = (int) (channelPosition - block * blockSize);
-		int bytesToCopy = Math.min(cnt, bytes.length - offset);
+		int offs = (int) (channelPosition - block * blockSize);
+		int bytesToCopy = Math.min(cnt, bytes.length - offs);
 		if (bytesToCopy < 1) {
 			return -1;
 		}
-		System.arraycopy(bytes, offset, dst, pos, bytesToCopy);
+		System.arraycopy(bytes, offs, dst, pos, bytesToCopy);
 		return bytesToCopy;
 	}
 

@@ -13,13 +13,13 @@
 			PackedObjectInfo entry = getObject(i);
 			inPack.add(new ObjFromPack(entry));
 
-			long offset = idx.findOffset(entry);
-			if (offset == -1) {
+			long offs = idx.findOffset(entry);
+			if (offs == -1) {
 				throw new CorruptPackIndexException(
 						MessageFormat.format(JGitText.get().missingObject,
 								entry.getType(), entry.getName()),
 						ErrorType.MISSING_OBJ);
-			} else if (offset != entry.getOffset()) {
+			} else if (offs != entry.getOffset()) {
 				throw new CorruptPackIndexException(MessageFormat
 						.format(JGitText.get().mismatchOffset, entry.getName()),
 						ErrorType.MISMATCH_OFFSET);
