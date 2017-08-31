@@ -1,0 +1,8 @@
+		@Override
+		public void adviseSequentialRead(long start, long end) {
+			int sz = ctx.getOptions().getStreamPackBufferSize();
+			if (sz > 0) {
+				readAhead = (int) Math.min(sz, end - start);
+			}
+		}
+

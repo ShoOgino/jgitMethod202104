@@ -1,0 +1,10 @@
+	private static Map<DfsPackDescription, DfsPackFile> packMap(PackList old) {
+		Map<DfsPackDescription, DfsPackFile> forReuse = new HashMap<>();
+		for (DfsPackFile p : old.packs) {
+			if (!p.invalid()) {
+				forReuse.put(p.desc, p);
+			}
+		}
+		return forReuse;
+	}
+

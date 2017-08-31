@@ -1,11 +1,11 @@
-	void pin(DfsPackFile pack, long position) throws IOException {
-		if (block == null || !block.contains(pack.key, position)) {
+	void pin(BlockBasedFile file, long position) throws IOException {
+		if (block == null || !block.contains(file.key, position)) {
 			// If memory is low, we may need what is in our window field to
 			// be cleaned up by the GC during the get for the next window.
 			// So we always clear it, even though we are just going to set
 			// it again.
 			block = null;
-			block = pack.getOrLoadBlock(position, this);
+			block = file.getOrLoadBlock(position, this);
 		}
 	}
 

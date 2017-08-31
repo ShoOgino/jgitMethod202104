@@ -1,29 +1,41 @@
 	private PackList scanPacksImpl(PackList old) throws IOException {
 		DfsBlockCache cache = DfsBlockCache.getInstance();
-		Map<DfsPackDescription, DfsPackFile> forReuse = reuseMap(old);
+		Map<DfsPackDescription, DfsPackFile> packs = packMap(old);
+		Map<DfsPackDescription, DfsReftable> reftables = reftableMap(old);
+
 		List<DfsPackDescription> scanned = listPacks();
 		Collections.sort(scanned);
 
-		List<DfsPackFile> list = new ArrayList<>(scanned.size());
+		List<DfsPackFile> newPacks = new ArrayList<>(scanned.size());
+		List<DfsReftable> newReftables = new ArrayList<>(scanned.size());
 		boolean foundNew = false;
 		for (DfsPackDescription dsc : scanned) {
-			DfsPackFile oldPack = forReuse.remove(dsc);
+			DfsPackFile oldPack = packs.remove(dsc);
 			if (oldPack != null) {
-				list.add(oldPack);
+				newPacks.add(oldPack);
 			} else if (dsc.hasFileExt(PackExt.PACK)) {
-				list.add(new DfsPackFile(cache, dsc));
+				newPacks.add(new DfsPackFile(cache, dsc));
+				foundNew = true;
+			}
+
+			DfsReftable oldReftable = reftables.remove(dsc);
+			if (oldReftable != null) {
+				newReftables.add(oldReftable);
+			} else if (dsc.hasFileExt(PackExt.REFTABLE)) {
+				newReftables.add(new DfsReftable(cache, dsc));
 				foundNew = true;
 			}
 		}
 
-		for (DfsPackFile p : forReuse.values())
-			p.close();
-		if (list.isEmpty())
-			return new PackListImpl(NO_PACKS.packs);
+		if (newPacks.isEmpty())
+			return new PackListImpl(NO_PACKS.packs, NO_PACKS.reftables);
 		if (!foundNew) {
 			old.clearDirty();
 			return old;
 		}
-		return new PackListImpl(list.toArray(new DfsPackFile[list.size()]));
+		Collections.sort(newReftables, reftableComparator());
+		return new PackListImpl(
+				newPacks.toArray(new DfsPackFile[0]),
+				newReftables.toArray(new DfsReftable[0]));
 	}
 

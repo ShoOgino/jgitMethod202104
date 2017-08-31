@@ -1,0 +1,10 @@
+	private static Map<DfsPackDescription, DfsReftable> reftableMap(PackList old) {
+		Map<DfsPackDescription, DfsReftable> forReuse = new HashMap<>();
+		for (DfsReftable p : old.reftables) {
+			if (!p.invalid()) {
+				forReuse.put(p.desc, p);
+			}
+		}
+		return forReuse;
+	}
+

@@ -1,0 +1,15 @@
+	/**
+	 * Open reader on the reftable.
+	 * <p>
+	 * The returned reader is not thread safe.
+	 *
+	 * @param ctx
+	 *            reader to access the DFS storage.
+	 * @return cursor to read the table; caller must close.
+	 * @throws IOException
+	 *             table cannot be opened.
+	 */
+	public ReftableReader open(DfsReader ctx) throws IOException {
+		return new ReftableReader(new CacheSource(this, cache, ctx));
+	}
+
