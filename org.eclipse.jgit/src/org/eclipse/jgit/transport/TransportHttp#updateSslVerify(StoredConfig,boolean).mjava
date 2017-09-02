@@ -1,0 +1,18 @@
+	private void updateSslVerify(StoredConfig config, boolean value) {
+		// Since git uses the original URI for matching, we must also use the
+		// original URI and cannot use the current URI (which might be different
+		// after redirects)
+		String uriPattern = uri.getScheme() + "://" + uri.getHost(); //$NON-NLS-1$
+		int port = uri.getPort();
+		if (port > 0) {
+			uriPattern += ":" + port; //$NON-NLS-1$
+		}
+		config.setBoolean(HttpConfig.HTTP, uriPattern,
+				HttpConfig.SSL_VERIFY_KEY, value);
+		try {
+			config.save();
+		} catch (IOException e) {
+			LOG.error(JGitText.get().sslVerifyCannotSave, e);
+		}
+	}
+

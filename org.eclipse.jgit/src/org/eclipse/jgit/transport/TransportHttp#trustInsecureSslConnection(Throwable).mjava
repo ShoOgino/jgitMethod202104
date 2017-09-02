@@ -1,0 +1,36 @@
+	private boolean trustInsecureSslConnection(Throwable cause) {
+		if (cause instanceof CertificateException
+				|| cause instanceof CertPathBuilderException
+				|| cause instanceof CertPathValidatorException) {
+			// Certificate expired or revoked, PKIX path building not
+			// possible, self-signed certificate, host does not match ...
+			CredentialsProvider provider = getCredentialsProvider();
+			if (provider != null) {
+				CredentialItems trust = constructSslTrustItems(cause);
+				CredentialItem[] items = trust.items();
+				if (provider.supports(items)) {
+					boolean answered = provider.get(uri, items);
+					if (answered) {
+						// Not canceled
+						boolean trustNow = trust.now.getValue();
+						boolean trustLocal = trust.forRepo != null
+								&& trust.forRepo.getValue();
+						boolean trustAlways = trust.always.getValue();
+						if (trustNow || trustLocal || trustAlways) {
+							sslVerify = false;
+							if (trustAlways) {
+								updateSslVerify(SystemReader.getInstance()
+										.openUserConfig(null, FS.DETECTED),
+										false);
+							} else if (trustLocal) {
+								updateSslVerify(local.getConfig(), false);
+							}
+							return true;
+						}
+					}
+				}
+			}
+		}
+		return false;
+	}
+

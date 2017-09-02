@@ -5,6 +5,7 @@
 
 		URIish cloneFrom = extendPath(secureURI, "/back");
 		try (Transport t = Transport.open(dst, cloneFrom)) {
+			t.setCredentialsProvider(testCredentials);
 			t.fetch(NullProgressMonitor.INSTANCE, mirror(master));
 			fail("Should have failed (redirect from https to http)");
 		} catch (TransportException e) {

@@ -1,0 +1,11 @@
+	private void handleSslFailure(Throwable e) throws TransportException {
+		if (sslFailure || !trustInsecureSslConnection(e.getCause())) {
+			throw new TransportException(uri,
+					MessageFormat.format(
+							JGitText.get().sslFailureExceptionMessage,
+							currentUri.setPass(null)),
+					e);
+		}
+		sslFailure = true;
+	}
+

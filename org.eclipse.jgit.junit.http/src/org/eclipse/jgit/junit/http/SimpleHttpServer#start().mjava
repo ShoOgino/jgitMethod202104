@@ -3,5 +3,9 @@
 		server.setUp();
 		final String srcName = db.getDirectory().getName();
 		uri = toURIish(sBasic, srcName);
+		int sslPort = server.getSecurePort();
+		if (sslPort > 0) {
+			secureUri = uri.setPort(sslPort).setScheme("https");
+		}
 	}
 

@@ -1,0 +1,24 @@
+	private CredentialItems constructSslTrustItems(Throwable cause) {
+		CredentialItems items = new CredentialItems();
+		String info = MessageFormat.format(JGitText.get().sslFailureInfo,
+				currentUri.setPass(null));
+		String sslMessage = cause.getLocalizedMessage();
+		if (sslMessage == null) {
+			sslMessage = cause.toString();
+		}
+		sslMessage = MessageFormat.format(JGitText.get().sslFailureCause,
+				sslMessage);
+		items.message = new CredentialItem.InformationalMessage(info + '\n'
+				+ sslMessage + '\n'
+				+ JGitText.get().sslFailureTrustExplanation);
+		items.now = new CredentialItem.YesNoType(JGitText.get().sslTrustNow);
+		if (local != null) {
+			items.forRepo = new CredentialItem.YesNoType(
+					MessageFormat.format(JGitText.get().sslTrustForRepo,
+					local.getDirectory()));
+		}
+		items.always = new CredentialItem.YesNoType(
+				JGitText.get().sslTrustAlways);
+		return items;
+	}
+

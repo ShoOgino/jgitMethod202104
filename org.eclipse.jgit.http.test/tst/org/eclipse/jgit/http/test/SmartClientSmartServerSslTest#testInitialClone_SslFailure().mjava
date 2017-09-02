@@ -1,0 +1,16 @@
+	@Test
+	public void testInitialClone_SslFailure() throws Exception {
+		Repository dst = createBareRepository();
+		assertFalse(dst.hasObject(A_txt));
+
+		try (Transport t = Transport.open(dst, secureURI)) {
+			// Set a credentials provider that doesn't handle questions
+			t.setCredentialsProvider(
+					new UsernamePasswordCredentialsProvider("any", "anypwd"));
+			t.fetch(NullProgressMonitor.INSTANCE, mirror(master));
+			fail("Should have failed (SSL certificate not trusted)");
+		} catch (TransportException e) {
+			assertTrue(e.getMessage().contains("Secure connection"));
+		}
+	}
+

@@ -81,6 +81,9 @@
 				throw e;
 			} catch (TransportException e) {
 				throw e;
+			} catch (SSLHandshakeException e) {
+				handleSslFailure(e);
+				continue; // Re-try
 			} catch (IOException e) {
 				if (authMethod.getType() != HttpAuthMethod.Type.NONE) {
 					if (ignoreTypes == null) {

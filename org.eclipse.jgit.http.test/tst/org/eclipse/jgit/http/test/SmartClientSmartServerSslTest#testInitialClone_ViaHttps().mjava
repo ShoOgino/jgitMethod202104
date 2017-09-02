@@ -4,6 +4,7 @@
 		assertFalse(dst.hasObject(A_txt));
 
 		try (Transport t = Transport.open(dst, secureURI)) {
+			t.setCredentialsProvider(testCredentials);
 			t.fetch(NullProgressMonitor.INSTANCE, mirror(master));
 		}
 		assertTrue(dst.hasObject(A_txt));
