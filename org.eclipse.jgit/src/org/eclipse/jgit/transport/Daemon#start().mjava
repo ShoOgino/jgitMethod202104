@@ -7,39 +7,19 @@
 	 *             the daemon is already running.
 	 */
 	public synchronized void start() throws IOException {
-		if (acceptThread != null)
+		if (acceptThread != null) {
 			throw new IllegalStateException(JGitText.get().daemonAlreadyRunning);
+		}
+		ServerSocket socket = new ServerSocket();
+		socket.setReuseAddress(true);
+		if (myAddress != null) {
+			socket.bind(myAddress, BACKLOG);
+		} else {
+			socket.bind(new InetSocketAddress((InetAddress) null, 0), BACKLOG);
+		}
+		myAddress = (InetSocketAddress) socket.getLocalSocketAddress();
 
-		final ServerSocket listenSock = new ServerSocket(
-				myAddress != null ? myAddress.getPort() : 0, BACKLOG,
-				myAddress != null ? myAddress.getAddress() : null);
-		myAddress = (InetSocketAddress) listenSock.getLocalSocketAddress();
-
-		run = true;
-		acceptThread = new Thread(processors, "Git-Daemon-Accept") { //$NON-NLS-1$
-			@Override
-			public void run() {
-				while (isRunning()) {
-					try {
-						startClient(listenSock.accept());
-					} catch (InterruptedIOException e) {
-						// Test again to see if we should keep accepting.
-					} catch (IOException e) {
-						break;
-					}
-				}
-
-				try {
-					listenSock.close();
-				} catch (IOException err) {
-					//
-				} finally {
-					synchronized (Daemon.this) {
-						acceptThread = null;
-					}
-				}
-			}
-		};
+		acceptThread = new Acceptor(processors, "Git-Daemon-Accept", socket); //$NON-NLS-1$
 		acceptThread.start();
 	}
 

@@ -1,0 +1,19 @@
+	@Test
+	public void testDaemonRestart() throws Exception {
+		Daemon d = new Daemon();
+		d.start();
+		InetSocketAddress address = d.getAddress();
+		assertTrue("Port should be allocated", address.getPort() > 0);
+		assertTrue("Daemon should be running", d.isRunning());
+		Thread.sleep(1000);
+		d.stopAndWait();
+		// Re-start the same daemon
+		d.start();
+		InetSocketAddress newAddress = d.getAddress();
+		assertEquals("Daemon should again run on the same port", address,
+				newAddress);
+		assertTrue("Daemon should be running", d.isRunning());
+		Thread.sleep(1000);
+		d.stopAndWait();
+	}
+

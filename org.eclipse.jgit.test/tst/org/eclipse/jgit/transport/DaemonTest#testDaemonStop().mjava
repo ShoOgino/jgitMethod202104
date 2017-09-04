@@ -1,0 +1,20 @@
+	@Test
+	public void testDaemonStop() throws Exception {
+		Daemon d = new Daemon();
+		d.start();
+		InetSocketAddress address = d.getAddress();
+		assertTrue("Port should be allocated", address.getPort() > 0);
+		assertTrue("Daemon should be running", d.isRunning());
+		Thread.sleep(1000); // Give it time to enter accept()
+		d.stopAndWait();
+		// Try to start a new Daemon again on the same port
+		d = new Daemon(address);
+		d.start();
+		InetSocketAddress newAddress = d.getAddress();
+		assertEquals("New daemon should run on the same port", address,
+				newAddress);
+		assertTrue("Daemon should be running", d.isRunning());
+		Thread.sleep(1000);
+		d.stopAndWait();
+	}
+

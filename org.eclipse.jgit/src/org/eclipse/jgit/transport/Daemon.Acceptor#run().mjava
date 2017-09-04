@@ -1,0 +1,16 @@
+		@Override
+		public void run() {
+			setUncaughtExceptionHandler((thread, throwable) -> terminate());
+			while (isRunning()) {
+				try {
+					startClient(listenSocket.accept());
+				} catch (SocketException e) {
+					// Test again to see if we should keep accepting.
+				} catch (IOException e) {
+					break;
+				}
+			}
+
+			terminate();
+		}
+
