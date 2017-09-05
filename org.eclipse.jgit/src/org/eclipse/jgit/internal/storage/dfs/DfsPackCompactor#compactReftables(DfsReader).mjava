@@ -1,0 +1,13 @@
+	private void compactReftables(DfsReader ctx) throws IOException {
+		DfsObjDatabase objdb = repo.getObjectDatabase();
+		Collections.sort(srcReftables, objdb.reftableComparator());
+
+		try (ReftableStack stack = ReftableStack.open(ctx, srcReftables)) {
+			initOutDesc(objdb);
+			ReftableCompactor compact = new ReftableCompactor();
+			compact.addAll(stack.readers());
+			compact.setIncludeDeletes(true);
+			writeReftable(objdb, outDesc, compact);
+		}
+	}
+

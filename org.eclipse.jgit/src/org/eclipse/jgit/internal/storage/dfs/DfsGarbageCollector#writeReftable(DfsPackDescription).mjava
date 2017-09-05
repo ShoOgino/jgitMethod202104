@@ -1,0 +1,14 @@
+	private void writeReftable(DfsPackDescription pack) throws IOException {
+		if (!hasGcReftable()) {
+			writeReftable(pack, refsBefore);
+			return;
+		}
+
+		try (ReftableStack stack = ReftableStack.open(ctx, reftablesBefore)) {
+			ReftableCompactor compact = new ReftableCompactor();
+			compact.addAll(stack.readers());
+			compact.setIncludeDeletes(false);
+			compactReftable(pack, compact);
+		}
+	}
+
