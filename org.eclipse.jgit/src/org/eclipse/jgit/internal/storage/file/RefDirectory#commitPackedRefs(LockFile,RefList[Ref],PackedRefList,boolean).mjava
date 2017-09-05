@@ -1,5 +1,6 @@
 	PackedRefList commitPackedRefs(final LockFile lck, final RefList<Ref> refs,
-			final PackedRefList oldPackedList) throws IOException {
+			final PackedRefList oldPackedList, boolean changed)
+			throws IOException {
 		// Can't just return packedRefs.get() from this method; it might have been
 		// updated again after writePackedRefs() returns.
 		AtomicReference<PackedRefList> result = new AtomicReference<>();
@@ -41,6 +42,9 @@
 				if (!afterUpdate.id.equals(newPackedList.id)) {
 					throw new ObjectWritingException(
 							MessageFormat.format(JGitText.get().unableToWrite, name));
+				}
+				if (changed) {
+					modCnt.incrementAndGet();
 				}
 				result.set(newPackedList);
 			}

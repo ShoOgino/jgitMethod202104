@@ -12,6 +12,7 @@
 		execute(newBatchUpdate(cmds).setRefLogMessage("a reflog", true));
 
 		assertResults(cmds, OK, OK);
+		assertEquals(atomic ? 2 : 3, refsChangedEvents);
 		assertReflogUnchanged(oldLogs, "refs/heads/master");
 		assertReflogEquals(
 				reflog(zeroId(), B, new PersonIdent(diskRepo), "a reflog: created"),

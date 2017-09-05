@@ -17,6 +17,7 @@
 			assertRefs(
 					"refs/heads/master", A,
 					"refs/heads/masters", B);
+			assertEquals(1, refsChangedEvents);
 		} else {
 			// Non-atomic updates are applied in order: master succeeds, then master/x
 			// fails due to conflict.
@@ -24,6 +25,7 @@
 			assertRefs(
 					"refs/heads/master", B,
 					"refs/heads/masters", B);
+			assertEquals(2, refsChangedEvents);
 		}
 	}
 

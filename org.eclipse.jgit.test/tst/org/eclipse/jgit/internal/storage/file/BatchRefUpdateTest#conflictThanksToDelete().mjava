@@ -13,5 +13,14 @@
 		assertRefs(
 				"refs/heads/master", B,
 				"refs/heads/masters/x", A);
+		if (atomic) {
+			assertEquals(2, refsChangedEvents);
+		} else {
+			// The non-atomic case actually produces 5 events, but that's an
+			// implementation detail. We expect at least 4 events, one for the
+			// initial read due to writeLooseRef(), and then one for each
+			// successful ref update.
+			assertTrue(refsChangedEvents >= 4);
+		}
 	}
 

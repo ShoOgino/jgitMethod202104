@@ -13,11 +13,13 @@
 			assertRefs(
 					"refs/heads/master", A,
 					"refs/heads/masters", B);
+			assertEquals(1, refsChangedEvents);
 		} else {
 			assertResults(cmds, OK, REJECTED_NONFASTFORWARD);
 			assertRefs(
 					"refs/heads/master", B,
 					"refs/heads/masters", B);
+			assertEquals(2, refsChangedEvents);
 		}
 	}
 

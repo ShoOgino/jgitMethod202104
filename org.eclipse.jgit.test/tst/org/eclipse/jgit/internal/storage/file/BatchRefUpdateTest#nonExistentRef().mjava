@@ -10,9 +10,11 @@
 		if (atomic) {
 			assertResults(cmds, TRANSACTION_ABORTED, LOCK_FAILURE);
 			assertRefs("refs/heads/master", A);
+			assertEquals(1, refsChangedEvents);
 		} else {
 			assertResults(cmds, OK, LOCK_FAILURE);
 			assertRefs("refs/heads/master", B);
+			assertEquals(2, refsChangedEvents);
 		}
 	}
 

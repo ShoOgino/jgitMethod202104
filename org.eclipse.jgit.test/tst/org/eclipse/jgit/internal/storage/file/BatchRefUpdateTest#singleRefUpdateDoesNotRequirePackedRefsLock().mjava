@@ -11,6 +11,7 @@
 
 			assertFalse(getLockFile("refs/heads/master").exists());
 			assertResults(cmds, OK);
+			assertEquals(2, refsChangedEvents);
 			assertRefs("refs/heads/master", B);
 		} finally {
 			myLock.unlock();

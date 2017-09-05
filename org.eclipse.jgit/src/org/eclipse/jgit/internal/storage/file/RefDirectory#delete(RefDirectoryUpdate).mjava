@@ -16,8 +16,9 @@
 				try {
 					PackedRefList cur = readPackedRefs();
 					int idx = cur.find(name);
-					if (0 <= idx)
-						commitPackedRefs(lck, cur.remove(idx), packed);
+					if (0 <= idx) {
+						commitPackedRefs(lck, cur.remove(idx), packed, true);
+					}
 				} finally {
 					lck.unlock();
 				}

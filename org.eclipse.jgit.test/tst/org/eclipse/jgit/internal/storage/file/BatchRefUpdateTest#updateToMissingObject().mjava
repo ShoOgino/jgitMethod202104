@@ -12,11 +12,13 @@
 		if (atomic) {
 			assertResults(cmds, REJECTED_MISSING_OBJECT, TRANSACTION_ABORTED);
 			assertRefs("refs/heads/master", A);
+			assertEquals(1, refsChangedEvents);
 		} else {
 			assertResults(cmds, REJECTED_MISSING_OBJECT, OK);
 			assertRefs(
 					"refs/heads/master", A,
 					"refs/heads/foo2", B);
+			assertEquals(2, refsChangedEvents);
 		}
 	}
 

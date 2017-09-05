@@ -13,6 +13,7 @@
 						.setRefLogMessage("a reflog", true));
 
 		assertResults(cmds, OK, OK);
+		assertEquals(atomic ? 2 : 3, refsChangedEvents);
 		assertReflogEquals(
 				reflog(A, B, ident, "custom log"),
 				getLastReflog("refs/heads/master"),

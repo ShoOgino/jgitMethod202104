@@ -11,6 +11,7 @@
 		assertRefs(
 				"refs/heads/master", B,
 				"refs/heads/branch", A);
+		assertEquals(atomic ? 2 : 3, refsChangedEvents);
 		assertReflogEquals(
 				reflog(A, B, new PersonIdent(diskRepo), "a reflog: fast-forward"),
 				getLastReflog("refs/heads/master"));

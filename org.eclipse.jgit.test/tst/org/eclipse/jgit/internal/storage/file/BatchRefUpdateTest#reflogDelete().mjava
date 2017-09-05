@@ -12,6 +12,7 @@
 
 		assertResults(cmds, OK, OK);
 		assertRefs("refs/heads/branch", B);
+		assertEquals(atomic ? 3 : 4, refsChangedEvents);
 		assertNull(getLastReflog("refs/heads/master"));
 		assertReflogEquals(
 				reflog(A, B, new PersonIdent(diskRepo), "a reflog"),

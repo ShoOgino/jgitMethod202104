@@ -16,5 +16,8 @@
 		repo = new TestRepository<>(diskRepo);
 		A = repo.commit().create();
 		B = repo.commit(repo.getRevWalk().parseCommit(A));
+		refsChangedEvents = 0;
+		handle = diskRepo.getListenerList()
+				.addRefsChangedListener(refsChangedListener);
 	}
 
