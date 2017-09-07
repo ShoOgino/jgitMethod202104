@@ -1,0 +1,26 @@
+	@Before
+	@Override
+	public void setUp() throws Exception {
+		super.setUp();
+		try (Git git = new Git(db)) {
+			JGitTestUtil.writeTrashFile(db, "hello", "hello");
+			JGitTestUtil.writeTrashFile(db, "dir", "world", "world");
+			git.add().addFilepattern("dir").call();
+			git.commit().setMessage("Initial commit").call();
+
+			JGitTestUtil.writeTrashFile(db, "hello2", "hello");
+			git.add().addFilepattern("hello2").call();
+			FileUtils.createSymLink(new File(db.getWorkTree(), "link"),
+					"target");
+			FileUtils.mkdir(new File(db.getWorkTree(), "target"));
+			writeTrashFile("target/file", "someData");
+			git.add().addFilepattern("target").addFilepattern("link").call();
+			git.commit().setMessage("hello2").call();
+
+			JGitTestUtil.writeTrashFile(db, "staged", "x");
+			JGitTestUtil.deleteTrashFile(db, "hello2");
+			git.add().addFilepattern("staged").call();
+			JGitTestUtil.writeTrashFile(db, "untracked", "untracked");
+		}
+	}
+

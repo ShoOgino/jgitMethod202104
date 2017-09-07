@@ -1,0 +1,28 @@
+	@Override
+	protected void run() throws Exception {
+		try (RevWalk rw = new RevWalk(db);
+				TreeWalk tw = new TreeWalk(db)) {
+			final ObjectId head = db.resolve(Constants.HEAD);
+			if (head == null) {
+				return;
+			}
+			RevCommit c = rw.parseCommit(head);
+			CanonicalTreeParser p = new CanonicalTreeParser();
+			p.reset(rw.getObjectReader(), c.getTree());
+			tw.reset(); // drop the first empty tree, which we do not need here
+			if (paths.size() > 0) {
+				tw.setFilter(PathFilterGroup.createFromStrings(paths));
+			}
+			tw.addTree(p);
+			tw.addTree(new DirCacheIterator(db.readDirCache()));
+			tw.setRecursive(true);
+			while (tw.next()) {
+				if (filterFileMode(tw, EXECUTABLE_FILE, GITLINK, REGULAR_FILE,
+						SYMLINK)) {
+					outw.println(
+							QuotedString.GIT_PATH.quote(tw.getPathString()));
+				}
+			}
+		}
+	}
+
