@@ -4,9 +4,8 @@
 		remoteGit.checkout().setName("other").setCreateBranch(true).call();
 		remoteGit.commit().setMessage("commit2").call();
 		remoteGit.tag().setName("foo").call();
-		RefSpec spec = new RefSpec(
-				"refs/heads/master:refs/remotes/origin/master");
-		git.fetch().setRemote("test").setRefSpecs(spec)
+		git.fetch().setRemote("test")
+				.setRefSpecs("refs/heads/master:refs/remotes/origin/master")
 				.setTagOpt(TagOpt.AUTO_FOLLOW).call();
 		assertNull(db.resolve("foo"));
 	}

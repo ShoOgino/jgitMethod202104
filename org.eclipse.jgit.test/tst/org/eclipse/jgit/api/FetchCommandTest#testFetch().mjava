@@ -5,9 +5,8 @@
 		RevCommit commit = remoteGit.commit().setMessage("initial commit").call();
 		Ref tagRef = remoteGit.tag().setName("tag").call();
 
-		RefSpec spec = new RefSpec("refs/heads/master:refs/heads/x");
-		git.fetch().setRemote("test").setRefSpecs(spec)
-				.call();
+		git.fetch().setRemote("test")
+				.setRefSpecs("refs/heads/master:refs/heads/x").call();
 
 		assertEquals(commit.getId(),
 				db.resolve(commit.getId().getName() + "^{commit}"));

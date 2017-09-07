@@ -5,7 +5,7 @@
 		Ref tagRef = remoteGit.tag().setName(tagName).call();
 		ObjectId originalId = tagRef.getObjectId();
 
-		RefSpec spec = new RefSpec("refs/heads/*:refs/remotes/origin/*");
+		String spec = "refs/heads/*:refs/remotes/origin/*";
 		git.fetch().setRemote("test").setRefSpecs(spec)
 				.setTagOpt(TagOpt.AUTO_FOLLOW).call();
 		assertEquals(originalId, db.resolve(tagName));
