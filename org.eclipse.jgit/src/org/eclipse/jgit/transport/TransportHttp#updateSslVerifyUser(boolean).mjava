@@ -1,0 +1,13 @@
+	private void updateSslVerifyUser(boolean value) {
+		FileBasedConfig userConfig = SystemReader.getInstance()
+				.openUserConfig(null, FS.DETECTED);
+		try {
+			userConfig.load();
+			updateSslVerify(userConfig, value);
+		} catch (IOException | ConfigInvalidException e) {
+			// Log it, but otherwise ignore here.
+			LOG.error(MessageFormat.format(JGitText.get().userConfigFileInvalid,
+					userConfig.getFile().getAbsolutePath(), e));
+		}
+	}
+
