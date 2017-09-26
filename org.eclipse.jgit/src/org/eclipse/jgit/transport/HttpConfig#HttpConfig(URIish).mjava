@@ -6,6 +6,17 @@
 	 *            to get the configuration values for
 	 */
 	public HttpConfig(URIish uri) {
-		this(SystemReader.getInstance().openUserConfig(null, FS.DETECTED), uri);
+		FileBasedConfig userConfig = SystemReader.getInstance()
+				.openUserConfig(null, FS.DETECTED);
+		try {
+			userConfig.load();
+		} catch (IOException | ConfigInvalidException e) {
+			// Log it and then work with default values.
+			LOG.error(MessageFormat.format(JGitText.get().userConfigFileInvalid,
+					userConfig.getFile().getAbsolutePath(), e));
+			init(new Config(), uri);
+			return;
+		}
+		init(userConfig, uri);
 	}
 

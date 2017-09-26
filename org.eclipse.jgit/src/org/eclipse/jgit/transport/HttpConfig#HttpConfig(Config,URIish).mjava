@@ -7,36 +7,6 @@
 	 *            to get the configuration values for
 	 */
 	public HttpConfig(Config config, URIish uri) {
-		// Set defaults from the section first
-		int postBufferSize = config.getInt(HTTP, POST_BUFFER_KEY,
-				1 * 1024 * 1024);
-		boolean sslVerifyFlag = config.getBoolean(HTTP, SSL_VERIFY_KEY, true);
-		HttpRedirectMode followRedirectsMode = config.getEnum(
-				HttpRedirectMode.values(), HTTP, null,
-				FOLLOW_REDIRECTS_KEY, HttpRedirectMode.INITIAL);
-		int redirectLimit = config.getInt(HTTP, MAX_REDIRECTS_KEY,
-				MAX_REDIRECTS);
-		if (redirectLimit < 0) {
-			redirectLimit = MAX_REDIRECTS;
-		}
-		String match = findMatch(config.getSubsections(HTTP), uri);
-		if (match != null) {
-			// Override with more specific items
-			postBufferSize = config.getInt(HTTP, match, POST_BUFFER_KEY,
-					postBufferSize);
-			sslVerifyFlag = config.getBoolean(HTTP, match, SSL_VERIFY_KEY,
-					sslVerifyFlag);
-			followRedirectsMode = config.getEnum(HttpRedirectMode.values(),
-					HTTP, match, FOLLOW_REDIRECTS_KEY, followRedirectsMode);
-			int newMaxRedirects = config.getInt(HTTP, match, MAX_REDIRECTS_KEY,
-					redirectLimit);
-			if (newMaxRedirects >= 0) {
-				redirectLimit = newMaxRedirects;
-			}
-		}
-		postBuffer = postBufferSize;
-		sslVerify = sslVerifyFlag;
-		followRedirects = followRedirectsMode;
-		maxRedirects = redirectLimit;
+		init(config, uri);
 	}
 
