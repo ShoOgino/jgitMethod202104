@@ -1,0 +1,28 @@
+	@Test
+	public void testFetchParentOfShallowCommit() throws Exception {
+		testProtocol = new TestProtocol<>(
+				new UploadPackFactory<Object>() {
+					@Override
+					public UploadPack create(Object req, Repository db)
+							throws ServiceNotEnabledException,
+							ServiceNotAuthorizedException {
+						UploadPack up = new UploadPack(db);
+						up.setRequestPolicy(RequestPolicy.REACHABLE_COMMIT);
+						// assume client has a shallow commit
+						up.getRevWalk().assumeShallow(
+								Collections.singleton(commit1.getId()));
+						return up;
+					}
+				}, null);
+		uri = testProtocol.register(ctx, server);
+
+		assertFalse(client.hasObject(commit0.toObjectId()));
+
+		// Fetch of the parent of the shallow commit
+		try (Transport tn = testProtocol.open(uri, client, "server")) {
+			tn.fetch(NullProgressMonitor.INSTANCE,
+					Collections.singletonList(new RefSpec(commit0.name())));
+			assertTrue(client.hasObject(commit0.toObjectId()));
+		}
+	}
+
