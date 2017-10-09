@@ -3,6 +3,10 @@
 		try (DfsReader ctx = objdb.newReader()) {
 			for (DfsPackFile pack : objdb.getPacks()) {
 				DfsPackDescription packDesc = pack.getPackDescription();
+				if (packDesc.getPackSource()
+						== PackSource.UNREACHABLE_GARBAGE) {
+					continue;
+				}
 				try (ReadableChannel rc = objdb.openFile(packDesc, PACK)) {
 					verifyPack(pm, errors, ctx, pack, rc);
 				} catch (MissingObjectException e) {
