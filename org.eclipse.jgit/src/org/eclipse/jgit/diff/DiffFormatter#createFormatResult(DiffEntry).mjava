@@ -11,46 +11,49 @@
 			// Content not changed (e.g. only mode, pure rename)
 			editList = new EditList();
 			type = PatchType.UNIFIED;
+			res.header = new FileHeader(buf.toByteArray(), editList, type);
+			return res;
+		}
 
+		assertHaveReader();
+
+		RawText aRaw = null;
+		RawText bRaw = null;
+		if (ent.getOldMode() == GITLINK || ent.getNewMode() == GITLINK) {
+			aRaw = new RawText(writeGitLinkText(ent.getOldId()));
+			bRaw = new RawText(writeGitLinkText(ent.getNewId()));
 		} else {
-			assertHaveReader();
-
-			byte[] aRaw, bRaw;
-
-			if (ent.getOldMode() == GITLINK || ent.getNewMode() == GITLINK) {
-				aRaw = writeGitLinkText(ent.getOldId());
-				bRaw = writeGitLinkText(ent.getNewId());
-			} else {
+			try {
 				aRaw = open(OLD, ent);
 				bRaw = open(NEW, ent);
-			}
-
-			if (aRaw == BINARY || bRaw == BINARY //
-					|| RawText.isBinary(aRaw) || RawText.isBinary(bRaw)) {
+			} catch (BinaryBlobException e) {
+				// Do nothing; we check for null below.
 				formatOldNewPaths(buf, ent);
 				buf.write(encodeASCII("Binary files differ\n")); //$NON-NLS-1$
 				editList = new EditList();
 				type = PatchType.BINARY;
-
-			} else {
-				res.a = new RawText(aRaw);
-				res.b = new RawText(bRaw);
-				editList = diff(res.a, res.b);
-				type = PatchType.UNIFIED;
-
-				switch (ent.getChangeType()) {
-				case RENAME:
-				case COPY:
-					if (!editList.isEmpty())
-						formatOldNewPaths(buf, ent);
-					break;
-
-				default:
-					formatOldNewPaths(buf, ent);
-					break;
-				}
+				res.header = new FileHeader(buf.toByteArray(), editList, type);
+				return res;
 			}
 		}
+
+		res.a = aRaw;
+		res.b = bRaw;
+		editList = diff(res.a, res.b);
+		type = PatchType.UNIFIED;
+
+		switch (ent.getChangeType()) {
+			case RENAME:
+			case COPY:
+				if (!editList.isEmpty())
+					formatOldNewPaths(buf, ent);
+				break;
+
+			default:
+				formatOldNewPaths(buf, ent);
+				break;
+		}
+
 
 		res.header = new FileHeader(buf.toByteArray(), editList, type);
 		return res;

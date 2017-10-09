@@ -1,10 +1,10 @@
-	private byte[] open(DiffEntry.Side side, DiffEntry entry)
-			throws IOException {
+	private RawText open(DiffEntry.Side side, DiffEntry entry)
+			throws IOException, BinaryBlobException {
 		if (entry.getMode(side) == FileMode.MISSING)
-			return EMPTY;
+			return RawText.EMPTY_TEXT;
 
 		if (entry.getMode(side).getObjectType() != Constants.OBJ_BLOB)
-			return EMPTY;
+			return RawText.EMPTY_TEXT;
 
 		AbbreviatedObjectId id = entry.getId(side);
 		if (!id.isComplete()) {
@@ -25,22 +25,7 @@
 				throw new AmbiguousObjectException(id, ids);
 		}
 
-		try {
-			ObjectLoader ldr = source.open(side, entry);
-			return ldr.getBytes(binaryFileThreshold);
-
-		} catch (LargeObjectException.ExceedsLimit overLimit) {
-			return BINARY;
-
-		} catch (LargeObjectException.ExceedsByteArrayLimit overLimit) {
-			return BINARY;
-
-		} catch (LargeObjectException.OutOfMemory tooBig) {
-			return BINARY;
-
-		} catch (LargeObjectException tooBig) {
-			tooBig.setObjectId(id.toObjectId());
-			throw tooBig;
-		}
+		ObjectLoader ldr = source.open(side, entry);
+		return RawText.load(ldr, binaryFileThreshold);
 	}
 
