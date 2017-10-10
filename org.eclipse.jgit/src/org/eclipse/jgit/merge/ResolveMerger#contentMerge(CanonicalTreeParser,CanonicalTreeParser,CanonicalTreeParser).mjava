@@ -13,12 +13,22 @@
 	private MergeResult<RawText> contentMerge(CanonicalTreeParser base,
 			CanonicalTreeParser ours, CanonicalTreeParser theirs)
 			throws IOException {
-		RawText baseText = base == null ? RawText.EMPTY_TEXT : getRawText(
+		RawText baseText;
+		RawText ourText;
+		RawText theirsText;
+
+		try {
+			baseText = base == null ? RawText.EMPTY_TEXT : getRawText(
 				base.getEntryObjectId(), reader);
-		RawText ourText = ours == null ? RawText.EMPTY_TEXT : getRawText(
+			ourText = ours == null ? RawText.EMPTY_TEXT : getRawText(
 				ours.getEntryObjectId(), reader);
-		RawText theirsText = theirs == null ? RawText.EMPTY_TEXT : getRawText(
+			theirsText = theirs == null ? RawText.EMPTY_TEXT : getRawText(
 				theirs.getEntryObjectId(), reader);
+		} catch (BinaryBlobException e) {
+			MergeResult<RawText> r = new MergeResult<>(Collections.<RawText>emptyList());
+			r.setContainsConflicts(true);
+			return r;
+		}
 		return (mergeAlgorithm.merge(RawTextComparator.DEFAULT, baseText,
 				ourText, theirsText));
 	}

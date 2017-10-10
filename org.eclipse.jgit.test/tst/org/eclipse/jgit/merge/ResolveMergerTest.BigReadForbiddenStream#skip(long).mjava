@@ -1,0 +1,10 @@
+		@Override
+		public long skip(long n) throws IOException {
+			limit -= n;
+			if (limit < 0) {
+				throw new IllegalStateException();
+			}
+
+			return super.skip(n);
+		}
+

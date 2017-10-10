@@ -221,6 +221,7 @@
 			// OURS or THEIRS has been deleted
 			if (((modeO != 0 && !tw.idEqual(T_BASE, T_OURS)) || (modeT != 0 && !tw
 					.idEqual(T_BASE, T_THEIRS)))) {
+				MergeResult<RawText> result = contentMerge(base, ours, theirs);
 
 				add(tw.getRawPath(), base, DirCacheEntry.STAGE_1, 0, 0);
 				add(tw.getRawPath(), ours, DirCacheEntry.STAGE_2, 0, 0);
@@ -241,8 +242,7 @@
 				unmergedPaths.add(tw.getPathString());
 
 				// generate a MergeResult for the deleted file
-				mergeResults.put(tw.getPathString(),
-						contentMerge(base, ours, theirs));
+				mergeResults.put(tw.getPathString(), result);
 			}
 		}
 		return true;

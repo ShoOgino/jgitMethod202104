@@ -1,0 +1,17 @@
+		@Override
+		public ObjectLoader open(AnyObjectId objectId, int typeHint) throws IOException {
+			ObjectLoader orig = super.open(objectId, typeHint);
+			return new ObjectLoader.Filter() {
+				@Override
+				protected ObjectLoader delegate() {
+					return orig;
+				}
+
+				@Override
+				public ObjectStream openStream() throws IOException {
+					ObjectStream os = orig.openStream();
+					return new BigReadForbiddenStream(os, limit);
+				}
+			};
+		}
+

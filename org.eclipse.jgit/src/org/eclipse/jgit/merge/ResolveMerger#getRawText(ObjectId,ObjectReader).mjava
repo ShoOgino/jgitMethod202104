@@ -1,7 +1,10 @@
 	private static RawText getRawText(ObjectId id, ObjectReader reader)
-			throws IOException {
+			throws IOException, BinaryBlobException {
 		if (id.equals(ObjectId.zeroId()))
 			return new RawText(new byte[] {});
-		return new RawText(reader.open(id, OBJ_BLOB).getCachedBytes());
+
+		ObjectLoader loader = reader.open(id, OBJ_BLOB);
+		int threshold = PackConfig.DEFAULT_BIG_FILE_THRESHOLD;
+		return RawText.load(loader, threshold);
 	}
 

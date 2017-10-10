@@ -1,0 +1,10 @@
+		@Override
+		public int read(byte[] b, int off, int len) throws IOException {
+			int n = super.read(b, off, len);
+			limit -= n;
+			if (limit < 0) {
+				throw new IllegalStateException();
+			}
+			return n;
+		}
+
