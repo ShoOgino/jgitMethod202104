@@ -68,7 +68,9 @@
 					String path = e.getKey();
 					CheckoutMetadata meta = e.getValue();
 					DirCacheEntry entry = dc.getEntry(path);
-					if (!FileMode.GITLINK.equals(entry.getRawMode())) {
+					if (FileMode.GITLINK.equals(entry.getRawMode())) {
+						checkoutGitlink(path, entry);
+					} else {
 						checkoutEntry(repo, entry, objectReader, false, meta);
 					}
 					e = null;

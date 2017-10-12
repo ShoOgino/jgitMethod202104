@@ -1,0 +1,65 @@
+	/**
+	 * Merging two non-conflicting submodules when the index does not contain
+	 * any entry for either submodule.
+	 *
+	 * @param strategy
+	 * @throws Exception
+	 */
+	@Theory
+	public void checkMergeNonConflictingSubmodulesWithoutIndex(
+			MergeStrategy strategy) throws Exception {
+		Git git = Git.wrap(db);
+		writeTrashFile("initial", "initial");
+		git.add().addFilepattern("initial").call();
+
+		writeSubmodule("one", ObjectId
+				.fromString("1000000000000000000000000000000000000000"));
+
+		// Our initial commit should include a .gitmodules with a bunch of
+		// comment lines, so that
+		// we don't have a content merge issue when we add a new submodule at
+		// the top and a different
+		// one at the bottom. This is sort of a hack, but it should allow
+		// add/add submodule merges
+		String existing = read(Constants.DOT_GIT_MODULES);
+		String context = "\n# context\n# more context\n# yet more context\n";
+		write(new File(db.getWorkTree(), Constants.DOT_GIT_MODULES),
+				existing + context + context + context);
+
+		git.add().addFilepattern(Constants.DOT_GIT_MODULES).call();
+		RevCommit initial = git.commit().setMessage("initial").call();
+
+		writeSubmodule("two", ObjectId
+				.fromString("1000000000000000000000000000000000000000"));
+		git.add().addFilepattern(Constants.DOT_GIT_MODULES).call();
+
+		RevCommit right = git.commit().setMessage("added two").call();
+
+		git.checkout().setStartPoint(initial).setName("left")
+				.setCreateBranch(true).call();
+
+		// we need to manually create the submodule for three for the
+		// .gitmodules hackery
+		addSubmoduleToIndex("three", ObjectId
+				.fromString("1000000000000000000000000000000000000000"));
+		new File(db.getWorkTree(), "three").mkdir();
+
+		existing = read(Constants.DOT_GIT_MODULES);
+		String three = "[submodule \"three\"]\n\tpath = three\n\turl = "
+				+ db.getDirectory().toURI() + "\n";
+		write(new File(db.getWorkTree(), Constants.DOT_GIT_MODULES),
+				three + existing);
+
+		git.add().addFilepattern(Constants.DOT_GIT_MODULES).call();
+		git.commit().setMessage("a different one").call();
+
+		MergeResult result = git.merge().setStrategy(strategy).include(right)
+				.call();
+
+		assertNull(result.getCheckoutConflicts());
+		assertNull(result.getFailingPaths());
+		for (String dir : Arrays.asList("one", "two", "three")) {
+			assertTrue(new File(db.getWorkTree(), dir).isDirectory());
+		}
+	}
+

@@ -1,0 +1,8 @@
+	private void checkoutGitlink(String path, DirCacheEntry entry)
+			throws IOException {
+		File gitlinkDir = new File(repo.getWorkTree(), path);
+		FileUtils.mkdirs(gitlinkDir, true);
+		FS fs = repo.getFS();
+		entry.setLastModified(fs.lastModified(gitlinkDir));
+	}
+

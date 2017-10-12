@@ -1,0 +1,21 @@
+	private void writeSubmodule(String path, ObjectId commit)
+			throws IOException, ConfigInvalidException {
+		addSubmoduleToIndex(path, commit);
+		new File(db.getWorkTree(), path).mkdir();
+
+		StoredConfig config = db.getConfig();
+		config.setString(ConfigConstants.CONFIG_SUBMODULE_SECTION, path,
+				ConfigConstants.CONFIG_KEY_URL,
+				db.getDirectory().toURI().toString());
+		config.save();
+
+		FileBasedConfig modulesConfig = new FileBasedConfig(
+				new File(db.getWorkTree(), Constants.DOT_GIT_MODULES),
+				db.getFS());
+		modulesConfig.load();
+		modulesConfig.setString(ConfigConstants.CONFIG_SUBMODULE_SECTION, path,
+				ConfigConstants.CONFIG_KEY_PATH, path);
+		modulesConfig.save();
+
+	}
+

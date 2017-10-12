@@ -13,8 +13,13 @@
 		}
 		for (Map.Entry<String, DirCacheEntry> entry : toBeCheckedOut
 				.entrySet()) {
-			DirCacheCheckout.checkoutEntry(db, entry.getValue(), reader);
-			modifiedFiles.add(entry.getKey());
+			DirCacheEntry cacheEntry = entry.getValue();
+			if (cacheEntry.getFileMode() == FileMode.GITLINK) {
+				new File(nonNullRepo().getWorkTree(), entry.getKey()).mkdirs();
+			} else {
+				DirCacheCheckout.checkoutEntry(db, cacheEntry, reader);
+				modifiedFiles.add(entry.getKey());
+			}
 		}
 	}
 

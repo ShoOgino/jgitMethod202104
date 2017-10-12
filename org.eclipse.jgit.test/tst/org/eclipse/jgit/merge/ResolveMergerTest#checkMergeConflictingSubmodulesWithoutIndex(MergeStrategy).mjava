@@ -1,0 +1,39 @@
+	/**
+	 * Merging two conflicting submodules when the index does not contain any
+	 * entry for that submodule.
+	 *
+	 * @param strategy
+	 * @throws Exception
+	 */
+	@Theory
+	public void checkMergeConflictingSubmodulesWithoutIndex(
+			MergeStrategy strategy) throws Exception {
+		Git git = Git.wrap(db);
+		writeTrashFile("initial", "initial");
+		git.add().addFilepattern("initial").call();
+		RevCommit initial = git.commit().setMessage("initial").call();
+
+		writeSubmodule("one", ObjectId
+				.fromString("1000000000000000000000000000000000000000"));
+		git.add().addFilepattern(Constants.DOT_GIT_MODULES).call();
+		RevCommit right = git.commit().setMessage("added one").call();
+
+		// a second commit in the submodule
+
+		git.checkout().setStartPoint(initial).setName("left")
+				.setCreateBranch(true).call();
+		writeSubmodule("one", ObjectId
+				.fromString("2000000000000000000000000000000000000000"));
+
+		git.add().addFilepattern(Constants.DOT_GIT_MODULES).call();
+		git.commit().setMessage("a different one").call();
+
+		MergeResult result = git.merge().setStrategy(strategy).include(right)
+				.call();
+
+		assertEquals(MergeStatus.CONFLICTING, result.getMergeStatus());
+		Map<String, int[][]> conflicts = result.getConflicts();
+		assertEquals(1, conflicts.size());
+		assertNotNull(conflicts.get("one"));
+	}
+
