@@ -1,0 +1,35 @@
+	private RevCommit commitSubmoduleCreation(String path, Git git) throws IOException, GitAPIException {
+		writeTrashFile("file.txt", "content");
+		git.add().addFilepattern("file.txt").call();
+		final RevCommit commit = git.commit().setMessage("create file").call();
+
+		DirCache cache = db.lockDirCache();
+		DirCacheEditor editor = cache.editor();
+		editor.add(new PathEdit(path) {
+
+			@Override
+			public void apply(DirCacheEntry ent) {
+				ent.setFileMode(FileMode.GITLINK);
+				ent.setObjectId(commit);
+			}
+		});
+		editor.commit();
+
+		StoredConfig config = db.getConfig();
+		config.setString(ConfigConstants.CONFIG_SUBMODULE_SECTION, path,
+				ConfigConstants.CONFIG_KEY_URL, db.getDirectory().toURI()
+						.toString());
+		config.save();
+
+		FileBasedConfig modulesConfig = new FileBasedConfig(new File(
+				db.getWorkTree(), Constants.DOT_GIT_MODULES), db.getFS());
+		modulesConfig.setString(ConfigConstants.CONFIG_SUBMODULE_SECTION, path,
+				ConfigConstants.CONFIG_KEY_PATH, path);
+		modulesConfig.save();
+
+		new File(db.getWorkTree(), "sub").mkdir();
+		git.add().addFilepattern(Constants.DOT_GIT_MODULES).call();
+		git.commit().setMessage("create submodule").call();
+		return commit;
+	}
+

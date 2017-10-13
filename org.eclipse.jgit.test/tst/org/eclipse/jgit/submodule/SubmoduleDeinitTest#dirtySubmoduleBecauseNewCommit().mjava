@@ -1,0 +1,29 @@
+	@Test
+	public void dirtySubmoduleBecauseNewCommit() throws Exception {
+		final String path = "sub";
+		Git git = Git.wrap(db);
+
+		commitSubmoduleCreation(path, git);
+
+		Collection<String> updated = new SubmoduleUpdateCommand(db).addPath(path).setFetch(false).call();
+		assertEquals(1, updated.size());
+
+		File submoduleDir = assertSubmoduleIsInitialized();
+		SubmoduleWalk generator = SubmoduleWalk.forIndex(db);
+		generator.next();
+
+		//want to create a commit inside the repo...
+		Repository submoduleLocalRepo = generator.getRepository();
+		JGitTestUtil.writeTrashFile(submoduleLocalRepo, "file.txt", "new data");
+		Git.wrap(submoduleLocalRepo).commit().setAll(true).setMessage("local commit").call();
+
+		SubmoduleDeinitResult result = runDeinit(new SubmoduleDeinitCommand(db).addPath("sub"));
+		assertEquals(path, result.getPath());
+		assertEquals(SubmoduleDeinitCommand.SubmoduleDeinitStatus.DIRTY, result.getStatus());
+
+		generator = SubmoduleWalk.forIndex(db);
+		assertTrue(generator.next());
+		assertTrue(submoduleDir.isDirectory());
+		assertNotEquals(0, submoduleDir.list().length);
+	}
+

@@ -1,0 +1,22 @@
+	@Test
+	public void cleanSubmodule() throws Exception {
+		final String path = "sub";
+		Git git = Git.wrap(db);
+
+		commitSubmoduleCreation(path, git);
+
+		Collection<String> updated = new SubmoduleUpdateCommand(db).addPath(path).setFetch(false).call();
+		assertEquals(1, updated.size());
+
+		File submoduleDir = assertSubmoduleIsInitialized();
+
+		SubmoduleDeinitResult result = runDeinit(new SubmoduleDeinitCommand(db).addPath("sub"));
+		assertEquals(path, result.getPath());
+		assertEquals(SubmoduleDeinitCommand.SubmoduleDeinitStatus.SUCCESS, result.getStatus());
+
+		SubmoduleWalk generator = SubmoduleWalk.forIndex(db);
+		assertTrue(generator.next());
+		assertTrue(submoduleDir.isDirectory());
+		assertEquals(0, submoduleDir.list().length);
+	}
+

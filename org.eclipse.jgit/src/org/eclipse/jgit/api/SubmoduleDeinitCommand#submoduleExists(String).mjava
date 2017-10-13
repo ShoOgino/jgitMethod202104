@@ -1,0 +1,18 @@
+	/**
+	 * Check if this path is a submodule by checking the index, which is what
+	 * git submodule deinit checks.
+	 *
+	 * @param path
+	 *            path of the submodule
+	 *
+	 * @return {@code true} if path exists and is a submodule in index,
+	 *         {@code false} otherwise
+	 * @throws IOException
+	 */
+	private boolean submoduleExists(String path) throws IOException {
+		TreeFilter filter = PathFilter.create(path);
+		try (SubmoduleWalk w = SubmoduleWalk.forIndex(repo)) {
+			return w.setFilter(filter).next();
+		}
+	}
+

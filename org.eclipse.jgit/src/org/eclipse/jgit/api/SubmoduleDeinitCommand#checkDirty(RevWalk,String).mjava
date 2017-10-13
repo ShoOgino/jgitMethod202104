@@ -1,0 +1,56 @@
+	/**
+	 * Check if a submodule is dirty. A submodule is dirty if there are local
+	 * changes to the submodule relative to its HEAD, including untracked files.
+	 * It is also dirty if the HEAD of the submodule does not match the value in
+	 * the parent repo's index or HEAD.
+	 *
+	 * @param revWalk
+	 * @param path
+	 * @return status of the command
+	 * @throws GitAPIException
+	 * @throws IOException
+	 */
+	private SubmoduleDeinitStatus checkDirty(RevWalk revWalk, String path)
+			throws GitAPIException, IOException {
+		Ref head = repo.exactRef("HEAD"); //$NON-NLS-1$
+		if (head == null) {
+			throw new NoHeadException(
+					JGitText.get().invalidRepositoryStateNoHead);
+		}
+		RevCommit headCommit = revWalk.parseCommit(head.getObjectId());
+		RevTree tree = headCommit.getTree();
+
+		ObjectId submoduleHead;
+		try (SubmoduleWalk w = SubmoduleWalk.forPath(repo, tree, path)) {
+			submoduleHead = w.getHead();
+			if (submoduleHead == null) {
+				// The submodule is not checked out.
+				return SubmoduleDeinitStatus.ALREADY_DEINITIALIZED;
+			}
+			if (!submoduleHead.equals(w.getObjectId())) {
+				// The submodule's current HEAD doesn't match the value in the
+				// outer repo's HEAD.
+				return SubmoduleDeinitStatus.DIRTY;
+			}
+		}
+
+		try (SubmoduleWalk w = SubmoduleWalk.forIndex(repo)) {
+			if (!w.next()) {
+				// The submodule does not exist in the index (shouldn't happen
+				// since we check this earlier)
+				return SubmoduleDeinitStatus.DIRTY;
+			}
+			if (!submoduleHead.equals(w.getObjectId())) {
+				// The submodule's current HEAD doesn't match the value in the
+				// outer repo's index.
+				return SubmoduleDeinitStatus.DIRTY;
+			}
+
+			Repository submoduleRepo = w.getRepository();
+
+			Status status = Git.wrap(submoduleRepo).status().call();
+			return status.isClean() ? SubmoduleDeinitStatus.SUCCESS
+					: SubmoduleDeinitStatus.DIRTY;
+		}
+	}
+

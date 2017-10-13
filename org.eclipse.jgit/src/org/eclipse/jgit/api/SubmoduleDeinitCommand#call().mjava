@@ -1,0 +1,59 @@
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 *
+	 * @return the set of repositories successfully deinitialized.
+	 * @throws NoSuchSubmoduleException
+	 *             if any of the submodules which we might want to deinitialize
+	 *             don't exist
+	 */
+	@Override
+	public Collection<SubmoduleDeinitResult> call() throws GitAPIException {
+		checkCallable();
+		try {
+			if (paths.isEmpty()) {
+				return Collections.emptyList();
+			}
+			for (String path : paths) {
+				if (!submoduleExists(path)) {
+					throw new NoSuchSubmoduleException(path);
+				}
+			}
+			List<SubmoduleDeinitResult> results = new ArrayList<>(paths.size());
+			try (RevWalk revWalk = new RevWalk(repo);
+					SubmoduleWalk generator = SubmoduleWalk.forIndex(repo)) {
+				generator.setFilter(PathFilterGroup.createFromStrings(paths));
+				StoredConfig config = repo.getConfig();
+				while (generator.next()) {
+					String path = generator.getPath();
+					String name = generator.getModuleName();
+					SubmoduleDeinitStatus status = checkDirty(revWalk, path);
+					switch (status) {
+					case SUCCESS:
+						deinit(path);
+						break;
+					case ALREADY_DEINITIALIZED:
+						break;
+					case DIRTY:
+						if (force) {
+							deinit(path);
+							status = SubmoduleDeinitStatus.FORCED;
+						}
+						break;
+					default:
+						throw new JGitInternalException(MessageFormat.format(
+								JGitText.get().unexpectedSubmoduleStatus,
+								status));
+					}
+
+					config.unsetSection(
+							ConfigConstants.CONFIG_SUBMODULE_SECTION, name);
+					results.add(new SubmoduleDeinitResult(path, status));
+				}
+			}
+			return results;
+		} catch (IOException e) {
+			throw new JGitInternalException(e.getMessage(), e);
+		}
+	}
+

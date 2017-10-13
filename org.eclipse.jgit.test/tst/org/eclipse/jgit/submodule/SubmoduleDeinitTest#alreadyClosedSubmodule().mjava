@@ -1,0 +1,12 @@
+	@Test
+	public void alreadyClosedSubmodule() throws Exception {
+		final String path = "sub";
+		Git git = Git.wrap(db);
+
+		commitSubmoduleCreation(path, git);
+
+		SubmoduleDeinitResult result = runDeinit(new SubmoduleDeinitCommand(db).addPath("sub"));
+		assertEquals(path, result.getPath());
+		assertEquals(SubmoduleDeinitCommand.SubmoduleDeinitStatus.ALREADY_DEINITIALIZED, result.getStatus());
+	}
+

@@ -1,0 +1,25 @@
+	@Test
+	public void dirtySubmoduleWithForce() throws Exception {
+		final String path = "sub";
+		Git git = Git.wrap(db);
+
+		commitSubmoduleCreation(path, git);
+
+		Collection<String> updated = new SubmoduleUpdateCommand(db).addPath(path).setFetch(false).call();
+		assertEquals(1, updated.size());
+
+		File submoduleDir = assertSubmoduleIsInitialized();
+
+		write(new File(submoduleDir, "untracked"), "untracked");
+
+		SubmoduleDeinitCommand command = new SubmoduleDeinitCommand(db).addPath("sub").setForce(true);
+		SubmoduleDeinitResult result = runDeinit(command);
+		assertEquals(path, result.getPath());
+		assertEquals(SubmoduleDeinitCommand.SubmoduleDeinitStatus.FORCED, result.getStatus());
+
+		SubmoduleWalk generator = SubmoduleWalk.forIndex(db);
+		assertTrue(generator.next());
+		assertTrue(submoduleDir.isDirectory());
+		assertEquals(0, submoduleDir.list().length);
+	}
+

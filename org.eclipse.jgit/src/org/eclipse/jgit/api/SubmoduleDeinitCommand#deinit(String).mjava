@@ -1,0 +1,22 @@
+	/**
+	 * Recursively delete the *contents* of path, but leave path as an empty
+	 * directory
+	 *
+	 * @param path
+	 *            the path to clean
+	 * @throws IOException
+	 */
+	private void deinit(String path) throws IOException {
+		File dir = new File(repo.getWorkTree(), path);
+		if (!dir.isDirectory()) {
+			throw new JGitInternalException(MessageFormat.format(
+					JGitText.get().expectedDirectoryNotSubmodule, path));
+		}
+		final File[] ls = dir.listFiles();
+		if (ls != null) {
+			for (int i = 0; i < ls.length; i++) {
+				FileUtils.delete(ls[i], RECURSIVE);
+			}
+		}
+	}
+
