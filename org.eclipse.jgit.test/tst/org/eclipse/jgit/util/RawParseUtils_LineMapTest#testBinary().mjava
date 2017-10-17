@@ -1,7 +1,6 @@
-	@Test
-	public void testBinary() throws UnsupportedEncodingException {
+	@Test(expected = BinaryBlobException.class)
+	public void testBinary() throws Exception {
 		final byte[] buf = "xxxfoo\nb\0ar".getBytes("ISO-8859-1");
-		final IntList map = RawParseUtils.lineMap(buf, 3, buf.length);
-		assertArrayEquals(new int[]{Integer.MIN_VALUE, 3, buf.length}, asInts(map));
+		RawParseUtils.lineMap(buf, 3, buf.length);
 	}
 

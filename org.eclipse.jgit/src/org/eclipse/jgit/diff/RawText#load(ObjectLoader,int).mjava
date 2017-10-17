@@ -55,7 +55,8 @@
 
 			System.arraycopy(head, 0, data, 0, head.length);
 			IO.readFully(stream, data, off, (int) (sz-off));
-			return new RawText(data);
+			IntList lineMap = RawParseUtils.lineMap(data, 0, data.length);
+			return new RawText(data, lineMap);
 		}
 	}
 
