@@ -40,6 +40,11 @@
 		if (first) {
 			return false;
 		}
+		if (filterBlobLimit == 0) {
+			p.writeString(OPTION_FILTER + " blob:none");
+		} else if (filterBlobLimit > 0) {
+			p.writeString(OPTION_FILTER + " blob:limit=" + filterBlobLimit);
+		}
 		p.end();
 		outNeedsEnd = false;
 		return true;

@@ -42,6 +42,9 @@
 				|| policy == null)
 			adv.advertiseCapability(OPTION_ALLOW_REACHABLE_SHA1_IN_WANT);
 		adv.advertiseCapability(OPTION_AGENT, UserAgent.get());
+		if (transferConfig.isAllowFilter()) {
+			adv.advertiseCapability(OPTION_FILTER);
+		}
 		adv.setDerefTags(true);
 		Map<String, Ref> advertisedOrDefaultRefs = getAdvertisedOrDefaultRefs();
 		findSymrefs(adv, advertisedOrDefaultRefs);

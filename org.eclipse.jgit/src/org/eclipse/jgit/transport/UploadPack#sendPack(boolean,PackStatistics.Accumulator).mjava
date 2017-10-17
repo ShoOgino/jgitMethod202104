@@ -46,7 +46,12 @@
 				accumulator);
 		try {
 			pw.setIndexDisabled(true);
-			pw.setUseCachedPacks(true);
+			if (filterBlobLimit >= 0) {
+				pw.setFilterBlobLimit(filterBlobLimit);
+				pw.setUseCachedPacks(false);
+			} else {
+				pw.setUseCachedPacks(true);
+			}
 			pw.setUseBitmaps(depth == 0 && clientShallowCommits.isEmpty());
 			pw.setClientShallowCommits(clientShallowCommits);
 			pw.setReuseDeltaCommits(true);

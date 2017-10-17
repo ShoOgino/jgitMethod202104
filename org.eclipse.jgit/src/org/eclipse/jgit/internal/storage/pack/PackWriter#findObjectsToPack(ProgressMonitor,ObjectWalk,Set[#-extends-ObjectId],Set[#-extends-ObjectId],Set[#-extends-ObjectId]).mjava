@@ -196,7 +196,7 @@
 				byte[] pathBuf = walker.getPathBuffer();
 				int pathLen = walker.getPathLength();
 				bases.addBase(o.getType(), pathBuf, pathLen, pathHash);
-				addObject(o, pathHash);
+				filterAndAddObject(o, o.getType(), pathHash);
 				countingMonitor.update(1);
 			}
 		} else {
@@ -206,7 +206,7 @@
 					continue;
 				if (exclude(o))
 					continue;
-				addObject(o, walker.getPathHashCode());
+				filterAndAddObject(o, o.getType(), walker.getPathHashCode());
 				countingMonitor.update(1);
 			}
 		}

@@ -33,6 +33,11 @@
 					OPTION_MULTI_ACK_DETAILED));
 		}
 
+		if (filterBlobLimit >= 0 && !wantCapability(line, OPTION_FILTER)) {
+			throw new PackProtocolException(uri,
+					JGitText.get().filterRequiresCapability);
+		}
+
 		addUserAgentCapability(line);
 		return line.toString();
 	}
