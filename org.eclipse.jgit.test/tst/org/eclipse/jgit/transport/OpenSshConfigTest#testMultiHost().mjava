@@ -4,12 +4,13 @@
 		final Host h1 = osc.lookup("repo.or.cz");
 		assertNotNull(h1);
 		assertEquals(new File(home, "foo/bar"), h1.getIdentityFile());
-		assertArrayEquals(new Object[] { "~/foo/bar", "/foo/baz" },
+		assertArrayEquals(new Object[] { new File(home, "foo/bar").getPath(),
+				"/foo/baz" },
 				h1.getConfig().getValues("IdentityFile"));
 		final Host h2 = osc.lookup("orcz");
 		assertNotNull(h2);
 		assertEquals(new File(home, "foo/bar"), h2.getIdentityFile());
-		assertArrayEquals(new Object[] { "~/foo/bar" },
+		assertArrayEquals(new Object[] { new File(home, "foo/bar").getPath() },
 				h2.getConfig().getValues("IdentityFile"));
 	}
 

@@ -4,12 +4,26 @@
 				List<String> values = multiOptions.get("IDENTITYFILE"); //$NON-NLS-1$
 				if (values != null) {
 					values = substitute(values, "dhlru", r); //$NON-NLS-1$
+					values = replaceTilde(values, home);
 					multiOptions.put("IDENTITYFILE", values); //$NON-NLS-1$
 				}
 				values = multiOptions.get("CERTIFICATEFILE"); //$NON-NLS-1$
 				if (values != null) {
 					values = substitute(values, "dhlru", r); //$NON-NLS-1$
+					values = replaceTilde(values, home);
 					multiOptions.put("CERTIFICATEFILE", values); //$NON-NLS-1$
+				}
+			}
+			if (listOptions != null) {
+				List<String> values = listOptions.get("GLOBALKNOWNHOSTSFILE"); //$NON-NLS-1$
+				if (values != null) {
+					values = replaceTilde(values, home);
+					listOptions.put("GLOBALKNOWNHOSTSFILE", values); //$NON-NLS-1$
+				}
+				values = listOptions.get("USERKNOWNHOSTSFILE"); //$NON-NLS-1$
+				if (values != null) {
+					values = replaceTilde(values, home);
+					listOptions.put("USERKNOWNHOSTSFILE", values); //$NON-NLS-1$
 				}
 			}
 			if (options != null) {
@@ -17,6 +31,7 @@
 				String value = options.get("IDENTITYAGENT"); //$NON-NLS-1$
 				if (value != null) {
 					value = r.substitute(value, "dhlru"); //$NON-NLS-1$
+					value = toFile(value, home).getPath();
 					options.put("IDENTITYAGENT", value); //$NON-NLS-1$
 				}
 			}
