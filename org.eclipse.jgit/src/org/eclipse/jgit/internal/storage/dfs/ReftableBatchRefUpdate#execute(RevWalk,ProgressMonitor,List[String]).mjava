@@ -1,0 +1,42 @@
+	@Override
+	public void execute(RevWalk rw, ProgressMonitor pm, List<String> options) {
+		List<ReceiveCommand> pending = getPending();
+		if (pending.isEmpty()) {
+			return;
+		}
+		if (options != null) {
+			setPushOptions(options);
+		}
+		try {
+			if (!checkObjectExistence(rw, pending)) {
+				return;
+			}
+			if (!checkNonFastForwards(rw, pending)) {
+				return;
+			}
+
+			lock.lock();
+			try {
+				Reftable table = refdb.reader();
+				if (!checkExpected(table, pending)) {
+					return;
+				}
+				if (!checkConflicting(pending)) {
+					return;
+				}
+				if (!blockUntilTimestamps(MAX_WAIT)) {
+					return;
+				}
+				applyUpdates(rw, pending);
+				for (ReceiveCommand cmd : pending) {
+					cmd.setResult(OK);
+				}
+			} finally {
+				lock.unlock();
+			}
+		} catch (IOException e) {
+			pending.get(0).setResult(LOCK_FAILURE, "io error"); //$NON-NLS-1$
+			ReceiveCommand.abort(pending);
+		}
+	}
+

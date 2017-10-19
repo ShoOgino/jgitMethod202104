@@ -1,0 +1,22 @@
+	private boolean canCompactTopOfStack(ReftableConfig cfg)
+			throws IOException {
+		ReftableStack stack = refdb.stack();
+		List<Reftable> readers = stack.readers();
+		if (readers.isEmpty()) {
+			return false;
+		}
+
+		int lastIdx = readers.size() - 1;
+		DfsReftable last = stack.files().get(lastIdx);
+		DfsPackDescription desc = last.getPackDescription();
+		if (desc.getPackSource() != PackSource.INSERT
+				|| !packOnlyContainsReftable(desc)) {
+			return false;
+		}
+
+		Reftable table = readers.get(lastIdx);
+		int bs = cfg.getRefBlockSize();
+		return table instanceof ReftableReader
+				&& ((ReftableReader) table).size() <= 3 * bs;
+	}
+

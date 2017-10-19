@@ -1,0 +1,36 @@
+	/**
+	 * Create a command to switch a symbolic reference's target.
+	 *
+	 * @param oldTarget
+	 *            expected old target. Use {@code null} to indicate a ref
+	 *            creation.
+	 * @param newTarget
+	 *            new target. Use {@code null} to indicate a ref deletion.
+	 * @param name
+	 *            name of the reference to make symbolic.
+	 * @since 4.10
+	 */
+	private ReceiveCommand(@Nullable String oldTarget, String newTarget, String name) {
+		if (name == null || name.isEmpty()) {
+			throw new IllegalArgumentException(
+					JGitText.get().nameMustNotBeNullOrEmpty);
+		}
+		this.oldId = ObjectId.zeroId();
+		this.oldSymref = oldTarget;
+		this.newId = ObjectId.zeroId();
+		this.newSymref = newTarget;
+		this.name = name;
+		if (oldTarget == null) {
+			if (newTarget == null) {
+				throw new IllegalArgumentException(
+						JGitText.get().bothRefTargetsMustNotBeNull);
+			}
+			type = Type.CREATE;
+		} else if (newTarget != null) {
+			type = Type.UPDATE;
+		} else {
+			type = Type.DELETE;
+		}
+		typeIsCorrect = true;
+	}
+

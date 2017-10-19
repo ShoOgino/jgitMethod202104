@@ -1,0 +1,31 @@
+	private void writeLog(ReftableWriter writer, long updateIndex,
+			List<ReceiveCommand> pending) throws IOException {
+		Map<String, ReceiveCommand> cmds = new HashMap<>();
+		List<String> byName = new ArrayList<>(pending.size());
+		for (ReceiveCommand cmd : pending) {
+			cmds.put(cmd.getRefName(), cmd);
+			byName.add(cmd.getRefName());
+		}
+		Collections.sort(byName);
+
+		PersonIdent ident = getRefLogIdent();
+		if (ident == null) {
+			ident = new PersonIdent(refdb.getRepository());
+		}
+		for (String name : byName) {
+			ReceiveCommand cmd = cmds.get(name);
+			if (isRefLogDisabled(cmd)) {
+				continue;
+			}
+			String msg = getRefLogMessage(cmd);
+			if (isRefLogIncludingResult(cmd)) {
+				String strResult = toResultString(cmd);
+				if (strResult != null) {
+					msg = msg.isEmpty() ? strResult : msg + ": " + strResult; //$NON-NLS-1$
+				}
+			}
+			writer.writeLog(name, updateIndex, ident, cmd.getOldId(),
+					cmd.getNewId(), msg);
+		}
+	}
+
