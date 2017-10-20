@@ -2,7 +2,6 @@
 			ProgressMonitor pm, long estimatedPackSize) throws IOException {
 		DfsPackDescription pack = repo.getObjectDatabase().newPack(source,
 				estimatedPackSize);
-		newPackDesc.add(pack);
 
 		if (source == GC && reftableConfig != null) {
 			writeReftable(pack);
@@ -36,6 +35,7 @@
 		PackStatistics stats = pw.getStatistics();
 		pack.setPackStats(stats);
 		pack.setLastModified(startTimeMillis);
+		newPackDesc.add(pack);
 		newPackStats.add(stats);
 		newPackObj.add(pw.getObjectSet());
 		return pack;
