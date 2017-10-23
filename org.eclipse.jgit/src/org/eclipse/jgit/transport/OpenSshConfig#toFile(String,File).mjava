@@ -1,0 +1,11 @@
+	private static File toFile(String path, File home) {
+		if (path.startsWith("~/")) { //$NON-NLS-1$
+			return new File(home, path.substring(2));
+		}
+		File ret = new File(path);
+		if (ret.isAbsolute()) {
+			return ret;
+		}
+		return new File(home, path);
+	}
+

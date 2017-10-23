@@ -8,8 +8,9 @@
 		// Host does tilde replacement
 		assertEquals(new File(home, "foo/ba z"), f);
 		final ConfigRepository.Config c = h.getConfig();
-		// Config doesn't
-		assertArrayEquals(new Object[] { "~/foo/ba z", "/foo/bar" },
+		// Config does tilde replacement, too
+		assertArrayEquals(new Object[] { new File(home, "foo/ba z").getPath(),
+				"/foo/bar" },
 				c.getValues("IdentityFile"));
 	}
 
