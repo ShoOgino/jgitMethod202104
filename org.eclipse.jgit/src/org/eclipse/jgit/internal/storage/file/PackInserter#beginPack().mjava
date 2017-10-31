@@ -1,0 +1,12 @@
+	private void beginPack() throws IOException {
+		objectList = new BlockList<>();
+		objectMap = new ObjectIdOwnerMap<>();
+
+		rollback = true;
+		tmpPack = File.createTempFile("insert_", ".pack", db.getDirectory()); //$NON-NLS-1$ //$NON-NLS-2$
+		packOut = new PackStream(tmpPack);
+
+		// Write the header as though it were a single object pack.
+		packOut.write(packOut.hdrBuf, 0, writePackHeader(packOut.hdrBuf, 1));
+	}
+

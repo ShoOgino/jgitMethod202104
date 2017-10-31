@@ -1,0 +1,9 @@
+	@Test
+	public void noFlush() throws Exception {
+		try (PackInserter ins = newInserter()) {
+			ins.insert(OBJ_BLOB, Constants.encode("foo contents"));
+			// No flush.
+		}
+		assertNoObjects();
+	}
+

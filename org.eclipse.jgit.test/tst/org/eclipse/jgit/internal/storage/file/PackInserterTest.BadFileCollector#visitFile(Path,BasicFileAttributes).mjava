@@ -1,0 +1,9 @@
+		@Override
+		public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+			String name = file.getFileName().toString();
+			if (!attrs.isDirectory() && badName.test(name)) {
+				bad.add(name);
+			}
+			return FileVisitResult.CONTINUE;
+		}
+

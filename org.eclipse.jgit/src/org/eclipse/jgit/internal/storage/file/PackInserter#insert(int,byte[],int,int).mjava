@@ -1,0 +1,18 @@
+	@Override
+	public ObjectId insert(int type, byte[] data, int off, int len)
+			throws IOException {
+		ObjectId id = idFor(type, data, off, len);
+		if (objectMap != null && objectMap.contains(id)) {
+			return id;
+		}
+		// Ignore loose objects, which are potentially unreachable.
+		if (checkExisting && db.hasPackedObject(id)) {
+			return id;
+		}
+
+		long offset = beginObject(type, len);
+		packOut.compress.write(data, off, len);
+		packOut.compress.finish();
+		return endObject(id, offset);
+	}
+

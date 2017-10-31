@@ -1,0 +1,48 @@
+	@Test
+	public void singlePack() throws Exception {
+		ObjectId blobId;
+		byte[] blob = Constants.encode("foo contents");
+		ObjectId treeId;
+		ObjectId commitId;
+		byte[] commit;
+		try (PackInserter ins = newInserter()) {
+			blobId = ins.insert(OBJ_BLOB, blob);
+
+			DirCache dc = DirCache.newInCore();
+			DirCacheBuilder b = dc.builder();
+			DirCacheEntry dce = new DirCacheEntry("foo");
+			dce.setFileMode(FileMode.REGULAR_FILE);
+			dce.setObjectId(blobId);
+			b.add(dce);
+			b.finish();
+			treeId = dc.writeTree(ins);
+
+			CommitBuilder cb = new CommitBuilder();
+			cb.setTreeId(treeId);
+			cb.setAuthor(author);
+			cb.setCommitter(committer);
+			cb.setMessage("Commit message");
+			commit = cb.toByteArray();
+			commitId = ins.insert(cb);
+			ins.flush();
+		}
+
+		assertPacksOnly();
+		List<PackFile> packs = listPacks();
+		assertEquals(1, packs.size());
+		assertEquals(3, packs.get(0).getObjectCount());
+
+		try (ObjectReader reader = db.newObjectReader()) {
+			assertBlob(reader, blobId, blob);
+
+			CanonicalTreeParser treeParser =
+					new CanonicalTreeParser(null, reader, treeId);
+			assertEquals("foo", treeParser.getEntryPathString());
+			assertEquals(blobId, treeParser.getEntryObjectId());
+
+			ObjectLoader commitLoader = reader.open(commitId);
+			assertEquals(OBJ_COMMIT, commitLoader.getType());
+			assertArrayEquals(commit, commitLoader.getBytes());
+		}
+	}
+

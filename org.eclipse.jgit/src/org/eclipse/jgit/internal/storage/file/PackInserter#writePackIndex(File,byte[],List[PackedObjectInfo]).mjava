@@ -1,0 +1,8 @@
+	private static void writePackIndex(File idx, byte[] packHash,
+			List<PackedObjectInfo> list) throws IOException {
+		try (OutputStream os = new FileOutputStream(idx)) {
+			PackIndexWriter w = PackIndexWriter.createVersion(os, INDEX_VERSION);
+			w.write(list, packHash);
+		}
+	}
+

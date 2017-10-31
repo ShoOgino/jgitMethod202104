@@ -1,0 +1,37 @@
+	@Test
+	public void overwriteExistingPack() throws Exception {
+		ObjectId blobId;
+		byte[] blob = Constants.encode("foo contents");
+
+		try (PackInserter ins = newInserter()) {
+			blobId = ins.insert(OBJ_BLOB, blob);
+			ins.flush();
+		}
+
+		assertPacksOnly();
+		List<PackFile> packs = listPacks();
+		assertEquals(1, packs.size());
+		PackFile pack = packs.get(0);
+		assertEquals(1, pack.getObjectCount());
+
+		String inode = getInode(pack.getPackFile());
+
+		try (PackInserter ins = newInserter()) {
+			ins.checkExisting(false);
+			assertEquals(blobId, ins.insert(OBJ_BLOB, blob));
+			ins.flush();
+		}
+
+		assertPacksOnly();
+		packs = listPacks();
+		assertEquals(1, packs.size());
+		pack = packs.get(0);
+		assertEquals(1, pack.getObjectCount());
+
+		if (inode != null) {
+			// Old file was overwritten with new file, although objects were
+			// equivalent.
+			assertNotEquals(inode, getInode(pack.getPackFile()));
+		}
+	}
+

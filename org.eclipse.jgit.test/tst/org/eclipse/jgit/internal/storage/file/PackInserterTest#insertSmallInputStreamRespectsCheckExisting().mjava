@@ -1,0 +1,24 @@
+	@Test
+	public void insertSmallInputStreamRespectsCheckExisting() throws Exception {
+		ObjectId blobId;
+		byte[] blob = Constants.encode("foo contents");
+		try (PackInserter ins = newInserter()) {
+			assertThat(blob.length, lessThan(ins.getBufferSize()));
+			blobId = ins.insert(OBJ_BLOB, blob);
+			ins.insert(OBJ_BLOB, Constants.encode("another blob"));
+			ins.flush();
+		}
+
+		assertPacksOnly();
+		assertEquals(1, listPacks().size());
+
+		try (PackInserter ins = newInserter()) {
+			assertEquals(blobId,
+					ins.insert(OBJ_BLOB, blob.length, new ByteArrayInputStream(blob)));
+			ins.flush();
+		}
+
+		assertPacksOnly();
+		assertEquals(1, listPacks().size());
+	}
+
