@@ -1,0 +1,25 @@
+		byte[] inflate(long filePos, int len) throws IOException, DataFormatException {
+			byte[] dstbuf;
+			try {
+				dstbuf = new byte[len];
+			} catch (OutOfMemoryError noMemory) {
+				return null; // Caller will switch to large object streaming.
+			}
+
+			byte[] srcbuf = buffer();
+			Inflater inf = inflater();
+			filePos += setInput(filePos, inf, srcbuf);
+			for (int dstoff = 0;;) {
+				int n = inf.inflate(dstbuf, dstoff, dstbuf.length - dstoff);
+				dstoff += n;
+				if (inf.finished()) {
+					return dstbuf;
+				}
+				if (inf.needsInput()) {
+					filePos += setInput(filePos, inf, srcbuf);
+				} else if (n == 0) {
+					throw new DataFormatException();
+				}
+			}
+		}
+

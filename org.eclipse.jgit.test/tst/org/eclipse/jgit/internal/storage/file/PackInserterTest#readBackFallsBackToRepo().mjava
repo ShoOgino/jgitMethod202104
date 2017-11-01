@@ -1,0 +1,16 @@
+	@Test
+	public void readBackFallsBackToRepo() throws Exception {
+		ObjectId blobId;
+		byte[] blob = Constants.encode("foo contents");
+		try (PackInserter ins = newInserter()) {
+			assertThat(blob.length, lessThan(ins.getBufferSize()));
+			blobId = ins.insert(OBJ_BLOB, blob);
+			ins.flush();
+		}
+
+		try (PackInserter ins = newInserter();
+				ObjectReader reader = ins.newReader()) {
+			assertBlob(reader, blobId, blob);
+		}
+	}
+

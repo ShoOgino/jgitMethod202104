@@ -23,6 +23,11 @@
 			}
 		} finally {
 			clear();
+			try {
+				InflaterCache.release(cachedInflater);
+			} finally {
+				cachedInflater = null;
+			}
 		}
 	}
 

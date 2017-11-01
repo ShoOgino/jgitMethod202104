@@ -1,0 +1,41 @@
+	@Test
+	public void readBackSmallFiles() throws Exception {
+		ObjectId blobId1;
+		ObjectId blobId2;
+		ObjectId blobId3;
+		byte[] blob1 = Constants.encode("blob1");
+		byte[] blob2 = Constants.encode("blob2");
+		byte[] blob3 = Constants.encode("blob3");
+		try (PackInserter ins = newInserter()) {
+			assertThat(blob1.length, lessThan(ins.getBufferSize()));
+			blobId1 = ins.insert(OBJ_BLOB, blob1);
+
+			try (ObjectReader reader = ins.newReader()) {
+				assertBlob(reader, blobId1, blob1);
+			}
+
+			// Read-back should not mess up the file pointer.
+			blobId2 = ins.insert(OBJ_BLOB, blob2);
+			ins.flush();
+
+			blobId3 = ins.insert(OBJ_BLOB, blob3);
+		}
+
+		assertPacksOnly();
+		List<PackFile> packs = listPacks();
+		assertEquals(1, packs.size());
+		assertEquals(2, packs.get(0).getObjectCount());
+
+		try (ObjectReader reader = db.newObjectReader()) {
+			assertBlob(reader, blobId1, blob1);
+			assertBlob(reader, blobId2, blob2);
+
+			try {
+				reader.open(blobId3);
+				fail("Expected MissingObjectException");
+			} catch (MissingObjectException expected) {
+				// Expected.
+			}
+		}
+	}
+

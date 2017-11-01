@@ -1,0 +1,14 @@
+			@Override
+			public ObjectStream openStream()
+					throws MissingObjectException, IOException {
+				int bufsz = buffer().length;
+				file.seek(pos);
+				return new ObjectStream.Filter(
+						type, size,
+						new BufferedInputStream(
+								new InflaterInputStream(
+										Channels.newInputStream(packOut.file.getChannel()),
+										inflater(), bufsz),
+								bufsz));
+			}
+

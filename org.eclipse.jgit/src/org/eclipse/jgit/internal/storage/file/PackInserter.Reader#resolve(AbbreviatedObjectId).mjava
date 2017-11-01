@@ -1,0 +1,18 @@
+		@Override
+		public Collection<ObjectId> resolve(AbbreviatedObjectId id)
+				throws IOException {
+			Collection<ObjectId> stored = ctx.resolve(id);
+			if (objectList == null) {
+				return stored;
+			}
+
+			Set<ObjectId> r = new HashSet<>(stored.size() + 2);
+			r.addAll(stored);
+			for (PackedObjectInfo obj : objectList) {
+				if (id.prefixCompare(obj) == 0) {
+					r.add(obj.copy());
+				}
+			}
+			return r;
+		}
+
