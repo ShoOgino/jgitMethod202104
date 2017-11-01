@@ -1,0 +1,13 @@
+	private static void assertBlob(ObjectReader reader, ObjectId id,
+			byte[] expected) throws Exception {
+		ObjectLoader loader = reader.open(id);
+		assertEquals(OBJ_BLOB, loader.getType());
+		assertEquals(expected.length, loader.getSize());
+		try (ObjectStream s = loader.openStream()) {
+			int n = (int) s.getSize();
+			byte[] actual = new byte[n];
+			assertEquals(n, IO.readFully(s, actual, 0));
+			assertArrayEquals(expected, actual);
+		}
+	}
+

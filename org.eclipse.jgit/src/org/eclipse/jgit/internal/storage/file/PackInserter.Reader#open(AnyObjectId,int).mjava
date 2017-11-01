@@ -1,23 +1,30 @@
 		@Override
 		public ObjectLoader open(AnyObjectId objectId, int typeHint)
-				throws IOException {
-			if (objectMap == null)
+				throws MissingObjectException, IncorrectObjectTypeException,
+				IOException {
+			if (objectMap == null) {
 				return ctx.open(objectId, typeHint);
+			}
 
 			PackedObjectInfo obj = objectMap.get(objectId);
-			if (obj == null)
+			if (obj == null) {
 				return ctx.open(objectId, typeHint);
+			}
 
 			byte[] buf = buffer();
-			int cnt = packOut.read(obj.getOffset(), buf, 0, 20);
-			if (cnt <= 0)
-					throw new EOFException(JGitText.get().unexpectedEofInPack);
+			RandomAccessFile f = packOut.file;
+			f.seek(obj.getOffset());
+			int cnt = f.read(buf, 0, 20);
+			if (cnt <= 0) {
+				throw new EOFException(JGitText.get().unexpectedEofInPack);
+			}
 
 			int c = buf[0] & 0xff;
 			int type = (c >> 4) & 7;
-			if (type == OBJ_OFS_DELTA || type == OBJ_REF_DELTA)
+			if (type == OBJ_OFS_DELTA || type == OBJ_REF_DELTA) {
 				throw new IOException(MessageFormat.format(
 						JGitText.get().cannotReadBackDelta, Integer.toString(type)));
+			}
 			if (typeHint != OBJ_ANY && type != typeHint) {
 				throw new IncorrectObjectTypeException(objectId.copy(), typeHint);
 			}
@@ -26,19 +33,21 @@
 			int ptr = 1;
 			int shift = 4;
 			while ((c & 0x80) != 0) {
-				if (ptr >= cnt)
+				if (ptr >= cnt) {
 					throw new EOFException(JGitText.get().unexpectedEofInPack);
+				}
 				c = buf[ptr++] & 0xff;
 				sz += ((long) (c & 0x7f)) << shift;
 				shift += 7;
 			}
 
 			long zpos = obj.getOffset() + ptr;
-			if (sz < ctx.getStreamFileThreshold()) {
+			if (sz < getStreamFileThreshold()) {
 				byte[] data = inflate(obj, zpos, (int) sz);
-				if (data != null)
+				if (data != null) {
 					return new ObjectLoader.SmallObject(type, data);
+				}
 			}
-			return new StreamLoader(obj.copy(), type, sz, packKey, zpos);
+			return new StreamLoader(f, type, sz, zpos);
 		}
 

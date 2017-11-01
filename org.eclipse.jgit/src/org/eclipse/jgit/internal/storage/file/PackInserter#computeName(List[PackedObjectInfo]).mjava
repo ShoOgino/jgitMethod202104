@@ -1,0 +1,10 @@
+	private ObjectId computeName(List<PackedObjectInfo> list) {
+		SHA1 md = digest().reset();
+		byte[] buf = buffer();
+		for (PackedObjectInfo otp : list) {
+			otp.copyRawTo(buf, 0);
+			md.update(buf, 0, OBJECT_ID_LENGTH);
+		}
+		return ObjectId.fromRaw(md.digest());
+	}
+

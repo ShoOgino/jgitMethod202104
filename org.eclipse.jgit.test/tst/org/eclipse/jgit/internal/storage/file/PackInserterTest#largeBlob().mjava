@@ -1,0 +1,22 @@
+	@Test
+	public void largeBlob() throws Exception {
+		ObjectId blobId;
+		byte[] blob = newLargeBlob();
+		try (PackInserter ins = newInserter()) {
+			assertThat(blob.length, greaterThan(ins.getBufferSize()));
+			blobId =
+					ins.insert(OBJ_BLOB, blob.length, new ByteArrayInputStream(blob));
+			ins.flush();
+		}
+
+		assertPacksOnly();
+		Collection<PackFile> packs = listPacks();
+		assertEquals(1, packs.size());
+		PackFile p = packs.iterator().next();
+		assertEquals(1, p.getObjectCount());
+
+		try (ObjectReader reader = db.newObjectReader()) {
+			assertBlob(reader, blobId, blob);
+		}
+	}
+

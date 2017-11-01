@@ -1,0 +1,36 @@
+	@Test
+	public void checkExisting() throws Exception {
+		ObjectId blobId;
+		byte[] blob = Constants.encode("foo contents");
+
+		try (PackInserter ins = newInserter()) {
+			blobId = ins.insert(OBJ_BLOB, blob);
+			ins.insert(OBJ_BLOB, Constants.encode("another blob"));
+			ins.flush();
+		}
+
+		assertPacksOnly();
+		assertEquals(1, listPacks().size());
+
+		try (PackInserter ins = newInserter()) {
+			assertEquals(blobId, ins.insert(OBJ_BLOB, blob));
+			ins.flush();
+		}
+
+		assertPacksOnly();
+		assertEquals(1, listPacks().size());
+
+		try (PackInserter ins = newInserter()) {
+			ins.checkExisting(false);
+			assertEquals(blobId, ins.insert(OBJ_BLOB, blob));
+			ins.flush();
+		}
+
+		assertPacksOnly();
+		assertEquals(2, listPacks().size());
+
+		try (ObjectReader reader = db.newObjectReader()) {
+			assertBlob(reader, blobId, blob);
+		}
+	}
+

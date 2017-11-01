@@ -1,0 +1,9 @@
+		PackStream(File pack) throws IOException {
+			file = new RandomAccessFile(pack, "rw"); //$NON-NLS-1$
+			out = new CountingOutputStream(new FileOutputStream(file.getFD()));
+			deflater = new Deflater(compression);
+			compress = new DeflaterOutputStream(this, deflater, 8192);
+			hdrBuf = new byte[32];
+			crc32 = new CRC32();
+		}
+

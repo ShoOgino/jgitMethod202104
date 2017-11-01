@@ -1,0 +1,13 @@
+		private int setInput(long filePos, Inflater inf, byte[] buf)
+				throws IOException {
+			if (file.getFilePointer() != filePos) {
+				file.seek(filePos);
+			}
+			int n = file.read(buf);
+			if (n < 0) {
+				throw new EOFException(JGitText.get().unexpectedEofInPack);
+			}
+			inf.setInput(buf, 0, n);
+			return n;
+		}
+

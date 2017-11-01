@@ -1,0 +1,37 @@
+	@Test
+	public void readBackLargeFile() throws Exception {
+		ObjectId blobId;
+		byte[] blob = newLargeBlob();
+
+		WindowCacheConfig wcc = new WindowCacheConfig();
+		wcc.setStreamFileThreshold(1024);
+		wcc.install();
+		try (ObjectReader reader = db.newObjectReader()) {
+			assertThat(blob.length, greaterThan(reader.getStreamFileThreshold()));
+		}
+
+		try (PackInserter ins = newInserter()) {
+			blobId = ins.insert(OBJ_BLOB, blob);
+
+			try (ObjectReader reader = ins.newReader()) {
+				// Double-check threshold is propagated.
+				assertThat(blob.length, greaterThan(reader.getStreamFileThreshold()));
+				assertBlob(reader, blobId, blob);
+			}
+		}
+
+		assertPacksOnly();
+		// Pack was streamed out to disk and read back from the temp file, but
+		// ultimately rolled back and deleted.
+		assertEquals(0, listPacks().size());
+
+		try (ObjectReader reader = db.newObjectReader()) {
+			try {
+				reader.open(blobId);
+				fail("Expected MissingObjectException");
+			} catch (MissingObjectException expected) {
+				// Expected.
+			}
+		}
+	}
+

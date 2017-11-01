@@ -1,0 +1,9 @@
+	private long beginObject(int type, long len) throws IOException {
+		if (packOut == null) {
+			beginPack();
+		}
+		long offset = packOut.getOffset();
+		packOut.beginObject(type, len);
+		return offset;
+	}
+

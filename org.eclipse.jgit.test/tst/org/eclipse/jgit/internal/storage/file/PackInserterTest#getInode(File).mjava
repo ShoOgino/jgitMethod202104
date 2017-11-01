@@ -1,0 +1,12 @@
+	private static String getInode(File f) throws Exception {
+		BasicFileAttributes attrs = Files.readAttributes(
+				f.toPath(), BasicFileAttributes.class);
+		Object k = attrs.fileKey();
+		if (k == null) {
+			return null;
+		}
+		Pattern p = Pattern.compile("^\\(dev=[^,]*,ino=(\\d+)\\)$");
+		Matcher m = p.matcher(k.toString());
+		return m.matches() ? m.group(1) : null;
+	}
+

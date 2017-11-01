@@ -1,0 +1,52 @@
+	@Override
+	public void flush() throws IOException {
+		if (tmpPack == null) {
+			return;
+		}
+
+		if (packOut == null) {
+			throw new IOException();
+		}
+
+		byte[] packHash;
+		try {
+			packHash = packOut.finishPack();
+		} finally {
+			packOut.close();
+			packOut = null;
+		}
+
+		Collections.sort(objectList);
+		File tmpIdx = idxFor(tmpPack);
+		writePackIndex(tmpIdx, packHash, objectList);
+
+		File realPack = new File(
+				new File(db.getDirectory(), "pack"), //$NON-NLS-1$
+				"pack-" + computeName(objectList).name() + ".pack"); //$NON-NLS-1$ //$NON-NLS-2$
+		db.closeAllPackHandles(realPack);
+		tmpPack.setReadOnly();
+		FileUtils.rename(tmpPack, realPack, ATOMIC_MOVE);
+
+		File realIdx = idxFor(realPack);
+		tmpIdx.setReadOnly();
+		try {
+			FileUtils.rename(tmpIdx, realIdx, ATOMIC_MOVE);
+		} catch (IOException e) {
+			File newIdx = new File(
+					realIdx.getParentFile(), realIdx.getName() + ".new"); //$NON-NLS-1$
+			try {
+				FileUtils.rename(tmpIdx, newIdx, ATOMIC_MOVE);
+			} catch (IOException e2) {
+				newIdx = tmpIdx;
+				e = e2;
+			}
+			throw new IOException(MessageFormat.format(
+					JGitText.get().panicCantRenameIndexFile, newIdx,
+					realIdx), e);
+		}
+
+		db.openPack(realPack);
+		rollback = false;
+		clear();
+	}
+

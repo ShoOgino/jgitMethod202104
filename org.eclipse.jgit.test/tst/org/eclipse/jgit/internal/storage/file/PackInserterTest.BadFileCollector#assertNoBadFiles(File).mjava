@@ -1,0 +1,8 @@
+		void assertNoBadFiles(File f) throws IOException {
+			bad = new ArrayList<>();
+			Files.walkFileTree(f.toPath(), this);
+			if (!bad.isEmpty()) {
+				fail("unexpected files in object directory: " + bad);
+			}
+		}
+

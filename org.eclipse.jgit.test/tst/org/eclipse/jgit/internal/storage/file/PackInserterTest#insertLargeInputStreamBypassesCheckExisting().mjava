@@ -1,0 +1,25 @@
+	@Test
+	public void insertLargeInputStreamBypassesCheckExisting() throws Exception {
+		ObjectId blobId;
+		byte[] blob = newLargeBlob();
+
+		try (PackInserter ins = newInserter()) {
+			assertThat(blob.length, greaterThan(ins.getBufferSize()));
+			blobId = ins.insert(OBJ_BLOB, blob);
+			ins.insert(OBJ_BLOB, Constants.encode("another blob"));
+			ins.flush();
+		}
+
+		assertPacksOnly();
+		assertEquals(1, listPacks().size());
+
+		try (PackInserter ins = newInserter()) {
+			assertEquals(blobId,
+					ins.insert(OBJ_BLOB, blob.length, new ByteArrayInputStream(blob)));
+			ins.flush();
+		}
+
+		assertPacksOnly();
+		assertEquals(2, listPacks().size());
+	}
+

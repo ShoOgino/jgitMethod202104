@@ -1,0 +1,33 @@
+	@Override
+	public void close() {
+		try {
+			if (packOut != null) {
+				try {
+					packOut.close();
+				} catch (IOException err) {
+					// Ignore a close failure, the pack should be removed.
+				}
+			}
+			if (rollback && tmpPack != null) {
+				try {
+					FileUtils.delete(tmpPack);
+				} catch (IOException e) {
+					// Still delete idx.
+				}
+				try {
+					FileUtils.delete(idxFor(tmpPack));
+				} catch (IOException e) {
+					// Ignore error deleting temp idx.
+				}
+				rollback = false;
+			}
+		} finally {
+			clear();
+			try {
+				InflaterCache.release(cachedInflater);
+			} finally {
+				cachedInflater = null;
+			}
+		}
+	}
+
