@@ -1,0 +1,19 @@
+	@Test
+	public void testFetchReachableBlobWithBitmap() throws Exception {
+		RevBlob blob = remote.blob("foo");
+		RevCommit commit = remote.commit(remote.tree(remote.file("foo", blob)));
+		remote.update("master", commit);
+		generateBitmaps(server);
+
+		testProtocol = generateReachableCommitUploadPackProtocol();
+		uri = testProtocol.register(ctx, server);
+
+		assertFalse(client.hasObject(blob.toObjectId()));
+
+		try (Transport tn = testProtocol.open(uri, client, "server")) {
+			tn.fetch(NullProgressMonitor.INSTANCE,
+					Collections.singletonList(new RefSpec(blob.name())));
+			assertTrue(client.hasObject(blob.toObjectId()));
+		}
+	}
+
