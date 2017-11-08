@@ -1,7 +1,8 @@
 	private void update(String path, ObjectId mId, FileMode mode)
 			throws IOException {
 		if (!FileMode.TREE.equals(mode)) {
-			updated.put(path, new CheckoutMetadata(walk.getEolStreamType(),
+			updated.put(path, new CheckoutMetadata(
+					walk.getEolStreamType(CHECKOUT_OP),
 					walk.getFilterCommand(Constants.ATTR_FILTER_TYPE_SMUDGE)));
 
 			DirCacheEntry entry = new DirCacheEntry(path, DirCacheEntry.STAGE_0);
