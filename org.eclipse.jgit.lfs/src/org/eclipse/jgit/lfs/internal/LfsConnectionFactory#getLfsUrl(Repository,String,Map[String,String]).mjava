@@ -1,0 +1,35 @@
+	private static String getLfsUrl(Repository db, String purpose,
+			Map<String, String> additionalHeaders)
+			throws LfsConfigInvalidException {
+		StoredConfig config = db.getConfig();
+		String lfsUrl = config.getString(Constants.LFS, null,
+				ConfigConstants.CONFIG_KEY_URL);
+		if (lfsUrl == null) {
+			String remoteUrl = null;
+			for (String remote : db.getRemoteNames()) {
+				lfsUrl = config.getString(Constants.LFS, remote,
+						ConfigConstants.CONFIG_KEY_URL);
+				// This could be done better (more precise logic), but according
+				// to https://github.com/git-lfs/git-lfs/issues/1759 git-lfs
+				// generally only supports 'origin' in an integrated workflow.
+				if (lfsUrl == null && (remote.equals(
+						org.eclipse.jgit.lib.Constants.DEFAULT_REMOTE_NAME))) {
+					remoteUrl = config.getString(
+							ConfigConstants.CONFIG_KEY_REMOTE, remote,
+							ConfigConstants.CONFIG_KEY_URL);
+				}
+				break;
+			}
+			if (lfsUrl == null && remoteUrl != null) {
+				lfsUrl = discoverLfsUrl(db, purpose, additionalHeaders,
+						remoteUrl);
+			} else {
+				lfsUrl = lfsUrl + Protocol.INFO_LFS_ENDPOINT;
+			}
+		}
+		if (lfsUrl == null) {
+			throw new LfsConfigInvalidException(LfsText.get().lfsNoDownloadUrl);
+		}
+		return lfsUrl;
+	}
+

@@ -1,0 +1,37 @@
+	@Override
+	@Before
+	public void setup() throws Exception {
+		super.setup();
+
+		SmudgeFilter.register();
+		CleanFilter.register();
+
+		Path rtmp = Files.createTempDirectory("jgit_test_");
+		remoteDb = FileRepositoryBuilder.create(rtmp.toFile());
+		remoteDb.create(true);
+
+		Path tmp = Files.createTempDirectory("jgit_test_");
+		Repository db = FileRepositoryBuilder
+				.create(tmp.resolve(".git").toFile());
+		db.create(false);
+		StoredConfig cfg = db.getConfig();
+		cfg.setString("filter", "lfs", "usejgitbuiltin", "true");
+		cfg.setString("lfs", null, "url", server.getURI().toString() + "/lfs");
+		cfg.save();
+
+		localDb = new TestRepository<>(db);
+		localDb.branch("master").commit().add(".gitattributes",
+				"*.bin filter=lfs diff=lfs merge=lfs -text ").create();
+		git = Git.wrap(db);
+
+		URIish uri = new URIish(
+				"file://" + remoteDb.getDirectory());
+		RemoteAddCommand radd = git.remoteAdd();
+		radd.setUri(uri);
+		radd.setName(Constants.DEFAULT_REMOTE_NAME);
+		radd.call();
+
+		git.checkout().setName("master").call();
+		git.push().call();
+	}
+

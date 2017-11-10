@@ -1,0 +1,19 @@
+	private Map<String, LfsPointer> requestBatchUpload(HttpConnection api,
+			Set<LfsPointer> toPush) throws IOException {
+		LfsPointer[] res = toPush.toArray(new LfsPointer[toPush.size()]);
+		Map<String, LfsPointer> oidStr2ptr = new HashMap<>();
+		for (LfsPointer p : res) {
+			oidStr2ptr.put(p.getOid().name(), p);
+		}
+		Gson gson = new Gson();
+		api.getOutputStream().write(
+				gson.toJson(toRequest(OPERATION_UPLOAD, res)).getBytes(UTF_8));
+		int responseCode = api.getResponseCode();
+		if (responseCode != HTTP_OK) {
+			throw new IOException(
+					MessageFormat.format(LfsText.get().serverFailure,
+							api.getURL(), Integer.valueOf(responseCode)));
+		}
+		return oidStr2ptr;
+	}
+

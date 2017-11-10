@@ -1,0 +1,29 @@
+	private void uploadContents(HttpConnection api,
+			Map<String, LfsPointer> oid2ptr) throws IOException {
+		try (JsonReader reader = new JsonReader(
+				new InputStreamReader(api.getInputStream()))) {
+			for (Protocol.ObjectInfo o : parseObjects(reader)) {
+				if (o.actions == null) {
+					continue;
+				}
+				LfsPointer ptr = oid2ptr.get(o.oid);
+				if (ptr == null) {
+					// received an object we didn't request
+					continue;
+				}
+				Protocol.Action uploadAction = o.actions.get(OPERATION_UPLOAD);
+				if (uploadAction == null || uploadAction.href == null) {
+					continue;
+				}
+
+				Lfs lfs = new Lfs(getRepository());
+				Path path = lfs.getMediaFile(ptr.getOid());
+				if (!Files.exists(path)) {
+					throw new IOException(MessageFormat
+							.format(LfsText.get().missingLocalObject, path));
+				}
+				uploadFile(o, uploadAction, path);
+			}
+		}
+	}
+

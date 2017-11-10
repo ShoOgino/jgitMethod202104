@@ -1,0 +1,36 @@
+	/**
+	 * Create a connection for the specified
+	 * {@link org.eclipse.jgit.lfs.Protocol.Action}.
+	 *
+	 * @param repo
+	 *            the repo to fetch required configuration from
+	 * @param action
+	 *            the action for which to create a connection
+	 * @param method
+	 *            the target method (GET or PUT)
+	 * @return a connection. output mode is not set.
+	 * @throws IOException
+	 *             in case of any error.
+	 */
+	public static @NonNull HttpConnection getLfsContentConnection(
+			Repository repo, Protocol.Action action, String method)
+			throws IOException {
+		URL contentUrl = new URL(action.href);
+		HttpConnection contentServerConn = HttpTransport.getConnectionFactory()
+				.create(contentUrl, HttpSupport
+						.proxyFor(ProxySelector.getDefault(), contentUrl));
+		contentServerConn.setRequestMethod(method);
+		action.header
+				.forEach((k, v) -> contentServerConn.setRequestProperty(k, v));
+		if (contentUrl.getProtocol().equals(SCHEME_HTTPS)
+				&& !repo.getConfig().getBoolean(HttpConfig.HTTP,
+						HttpConfig.SSL_VERIFY_KEY, true)) {
+			HttpSupport.disableSslVerify(contentServerConn);
+		}
+
+		contentServerConn.setRequestProperty(HDR_ACCEPT_ENCODING,
+				ENCODING_GZIP);
+
+		return contentServerConn;
+	}
+

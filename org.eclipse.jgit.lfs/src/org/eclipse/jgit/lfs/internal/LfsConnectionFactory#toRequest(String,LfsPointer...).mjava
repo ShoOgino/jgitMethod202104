@@ -1,0 +1,23 @@
+	/**
+	 * @param operation
+	 *            the operation to perform, e.g. Protocol.OPERATION_DOWNLOAD
+	 * @param resources
+	 *            the LFS resources affected
+	 * @return a request that can be serialized to JSON
+	 */
+	public static Protocol.Request toRequest(String operation,
+			LfsPointer... resources) {
+		Protocol.Request req = new Protocol.Request();
+		req.operation = operation;
+		if (resources != null) {
+			req.objects = new LinkedList<>();
+			for (LfsPointer res : resources) {
+				Protocol.ObjectSpec o = new Protocol.ObjectSpec();
+				o.oid = res.getOid().getName();
+				o.size = res.getSize();
+				req.objects.add(o);
+			}
+		}
+		return req;
+	}
+

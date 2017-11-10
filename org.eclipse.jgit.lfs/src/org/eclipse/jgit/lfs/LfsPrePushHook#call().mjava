@@ -1,0 +1,13 @@
+	@Override
+	public String call() throws IOException, AbortedByHookException {
+		Set<LfsPointer> toPush = findObjectsToPush();
+		if (toPush.isEmpty()) {
+			return EMPTY;
+		}
+		HttpConnection api = LfsConnectionFactory.getLfsConnection(
+				getRepository(), METHOD_POST, OPERATION_UPLOAD);
+		Map<String, LfsPointer> oid2ptr = requestBatchUpload(api, toPush);
+		uploadContents(api, oid2ptr);
+		return EMPTY;
+	}
+

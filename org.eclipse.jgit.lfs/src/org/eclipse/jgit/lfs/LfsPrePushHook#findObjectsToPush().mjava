@@ -1,0 +1,18 @@
+	private Set<LfsPointer> findObjectsToPush() throws IOException,
+			MissingObjectException, IncorrectObjectTypeException {
+		Set<LfsPointer> toPush = new TreeSet<>();
+
+		try (ObjectWalk walk = new ObjectWalk(getRepository())) {
+			for (RemoteRefUpdate up : refs) {
+				walk.setRewriteParents(false);
+				excludeRemoteRefs(walk);
+				walk.markStart(walk.parseCommit(up.getNewObjectId()));
+				while (walk.next() != null) {
+					// walk all commits to populate objects
+				}
+				findLfsPointers(toPush, walk);
+			}
+		}
+		return toPush;
+	}
+

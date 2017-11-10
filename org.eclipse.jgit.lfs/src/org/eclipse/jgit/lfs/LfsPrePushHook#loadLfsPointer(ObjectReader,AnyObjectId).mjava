@@ -1,0 +1,7 @@
+	private static LfsPointer loadLfsPointer(ObjectReader r, AnyObjectId obj)
+			throws IOException {
+		try (InputStream is = r.open(obj, Constants.OBJ_BLOB).openStream()) {
+			return LfsPointer.parseLfsPointer(is);
+		}
+	}
+

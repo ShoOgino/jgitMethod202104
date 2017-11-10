@@ -1,0 +1,22 @@
+	private void uploadFile(Protocol.ObjectInfo o,
+			Protocol.Action uploadAction, Path path)
+			throws IOException, CorruptMediaFile {
+		HttpConnection contentServer = LfsConnectionFactory
+				.getLfsContentConnection(getRepository(), uploadAction,
+						METHOD_PUT);
+		contentServer.setDoOutput(true);
+		try (OutputStream out = contentServer
+				.getOutputStream()) {
+			long size = Files.copy(path, out);
+			if (size != o.size) {
+				throw new CorruptMediaFile(path, o.size, size);
+			}
+		}
+		int responseCode = contentServer.getResponseCode();
+		if (responseCode != HTTP_OK) {
+			throw new IOException(MessageFormat.format(
+					LfsText.get().serverFailure, contentServer.getURL(),
+					Integer.valueOf(responseCode)));
+		}
+	}
+

@@ -16,11 +16,14 @@
 		for (LfsPointer p : res) {
 			oidStr2ptr.put(p.getOid().name(), p);
 		}
-		HttpConnection lfsServerConn = getLfsConnection(db,
-				HttpSupport.METHOD_POST);
+		HttpConnection lfsServerConn = LfsConnectionFactory.getLfsConnection(db,
+				HttpSupport.METHOD_POST, Protocol.OPERATION_DOWNLOAD);
 		Gson gson = new Gson();
 		lfsServerConn.getOutputStream()
-				.write(gson.toJson(body(res)).getBytes(StandardCharsets.UTF_8));
+				.write(gson
+						.toJson(LfsConnectionFactory
+								.toRequest(Protocol.OPERATION_DOWNLOAD, res))
+						.getBytes(StandardCharsets.UTF_8));
 		int responseCode = lfsServerConn.getResponseCode();
 		if (responseCode != HttpConnection.HTTP_OK) {
 			throw new IOException(
@@ -52,21 +55,11 @@
 				if (downloadAction == null || downloadAction.href == null) {
 					continue;
 				}
-				URL contentUrl = new URL(downloadAction.href);
-				HttpConnection contentServerConn = HttpTransport
-						.getConnectionFactory().create(contentUrl,
-								HttpSupport.proxyFor(ProxySelector.getDefault(),
-										contentUrl));
-				contentServerConn.setRequestMethod(HttpSupport.METHOD_GET);
-				downloadAction.header.forEach(
-						(k, v) -> contentServerConn.setRequestProperty(k, v));
-				if (contentUrl.getProtocol().equals("https") && !db.getConfig() //$NON-NLS-1$
-						.getBoolean(HttpConfig.HTTP, HttpConfig.SSL_VERIFY_KEY,
-								true)) {
-					HttpSupport.disableSslVerify(contentServerConn);
-				}
-				contentServerConn.setRequestProperty(HDR_ACCEPT_ENCODING,
-						ENCODING_GZIP);
+
+				HttpConnection contentServerConn = LfsConnectionFactory
+						.getLfsContentConnection(db, downloadAction,
+								HttpSupport.METHOD_GET);
+
 				responseCode = contentServerConn.getResponseCode();
 				if (responseCode != HttpConnection.HTTP_OK) {
 					throw new IOException(

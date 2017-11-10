@@ -1,0 +1,9 @@
+	@After
+	public void cleanup() throws Exception {
+		remoteDb.close();
+		localDb.getRepository().close();
+		FileUtils.delete(localDb.getRepository().getWorkTree(),
+				FileUtils.RECURSIVE);
+		FileUtils.delete(remoteDb.getDirectory(), FileUtils.RECURSIVE);
+	}
+

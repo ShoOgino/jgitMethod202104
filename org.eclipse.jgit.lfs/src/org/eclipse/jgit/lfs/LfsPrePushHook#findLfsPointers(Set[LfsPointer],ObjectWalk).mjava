@@ -1,0 +1,16 @@
+	private static void findLfsPointers(Set<LfsPointer> toPush, ObjectWalk walk)
+			throws MissingObjectException, IncorrectObjectTypeException,
+			IOException {
+		RevObject obj;
+		ObjectReader r = walk.getObjectReader();
+		while ((obj = walk.nextObject()) != null) {
+			if (obj.getType() == Constants.OBJ_BLOB
+					&& getObjectSize(r, obj) < LfsPointer.SIZE_THRESHOLD) {
+				LfsPointer ptr = loadLfsPointer(r, obj);
+				if (ptr != null) {
+					toPush.add(ptr);
+				}
+			}
+		}
+	}
+

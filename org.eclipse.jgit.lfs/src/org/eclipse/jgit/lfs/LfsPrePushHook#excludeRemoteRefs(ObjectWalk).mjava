@@ -1,0 +1,16 @@
+	private void excludeRemoteRefs(ObjectWalk walk) throws IOException {
+		RefDatabase refDatabase = getRepository().getRefDatabase();
+		Map<String, Ref> remoteRefs = refDatabase.getRefs(remote());
+		for (Ref r : remoteRefs.values()) {
+			ObjectId oid = r.getPeeledObjectId();
+			if (oid == null) {
+				oid = r.getObjectId();
+			}
+			RevObject o = walk.parseAny(oid);
+			if (o.getType() == Constants.OBJ_COMMIT
+					|| o.getType() == Constants.OBJ_TAG) {
+				walk.markUninteresting(o);
+			}
+		}
+	}
+

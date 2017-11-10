@@ -1,0 +1,37 @@
+	@Test
+	public void testPushSimple() throws Exception {
+		JGitTestUtil.writeTrashFile(localDb.getRepository(), "a.bin",
+				"1234567");
+		git.add().addFilepattern("a.bin").call();
+		RevCommit commit = git.commit().setMessage("add lfs blob").call();
+		git.push().call();
+
+		// check object in remote db, should be LFS pointer
+		ObjectId id = commit.getId();
+		try (RevWalk walk = new RevWalk(remoteDb)) {
+			RevCommit rc = walk.parseCommit(id);
+			try (TreeWalk tw = new TreeWalk(walk.getObjectReader())) {
+				tw.addTree(rc.getTree());
+				tw.setFilter(PathFilter.create("a.bin"));
+				tw.next();
+
+				assertEquals(tw.getPathString(), "a.bin");
+				ObjectLoader ldr = walk.getObjectReader()
+						.open(tw.getObjectId(0), Constants.OBJ_BLOB);
+				try(InputStream is = ldr.openStream()) {
+					assertEquals(
+							"version https://git-lfs.github.com/spec/v1\noid sha256:8bb0cf6eb9b17d0f7d22b456f121257dc1254e1f01665370476383ea776df414\nsize 7\n",
+							new String(IO
+									.readWholeStream(is,
+											(int) ldr.getSize())
+									.array()));
+				}
+			}
+
+		}
+
+		assertEquals(
+				"[POST /lfs/objects/batch 200, PUT /lfs/objects/8bb0cf6eb9b17d0f7d22b456f121257dc1254e1f01665370476383ea776df414 200]",
+				server.getRequests().toString());
+	}
+

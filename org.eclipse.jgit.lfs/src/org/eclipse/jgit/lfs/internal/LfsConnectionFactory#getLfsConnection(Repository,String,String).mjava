@@ -1,0 +1,42 @@
+	/**
+	 * Determine URL of LFS server by looking into config parameters lfs.url,
+	 * lfs.[remote].url or remote.[remote].url. The LFS server URL is computed
+	 * from remote.[remote].url by appending "/info/lfs". In case there is no
+	 * URL configured, a SSH remote URI can be used to auto-detect the LFS URI
+	 * by using the remote "git-lfs-authenticate" command.
+	 *
+	 * @param db
+	 *            the repository to work with
+	 * @param method
+	 *            the method (GET,PUT,...) of the request this connection will
+	 *            be used for
+	 * @param purpose
+	 *            the action, e.g. Protocol.OPERATION_DOWNLOAD
+	 * @return the url for the lfs server. e.g.
+	 *         "https://github.com/github/git-lfs.git/info/lfs"
+	 * @throws IOException
+	 */
+	public static HttpConnection getLfsConnection(Repository db, String method,
+			String purpose) throws IOException {
+		StoredConfig config = db.getConfig();
+		Map<String, String> additionalHeaders = new TreeMap<>();
+		String lfsUrl = getLfsUrl(db, purpose, additionalHeaders);
+		URL url = new URL(lfsUrl + Protocol.OBJECTS_LFS_ENDPOINT);
+		HttpConnection connection = HttpTransport.getConnectionFactory().create(
+				url, HttpSupport.proxyFor(ProxySelector.getDefault(), url));
+		connection.setDoOutput(true);
+		if (url.getProtocol().equals(SCHEME_HTTPS)
+				&& !config.getBoolean(HttpConfig.HTTP,
+						HttpConfig.SSL_VERIFY_KEY, true)) {
+			HttpSupport.disableSslVerify(connection);
+		}
+		connection.setRequestMethod(method);
+		connection.setRequestProperty(HDR_ACCEPT,
+				Protocol.CONTENTTYPE_VND_GIT_LFS_JSON);
+		connection.setRequestProperty(HDR_CONTENT_TYPE,
+				Protocol.CONTENTTYPE_VND_GIT_LFS_JSON);
+		additionalHeaders
+				.forEach((k, v) -> connection.setRequestProperty(k, v));
+		return connection;
+	}
+
