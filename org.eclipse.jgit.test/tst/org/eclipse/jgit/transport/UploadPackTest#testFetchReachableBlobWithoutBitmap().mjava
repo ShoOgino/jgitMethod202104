@@ -1,0 +1,20 @@
+	@Test
+	public void testFetchReachableBlobWithoutBitmap() throws Exception {
+		RevBlob blob = remote.blob("foo");
+		RevCommit commit = remote.commit(remote.tree(remote.file("foo", blob)));
+		remote.update("master", commit);
+
+		testProtocol = generateReachableCommitUploadPackProtocol();
+		uri = testProtocol.register(ctx, server);
+
+		assertFalse(client.hasObject(blob.toObjectId()));
+
+		try (Transport tn = testProtocol.open(uri, client, "server")) {
+			thrown.expect(TransportException.class);
+			thrown.expectMessage(Matchers.containsString(
+						"want " + blob.name() + " not valid"));
+			tn.fetch(NullProgressMonitor.INSTANCE,
+					Collections.singletonList(new RefSpec(blob.name())));
+		}
+	}
+
