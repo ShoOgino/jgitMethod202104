@@ -14,7 +14,9 @@
 		}
 
 		FsckError errors = new FsckError();
-		checkPacks(pm, errors);
+		if (!connectivityOnly) {
+			checkPacks(pm, errors);
+		}
 		checkConnectivity(pm, errors);
 		return errors;
 	}
