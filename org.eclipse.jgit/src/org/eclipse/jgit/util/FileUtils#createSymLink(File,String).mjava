@@ -11,7 +11,7 @@
 	 */
 	public static Path createSymLink(File path, String target)
 			throws IOException {
-		Path nioPath = path.toPath();
+		Path nioPath = toPath(path);
 		if (Files.exists(nioPath, LinkOption.NOFOLLOW_LINKS)) {
 			BasicFileAttributes attrs = Files.readAttributes(nioPath,
 					BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
@@ -24,7 +24,7 @@
 		if (SystemReader.getInstance().isWindows()) {
 			target = target.replace('/', '\\');
 		}
-		Path nioTarget = new File(target).toPath();
+		Path nioTarget = toPath(new File(target));
 		return Files.createSymbolicLink(nioPath, nioTarget);
 	}
 

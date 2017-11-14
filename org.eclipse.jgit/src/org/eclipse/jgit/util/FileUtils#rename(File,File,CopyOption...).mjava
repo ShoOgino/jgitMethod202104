@@ -30,7 +30,7 @@
 		int attempts = FS.DETECTED.retryFailedLockFileCommit() ? 10 : 1;
 		while (--attempts >= 0) {
 			try {
-				Files.move(src.toPath(), dst.toPath(), options);
+				Files.move(toPath(src), toPath(dst), options);
 				return;
 			} catch (AtomicMoveNotSupportedException e) {
 				throw e;
@@ -40,7 +40,7 @@
 						delete(dst, EMPTY_DIRECTORIES_ONLY | RECURSIVE);
 					}
 					// On *nix there is no try, you do or do not
-					Files.move(src.toPath(), dst.toPath(), options);
+					Files.move(toPath(src), toPath(dst), options);
 					return;
 				} catch (IOException e2) {
 					// ignore and continue retry

@@ -5,7 +5,7 @@
 	 * @since 3.0
 	 */
 	public static String readSymLink(File path) throws IOException {
-		Path nioPath = path.toPath();
+		Path nioPath = toPath(path);
 		Path target = Files.readSymbolicLink(nioPath);
 		String targetString = target.toString();
 		if (SystemReader.getInstance().isWindows()) {

@@ -5,7 +5,7 @@
 	 * @since 4.1
 	 */
 	public static long getLength(File file) throws IOException {
-		Path nioPath = file.toPath();
+		Path nioPath = toPath(file);
 		if (Files.isSymbolicLink(nioPath))
 			return Files.readSymbolicLink(nioPath).toString()
 					.getBytes(Constants.CHARSET).length;
