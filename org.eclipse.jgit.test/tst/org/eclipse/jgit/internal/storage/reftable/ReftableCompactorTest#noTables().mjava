@@ -1,0 +1,12 @@
+	@Test
+	public void noTables() throws IOException {
+		ReftableCompactor compactor = new ReftableCompactor();
+		try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+			compactor.compact(out);
+		}
+		Stats stats = compactor.getStats();
+		assertEquals(0, stats.minUpdateIndex());
+		assertEquals(0, stats.maxUpdateIndex());
+		assertEquals(0, stats.refCount());
+	}
+

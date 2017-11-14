@@ -11,7 +11,7 @@
 		MergedReftable mr = new MergedReftable(new ArrayList<>(tables));
 		mr.setIncludeDeletes(includeDeletes);
 
-		writer.setMinUpdateIndex(minUpdateIndex);
+		writer.setMinUpdateIndex(Math.max(minUpdateIndex, 0));
 		writer.setMaxUpdateIndex(maxUpdateIndex);
 		writer.begin(out);
 		mergeRefs(mr);
