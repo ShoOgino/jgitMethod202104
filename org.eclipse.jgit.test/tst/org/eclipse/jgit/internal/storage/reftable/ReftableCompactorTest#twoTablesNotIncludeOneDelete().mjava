@@ -1,0 +1,45 @@
+	@Test
+	public void twoTablesNotIncludeOneDelete() throws IOException {
+		byte[] inTab1;
+		try (ByteArrayOutputStream inBuf = new ByteArrayOutputStream()) {
+			ReftableWriter writer = new ReftableWriter()
+				.setMinUpdateIndex(0)
+				.setMaxUpdateIndex(0)
+				.begin(inBuf);
+
+			writer.writeRef(ref(MASTER, 1));
+			writer.finish();
+			inTab1 = inBuf.toByteArray();
+		}
+
+		byte[] inTab2;
+		try (ByteArrayOutputStream inBuf = new ByteArrayOutputStream()) {
+			ReftableWriter writer = new ReftableWriter()
+				.setMinUpdateIndex(1)
+				.setMaxUpdateIndex(1)
+				.begin(inBuf);
+
+			writer.writeRef(tombstone(MASTER));
+			writer.finish();
+			inTab2 = inBuf.toByteArray();
+		}
+
+		byte[] outTab;
+		ReftableCompactor compactor = new ReftableCompactor();
+		try (ByteArrayOutputStream outBuf = new ByteArrayOutputStream()) {
+			compactor.setIncludeDeletes(false);
+			compactor.addAll(Arrays.asList(read(inTab1), read(inTab2)));
+			compactor.compact(outBuf);
+			outTab = outBuf.toByteArray();
+		}
+		Stats stats = compactor.getStats();
+		assertEquals(0, stats.minUpdateIndex());
+		assertEquals(1, stats.maxUpdateIndex());
+		assertEquals(0, stats.refCount());
+
+		ReftableReader rr = read(outTab);
+		try (RefCursor rc = rr.allRefs()) {
+			assertFalse(rc.next());
+		}
+	}
+

@@ -1,0 +1,9 @@
+	private static ObjectId id(int i) {
+		byte[] buf = new byte[OBJECT_ID_LENGTH];
+		buf[0] = (byte) (i & 0xff);
+		buf[1] = (byte) ((i >>> 8) & 0xff);
+		buf[2] = (byte) ((i >>> 16) & 0xff);
+		buf[3] = (byte) (i >>> 24);
+		return ObjectId.fromRaw(buf);
+	}
+
