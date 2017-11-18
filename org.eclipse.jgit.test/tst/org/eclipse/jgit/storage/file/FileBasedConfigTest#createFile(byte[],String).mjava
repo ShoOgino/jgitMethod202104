@@ -1,0 +1,14 @@
+	private File createFile(byte[] content, String subdir) throws IOException {
+		File dir = subdir != null ? new File(trash, subdir) : trash;
+		dir.mkdirs();
+
+		File f = File.createTempFile(getClass().getName(), null, dir);
+		FileOutputStream os = new FileOutputStream(f, true);
+		try {
+			os.write(content);
+		} finally {
+			os.close();
+		}
+		return f;
+	}
+
