@@ -1,7 +1,7 @@
 	@Test
 	public void testIncludeTooManyRecursions() throws IOException {
 		File config = tmp.newFile("config");
-		String include = "[include]\npath=" + config.toPath() + "\n";
+		String include = "[include]\npath=" + pathToString(config) + "\n";
 		Files.write(config.toPath(), include.getBytes());
 		FileBasedConfig fbConfig = new FileBasedConfig(null, config,
 				FS.DETECTED);
