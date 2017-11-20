@@ -1,0 +1,6 @@
+	private static void assertParseRoundTrip(String value)
+			throws ConfigInvalidException {
+		Config c = parse("[foo]\nbar = " + Config.escapeValue(value));
+		assertEquals(value, c.getString("foo", null, "bar"));
+	}
+

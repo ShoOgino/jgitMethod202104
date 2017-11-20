@@ -1,0 +1,10 @@
+	@Test
+	public void testEscapeSpacesOnly() throws ConfigInvalidException {
+		assertEquals("", Config.escapeValue(""));
+		assertEquals("\" \"", Config.escapeValue(" "));
+		assertEquals("\"  \"", Config.escapeValue("  "));
+
+		assertParseRoundTrip(" ");
+		assertParseRoundTrip("  ");
+	}
+
