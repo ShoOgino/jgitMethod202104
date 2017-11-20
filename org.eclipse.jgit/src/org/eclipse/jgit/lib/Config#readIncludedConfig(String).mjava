@@ -1,0 +1,30 @@
+	/**
+	 * Read the included config from the specified (possibly) relative path
+	 *
+	 * @param relPath
+	 *            possibly relative path to the included config, as specified in
+	 *            this config
+	 * @return the read bytes, or null if the included config should be ignored
+	 * @throws ConfigInvalidException
+	 *             if something went wrong while reading the config
+	 * @since 4.10
+	 */
+	@Nullable
+	protected byte[] readIncludedConfig(String relPath)
+			throws ConfigInvalidException {
+		File path = new File(relPath);
+		try {
+			return IO.readFully(path);
+		} catch (FileNotFoundException fnfe) {
+			if (path.exists()) {
+				throw new ConfigInvalidException(MessageFormat
+						.format(JGitText.get().cannotReadFile, path), fnfe);
+			}
+			return null;
+		} catch (IOException ioe) {
+			throw new ConfigInvalidException(
+					MessageFormat.format(JGitText.get().cannotReadFile, path),
+					ioe);
+		}
+	}
+
