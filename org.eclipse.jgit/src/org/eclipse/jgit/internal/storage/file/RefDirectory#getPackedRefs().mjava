@@ -1,12 +1,18 @@
 	private PackedRefList getPackedRefs() throws IOException {
+		boolean trustFolderStat = getRepository().getConfig().getBoolean(
+				ConfigConstants.CONFIG_CORE_SECTION,
+				ConfigConstants.CONFIG_KEY_TRUSTFOLDERSTAT, true);
+
 		final PackedRefList curList = packedRefs.get();
-		if (!curList.snapshot.isModified(packedRefsFile))
+		if (trustFolderStat && !curList.snapshot.isModified(packedRefsFile)) {
 			return curList;
+		}
 
 		final PackedRefList newList = readPackedRefs();
 		if (packedRefs.compareAndSet(curList, newList)
-				&& !curList.id.equals(newList.id))
+				&& !curList.id.equals(newList.id)) {
 			modCnt.incrementAndGet();
+		}
 		return newList;
 	}
 
