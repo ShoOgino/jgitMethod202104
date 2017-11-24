@@ -1,0 +1,15 @@
+	private Boolean getAtomicFileCreationSupportOption(FileBasedConfig config) {
+		try {
+			config.load();
+			String value = config.getString(ConfigConstants.CONFIG_CORE_SECTION,
+					null,
+					ConfigConstants.CONFIG_KEY_SUPPORTSATOMICFILECREATION);
+			if (value == null) {
+				return null;
+			}
+			return Boolean.valueOf(StringUtils.toBoolean(value));
+		} catch (IOException | ConfigInvalidException e) {
+			return Boolean.TRUE;
+		}
+	}
+
