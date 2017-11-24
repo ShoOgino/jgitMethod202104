@@ -155,8 +155,11 @@
 					if (peeledId == null || objectId == null)
 						continue;
 
+					objectId = ref.getObjectId();
 					if (pw.willInclude(peeledId) && !pw.willInclude(objectId)) {
-						pw.addObject(rw.parseAny(objectId));
+						RevObject o = rw.parseAny(objectId);
+						addTagChain(o, pw);
+						pw.addObject(o);
 					}
 				}
 			}
