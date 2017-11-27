@@ -17,11 +17,13 @@
 		clockLock = new ReentrantLock(true /* fair */);
 		String none = ""; //$NON-NLS-1$
 		clockHand = new Ref<>(
-				DfsStreamKey.of(new DfsRepositoryDescription(none), none),
+				DfsStreamKey.of(new DfsRepositoryDescription(none), none, null),
 				-1, 0, null);
 		clockHand.next = clockHand;
 
-		statHit = new AtomicLong();
-		statMiss = new AtomicLong();
+		statHit = new AtomicReference<>(newCounters());
+		statMiss = new AtomicReference<>(newCounters());
+		statEvict = new AtomicReference<>(newCounters());
+		liveBytes = new AtomicReference<>(newCounters());
 	}
 

@@ -2,9 +2,9 @@
 	<T> T get(DfsStreamKey key, long position) {
 		T val = (T) scan(table.get(slot(key, position)), key, position);
 		if (val == null)
-			statMiss.incrementAndGet();
+			getStat(statMiss, key).incrementAndGet();
 		else
-			statHit.incrementAndGet();
+			getStat(statHit, key).incrementAndGet();
 		return val;
 	}
 

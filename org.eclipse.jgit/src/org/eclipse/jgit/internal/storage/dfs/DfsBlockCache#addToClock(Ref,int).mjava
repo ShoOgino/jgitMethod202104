@@ -2,8 +2,9 @@
 	private void addToClock(Ref ref, int credit) {
 		clockLock.lock();
 		try {
-			if (credit != 0)
-				liveBytes -= credit;
+			if (credit != 0) {
+				getStat(liveBytes, ref.key).addAndGet(-credit);
+			}
 			Ref ptr = clockHand;
 			ref.next = ptr.next;
 			ptr.next = ref;

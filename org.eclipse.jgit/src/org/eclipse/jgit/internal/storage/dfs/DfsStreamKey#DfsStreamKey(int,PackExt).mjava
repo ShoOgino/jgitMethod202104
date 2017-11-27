@@ -1,10 +1,13 @@
 	/**
 	 * @param hash
 	 *            hash of the other identifying components of the key.
+	 * @param ext
+	 *            pack file extension, or {@code null}.
 	 */
-	protected DfsStreamKey(int hash) {
+	protected DfsStreamKey(int hash, @Nullable PackExt ext) {
 		// Multiply by 31 here so we can more directly combine with another
 		// value without doing the multiply there.
 		this.hash = hash * 31;
+		this.packExtPos = ext == null ? 0 : ext.getPosition();
 	}
 
