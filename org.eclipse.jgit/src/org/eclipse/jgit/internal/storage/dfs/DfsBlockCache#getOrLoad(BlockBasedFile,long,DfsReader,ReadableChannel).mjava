@@ -24,11 +24,11 @@
 		DfsBlock v = scan(e1, key, position);
 		if (v != null && v.contains(key, requestedPosition)) {
 			ctx.stats.blockCacheHit++;
-			statHit.incrementAndGet();
+			getStat(statHit, key).incrementAndGet();
 			return v;
 		}
 
-		reserveSpace(blockSize);
+		reserveSpace(blockSize, key);
 		ReentrantLock regionLock = lockFor(key, position);
 		regionLock.lock();
 		try {
@@ -37,20 +37,20 @@
 				v = scan(e2, key, position);
 				if (v != null) {
 					ctx.stats.blockCacheHit++;
-					statHit.incrementAndGet();
-					creditSpace(blockSize);
+					getStat(statHit, key).incrementAndGet();
+					creditSpace(blockSize, key);
 					return v;
 				}
 			}
 
-			statMiss.incrementAndGet();
+			getStat(statMiss, key).incrementAndGet();
 			boolean credit = true;
 			try {
 				v = file.readOneBlock(requestedPosition, ctx, fileChannel);
 				credit = false;
 			} finally {
 				if (credit)
-					creditSpace(blockSize);
+					creditSpace(blockSize, key);
 			}
 			if (position != v.start) {
 				// The file discovered its blockSize and adjusted.

@@ -5,7 +5,7 @@
 		if (ref != null)
 			return ref;
 
-		reserveSpace(size);
+		reserveSpace(size, key);
 		ReentrantLock regionLock = lockFor(key, pos);
 		regionLock.lock();
 		try {
@@ -13,7 +13,7 @@
 			if (e2 != e1) {
 				ref = scanRef(e2, key, pos);
 				if (ref != null) {
-					creditSpace(size);
+					creditSpace(size, key);
 					return ref;
 				}
 			}

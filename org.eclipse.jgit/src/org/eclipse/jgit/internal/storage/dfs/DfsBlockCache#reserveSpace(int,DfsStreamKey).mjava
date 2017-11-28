@@ -1,8 +1,8 @@
 	@SuppressWarnings("unchecked")
-	private void reserveSpace(int reserve) {
+	private void reserveSpace(int reserve, DfsStreamKey key) {
 		clockLock.lock();
 		try {
-			long live = liveBytes + reserve;
+			long live = LongStream.of(getCurrentSize()).sum() + reserve;
 			if (maxBytes < live) {
 				Ref prev = clockHand;
 				Ref hand = clockHand.next;
@@ -25,11 +25,12 @@
 					dead.next = null;
 					dead.value = null;
 					live -= dead.size;
-					statEvict++;
+					getStat(liveBytes, dead.key).addAndGet(-dead.size);
+					getStat(statEvict, dead.key).incrementAndGet();
 				} while (maxBytes < live);
 				clockHand = prev;
 			}
-			liveBytes = live;
+			getStat(liveBytes, key).addAndGet(reserve);
 		} finally {
 			clockLock.unlock();
 		}
