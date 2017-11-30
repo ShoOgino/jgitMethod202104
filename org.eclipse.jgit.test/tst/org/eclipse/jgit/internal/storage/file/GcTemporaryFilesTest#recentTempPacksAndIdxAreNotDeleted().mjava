@@ -1,0 +1,16 @@
+	@Test
+	public void recentTempPacksAndIdxAreNotDeleted() throws Exception {
+		File tempIndex = new File(packDir, TEMP_IDX);
+		File tempPack = new File(packDir, TEMP_PACK);
+		if (!packDir.exists() || !packDir.isDirectory()) {
+			assertTrue(packDir.mkdirs());
+		}
+		assertTrue(tempPack.createNewFile());
+		assertTrue(tempIndex.createNewFile());
+		assertTrue(tempIndex.exists());
+		assertTrue(tempPack.exists());
+		gc.gc();
+		assertTrue(tempIndex.exists());
+		assertTrue(tempPack.exists());
+	}
+
