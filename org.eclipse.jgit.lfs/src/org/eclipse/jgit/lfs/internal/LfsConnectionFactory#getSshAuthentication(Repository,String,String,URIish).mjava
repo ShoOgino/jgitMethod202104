@@ -1,0 +1,28 @@
+	private static Protocol.ExpiringAction getSshAuthentication(
+			Repository db, String purpose, String remoteUrl, URIish u)
+			throws IOException {
+		AuthCache cached = sshAuthCache.get(remoteUrl);
+		Protocol.ExpiringAction action = null;
+		if (cached != null && cached.validUntil > System.currentTimeMillis()) {
+			action = cached.cachedAction;
+		}
+
+		if (action == null) {
+			// discover and authenticate; git-lfs does "ssh
+			// -p <port> -- <host> git-lfs-authenticate
+			// <project> <upload/download>"
+			String json = runSshCommand(u.setPath(""), //$NON-NLS-1$
+					db.getFS(),
+					"git-lfs-authenticate " + extractProjectName(u) + " " //$NON-NLS-1$//$NON-NLS-2$
+							+ purpose);
+
+			action = Protocol.gson().fromJson(json,
+					Protocol.ExpiringAction.class);
+
+			// cache the result as long as possible.
+			AuthCache c = new AuthCache(action);
+			sshAuthCache.put(remoteUrl, c);
+		}
+		return action;
+	}
+

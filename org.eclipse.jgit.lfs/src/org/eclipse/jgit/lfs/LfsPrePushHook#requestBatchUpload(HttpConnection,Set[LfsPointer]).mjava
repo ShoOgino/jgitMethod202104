@@ -5,7 +5,7 @@
 		for (LfsPointer p : res) {
 			oidStr2ptr.put(p.getOid().name(), p);
 		}
-		Gson gson = new Gson();
+		Gson gson = Protocol.gson();
 		api.getOutputStream().write(
 				gson.toJson(toRequest(OPERATION_UPLOAD, res)).getBytes(UTF_8));
 		int responseCode = api.getResponseCode();

@@ -2,17 +2,9 @@
 			Map<String, String> additionalHeaders, String remoteUrl) {
 		try {
 			URIish u = new URIish(remoteUrl);
-
 			if (SCHEME_SSH.equals(u.getScheme())) {
-				// discover and authenticate; git-lfs does "ssh -p
-				// <port> -- <host> git-lfs-authenticate <project>
-				// <upload/download>"
-				String json = runSshCommand(u.setPath(""), db.getFS(), //$NON-NLS-1$
-						"git-lfs-authenticate " + extractProjectName(u) //$NON-NLS-1$
-								+ " " + purpose); //$NON-NLS-1$
-
-				Protocol.Action action = new Gson().fromJson(json,
-						Protocol.Action.class);
+				Protocol.ExpiringAction action = getSshAuthentication(
+						db, purpose, remoteUrl, u);
 				additionalHeaders.putAll(action.header);
 				return action.href;
 			} else {
