@@ -10,8 +10,12 @@
 				.create(tmp.resolve(".git").toFile());
 		db.create();
 		StoredConfig cfg = db.getConfig();
-		cfg.setString("filter", "lfs", "usejgitbuiltin", "true");
-		cfg.setString("lfs", null, "url", server.getURI().toString() + "/lfs");
+		cfg.setBoolean(ConfigConstants.CONFIG_FILTER_SECTION, Constants.LFS,
+				ConfigConstants.CONFIG_KEY_USEJGITBUILTIN, true);
+		cfg.setBoolean(ConfigConstants.CONFIG_FILTER_SECTION, Constants.LFS,
+				ConfigConstants.CONFIG_KEY_REQUIRED, false);
+		cfg.setString(Constants.LFS, null, "url",
+				server.getURI().toString() + "/lfs");
 		cfg.save();
 
 		tdb = new TestRepository<>(db);
