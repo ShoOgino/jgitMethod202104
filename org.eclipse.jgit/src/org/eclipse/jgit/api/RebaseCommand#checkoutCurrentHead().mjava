@@ -7,6 +7,7 @@
 		try {
 			DirCacheCheckout dco = new DirCacheCheckout(repo, dc, headTree);
 			dco.setFailOnConflict(false);
+			dco.setProgressMonitor(monitor);
 			boolean needsDeleteFiles = dco.checkout();
 			if (needsDeleteFiles) {
 				List<String> fileList = dco.getToBeDeleted();

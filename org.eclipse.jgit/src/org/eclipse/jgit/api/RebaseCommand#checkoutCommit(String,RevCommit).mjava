@@ -6,6 +6,7 @@
 			DirCacheCheckout dco = new DirCacheCheckout(repo, head.getTree(),
 					repo.lockDirCache(), commit.getTree());
 			dco.setFailOnConflict(true);
+			dco.setProgressMonitor(monitor);
 			try {
 				dco.checkout();
 			} catch (org.eclipse.jgit.errors.CheckoutConflictException cce) {

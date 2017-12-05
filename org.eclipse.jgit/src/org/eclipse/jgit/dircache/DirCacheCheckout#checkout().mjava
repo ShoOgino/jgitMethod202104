@@ -15,6 +15,10 @@
 	public boolean checkout() throws IOException {
 		try {
 			return doCheckout();
+		} catch (CanceledException ce) {
+			// should actually be propagated, but this would change a LOT of
+			// APIs
+			throw new IOException(ce);
 		} finally {
 			try {
 				dc.unlock();

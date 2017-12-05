@@ -9,6 +9,7 @@
 
 		CheckoutCommand co = new CheckoutCommand(repo);
 		try {
+			co.setProgressMonitor(monitor);
 			co.setName(newCommit.name()).call();
 			if (headName.startsWith(Constants.R_HEADS)) {
 				RefUpdate rup = repo.updateRef(headName);

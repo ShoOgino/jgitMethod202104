@@ -1,6 +1,6 @@
 	private boolean doCheckout() throws CorruptObjectException, IOException,
 			MissingObjectException, IncorrectObjectTypeException,
-			CheckoutConflictException, IndexWriteException {
+			CheckoutConflictException, IndexWriteException, CanceledException {
 		toBeDeleted.clear();
 		try (ObjectReader objectReader = repo.getObjectDatabase().newReader()) {
 			if (headCommitTree != null)
@@ -17,6 +17,10 @@
 
 			// update our index
 			builder.finish();
+
+			// init progress reporting
+			int numTotal = removed.size() + updated.size();
+			monitor.beginTask(JGitText.get().checkingOutFiles, numTotal);
 
 			performingCheckout = true;
 			File file = null;
@@ -43,6 +47,12 @@
 						removeEmptyParents(new File(repo.getWorkTree(), last));
 					last = r;
 				}
+				monitor.update(1);
+				if (monitor.isCancelled()) {
+					throw new CanceledException(MessageFormat.format(
+							JGitText.get().operationCanceled,
+							JGitText.get().checkingOutFiles));
+				}
 			}
 			if (file != null) {
 				removeEmptyParents(file);
@@ -62,6 +72,13 @@
 						checkoutEntry(repo, entry, objectReader, false, meta);
 					}
 					e = null;
+
+					monitor.update(1);
+					if (monitor.isCancelled()) {
+						throw new CanceledException(MessageFormat.format(
+								JGitText.get().operationCanceled,
+								JGitText.get().checkingOutFiles));
+					}
 				}
 			} catch (Exception ex) {
 				// We didn't actually modify the current entry nor any that
@@ -75,6 +92,8 @@
 				}
 				throw ex;
 			}
+			monitor.endTask();
+
 			// commit the index builder - a new index is persisted
 			if (!builder.commit())
 				throw new IndexWriteException();

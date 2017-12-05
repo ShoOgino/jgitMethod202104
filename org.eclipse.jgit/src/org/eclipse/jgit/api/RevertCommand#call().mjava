@@ -67,6 +67,7 @@
 							headCommit.getTree(), repo.lockDirCache(),
 							merger.getResultTreeId());
 					dco.setFailOnConflict(true);
+					dco.setProgressMonitor(monitor);
 					dco.checkout();
 					try (Git git = new Git(getRepository())) {
 						newHead = git.commit().setMessage(newMessage)
