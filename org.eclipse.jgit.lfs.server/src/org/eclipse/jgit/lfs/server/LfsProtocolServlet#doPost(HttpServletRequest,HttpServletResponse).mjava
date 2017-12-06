@@ -6,7 +6,7 @@
 
 		Reader r = new BufferedReader(
 				new InputStreamReader(req.getInputStream(), UTF_8));
-		LfsRequest request = gson.fromJson(r, LfsRequest.class);
+		LfsRequest request = LfsGson.fromJson(r, LfsRequest.class);
 		String path = req.getPathInfo();
 
 		res.setContentType(CONTENTTYPE_VND_GIT_LFS_JSON);
@@ -23,7 +23,7 @@
 			res.setStatus(SC_OK);
 			TransferHandler handler = TransferHandler
 					.forOperation(request.operation, repo, request.objects);
-			gson.toJson(handler.process(), w);
+			LfsGson.toJson(handler.process(), w);
 		} catch (LfsValidationError e) {
 			sendError(res, w, SC_UNPROCESSABLE_ENTITY, e.getMessage());
 		} catch (LfsRepositoryNotFound e) {
