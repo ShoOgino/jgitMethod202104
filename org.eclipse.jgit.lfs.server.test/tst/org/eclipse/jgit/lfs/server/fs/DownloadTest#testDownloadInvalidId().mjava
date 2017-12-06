@@ -4,13 +4,10 @@
 		String TEXT = "test";
 		String id = putContent(TEXT).name().replace('f', 'z');
 		Path f = Paths.get(getTempDirectory().toString(), "download");
-		try {
-			getContent(id, f);
-			fail("expected RuntimeException");
-		} catch (RuntimeException e) {
-			String error = String.format("Invalid id: : %s", id);
-			assertEquals(formatErrorMessage(SC_UNPROCESSABLE_ENTITY, error),
-					e.getMessage());
-		}
+		String error = String.format("Invalid id: : %s", id);
+		exception.expect(RuntimeException.class);
+		exception.expectMessage(
+				formatErrorMessage(SC_UNPROCESSABLE_ENTITY, error));
+		getContent(id, f);
 	}
 

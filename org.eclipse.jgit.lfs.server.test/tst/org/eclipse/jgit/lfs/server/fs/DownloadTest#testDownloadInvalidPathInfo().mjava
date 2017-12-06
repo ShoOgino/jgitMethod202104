@@ -4,14 +4,11 @@
 		String TEXT = "test";
 		String id = putContent(TEXT).name().substring(0, 60);
 		Path f = Paths.get(getTempDirectory().toString(), "download");
-		try {
-			getContent(id, f);
-			fail("expected RuntimeException");
-		} catch (RuntimeException e) {
-			String error = String.format(
-					"Invalid pathInfo '/%s' does not match '/{SHA-256}'", id);
-			assertEquals(formatErrorMessage(SC_UNPROCESSABLE_ENTITY, error),
-					e.getMessage());
-		}
+		String error = String.format(
+				"Invalid pathInfo '/%s' does not match '/{SHA-256}'", id);
+		exception.expect(RuntimeException.class);
+		exception.expectMessage(
+				formatErrorMessage(SC_UNPROCESSABLE_ENTITY, error));
+		getContent(id, f);
 	}
 

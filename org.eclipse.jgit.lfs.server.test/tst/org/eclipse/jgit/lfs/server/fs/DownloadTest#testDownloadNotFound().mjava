@@ -4,13 +4,9 @@
 		String TEXT = "test";
 		AnyLongObjectId id = LongObjectIdTestUtils.hash(TEXT);
 		Path f = Paths.get(getTempDirectory().toString(), "download");
-		try {
-			getContent(id, f);
-			fail("expected RuntimeException");
-		} catch (RuntimeException e) {
-			String error = String.format("Object '%s' not found", id.getName());
-			assertEquals(formatErrorMessage(SC_NOT_FOUND, error),
-					e.getMessage());
-		}
+		String error = String.format("Object '%s' not found", id.getName());
+		exception.expect(RuntimeException.class);
+		exception.expectMessage(formatErrorMessage(SC_NOT_FOUND, error));
+		getContent(id, f);
 	}
 
