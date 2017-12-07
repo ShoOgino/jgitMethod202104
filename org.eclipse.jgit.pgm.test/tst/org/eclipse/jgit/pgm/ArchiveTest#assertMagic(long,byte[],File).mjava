@@ -2,7 +2,10 @@
 		BufferedInputStream in = new BufferedInputStream(
 				new FileInputStream(file));
 		try {
-			in.skip(offset);
+			if (offset > 0) {
+				long skipped = in.skip(offset);
+				assertEquals(offset, skipped);
+			}
 
 			byte[] actual = new byte[magicBytes.length];
 			in.read(actual);
