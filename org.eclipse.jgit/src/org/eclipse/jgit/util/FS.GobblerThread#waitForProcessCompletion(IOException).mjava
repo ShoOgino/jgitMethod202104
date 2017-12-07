@@ -1,0 +1,16 @@
+		@SuppressWarnings("boxing")
+		private boolean waitForProcessCompletion(IOException originalError) {
+			try {
+				if (!p.waitFor(PROCESS_EXIT_TIMEOUT, TimeUnit.SECONDS)) {
+					setError(originalError, MessageFormat.format(
+							JGitText.get().commandClosedStderrButDidntExit,
+							desc, PROCESS_EXIT_TIMEOUT), -1);
+					fail.set(true);
+				}
+			} catch (InterruptedException e) {
+				LOG.error(MessageFormat.format(
+						JGitText.get().threadInterruptedWhileRunning, desc), e);
+			}
+			return false;
+		}
+
