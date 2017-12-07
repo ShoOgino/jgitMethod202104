@@ -1,13 +1,13 @@
-	@SuppressWarnings("boxing")
 	private void determineAtomicFileCreationSupport() {
 		// @TODO: enhance SystemReader to support this without copying code
-		Boolean ret = getAtomicFileCreationSupportOption(
+		AtomicFileCreation ret = getAtomicFileCreationSupportOption(
 				SystemReader.getInstance().openUserConfig(null, this));
-		if (ret == null && StringUtils.isEmptyOrNull(SystemReader.getInstance()
-				.getenv(Constants.GIT_CONFIG_NOSYSTEM_KEY))) {
+		if (ret == AtomicFileCreation.UNDEFINED
+				&& StringUtils.isEmptyOrNull(SystemReader.getInstance()
+						.getenv(Constants.GIT_CONFIG_NOSYSTEM_KEY))) {
 			ret = getAtomicFileCreationSupportOption(
 					SystemReader.getInstance().openSystemConfig(null, this));
 		}
-		supportsAtomicCreateNewFile = (ret == null) || ret;
+		supportsAtomicCreateNewFile = ret;
 	}
 
