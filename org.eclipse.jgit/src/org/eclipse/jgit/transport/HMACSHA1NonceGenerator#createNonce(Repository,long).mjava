@@ -14,12 +14,7 @@
 		}
 
 		String input = path + ":" + String.valueOf(timestamp); //$NON-NLS-1$
-		byte[] rawHmac;
-		try {
-			rawHmac = mac.doFinal(input.getBytes("UTF-8")); //$NON-NLS-1$
-		} catch (UnsupportedEncodingException e) {
-			throw new IllegalStateException(e);
-		}
+		byte[] rawHmac = mac.doFinal(input.getBytes(UTF_8));
 		return Long.toString(timestamp) + "-" + toHex(rawHmac); //$NON-NLS-1$
 	}
 

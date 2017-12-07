@@ -4,15 +4,13 @@
 	 */
 	public HMACSHA1NonceGenerator(String seed) throws IllegalStateException {
 		try {
-			byte[] keyBytes = seed.getBytes("ISO-8859-1"); //$NON-NLS-1$
+			byte[] keyBytes = seed.getBytes(ISO_8859_1);
 			SecretKeySpec signingKey = new SecretKeySpec(keyBytes, "HmacSHA1"); //$NON-NLS-1$
 			mac = Mac.getInstance("HmacSHA1"); //$NON-NLS-1$
 			mac.init(signingKey);
 		} catch (InvalidKeyException e) {
 			throw new IllegalStateException(e);
 		} catch (NoSuchAlgorithmException e) {
-			throw new IllegalStateException(e);
-		} catch (UnsupportedEncodingException e) {
 			throw new IllegalStateException(e);
 		}
 	}

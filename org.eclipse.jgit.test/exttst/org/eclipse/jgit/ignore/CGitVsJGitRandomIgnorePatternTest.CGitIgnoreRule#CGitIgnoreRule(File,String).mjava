@@ -1,10 +1,8 @@
-		public CGitIgnoreRule(File gitDir, String pattern)
-				throws UnsupportedEncodingException, IOException {
+		public CGitIgnoreRule(File gitDir, String pattern) throws IOException {
 			this.gitDir = gitDir;
 			this.pattern = pattern;
 			Files.write(FileUtils.toPath(new File(gitDir, ".gitignore")),
-					(pattern + "\n").getBytes("UTF-8"),
-					StandardOpenOption.CREATE,
+					(pattern + "\n").getBytes(UTF_8), StandardOpenOption.CREATE,
 					StandardOpenOption.TRUNCATE_EXISTING,
 					StandardOpenOption.WRITE);
 		}
