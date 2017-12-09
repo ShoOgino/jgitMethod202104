@@ -1,0 +1,13 @@
+	@Test
+	public void testFileProtoWindowsMissingHostSlash2() throws Exception {
+		final String str = "file://D: /m y";
+		URIish u = new URIish(str);
+		assertEquals("file", u.getScheme());
+		assertFalse(u.isRemote());
+		assertEquals("D: /m y", u.getRawPath());
+		assertEquals("D: /m y", u.getPath());
+		assertEquals("file:///D: /m y", u.toString());
+		assertEquals("file:///D:%20/m%20y", u.toASCIIString());
+		assertEquals(u, new URIish(str));
+	}
+
