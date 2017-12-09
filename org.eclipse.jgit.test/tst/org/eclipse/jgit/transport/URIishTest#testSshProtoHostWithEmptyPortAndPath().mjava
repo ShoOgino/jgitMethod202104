@@ -1,0 +1,16 @@
+	@Test
+	public void testSshProtoHostWithEmptyPortAndPath() throws Exception {
+		final String str = "ssh://example.com:/path";
+		URIish u = new URIish(str);
+		assertEquals("ssh", u.getScheme());
+		assertTrue(u.isRemote());
+		assertEquals("/path", u.getRawPath());
+		assertEquals("/path", u.getPath());
+		assertEquals("example.com", u.getHost());
+		assertEquals(-1, u.getPort());
+		assertEquals("ssh://example.com/path", u.toString());
+		assertEquals("ssh://example.com/path", u.toASCIIString());
+		assertEquals(u, new URIish(str));
+		assertEquals(u, new URIish("ssh://example.com/path"));
+	}
+
