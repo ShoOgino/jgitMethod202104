@@ -1,0 +1,18 @@
+	@Test
+	public void testFileProtoWindowsWithHostAndEmptyPortIsAmbiguous()
+			throws Exception {
+		final String str = "file://localhost:/D:/m y";
+		URIish u = new URIish(str);
+		assertEquals("file", u.getScheme());
+		assertFalse(u.isRemote());
+		assertEquals(null, u.getHost());
+		assertEquals(-1, u.getPort());
+		assertEquals(null, u.getUser());
+		assertEquals(null, u.getPass());
+		assertEquals("localhost:/D:/m y", u.getRawPath());
+		assertEquals("localhost:/D:/m y", u.getPath());
+		assertEquals("file:///localhost:/D:/m y", u.toString());
+		assertEquals("file:///localhost:/D:/m%20y", u.toASCIIString());
+		assertEquals(u, new URIish(str));
+	}
+
