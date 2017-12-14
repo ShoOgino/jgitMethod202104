@@ -1,0 +1,10 @@
+	/**
+	 * Detect if we are in a clone command execution
+	 *
+	 * @return {@code true} if we are currently cloning a repository
+	 * @throws IOException
+	 */
+	boolean isInClone() throws IOException {
+		return hasDanglingHead() && !packedRefsFile.exists() && !hasLooseRef();
+	}
+
