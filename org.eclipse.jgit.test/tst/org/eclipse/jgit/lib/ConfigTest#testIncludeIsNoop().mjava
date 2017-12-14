@@ -1,0 +1,11 @@
+	@Test
+	public void testIncludeIsNoop() throws IOException, ConfigInvalidException {
+		File config = tmp.newFile("config");
+
+		String fooBar = "[foo]\nbar=true\n";
+		Files.write(config.toPath(), fooBar.getBytes());
+
+		Config parsed = parse("[include]\npath=" + config.toPath() + "\n");
+		assertFalse(parsed.getBoolean("foo", "bar", false));
+	}
+
