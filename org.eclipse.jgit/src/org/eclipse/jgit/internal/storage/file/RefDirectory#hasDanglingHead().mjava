@@ -1,0 +1,9 @@
+	private boolean hasDanglingHead() throws IOException {
+		Ref head = exactRef(Constants.HEAD);
+		if (head != null) {
+			ObjectId id = head.getObjectId();
+			return id == null || id.equals(ObjectId.zeroId());
+		}
+		return false;
+	}
+
