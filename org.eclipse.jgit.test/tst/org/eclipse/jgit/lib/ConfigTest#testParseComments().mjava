@@ -1,0 +1,13 @@
+	@Test
+	public void testParseComments() throws ConfigInvalidException {
+		assertEquals("baz", parseEscapedValue("baz; comment"));
+		assertEquals("baz", parseEscapedValue("baz# comment"));
+		assertEquals("baz", parseEscapedValue("baz ; comment"));
+		assertEquals("baz", parseEscapedValue("baz # comment"));
+
+		assertEquals("baz", parseEscapedValue("baz ; comment"));
+		assertEquals("baz", parseEscapedValue("baz # comment"));
+		assertEquals("baz", parseEscapedValue("baz " + WS + " ; comment"));
+		assertEquals("baz", parseEscapedValue("baz " + WS + " # comment"));
+	}
+

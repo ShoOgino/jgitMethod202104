@@ -1,0 +1,9 @@
+	private static String parseEscapedSubsection(String escapedSubsection)
+			throws ConfigInvalidException {
+		String text = "[foo " + escapedSubsection + "]\nbar = value";
+		Config c = parse(text);
+		Set<String> subsections = c.getSubsections("foo");
+		assertEquals("only one section", 1, subsections.size());
+		return subsections.iterator().next();
+	}
+

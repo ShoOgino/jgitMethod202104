@@ -1,38 +1,48 @@
-	private static String readValue(final StringReader in, boolean quote,
-			final int eol) throws ConfigInvalidException {
-		final StringBuilder value = new StringBuilder();
-		boolean space = false;
+	private static String readValue(final StringReader in)
+			throws ConfigInvalidException {
+		StringBuilder value = new StringBuilder();
+		StringBuilder trailingSpaces = null;
+		boolean quote = false;
+		boolean inLeadingSpace = true;
+
 		for (;;) {
 			int c = in.read();
 			if (c < 0) {
 				break;
 			}
-
 			if ('\n' == c) {
-				if (quote)
-					throw new ConfigInvalidException(JGitText.get().newlineInQuotesNotAllowed);
+				if (quote) {
+					throw new ConfigInvalidException(
+							JGitText.get().newlineInQuotesNotAllowed);
+				}
 				in.reset();
 				break;
 			}
 
-			if (eol == c)
+			if (!quote && (';' == c || '#' == c)) {
+				if (trailingSpaces != null) {
+					trailingSpaces.setLength(0);
+				}
+				in.reset();
 				break;
-
-			if (!quote) {
-				if (Character.isWhitespace((char) c)) {
-					space = true;
-					continue;
-				}
-				if (';' == c || '#' == c) {
-					in.reset();
-					break;
-				}
 			}
 
-			if (space) {
-				if (value.length() > 0)
-					value.append(' ');
-				space = false;
+			char cc = (char) c;
+			if (Character.isWhitespace(cc)) {
+				if (inLeadingSpace) {
+					continue;
+				}
+				if (trailingSpaces == null) {
+					trailingSpaces = new StringBuilder();
+				}
+				trailingSpaces.append(cc);
+				continue;
+			} else {
+				inLeadingSpace = false;
+				if (trailingSpaces != null) {
+					value.append(trailingSpaces);
+					trailingSpaces.setLength(0);
+				}
 			}
 
 			if ('\\' == c) {
@@ -69,7 +79,7 @@
 				continue;
 			}
 
-			value.append((char) c);
+			value.append(cc);
 		}
 		return value.length() > 0 ? value.toString() : null;
 	}

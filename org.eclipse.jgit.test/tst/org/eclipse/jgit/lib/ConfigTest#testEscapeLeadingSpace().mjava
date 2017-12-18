@@ -1,11 +1,7 @@
 	@Test
 	public void testEscapeLeadingSpace() throws ConfigInvalidException {
-		assertEquals("x", Config.escapeValue("x"));
-		assertEquals("\" x\"", Config.escapeValue(" x"));
-		assertEquals("\"  x\"", Config.escapeValue("  x"));
-
-		assertParseRoundTrip("x");
-		assertParseRoundTrip(" x");
-		assertParseRoundTrip("  x");
+		assertValueRoundTrip("x", "x");
+		assertValueRoundTrip(" x", "\" x\"");
+		assertValueRoundTrip("  x", "\"  x\"");
 	}
 

@@ -43,7 +43,7 @@
 				e.section = readSectionName(in);
 				input = in.read();
 				if ('"' == input) {
-					e.subsection = readValue(in, true, '"');
+					e.subsection = readSubsectionName(in);
 					input = in.read();
 				}
 				if (']' != input)
@@ -60,7 +60,7 @@
 					e.name = e.name.substring(0, e.name.length() - 1);
 					e.value = MAGIC_EMPTY_VALUE;
 				} else
-					e.value = readValue(in, false, -1);
+					e.value = readValue(in);
 
 				if (e.section.equals("include")) { //$NON-NLS-1$
 					addIncludedConfig(newEntries, e, depth);

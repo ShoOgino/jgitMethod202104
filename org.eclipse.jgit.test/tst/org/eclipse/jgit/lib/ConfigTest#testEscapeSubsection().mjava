@@ -1,0 +1,17 @@
+	@Test
+	public void testEscapeSubsection() throws ConfigInvalidException {
+		assertSubsectionRoundTrip("", "\"\"");
+		assertSubsectionRoundTrip("x", "\"x\"");
+		assertSubsectionRoundTrip(" x", "\" x\"");
+		assertSubsectionRoundTrip("x ", "\"x \"");
+		assertSubsectionRoundTrip(" x ", "\" x \"");
+		assertSubsectionRoundTrip("x y", "\"x y\"");
+		assertSubsectionRoundTrip("x  y", "\"x  y\"");
+		assertSubsectionRoundTrip("x\\y", "\"x\\\\y\"");
+		assertSubsectionRoundTrip("x\"y", "\"x\\\"y\"");
+
+		// Unlike for values, \b and \t are not escaped.
+		assertSubsectionRoundTrip("x\by", "\"x\by\"");
+		assertSubsectionRoundTrip("x\ty", "\"x\ty\"");
+	}
+
