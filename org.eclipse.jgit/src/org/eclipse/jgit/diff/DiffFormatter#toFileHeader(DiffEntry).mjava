@@ -1,22 +1,24 @@
 	/**
-	 * Creates a {@link FileHeader} representing the given {@link DiffEntry}
+	 * Creates a {@link org.eclipse.jgit.patch.FileHeader} representing the
+	 * given {@link org.eclipse.jgit.diff.DiffEntry}
 	 * <p>
 	 * This method does not use the OutputStream associated with this
 	 * DiffFormatter instance. It is therefore safe to instantiate this
-	 * DiffFormatter instance with a {@link DisabledOutputStream} if this method
-	 * is the only one that will be used.
+	 * DiffFormatter instance with a
+	 * {@link org.eclipse.jgit.util.io.DisabledOutputStream} if this method is
+	 * the only one that will be used.
 	 *
 	 * @param ent
 	 *            the DiffEntry to create the FileHeader for
 	 * @return a FileHeader representing the DiffEntry. The FileHeader's buffer
 	 *         will contain only the header of the diff output. It will also
-	 *         contain one {@link HunkHeader}.
-	 * @throws IOException
+	 *         contain one {@link org.eclipse.jgit.patch.HunkHeader}.
+	 * @throws java.io.IOException
 	 *             the stream threw an exception while writing to it, or one of
 	 *             the blobs referenced by the DiffEntry could not be read.
-	 * @throws CorruptObjectException
+	 * @throws org.eclipse.jgit.errors.CorruptObjectException
 	 *             one of the blobs referenced by the DiffEntry is corrupt.
-	 * @throws MissingObjectException
+	 * @throws org.eclipse.jgit.errors.MissingObjectException
 	 *             one of the blobs referenced by the DiffEntry is missing.
 	 */
 	public FileHeader toFileHeader(DiffEntry ent) throws IOException,
