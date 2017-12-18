@@ -1,34 +1,39 @@
 	/**
 	 * Mark an object or commit to start graph traversal from.
 	 * <p>
-	 * Callers are encouraged to use {@link RevWalk#parseAny(AnyObjectId)}
-	 * instead of {@link RevWalk#lookupAny(AnyObjectId, int)}, as this method
-	 * requires the object to be parsed before it can be added as a root for the
-	 * traversal.
+	 * Callers are encouraged to use
+	 * {@link org.eclipse.jgit.revwalk.RevWalk#parseAny(AnyObjectId)} instead of
+	 * {@link org.eclipse.jgit.revwalk.RevWalk#lookupAny(AnyObjectId, int)}, as
+	 * this method requires the object to be parsed before it can be added as a
+	 * root for the traversal.
 	 * <p>
 	 * The method will automatically parse an unparsed object, but error
 	 * handling may be more difficult for the application to explain why a
 	 * RevObject is not actually valid. The object pool of this walker would
 	 * also be 'poisoned' by the invalid RevObject.
 	 * <p>
-	 * This method will automatically call {@link RevWalk#markStart(RevCommit)}
-	 * if passed RevCommit instance, or a RevTag that directly (or indirectly)
-	 * references a RevCommit.
+	 * This method will automatically call
+	 * {@link org.eclipse.jgit.revwalk.RevWalk#markStart(RevCommit)} if passed
+	 * RevCommit instance, or a RevTag that directly (or indirectly) references
+	 * a RevCommit.
 	 *
 	 * @param o
 	 *            the object to start traversing from. The object passed must be
 	 *            from this same revision walker.
-	 * @throws MissingObjectException
+	 * @throws org.eclipse.jgit.errors.MissingObjectException
 	 *             the object supplied is not available from the object
 	 *             database. This usually indicates the supplied object is
 	 *             invalid, but the reference was constructed during an earlier
-	 *             invocation to {@link RevWalk#lookupAny(AnyObjectId, int)}.
-	 * @throws IncorrectObjectTypeException
+	 *             invocation to
+	 *             {@link org.eclipse.jgit.revwalk.RevWalk#lookupAny(AnyObjectId, int)}.
+	 * @throws org.eclipse.jgit.errors.IncorrectObjectTypeException
 	 *             the object was not parsed yet and it was discovered during
 	 *             parsing that it is not actually the type of the instance
 	 *             passed in. This usually indicates the caller used the wrong
-	 *             type in a {@link RevWalk#lookupAny(AnyObjectId, int)} call.
-	 * @throws IOException
+	 *             type in a
+	 *             {@link org.eclipse.jgit.revwalk.RevWalk#lookupAny(AnyObjectId, int)}
+	 *             call.
+	 * @throws java.io.IOException
 	 *             a pack file or loose object could not be read.
 	 */
 	public void markStart(RevObject o) throws MissingObjectException,
