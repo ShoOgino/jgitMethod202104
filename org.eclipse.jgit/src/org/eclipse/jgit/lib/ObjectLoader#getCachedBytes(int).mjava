@@ -14,16 +14,17 @@
 	 * @param sizeLimit
 	 *            maximum number of bytes to return. If the object size is
 	 *            larger than this limit and {@link #isLarge()} is true,
-	 *            {@link LargeObjectException} will be thrown.
+	 *            {@link org.eclipse.jgit.errors.LargeObjectException} will be
+	 *            thrown.
 	 * @return the cached bytes of this object. Do not modify it.
-	 * @throws LargeObjectException
+	 * @throws org.eclipse.jgit.errors.LargeObjectException
 	 *             if the object is bigger than {@code sizeLimit}, or if
-	 *             {@link OutOfMemoryError} occurs during allocation of the
-	 *             result array. Callers should use {@link #openStream()}
+	 *             {@link java.lang.OutOfMemoryError} occurs during allocation
+	 *             of the result array. Callers should use {@link #openStream()}
 	 *             instead to access the contents.
-	 * @throws MissingObjectException
+	 * @throws org.eclipse.jgit.errors.MissingObjectException
 	 *             the object is large, and it no longer exists.
-	 * @throws IOException
+	 * @throws java.io.IOException
 	 *             the object store cannot be accessed.
 	 */
 	public byte[] getCachedBytes(int sizeLimit) throws LargeObjectException,
