@@ -1,12 +1,11 @@
 	private void loadSystemConfig() throws IOException {
 		try {
 			systemConfig.load();
-		} catch (ConfigInvalidException e1) {
-			IOException e2 = new IOException(MessageFormat.format(JGitText
+		} catch (ConfigInvalidException e) {
+			throw new IOException(MessageFormat.format(JGitText
 					.get().systemConfigFileInvalid, systemConfig.getFile()
-					.getAbsolutePath(), e1));
-			e2.initCause(e1);
-			throw e2;
+							.getAbsolutePath(),
+					e), e);
 		}
 	}
 
