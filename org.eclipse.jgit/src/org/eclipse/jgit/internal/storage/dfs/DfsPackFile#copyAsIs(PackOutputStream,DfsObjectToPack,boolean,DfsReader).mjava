@@ -128,8 +128,8 @@
 			CorruptObjectException corruptObject = new CorruptObjectException(
 					MessageFormat.format(
 							JGitText.get().objectAtHasBadZlibStream,
-							Long.valueOf(src.offset), getFileName()));
-			corruptObject.initCause(dataFormat);
+							Long.valueOf(src.offset), getFileName()),
+					dataFormat);
 
 			throw new StoredObjectRepresentationNotAvailableException(src,
 					corruptObject);
