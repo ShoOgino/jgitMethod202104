@@ -4,11 +4,8 @@
 			try {
 				doOpen();
 			} catch (IOException thisPackNotValid) {
-				StoredObjectRepresentationNotAvailableException gone;
-
-				gone = new StoredObjectRepresentationNotAvailableException(otp);
-				gone.initCause(thisPackNotValid);
-				throw gone;
+				throw new StoredObjectRepresentationNotAvailableException(otp,
+						thisPackNotValid);
 			}
 		}
 	}
