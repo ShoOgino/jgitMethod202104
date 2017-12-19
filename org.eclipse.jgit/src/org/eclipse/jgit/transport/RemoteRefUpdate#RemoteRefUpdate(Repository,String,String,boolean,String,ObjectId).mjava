@@ -1,15 +1,18 @@
 	/**
 	 * Construct remote ref update request by providing an update specification.
-	 * Object is created with default {@link Status#NOT_ATTEMPTED} status and no
-	 * message.
+	 * Object is created with default
+	 * {@link org.eclipse.jgit.transport.RemoteRefUpdate.Status#NOT_ATTEMPTED}
+	 * status and no message.
 	 *
 	 * @param localDb
 	 *            local repository to push from.
 	 * @param srcRef
 	 *            source revision - any string resolvable by
-	 *            {@link Repository#resolve(String)}. This resolves to the new
-	 *            object that the caller want remote ref to be after update. Use
-	 *            null or {@link ObjectId#zeroId()} string for delete request.
+	 *            {@link org.eclipse.jgit.lib.Repository#resolve(String)}. This
+	 *            resolves to the new object that the caller want remote ref to
+	 *            be after update. Use null or
+	 *            {@link org.eclipse.jgit.lib.ObjectId#zeroId()} string for
+	 *            delete request.
 	 * @param remoteName
 	 *            full name of a remote ref to update, e.g. "refs/heads/master"
 	 *            (no wildcard, no short name).
@@ -27,13 +30,14 @@
 	 *            advertised by remote side before update; update will take
 	 *            place ONLY if remote side advertise exactly this expected id;
 	 *            null if caller doesn't care what object id remote side
-	 *            advertise. Use {@link ObjectId#zeroId()} when expecting no
-	 *            remote ref with this name.
-	 * @throws IOException
+	 *            advertise. Use {@link org.eclipse.jgit.lib.ObjectId#zeroId()}
+	 *            when expecting no remote ref with this name.
+	 * @throws java.io.IOException
 	 *             when I/O error occurred during creating
-	 *             {@link TrackingRefUpdate} for local tracking branch or srcRef
-	 *             can't be resolved to any object.
-	 * @throws IllegalArgumentException
+	 *             {@link org.eclipse.jgit.transport.TrackingRefUpdate} for
+	 *             local tracking branch or srcRef can't be resolved to any
+	 *             object.
+	 * @throws java.lang.IllegalArgumentException
 	 *             if some required parameter was null
 	 */
 	public RemoteRefUpdate(final Repository localDb, final String srcRef,

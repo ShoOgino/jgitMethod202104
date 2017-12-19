@@ -10,30 +10,30 @@
 	 * For setting up remote ref update specification from ref spec, see helper
 	 * method {@link #findRemoteRefUpdatesFor(Collection)}, predefined refspecs
 	 * ({@link #REFSPEC_TAGS}, {@link #REFSPEC_PUSH_ALL}) or consider using
-	 * directly {@link RemoteRefUpdate} for more possibilities.
+	 * directly {@link org.eclipse.jgit.transport.RemoteRefUpdate} for more
+	 * possibilities.
 	 * <p>
 	 * When {@link #isDryRun()} is true, result of this operation is just
 	 * estimation of real operation result, no real action is performed.
 	 *
 	 * @see RemoteRefUpdate
-	 *
 	 * @param monitor
 	 *            progress monitor to inform the user about our processing
-	 *            activity. Must not be null. Use {@link NullProgressMonitor} if
-	 *            progress updates are not interesting or necessary.
+	 *            activity. Must not be null. Use
+	 *            {@link org.eclipse.jgit.lib.NullProgressMonitor} if progress
+	 *            updates are not interesting or necessary.
 	 * @param toPush
 	 *            specification of refs to push. May be null or the empty
 	 *            collection to use the specifications from the RemoteConfig
 	 *            converted by {@link #findRemoteRefUpdatesFor(Collection)}. No
 	 *            more than 1 RemoteRefUpdate with the same remoteName is
 	 *            allowed. These objects are modified during this call.
-	 *
 	 * @return information about results of remote refs updates, tracking refs
 	 *         updates and refs advertised by remote repository.
-	 * @throws NotSupportedException
+	 * @throws org.eclipse.jgit.errors.NotSupportedException
 	 *             this transport implementation does not support pushing
 	 *             objects.
-	 * @throws TransportException
+	 * @throws org.eclipse.jgit.errors.TransportException
 	 *             the remote connection could not be established or object
 	 *             copying (if necessary) failed at I/O or protocol level or
 	 *             update specification was incorrect.

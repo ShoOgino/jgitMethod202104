@@ -2,7 +2,7 @@
 	 * Fetch objects we don't have but that are reachable from advertised refs.
 	 * <p>
 	 * Only one call per connection is allowed. Subsequent calls will result in
-	 * {@link TransportException}.
+	 * {@link org.eclipse.jgit.errors.TransportException}.
 	 * </p>
 	 * <p>
 	 * Implementations are free to use network connections as necessary to
@@ -11,7 +11,8 @@
 	 * avoid replacing/overwriting/duplicating an object already available in
 	 * the local destination repository. Locally available objects and packs
 	 * should always be preferred over remotely available objects and packs.
-	 * {@link Transport#isFetchThin()} should be honored if applicable.
+	 * {@link org.eclipse.jgit.transport.Transport#isFetchThin()} should be
+	 * honored if applicable.
 	 * </p>
 	 *
 	 * @param monitor
@@ -29,7 +30,7 @@
 	 *            what is reachable through all Refs, not in replace of it.
 	 * @param out
 	 *            OutputStream to write sideband messages to
-	 * @throws TransportException
+	 * @throws org.eclipse.jgit.errors.TransportException
 	 *             objects could not be copied due to a network failure,
 	 *             protocol error, or error on remote side, or connection was
 	 *             already used for fetch.
