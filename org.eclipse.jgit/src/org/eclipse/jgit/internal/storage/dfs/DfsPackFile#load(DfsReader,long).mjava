@@ -131,12 +131,11 @@
 			return new ObjectLoader.SmallObject(type, data);
 
 		} catch (DataFormatException dfe) {
-			CorruptObjectException coe = new CorruptObjectException(
+			throw new CorruptObjectException(
 					MessageFormat.format(
 							JGitText.get().objectAtHasBadZlibStream, Long.valueOf(pos),
-							getFileName()));
-			coe.initCause(dfe);
-			throw coe;
+							getFileName()),
+					dfe);
 		}
 	}
 
