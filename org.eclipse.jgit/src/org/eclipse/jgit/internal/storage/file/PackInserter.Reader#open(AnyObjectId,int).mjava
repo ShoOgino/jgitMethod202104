@@ -12,9 +12,8 @@
 			}
 
 			byte[] buf = buffer();
-			RandomAccessFile f = packOut.file;
-			f.seek(obj.getOffset());
-			int cnt = f.read(buf, 0, 20);
+			packOut.seek(obj.getOffset());
+			int cnt = packOut.file.read(buf, 0, 20);
 			if (cnt <= 0) {
 				throw new EOFException(JGitText.get().unexpectedEofInPack);
 			}
@@ -48,6 +47,6 @@
 					return new ObjectLoader.SmallObject(type, data);
 				}
 			}
-			return new StreamLoader(f, type, sz, zpos);
+			return new StreamLoader(type, sz, zpos);
 		}
 
