@@ -1,20 +1,28 @@
 		byte[] finishPack() throws IOException {
-			// Overwrite placeholder header with actual object count, then hash.
-			file.seek(0);
-			write(hdrBuf, 0, writePackHeader(hdrBuf, objectList.size()));
+			// Overwrite placeholder header with actual object count, then hash. This
+			// method intentionally uses direct seek/write calls rather than the
+			// wrappers which keep track of atEnd. This leaves atEnd, the file
+			// pointer, and out's counter in an inconsistent state; that's ok, since
+			// this method closes the file anyway.
+			try {
+				file.seek(0);
+				out.write(hdrBuf, 0, writePackHeader(hdrBuf, objectList.size()));
 
-			byte[] buf = buffer();
-			SHA1 md = digest().reset();
-			file.seek(0);
-			while (true) {
-				int r = file.read(buf);
-				if (r < 0) {
-					break;
+				byte[] buf = buffer();
+				SHA1 md = digest().reset();
+				file.seek(0);
+				while (true) {
+					int r = file.read(buf);
+					if (r < 0) {
+						break;
+					}
+					md.update(buf, 0, r);
 				}
-				md.update(buf, 0, r);
+				byte[] packHash = md.digest();
+				out.write(packHash, 0, packHash.length);
+				return packHash;
+			} finally {
+				close();
 			}
-			byte[] packHash = md.digest();
-			out.write(packHash, 0, packHash.length);
-			return packHash;
 		}
 

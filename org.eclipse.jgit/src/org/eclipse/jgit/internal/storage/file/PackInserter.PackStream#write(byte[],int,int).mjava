@@ -1,6 +1,10 @@
 		@Override
 		public void write(byte[] data, int off, int len) throws IOException {
 			crc32.update(data, off, len);
+			if (!atEnd) {
+				file.seek(file.length());
+				atEnd = true;
+			}
 			out.write(data, off, len);
 		}
 

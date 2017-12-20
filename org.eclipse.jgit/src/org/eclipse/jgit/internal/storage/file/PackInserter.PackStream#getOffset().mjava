@@ -1,4 +1,9 @@
 		long getOffset() {
+			// This value is accurate as long as we only ever write to the end of the
+			// file, and don't seek back to overwrite any previous segments. Although
+			// this is subtle, storing the stream counter this way is still preferable
+			// to returning file.length() here, as it avoids a syscall and possible
+			// IOException.
 			return out.getCount();
 		}
 

@@ -1,7 +1,10 @@
 		@Override
 		public void close() throws IOException {
 			deflater.end();
-			out.close();
-			file.close();
+			try {
+				out.close();
+			} finally {
+				file.close();
+			}
 		}
 

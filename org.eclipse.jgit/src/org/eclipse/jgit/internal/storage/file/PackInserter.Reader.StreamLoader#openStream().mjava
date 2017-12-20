@@ -2,13 +2,43 @@
 			public ObjectStream openStream()
 					throws MissingObjectException, IOException {
 				int bufsz = buffer().length;
-				file.seek(pos);
+				packOut.seek(pos);
+
+				InputStream fileStream = new FilterInputStream(
+						Channels.newInputStream(packOut.file.getChannel())) {
+							// atEnd was already set to false by the previous seek, but it's
+							// technically possible for a caller to call insert on the
+							// inserter in the middle of reading from this stream. Behavior is
+							// undefined in this case, so it would arguably be ok to ignore,
+							// but it's not hard to at least make an attempt to not corrupt
+							// the data.
+							@Override
+							public int read() throws IOException {
+								packOut.atEnd = false;
+								return super.read();
+							}
+
+							@Override
+							public int read(byte[] b) throws IOException {
+								packOut.atEnd = false;
+								return super.read(b);
+							}
+
+							@Override
+							public int read(byte[] b, int off, int len) throws IOException {
+								packOut.atEnd = false;
+								return super.read(b,off,len);
+							}
+
+							@Override
+							public void close() {
+								// Never close underlying RandomAccessFile, which lasts the
+								// lifetime of the enclosing PackStream.
+							}
+						};
 				return new ObjectStream.Filter(
 						type, size,
 						new BufferedInputStream(
-								new InflaterInputStream(
-										Channels.newInputStream(packOut.file.getChannel()),
-										inflater(), bufsz),
-								bufsz));
+								new InflaterInputStream(fileStream, inflater(), bufsz), bufsz));
 			}
 
