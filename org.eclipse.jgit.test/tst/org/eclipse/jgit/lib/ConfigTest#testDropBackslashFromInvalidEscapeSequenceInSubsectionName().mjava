@@ -1,0 +1,11 @@
+	@Test
+	public void testDropBackslashFromInvalidEscapeSequenceInSubsectionName()
+			throws ConfigInvalidException {
+		assertEquals("x0", parseEscapedSubsection("\"x\\0\""));
+		assertEquals("xq", parseEscapedSubsection("\"x\\q\""));
+		// Unlike for values, \b, \n, and \t are not valid escape sequences.
+		assertEquals("xb", parseEscapedSubsection("\"x\\b\""));
+		assertEquals("xn", parseEscapedSubsection("\"x\\n\""));
+		assertEquals("xt", parseEscapedSubsection("\"x\\t\""));
+	}
+
