@@ -1,0 +1,7 @@
+	@Test
+	public void testUnescapedBracketsInGroup() throws Exception {
+		createFiles("[", "]", "[]", "][", "[[]", "[]]", "[[]]");
+		writeTrashFile(".gitignore", "[[]]\n");
+		assertSameAsCGit();
+	}
+
