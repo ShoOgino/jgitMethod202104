@@ -15,6 +15,10 @@
 	 *                {@link org.eclipse.jgit.errors.TranslationStringMissingException}
 	 */
 	public static <T extends TranslationBundle> T getBundleFor(Class<T> type) {
-		return local.get().get(type);
+		NLS b = local.get();
+		if (b == null) {
+			b = useJVMDefaultInternal();
+		}
+		return b.get(type);
 	}
 
