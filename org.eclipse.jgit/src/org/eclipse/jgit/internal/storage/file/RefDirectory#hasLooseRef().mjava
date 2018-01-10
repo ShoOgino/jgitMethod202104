@@ -1,4 +1,6 @@
 	private boolean hasLooseRef() throws IOException {
-		return Files.walk(refsDir.toPath()).anyMatch(Files::isRegularFile);
+		try (Stream<Path> stream = Files.walk(refsDir.toPath())) {
+			return stream.anyMatch(Files::isRegularFile);
+		}
 	}
 
