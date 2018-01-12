@@ -14,7 +14,8 @@
 		if (defaultJSch == null) {
 			defaultJSch = createDefaultJSch(fs);
 			if (defaultJSch.getConfigRepository() == null) {
-				defaultJSch.setConfigRepository(config);
+				defaultJSch.setConfigRepository(
+						new JschBugFixingConfigRepository(config));
 			}
 			for (Object name : defaultJSch.getIdentityNames())
 				byIdentityFile.put((String) name, defaultJSch);
