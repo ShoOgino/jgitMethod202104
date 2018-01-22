@@ -1,13 +1,23 @@
 	/**
 	 * Set maximum number bytes of heap memory to dedicate to caching pack file
 	 * data.
+	 * <p>
+	 * It is strongly recommended to set the block limit to be an integer multiple
+	 * of the block size. This constraint is not enforced by this method (since
+	 * it may be called before {@link #setBlockSize(int)}), but it is enforced by
+	 * {@link #fromConfig(Config)}.
 	 *
 	 * @param newLimit
 	 *            maximum number bytes of heap memory to dedicate to caching
-	 *            pack file data.
+	 *            pack file data; must be positive.
 	 * @return {@code this}
 	 */
 	public DfsBlockCacheConfig setBlockLimit(final long newLimit) {
+		if (newLimit <= 0) {
+			throw new IllegalArgumentException(MessageFormat.format(
+					JGitText.get().blockLimitNotPositive,
+					Long.valueOf(newLimit)));
+		}
 		blockLimit = newLimit;
 		return this;
 	}
