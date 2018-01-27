@@ -1,0 +1,17 @@
+	@Test
+	public void testIncludeCaseInsensitiveKey()
+			throws IOException, ConfigInvalidException {
+		File included = tmp.newFile("included");
+		String content = "[foo]\nbar=true\n";
+		Files.write(included.toPath(), content.getBytes());
+
+		File config = tmp.newFile("config");
+		content = "[include]\nPath=" + pathToString(included) + "\n";
+		Files.write(config.toPath(), content.getBytes());
+
+		FileBasedConfig fbConfig = new FileBasedConfig(null, config,
+				FS.DETECTED);
+		fbConfig.load();
+		assertTrue(fbConfig.getBoolean("foo", "bar", false));
+	}
+

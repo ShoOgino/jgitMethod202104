@@ -9,8 +9,14 @@
 			fbConfig.load();
 			fail();
 		} catch (ConfigInvalidException cie) {
-			assertEquals(JGitText.get().tooManyIncludeRecursions,
-					cie.getCause().getMessage());
+			for (Throwable t = cie; t != null; t = t.getCause()) {
+				if (t.getMessage()
+						.equals(JGitText.get().tooManyIncludeRecursions)) {
+					return;
+				}
+			}
+			fail("Expected to find expected exception message: "
+					+ JGitText.get().tooManyIncludeRecursions);
 		}
 	}
 

@@ -1,0 +1,28 @@
+	@Test
+	public void testIncludeExceptionContainsFile() throws IOException {
+		File included = tmp.newFile("included");
+		String includedPath = pathToString(included);
+		String content = "[include]\npath=\n";
+		Files.write(included.toPath(), content.getBytes());
+
+		File config = tmp.newFile("config");
+		String include = "[include]\npath=" + includedPath + "\n";
+		Files.write(config.toPath(), include.getBytes());
+		FileBasedConfig fbConfig = new FileBasedConfig(null, config,
+				FS.DETECTED);
+		try {
+			fbConfig.load();
+			fail("Expected ConfigInvalidException");
+		} catch (ConfigInvalidException e) {
+			// Check that there is some exception in the chain that contains
+			// includedPath
+			for (Throwable t = e; t != null; t = t.getCause()) {
+				if (t.getMessage().contains(includedPath)) {
+					return;
+				}
+			}
+			fail("Expected to find the path in the exception message: "
+					+ includedPath);
+		}
+	}
+

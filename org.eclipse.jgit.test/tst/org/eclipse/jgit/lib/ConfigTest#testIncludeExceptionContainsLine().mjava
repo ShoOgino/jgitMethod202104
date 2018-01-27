@@ -1,0 +1,12 @@
+	@Test
+	public void testIncludeExceptionContainsLine() {
+		try {
+			parse("[include]\npath=\n");
+			fail("Expected ConfigInvalidException");
+		} catch (ConfigInvalidException e) {
+			assertTrue(
+					"Expected to find the problem line in the exception message",
+					e.getMessage().contains("include.path"));
+		}
+	}
+
