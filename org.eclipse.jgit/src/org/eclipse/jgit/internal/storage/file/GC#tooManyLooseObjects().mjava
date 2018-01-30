@@ -15,19 +15,14 @@
 		if (!Files.exists(dir)) {
 			return false;
 		}
-		try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir,
-				new DirectoryStream.Filter<Path>() {
-
-					@Override
-					public boolean accept(Path file) throws IOException {
-						Path fileName = file.getFileName();
-						return Files.isRegularFile(file) && fileName != null
-								&& PATTERN_LOOSE_OBJECT
-										.matcher(fileName.toString()).matches();
-					}
+		try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir, file -> {
+					Path fileName = file.getFileName();
+					return Files.isRegularFile(file) && fileName != null
+							&& PATTERN_LOOSE_OBJECT.matcher(fileName.toString())
+									.matches();
 				})) {
-			for (Iterator<Path> iter = stream.iterator(); iter.hasNext();
-					iter.next()) {
+			for (Iterator<Path> iter = stream.iterator(); iter.hasNext(); iter
+					.next()) {
 				if (++n > threshold) {
 					return true;
 				}

@@ -4,23 +4,21 @@
 			throws IOException {
 		checkCancelled();
 		File tmpPack = null;
-		Map<PackExt, File> tmpExts = new TreeMap<>(
-				new Comparator<PackExt>() {
-					@Override
-					public int compare(PackExt o1, PackExt o2) {
-						// INDEX entries must be returned last, so the pack
-						// scanner does pick up the new pack until all the
-						// PackExt entries have been written.
-						if (o1 == o2)
-							return 0;
-						if (o1 == PackExt.INDEX)
-							return 1;
-						if (o2 == PackExt.INDEX)
-							return -1;
-						return Integer.signum(o1.hashCode() - o2.hashCode());
-					}
-
-				});
+		Map<PackExt, File> tmpExts = new TreeMap<>((o1, o2) -> {
+			// INDEX entries must be returned last, so the pack
+			// scanner does pick up the new pack until all the
+			// PackExt entries have been written.
+			if (o1 == o2) {
+				return 0;
+			}
+			if (o1 == PackExt.INDEX) {
+				return 1;
+			}
+			if (o2 == PackExt.INDEX) {
+				return -1;
+			}
+			return Integer.signum(o1.hashCode() - o2.hashCode());
+		});
 		try (PackWriter pw = new PackWriter(
 				(pconfig == null) ? new PackConfig(repo) : pconfig,
 				repo.newObjectReader())) {
