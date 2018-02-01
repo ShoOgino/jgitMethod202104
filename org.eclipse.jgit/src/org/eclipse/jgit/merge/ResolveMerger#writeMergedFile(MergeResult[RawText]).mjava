@@ -13,10 +13,15 @@
 		FS fs = nonNullRepo().getFS();
 		File of = new File(workTree, tw.getPathString());
 		File parentFolder = of.getParentFile();
-		if (!fs.exists(parentFolder))
+		if (!fs.exists(parentFolder)) {
 			parentFolder.mkdirs();
-		try (OutputStream os = new BufferedOutputStream(
-				new FileOutputStream(of))) {
+		}
+		EolStreamType streamType = EolStreamTypeUtil.detectStreamType(
+				OperationType.CHECKOUT_OP, workingTreeOptions,
+				tw.getAttributes());
+		try (OutputStream os = EolStreamTypeUtil.wrapOutputStream(
+				new BufferedOutputStream(new FileOutputStream(of)),
+				streamType)) {
 			new MergeFormatter().formatMerge(os, result,
 					Arrays.asList(commitNames), CHARACTER_ENCODING);
 		}
