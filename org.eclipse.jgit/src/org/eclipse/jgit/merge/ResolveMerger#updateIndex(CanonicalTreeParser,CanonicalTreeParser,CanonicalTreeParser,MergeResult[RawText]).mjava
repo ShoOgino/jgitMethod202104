@@ -15,50 +15,42 @@
 			CanonicalTreeParser ours, CanonicalTreeParser theirs,
 			MergeResult<RawText> result) throws FileNotFoundException,
 			IOException {
-		File mergedFile = !inCore ? writeMergedFile(result) : null;
-
-		if (result.containsConflicts()) {
-			// A conflict occurred, the file will contain conflict markers
-			// the index will be populated with the three stages and the
-			// workdir (if used) contains the halfway merged content.
-			add(tw.getRawPath(), base, DirCacheEntry.STAGE_1, 0, 0);
-			add(tw.getRawPath(), ours, DirCacheEntry.STAGE_2, 0, 0);
-			add(tw.getRawPath(), theirs, DirCacheEntry.STAGE_3, 0, 0);
-			mergeResults.put(tw.getPathString(), result);
-			return;
-		}
-
-		// No conflict occurred, the file will contain fully merged content.
-		// The index will be populated with the new merged version.
-		DirCacheEntry dce = new DirCacheEntry(tw.getPathString());
-
-		// Set the mode for the new content. Fall back to REGULAR_FILE if
-		// we can't merge modes of OURS and THEIRS.
-		int newMode = mergeFileModes(
-				tw.getRawMode(0),
-				tw.getRawMode(1),
-				tw.getRawMode(2));
-		dce.setFileMode(newMode == FileMode.MISSING.getBits()
-				? FileMode.REGULAR_FILE
-				: FileMode.fromBits(newMode));
-		if (mergedFile != null) {
-			long len = mergedFile.length();
-			dce.setLastModified(FS.DETECTED.lastModified(mergedFile));
-			dce.setLength((int) len);
-			EolStreamType streamType = EolStreamTypeUtil.detectStreamType(
-					OperationType.CHECKIN_OP, workingTreeOptions,
-					tw.getAttributes());
-			long blobLen = len == 0 ? 0
-					: getEntryContentLength(mergedFile, streamType);
-			// TODO: we read the file twice because insert() needs the blob
-			// length up front. C.f. AddCommand.
-			try (InputStream is = EolStreamTypeUtil.wrapInputStream(
-					new FileInputStream(mergedFile), streamType)) {
-				dce.setObjectId(
-						getObjectInserter().insert(OBJ_BLOB, blobLen, is));
+		TemporaryBuffer rawMerged = null;
+		try {
+			rawMerged = doMerge(result);
+			File mergedFile = inCore ? null : writeMergedFile(rawMerged);
+			if (result.containsConflicts()) {
+				// A conflict occurred, the file will contain conflict markers
+				// the index will be populated with the three stages and the
+				// workdir (if used) contains the halfway merged content.
+				add(tw.getRawPath(), base, DirCacheEntry.STAGE_1, 0, 0);
+				add(tw.getRawPath(), ours, DirCacheEntry.STAGE_2, 0, 0);
+				add(tw.getRawPath(), theirs, DirCacheEntry.STAGE_3, 0, 0);
+				mergeResults.put(tw.getPathString(), result);
+				return;
 			}
-		} else
-			dce.setObjectId(insertMergeResult(result));
-		builder.add(dce);
+
+			// No conflict occurred, the file will contain fully merged content.
+			// The index will be populated with the new merged version.
+			DirCacheEntry dce = new DirCacheEntry(tw.getPathString());
+
+			// Set the mode for the new content. Fall back to REGULAR_FILE if
+			// we can't merge modes of OURS and THEIRS.
+			int newMode = mergeFileModes(tw.getRawMode(0), tw.getRawMode(1),
+					tw.getRawMode(2));
+			dce.setFileMode(newMode == FileMode.MISSING.getBits()
+					? FileMode.REGULAR_FILE : FileMode.fromBits(newMode));
+			if (mergedFile != null) {
+				dce.setLastModified(
+						nonNullRepo().getFS().lastModified(mergedFile));
+				dce.setLength((int) mergedFile.length());
+			}
+			dce.setObjectId(insertMergeResult(rawMerged));
+			builder.add(dce);
+		} finally {
+			if (rawMerged != null) {
+				rawMerged.destroy();
+			}
+		}
 	}
 

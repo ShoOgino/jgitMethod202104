@@ -1,13 +1,13 @@
 	/**
 	 * Writes merged file content to the working tree.
 	 *
-	 * @param result
-	 *            the result of the content merge
+	 * @param rawMerged
+	 *            the raw merged content
 	 * @return the working tree file to which the merged content was written.
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
-	private File writeMergedFile(MergeResult<RawText> result)
+	private File writeMergedFile(TemporaryBuffer rawMerged)
 			throws FileNotFoundException, IOException {
 		File workTree = nonNullRepo().getWorkTree();
 		FS fs = nonNullRepo().getFS();
@@ -22,8 +22,7 @@
 		try (OutputStream os = EolStreamTypeUtil.wrapOutputStream(
 				new BufferedOutputStream(new FileOutputStream(of)),
 				streamType)) {
-			new MergeFormatter().formatMerge(os, result,
-					Arrays.asList(commitNames), CHARACTER_ENCODING);
+			rawMerged.writeTo(os, null);
 		}
 		return of;
 	}

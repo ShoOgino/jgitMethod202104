@@ -1,4 +1,4 @@
-	private ObjectId insertMergeResult(MergeResult<RawText> result)
+	private TemporaryBuffer doMerge(MergeResult<RawText> result)
 			throws IOException {
 		TemporaryBuffer.LocalFile buf = new TemporaryBuffer.LocalFile(
 				db != null ? nonNullRepo().getDirectory() : null, inCoreLimit);
@@ -6,11 +6,10 @@
 			new MergeFormatter().formatMerge(buf, result,
 					Arrays.asList(commitNames), CHARACTER_ENCODING);
 			buf.close();
-			try (InputStream in = buf.openInputStream()) {
-				return getObjectInserter().insert(OBJ_BLOB, buf.length(), in);
-			}
-		} finally {
+		} catch (IOException e) {
 			buf.destroy();
+			throw e;
 		}
+		return buf;
 	}
 
