@@ -45,11 +45,17 @@
 			long len = mergedFile.length();
 			dce.setLastModified(FS.DETECTED.lastModified(mergedFile));
 			dce.setLength((int) len);
-			InputStream is = new FileInputStream(mergedFile);
-			try {
-				dce.setObjectId(getObjectInserter().insert(OBJ_BLOB, len, is));
-			} finally {
-				is.close();
+			EolStreamType streamType = EolStreamTypeUtil.detectStreamType(
+					OperationType.CHECKIN_OP, workingTreeOptions,
+					tw.getAttributes());
+			long blobLen = len == 0 ? 0
+					: getEntryContentLength(mergedFile, streamType);
+			// TODO: we read the file twice because insert() needs the blob
+			// length up front. C.f. AddCommand.
+			try (InputStream is = EolStreamTypeUtil.wrapInputStream(
+					new FileInputStream(mergedFile), streamType)) {
+				dce.setObjectId(
+						getObjectInserter().insert(OBJ_BLOB, blobLen, is));
 			}
 		} else
 			dce.setObjectId(insertMergeResult(result));
