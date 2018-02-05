@@ -1,0 +1,18 @@
+	private boolean delete(Path d) {
+		try {
+			// Avoid deleting a folder that was just created so that concurrent
+			// operations trying to create a reference are not impacted
+			Instant threshold = Instant.now().minus(30, ChronoUnit.SECONDS);
+			Instant lastModified = Files.getLastModifiedTime(d).toInstant();
+			if (lastModified.isBefore(threshold)) {
+				// If the folder is not empty, the delete operation will fail
+				// silently. This is a cheaper alternative to filtering the
+				// stream in the calling method.
+				return d.toFile().delete();
+			}
+		} catch (IOException e) {
+			LOG.error(e.getMessage(), e);
+		}
+		return false;
+	}
+
