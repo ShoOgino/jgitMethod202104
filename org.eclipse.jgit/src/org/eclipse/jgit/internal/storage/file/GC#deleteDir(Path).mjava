@@ -1,0 +1,9 @@
+	private void deleteDir(Path dir) {
+		try (Stream<Path> dirs = Files.walk(dir)) {
+			dirs.filter(this::isDirectory).sorted(Comparator.reverseOrder())
+					.forEach(this::delete);
+		} catch (IOException e) {
+			LOG.error(e.getMessage(), e);
+		}
+	}
+

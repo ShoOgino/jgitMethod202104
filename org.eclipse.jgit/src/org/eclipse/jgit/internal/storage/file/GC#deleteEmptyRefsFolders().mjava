@@ -1,0 +1,12 @@
+	private void deleteEmptyRefsFolders() throws IOException {
+		Path refs = repo.getDirectory().toPath().resolve("refs"); //$NON-NLS-1$
+		try (Stream<Path> entries = Files.list(refs)) {
+			Iterator<Path> iterator = entries.iterator();
+			while (iterator.hasNext()) {
+				try (Stream<Path> s = Files.list(iterator.next())) {
+					s.forEach(this::deleteDir);
+				}
+			}
+		}
+	}
+
