@@ -27,20 +27,22 @@
 				if (new File(curFile, DOT_GIT).exists()) {
 					if (force) {
 						if (!dryRun) {
-							FileUtils.delete(curFile, FileUtils.RECURSIVE);
+							FileUtils.delete(curFile, FileUtils.RECURSIVE
+									| FileUtils.SKIP_MISSING);
 						}
 						inFiles.add(path + "/"); //$NON-NLS-1$
 					}
 				} else {
 					if (!dryRun) {
-						FileUtils.delete(curFile, FileUtils.RECURSIVE);
+						FileUtils.delete(curFile,
+								FileUtils.RECURSIVE | FileUtils.SKIP_MISSING);
 					}
 					inFiles.add(path + "/"); //$NON-NLS-1$
 				}
 			}
 		} else {
 			if (!dryRun) {
-				FileUtils.delete(curFile, FileUtils.NONE);
+				FileUtils.delete(curFile, FileUtils.SKIP_MISSING);
 			}
 			inFiles.add(path);
 		}

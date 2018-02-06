@@ -1,0 +1,14 @@
+	@Test
+	// To proof Bug 514434. No assertions, but before the bugfix
+	// this test was throwing Exceptions
+	public void testFilesShouldBeCleanedInSubSubFolders()
+			throws IOException, NoFilepatternException, GitAPIException {
+		writeTrashFile(".gitignore",
+				"/ignored-dir\n/sub-noclean/Ignored.txt\n/this_is_ok\n/this_is/not_ok\n");
+		git.add().addFilepattern(".gitignore").call();
+		git.commit().setMessage("adding .gitignore").call();
+		writeTrashFile("this_is_ok/more/subdirs/file.txt", "1");
+		writeTrashFile("this_is/not_ok/more/subdirs/file.txt", "2");
+		git.clean().setCleanDirectories(true).setIgnore(false).call();
+	}
+
