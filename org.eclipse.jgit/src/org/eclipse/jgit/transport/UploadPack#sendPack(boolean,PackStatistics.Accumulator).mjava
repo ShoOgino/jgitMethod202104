@@ -1,5 +1,6 @@
 	@SuppressWarnings("deprecation")
-	private void sendPack(final boolean sideband) throws IOException {
+	private void sendPack(final boolean sideband,
+			PackStatistics.Accumulator accumulator) throws IOException {
 		ProgressMonitor pm = NullProgressMonitor.INSTANCE;
 		OutputStream packOut = rawOut;
 
@@ -40,7 +41,8 @@
 		PackConfig cfg = packConfig;
 		if (cfg == null)
 			cfg = new PackConfig(db);
-		final PackWriter pw = new PackWriter(cfg, walk.getObjectReader());
+		final PackWriter pw = new PackWriter(cfg, walk.getObjectReader(),
+				accumulator);
 		try {
 			pw.setIndexDisabled(true);
 			pw.setUseCachedPacks(true);

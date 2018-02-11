@@ -2,6 +2,7 @@
 		boolean sendPack = false;
 		// If it's a non-bidi request, we need to read the entire request before
 		// writing a response. Buffer the response until then.
+		PackStatistics.Accumulator accumulator = new PackStatistics.Accumulator();
 		try {
 			if (biDirectionalPipe)
 				sendAdvertisedRefs(new PacketLineOutRefAdvertiser(pckOut));
@@ -10,12 +11,15 @@
 			else
 				advertised = refIdSet(getAdvertisedOrDefaultRefs().values());
 
+			long negotiateStart = System.currentTimeMillis();
+			accumulator.advertised = advertised.size();
 			recvWants();
 			if (wantIds.isEmpty()) {
 				preUploadHook.onBeginNegotiateRound(this, wantIds, 0);
 				preUploadHook.onEndNegotiateRound(this, wantIds, 0, 0, false);
 				return;
 			}
+			accumulator.wants = wantIds.size();
 
 			if (options.contains(OPTION_MULTI_ACK_DETAILED)) {
 				multiAck = MultiAck.DETAILED;
@@ -31,7 +35,10 @@
 				processShallow();
 			if (!clientShallowCommits.isEmpty())
 				walk.assumeShallow(clientShallowCommits);
-			sendPack = negotiate();
+			sendPack = negotiate(accumulator);
+			accumulator.timeNegotiating += System.currentTimeMillis()
+					- negotiateStart;
+
 			if (sendPack && !biDirectionalPipe) {
 				// Ensure the request was fully consumed. Any remaining input must
 				// be a protocol error. If we aren't at EOF the implementation is broken.
@@ -78,6 +85,6 @@
 		}
 
 		if (sendPack)
-			sendPack();
+			sendPack(accumulator);
 	}
 

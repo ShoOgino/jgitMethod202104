@@ -10,19 +10,6 @@
 	 *            reader to read from the repository with.
 	 */
 	public PackWriter(final PackConfig config, final ObjectReader reader) {
-		this.config = config;
-		this.reader = reader;
-		if (reader instanceof ObjectReuseAsIs)
-			reuseSupport = ((ObjectReuseAsIs) reader);
-		else
-			reuseSupport = null;
-
-		deltaBaseAsOffset = config.isDeltaBaseAsOffset();
-		reuseDeltas = config.isReuseDeltas();
-		reuseValidate = true; // be paranoid by default
-		stats = new PackStatistics.Accumulator();
-		state = new MutableState();
-		selfRef = new WeakReference<>(this);
-		instances.put(selfRef, Boolean.TRUE);
+		this(config, reader, null);
 	}
 

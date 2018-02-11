@@ -1,4 +1,5 @@
-	private boolean negotiate() throws IOException {
+	private boolean negotiate(PackStatistics.Accumulator accumulator)
+			throws IOException {
 		okToGiveUp = Boolean.FALSE;
 
 		ObjectId last = ObjectId.zeroId();
@@ -32,7 +33,7 @@
 
 			} else if (line.startsWith("have ") && line.length() == 45) { //$NON-NLS-1$
 				peerHas.add(ObjectId.fromString(line.substring(5)));
-
+				accumulator.haves++;
 			} else if (line.equals("done")) { //$NON-NLS-1$
 				last = processHaveLines(peerHas, last);
 
