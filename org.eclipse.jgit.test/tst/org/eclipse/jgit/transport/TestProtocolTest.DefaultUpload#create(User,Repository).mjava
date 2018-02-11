@@ -1,5 +1,12 @@
 		@Override
 		public UploadPack create(User req, Repository db) {
-			return new UploadPack(db);
+			UploadPack up = new UploadPack(db);
+			up.setPostUploadHook(new PostUploadHook() {
+				@Override
+				public void onPostUpload(PackStatistics stats) {
+					havesCount = stats.getHaves();
+				}
+			});
+			return up;
 		}
 

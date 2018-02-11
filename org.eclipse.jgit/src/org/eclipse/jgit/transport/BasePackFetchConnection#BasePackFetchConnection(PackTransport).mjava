@@ -8,8 +8,11 @@
 		super(packTransport);
 
 		if (local != null) {
-			final FetchConfig cfg = local.getConfig().get(FetchConfig::new);
+			final FetchConfig cfg = getFetchConfig();
 			allowOfsDelta = cfg.allowOfsDelta;
+			if (cfg.minimalNegotiation) {
+				minimalNegotiationSet = new HashSet<>();
+			}
 		} else {
 			allowOfsDelta = true;
 		}

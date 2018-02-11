@@ -8,18 +8,24 @@
 		boolean receivedAck = false;
 		boolean receivedReady = false;
 
-		if (statelessRPC)
+		if (statelessRPC) {
 			state.writeTo(out, null);
+		}
 
 		negotiateBegin();
 		SEND_HAVES: for (;;) {
 			final RevCommit c = walk.next();
-			if (c == null)
+			if (c == null) {
 				break SEND_HAVES;
+			}
 
-			pckOut.writeString("have " + c.getId().name() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			ObjectId o = c.getId();
+			pckOut.writeString("have " + o.name() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 			havesSent++;
 			havesSinceLastContinue++;
+			if (minimalNegotiationSet != null) {
+				minimalNegotiationSet.remove(o);
+			}
 
 			if ((31 & havesSent) != 0) {
 				// We group the have lines into blocks of 32, each marked
@@ -29,8 +35,9 @@
 				continue;
 			}
 
-			if (monitor.isCancelled())
+			if (monitor.isCancelled()) {
 				throw new CancelledException();
+			}
 
 			pckOut.end();
 			resultsPending++; // Each end will cause a result to come back.
@@ -52,6 +59,13 @@
 					// pack on the remote side. Keep doing that.
 					//
 					resultsPending--;
+					if (minimalNegotiationSet != null
+							&& minimalNegotiationSet.isEmpty()) {
+						// Minimal negotiation was requested and we sent out our
+						// current reference values for our wants, so terminate
+						// negotiation early.
+						break SEND_HAVES;
+					}
 					break READ_RESULT;
 
 				case ACK:
@@ -62,8 +76,9 @@
 					multiAck = MultiAck.OFF;
 					resultsPending = 0;
 					receivedAck = true;
-					if (statelessRPC)
+					if (statelessRPC) {
 						state.writeTo(out, null);
+					}
 					break SEND_HAVES;
 
 				case ACK_CONTINUE:
@@ -78,19 +93,28 @@
 					receivedAck = true;
 					receivedContinue = true;
 					havesSinceLastContinue = 0;
-					if (anr == AckNackResult.ACK_READY)
+					if (anr == AckNackResult.ACK_READY) {
 						receivedReady = true;
+					}
+					if (minimalNegotiationSet != null && minimalNegotiationSet.isEmpty()) {
+						// Minimal negotiation was requested and we sent out our current reference
+						// values for our wants, so terminate negotiation early.
+						break SEND_HAVES;
+					}
 					break;
 				}
 
-				if (monitor.isCancelled())
+				if (monitor.isCancelled()) {
 					throw new CancelledException();
+				}
 			}
 
-			if (noDone & receivedReady)
+			if (noDone & receivedReady) {
 				break SEND_HAVES;
-			if (statelessRPC)
+			}
+			if (statelessRPC) {
 				state.writeTo(out, null);
+			}
 
 			if (receivedContinue && havesSinceLastContinue > MAX_HAVES) {
 				// Our history must be really different from the remote's.
@@ -104,8 +128,9 @@
 
 		// Tell the remote side we have run out of things to talk about.
 		//
-		if (monitor.isCancelled())
+		if (monitor.isCancelled()) {
 			throw new CancelledException();
+		}
 
 		if (!receivedReady || !noDone) {
 			// When statelessRPC is true we should always leave SEND_HAVES
@@ -150,8 +175,9 @@
 				break;
 			}
 
-			if (monitor.isCancelled())
+			if (monitor.isCancelled()) {
 				throw new CancelledException();
+			}
 		}
 	}
 

@@ -1,0 +1,23 @@
+	@Test
+	public void testFullNegotiation() throws Exception {
+		TestProtocol<User> proto = registerDefault();
+		URIish uri = proto.register(new User("user"), remote.getRepository());
+
+		// Enough local branches to cause 10 rounds of negotiation,
+		// and a unique remote master branch commit with a later timestamp.
+		for (int i = 0; i < 10 * HAVES_PER_ROUND; i++) {
+			local.branch("local-branch-" + i).commit().create();
+		}
+		remote.tick(11 * HAVES_PER_ROUND);
+		RevCommit master = remote.branch("master").commit()
+				.add("readme.txt", "unique commit").create();
+
+		try (Git git = new Git(local.getRepository())) {
+			assertNull(local.getRepository().exactRef("refs/heads/master"));
+			git.fetch().setRemote(uri.toString()).setRefSpecs(MASTER).call();
+			assertEquals(master, local.getRepository()
+					.exactRef("refs/heads/master").getObjectId());
+			assertEquals(10 * HAVES_PER_ROUND, havesCount);
+		}
+	}
+
