@@ -1,0 +1,15 @@
+	@Test
+	public void testCheckoutForce_Bug530771() throws Exception {
+		try (Git git = new Git(db)) {
+			File f = writeTrashFile("a", "Hello world");
+			git.add().addFilepattern("a").call();
+			git.commit().setMessage("create a").call();
+			writeTrashFile("a", "Goodbye world");
+			assertEquals("[]",
+					Arrays.toString(execute("git checkout -f HEAD")));
+			assertEquals("Hello world", read(f));
+			assertEquals("[a, mode:100644, content:Hello world]",
+					indexState(db, LocalDiskRepositoryTestCase.CONTENT));
+		}
+	}
+

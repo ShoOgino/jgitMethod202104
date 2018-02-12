@@ -1,0 +1,11 @@
+	private void keep(DirCacheEntry e, WorkingTreeIterator f)
+			throws IOException {
+		if (e != null && !FileMode.TREE.equals(e.getFileMode()))
+			builder.add(e);
+		if (force) {
+			if (f.isModified(e, true, this.walk.getObjectReader())) {
+				checkoutEntry(repo, e, this.walk.getObjectReader());
+			}
+		}
+	}
+

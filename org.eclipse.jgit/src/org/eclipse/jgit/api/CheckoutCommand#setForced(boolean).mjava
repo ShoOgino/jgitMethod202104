@@ -1,0 +1,21 @@
+	/**
+	 * Allow a checkout even if the workingtree or index differs from HEAD. This
+	 * matches native git's '--force' option.
+	 *
+	 * JGit releases before 5.2 had a method <code>setForce()</code> offering
+	 * semantics different from this new <code>setForced()</code>. This old
+	 * semantic can now be found in {@link #setForceRefUpdate(boolean)}
+	 *
+	 * @param forced
+	 *            if set to <code>true</code> then allow the checkout even if
+	 *            workingtree or index doesn't match HEAD. Overwrite workingtree
+	 *            files and index content with the new content in this case.
+	 * @return this instance
+	 * @since 5.3
+	 */
+	public CheckoutCommand setForced(boolean forced) {
+		checkCallable();
+		this.forced = forced;
+		return this;
+	}
+
