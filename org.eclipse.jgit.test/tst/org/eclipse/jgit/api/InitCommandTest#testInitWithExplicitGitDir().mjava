@@ -8,10 +8,11 @@
 		InitCommand command = new InitCommand();
 		command.setDirectory(wt);
 		command.setGitDir(gitDir);
-		Repository repository = command.call().getRepository();
-		addRepoToClose(repository);
-		assertNotNull(repository);
-		assertEqualsFile(wt, repository.getWorkTree());
-		assertEqualsFile(gitDir, repository.getDirectory());
+		try (Git git = command.call()) {
+			Repository repository = git.getRepository();
+			assertNotNull(repository);
+			assertEqualsFile(wt, repository.getWorkTree());
+			assertEqualsFile(gitDir, repository.getDirectory());
+		}
 	}
 
