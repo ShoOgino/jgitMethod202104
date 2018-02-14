@@ -1,0 +1,17 @@
+	@Test
+	public void testAliasCaseDifferenceLowcase() throws Exception {
+		tmpConfigFile = createConfig("Host Bitbucket.org",
+				"Hostname bitbucket.org", "User foo", "Port 29418",
+				"ConnectTimeout 10", //
+				"Host bitbucket.org", "Hostname bitbucket.org", "User bar",
+				"Port 22", "ConnectTimeout 5");
+		tmpConfig = new OpenSshConfig(tmpConfigFile.getParentFile(),
+				tmpConfigFile);
+		factory.setConfig(tmpConfig);
+		Session session = createSession("ssh://bitbucket.org/something");
+		assertEquals("bitbucket.org", session.getHost());
+		assertEquals("bar", session.getUserName());
+		assertEquals(22, session.getPort());
+		assertEquals(TimeUnit.SECONDS.toMillis(5), session.getTimeout());
+	}
+
