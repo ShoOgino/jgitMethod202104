@@ -1,0 +1,13 @@
+	@Test
+	public void testAliasWithUser() throws Exception {
+		tmpConfigFile = createConfig("Host egit", "Hostname git.eclipse.org",
+				"User foo", "Port 29418");
+		tmpConfig = new OpenSshConfig(tmpConfigFile.getParentFile(),
+				tmpConfigFile);
+		factory.setConfig(tmpConfig);
+		Session session = createSession("ssh://bar@egit/egit/egit");
+		assertEquals("git.eclipse.org", session.getHost());
+		assertEquals("bar", session.getUserName());
+		assertEquals(29418, session.getPort());
+	}
+

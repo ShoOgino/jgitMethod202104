@@ -1,0 +1,23 @@
+	private Session createSession(String uriText) throws Exception {
+		// For this test to make sense, these few lines must correspond to the
+		// code in JschConfigSessionFactory.getSession(). Because of
+		// side-effects we cannot encapsulate that there properly and so we have
+		// to duplicate this bit here. We also can't test getSession() itself
+		// since it would try to actually connect to a server.
+		URIish uri = new URIish(uriText);
+		String host = uri.getHost();
+		String user = uri.getUser();
+		String password = uri.getPass();
+		int port = uri.getPort();
+		OpenSshConfig.Host hostConfig = tmpConfig.lookup(host);
+		host = hostConfig.getHostName();
+		if (port <= 0) {
+			port = hostConfig.getPort();
+		}
+		if (user == null) {
+			user = hostConfig.getUser();
+		}
+		return factory.createSession(null, FS.DETECTED, user, password, host,
+				port, hostConfig);
+	}
+
