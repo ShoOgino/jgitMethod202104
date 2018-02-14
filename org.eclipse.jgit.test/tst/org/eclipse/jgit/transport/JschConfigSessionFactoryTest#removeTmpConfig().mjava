@@ -1,0 +1,11 @@
+	@After
+	public void removeTmpConfig() {
+		if (tmpConfigFile == null) {
+			return;
+		}
+		if (tmpConfigFile.exists() && !tmpConfigFile.delete()) {
+			tmpConfigFile.deleteOnExit();
+		}
+		tmpConfigFile = null;
+	}
+
