@@ -9,11 +9,12 @@
 		File gitDir = createTempDirectory("testInitRepository/.git");
 		InitCommand command = new InitCommand();
 		command.setGitDir(gitDir);
-		Repository repository = command.call().getRepository();
-		addRepoToClose(repository);
-		assertNotNull(repository);
-		assertEqualsFile(gitDir, repository.getDirectory());
-		assertEqualsFile(new File(reader.getProperty("user.dir")),
-				repository.getWorkTree());
+		try (Git git = command.call()) {
+			Repository repository = git.getRepository();
+			assertNotNull(repository);
+			assertEqualsFile(gitDir, repository.getDirectory());
+			assertEqualsFile(new File(reader.getProperty("user.dir")),
+					repository.getWorkTree());
+		}
 	}
 
