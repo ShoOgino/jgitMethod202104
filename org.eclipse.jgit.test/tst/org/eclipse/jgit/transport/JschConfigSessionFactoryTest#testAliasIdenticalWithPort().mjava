@@ -1,0 +1,14 @@
+	@Test
+	public void testAliasIdenticalWithPort() throws Exception {
+		tmpConfigFile = createConfig("Host git.eclipse.org",
+				"Hostname git.eclipse.org", "User foo", "Port 29418");
+		tmpConfig = new OpenSshConfig(tmpConfigFile.getParentFile(),
+				tmpConfigFile);
+		factory.setConfig(tmpConfig);
+		Session session = createSession(
+				"ssh://bar@git.eclipse.org:300/egit/egit");
+		assertEquals("git.eclipse.org", session.getHost());
+		assertEquals("bar", session.getUserName());
+		assertEquals(300, session.getPort());
+	}
+
