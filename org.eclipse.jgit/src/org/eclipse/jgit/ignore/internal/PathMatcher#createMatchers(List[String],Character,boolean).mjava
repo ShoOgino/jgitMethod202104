@@ -5,11 +5,15 @@
 		for (int i = 0; i < segments.size(); i++) {
 			String segment = segments.get(i);
 			IMatcher matcher = createNameMatcher0(segment, pathSeparator,
-					dirOnly);
-			if (matcher == WILD && i > 0
-					&& matchers.get(matchers.size() - 1) == WILD)
-				// collapse wildmatchers **/** is same as **
-				continue;
+					dirOnly, i == segments.size() - 1);
+			if (i > 0) {
+				final IMatcher last = matchers.get(matchers.size() - 1);
+				if (isWild(matcher) && isWild(last))
+					// collapse wildmatchers **/** is same as **, but preserve
+					// dirOnly flag (i.e. always use the last wildmatcher)
+					matchers.remove(matchers.size() - 1);
+			}
+
 			matchers.add(matcher);
 		}
 		return matchers;

@@ -15,18 +15,18 @@
 			if (right == -1) {
 				if (left < endExcl) {
 					match = matches(matcher, path, left, endExcl,
-							assumeDirectory);
+							assumeDirectory, pathMatch);
 				} else {
 					// a/** should not match a/ or a
-					match = match && matchers.get(matcher) != WILD;
+					match = match && !isWild(matchers.get(matcher));
 				}
 				if (match) {
 					if (matcher < matchers.size() - 1
-							&& matchers.get(matcher) == WILD) {
+							&& isWild(matchers.get(matcher))) {
 						// ** can match *nothing*: a/**/b match also a/b
 						matcher++;
 						match = matches(matcher, path, left, endExcl,
-								assumeDirectory);
+								assumeDirectory, pathMatch);
 					} else if (dirOnly && !assumeDirectory) {
 						// Directory expectations not met
 						return false;
@@ -38,14 +38,15 @@
 				wildmatchBacktrackPos = right;
 			}
 			if (right - left > 0) {
-				match = matches(matcher, path, left, right, assumeDirectory);
+				match = matches(matcher, path, left, right, assumeDirectory,
+						pathMatch);
 			} else {
 				// path starts with slash???
 				right++;
 				continue;
 			}
 			if (match) {
-				boolean wasWild = matchers.get(matcher) == WILD;
+				boolean wasWild = isWild(matchers.get(matcher));
 				if (wasWild) {
 					lastWildmatch = matcher;
 					wildmatchBacktrackPos = -1;

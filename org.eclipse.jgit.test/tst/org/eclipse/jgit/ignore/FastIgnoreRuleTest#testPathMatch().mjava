@@ -1,0 +1,22 @@
+	@Test
+	public void testPathMatch() {
+		pathMatch = true;
+		assertMatched("a", "a");
+		assertMatched("a/", "a/");
+		assertNotMatched("a/", "a/b");
+
+		assertMatched("**", "a");
+		assertMatched("**", "a/");
+		assertMatched("**", "a/b");
+
+		assertNotMatched("**/", "a");
+		assertNotMatched("**/", "a/b");
+		assertMatched("**/", "a/");
+		assertMatched("**/", "a/b/");
+
+		assertNotMatched("x/**/", "x/a");
+		assertNotMatched("x/**/", "x/a/b");
+		assertMatched("x/**/", "x/a/");
+		assertMatched("x/**/", "x/y/a/");
+	}
+

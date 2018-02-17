@@ -1,0 +1,13 @@
+	private boolean matches(int matcherIdx, String path, int startIncl,
+			int endExcl, boolean assumeDirectory, boolean pathMatch) {
+		IMatcher matcher = matchers.get(matcherIdx);
+
+		final boolean matches = matcher.matches(path, startIncl, endExcl);
+		if (!matches || !pathMatch || matcherIdx < matchers.size() - 1
+				|| !(matcher instanceof AbstractMatcher)) {
+			return matches;
+		}
+
+		return assumeDirectory || !((AbstractMatcher) matcher).dirOnly;
+	}
+
