@@ -1,0 +1,19 @@
+	private void jgitIgnoredAndUntracked(LinkedHashSet<String> ignored,
+			LinkedHashSet<String> untracked) throws IOException {
+		// Do a tree walk that does descend into ignored directories and return
+		// a list of all ignored files
+		try (TreeWalk walk = new TreeWalk(db)) {
+			walk.addTree(new FileTreeIterator(db));
+			walk.setRecursive(true);
+			while (walk.next()) {
+				if (walk.getTree(WorkingTreeIterator.class).isEntryIgnored()) {
+					ignored.add(walk.getPathString());
+				} else {
+					// tests of this class won't add any files to the index,
+					// hence everything what is not ignored is untracked
+					untracked.add(walk.getPathString());
+				}
+			}
+		}
+	}
+

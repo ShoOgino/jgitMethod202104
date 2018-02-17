@@ -1,7 +1,11 @@
 	private void assertSameAsCGit(String... notIgnored) throws Exception {
-		LinkedHashSet<String> ignored = jgitIgnored();
+		LinkedHashSet<String> ignored = new LinkedHashSet<>();
+		LinkedHashSet<String> untracked = new LinkedHashSet<>();
+		jgitIgnoredAndUntracked(ignored, untracked);
 		String[] cgit = cgitIgnored();
+		String[] cgitUntracked = cgitUntracked();
 		assertArrayEquals(cgit, ignored.toArray());
+		assertArrayEquals(cgitUntracked, untracked.toArray());
 		for (String notExcluded : notIgnored) {
 			assertFalse("File " + notExcluded + " should not be ignored",
 					ignored.contains(notExcluded));
