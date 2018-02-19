@@ -1,0 +1,16 @@
+	@Test
+	public void testDiffAutoCrlfLargeFile() throws Exception {
+		String content = largeCrLfString();
+		String expectedDiff = "diff --git a/test.txt b/test.txt\n"
+				+ "index 7014942..c0487a7 100644\n" //
+				+ "--- a/test.txt\n" //
+				+ "+++ b/test.txt\n" //
+				+ "@@ -1,4 +1,5 @@\n"
+				+ " 012345678901234567890123456789012345678901234567\n"
+				+ "+ABCD\n"
+				+ " 012345678901234567890123456789012345678901234567\n"
+				+ " 012345678901234567890123456789012345678901234567\n"
+				+ " 012345678901234567890123456789012345678901234567\n";
+		doAutoCrLfTest(content, expectedDiff);
+	}
+

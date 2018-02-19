@@ -1,0 +1,12 @@
+	private static String mediumCrLfString() {
+		// Create a CR-LF string longer than RawText.FIRST_FEW_BYTES whose
+		// canonical representation is shorter than RawText.FIRST_FEW_BYTES.
+		String line = "01234567\r\n"; // 10 characters
+		StringBuilder builder = new StringBuilder(
+				RawText.FIRST_FEW_BYTES + line.length());
+		while (builder.length() <= RawText.FIRST_FEW_BYTES) {
+			builder.append(line);
+		}
+		return builder.toString();
+	}
+

@@ -1,0 +1,15 @@
+	@Test
+	public void testDiffAutoCrlfSmallFile() throws Exception {
+		String content = "01234\r\n01234\r\n01234\r\n";
+		String expectedDiff = "diff --git a/test.txt b/test.txt\n"
+				+ "index fe25983..a44a032 100644\n" //
+				+ "--- a/test.txt\n" //
+				+ "+++ b/test.txt\n" //
+				+ "@@ -1,3 +1,4 @@\n" //
+				+ " 01234\n" //
+				+ "+ABCD\n" //
+				+ " 01234\n" //
+				+ " 01234\n";
+		doAutoCrLfTest(content, expectedDiff);
+	}
+

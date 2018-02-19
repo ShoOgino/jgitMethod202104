@@ -1,0 +1,27 @@
+	private void doAutoCrLfTest(String content, String expectedDiff)
+			throws Exception {
+		FileBasedConfig config = db.getConfig();
+		config.setString(ConfigConstants.CONFIG_CORE_SECTION, null,
+				ConfigConstants.CONFIG_KEY_AUTOCRLF, "true");
+		config.save();
+		commitFile("test.txt", content, "master");
+		// Insert a line into content
+		int i = content.indexOf('\n');
+		content = content.substring(0, i + 1) + "ABCD\r\n"
+				+ content.substring(i + 1);
+		writeTrashFile("test.txt", content);
+		// Create the patch
+		try (ByteArrayOutputStream os = new ByteArrayOutputStream();
+				DiffFormatter dfmt = new DiffFormatter(
+						new BufferedOutputStream(os))) {
+			dfmt.setRepository(db);
+			dfmt.format(new DirCacheIterator(db.readDirCache()),
+					new FileTreeIterator(db));
+			dfmt.flush();
+
+			String actual = os.toString("UTF-8");
+
+			assertEquals(expectedDiff, actual);
+		}
+	}
+
