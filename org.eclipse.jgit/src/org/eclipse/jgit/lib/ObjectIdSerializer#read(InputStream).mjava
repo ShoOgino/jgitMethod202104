@@ -1,0 +1,21 @@
+	/**
+	 * @param in
+	 *            the input stream
+	 * @return the object id
+	 * @throws IOException
+	 *             there was an error reading the stream
+	 */
+	@Nullable
+	public static ObjectId read(InputStream in) throws IOException {
+		switch (in.read()) {
+		case 0:
+			return null;
+		case 1:
+			final byte[] b = new byte[OBJECT_ID_LENGTH];
+			IO.readFully(in, b, 0, OBJECT_ID_LENGTH);
+			return ObjectId.fromRaw(b);
+		default:
+			throw new IOException("Invalid flag before ObjectId"); //$NON-NLS-1$
+		}
+	}
+

@@ -1,0 +1,11 @@
+	private ObjectId writeAndReadBackFromTempFile(ObjectId objectId)
+			throws Exception {
+		File file = File.createTempFile("ObjectIdSerializerTest_", "");
+		try (OutputStream out = new FileOutputStream(file)) {
+			ObjectIdSerializer.write(out, objectId);
+		}
+		try (InputStream in = new FileInputStream(file)) {
+			return ObjectIdSerializer.read(in);
+		}
+	}
+
