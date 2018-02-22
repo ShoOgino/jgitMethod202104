@@ -1,20 +1,20 @@
-  /** @return all of the events made since the last clear. */
-  List<AccessEvent> getEvents() {
-    try {
-      for (;;) {
-        try {
-          active.acquire(MAX);
-          break;
-        } catch (InterruptedException e) {
-          continue;
-        }
-      }
+	/** @return all of the events made since the last clear. */
+	List<AccessEvent> getEvents() {
+		try {
+			for (;;) {
+				try {
+					active.acquire(MAX);
+					break;
+				} catch (InterruptedException e) {
+					continue;
+				}
+			}
 
-      synchronized (events) {
-        return events;
-      }
-    } finally {
-      active.release(MAX);
-    }
-  }
+			synchronized (events) {
+				return events;
+			}
+		} finally {
+			active.release(MAX);
+		}
+	}
 
