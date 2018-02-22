@@ -1,10 +1,5 @@
 	static URI relativize(URI current, URI target) {
-
-		// We only handle bare paths for now.
-		if (!target.toString().equals(target.getPath())) {
-			return target;
-		}
-		if (!current.toString().equals(current.getPath())) {
+		if (!Objects.equals(current.getHost(), target.getHost())) {
 			return target;
 		}
 

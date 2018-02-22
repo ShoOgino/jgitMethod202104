@@ -1,14 +1,14 @@
 	@Test
-	public void androidSetup() throws Exception {
+	public void runTwiceIsNOP() throws Exception {
 		Repository child = Git.cloneRepository()
-				.setURI(groupADb.getDirectory().toURI().toString())
-				.setDirectory(createUniqueTestGitDir(true)).setBare(true).call()
-				.getRepository();
+			.setURI(groupADb.getDirectory().toURI().toString())
+			.setDirectory(createUniqueTestGitDir(true)).setBare(true).call()
+			.getRepository();
 
 		Repository dest = Git.cloneRepository()
-				.setURI(db.getDirectory().toURI().toString())
-				.setDirectory(createUniqueTestGitDir(true)).setBare(true).call()
-				.getRepository();
+			.setURI(db.getDirectory().toURI().toString())
+			.setDirectory(createUniqueTestGitDir(true)).setBare(true).call()
+			.getRepository();
 
 		assertTrue(dest.isBare());
 		assertTrue(child.isBare());
@@ -26,7 +26,8 @@
 		repos.put("platform/base", child);
 
 		RevCommit commit = cmd
-			.setInputStream(new ByteArrayInputStream(xmlContent.toString().getBytes(UTF_8)))
+			.setInputStream(new ByteArrayInputStream(
+				xmlContent.toString().getBytes(UTF_8)))
 			.setRemoteReader(repos)
 			.setURI("platform/")
 			.setTargetURI("platform/superproject")
@@ -34,17 +35,18 @@
 			.setRecordSubmoduleLabels(true)
 			.call();
 
+		String firstIdStr = commit.getId().name() + ":" + ".gitmodules";
+		commit = new RepoCommand(dest)
+			.setInputStream(new ByteArrayInputStream(
+				xmlContent.toString().getBytes(UTF_8)))
+			.setRemoteReader(repos)
+			.setURI("platform/")
+			.setTargetURI("platform/superproject")
+			.setRecordRemoteBranch(true)
+			.setRecordSubmoduleLabels(true)
+			.call();
 		String idStr = commit.getId().name() + ":" + ".gitmodules";
-		ObjectId modId = dest.resolve(idStr);
-
-		try (ObjectReader reader = dest.newObjectReader()) {
-			byte[] bytes = reader.open(modId).getCachedBytes(Integer.MAX_VALUE);
-			Config base = new Config();
-			BlobBasedConfig cfg = new BlobBasedConfig(base, bytes);
-			String subUrl = cfg.getString("submodule", "base", "url");
-			assertEquals(subUrl, "../base");
-		}
-
+		assertEquals(firstIdStr, idStr);
 		child.close();
 		dest.close();
 	}
