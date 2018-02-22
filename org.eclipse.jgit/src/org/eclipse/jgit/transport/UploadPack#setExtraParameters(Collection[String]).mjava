@@ -1,0 +1,17 @@
+	/**
+	 * Set the Extra Parameters provided by the client.
+	 *
+	 * <p>These are parameters passed by the client through a side channel
+	 * such as the Git-Protocol HTTP header, to allow a client to request
+	 * a newer response format while remaining compatible with older servers
+	 * that do not understand different request formats.
+	 *
+	 * @param params
+	 *            parameters supplied by the client, split at colons or NUL
+	 *            bytes.
+	 * @since 5.0
+	 */
+	public void setExtraParameters(Collection<String> params) {
+		this.clientRequestedV2 = params.contains("version=2"); // $NON-NLS-1$
+	}
+

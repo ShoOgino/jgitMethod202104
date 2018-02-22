@@ -1,0 +1,21 @@
+	/*
+	 * Returns true if this is the last command and we should tear down the
+	 * connection.
+	 */
+	private boolean serveOneCommandV2() throws IOException {
+		String command;
+		try {
+			command = pckIn.readString();
+		} catch (EOFException eof) {
+			/* EOF when awaiting command is fine */
+			return true;
+		}
+		if (command == PacketLineIn.END) {
+			// A blank request is valid according
+			// to the protocol; do nothing in this
+			// case.
+			return true;
+		}
+		throw new PackProtocolException("unknown command " + command);
+	}
+

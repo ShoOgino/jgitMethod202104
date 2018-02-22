@@ -1,0 +1,27 @@
+	private void serviceV2() throws IOException {
+		if (biDirectionalPipe) {
+			// Just like in service(), the capability advertisement
+			// is sent only if this is a bidirectional pipe. (If
+			// not, the client is expected to call
+			// sendAdvertisedRefs() on its own.)
+			for (String s : v2CapabilityAdvertisement) {
+				pckOut.writeString(s + "\n");
+			}
+			pckOut.end();
+
+			while (!serveOneCommandV2()) {
+				// Repeat until an empty command or EOF.
+			}
+			return;
+		}
+
+		try {
+			serveOneCommandV2();
+		} finally {
+			while (0 < rawIn.skip(2048) || 0 <= rawIn.read()) {
+				// Discard until EOF.
+			}
+			rawOut.stopBuffering();
+		}
+	}
+

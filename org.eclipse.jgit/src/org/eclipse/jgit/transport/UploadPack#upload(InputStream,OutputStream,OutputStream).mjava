@@ -1,6 +1,10 @@
 	/**
 	 * Execute the upload task on the socket.
 	 *
+	 * <p>If the client passed extra parameters (e.g., "version=2") through a
+	 * side channel, the caller must call setExtraParameters first to supply
+	 * them.
+	 *
 	 * @param input
 	 *            raw input to read client commands from. Caller must ensure the
 	 *            input is buffered, otherwise read performance may suffer.
@@ -41,7 +45,11 @@
 
 			pckIn = new PacketLineIn(rawIn);
 			pckOut = new PacketLineOut(rawOut);
-			service();
+			if (useProtocolV2()) {
+				serviceV2();
+			} else {
+				service();
+			}
 		} finally {
 			msgOut = NullOutputStream.INSTANCE;
 			walk.close();
