@@ -1,0 +1,26 @@
+	@Test
+	public void testV2LsRefsMultipleCommands() throws Exception {
+		RevCommit tip = remote.commit().message("message").create();
+		remote.update("master", tip);
+		server.updateRef("HEAD").link("refs/heads/master");
+		RevTag tag = remote.tag("tag", tip);
+		remote.update("refs/tags/tag", tag);
+
+		ByteArrayInputStream recvStream = uploadPackV2(
+			"command=ls-refs\n", PacketLineIn.DELIM, "symrefs", "peel", PacketLineIn.END,
+			"command=ls-refs\n", PacketLineIn.DELIM, PacketLineIn.END);
+		PacketLineIn pckIn = new PacketLineIn(recvStream);
+
+		assertThat(pckIn.readString(), is(tip.toObjectId().getName() + " HEAD symref-target:refs/heads/master"));
+		assertThat(pckIn.readString(), is(tip.toObjectId().getName() + " refs/heads/master"));
+		assertThat(
+			pckIn.readString(),
+			is(tag.toObjectId().getName() + " refs/tags/tag peeled:"
+				+ tip.toObjectId().getName()));
+		assertTrue(pckIn.readString() == PacketLineIn.END);
+		assertThat(pckIn.readString(), is(tip.toObjectId().getName() + " HEAD"));
+		assertThat(pckIn.readString(), is(tip.toObjectId().getName() + " refs/heads/master"));
+		assertThat(pckIn.readString(), is(tag.toObjectId().getName() + " refs/tags/tag"));
+		assertTrue(pckIn.readString() == PacketLineIn.END);
+	}
+

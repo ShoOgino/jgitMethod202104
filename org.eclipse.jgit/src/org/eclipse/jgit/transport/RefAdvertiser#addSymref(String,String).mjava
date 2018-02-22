@@ -14,6 +14,10 @@
 	 * @since 3.6
 	 */
 	public void addSymref(String from, String to) {
-		advertiseCapability(OPTION_SYMREF, from + ':' + to);
+		if (useProtocolV2) {
+			symrefs.put(from, to);
+		} else {
+			advertiseCapability(OPTION_SYMREF, from + ':' + to);
+		}
 	}
 

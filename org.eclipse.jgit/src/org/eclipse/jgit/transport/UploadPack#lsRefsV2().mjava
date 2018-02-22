@@ -1,0 +1,29 @@
+	private void lsRefsV2() throws IOException {
+		PacketLineOutRefAdvertiser adv = new PacketLineOutRefAdvertiser(pckOut);
+		Map<String, Ref> refs = getAdvertisedOrDefaultRefs();
+		String line;
+
+		adv.setUseProtocolV2(true);
+
+		line = pckIn.readString();
+
+		// Currently, we do not support any capabilities, so the next
+		// line is DELIM if there are arguments or END if not.
+		if (line == PacketLineIn.DELIM) {
+			while ((line = pckIn.readString()) != PacketLineIn.END) {
+				if (line.equals("peel")) {
+					adv.setDerefTags(true);
+				} else if (line.equals("symrefs")) {
+					findSymrefs(adv, refs);
+				} else {
+					throw new PackProtocolException("unexpected " + line);
+				}
+			}
+		} else if (line != PacketLineIn.END) {
+			throw new PackProtocolException("unexpected " + line);
+		}
+
+		adv.send(refs);
+		adv.end();
+	}
+
