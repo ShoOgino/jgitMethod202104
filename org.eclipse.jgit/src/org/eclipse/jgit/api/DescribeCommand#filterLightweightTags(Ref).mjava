@@ -1,0 +1,18 @@
+	/**
+	 * Whether we use lightweight tags or not for describe Candidates
+	 *
+	 * @param ref
+	 *            reference under inspection
+	 * @return true if it should be used for describe or not regarding
+	 *         {@link org.eclipse.jgit.api.DescribeCommand#useTags}
+	 */
+	@SuppressWarnings("null")
+	private boolean filterLightweightTags(Ref ref) {
+		ObjectId id = ref.getObjectId();
+		try {
+			return this.useTags || (id != null && (w.parseTag(id) != null));
+		} catch (IOException e) {
+			return false;
+		}
+	}
+

@@ -1,0 +1,57 @@
+	/**
+	 * When t1 annotated dominates t2 lightweight tag
+	 *
+	 * <pre>
+	 * t1 -+-> t2  -
+	 *     |       |
+	 *     +-> c3 -+-> c4
+	 * </pre>
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void t1AnnotatedDominatesT2lightweight() throws Exception {
+		ObjectId c1 = modify("aaa");
+		tag("t1", useAnnotatedTags);
+
+		ObjectId c2 = modify("bbb");
+		tag("t2", false);
+
+		assertNameStartsWith(c2, "3747db3");
+		if (useAnnotatedTags && !describeUseAllTags) {
+			assertEquals(
+					"only annotated tag t1 expected to be used for describe",
+					"t1-1-g3747db3", describe(c2)); // 1 commits: t2 overridden
+													// by t1
+		} else if (!useAnnotatedTags && !describeUseAllTags) {
+			assertEquals("no commits to describe expected", null, describe(c2));
+		} else {
+			assertEquals("lightweight tag t2 expected in describe", "t2",
+					describe(c2));
+		}
+
+		branch("b", c1);
+
+		ObjectId c3 = modify("ccc");
+
+		assertNameStartsWith(c3, "0244e7f");
+		if (useAnnotatedTags || describeUseAllTags) {
+			assertEquals("t1-1-g0244e7f", describe(c3));
+		}
+
+		ObjectId c4 = merge(c2);
+
+		assertNameStartsWith(c4, "119892b");
+		if (describeUseAllTags) {
+			assertEquals(
+					"2 commits for describe commit increment expected since lightweight tag: c4 and c3",
+					"t2-2-g119892b", describe(c4)); // 2 commits: c4 and c3
+		} else if (!useAnnotatedTags && !describeUseAllTags) {
+			assertEquals("no matching commits expected", null, describe(c4));
+		} else {
+			assertEquals(
+					"3 commits for describe commit increment expected since annotated tag: c4 and c3 and c2",
+					"t1-3-g119892b", describe(c4)); //
+		}
+	}
+
