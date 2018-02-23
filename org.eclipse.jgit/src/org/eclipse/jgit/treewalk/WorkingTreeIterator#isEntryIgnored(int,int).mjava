@@ -1,0 +1,53 @@
+	/**
+	 * Determine if the entry path is ignored by an ignore rule.
+	 *
+	 * @param pLen
+	 *            the length of the path in the path buffer.
+	 * @param fileMode
+	 *            the original iterator file mode
+	 * @return true if the entry is ignored by an ignore rule.
+	 * @throws IOException
+	 *             a relevant ignore rule file exists but cannot be read.
+	 */
+	private boolean isEntryIgnored(final int pLen, int fileMode)
+			throws IOException {
+		// The ignore code wants path to start with a '/' if possible.
+		// If we have the '/' in our path buffer because we are inside
+		// a sub-directory include it in the range we convert to string.
+		//
+		final int pOff = 0 < pathOffset ? pathOffset - 1 : pathOffset;
+		String pathRel = TreeWalk.pathOf(this.path, pOff, pLen);
+		String parentRel = getParentPath(pathRel);
+
+		// CGit is processing .gitignore files by starting at the root of the
+		// repository and then recursing into subdirectories. With this
+		// approach, top-level ignored directories will be processed first which
+		// allows to skip entire subtrees and further .gitignore-file processing
+		// within these subtrees.
+		//
+		// We will follow the same approach by marking directories as "ignored"
+		// here. This allows to have a simplified FastIgnore.checkIgnore()
+		// implementation (both in terms of code and computational complexity):
+		//
+		// Without the "ignored" flag, we would have to apply the ignore-check
+		// to a path and all of its parents always(!), to determine whether a
+		// path is ignored directly or by one of its parent directories; with
+		// the "ignored" flag, we know at this point that the parent directory
+		// is definitely not ignored, thus the path can only become ignored if
+		// there is a rule matching the path itself.
+		if (isDirectoryIgnored(parentRel)) {
+			return true;
+		}
+
+		IgnoreNode rules = getIgnoreNode();
+		final Boolean ignored = rules != null
+				? rules.checkIgnored(pathRel, FileMode.TREE.equals(fileMode))
+				: null;
+		if (ignored != null) {
+			return ignored.booleanValue();
+		}
+		return parent instanceof WorkingTreeIterator
+				&& ((WorkingTreeIterator) parent).isEntryIgnored(pLen,
+						fileMode);
+	}
+

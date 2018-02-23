@@ -10,6 +10,11 @@
 	 * @return status of the path.
 	 */
 	public MatchResult isIgnored(String entryPath, boolean isDirectory) {
-		return isIgnored(entryPath, isDirectory, false);
+		final Boolean result = checkIgnored(entryPath, isDirectory);
+		if (result == null) {
+			return MatchResult.CHECK_PARENT;
+		}
+
+		return result ? MatchResult.IGNORED : MatchResult.NOT_IGNORED;
 	}
 

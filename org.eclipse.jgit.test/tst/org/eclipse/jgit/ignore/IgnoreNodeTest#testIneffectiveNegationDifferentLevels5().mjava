@@ -1,0 +1,16 @@
+	@Test
+	public void testIneffectiveNegationDifferentLevels5() throws IOException {
+		writeIgnoreFile("a/.gitignore", "b/e/");
+		writeIgnoreFile("a/b/.gitignore", "!e/*");
+		writeTrashFile("a/b/e/nothere.o", "");
+
+		beginWalk();
+		assertEntry(D, tracked, "a");
+		assertEntry(F, tracked, "a/.gitignore");
+		assertEntry(D, tracked, "a/b");
+		assertEntry(F, tracked, "a/b/.gitignore");
+		assertEntry(D, ignored, "a/b/e");
+		assertEntry(F, ignored, "a/b/e/nothere.o");
+		endWalk();
+	}
+

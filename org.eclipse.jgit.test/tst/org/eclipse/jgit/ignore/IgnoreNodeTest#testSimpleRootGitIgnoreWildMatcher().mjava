@@ -1,0 +1,15 @@
+	@Test
+	public void testSimpleRootGitIgnoreWildMatcher() throws IOException {
+		writeIgnoreFile(".gitignore", "**");
+
+		writeTrashFile("a/x", "");
+		writeTrashFile("y", "");
+
+		beginWalk();
+		assertEntry(F, ignored, ".gitignore");
+		assertEntry(D, ignored, "a");
+		assertEntry(F, ignored, "a/x");
+		assertEntry(F, ignored, "y");
+		endWalk();
+	}
+

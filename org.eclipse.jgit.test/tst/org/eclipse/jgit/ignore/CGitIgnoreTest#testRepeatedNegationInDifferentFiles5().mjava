@@ -1,0 +1,10 @@
+	@Test
+	public void testRepeatedNegationInDifferentFiles5() throws Exception {
+		// see IgnoreNodeTest.testRepeatedNegationInDifferentFiles5
+		createFiles("a/b/e/nothere.o");
+		writeTrashFile(".gitignore", "e");
+		writeTrashFile("a/.gitignore", "e");
+		writeTrashFile("a/b/.gitignore", "!e");
+		assertSameAsCGit();
+	}
+

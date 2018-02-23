@@ -1,0 +1,44 @@
+	private boolean isDirectoryIgnored(String pathRel, String pathAbs)
+			throws IOException {
+		assert pathRel.length() == 0 || (pathRel.charAt(0) != '/'
+				&& pathRel.charAt(pathRel.length() - 1) != '/');
+		assert pathAbs.length() == 0 || (pathAbs.charAt(0) != '/'
+				&& pathAbs.charAt(pathAbs.length() - 1) != '/');
+		assert pathAbs.endsWith(pathRel);
+
+		Boolean ignored = state.directoryToIgnored.get(pathAbs);
+		if (ignored != null) {
+			return ignored;
+		}
+
+		final String parentRel = getParentPath(pathRel);
+		if (parentRel != null && isDirectoryIgnored(parentRel)) {
+			state.directoryToIgnored.put(pathAbs, Boolean.TRUE);
+			return true;
+		}
+
+		final IgnoreNode ignoreNode = getIgnoreNode();
+		for (String path = pathRel; ignoreNode != null
+				&& !"".equals(path); path = getParentPath(path)) {
+			ignored = ignoreNode.checkIgnored(path, true);
+			if (ignored != null) {
+				state.directoryToIgnored.put(pathAbs, ignored);
+				return ignored;
+			}
+		}
+
+		if (!(this.parent instanceof WorkingTreeIterator)) {
+			state.directoryToIgnored.put(pathAbs, Boolean.FALSE);
+			return false;
+		}
+
+		final WorkingTreeIterator wtParent = (WorkingTreeIterator) this.parent;
+		final String parentRelPath = concatPath(
+				TreeWalk.pathOf(this.path, wtParent.pathOffset, pathOffset - 1),
+				pathRel);
+		assert concatPath(TreeWalk.pathOf(wtParent.path, 0,
+				Math.max(0, wtParent.pathOffset - 1)), parentRelPath)
+						.equals(pathAbs);
+		return wtParent.isDirectoryIgnored(parentRelPath, pathAbs);
+	}
+

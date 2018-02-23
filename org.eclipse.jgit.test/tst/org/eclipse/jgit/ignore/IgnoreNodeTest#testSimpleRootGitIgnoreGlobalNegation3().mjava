@@ -1,0 +1,17 @@
+	@Test
+	public void testSimpleRootGitIgnoreGlobalNegation3() throws IOException {
+		writeIgnoreFile(".gitignore", "*", "!x*", "!x*/**");
+		writeTrashFile("x1", "");
+		writeTrashFile("a/x2", "");
+		writeTrashFile("x3/y", "");
+
+		beginWalk();
+		assertEntry(F, ignored, ".gitignore");
+		assertEntry(D, ignored, "a");
+		assertEntry(F, ignored, "a/x2");
+		assertEntry(F, tracked, "x1");
+		assertEntry(D, tracked, "x3");
+		assertEntry(F, tracked, "x3/y");
+		endWalk();
+	}
+
