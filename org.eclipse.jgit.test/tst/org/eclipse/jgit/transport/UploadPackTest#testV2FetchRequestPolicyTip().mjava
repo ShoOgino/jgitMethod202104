@@ -1,0 +1,28 @@
+	@Test
+	public void testV2FetchRequestPolicyTip() throws Exception {
+		RevCommit parentOfTip = remote.commit().message("x").create();
+		RevCommit tip = remote.commit().message("y").parent(parentOfTip).create();
+		remote.update("secret", tip);
+
+		// This works
+		uploadPackV2(
+			RequestPolicy.TIP,
+			new RejectAllRefFilter(),
+			"command=fetch\n",
+			PacketLineIn.DELIM,
+			"want " + tip.name() + "\n",
+			PacketLineIn.END);
+
+		// This doesn't
+		thrown.expect(TransportException.class);
+		thrown.expectMessage(Matchers.containsString(
+					"want " + parentOfTip.name() + " not valid"));
+		uploadPackV2(
+			RequestPolicy.TIP,
+			new RejectAllRefFilter(),
+			"command=fetch\n",
+			PacketLineIn.DELIM,
+			"want " + parentOfTip.name() + "\n",
+			PacketLineIn.END);
+	}
+

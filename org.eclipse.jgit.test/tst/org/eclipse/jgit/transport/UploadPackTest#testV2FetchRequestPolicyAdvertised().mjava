@@ -1,0 +1,28 @@
+	@Test
+	public void testV2FetchRequestPolicyAdvertised() throws Exception {
+		RevCommit advertized = remote.commit().message("x").create();
+		RevCommit unadvertized = remote.commit().message("y").create();
+		remote.update("branch1", advertized);
+
+		// This works
+		uploadPackV2(
+			RequestPolicy.ADVERTISED,
+			null,
+			"command=fetch\n",
+			PacketLineIn.DELIM,
+			"want " + advertized.name() + "\n",
+			PacketLineIn.END);
+
+		// This doesn't
+		thrown.expect(TransportException.class);
+		thrown.expectMessage(Matchers.containsString(
+					"want " + unadvertized.name() + " not valid"));
+		uploadPackV2(
+			RequestPolicy.ADVERTISED,
+			null,
+			"command=fetch\n",
+			PacketLineIn.DELIM,
+			"want " + unadvertized.name() + "\n",
+			PacketLineIn.END);
+	}
+

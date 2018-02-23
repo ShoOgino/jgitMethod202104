@@ -1,0 +1,14 @@
+	@Test
+	public void testV2FetchRequestPolicyAny() throws Exception {
+		RevCommit unreachable = remote.commit().message("y").create();
+
+		// Exercise to make sure that even unreachable commits can be fetched
+		uploadPackV2(
+			RequestPolicy.ANY,
+			null,
+			"command=fetch\n",
+			PacketLineIn.DELIM,
+			"want " + unreachable.name() + "\n",
+			PacketLineIn.END);
+	}
+

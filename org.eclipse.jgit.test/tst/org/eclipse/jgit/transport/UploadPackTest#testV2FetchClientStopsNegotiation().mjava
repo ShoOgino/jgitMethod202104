@@ -1,0 +1,27 @@
+	@Test
+	public void testV2FetchClientStopsNegotiation() throws Exception {
+		RevCommit fooParent = remote.commit().message("x").create();
+		RevCommit fooChild = remote.commit().message("x").parent(fooParent).create();
+		RevCommit barParent = remote.commit().message("y").create();
+		RevCommit barChild = remote.commit().message("y").parent(barParent).create();
+		remote.update("branch1", fooChild);
+		remote.update("branch2", barChild);
+
+		ByteArrayInputStream recvStream = uploadPackV2(
+			"command=fetch\n",
+			PacketLineIn.DELIM,
+			"want " + fooChild.toObjectId().getName() + "\n",
+			"want " + barChild.toObjectId().getName() + "\n",
+			"have " + fooParent.toObjectId().getName() + "\n",
+			"done\n",
+			PacketLineIn.END);
+		PacketLineIn pckIn = new PacketLineIn(recvStream);
+
+		assertThat(pckIn.readString(), is("packfile"));
+		parsePack(recvStream);
+		assertFalse(client.hasObject(fooParent.toObjectId()));
+		assertTrue(client.hasObject(fooChild.toObjectId()));
+		assertTrue(client.hasObject(barParent.toObjectId()));
+		assertTrue(client.hasObject(barChild.toObjectId()));
+	}
+

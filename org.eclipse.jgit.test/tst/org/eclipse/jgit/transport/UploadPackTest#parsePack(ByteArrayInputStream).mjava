@@ -1,0 +1,11 @@
+	/*
+	 * Parse multiplexed packfile output from upload-pack using protocol V2
+	 * into the client repository.
+	 */
+	private void parsePack(ByteArrayInputStream recvStream) throws Exception {
+		SideBandInputStream sb = new SideBandInputStream(
+				recvStream, NullProgressMonitor.INSTANCE,
+				new StringWriter(), NullOutputStream.INSTANCE);
+		client.newObjectInserter().newPackParser(sb).parse(NullProgressMonitor.INSTANCE);
+	}
+

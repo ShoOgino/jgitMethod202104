@@ -20,7 +20,7 @@
 			}
 
 			if (line == PacketLineIn.END) {
-				last = processHaveLines(peerHas, last);
+				last = processHaveLines(peerHas, last, pckOut);
 				if (commonBase.isEmpty() || multiAck != MultiAck.OFF)
 					pckOut.writeString("NAK\n"); //$NON-NLS-1$
 				if (noDone && sentReady) {
@@ -35,7 +35,7 @@
 				peerHas.add(ObjectId.fromString(line.substring(5)));
 				accumulator.haves++;
 			} else if (line.equals("done")) { //$NON-NLS-1$
-				last = processHaveLines(peerHas, last);
+				last = processHaveLines(peerHas, last, pckOut);
 
 				if (commonBase.isEmpty())
 					pckOut.writeString("NAK\n"); //$NON-NLS-1$
