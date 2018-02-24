@@ -52,12 +52,17 @@
 
 					@Override
 					protected void execute(final DaemonClient dc,
-							final Repository db) throws IOException,
+							final Repository db,
+							@Nullable Collection<String> extraParameters)
+							throws IOException,
 							ServiceNotEnabledException,
 							ServiceNotAuthorizedException {
 						UploadPack up = uploadPackFactory.create(dc, db);
 						InputStream in = dc.getInputStream();
 						OutputStream out = dc.getOutputStream();
+						if (extraParameters != null) {
+							up.setExtraParameters(extraParameters);
+						}
 						up.upload(in, out, null);
 					}
 				}, new DaemonService("receive-pack", "receivepack") { //$NON-NLS-1$ //$NON-NLS-2$
@@ -67,7 +72,9 @@
 
 					@Override
 					protected void execute(final DaemonClient dc,
-							final Repository db) throws IOException,
+							final Repository db,
+							@Nullable Collection<String> extraParameters)
+							throws IOException,
 							ServiceNotEnabledException,
 							ServiceNotAuthorizedException {
 						ReceivePack rp = receivePackFactory.create(dc, db);
