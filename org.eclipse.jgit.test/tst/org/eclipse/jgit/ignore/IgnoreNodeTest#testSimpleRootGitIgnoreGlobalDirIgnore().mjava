@@ -1,0 +1,17 @@
+	@Test
+	public void testSimpleRootGitIgnoreGlobalDirIgnore() throws IOException {
+		writeIgnoreFile(".gitignore", "x/");
+
+		writeTrashFile("a/x/file", "");
+		writeTrashFile("x/file", "");
+
+		beginWalk();
+		assertEntry(F, tracked, ".gitignore");
+		assertEntry(D, tracked, "a");
+		assertEntry(D, ignored, "a/x");
+		assertEntry(F, ignored, "a/x/file");
+		assertEntry(D, ignored, "x");
+		assertEntry(F, ignored, "x/file");
+		endWalk();
+	}
+

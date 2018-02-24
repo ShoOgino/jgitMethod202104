@@ -1,0 +1,18 @@
+	@Test
+	public void testRepeatedNegationInDifferentFiles5() throws IOException {
+		writeIgnoreFile(".gitignore", "e");
+		writeIgnoreFile("a/.gitignore", "e");
+		writeIgnoreFile("a/b/.gitignore", "!e");
+		writeTrashFile("a/b/e/nothere.o", "");
+
+		beginWalk();
+		assertEntry(F, tracked, ".gitignore");
+		assertEntry(D, tracked, "a");
+		assertEntry(F, tracked, "a/.gitignore");
+		assertEntry(D, tracked, "a/b");
+		assertEntry(F, tracked, "a/b/.gitignore");
+		assertEntry(D, tracked, "a/b/e");
+		assertEntry(F, tracked, "a/b/e/nothere.o");
+		endWalk();
+	}
+

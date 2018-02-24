@@ -1,0 +1,15 @@
+	/*
+	 * See https://bugs.eclipse.org/bugs/show_bug.cgi?id=407475
+	 */
+	@Test
+	public void testNegationAllExceptJavaInSrcAndExceptChildDirInSrc()
+			throws Exception {
+		// see
+		// IgnoreNodeTest.testNegationAllExceptJavaInSrcAndExceptChildDirInSrc
+		createFiles("nothere.o", "src/keep.java", "src/nothere.o",
+				"src/a/keep.java", "src/a/keep.o");
+		writeTrashFile(".gitignore", "/*\n!/src/");
+		writeTrashFile("src/.gitignore", "*\n!*.java\n!*/");
+		assertSameAsCGit();
+	}
+

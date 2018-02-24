@@ -1,0 +1,9 @@
+	@Test
+	public void testNegationForSubDirectoryWithinIgnoredDirectoryHasNoEffect1()
+			throws Exception {
+		createFiles("e", "a/f", "a/b/g", "a/b/h/i");
+		writeTrashFile(".gitignore", "a/b");
+		writeTrashFile("a/.gitignore", "!b/*");
+		assertSameAsCGit();
+	}
+

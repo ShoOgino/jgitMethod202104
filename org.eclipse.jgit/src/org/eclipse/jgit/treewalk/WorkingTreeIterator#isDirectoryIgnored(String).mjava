@@ -1,0 +1,7 @@
+	private boolean isDirectoryIgnored(String pathRel) throws IOException {
+		final int pOff = 0 < pathOffset ? pathOffset - 1 : pathOffset;
+		final String base = TreeWalk.pathOf(this.path, 0, pOff);
+		final String pathAbs = concatPath(base, pathRel);
+		return isDirectoryIgnored(pathRel, pathAbs);
+	}
+

@@ -1,0 +1,9 @@
+	@Test
+	public void testRepeatedNegationInDifferentFilesWithWildmatcher1()
+			throws Exception {
+		createFiles("e", "x/e/f", "a/e/x1", "a/e/x2", "a/e/y", "a/e/sub/y");
+		writeTrashFile(".gitignore", "a/e/**");
+		writeTrashFile("a/.gitignore", "!e/x*");
+		assertSameAsCGit();
+	}
+
