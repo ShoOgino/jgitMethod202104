@@ -8,7 +8,7 @@
 
 		Boolean ignored = state.directoryToIgnored.get(pathAbs);
 		if (ignored != null) {
-			return ignored;
+			return ignored.booleanValue();
 		}
 
 		final String parentRel = getParentPath(pathRel);
@@ -23,7 +23,7 @@
 			ignored = node.checkIgnored(p, true);
 			if (ignored != null) {
 				state.directoryToIgnored.put(pathAbs, ignored);
-				return ignored;
+				return ignored.booleanValue();
 			}
 		}
 
