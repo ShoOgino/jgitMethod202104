@@ -17,12 +17,10 @@
 			authorize(c);
 			c.setDoOutput(true);
 			monitor.beginTask(monitorTask, (int) (len / 1024));
-			final OutputStream os = c.getOutputStream();
-			try {
+			try (OutputStream os = c.getOutputStream()) {
 				buf.writeTo(os, monitor);
 			} finally {
 				monitor.endTask();
-				os.close();
 			}
 
 			switch (HttpSupport.response(c)) {

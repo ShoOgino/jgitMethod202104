@@ -24,9 +24,9 @@
 			// We have to copy to produce the cipher text anyway so use
 			// the large object code path as it supports that behavior.
 			//
-			final OutputStream os = beginPut(bucket, key, null, null);
-			os.write(data);
-			os.close();
+			try (OutputStream os = beginPut(bucket, key, null, null)) {
+				os.write(data);
+			}
 			return;
 		}
 
@@ -40,11 +40,8 @@
 			authorize(c);
 			c.setDoOutput(true);
 			c.setFixedLengthStreamingMode(data.length);
-			final OutputStream os = c.getOutputStream();
-			try {
+			try (OutputStream os = c.getOutputStream()) {
 				os.write(data);
-			} finally {
-				os.close();
 			}
 
 			switch (HttpSupport.response(c)) {
