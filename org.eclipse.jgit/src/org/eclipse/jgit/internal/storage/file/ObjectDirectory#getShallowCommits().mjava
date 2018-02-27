@@ -7,8 +7,7 @@
 				|| shallowFileSnapshot.isModified(shallowFile)) {
 			shallowCommitsIds = new HashSet<>();
 
-			final BufferedReader reader = open(shallowFile);
-			try {
+			try (BufferedReader reader = open(shallowFile)) {
 				String line;
 				while ((line = reader.readLine()) != null) {
 					try {
@@ -18,8 +17,6 @@
 								.format(JGitText.get().badShallowLine, line));
 					}
 				}
-			} finally {
-				reader.close();
 			}
 
 			shallowFileSnapshot = FileSnapshot.save(shallowFile);

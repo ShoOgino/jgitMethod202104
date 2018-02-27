@@ -1,13 +1,10 @@
 	private AlternateHandle[] loadAlternates() throws IOException {
 		final List<AlternateHandle> l = new ArrayList<>(4);
-		final BufferedReader br = open(alternatesFile);
-		try {
+		try (BufferedReader br = open(alternatesFile)) {
 			String line;
 			while ((line = br.readLine()) != null) {
 				l.add(openAlternate(line));
 			}
-		} finally {
-			br.close();
 		}
 		return l.toArray(new AlternateHandle[l.size()]);
 	}
