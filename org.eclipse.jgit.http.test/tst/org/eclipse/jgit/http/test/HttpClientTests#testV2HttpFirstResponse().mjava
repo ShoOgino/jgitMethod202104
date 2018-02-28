@@ -1,0 +1,24 @@
+	@Test
+	public void testV2HttpFirstResponse() throws Exception {
+		remoteRepository.getRepository().getConfig().setInt(
+				"protocol", null, "version", 2);
+
+		JDKHttpConnectionFactory f = new JDKHttpConnectionFactory();
+		String url = smartAuthNoneURI.toString() + "/info/refs?service=git-upload-pack";
+		HttpConnection c = f.create(new URL(url));
+		c.setRequestMethod("GET");
+		c.setRequestProperty("Git-Protocol", "version=2");
+		c.connect();
+		assertThat(c.getResponseCode(), is(200));
+
+		PacketLineIn pckIn = new PacketLineIn(c.getInputStream());
+		assertThat(pckIn.readString(), is("version 2"));
+
+		// What remains are capabilities - ensure that all of them are
+		// non-empty strings, and that we see END at the end.
+		String s;
+		while ((s = pckIn.readString()) != PacketLineIn.END) {
+			assertTrue(!s.isEmpty());
+		}
+	}
+

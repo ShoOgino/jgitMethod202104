@@ -1,11 +1,11 @@
 		@Override
-		protected void advertise(HttpServletRequest req,
-				PacketLineOutRefAdvertiser pck) throws IOException,
+		protected void respond(HttpServletRequest req,
+				PacketLineOut pckOut, String serviceName) throws IOException,
 				ServiceNotEnabledException, ServiceNotAuthorizedException {
 			UploadPack up = (UploadPack) req.getAttribute(ATTRIBUTE_HANDLER);
 			try {
 				up.setBiDirectionalPipe(false);
-				up.sendAdvertisedRefs(pck);
+				up.sendAdvertisedRefs(new PacketLineOutRefAdvertiser(pckOut), serviceName);
 			} finally {
 				// TODO(jonathantanmy): Move responsibility for closing the
 				// RevWalk to UploadPack, either by making it AutoCloseable
