@@ -1,0 +1,7 @@
+	private void parsePack(ByteArrayInputStream recvStream, ProgressMonitor pm)
+			throws Exception {
+		SideBandInputStream sb = new SideBandInputStream(
+				recvStream, pm, new StringWriter(), NullOutputStream.INSTANCE);
+		client.newObjectInserter().newPackParser(sb).parse(NullProgressMonitor.INSTANCE);
+	}
+
