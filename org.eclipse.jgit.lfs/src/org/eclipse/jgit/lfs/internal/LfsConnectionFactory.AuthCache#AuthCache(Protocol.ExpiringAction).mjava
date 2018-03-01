@@ -1,0 +1,26 @@
+		/**
+		 * Creates a cache entry for an authentication response.
+		 * <p>
+		 * The timeout of the cache token is extracted from the given action. If
+		 * no timeout can be determined, the token will be used only once.
+		 *
+		 * @param action
+		 */
+		public AuthCache(Protocol.ExpiringAction action) {
+			this.cachedAction = action;
+			try {
+				if (action.expiresIn != null && !action.expiresIn.isEmpty()) {
+					this.validUntil = System.currentTimeMillis()
+							+ Long.parseLong(action.expiresIn);
+				} else if (action.expiresAt != null
+						&& !action.expiresAt.isEmpty()) {
+					this.validUntil = ISO_FORMAT.parse(action.expiresAt)
+							.getTime() - AUTH_CACHE_EAGER_TIMEOUT;
+				} else {
+					this.validUntil = System.currentTimeMillis();
+				}
+			} catch (Exception e) {
+				this.validUntil = System.currentTimeMillis();
+			}
+		}
+
