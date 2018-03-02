@@ -1,0 +1,14 @@
+	/**
+	 * @param db
+	 *            the repository
+	 * @return whether LFS is requested for the given repo.
+	 */
+	private boolean isEnabled(Repository db) {
+		if (db == null) {
+			return false;
+		}
+		return db.getConfig().getBoolean(ConfigConstants.CONFIG_FILTER_SECTION,
+				Constants.LFS, ConfigConstants.CONFIG_KEY_USEJGITBUILTIN,
+				false);
+	}
+

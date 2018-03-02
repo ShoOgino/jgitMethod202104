@@ -1,0 +1,15 @@
+	/**
+	 * @param db
+	 *            the repository
+	 * @param attribute
+	 *            the attribute to check
+	 * @return whether LFS filter is enabled for the given .gitattribute
+	 *         attribute.
+	 */
+	private boolean isEnabled(Repository db, Attribute attribute) {
+		if (attribute == null) {
+			return false;
+		}
+		return isEnabled(db) && Constants.LFS.equals(attribute.getValue());
+	}
+

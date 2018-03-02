@@ -1,0 +1,28 @@
+	/**
+	 * Run the LFS clean filter on the given stream and return a stream to the
+	 * LFS pointer file buffer. Used when inserting objects.
+	 *
+	 * @param db
+	 *            the {@link Repository}
+	 * @param originalContent
+	 *            the {@link InputStream} to the original content
+	 * @return a {@link TemporaryBuffer} representing the LFS pointer. The
+	 *         caller is responsible to destroy the buffer.
+	 * @throws IOException
+	 *             in case of any error.
+	 */
+	public static TemporaryBuffer cleanLfsBlob(Repository db,
+			InputStream originalContent) throws IOException {
+		LocalFile buffer = new TemporaryBuffer.LocalFile(null);
+		CleanFilter f = new CleanFilter(db, originalContent, buffer);
+		try {
+			while (f.run() != -1) {
+				// loop as long as f.run() tells there is work to do
+			}
+		} catch (IOException e) {
+			buffer.destroy();
+			throw e;
+		}
+		return buffer;
+	}
+

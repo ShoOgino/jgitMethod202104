@@ -1,0 +1,13 @@
+	private RawText getRawText(ObjectId id,
+			Attributes attributes)
+			throws IOException, BinaryBlobException {
+		if (id.equals(ObjectId.zeroId()))
+			return new RawText(new byte[] {});
+
+		ObjectLoader loader = LfsFactory.getInstance().applySmudgeFilter(
+				getRepository(), reader.open(id, OBJ_BLOB),
+				attributes.get(Constants.ATTR_MERGE));
+		int threshold = PackConfig.DEFAULT_BIG_FILE_THRESHOLD;
+		return RawText.load(loader, threshold);
+	}
+

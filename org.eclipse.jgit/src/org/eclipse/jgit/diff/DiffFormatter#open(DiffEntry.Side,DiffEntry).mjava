@@ -25,7 +25,8 @@
 				throw new AmbiguousObjectException(id, ids);
 		}
 
-		ObjectLoader ldr = source.open(side, entry);
+		ObjectLoader ldr = LfsFactory.getInstance().applySmudgeFilter(repository,
+				source.open(side, entry), entry.getDiffAttribute());
 		return RawText.load(ldr, binaryFileThreshold);
 	}
 

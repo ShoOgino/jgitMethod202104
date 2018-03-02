@@ -53,6 +53,11 @@
 			entry.newMode = walk.getFileMode(1);
 			entry.newPath = entry.oldPath = walk.getPathString();
 
+			if (walk.getAttributesNodeProvider() != null) {
+				entry.diffAttribute = walk.getAttributes()
+						.get(Constants.ATTR_DIFF);
+			}
+
 			if (treeFilterMarker != null)
 				entry.treeFilterMarks = treeFilterMarker.getMarks(walk);
 

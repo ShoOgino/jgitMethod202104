@@ -1,0 +1,10 @@
+	@Override
+	public ObjectLoader applySmudgeFilter(Repository db, ObjectLoader loader,
+			Attribute attribute) throws IOException {
+		if (isEnabled(db) && (attribute == null || isEnabled(db, attribute))) {
+			return LfsBlobFilter.smudgeLfsBlob(db, loader);
+		} else {
+			return loader;
+		}
+	}
+

@@ -1,6 +1,8 @@
 	/**
 	 * Download content which is hosted on a LFS server
 	 *
+	 * @param lfs
+	 *            local {@link Lfs} storage.
 	 * @param db
 	 *            the repository to work with
 	 * @param res
@@ -8,9 +10,8 @@
 	 * @return the paths of all mediafiles which have been downloaded
 	 * @throws IOException
 	 */
-	private Collection<Path> downloadLfsResource(Repository db,
-			LfsPointer... res)
-			throws IOException {
+	public static Collection<Path> downloadLfsResource(Lfs lfs, Repository db,
+			LfsPointer... res) throws IOException {
 		Collection<Path> downloadedPaths = new ArrayList<>();
 		Map<String, LfsPointer> oidStr2ptr = new HashMap<>();
 		for (LfsPointer p : res) {

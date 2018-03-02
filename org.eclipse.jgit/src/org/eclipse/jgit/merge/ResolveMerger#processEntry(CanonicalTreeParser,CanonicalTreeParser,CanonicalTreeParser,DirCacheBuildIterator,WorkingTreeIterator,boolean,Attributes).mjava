@@ -234,11 +234,12 @@
 				return false;
 			}
 
-			MergeResult<RawText> result = contentMerge(base, ours, theirs);
+			MergeResult<RawText> result = contentMerge(base, ours, theirs,
+					attributes);
 			if (ignoreConflicts) {
 				result.setContainsConflicts(false);
 			}
-			updateIndex(base, ours, theirs, result);
+			updateIndex(base, ours, theirs, result, attributes);
 			if (result.containsConflicts() && !ignoreConflicts)
 				unmergedPaths.add(tw.getPathString());
 			modifiedFiles.add(tw.getPathString());
@@ -246,7 +247,8 @@
 			// OURS or THEIRS has been deleted
 			if (((modeO != 0 && !tw.idEqual(T_BASE, T_OURS)) || (modeT != 0 && !tw
 					.idEqual(T_BASE, T_THEIRS)))) {
-				MergeResult<RawText> result = contentMerge(base, ours, theirs);
+				MergeResult<RawText> result = contentMerge(base, ours, theirs,
+						attributes);
 
 				add(tw.getRawPath(), base, DirCacheEntry.STAGE_1, 0, 0);
 				add(tw.getRawPath(), ours, DirCacheEntry.STAGE_2, 0, 0);

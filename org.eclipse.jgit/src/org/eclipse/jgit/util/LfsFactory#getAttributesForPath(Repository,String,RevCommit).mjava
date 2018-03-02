@@ -1,0 +1,30 @@
+	/**
+	 * Get attributes for given path and commit
+	 *
+	 * @param db
+	 *            the repository
+	 * @param path
+	 *            the path to find attributes for
+	 * @param commit
+	 *            the commit to inspect.
+	 * @return the {@link Attributes} for the given path.
+	 * @throws IOException
+	 *             in case of an error
+	 */
+	public static Attributes getAttributesForPath(Repository db, String path,
+			RevCommit commit) throws IOException {
+		if (commit == null) {
+			return getAttributesForPath(db, path);
+		}
+
+		try (TreeWalk walk = TreeWalk.forPath(db, path, commit.getTree())) {
+			Attributes attr = walk == null ? null : walk.getAttributes();
+			if (attr == null) {
+				throw new IOException(MessageFormat
+						.format(JGitText.get().noPathAttributesFound, path));
+			}
+
+			return attr;
+		}
+	}
+

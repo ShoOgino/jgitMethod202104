@@ -1,5 +1,9 @@
 	void loadText(ObjectReader reader) throws IOException {
-		ObjectLoader ldr = reader.open(sourceBlob, Constants.OBJ_BLOB);
+		ObjectLoader ldr = LfsFactory.getInstance().applySmudgeFilter(sourceRepository,
+				reader.open(sourceBlob, Constants.OBJ_BLOB),
+				LfsFactory.getAttributesForPath(sourceRepository,
+						sourcePath.getPath(), sourceCommit)
+						.get(Constants.ATTR_DIFF));
 		sourceText = new RawText(ldr.getCachedBytes(Integer.MAX_VALUE));
 	}
 

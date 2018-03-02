@@ -1,0 +1,38 @@
+	/**
+	 * In case the given {@link ObjectLoader} points to a LFS pointer file
+	 * replace the loader with one pointing to the LFS media file contents.
+	 * Missing LFS files are downloaded on the fly - same logic as the smudge
+	 * filter.
+	 *
+	 * @param db
+	 *            the repo
+	 * @param loader
+	 *            the loader for the blob
+	 * @return either the original loader, or a loader for the LFS media file if
+	 *         managed by LFS. Files are downloaded on demand if required.
+	 * @throws IOException
+	 *             in case of an error
+	 */
+	public static ObjectLoader smudgeLfsBlob(Repository db, ObjectLoader loader)
+			throws IOException {
+		if (loader.getSize() > LfsPointer.SIZE_THRESHOLD) {
+			return loader;
+		}
+
+		try (InputStream is = loader.openStream()) {
+			LfsPointer ptr = LfsPointer.parseLfsPointer(is);
+			if (ptr != null) {
+				Lfs lfs = new Lfs(db);
+				AnyLongObjectId oid = ptr.getOid();
+				Path mediaFile = lfs.getMediaFile(oid);
+				if (!Files.exists(mediaFile)) {
+					SmudgeFilter.downloadLfsResource(lfs, db, ptr);
+				}
+
+				return new LfsBlobLoader(mediaFile);
+			}
+		}
+
+		return loader;
+	}
+

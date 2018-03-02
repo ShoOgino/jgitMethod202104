@@ -1,0 +1,14 @@
+		/**
+		 * Create a new wrapper around a temporary buffer.
+		 *
+		 * @param buffer
+		 *            the buffer to initialize stream and length from. The
+		 *            buffer will be destroyed on {@link #close()}
+		 * @throws IOException
+		 *             in case of an error opening the stream to the buffer.
+		 */
+		public LfsInputStream(TemporaryBuffer buffer) throws IOException {
+			this.stream = buffer.openInputStream();
+			this.length = buffer.length();
+		}
+

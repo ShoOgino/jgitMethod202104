@@ -55,12 +55,12 @@
 
 			Candidate p;
 			if (renames != null && renames[pIdx] != null) {
-				p = n.create(parent,
+				p = n.create(getRepository(), parent,
 						PathFilter.create(renames[pIdx].getOldPath()));
 				p.renameScore = renames[pIdx].getScore();
 				p.sourceBlob = renames[pIdx].getOldId().toObjectId();
 			} else if (ids != null && ids[pIdx] != null) {
-				p = n.create(parent, n.sourcePath);
+				p = n.create(getRepository(), parent, n.sourcePath);
 				p.sourceBlob = ids[pIdx];
 			} else {
 				continue;

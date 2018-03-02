@@ -1,6 +1,6 @@
 	private boolean splitBlameWithParent(Candidate n, RevCommit parent)
 			throws IOException {
-		Candidate next = n.create(parent, n.sourcePath);
+		Candidate next = n.create(getRepository(), parent, n.sourcePath);
 		next.sourceBlob = idBuf.toObjectId();
 		next.loadText(reader);
 		return split(next, n);

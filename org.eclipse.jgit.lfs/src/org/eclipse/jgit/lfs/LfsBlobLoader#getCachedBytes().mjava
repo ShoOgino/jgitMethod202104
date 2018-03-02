@@ -1,0 +1,16 @@
+	@Override
+	public byte[] getCachedBytes() throws LargeObjectException {
+		if (getSize() > PackConfig.DEFAULT_BIG_FILE_THRESHOLD) {
+			throw new LargeObjectException();
+		}
+
+		if (cached == null) {
+			try {
+				cached = IO.readFully(mediaFile.toFile());
+			} catch (IOException ioe) {
+				throw new LargeObjectException(ioe);
+			}
+		}
+		return cached;
+	}
+

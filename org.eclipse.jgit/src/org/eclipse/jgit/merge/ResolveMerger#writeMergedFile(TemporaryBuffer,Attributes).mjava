@@ -3,11 +3,14 @@
 	 *
 	 * @param rawMerged
 	 *            the raw merged content
+	 * @param attributes
+	 *            the files .gitattributes entries
 	 * @return the working tree file to which the merged content was written.
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
-	private File writeMergedFile(TemporaryBuffer rawMerged)
+	private File writeMergedFile(TemporaryBuffer rawMerged,
+			Attributes attributes)
 			throws FileNotFoundException, IOException {
 		File workTree = nonNullRepo().getWorkTree();
 		FS fs = nonNullRepo().getFS();
@@ -18,7 +21,7 @@
 		}
 		EolStreamType streamType = EolStreamTypeUtil.detectStreamType(
 				OperationType.CHECKOUT_OP, workingTreeOptions,
-				tw.getAttributes());
+				attributes);
 		try (OutputStream os = EolStreamTypeUtil.wrapOutputStream(
 				new BufferedOutputStream(new FileOutputStream(of)),
 				streamType)) {

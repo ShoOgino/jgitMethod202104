@@ -1,0 +1,34 @@
+	/**
+	 * @param db
+	 *            the repository
+	 * @param path
+	 *            the path to find attributes for
+	 * @return the {@link Attributes} for the given path.
+	 * @throws IOException
+	 *             in case of an error
+	 */
+	public static Attributes getAttributesForPath(Repository db, String path)
+			throws IOException {
+		try (TreeWalk walk = new TreeWalk(db)) {
+			walk.addTree(new FileTreeIterator(db));
+			PathFilter f = PathFilter.create(path);
+			walk.setFilter(f);
+			walk.setRecursive(false);
+			Attributes attr = null;
+			while (walk.next()) {
+				if (f.isDone(walk)) {
+					attr = walk.getAttributes();
+					break;
+				} else if (walk.isSubtree()) {
+					walk.enterSubtree();
+				}
+			}
+			if (attr == null) {
+				throw new IOException(MessageFormat
+						.format(JGitText.get().noPathAttributesFound, path));
+			}
+
+			return attr;
+		}
+	}
+

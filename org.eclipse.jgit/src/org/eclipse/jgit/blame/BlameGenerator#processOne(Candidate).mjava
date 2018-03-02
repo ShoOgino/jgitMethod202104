@@ -26,7 +26,8 @@
 			return false;
 		}
 
-		Candidate next = n.create(parent, PathFilter.create(r.getOldPath()));
+		Candidate next = n.create(getRepository(), parent,
+				PathFilter.create(r.getOldPath()));
 		next.sourceBlob = r.getOldId().toObjectId();
 		next.renameScore = r.getScore();
 		next.loadText(reader);

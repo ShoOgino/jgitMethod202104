@@ -1,0 +1,10 @@
+	@Override
+	public LfsInputStream applyCleanFilter(Repository db, InputStream input,
+			long length, Attribute attribute) throws IOException {
+		if (isEnabled(db, attribute)) {
+			return new LfsInputStream(LfsBlobFilter.cleanLfsBlob(db, input));
+		} else {
+			return new LfsInputStream(input, length);
+		}
+	}
+

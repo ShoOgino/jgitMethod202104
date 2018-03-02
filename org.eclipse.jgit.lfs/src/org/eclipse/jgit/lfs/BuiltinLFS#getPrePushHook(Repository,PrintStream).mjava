@@ -1,0 +1,9 @@
+	@Override
+	public @Nullable PrePushHook getPrePushHook(Repository repo,
+			PrintStream outputStream) {
+		if (isEnabled(repo)) {
+			return new LfsPrePushHook(repo, outputStream);
+		}
+		return null;
+	}
+

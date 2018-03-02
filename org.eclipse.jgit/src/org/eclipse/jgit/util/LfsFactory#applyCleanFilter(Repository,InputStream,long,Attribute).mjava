@@ -1,0 +1,26 @@
+	/**
+	 * Apply clean filtering to the given stream, writing the file content to
+	 * the LFS storage if required and returning a stream to the LFS pointer
+	 * instead.
+	 *
+	 * @param db
+	 *            the repository
+	 * @param input
+	 *            the original input
+	 * @param length
+	 *            the expected input stream length
+	 * @param attribute
+	 *            the attribute used to check for LFS enablement (i.e. "merge",
+	 *            "diff", "filter" from .gitattributes).
+	 * @return a stream to the content that should be written to the object
+	 *         store along with the expected length of the stream. the original
+	 *         stream is not applicable.
+	 * @throws IOException
+	 *             in case of an error
+	 */
+	public LfsInputStream applyCleanFilter(Repository db,
+			InputStream input, long length, Attribute attribute)
+			throws IOException {
+		return new LfsInputStream(input, length);
+	}
+
