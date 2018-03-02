@@ -13,7 +13,8 @@
 				map = NoteMap.read(walk.getObjectReader(), notesCommit);
 			}
 			map.set(id, null, inserter);
-			commitNoteMap(walk, map, notesCommit, inserter,
+			AddNoteCommand.commitNoteMap(repo, notesRef, walk, map, notesCommit,
+					inserter,
 					"Notes removed by 'git notes remove'"); //$NON-NLS-1$
 			return map.getNote(id);
 		} catch (IOException e) {

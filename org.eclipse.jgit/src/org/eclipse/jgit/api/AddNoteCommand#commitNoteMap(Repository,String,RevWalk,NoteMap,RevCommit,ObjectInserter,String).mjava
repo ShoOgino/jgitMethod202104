@@ -1,4 +1,5 @@
-	private void commitNoteMap(RevWalk walk, NoteMap map,
+	static void commitNoteMap(Repository r, String ref, RevWalk walk,
+			NoteMap map,
 			RevCommit notesCommit,
 			ObjectInserter inserter,
 			String msg)
@@ -6,14 +7,14 @@
 		// commit the note
 		CommitBuilder builder = new CommitBuilder();
 		builder.setTreeId(map.writeTree(inserter));
-		builder.setAuthor(new PersonIdent(repo));
+		builder.setAuthor(new PersonIdent(r));
 		builder.setCommitter(builder.getAuthor());
 		builder.setMessage(msg);
 		if (notesCommit != null)
 			builder.setParentIds(notesCommit);
 		ObjectId commit = inserter.insert(builder);
 		inserter.flush();
-		RefUpdate refUpdate = repo.updateRef(notesRef);
+		RefUpdate refUpdate = r.updateRef(ref);
 		if (notesCommit != null)
 			refUpdate.setExpectedOldObjectId(notesCommit);
 		else
