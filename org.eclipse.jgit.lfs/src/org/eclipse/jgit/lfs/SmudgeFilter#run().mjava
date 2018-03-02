@@ -1,32 +1,38 @@
 	/** {@inheritDoc} */
 	@Override
 	public int run() throws IOException {
-		int totalRead = 0;
-		int length = 0;
-		if (in != null) {
-			byte[] buf = new byte[8192];
-			while ((length = in.read(buf)) != -1) {
-				out.write(buf, 0, length);
-				totalRead += length;
+		try {
+			int totalRead = 0;
+			int length = 0;
+			if (in != null) {
+				byte[] buf = new byte[8192];
+				while ((length = in.read(buf)) != -1) {
+					out.write(buf, 0, length);
+					totalRead += length;
 
-				// when threshold reached, loop back to the caller. otherwise we
-				// could only support files up to 2GB (int return type)
-				// properly. we will be called again as long as we don't return
-				// -1 here.
-				if (totalRead >= MAX_COPY_BYTES) {
-					// leave streams open - we need them in the next call.
-					return totalRead;
+					// when threshold reached, loop back to the caller.
+					// otherwise we could only support files up to 2GB (int
+					// return type) properly. we will be called again as long as
+					// we don't return -1 here.
+					if (totalRead >= MAX_COPY_BYTES) {
+						// leave streams open - we need them in the next call.
+						return totalRead;
+					}
 				}
 			}
-		}
 
-		if (totalRead == 0 && length == -1) {
-			// we're totally done :)
-			in.close();
+			if (totalRead == 0 && length == -1) {
+				// we're totally done :) cleanup all streams
+				in.close();
+				out.close();
+				return length;
+			}
+
+			return totalRead;
+		} catch (IOException e) {
+			in.close(); // clean up - we swapped this stream.
 			out.close();
-			return length;
+			throw e;
 		}
-
-		return totalRead;
 	}
 
