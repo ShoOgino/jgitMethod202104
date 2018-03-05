@@ -1,22 +1,22 @@
 	private String[] listTarEntries(byte[] tarData) throws Exception {
 		List<String> l = new ArrayList<>();
 		Process proc = spawnAssumingCommandPresent("tar", "tf", "-");
-		BufferedReader reader = readFromProcess(proc);
-		OutputStream out = proc.getOutputStream();
+		try (BufferedReader reader = readFromProcess(proc)) {
+			OutputStream out = proc.getOutputStream();
 
-		// Dump tarball to tar stdin in background
-		Future<?> writing = writeAsync(out, tarData);
+			// Dump tarball to tar stdin in background
+			Future<?> writing = writeAsync(out, tarData);
 
-		try {
-			String line;
-			while ((line = reader.readLine()) != null)
-				l.add(line);
+			try {
+				String line;
+				while ((line = reader.readLine()) != null)
+					l.add(line);
 
-			return l.toArray(new String[l.size()]);
-		} finally {
-			writing.get();
-			reader.close();
-			proc.destroy();
+				return l.toArray(new String[l.size()]);
+			} finally {
+				writing.get();
+				proc.destroy();
+			}
 		}
 	}
 

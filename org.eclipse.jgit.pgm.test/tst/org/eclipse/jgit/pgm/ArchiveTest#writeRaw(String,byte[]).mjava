@@ -1,11 +1,8 @@
 	private void writeRaw(String filename, byte[] data)
 			throws IOException {
 		File path = new File(db.getWorkTree(), filename);
-		OutputStream out = new FileOutputStream(path);
-		try {
+		try (OutputStream out = new FileOutputStream(path)) {
 			out.write(data);
-		} finally {
-			out.close();
 		}
 	}
 
