@@ -23,8 +23,7 @@
 	 */
 	Collection<WalkRemoteObjectDatabase> readAlternates(final String listPath)
 			throws IOException {
-		final BufferedReader br = openReader(listPath);
-		try {
+		try (BufferedReader br = openReader(listPath)) {
 			final Collection<WalkRemoteObjectDatabase> alts = new ArrayList<>();
 			for (;;) {
 				String line = br.readLine();
@@ -35,8 +34,6 @@
 				alts.add(openAlternate(line));
 			}
 			return alts;
-		} finally {
-			br.close();
 		}
 	}
 

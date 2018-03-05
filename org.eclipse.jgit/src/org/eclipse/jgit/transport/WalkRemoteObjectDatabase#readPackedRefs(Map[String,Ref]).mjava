@@ -9,14 +9,8 @@
 	 */
 	protected void readPackedRefs(final Map<String, Ref> avail)
 			throws TransportException {
-		try {
-			final BufferedReader br = openReader(ROOT_DIR
-					+ Constants.PACKED_REFS);
-			try {
-				readPackedRefsImpl(avail, br);
-			} finally {
-				br.close();
-			}
+		try (BufferedReader br = openReader(ROOT_DIR + Constants.PACKED_REFS)) {
+			readPackedRefsImpl(avail, br);
 		} catch (FileNotFoundException notPacked) {
 			// Perhaps it wasn't worthwhile, or is just an older repository.
 		} catch (IOException e) {

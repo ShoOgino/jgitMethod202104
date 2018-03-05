@@ -24,11 +24,8 @@
 	 *             failed, possibly due to permissions or remote disk full, etc.
 	 */
 	void writeFile(final String path, final byte[] data) throws IOException {
-		final OutputStream os = writeFile(path, null, null);
-		try {
+		try (OutputStream os = writeFile(path, null, null)) {
 			os.write(data);
-		} finally {
-			os.close();
 		}
 	}
 
