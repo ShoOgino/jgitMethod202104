@@ -20,16 +20,13 @@
 						throw new IOException(JGitText.get().noXMLParserAvailable);
 					}
 					xr.setContentHandler(this);
-					final InputStream in = c.getInputStream();
-					try {
+					try (InputStream in = c.getInputStream()) {
 						xr.parse(new InputSource(in));
 					} catch (SAXException parsingError) {
 						throw new IOException(
 								MessageFormat.format(
 										JGitText.get().errorListing, prefix),
 								parsingError);
-					} finally {
-						in.close();
 					}
 					return;
 

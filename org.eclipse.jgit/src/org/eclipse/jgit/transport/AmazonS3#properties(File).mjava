@@ -1,11 +1,8 @@
 	static Properties properties(final File authFile)
 			throws FileNotFoundException, IOException {
 		final Properties p = new Properties();
-		final FileInputStream in = new FileInputStream(authFile);
-		try {
+		try (FileInputStream in = new FileInputStream(authFile)) {
 			p.load(in);
-		} finally {
-			in.close();
 		}
 		return p;
 	}
