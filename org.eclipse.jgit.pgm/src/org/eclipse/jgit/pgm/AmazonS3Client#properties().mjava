@@ -1,12 +1,9 @@
 	private Properties properties() {
 		try {
-			final InputStream in = new FileInputStream(propertyFile);
-			try {
+			try (InputStream in = new FileInputStream(propertyFile)) {
 				final Properties p = new Properties();
 				p.load(in);
 				return p;
-			} finally {
-				in.close();
 			}
 		} catch (FileNotFoundException e) {
 			throw die(MessageFormat.format(CLIText.get().noSuchFile, propertyFile), e);
