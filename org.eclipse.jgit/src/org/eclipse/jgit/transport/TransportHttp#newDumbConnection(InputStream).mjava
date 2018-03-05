@@ -1,12 +1,9 @@
 	private WalkFetchConnection newDumbConnection(InputStream in)
 			throws IOException, PackProtocolException {
 		HttpObjectDB d = new HttpObjectDB(objectsUrl);
-		BufferedReader br = toBufferedReader(in);
 		Map<String, Ref> refs;
-		try {
+		try (BufferedReader br = toBufferedReader(in)) {
 			refs = d.readAdvertisedImpl(br);
-		} finally {
-			br.close();
 		}
 
 		if (!refs.containsKey(HEAD)) {
@@ -21,8 +18,8 @@
 			int status = HttpSupport.response(conn);
 			switch (status) {
 			case HttpConnection.HTTP_OK: {
-				br = toBufferedReader(openInputStream(conn));
-				try {
+				try (BufferedReader br = toBufferedReader(
+						openInputStream(conn))) {
 					String line = br.readLine();
 					if (line != null && line.startsWith(RefDirectory.SYMREF)) {
 						String target = line.substring(RefDirectory.SYMREF.length());
@@ -36,8 +33,6 @@
 								HEAD, ObjectId.fromString(line));
 						refs.put(r.getName(), r);
 					}
-				} finally {
-					br.close();
 				}
 				break;
 			}

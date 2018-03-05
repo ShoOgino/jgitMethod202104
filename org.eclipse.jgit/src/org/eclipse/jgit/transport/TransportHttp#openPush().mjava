@@ -5,8 +5,7 @@
 		final String service = SVC_RECEIVE_PACK;
 		try {
 			final HttpConnection c = connect(service);
-			final InputStream in = openInputStream(c);
-			try {
+			try (InputStream in = openInputStream(c)) {
 				if (isSmartHttp(c, service)) {
 					return smartPush(service, c, in);
 				} else if (!useSmartHttp) {
@@ -17,8 +16,6 @@
 					final String msg = JGitText.get().remoteDoesNotSupportSmartHTTPPush;
 					throw new NotSupportedException(msg);
 				}
-			} finally {
-				in.close();
 			}
 		} catch (NotSupportedException err) {
 			throw err;

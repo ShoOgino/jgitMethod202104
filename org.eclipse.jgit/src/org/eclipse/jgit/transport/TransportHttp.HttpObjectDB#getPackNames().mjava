@@ -1,21 +1,16 @@
 		@Override
 		Collection<String> getPackNames() throws IOException {
 			final Collection<String> packs = new ArrayList<>();
-			try {
-				final BufferedReader br = openReader(INFO_PACKS);
-				try {
-					for (;;) {
-						final String s = br.readLine();
-						if (s == null || s.length() == 0)
-							break;
-						if (!s.startsWith("P pack-") || !s.endsWith(".pack")) //$NON-NLS-1$ //$NON-NLS-2$
-							throw invalidAdvertisement(s);
-						packs.add(s.substring(2));
-					}
-					return packs;
-				} finally {
-					br.close();
+			try (BufferedReader br = openReader(INFO_PACKS)) {
+				for (;;) {
+					final String s = br.readLine();
+					if (s == null || s.length() == 0)
+						break;
+					if (!s.startsWith("P pack-") || !s.endsWith(".pack")) //$NON-NLS-1$ //$NON-NLS-2$
+						throw invalidAdvertisement(s);
+					packs.add(s.substring(2));
 				}
+				return packs;
 			} catch (FileNotFoundException err) {
 				return packs;
 			}

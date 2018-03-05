@@ -2,10 +2,8 @@
 			// Try to compress the content, but only if that is smaller.
 			TemporaryBuffer buf = new TemporaryBuffer.Heap(
 					http.getPostBuffer());
-			try {
-				GZIPOutputStream gzip = new GZIPOutputStream(buf);
+			try (GZIPOutputStream gzip = new GZIPOutputStream(buf)) {
 				out.writeTo(gzip, null);
-				gzip.close();
 				if (out.length() < buf.length())
 					buf = out;
 			} catch (IOException err) {
