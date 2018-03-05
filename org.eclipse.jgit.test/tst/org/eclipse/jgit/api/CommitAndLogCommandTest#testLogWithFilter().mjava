@@ -6,9 +6,9 @@
 			// create first file
 			File file = new File(db.getWorkTree(), "a.txt");
 			FileUtils.createNewFile(file);
-			PrintWriter writer = new PrintWriter(file);
-			writer.print("content1");
-			writer.close();
+			try (PrintWriter writer = new PrintWriter(file)) {
+				writer.print("content1");
+			}
 
 			// First commit - a.txt file
 			git.add().addFilepattern("a.txt").call();
@@ -17,9 +17,9 @@
 			// create second file
 			file = new File(db.getWorkTree(), "b.txt");
 			FileUtils.createNewFile(file);
-			writer = new PrintWriter(file);
-			writer.print("content2");
-			writer.close();
+			try (PrintWriter writer = new PrintWriter(file)) {
+				writer.print("content2");
+			}
 
 			// Second commit - b.txt file
 			git.add().addFilepattern("b.txt").call();

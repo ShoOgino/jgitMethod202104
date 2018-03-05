@@ -5,9 +5,9 @@
 			// create file
 			File file = new File(db.getWorkTree(), "a.txt");
 			FileUtils.createNewFile(file);
-			PrintWriter writer = new PrintWriter(file);
-			writer.print("content1");
-			writer.close();
+			try (PrintWriter writer = new PrintWriter(file)) {
+				writer.print("content1");
+			}
 
 			// First commit - a.txt file
 			git.add().addFilepattern("a.txt").call();
