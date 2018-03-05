@@ -1,10 +1,11 @@
 	private static DirCacheEntry addEntryToBuilder(String path, File file,
 			ObjectInserter newObjectInserter, DirCacheBuilder builder, int stage)
 			throws IOException {
-		FileInputStream inputStream = new FileInputStream(file);
-		ObjectId id = newObjectInserter.insert(
+		ObjectId id;
+		try (FileInputStream inputStream = new FileInputStream(file)) {
+			id = newObjectInserter.insert(
 				Constants.OBJ_BLOB, file.length(), inputStream);
-		inputStream.close();
+		}
 		DirCacheEntry entry = new DirCacheEntry(path, stage);
 		entry.setObjectId(id);
 		entry.setFileMode(FileMode.REGULAR_FILE);

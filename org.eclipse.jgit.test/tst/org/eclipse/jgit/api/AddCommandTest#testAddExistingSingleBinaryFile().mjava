@@ -3,9 +3,9 @@
 			GitAPIException {
 		File file = new File(db.getWorkTree(), "a.txt");
 		FileUtils.createNewFile(file);
-		PrintWriter writer = new PrintWriter(file);
-		writer.print("row1\r\nrow2\u0000");
-		writer.close();
+		try (PrintWriter writer = new PrintWriter(file)) {
+			writer.print("row1\r\nrow2\u0000");
+		}
 
 		try (Git git = new Git(db)) {
 			db.getConfig().setString("core", null, "autocrlf", "false");

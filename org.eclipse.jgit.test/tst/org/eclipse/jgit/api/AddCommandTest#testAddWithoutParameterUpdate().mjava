@@ -7,15 +7,15 @@
 		FileUtils.mkdir(new File(db.getWorkTree(), "sub"));
 		File file = new File(db.getWorkTree(), "sub/a.txt");
 		FileUtils.createNewFile(file);
-		PrintWriter writer = new PrintWriter(file);
-		writer.print("content");
-		writer.close();
+		try (PrintWriter writer = new PrintWriter(file)) {
+			writer.print("content");
+		}
 
 		File file2 = new File(db.getWorkTree(), "sub/b.txt");
 		FileUtils.createNewFile(file2);
-		writer = new PrintWriter(file2);
-		writer.print("content b");
-		writer.close();
+		try (PrintWriter writer = new PrintWriter(file2)) {
+			writer.print("content b");
+		}
 
 		try (Git git = new Git(db)) {
 			git.add().addFilepattern("sub").call();
@@ -30,14 +30,14 @@
 			// new unstaged file sub/c.txt
 			File file3 = new File(db.getWorkTree(), "sub/c.txt");
 			FileUtils.createNewFile(file3);
-			writer = new PrintWriter(file3);
-			writer.print("content c");
-			writer.close();
+			try (PrintWriter writer = new PrintWriter(file3)) {
+				writer.print("content c");
+			}
 
 			// file sub/a.txt is modified
-			writer = new PrintWriter(file);
-			writer.print("modified content");
-			writer.close();
+			try (PrintWriter writer = new PrintWriter(file)) {
+				writer.print("modified content");
+			}
 
 			// file sub/b.txt is deleted
 			FileUtils.delete(file2);

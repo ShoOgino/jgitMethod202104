@@ -8,9 +8,9 @@
 			data.append("row1\r\nrow2");
 		}
 		String crData = data.toString();
-		PrintWriter writer = new PrintWriter(file);
-		writer.print(crData);
-		writer.close();
+		try (PrintWriter writer = new PrintWriter(file)) {
+			writer.print(crData);
+		}
 		String lfData = data.toString().replaceAll("\r", "");
 		try (Git git = new Git(db)) {
 			db.getConfig().setString("core", null, "autocrlf", "false");

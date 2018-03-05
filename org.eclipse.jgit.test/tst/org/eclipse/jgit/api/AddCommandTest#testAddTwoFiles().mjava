@@ -2,15 +2,15 @@
 	public void testAddTwoFiles() throws Exception  {
 		File file = new File(db.getWorkTree(), "a.txt");
 		FileUtils.createNewFile(file);
-		PrintWriter writer = new PrintWriter(file);
-		writer.print("content");
-		writer.close();
+		try (PrintWriter writer = new PrintWriter(file)) {
+			writer.print("content");
+		}
 
 		File file2 = new File(db.getWorkTree(), "b.txt");
 		FileUtils.createNewFile(file2);
-		writer = new PrintWriter(file2);
-		writer.print("content b");
-		writer.close();
+		try (PrintWriter writer = new PrintWriter(file2)) {
+			writer.print("content b");
+		}
 
 		try (Git git = new Git(db)) {
 			git.add().addFilepattern("a.txt").addFilepattern("b.txt").call();

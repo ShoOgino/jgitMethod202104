@@ -3,18 +3,18 @@
 			GitAPIException {
 		File file = new File(db.getWorkTree(), "a.txt");
 		FileUtils.createNewFile(file);
-		PrintWriter writer = new PrintWriter(file);
-		writer.print("content");
-		writer.close();
+		try (PrintWriter writer = new PrintWriter(file)) {
+			writer.print("content");
+		}
 
 		try (Git git = new Git(db)) {
 			DirCache dc = git.add().addFilepattern("a.txt").call();
 
 			dc.getEntry(0).getObjectId();
 
-			writer = new PrintWriter(file);
-			writer.print("other content");
-			writer.close();
+			try (PrintWriter writer = new PrintWriter(file)) {
+				writer.print("other content");
+			}
 
 			dc = git.add().addFilepattern("a.txt").call();
 

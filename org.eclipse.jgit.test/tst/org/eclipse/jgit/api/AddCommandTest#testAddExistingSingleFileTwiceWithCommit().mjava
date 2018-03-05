@@ -2,9 +2,9 @@
 	public void testAddExistingSingleFileTwiceWithCommit() throws Exception {
 		File file = new File(db.getWorkTree(), "a.txt");
 		FileUtils.createNewFile(file);
-		PrintWriter writer = new PrintWriter(file);
-		writer.print("content");
-		writer.close();
+		try (PrintWriter writer = new PrintWriter(file)) {
+			writer.print("content");
+		}
 
 		try (Git git = new Git(db)) {
 			DirCache dc = git.add().addFilepattern("a.txt").call();
@@ -13,9 +13,9 @@
 
 			git.commit().setMessage("commit a.txt").call();
 
-			writer = new PrintWriter(file);
-			writer.print("other content");
-			writer.close();
+			try (PrintWriter writer = new PrintWriter(file)) {
+				writer.print("other content");
+			}
 
 			dc = git.add().addFilepattern("a.txt").call();
 

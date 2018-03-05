@@ -4,15 +4,15 @@
 
 		File file = new File(db.getWorkTree(), "a.txt");
 		FileUtils.createNewFile(file);
-		PrintWriter writer = new PrintWriter(file);
-		writer.print("content");
-		writer.close();
+		try (PrintWriter writer = new PrintWriter(file)) {
+			writer.print("content");
+		}
 
 		File file2 = new File(db.getWorkTree(), "b.txt");
 		FileUtils.createNewFile(file2);
-		writer = new PrintWriter(file2);
-		writer.print("content b");
-		writer.close();
+		try (PrintWriter writer = new PrintWriter(file2)) {
+			writer.print("content b");
+		}
 
 		ObjectInserter newObjectInserter = db.newObjectInserter();
 		DirCache dc = db.lockDirCache();
@@ -21,14 +21,14 @@
 		addEntryToBuilder("b.txt", file2, newObjectInserter, builder, 0);
 		addEntryToBuilder("a.txt", file, newObjectInserter, builder, 1);
 
-		writer = new PrintWriter(file);
-		writer.print("other content");
-		writer.close();
+		try (PrintWriter writer = new PrintWriter(file)) {
+			writer.print("other content");
+		}
 		addEntryToBuilder("a.txt", file, newObjectInserter, builder, 3);
 
-		writer = new PrintWriter(file);
-		writer.print("our content");
-		writer.close();
+		try (PrintWriter writer = new PrintWriter(file)) {
+			writer.print("our content");
+		}
 		addEntryToBuilder("a.txt", file, newObjectInserter, builder, 2)
 				.getObjectId();
 
