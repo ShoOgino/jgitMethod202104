@@ -5,9 +5,8 @@
 		assertEquals("http", remoteURI.getScheme());
 
 		Map<String, Ref> map;
-		Transport t = Transport.open(dst, remoteURI);
+		try (Transport t = Transport.open(dst, remoteURI)) {
 		((TransportHttp) t).setUseSmartHttp(false);
-		try {
 			// I didn't make up these public interface names, I just
 			// approved them for inclusion into the code base. Sorry.
 			// --spearce
@@ -15,14 +14,9 @@
 			assertTrue("isa TransportHttp", t instanceof TransportHttp);
 			assertTrue("isa HttpTransport", t instanceof HttpTransport);
 
-			FetchConnection c = t.openFetch();
-			try {
+			try (FetchConnection c = t.openFetch()) {
 				map = c.getRefsMap();
-			} finally {
-				c.close();
 			}
-		} finally {
-			t.close();
 		}
 
 		assertNotNull("have map of refs", map);

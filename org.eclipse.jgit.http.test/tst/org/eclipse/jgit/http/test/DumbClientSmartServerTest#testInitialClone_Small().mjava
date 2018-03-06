@@ -3,12 +3,9 @@
 		Repository dst = createBareRepository();
 		assertFalse(dst.hasObject(A_txt));
 
-		Transport t = Transport.open(dst, remoteURI);
+		try (Transport t = Transport.open(dst, remoteURI)) {
 		((TransportHttp) t).setUseSmartHttp(false);
-		try {
 			t.fetch(NullProgressMonitor.INSTANCE, mirror(master));
-		} finally {
-			t.close();
 		}
 
 		assertTrue(dst.hasObject(A_txt));

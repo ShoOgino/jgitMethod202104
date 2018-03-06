@@ -4,9 +4,8 @@
 		final RevCommit Q = src.commit().create();
 		final Repository db = src.getRepository();
 
-		Transport t = Transport.open(db, remoteURI);
-		((TransportHttp) t).setUseSmartHttp(false);
-		try {
+		try (Transport t = Transport.open(db, remoteURI)) {
+			((TransportHttp) t).setUseSmartHttp(false);
 			try {
 				t.push(NullProgressMonitor.INSTANCE, push(src, Q));
 				fail("push incorrectly completed against a smart server");
@@ -14,8 +13,6 @@
 				String exp = "smart HTTP push disabled";
 				assertEquals(exp, nse.getMessage());
 			}
-		} finally {
-			t.close();
 		}
 	}
 
