@@ -15,11 +15,9 @@
 	public static void write(final File f, final String body)
 			throws IOException {
 		FileUtils.mkdirs(f.getParentFile(), true);
-		Writer w = new OutputStreamWriter(new FileOutputStream(f), UTF_8);
-		try {
+		try (Writer w = new OutputStreamWriter(new FileOutputStream(f),
+				UTF_8)) {
 			w.write(body);
-		} finally {
-			w.close();
 		}
 	}
 
