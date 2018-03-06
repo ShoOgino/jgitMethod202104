@@ -17,7 +17,6 @@
 		final RevCommit Q = client.commit().add("Q", Q_txt).create();
 		final Repository clientRepo = client.getRepository();
 		final String srvBranchName = Constants.R_HEADS + "new.branch";
-		Transport t;
 
 		// this maxPackSize leads to an unPackError
 		maxPackSize = 100;
@@ -34,8 +33,7 @@
 			}
 		};
 
-		t = Transport.open(clientRepo, srvURI);
-		try {
+		try (Transport t = Transport.open(clientRepo, srvURI)) {
 			RemoteRefUpdate update = new RemoteRefUpdate(clientRepo, Q.name(),
 					srvBranchName, false, null, null);
 			try {
@@ -45,8 +43,6 @@
 			} catch (Exception e) {
 				assertTrue(e instanceof TooLargePackException);
 			}
-		} finally {
-			t.close();
 		}
 	}
 
