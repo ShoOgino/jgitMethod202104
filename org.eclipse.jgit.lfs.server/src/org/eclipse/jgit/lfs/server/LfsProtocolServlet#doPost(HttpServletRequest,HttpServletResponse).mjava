@@ -3,10 +3,10 @@
 	protected void doPost(HttpServletRequest req, HttpServletResponse res)
 			throws ServletException, IOException {
 		Writer w = new BufferedWriter(
-				new OutputStreamWriter(res.getOutputStream(), UTF_8));
+				new OutputStreamWriter(res.getOutputStream(), CHARSET));
 
 		Reader r = new BufferedReader(
-				new InputStreamReader(req.getInputStream(), UTF_8));
+				new InputStreamReader(req.getInputStream(), CHARSET));
 		LfsRequest request = LfsGson.fromJson(r, LfsRequest.class);
 		String path = req.getPathInfo();
 

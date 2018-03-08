@@ -2,7 +2,8 @@
 	@Override
 	public ArchiveOutputStream createArchiveOutputStream(OutputStream s,
 			Map<String, Object> o) throws IOException {
-		TarArchiveOutputStream out = new TarArchiveOutputStream(s, "UTF-8"); //$NON-NLS-1$
+		TarArchiveOutputStream out = new TarArchiveOutputStream(s,
+				CHARACTER_ENCODING);
 		out.setLongFileMode(TarArchiveOutputStream.LONGFILE_POSIX);
 		out.setBigNumberMode(TarArchiveOutputStream.BIGNUMBER_POSIX);
 		return applyFormatOptions(out, o);

@@ -4,7 +4,7 @@
 		bos1.write(0xEF);
 		bos1.write(0xBB);
 		bos1.write(0xBF);
-		bos1.write(CONTENT1.getBytes(UTF_8));
+		bos1.write(CONTENT1.getBytes(CHARSET));
 
 		final File file = createFile(bos1.toByteArray());
 		final FileBasedConfig config = new FileBasedConfig(file, FS.DETECTED);
@@ -18,7 +18,7 @@
 		bos2.write(0xEF);
 		bos2.write(0xBB);
 		bos2.write(0xBF);
-		bos2.write(CONTENT2.getBytes(UTF_8));
+		bos2.write(CONTENT2.getBytes(CHARSET));
 		assertArrayEquals(bos2.toByteArray(), IO.readFully(file));
 	}
 

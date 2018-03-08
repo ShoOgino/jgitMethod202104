@@ -5,7 +5,7 @@
 		ObjectLoader loader =
 				tw.getObjectReader().open(tw.getObjectId(0), OBJ_BLOB);
 		try (InputStream in = loader.openStream();
-				Reader r = new BufferedReader(new InputStreamReader(in, UTF_8))) {
+				Reader r = new BufferedReader(new InputStreamReader(in, CHARSET))) {
 			return PushCertificateParser.fromReader(r);
 		}
 	}

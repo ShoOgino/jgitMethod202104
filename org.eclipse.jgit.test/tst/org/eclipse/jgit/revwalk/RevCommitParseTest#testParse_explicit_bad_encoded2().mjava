@@ -11,14 +11,14 @@
 	@Test
 	public void testParse_explicit_bad_encoded2() throws Exception {
 		final ByteArrayOutputStream b = new ByteArrayOutputStream();
-		b.write("tree 9788669ad918b6fcce64af8882fc9a81cb6aba67\n".getBytes(UTF_8));
-		b.write("author F\u00f6r fattare <a_u_thor@example.com> 1218123387 +0700\n".getBytes(UTF_8));
-		b.write("committer C O. Miter <c@example.com> 1218123390 -0500\n".getBytes(UTF_8));
-		b.write("encoding ISO-8859-1\n".getBytes(UTF_8));
-		b.write("\n".getBytes(UTF_8));
-		b.write("\u304d\u308c\u3044\n".getBytes(UTF_8));
-		b.write("\n".getBytes(UTF_8));
-		b.write("Hi\n".getBytes(UTF_8));
+		b.write("tree 9788669ad918b6fcce64af8882fc9a81cb6aba67\n".getBytes(CHARSET));
+		b.write("author F\u00f6r fattare <a_u_thor@example.com> 1218123387 +0700\n".getBytes(CHARSET));
+		b.write("committer C O. Miter <c@example.com> 1218123390 -0500\n".getBytes(CHARSET));
+		b.write("encoding ISO-8859-1\n".getBytes(CHARSET));
+		b.write("\n".getBytes(CHARSET));
+		b.write("\u304d\u308c\u3044\n".getBytes(CHARSET));
+		b.write("\n".getBytes(CHARSET));
+		b.write("Hi\n".getBytes(CHARSET));
 		final RevCommit c;
 		c = new RevCommit(id("9473095c4cb2f12aefe1db8a355fe3fafba42f67")); // bogus id
 		c.parseCanonical(new RevWalk(db), b.toByteArray());

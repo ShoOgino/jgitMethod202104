@@ -14,7 +14,7 @@
 
 		DirCacheEditor editor = dc.editor();
 		String certText = pc.cert.toText() + pc.cert.getSignature();
-		final ObjectId certId = inserter.insert(OBJ_BLOB, certText.getBytes(UTF_8));
+		final ObjectId certId = inserter.insert(OBJ_BLOB, certText.getBytes(CHARSET));
 		boolean any = false;
 		for (ReceiveCommand cmd : pc.cert.getCommands()) {
 			if (byRef != null && !commandsEqual(cmd, byRef.get(cmd.getRefName()))) {

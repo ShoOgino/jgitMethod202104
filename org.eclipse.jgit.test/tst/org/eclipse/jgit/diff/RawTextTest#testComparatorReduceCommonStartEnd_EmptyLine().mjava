@@ -4,14 +4,14 @@
 		RawText b;
 		Edit e;
 
-		a = new RawText("R\n y\n".getBytes(UTF_8));
-		b = new RawText("S\n\n y\n".getBytes(UTF_8));
+		a = new RawText("R\n y\n".getBytes(CHARSET));
+		b = new RawText("S\n\n y\n".getBytes(CHARSET));
 		e = new Edit(0, 2, 0, 3);
 		e = RawTextComparator.DEFAULT.reduceCommonStartEnd(a, b, e);
 		assertEquals(new Edit(0, 1, 0, 2), e);
 
-		a = new RawText("S\n\n y\n".getBytes(UTF_8));
-		b = new RawText("R\n y\n".getBytes(UTF_8));
+		a = new RawText("S\n\n y\n".getBytes(CHARSET));
+		b = new RawText("R\n y\n".getBytes(CHARSET));
 		e = new Edit(0, 3, 0, 2);
 		e = RawTextComparator.DEFAULT.reduceCommonStartEnd(a, b, e);
 		assertEquals(new Edit(0, 2, 0, 1), e);
