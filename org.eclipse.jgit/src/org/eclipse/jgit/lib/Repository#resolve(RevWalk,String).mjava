@@ -187,7 +187,7 @@
 									.format(JGitText.get().invalidRefName,
 											name),
 									revstr);
-						Ref ref = getRef(name);
+						Ref ref = findRef(name);
 						name = null;
 						if (ref == null)
 							return null;
@@ -240,7 +240,7 @@
 									.format(JGitText.get().invalidRefName,
 											name),
 									revstr);
-						Ref ref = getRef(name);
+						Ref ref = findRef(name);
 						name = null;
 						if (ref == null)
 							return null;
@@ -291,7 +291,7 @@
 			throw new RevisionSyntaxException(
 					MessageFormat.format(JGitText.get().invalidRefName, name),
 					revstr);
-		if (getRef(name) != null)
+		if (findRef(name) != null)
 			return name;
 		return resolveSimple(name);
 	}
