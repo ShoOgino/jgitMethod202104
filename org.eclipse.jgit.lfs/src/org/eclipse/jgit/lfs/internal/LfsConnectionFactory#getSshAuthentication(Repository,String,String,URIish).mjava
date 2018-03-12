@@ -11,10 +11,11 @@
 			// discover and authenticate; git-lfs does "ssh
 			// -p <port> -- <host> git-lfs-authenticate
 			// <project> <upload/download>"
-			String json = runSshCommand(u.setPath(""), //$NON-NLS-1$
-					db.getFS(),
+			String json = SshSupport.runSshCommand(u.setPath(""), //$NON-NLS-1$
+					null, db.getFS(),
 					"git-lfs-authenticate " + extractProjectName(u) + " " //$NON-NLS-1$//$NON-NLS-2$
-							+ purpose);
+							+ purpose,
+					SSH_AUTH_TIMEOUT_SECONDS);
 
 			action = Protocol.gson().fromJson(json,
 					Protocol.ExpiringAction.class);
