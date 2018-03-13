@@ -28,8 +28,9 @@
 			while (actTime <= startTime) {
 				Thread.sleep(sleepTime);
 				sleepTime *= 2;
-				FileOutputStream fos = new FileOutputStream(tmp);
-				fos.close();
+				try (FileOutputStream fos = new FileOutputStream(tmp)) {
+					// Do nothing
+				}
 				actTime = fs.lastModified(tmp);
 			}
 			return actTime;

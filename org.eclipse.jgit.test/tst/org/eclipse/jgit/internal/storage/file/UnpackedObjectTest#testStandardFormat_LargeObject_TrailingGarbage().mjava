@@ -11,16 +11,12 @@
 		write(id, tr);
 
 		ObjectLoader ol;
-		{
-			FileInputStream fs = new FileInputStream(path(id));
-			try {
-				ol = UnpackedObject.open(fs, path(id), id, wc);
-			} finally {
-				fs.close();
-			}
+		try (FileInputStream fs = new FileInputStream(path(id))) {
+			ol = UnpackedObject.open(fs, path(id), id, wc);
 		}
 
 		byte[] tmp = new byte[data.length];
+		@SuppressWarnings("resource") // We are testing that the close() method throws
 		InputStream in = ol.openStream();
 		IO.readFully(in, tmp, 0, tmp.length);
 		try {

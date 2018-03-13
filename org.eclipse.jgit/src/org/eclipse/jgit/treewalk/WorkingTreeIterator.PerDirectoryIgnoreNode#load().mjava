@@ -1,10 +1,7 @@
 		IgnoreNode load() throws IOException {
 			IgnoreNode r = new IgnoreNode();
-			InputStream in = entry.openInputStream();
-			try {
+			try (InputStream in = entry.openInputStream()) {
 				r.parse(in);
-			} finally {
-				in.close();
 			}
 			return r.getRules().isEmpty() ? null : r;
 		}

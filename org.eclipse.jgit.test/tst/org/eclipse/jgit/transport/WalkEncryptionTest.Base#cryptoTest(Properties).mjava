@@ -31,10 +31,10 @@
 				remoteConfig.update(config);
 				config.save();
 
-				Git git = Git.open(dirOne);
-				git.checkout().setName("master").call();
-				git.push().setRemote(remote).setRefSpecs(specs).call();
-				git.close();
+				try (Git git = Git.open(dirOne)) {
+					git.checkout().setName("master").call();
+					git.push().setRemote(remote).setRefSpecs(specs).call();
+				}
 
 				File fileStatic = new File(dirOne, nameStatic);
 				assertTrue("Provided by setup", fileStatic.exists());
@@ -46,11 +46,11 @@
 				File fileStatic = new File(dirTwo, nameStatic);
 				assertFalse("Not Provided by setup", fileStatic.exists());
 
-				Git git = Git.cloneRepository().setURI(uri).setDirectory(dirTwo)
-						.call();
-				git.close();
+				try (Git git = Git.cloneRepository().setURI(uri)
+						.setDirectory(dirTwo).call()) {
+					assertTrue("Provided by clone", fileStatic.exists());
+				}
 
-				assertTrue("Provided by clone", fileStatic.exists());
 			}
 
 			{ // Verify static file content.
@@ -68,11 +68,11 @@
 				assertTrue("Provided by create", fileDynamic.exists());
 				assertTrue("Need content to encrypt", fileDynamic.length() > 0);
 
-				Git git = Git.open(dirOne);
-				git.add().addFilepattern(nameDynamic).call();
-				git.commit().setMessage(nameDynamic).call();
-				git.push().setRemote(remote).setRefSpecs(specs).call();
-				git.close();
+				try (Git git = Git.open(dirOne)) {
+					git.add().addFilepattern(nameDynamic).call();
+					git.commit().setMessage(nameDynamic).call();
+					git.push().setRemote(remote).setRefSpecs(specs).call();
+				}
 
 			}
 
@@ -81,9 +81,9 @@
 				File fileDynamic = new File(dirTwo, nameDynamic);
 				assertFalse("Not Provided by setup", fileDynamic.exists());
 
-				Git git = Git.open(dirTwo);
-				git.pull().call();
-				git.close();
+				try (Git git = Git.open(dirTwo)) {
+					git.pull().call();
+				}
 
 				assertTrue("Provided by pull", fileDynamic.exists());
 			}

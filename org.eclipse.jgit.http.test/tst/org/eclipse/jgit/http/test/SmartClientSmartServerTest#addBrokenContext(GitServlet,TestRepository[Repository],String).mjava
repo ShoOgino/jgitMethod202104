@@ -10,9 +10,9 @@
 				final HttpServletResponse r = (HttpServletResponse) response;
 				r.setContentType("text/plain");
 				r.setCharacterEncoding("UTF-8");
-				PrintWriter w = r.getWriter();
-				w.print("OK");
-				w.close();
+				try (PrintWriter w = r.getWriter()) {
+					w.print("OK");
+				}
 			}
 
 			@Override

@@ -7,20 +7,13 @@
 	 */
 	protected static void copyFile(final File src, final File dst)
 			throws IOException {
-		final FileInputStream fis = new FileInputStream(src);
-		try {
-			final FileOutputStream fos = new FileOutputStream(dst);
-			try {
-				final byte[] buf = new byte[4096];
-				int r;
-				while ((r = fis.read(buf)) > 0) {
-					fos.write(buf, 0, r);
-				}
-			} finally {
-				fos.close();
+		try (FileInputStream fis = new FileInputStream(src);
+				FileOutputStream fos = new FileOutputStream(dst)) {
+			final byte[] buf = new byte[4096];
+			int r;
+			while ((r = fis.read(buf)) > 0) {
+				fos.write(buf, 0, r);
 			}
-		} finally {
-			fis.close();
 		}
 	}
 

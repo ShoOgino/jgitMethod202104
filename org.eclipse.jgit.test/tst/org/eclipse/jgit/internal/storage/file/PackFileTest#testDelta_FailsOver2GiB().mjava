@@ -29,22 +29,16 @@
 			File packName = new File(dir, idA.name() + ".pack");
 			File idxName = new File(dir, idA.name() + ".idx");
 
-			FileOutputStream f = new FileOutputStream(packName);
-			try {
+			try (FileOutputStream f = new FileOutputStream(packName)) {
 				f.write(pack.toByteArray());
-			} finally {
-				f.close();
 			}
 
-			f = new FileOutputStream(idxName);
-			try {
+			try (FileOutputStream f = new FileOutputStream(idxName)) {
 				List<PackedObjectInfo> list = new ArrayList<>();
 				list.add(a);
 				list.add(b);
 				Collections.sort(list);
 				new PackIndexWriterV1(f).write(list, footer);
-			} finally {
-				f.close();
 			}
 
 			PackFile packFile = new PackFile(packName, PackExt.INDEX.getBit());

@@ -11,23 +11,13 @@
 		write(id, gz);
 
 		ObjectLoader ol;
-		{
-			FileInputStream fs = new FileInputStream(path(id));
-			try {
-				ol = UnpackedObject.open(fs, path(id), id, wc);
-			} finally {
-				fs.close();
-			}
+		try (FileInputStream fs = new FileInputStream(path(id))) {
+			ol = UnpackedObject.open(fs, path(id), id, wc);
 		}
 
-		try {
-			byte[] tmp = new byte[data.length];
-			InputStream in = ol.openStream();
-			try {
-				IO.readFully(in, tmp, 0, tmp.length);
-			} finally {
-				in.close();
-			}
+		byte[] tmp = new byte[data.length];
+		try (InputStream in = ol.openStream()) {
+			IO.readFully(in, tmp, 0, tmp.length);
 			fail("Did not throw CorruptObjectException");
 		} catch (CorruptObjectException coe) {
 			assertEquals(MessageFormat.format(JGitText.get().objectIsCorrupt,

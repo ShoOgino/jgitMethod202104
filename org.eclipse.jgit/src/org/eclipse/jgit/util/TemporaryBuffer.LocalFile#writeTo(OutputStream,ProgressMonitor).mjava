@@ -7,16 +7,13 @@
 			}
 			if (pm == null)
 				pm = NullProgressMonitor.INSTANCE;
-			final FileInputStream in = new FileInputStream(onDiskFile);
-			try {
+			try (FileInputStream in = new FileInputStream(onDiskFile)) {
 				int cnt;
 				final byte[] buf = new byte[Block.SZ];
 				while ((cnt = in.read(buf)) >= 0) {
 					os.write(buf, 0, cnt);
 					pm.update(cnt / 1024);
 				}
-			} finally {
-				in.close();
 			}
 		}
 

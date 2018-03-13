@@ -9,13 +9,13 @@
 		File repo1Parent = new File(trash.getParentFile(), "r1");
 		File workdir = new File(trash.getParentFile(), "rw");
 		FileUtils.mkdir(workdir);
-		FileRepository repo1initial = new FileRepository(new File(repo1Parent,
-				Constants.DOT_GIT));
-		repo1initial.create();
-		final FileBasedConfig cfg = repo1initial.getConfig();
-		cfg.setString("core", null, "worktree", workdir.getAbsolutePath());
-		cfg.save();
-		repo1initial.close();
+		try (FileRepository repo1initial = new FileRepository(
+				new File(repo1Parent, Constants.DOT_GIT))) {
+			repo1initial.create();
+			final FileBasedConfig cfg = repo1initial.getConfig();
+			cfg.setString("core", null, "worktree", workdir.getAbsolutePath());
+			cfg.save();
+		}
 
 		File theDir = new File(repo1Parent, Constants.DOT_GIT);
 		FileRepository r = (FileRepository) new FileRepositoryBuilder()

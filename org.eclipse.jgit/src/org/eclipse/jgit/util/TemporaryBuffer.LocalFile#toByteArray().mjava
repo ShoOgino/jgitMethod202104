@@ -8,11 +8,8 @@
 			if (Integer.MAX_VALUE < len)
 				throw new OutOfMemoryError(JGitText.get().lengthExceedsMaximumArraySize);
 			final byte[] out = new byte[(int) len];
-			final FileInputStream in = new FileInputStream(onDiskFile);
-			try {
+			try (FileInputStream in = new FileInputStream(onDiskFile)) {
 				IO.readFully(in, out, 0, (int) len);
-			} finally {
-				in.close();
 			}
 			return out;
 		}

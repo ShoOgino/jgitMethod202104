@@ -13,11 +13,8 @@
 			assertTrue("isa TransportHttp", t instanceof TransportHttp);
 			assertTrue("isa HttpTransport", t instanceof HttpTransport);
 
-			FetchConnection c = t.openFetch();
-			try {
+			try (FetchConnection c = t.openFetch()) {
 				map = c.getRefsMap();
-			} finally {
-				c.close();
 			}
 		}
 

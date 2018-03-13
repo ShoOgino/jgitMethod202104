@@ -27,10 +27,11 @@
 				dce.setFileMode(treeItr.getEntryFileMode());
 				dce.setLastModified(treeItr.getEntryLastModified());
 				dce.setLength((int) len);
-				FileInputStream in = new FileInputStream(
-						treeItr.getEntryFile());
-				dce.setObjectId(inserter.insert(Constants.OBJ_BLOB, len, in));
-				in.close();
+				try (FileInputStream in = new FileInputStream(
+						treeItr.getEntryFile())) {
+					dce.setObjectId(
+							inserter.insert(Constants.OBJ_BLOB, len, in));
+				}
 				builder.add(dce);
 				treeItr.next(1);
 			}

@@ -1,11 +1,8 @@
 		private static void loadRulesFromFile(IgnoreNode r, File exclude)
 				throws FileNotFoundException, IOException {
 			if (FS.DETECTED.exists(exclude)) {
-				FileInputStream in = new FileInputStream(exclude);
-				try {
+				try (FileInputStream in = new FileInputStream(exclude)) {
 					r.parse(in);
-				} finally {
-					in.close();
 				}
 			}
 		}

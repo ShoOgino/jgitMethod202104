@@ -8,8 +8,8 @@
 			Properties props = Props.discover();
 			props.put(AmazonS3.Keys.PASSWORD, JGIT_PASS);
 			props.put(AmazonS3.Keys.CRYPTO_ALG, algorithm);
-			PrintWriter writer = new PrintWriter(JGIT_CONF_FILE);
-			props.store(writer, "JGIT S3 connection configuration file.");
-			writer.close();
+			try (PrintWriter writer = new PrintWriter(JGIT_CONF_FILE)) {
+				props.store(writer, "JGIT S3 connection configuration file.");
+			}
 		}
 

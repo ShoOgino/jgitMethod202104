@@ -1,15 +1,15 @@
 	@Test
 	public void testFileKeyOpenExisting() throws IOException {
-		Repository r;
+		try (Repository r = new FileKey(db.getDirectory(), db.getFS())
+				.open(true)) {
+			assertNotNull(r);
+			assertEqualsFile(db.getDirectory(), r.getDirectory());
+		}
 
-		r = new FileKey(db.getDirectory(), db.getFS()).open(true);
-		assertNotNull(r);
-		assertEqualsFile(db.getDirectory(), r.getDirectory());
-		r.close();
-
-		r = new FileKey(db.getDirectory(), db.getFS()).open(false);
-		assertNotNull(r);
-		assertEqualsFile(db.getDirectory(), r.getDirectory());
-		r.close();
+		try (Repository r = new FileKey(db.getDirectory(), db.getFS())
+				.open(false)) {
+			assertNotNull(r);
+			assertEqualsFile(db.getDirectory(), r.getDirectory());
+		}
 	}
 

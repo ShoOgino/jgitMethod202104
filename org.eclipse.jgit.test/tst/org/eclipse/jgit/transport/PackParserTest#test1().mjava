@@ -6,8 +6,7 @@
 	@Test
 	public void test1() throws  IOException {
 		File packFile = JGitTestUtil.getTestResourceFile("pack-34be9032ac282b11fa9babdc2b2a93ca996c9c2f.pack");
-		final InputStream is = new FileInputStream(packFile);
-		try {
+		try (InputStream is = new FileInputStream(packFile)) {
 			ObjectDirectoryPackParser p = (ObjectDirectoryPackParser) index(is);
 			p.parse(NullProgressMonitor.INSTANCE);
 			PackFile file = p.getPackFile();
@@ -20,8 +19,6 @@
 			assertTrue(file.hasObject(ObjectId.fromString("902d5476fa249b7abc9d84c611577a81381f0327")));
 			assertTrue(file.hasObject(ObjectId.fromString("aabf2ffaec9b497f0950352b3e582d73035c2035")));
 			assertTrue(file.hasObject(ObjectId.fromString("c59759f143fb1fe21c197981df75a7ee00290799")));
-		} finally {
-			is.close();
 		}
 	}
 

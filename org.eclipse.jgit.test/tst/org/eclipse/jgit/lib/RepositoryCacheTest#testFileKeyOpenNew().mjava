@@ -1,8 +1,9 @@
 	@Test
 	public void testFileKeyOpenNew() throws IOException {
-		final Repository n = createRepository(true, false);
-		final File gitdir = n.getDirectory();
-		n.close();
+		File gitdir;
+		try (Repository n = createRepository(true, false)) {
+			gitdir = n.getDirectory();
+		}
 		recursiveDelete(gitdir);
 		assertFalse(gitdir.exists());
 

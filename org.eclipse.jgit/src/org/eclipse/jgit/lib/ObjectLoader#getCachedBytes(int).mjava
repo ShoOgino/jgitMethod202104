@@ -32,8 +32,7 @@
 		if (!isLarge())
 			return getCachedBytes();
 
-		ObjectStream in = openStream();
-		try {
+		try (ObjectStream in = openStream()) {
 			long sz = in.getSize();
 			if (sizeLimit < sz)
 				throw new LargeObjectException.ExceedsLimit(sizeLimit, sz);
@@ -50,8 +49,6 @@
 
 			IO.readFully(in, buf, 0, buf.length);
 			return buf;
-		} finally {
-			in.close();
 		}
 	}
 

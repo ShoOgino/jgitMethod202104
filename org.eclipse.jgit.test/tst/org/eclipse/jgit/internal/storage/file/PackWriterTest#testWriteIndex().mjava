@@ -16,11 +16,8 @@
 
 		// Validate that an index written by PackWriter is the same.
 		final File idx2File = new File(indexFile.getAbsolutePath() + ".2");
-		final FileOutputStream is = new FileOutputStream(idx2File);
-		try {
+		try (FileOutputStream is = new FileOutputStream(idx2File)) {
 			writer.writeIndex(is);
-		} finally {
-			is.close();
 		}
 		final PackIndex idx2 = PackIndex.open(idx2File);
 		assertTrue(idx2 instanceof PackIndexV2);

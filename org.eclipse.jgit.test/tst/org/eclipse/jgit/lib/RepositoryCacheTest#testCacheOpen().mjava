@@ -1,6 +1,7 @@
 	@Test
 	public void testCacheOpen() throws Exception {
 		final FileKey loc = FileKey.exact(db.getDirectory(), db.getFS());
+		@SuppressWarnings("resource") // We are testing the close() method
 		final Repository d2 = RepositoryCache.open(loc);
 		assertNotSame(db, d2);
 		assertSame(d2, RepositoryCache.open(FileKey.exact(loc.getFile(), db.getFS())));

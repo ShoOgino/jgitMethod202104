@@ -12,10 +12,10 @@
 			{
 				byte[] origin = sourceText.getBytes(charset);
 				ByteArrayOutputStream target = new ByteArrayOutputStream();
-				OutputStream source = crypto.encrypt(target);
-				source.write(origin);
-				source.flush();
-				source.close();
+				try (OutputStream source = crypto.encrypt(target)) {
+					source.write(origin);
+					source.flush();
+				}
 				cipherText = target.toByteArray();
 			}
 			{

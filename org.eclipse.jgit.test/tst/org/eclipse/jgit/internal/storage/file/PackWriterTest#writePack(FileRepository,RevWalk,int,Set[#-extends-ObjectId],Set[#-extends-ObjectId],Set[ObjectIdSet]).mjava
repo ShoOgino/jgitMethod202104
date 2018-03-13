@@ -17,14 +17,14 @@
 			String id = pw.computeName().getName();
 			File packdir = repo.getObjectDatabase().getPackDirectory();
 			File packFile = new File(packdir, "pack-" + id + ".pack");
-			FileOutputStream packOS = new FileOutputStream(packFile);
-			pw.writePack(NullProgressMonitor.INSTANCE,
-					NullProgressMonitor.INSTANCE, packOS);
-			packOS.close();
+			try (FileOutputStream packOS = new FileOutputStream(packFile)) {
+				pw.writePack(NullProgressMonitor.INSTANCE,
+						NullProgressMonitor.INSTANCE, packOS);
+			}
 			File idxFile = new File(packdir, "pack-" + id + ".idx");
-			FileOutputStream idxOS = new FileOutputStream(idxFile);
-			pw.writeIndex(idxOS);
-			idxOS.close();
+			try (FileOutputStream idxOS = new FileOutputStream(idxFile)) {
+				pw.writeIndex(idxOS);
+			}
 			return PackIndex.open(idxFile);
 		}
 	}

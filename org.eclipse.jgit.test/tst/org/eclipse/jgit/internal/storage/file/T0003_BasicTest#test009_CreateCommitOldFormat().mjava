@@ -17,14 +17,11 @@
 		// Verify the commit we just wrote is in the correct format.
 		ObjectDatabase odb = db.getObjectDatabase();
 		assertTrue("is ObjectDirectory", odb instanceof ObjectDirectory);
-		final XInputStream xis = new XInputStream(new FileInputStream(
-				((ObjectDirectory) odb).fileFor(cmtid)));
-		try {
+		try (XInputStream xis = new XInputStream(
+				new FileInputStream(((ObjectDirectory) odb).fileFor(cmtid)))) {
 			assertEquals(0x78, xis.readUInt8());
 			assertEquals(0x9c, xis.readUInt8());
 			assertEquals(0, 0x789c % 31);
-		} finally {
-			xis.close();
 		}
 
 		// Verify we can read it.

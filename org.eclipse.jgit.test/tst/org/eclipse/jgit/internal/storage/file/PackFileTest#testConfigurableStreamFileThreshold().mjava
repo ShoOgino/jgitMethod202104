@@ -7,15 +7,16 @@
 		assertTrue("has blob", wc.has(id));
 
 		ObjectLoader ol = wc.open(id);
-		ObjectStream in = ol.openStream();
-		assertTrue(in instanceof ObjectStream.SmallStream);
-		assertEquals(300, in.available());
-		in.close();
+		try (ObjectStream in = ol.openStream()) {
+			assertTrue(in instanceof ObjectStream.SmallStream);
+			assertEquals(300, in.available());
+		}
 
 		wc.setStreamFileThreshold(299);
 		ol = wc.open(id);
-		in = ol.openStream();
-		assertTrue(in instanceof ObjectStream.Filter);
-		assertEquals(1, in.available());
+		try (ObjectStream in = ol.openStream()) {
+			assertTrue(in instanceof ObjectStream.Filter);
+			assertEquals(1, in.available());
+		}
 	}
 

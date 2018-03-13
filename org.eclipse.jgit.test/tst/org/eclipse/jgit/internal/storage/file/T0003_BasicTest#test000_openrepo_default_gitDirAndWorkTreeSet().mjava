@@ -8,10 +8,10 @@
 	public void test000_openrepo_default_gitDirAndWorkTreeSet()
 			throws IOException {
 		File repo1Parent = new File(trash.getParentFile(), "r1");
-		Repository repo1initial = new FileRepository(new File(repo1Parent,
-				Constants.DOT_GIT));
-		repo1initial.create();
-		repo1initial.close();
+		try (Repository repo1initial = new FileRepository(
+				new File(repo1Parent, Constants.DOT_GIT))) {
+			repo1initial.create();
+		}
 
 		File theDir = new File(repo1Parent, Constants.DOT_GIT);
 		FileRepository r = (FileRepository) new FileRepositoryBuilder()
