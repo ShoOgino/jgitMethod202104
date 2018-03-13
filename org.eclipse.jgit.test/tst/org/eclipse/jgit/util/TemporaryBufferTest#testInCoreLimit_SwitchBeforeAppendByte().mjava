@@ -1,5 +1,6 @@
 	@Test
 	public void testInCoreLimit_SwitchBeforeAppendByte() throws IOException {
+		@SuppressWarnings("resource") // Buffer is explicitly destroyed in finally block
 		final TemporaryBuffer b = new TemporaryBuffer.LocalFile(null);
 		final byte[] test = new TestRng(getName())
 				.nextBytes(TemporaryBuffer.DEFAULT_IN_CORE_LIMIT * 3);

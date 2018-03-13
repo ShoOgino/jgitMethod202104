@@ -1,6 +1,6 @@
 	@Test
 	public void testDestroyWhileOpen() throws IOException {
-		@SuppressWarnings("resource" /* java 7 */)
+		@SuppressWarnings("resource") // Buffer is explicitly destroyed in finally block
 		final TemporaryBuffer b = new TemporaryBuffer.LocalFile(null);
 		try {
 			b.write(new TestRng(getName())

@@ -1,5 +1,6 @@
 	@Test
 	public void testOneByte() throws IOException {
+		@SuppressWarnings("resource") // Buffer is explicitly destroyed in finally block
 		final TemporaryBuffer b = new TemporaryBuffer.LocalFile(null);
 		final byte test = (byte) new TestRng(getName()).nextInt();
 		try {
