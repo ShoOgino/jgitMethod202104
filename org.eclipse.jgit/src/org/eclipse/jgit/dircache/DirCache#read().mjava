@@ -18,18 +18,10 @@
 		if (!liveFile.exists())
 			clear();
 		else if (snapshot == null || snapshot.isModified(liveFile)) {
-			try {
-				final FileInputStream inStream = new FileInputStream(liveFile);
-				try {
-					clear();
-					readFrom(inStream);
-				} finally {
-					try {
-						inStream.close();
-					} catch (IOException err2) {
-						// Ignore any close failures.
-					}
-				}
+			try (SilentFileInputStream inStream = new SilentFileInputStream(
+					liveFile)) {
+				clear();
+				readFrom(inStream);
 			} catch (FileNotFoundException fnfe) {
 				if (liveFile.exists()) {
 					// Panic: the index file exists but we can't read it

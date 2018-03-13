@@ -20,19 +20,15 @@
 	public static PackBitmapIndex open(
 			File idxFile, PackIndex packIndex, PackReverseIndex reverseIndex)
 			throws IOException {
-		final FileInputStream fd = new FileInputStream(idxFile);
-		try {
-			return read(fd, packIndex, reverseIndex);
-		} catch (IOException ioe) {
-			throw new IOException(MessageFormat
-					.format(JGitText.get().unreadablePackIndex,
-							idxFile.getAbsolutePath()),
-					ioe);
-		} finally {
+		try (SilentFileInputStream fd = new SilentFileInputStream(
+				idxFile)) {
 			try {
-				fd.close();
-			} catch (IOException err2) {
-				// ignore
+				return read(fd, packIndex, reverseIndex);
+			} catch (IOException ioe) {
+				throw new IOException(
+						MessageFormat.format(JGitText.get().unreadablePackIndex,
+								idxFile.getAbsolutePath()),
+						ioe);
 			}
 		}
 	}
