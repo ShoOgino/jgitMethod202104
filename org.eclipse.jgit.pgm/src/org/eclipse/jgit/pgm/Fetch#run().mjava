@@ -22,6 +22,9 @@
 			if (quiet == null || !quiet.booleanValue())
 				fetch.setProgressMonitor(new TextProgressMonitor(errw));
 			fetch.setRecurseSubmodules(recurseSubmodules).setCallback(this);
+			if (force != null) {
+				fetch.setForceUpdate(force.booleanValue());
+			}
 
 			FetchResult result = fetch.call();
 			if (result.getTrackingRefUpdates().isEmpty()

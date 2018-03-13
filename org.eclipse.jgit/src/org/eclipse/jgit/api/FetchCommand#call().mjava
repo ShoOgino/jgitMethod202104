@@ -19,8 +19,8 @@
 				transport.setTagOpt(tagOption);
 			transport.setFetchThin(thin);
 			configure(transport);
-
-			FetchResult result = transport.fetch(monitor, refSpecs);
+			FetchResult result = transport.fetch(monitor,
+					applyOptions(refSpecs));
 			if (!repo.isBare()) {
 				fetchSubmodules(result);
 			}
