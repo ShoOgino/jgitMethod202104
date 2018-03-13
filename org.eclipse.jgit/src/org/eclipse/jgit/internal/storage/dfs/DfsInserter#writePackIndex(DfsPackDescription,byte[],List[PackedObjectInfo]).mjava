@@ -6,27 +6,20 @@
 		// If there are less than 58,000 objects, the entire index fits in under
 		// 2 MiB. Callers will probably need the index immediately, so buffer
 		// the index in process and load from the buffer.
-		TemporaryBuffer.Heap buf = null;
 		PackIndex packIndex = null;
-		if (list.size() <= 58000) {
-			buf = new TemporaryBuffer.Heap(2 << 20);
-			index(buf, packHash, list);
-			packIndex = PackIndex.read(buf.openInputStream());
-		}
-
-		try (DfsOutputStream os = db.writeFile(pack, INDEX)) {
-			CountingOutputStream cnt = new CountingOutputStream(os);
-			if (buf != null)
+		try (TemporaryBuffer.Heap buf = maybeGetTemporaryBuffer(list);
+				DfsOutputStream os = db.writeFile(pack, INDEX);
+				CountingOutputStream cnt = new CountingOutputStream(os)) {
+			if (buf != null) {
+				index(buf, packHash, list);
+				packIndex = PackIndex.read(buf.openInputStream());
 				buf.writeTo(cnt, null);
-			else
+			} else {
 				index(cnt, packHash, list);
+			}
 			pack.addFileExt(INDEX);
 			pack.setBlockSize(INDEX, os.blockSize());
 			pack.setFileSize(INDEX, cnt.getCount());
-		} finally {
-			if (buf != null) {
-				buf.close();
-			}
 		}
 		return packIndex;
 	}
