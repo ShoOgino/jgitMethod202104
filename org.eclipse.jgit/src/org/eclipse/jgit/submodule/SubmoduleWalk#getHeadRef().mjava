@@ -5,14 +5,12 @@
 	 * @throws java.io.IOException
 	 */
 	public String getHeadRef() throws IOException {
-		Repository subRepo = getRepository();
-		if (subRepo == null)
-			return null;
-		try {
+		try (Repository subRepo = getRepository()) {
+			if (subRepo == null) {
+				return null;
+			}
 			Ref head = subRepo.exactRef(Constants.HEAD);
 			return head != null ? head.getLeaf().getName() : null;
-		} finally {
-			subRepo.close();
 		}
 	}
 

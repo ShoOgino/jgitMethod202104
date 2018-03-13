@@ -5,13 +5,11 @@
 	 * @throws java.io.IOException
 	 */
 	public ObjectId getHead() throws IOException {
-		Repository subRepo = getRepository();
-		if (subRepo == null)
-			return null;
-		try {
+		try (Repository subRepo = getRepository()) {
+			if (subRepo == null) {
+				return null;
+			}
 			return subRepo.resolve(Constants.HEAD);
-		} finally {
-			subRepo.close();
 		}
 	}
 
