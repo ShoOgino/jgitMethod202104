@@ -1,21 +1,25 @@
 	/**
+	 * Read a possibly null {@link ObjectId} from the stream.
+	 *
+	 * Reads the first byte of the stream, which is expected to be either
+	 * {@link #NON_NULL_MARKER} or {@link #NULL_MARKER}.
+	 *
 	 * @param in
 	 *            the input stream
-	 * @return the object id
+	 * @return the object id, or null
 	 * @throws IOException
 	 *             there was an error reading the stream
 	 */
 	@Nullable
 	public static ObjectId read(InputStream in) throws IOException {
-		switch (in.read()) {
-		case 0:
+		byte marker = (byte) in.read();
+		switch (marker) {
+		case NULL_MARKER:
 			return null;
-		case 1:
-			final byte[] b = new byte[OBJECT_ID_LENGTH];
-			IO.readFully(in, b, 0, OBJECT_ID_LENGTH);
-			return ObjectId.fromRaw(b);
+		case NON_NULL_MARKER:
+			return readWithoutMarker(in);
 		default:
-			throw new IOException("Invalid flag before ObjectId"); //$NON-NLS-1$
+			throw new IOException("Invalid flag before ObjectId: " + marker); //$NON-NLS-1$
 		}
 	}
 
