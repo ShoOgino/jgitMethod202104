@@ -21,21 +21,23 @@
 				.setURI(rootUri).call();
 		// Clone it
 		File directory = createTempDirectory("testCopyFileBare");
-		Repository localDb = Git.cloneRepository().setDirectory(directory)
+		try (Repository localDb = Git.cloneRepository().setDirectory(directory)
 				.setURI(remoteDb.getDirectory().toURI().toString()).call()
-				.getRepository();
-		// The Hello file should exist
-		File hello = new File(localDb.getWorkTree(), "Hello");
-		assertTrue("The Hello file should exist", hello.exists());
-		// The foo/Hello file should be skipped.
-		File foohello = new File(localDb.getWorkTree(), "foo/Hello");
-		assertFalse("The foo/Hello file should be skipped", foohello.exists());
-		localDb.close();
-		// The content of Hello file should be expected
-		BufferedReader reader = new BufferedReader(new FileReader(hello));
-		String content = reader.readLine();
-		reader.close();
-		assertEquals("The Hello file should have expected content",
-				"branch world", content);
+				.getRepository()) {
+			// The Hello file should exist
+			File hello = new File(localDb.getWorkTree(), "Hello");
+			assertTrue("The Hello file should exist", hello.exists());
+			// The foo/Hello file should be skipped.
+			File foohello = new File(localDb.getWorkTree(), "foo/Hello");
+			assertFalse("The foo/Hello file should be skipped",
+					foohello.exists());
+			// The content of Hello file should be expected
+			try (BufferedReader reader = new BufferedReader(
+					new FileReader(hello))) {
+				String content = reader.readLine();
+				assertEquals("The Hello file should have expected content",
+						"branch world", content);
+			}
+		}
 	}
 

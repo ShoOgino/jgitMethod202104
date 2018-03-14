@@ -1,53 +1,37 @@
 	@Test
 	public void runTwiceIsNOP() throws Exception {
-		Repository child = Git.cloneRepository()
-			.setURI(groupADb.getDirectory().toURI().toString())
-			.setDirectory(createUniqueTestGitDir(true)).setBare(true).call()
-			.getRepository();
+		try (Repository child = cloneRepository(groupADb, true);
+				Repository dest = cloneRepository(db, true)) {
+			StringBuilder xmlContent = new StringBuilder();
+			xmlContent.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
+					.append("<manifest>")
+					.append("<remote name=\"remote1\" fetch=\"..\" />")
+					.append("<default revision=\"master\" remote=\"remote1\" />")
+					.append("<project path=\"base\" name=\"platform/base\" />")
+					.append("</manifest>");
+			RepoCommand cmd = new RepoCommand(dest);
 
-		Repository dest = Git.cloneRepository()
-			.setURI(db.getDirectory().toURI().toString())
-			.setDirectory(createUniqueTestGitDir(true)).setBare(true).call()
-			.getRepository();
+			IndexedRepos repos = new IndexedRepos();
+			repos.put("platform/base", child);
 
-		assertTrue(dest.isBare());
-		assertTrue(child.isBare());
+			RevCommit commit = cmd
+					.setInputStream(new ByteArrayInputStream(
+							xmlContent.toString().getBytes(CHARSET)))
+					.setRemoteReader(repos).setURI("platform/")
+					.setTargetURI("platform/superproject")
+					.setRecordRemoteBranch(true).setRecordSubmoduleLabels(true)
+					.call();
 
-		StringBuilder xmlContent = new StringBuilder();
-		xmlContent.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
-			.append("<manifest>")
-			.append("<remote name=\"remote1\" fetch=\"..\" />")
-			.append("<default revision=\"master\" remote=\"remote1\" />")
-			.append("<project path=\"base\" name=\"platform/base\" />")
-			.append("</manifest>");
-		RepoCommand cmd = new RepoCommand(dest);
-
-		IndexedRepos repos = new IndexedRepos();
-		repos.put("platform/base", child);
-
-		RevCommit commit = cmd
-			.setInputStream(new ByteArrayInputStream(
-				xmlContent.toString().getBytes(CHARSET)))
-			.setRemoteReader(repos)
-			.setURI("platform/")
-			.setTargetURI("platform/superproject")
-			.setRecordRemoteBranch(true)
-			.setRecordSubmoduleLabels(true)
-			.call();
-
-		String firstIdStr = commit.getId().name() + ":" + ".gitmodules";
-		commit = new RepoCommand(dest)
-			.setInputStream(new ByteArrayInputStream(
-				xmlContent.toString().getBytes(CHARSET)))
-			.setRemoteReader(repos)
-			.setURI("platform/")
-			.setTargetURI("platform/superproject")
-			.setRecordRemoteBranch(true)
-			.setRecordSubmoduleLabels(true)
-			.call();
-		String idStr = commit.getId().name() + ":" + ".gitmodules";
-		assertEquals(firstIdStr, idStr);
-		child.close();
-		dest.close();
+			String firstIdStr = commit.getId().name() + ":" + ".gitmodules";
+			commit = new RepoCommand(dest)
+					.setInputStream(new ByteArrayInputStream(
+							xmlContent.toString().getBytes(CHARSET)))
+					.setRemoteReader(repos).setURI("platform/")
+					.setTargetURI("platform/superproject")
+					.setRecordRemoteBranch(true).setRecordSubmoduleLabels(true)
+					.call();
+			String idStr = commit.getId().name() + ":" + ".gitmodules";
+			assertEquals(firstIdStr, idStr);
+		}
 	}
 

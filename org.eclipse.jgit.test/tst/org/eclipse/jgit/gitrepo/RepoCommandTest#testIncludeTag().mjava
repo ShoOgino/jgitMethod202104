@@ -31,10 +31,11 @@
 			.call();
 		File hello = new File(localDb.getWorkTree(), "foo/hello.txt");
 		assertTrue("submodule should be checked out", hello.exists());
-		BufferedReader reader = new BufferedReader(new FileReader(hello));
-		String content = reader.readLine();
-		reader.close();
-		assertEquals("submodule content should be as expected",
-				"master world", content);
+		try (BufferedReader reader = new BufferedReader(
+				new FileReader(hello))) {
+			String content = reader.readLine();
+			assertEquals("submodule content should be as expected",
+					"master world", content);
+		}
 	}
 

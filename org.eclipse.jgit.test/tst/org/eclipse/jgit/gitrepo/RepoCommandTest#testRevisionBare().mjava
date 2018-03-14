@@ -19,13 +19,13 @@
 				.setURI(rootUri).call();
 		// Clone it
 		File directory = createTempDirectory("testRevisionBare");
-		Repository localDb = Git.cloneRepository().setDirectory(directory)
+		try (Repository localDb = Git.cloneRepository().setDirectory(directory)
 				.setURI(remoteDb.getDirectory().toURI().toString()).call()
-				.getRepository();
-		// The gitlink should be the same as oldCommitId
-		String gitlink = localDb.resolve(Constants.HEAD + ":foo").name();
-		localDb.close();
-		assertEquals("The gitlink is same as remote head", oldCommitId.name(),
-				gitlink);
+				.getRepository()) {
+			// The gitlink should be the same as oldCommitId
+			String gitlink = localDb.resolve(Constants.HEAD + ":foo").name();
+			assertEquals("The gitlink is same as remote head",
+					oldCommitId.name(), gitlink);
+		}
 	}
 

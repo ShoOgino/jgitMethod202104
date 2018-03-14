@@ -31,35 +31,37 @@
 				.setURI(rootUri).call();
 		// Clone it
 		File directory = createTempDirectory("testReplaceManifestBare");
-		Repository localDb = Git.cloneRepository().setDirectory(directory)
+		File dotmodules;
+		try (Repository localDb = Git.cloneRepository().setDirectory(directory)
 				.setURI(remoteDb.getDirectory().toURI().toString()).call()
-				.getRepository();
-		// The Hello file should not exist
-		File hello = new File(localDb.getWorkTree(), "Hello");
-		assertFalse("The Hello file shouldn't exist", hello.exists());
-		// The Hello.txt file should exist
-		File hellotxt = new File(localDb.getWorkTree(), "Hello.txt");
-		assertTrue("The Hello.txt file should exist", hellotxt.exists());
+				.getRepository()) {
+			// The Hello file should not exist
+			File hello = new File(localDb.getWorkTree(), "Hello");
+			assertFalse("The Hello file shouldn't exist", hello.exists());
+			// The Hello.txt file should exist
+			File hellotxt = new File(localDb.getWorkTree(), "Hello.txt");
+			assertTrue("The Hello.txt file should exist", hellotxt.exists());
+			dotmodules = new File(localDb.getWorkTree(),
+					Constants.DOT_GIT_MODULES);
+		}
 		// The .gitmodules file should have 'submodule "bar"' and shouldn't
 		// have
 		// 'submodule "foo"' lines.
-		File dotmodules = new File(localDb.getWorkTree(),
-				Constants.DOT_GIT_MODULES);
-		localDb.close();
-		BufferedReader reader = new BufferedReader(new FileReader(dotmodules));
-		boolean foo = false;
-		boolean bar = false;
-		while (true) {
-			String line = reader.readLine();
-			if (line == null)
-				break;
-			if (line.contains("submodule \"foo\""))
-				foo = true;
-			if (line.contains("submodule \"bar\""))
-				bar = true;
+		try (BufferedReader reader = new BufferedReader(
+				new FileReader(dotmodules))) {
+			boolean foo = false;
+			boolean bar = false;
+			while (true) {
+				String line = reader.readLine();
+				if (line == null)
+					break;
+				if (line.contains("submodule \"foo\""))
+					foo = true;
+				if (line.contains("submodule \"bar\""))
+					bar = true;
+			}
+			assertTrue("The bar submodule should exist", bar);
+			assertFalse("The foo submodule shouldn't exist", foo);
 		}
-		reader.close();
-		assertTrue("The bar submodule should exist", bar);
-		assertFalse("The foo submodule shouldn't exist", foo);
 	}
 
