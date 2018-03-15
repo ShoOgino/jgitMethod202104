@@ -45,12 +45,65 @@
 				includeTag = true;
 			} else if (line.equals(OPTION_OFS_DELTA)) {
 				options.add(OPTION_OFS_DELTA);
+			} else if (line.startsWith("shallow ")) { //$NON-NLS-1$
+				clientShallowCommits.add(ObjectId.fromString(line.substring(8)));
+			} else if (line.startsWith("deepen ")) { //$NON-NLS-1$
+				depth = Integer.parseInt(line.substring(7));
+				if (depth <= 0) {
+					throw new PackProtocolException(
+							MessageFormat.format(JGitText.get().invalidDepth,
+									Integer.valueOf(depth)));
+				}
+				if (shallowSince != 0) {
+					throw new PackProtocolException(
+							JGitText.get().deepenSinceWithDeepen);
+				}
+				if (shallowExcludeRefs != null) {
+					throw new PackProtocolException(
+							JGitText.get().deepenNotWithDeepen);
+				}
+			} else if (line.startsWith("deepen-not ")) { //$NON-NLS-1$
+				List<String> exclude = shallowExcludeRefs;
+				if (exclude == null) {
+					exclude = shallowExcludeRefs = new ArrayList<>();
+				}
+				exclude.add(line.substring(11));
+				if (depth != 0) {
+					throw new PackProtocolException(
+							JGitText.get().deepenNotWithDeepen);
+				}
+			} else if (line.equals(OPTION_DEEPEN_RELATIVE)) {
+				options.add(OPTION_DEEPEN_RELATIVE);
+			} else if (line.startsWith("deepen-since ")) { //$NON-NLS-1$
+				shallowSince = Integer.parseInt(line.substring(13));
+				if (shallowSince <= 0) {
+					throw new PackProtocolException(
+							MessageFormat.format(
+									JGitText.get().invalidTimestamp, line));
+				}
+				if (depth !=  0) {
+					throw new PackProtocolException(
+							JGitText.get().deepenSinceWithDeepen);
+				}
 			}
 			// else ignore it
 		}
 		rawOut.stopBuffering();
 
 		boolean sectionSent = false;
+		@Nullable List<ObjectId> shallowCommits = null;
+		List<ObjectId> unshallowCommits = new ArrayList<>();
+
+		if (!clientShallowCommits.isEmpty()) {
+			verifyClientShallow();
+		}
+		if (depth != 0 || shallowSince != 0 || shallowExcludeRefs != null) {
+			shallowCommits = new ArrayList<ObjectId>();
+			processShallow(shallowCommits, unshallowCommits, false);
+		}
+		if (!clientShallowCommits.isEmpty())
+			walk.assumeShallow(clientShallowCommits);
+
 		if (doneReceived) {
 			processHaveLines(peerHas, ObjectId.zeroId(), new PacketLineOut(NullOutputStream.INSTANCE));
 		} else {
@@ -68,7 +121,21 @@
 			}
 			sectionSent = true;
 		}
+
 		if (doneReceived || okToGiveUp()) {
+			if (shallowCommits != null) {
+				if (sectionSent)
+					pckOut.writeDelim();
+				pckOut.writeString("shallow-info\n"); //$NON-NLS-1$
+				for (ObjectId o : shallowCommits) {
+					pckOut.writeString("shallow " + o.getName() + '\n'); //$NON-NLS-1$
+				}
+				for (ObjectId o : unshallowCommits) {
+					pckOut.writeString("unshallow " + o.getName() + '\n'); //$NON-NLS-1$
+				}
+				sectionSent = true;
+			}
+
 			if (sectionSent)
 				pckOut.writeDelim();
 			pckOut.writeString("packfile\n"); //$NON-NLS-1$

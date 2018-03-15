@@ -1,0 +1,38 @@
+	@Test
+	public void testV2FetchShallow() throws Exception {
+		RevCommit commonParent = remote.commit().message("parent").create();
+		RevCommit fooChild = remote.commit().message("x").parent(commonParent).create();
+		RevCommit barChild = remote.commit().message("y").parent(commonParent).create();
+		remote.update("branch1", barChild);
+
+		// Without shallow, the server thinks that we have
+		// commonParent, so it doesn't send it.
+		ByteArrayInputStream recvStream = uploadPackV2(
+			"command=fetch\n",
+			PacketLineIn.DELIM,
+			"want " + barChild.toObjectId().getName() + "\n",
+			"have " + fooChild.toObjectId().getName() + "\n",
+			"done\n",
+			PacketLineIn.END);
+		PacketLineIn pckIn = new PacketLineIn(recvStream);
+		assertThat(pckIn.readString(), is("packfile"));
+		parsePack(recvStream);
+		assertTrue(client.hasObject(barChild.toObjectId()));
+		assertFalse(client.hasObject(commonParent.toObjectId()));
+
+		// With shallow, the server knows that we don't have
+		// commonParent, so it sends it.
+		recvStream = uploadPackV2(
+			"command=fetch\n",
+			PacketLineIn.DELIM,
+			"want " + barChild.toObjectId().getName() + "\n",
+			"have " + fooChild.toObjectId().getName() + "\n",
+			"shallow " + fooChild.toObjectId().getName() + "\n",
+			"done\n",
+			PacketLineIn.END);
+		pckIn = new PacketLineIn(recvStream);
+		assertThat(pckIn.readString(), is("packfile"));
+		parsePack(recvStream);
+		assertTrue(client.hasObject(commonParent.toObjectId()));
+	}
+
