@@ -1,0 +1,23 @@
+		/**
+		 * Create a new file entry given the specified FileModeStrategy
+		 *
+		 * @param f
+		 *            file
+		 * @param fs
+		 *            file system
+		 * @param attributes
+		 *            of the file
+		 * @param fileModeStrategy
+		 *            the strategy to use when determining the FileMode of a
+		 *            file; controls gitlinks etc.
+		 *
+		 * @since 5.0
+		 */
+		public FileEntry(File f, FS fs, FS.Attributes attributes,
+				FileModeStrategy fileModeStrategy) {
+			this.fs = fs;
+			this.attributes = attributes;
+			f = fs.normalize(f);
+			mode = fileModeStrategy.getMode(f, attributes);
+		}
+
