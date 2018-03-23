@@ -1,14 +1,14 @@
 	@Test
 	public void testFetchWithBlobLimitFilterAndBitmaps() throws Exception {
 		InMemoryRepository server2 = newRepo("server2");
-		TestRepository<InMemoryRepository> remote =
+		TestRepository<InMemoryRepository> remote2 =
 				new TestRepository<>(server2);
-		RevBlob longBlob = remote.blob("foobar");
-		RevBlob shortBlob = remote.blob("fooba");
-		RevTree tree = remote.tree(
-				remote.file("1", longBlob), remote.file("2", shortBlob));
-		RevCommit commit = remote.commit(tree);
-		remote.update("master", commit);
+		RevBlob longBlob = remote2.blob("foobar");
+		RevBlob shortBlob = remote2.blob("fooba");
+		RevTree tree = remote2.tree(remote2.file("1", longBlob),
+				remote2.file("2", shortBlob));
+		RevCommit commit = remote2.commit(tree);
+		remote2.update("master", commit);
 
 		server2.getConfig().setBoolean("uploadpack", null, "allowfilter", true);
 

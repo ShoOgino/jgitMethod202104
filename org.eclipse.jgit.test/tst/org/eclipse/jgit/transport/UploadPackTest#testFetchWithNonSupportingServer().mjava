@@ -1,12 +1,12 @@
 	@Test
 	public void testFetchWithNonSupportingServer() throws Exception {
 		InMemoryRepository server2 = newRepo("server2");
-		TestRepository<InMemoryRepository> remote =
+		TestRepository<InMemoryRepository> remote2 =
 				new TestRepository<>(server2);
-		RevBlob blob = remote.blob("foo");
-		RevTree tree = remote.tree(remote.file("1", blob));
-		RevCommit commit = remote.commit(tree);
-		remote.update("master", commit);
+		RevBlob blob = remote2.blob("foo");
+		RevTree tree = remote2.tree(remote2.file("1", blob));
+		RevCommit commit = remote2.commit(tree);
+		remote2.update("master", commit);
 
 		server2.getConfig().setBoolean("uploadpack", null, "allowfilter", false);
 
