@@ -1,0 +1,15 @@
+	/**
+	 * Create a new iterator for the current entry's subtree.
+	 * <p>
+	 * The parent reference of the iterator must be <code>this</code>, otherwise
+	 * the caller would not be able to exit out of the subtree iterator
+	 * correctly and return to continue walking <code>this</code>.
+	 *
+	 * @return a new iterator that walks over the current subtree.
+	 * @since 5.0
+	 */
+	protected AbstractTreeIterator enterSubtree() {
+		return new FileTreeIterator(this, ((FileEntry) current()).getFile(), fs,
+				fileModeStrategy);
+	}
+

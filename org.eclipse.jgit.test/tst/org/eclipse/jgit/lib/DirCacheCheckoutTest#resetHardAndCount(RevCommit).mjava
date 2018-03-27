@@ -1,0 +1,16 @@
+	private int resetHardAndCount(RevCommit commit) throws Exception {
+		int[] callCount = { 0 };
+		DirCache cache = db.lockDirCache();
+		FileTreeIterator workingTreeIterator = new TestFileTreeIterator(db,
+				callCount);
+		try {
+			DirCacheCheckout checkout = new DirCacheCheckout(db, null, cache,
+					commit.getTree().getId(), workingTreeIterator);
+			checkout.setFailOnConflict(false);
+			checkout.checkout();
+		} finally {
+			cache.unlock();
+		}
+		return callCount[0];
+	}
+

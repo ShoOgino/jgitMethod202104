@@ -2,6 +2,16 @@
 	@Override
 	public AbstractTreeIterator createSubtreeIterator(ObjectReader reader)
 			throws IncorrectObjectTypeException, IOException {
-		return new FileTreeIterator(this, ((FileEntry) current()).getFile(), fs, fileModeStrategy);
+		if (!walksIgnoredDirectories() && isEntryIgnored()) {
+			DirCacheIterator iterator = getDirCacheIterator();
+			if (iterator == null) {
+				return new EmptyTreeIterator(this);
+			}
+			// Only enter if we have an associated DirCacheIterator that is
+			// at the same entry (which indicates there is some already
+			// tracked file underneath this directory). Otherwise the
+			// directory is indeed ignored and can be skipped entirely.
+		}
+		return enterSubtree();
 	}
 
