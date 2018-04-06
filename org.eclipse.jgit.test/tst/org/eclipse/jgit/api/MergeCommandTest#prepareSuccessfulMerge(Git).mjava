@@ -1,0 +1,21 @@
+	private Ref prepareSuccessfulMerge(Git git) throws Exception {
+		writeTrashFile("a", "1\na\n3\n");
+		git.add().addFilepattern("a").call();
+		RevCommit initialCommit = git.commit().setMessage("initial").call();
+
+		createBranch(initialCommit, "refs/heads/side");
+		checkoutBranch("refs/heads/side");
+
+		writeTrashFile("b", "1\nb\n3\n");
+		git.add().addFilepattern("b").call();
+		git.commit().setMessage("side").call();
+
+		checkoutBranch("refs/heads/master");
+
+		writeTrashFile("c", "1\nc\n3\n");
+		git.add().addFilepattern("c").call();
+		git.commit().setMessage("main").call();
+
+		return db.exactRef("refs/heads/side");
+	}
+

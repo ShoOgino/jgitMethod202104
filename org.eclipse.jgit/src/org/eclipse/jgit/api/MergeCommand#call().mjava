@@ -170,6 +170,7 @@
 						try (Git git = new Git(getRepository())) {
 							newHeadId = git.commit()
 									.setReflogComment(refLogMessage.toString())
+									.setInsertChangeId(insertChangeId)
 									.call().getId();
 						}
 						mergeStatus = MergeStatus.MERGED;
