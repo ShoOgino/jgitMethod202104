@@ -1,7 +1,7 @@
 	private Map<String, RemoteRefUpdate> prepareRemoteUpdates()
 			throws TransportException {
 		boolean atomic = transport.isPushAtomic();
-		final Map<String, RemoteRefUpdate> result = new HashMap<>();
+		final Map<String, RemoteRefUpdate> result = new LinkedHashMap<>();
 		for (final RemoteRefUpdate rru : toPush.values()) {
 			final Ref advertisedRef = connection.getRef(rru.getRemoteName());
 			ObjectId advertisedOld = null;
