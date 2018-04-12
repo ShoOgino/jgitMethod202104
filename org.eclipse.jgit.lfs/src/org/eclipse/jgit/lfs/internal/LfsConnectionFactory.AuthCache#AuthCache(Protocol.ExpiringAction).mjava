@@ -10,8 +10,9 @@
 			this.cachedAction = action;
 			try {
 				if (action.expiresIn != null && !action.expiresIn.isEmpty()) {
-					this.validUntil = System.currentTimeMillis()
-							+ Long.parseLong(action.expiresIn);
+					this.validUntil = (System.currentTimeMillis()
+							+ Long.parseLong(action.expiresIn))
+							- AUTH_CACHE_EAGER_TIMEOUT;
 				} else if (action.expiresAt != null
 						&& !action.expiresAt.isEmpty()) {
 					this.validUntil = ISO_FORMAT.parse(action.expiresAt)
