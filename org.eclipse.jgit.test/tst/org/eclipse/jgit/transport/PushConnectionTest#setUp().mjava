@@ -2,6 +2,7 @@
 	public void setUp() throws Exception {
 		server = newRepo("server");
 		client = newRepo("client");
+		processedRefs = new ArrayList<>();
 		testProtocol = new TestProtocol<>(
 				null,
 				new ReceivePackFactory<Object>() {
@@ -9,7 +10,18 @@
 					public ReceivePack create(Object req, Repository db)
 							throws ServiceNotEnabledException,
 							ServiceNotAuthorizedException {
-						return new ReceivePack(db);
+						ReceivePack rp = new ReceivePack(db);
+						rp.setPreReceiveHook(
+								new PreReceiveHook() {
+									@Override
+									public void onPreReceive(ReceivePack receivePack,
+											Collection<ReceiveCommand> cmds) {
+										for (ReceiveCommand cmd : cmds) {
+											processedRefs.add(cmd.getRefName());
+										}
+									}
+								});
+						return rp;
 					}
 				});
 		uri = testProtocol.register(ctx, server);
