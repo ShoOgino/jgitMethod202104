@@ -13,7 +13,7 @@
 					@Override
 					public void onRefsChanged(RefsChangedEvent event) {
 						try {
-							refDb.getRefs("ref");
+							refDb.getRefsByPrefix("ref");
 							changeCount.incrementAndGet();
 						} catch (StackOverflowError soe) {
 							error.set(soe);
@@ -22,8 +22,8 @@
 						}
 					}
 				});
-		refDb.getRefs("ref");
-		refDb.getRefs("ref");
+		refDb.getRefsByPrefix("ref");
+		refDb.getRefsByPrefix("ref");
 		assertNull(error.get());
 		assertNull(exception.get());
 		assertEquals(1, changeCount.get());

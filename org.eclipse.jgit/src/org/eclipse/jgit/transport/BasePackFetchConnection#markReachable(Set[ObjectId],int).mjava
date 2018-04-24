@@ -1,7 +1,6 @@
 	private void markReachable(final Set<ObjectId> have, final int maxTime)
 			throws IOException {
-		Map<String, Ref> refs = local.getRefDatabase().getRefs(ALL);
-		for (final Ref r : refs.values()) {
+		for (Ref r : local.getRefDatabase().getRefsByPrefix(ALL)) {
 			ObjectId id = r.getPeeledObjectId();
 			if (id == null)
 				id = r.getObjectId();

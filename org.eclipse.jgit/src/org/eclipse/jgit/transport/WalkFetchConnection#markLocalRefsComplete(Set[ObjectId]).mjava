@@ -1,11 +1,11 @@
 	private void markLocalRefsComplete(final Set<ObjectId> have) throws TransportException {
-		Map<String, Ref> refs;
+		List<Ref> refs;
 		try {
-			refs = local.getRefDatabase().getRefs(ALL);
+			refs = local.getRefDatabase().getRefsByPrefix(ALL);
 		} catch (IOException e) {
 			throw new TransportException(e.getMessage(), e);
 		}
-		for (final Ref r : refs.values()) {
+		for (final Ref r : refs) {
 			try {
 				markLocalObjComplete(revWalk.parseAny(r.getObjectId()));
 			} catch (IOException readError) {

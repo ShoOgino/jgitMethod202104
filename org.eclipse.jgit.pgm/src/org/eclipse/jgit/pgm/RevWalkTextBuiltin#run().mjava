@@ -20,9 +20,9 @@
 			walk.setRevFilter(AndRevFilter.create(revLimiter));
 
 		if (all) {
-			Map<String, Ref> refs =
-				db.getRefDatabase().getRefs(RefDatabase.ALL);
-			for (Ref a : refs.values()) {
+			List<Ref> refs =
+					db.getRefDatabase().getRefsByPrefix(RefDatabase.ALL);
+			for (Ref a : refs) {
 				ObjectId oid = a.getPeeledObjectId();
 				if (oid == null)
 					oid = a.getObjectId();

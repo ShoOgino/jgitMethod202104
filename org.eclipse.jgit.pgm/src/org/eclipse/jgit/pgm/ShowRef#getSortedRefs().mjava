@@ -1,8 +1,7 @@
 	private Iterable<Ref> getSortedRefs() throws Exception {
-		Map<String, Ref> all = db.getRefDatabase().getRefs(ALL);
-		if (all instanceof RefMap
-				|| (all instanceof SortedMap && ((SortedMap) all).comparator() == null))
-			return all.values();
-		return RefComparator.sort(all.values());
+		List<Ref> all = db.getRefDatabase().getRefsByPrefix(ALL);
+		// TODO(jrn) check if we can reintroduce fast-path by e.g. implementing
+		// SortedList
+		return RefComparator.sort(all);
 	}
 
