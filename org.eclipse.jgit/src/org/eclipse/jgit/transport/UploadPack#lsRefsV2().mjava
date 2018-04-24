@@ -12,18 +12,20 @@
 		// line is DELIM if there are arguments or END if not.
 		if (line == PacketLineIn.DELIM) {
 			while ((line = pckIn.readString()) != PacketLineIn.END) {
-				if (line.equals("peel")) {
+				if (line.equals("peel")) { //$NON-NLS-1$
 					adv.setDerefTags(true);
-				} else if (line.equals("symrefs")) {
+				} else if (line.equals("symrefs")) { //$NON-NLS-1$
 					needToFindSymrefs = true;
-				} else if (line.startsWith("ref-prefix ")) {
-					refPrefixes.add(line.substring("ref-prefix ".length()));
+				} else if (line.startsWith("ref-prefix ")) { //$NON-NLS-1$
+					refPrefixes.add(line.substring("ref-prefix ".length())); //$NON-NLS-1$
 				} else {
-					throw new PackProtocolException("unexpected " + line);
+					throw new PackProtocolException(MessageFormat
+							.format(JGitText.get().unexpectedPacketLine, line));
 				}
 			}
 		} else if (line != PacketLineIn.END) {
-			throw new PackProtocolException("unexpected " + line);
+			throw new PackProtocolException(MessageFormat
+					.format(JGitText.get().unexpectedPacketLine, line));
 		}
 		rawOut.stopBuffering();
 
