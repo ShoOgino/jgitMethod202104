@@ -1,22 +1,4 @@
 	boolean hasPackedObject(AnyObjectId objectId) {
-		PackList pList;
-		do {
-			pList = packList.get();
-			for (PackFile p : pList.packs) {
-				try {
-					if (p.hasObject(objectId))
-						return true;
-				} catch (IOException e) {
-					// The hasObject call should have only touched the index,
-					// so any failure here indicates the index is unreadable
-					// by this process, and the pack is likewise not readable.
-					LOG.warn(MessageFormat.format(
-							JGitText.get().unableToReadPackfile,
-							p.getPackFile().getAbsolutePath()), e);
-					removePack(p);
-				}
-			}
-		} while (searchPacksAgain(pList));
-		return false;
+		return packed.has(objectId);
 	}
 

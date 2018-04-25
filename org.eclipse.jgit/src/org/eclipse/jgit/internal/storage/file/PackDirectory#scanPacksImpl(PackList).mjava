@@ -1,6 +1,6 @@
 	private PackList scanPacksImpl(PackList old) {
 		final Map<String, PackFile> forReuse = reuseMap(old);
-		final FileSnapshot snapshot = FileSnapshot.save(packDirectory);
+		final FileSnapshot snapshot = FileSnapshot.save(directory);
 		final Set<String> names = listPackDirectory();
 		final List<PackFile> list = new ArrayList<>(names.size() >> 2);
 		boolean foundNew = false;
@@ -26,7 +26,7 @@
 			}
 
 			final String packName = base + PACK.getExtension();
-			final File packFile = new File(packDirectory, packName);
+			final File packFile = new File(directory, packName);
 			final PackFile oldPack = forReuse.get(packName);
 			if (oldPack != null
 					&& !oldPack.getFileSnapshot().isModified(packFile)) {

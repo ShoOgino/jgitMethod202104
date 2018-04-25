@@ -8,18 +8,18 @@
 			LOG.warn(MessageFormat.format(warnTmpl,
 					p.getPackFile().getAbsolutePath()), e);
 			// Assume the pack is corrupted, and remove it from the list.
-			removePack(p);
+			remove(p);
 		} else if (e instanceof FileNotFoundException) {
 			if (p.getPackFile().exists()) {
 				errTmpl = JGitText.get().packInaccessible;
 				transientErrorCount = p.incrementTransientErrorCount();
 			} else {
 				warnTmpl = JGitText.get().packWasDeleted;
-				removePack(p);
+				remove(p);
 			}
 		} else if (FileUtils.isStaleFileHandleInCausalChain(e)) {
 			warnTmpl = JGitText.get().packHandleIsStale;
-			removePack(p);
+			remove(p);
 		} else {
 			transientErrorCount = p.incrementTransientErrorCount();
 		}

@@ -1,23 +1,8 @@
 	private void resolve(Set<ObjectId> matches, AbbreviatedObjectId id,
 			Set<AlternateHandle.Id> skips)
 			throws IOException {
-		// Go through the packs once. If we didn't find any resolutions
-		// scan for new packs and check once more.
-		int oldSize = matches.size();
-		PackList pList;
-		do {
-			pList = packList.get();
-			for (PackFile p : pList.packs) {
-				try {
-					p.resolve(matches, id, RESOLVE_ABBREV_LIMIT);
-					p.resetTransientErrorCount();
-				} catch (IOException e) {
-					handlePackError(e, p);
-				}
-				if (matches.size() > RESOLVE_ABBREV_LIMIT)
-					return;
-			}
-		} while (matches.size() == oldSize && searchPacksAgain(pList));
+		if (!packed.resolve(matches, id, RESOLVE_ABBREV_LIMIT))
+			return;
 
 		String fanOut = id.name().substring(0, 2);
 		String[] entries = new File(getDirectory(), fanOut).list();
