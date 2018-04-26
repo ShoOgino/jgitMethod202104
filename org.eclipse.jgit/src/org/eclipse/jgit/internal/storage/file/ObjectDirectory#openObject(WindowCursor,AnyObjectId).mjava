@@ -1,7 +1,7 @@
 	@Override
 	ObjectLoader openObject(WindowCursor curs, AnyObjectId objectId)
 			throws IOException {
-		if (unpackedObjectCache.isUnpacked(objectId)) {
+		if (loose.hasCached(objectId)) {
 			ObjectLoader ldr = openLooseObject(curs, objectId);
 			if (ldr != null) {
 				return ldr;

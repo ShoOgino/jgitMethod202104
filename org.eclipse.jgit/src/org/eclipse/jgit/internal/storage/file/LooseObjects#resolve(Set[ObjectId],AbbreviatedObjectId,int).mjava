@@ -1,0 +1,36 @@
+	/**
+	 * Find objects matching the prefix abbreviation.
+	 *
+	 * @param matches
+	 *            set to add any located ObjectIds to. This is an output
+	 *            parameter.
+	 * @param id
+	 *            prefix to search for.
+	 * @param matchLimit
+	 *            maximum number of results to return. At most this many
+	 *            ObjectIds should be added to matches before returning.
+	 * @return {@code true} if the matches were exhausted before reaching
+	 *            {@code maxLimit}.
+	 */
+	boolean resolve(Set<ObjectId> matches, AbbreviatedObjectId id,
+			int matchLimit) {
+		String fanOut = id.name().substring(0, 2);
+		String[] entries = new File(directory, fanOut).list();
+		if (entries != null) {
+			for (String e : entries) {
+				if (e.length() != Constants.OBJECT_ID_STRING_LENGTH - 2)
+					continue;
+				try {
+					ObjectId entId = ObjectId.fromString(fanOut + e);
+					if (id.prefixCompare(entId) == 0)
+						matches.add(entId);
+				} catch (IllegalArgumentException notId) {
+					continue;
+				}
+				if (matches.size() > matchLimit)
+					return false;
+			}
+		}
+		return true;
+	}
+

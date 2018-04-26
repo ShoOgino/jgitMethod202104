@@ -1,8 +1,8 @@
 	@Override
 	long getObjectSize(WindowCursor curs, AnyObjectId id)
 			throws IOException {
-		if (unpackedObjectCache.isUnpacked(id)) {
-			long len = getLooseObjectSize(curs, id);
+		if (loose.hasCached(id)) {
+			long len = loose.getSize(curs, id);
 			if (0 <= len) {
 				return len;
 			}

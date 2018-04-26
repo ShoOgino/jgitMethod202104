@@ -1,0 +1,14 @@
+	/**
+	 * Compute the location of a loose object file.
+	 *
+	 * @param objectId
+	 *            identity of the object to get the File location for.
+	 * @return {@link java.io.File} location of the specified loose object.
+	 */
+	File fileFor(AnyObjectId objectId) {
+		String n = objectId.name();
+		String d = n.substring(0, 2);
+		String f = n.substring(2);
+		return new File(new File(getDirectory(), d), f);
+	}
+

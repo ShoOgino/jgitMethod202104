@@ -1,0 +1,42 @@
+	InsertLooseObjectResult insert(File tmp, ObjectId id) throws IOException {
+		final File dst = fileFor(id);
+		if (dst.exists()) {
+			// We want to be extra careful and avoid replacing an object
+			// that already exists. We can't be sure renameTo() would
+			// fail on all platforms if dst exists, so we check first.
+			//
+			FileUtils.delete(tmp, FileUtils.RETRY);
+			return InsertLooseObjectResult.EXISTS_LOOSE;
+		}
+
+		try {
+			return tryMove(tmp, dst, id);
+		} catch (NoSuchFileException e) {
+			// It's possible the directory doesn't exist yet as the object
+			// directories are always lazily created. Note that we try the
+			// rename/move first as the directory likely does exist.
+			//
+			// Create the directory.
+			//
+			FileUtils.mkdir(dst.getParentFile(), true);
+		} catch (IOException e) {
+			// Any other IO error is considered a failure.
+			//
+			LOG.error(e.getMessage(), e);
+			FileUtils.delete(tmp, FileUtils.RETRY);
+			return InsertLooseObjectResult.FAILURE;
+		}
+
+		try {
+			return tryMove(tmp, dst, id);
+		} catch (IOException e) {
+			// The object failed to be renamed into its proper location and
+			// it doesn't exist in the repository either. We really don't
+			// know what went wrong, so fail.
+			//
+			LOG.error(e.getMessage(), e);
+			FileUtils.delete(tmp, FileUtils.RETRY);
+			return InsertLooseObjectResult.FAILURE;
+		}
+	}
+
