@@ -7,8 +7,7 @@
 	 *             the references could not be accessed
 	 */
 	public LogCommand all() throws IOException {
-		List<Ref> refs = getRepository().getRefDatabase().getRefsByPrefix(ALL);
-		for (Ref ref : refs) {
+		for (Ref ref : getRepository().getRefDatabase().getAllRefs()) {
 			if(!ref.isPeeled())
 				ref = getRepository().peel(ref);
 
