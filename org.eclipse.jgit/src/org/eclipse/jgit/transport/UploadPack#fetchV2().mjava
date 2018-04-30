@@ -29,6 +29,7 @@
 		}
 
 		boolean includeTag = false;
+		boolean filterReceived = false;
 		while ((line = pckIn.readString()) != PacketLineIn.END) {
 			if (line.startsWith("want ")) { //$NON-NLS-1$
 				wantIds.add(ObjectId.fromString(line.substring(5)));
@@ -85,6 +86,13 @@
 					throw new PackProtocolException(
 							JGitText.get().deepenSinceWithDeepen);
 				}
+			} else if (transferConfig.isAllowFilter()
+					&& line.startsWith(OPTION_FILTER + ' ')) {
+				if (filterReceived) {
+					throw new PackProtocolException(JGitText.get().tooManyFilters);
+				}
+				filterReceived = true;
+				parseFilter(line.substring(OPTION_FILTER.length() + 1));
 			} else {
 				throw new PackProtocolException(MessageFormat
 						.format(JGitText.get().unexpectedPacketLine, line));

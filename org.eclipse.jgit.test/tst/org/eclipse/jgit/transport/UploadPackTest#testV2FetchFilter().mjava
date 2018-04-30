@@ -1,0 +1,26 @@
+	@Test
+	public void testV2FetchFilter() throws Exception {
+		RevBlob big = remote.blob("foobar");
+		RevBlob small = remote.blob("fooba");
+		RevTree tree = remote.tree(remote.file("1", big),
+				remote.file("2", small));
+		RevCommit commit = remote.commit(tree);
+		remote.update("master", commit);
+
+		server.getConfig().setBoolean("uploadpack", null, "allowfilter", true);
+
+		ByteArrayInputStream recvStream = uploadPackV2(
+			"command=fetch\n",
+			PacketLineIn.DELIM,
+			"want " + commit.toObjectId().getName() + "\n",
+			"filter blob:limit=5\n",
+			"done\n",
+			PacketLineIn.END);
+		PacketLineIn pckIn = new PacketLineIn(recvStream);
+		assertThat(pckIn.readString(), is("packfile"));
+		parsePack(recvStream);
+
+		assertFalse(client.hasObject(big.toObjectId()));
+		assertTrue(client.hasObject(small.toObjectId()));
+	}
+
