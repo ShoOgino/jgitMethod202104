@@ -1,5 +1,11 @@
 	/**
 	 * Check if any refs exist in the ref database.
+	 * <p>
+	 * This uses the same definition of refs as {@link #getRefs()}. In
+	 * particular, returns {@code false} in a new repository with no refs
+	 * under {@code refs/} and {@code HEAD} pointing to a branch yet to be
+	 * born, and returns {@code true} in a repository with no refs under
+	 * {@code refs/} and a detached {@code HEAD} pointing to history.
 	 *
 	 * @return true if the database has refs.
 	 * @throws java.io.IOException
@@ -7,6 +13,6 @@
 	 * @since 5.0
 	 */
 	public boolean hasRefs() throws IOException {
-		return !getAllRefs().isEmpty();
+		return !getRefs().isEmpty();
 	}
 

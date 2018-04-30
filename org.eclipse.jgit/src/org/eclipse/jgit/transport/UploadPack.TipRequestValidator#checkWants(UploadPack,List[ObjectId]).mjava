@@ -5,8 +5,7 @@
 				new ReachableCommitTipRequestValidator().checkWants(up, wants);
 			else if (!wants.isEmpty()) {
 				Set<ObjectId> refIds =
-						refIdSet(up.getRepository().getRefDatabase()
-								.getAllRefs());
+						refIdSet(up.getRepository().getRefDatabase().getRefs());
 				for (ObjectId obj : wants) {
 					if (!refIds.contains(obj))
 						throw new WantNotValidException(obj);
