@@ -1,12 +1,14 @@
 	/** Detect index changes. */
 	private void detectIndexChanges() {
-		if (isBare())
+		if (isBare()) {
 			return;
+		}
 
 		File indexFile = getIndexFile();
-		if (snapshot == null)
-			snapshot = FileSnapshot.save(indexFile);
-		else if (snapshot.isModified(indexFile))
-			notifyIndexChanged();
+		if (snapshot.get() == null) {
+			snapshot.getAndSet(FileSnapshot.save(indexFile));
+		} else if (snapshot.get().isModified(indexFile)) {
+			notifyIndexChanged(false);
+		}
 	}
 

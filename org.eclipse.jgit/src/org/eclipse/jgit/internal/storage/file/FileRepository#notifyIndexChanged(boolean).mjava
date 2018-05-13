@@ -1,0 +1,7 @@
+	/** {@inheritDoc} */
+	@Override
+	public void notifyIndexChanged(boolean internal) {
+		snapshot.getAndSet(FileSnapshot.save(getIndexFile()));
+		fireEvent(new IndexChangedEvent(internal));
+	}
+
