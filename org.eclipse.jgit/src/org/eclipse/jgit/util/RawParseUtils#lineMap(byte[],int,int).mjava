@@ -26,10 +26,8 @@
 	 *            array as a single line if a '\0' is found.
 	 */
 	public static final IntList lineMap(final byte[] buf, int ptr, int end) {
-		IntList map;
-		try {
-		  map = lineMapOrBinary(buf, ptr, end);
-		} catch (BinaryBlobException e) {
+		IntList map = lineMapOrNull(buf, ptr, end);
+		if (map == null) {
 			map = new IntList(3);
 			map.add(Integer.MIN_VALUE);
 			map.add(ptr);
