@@ -1,0 +1,58 @@
+	/**
+	 * Format an advertisement for the supplied refs.
+	 *
+	 * @param refs
+	 *            zero or more refs to format for the client. The collection is
+	 *            sorted before display if necessary, and therefore may appear
+	 *            in any order.
+	 * @return set of ObjectIds that were advertised to the client.
+	 * @throws java.io.IOException
+	 *             the underlying output stream failed to write out an
+	 *             advertisement record.
+	 * @since 5.0
+	 */
+	public Set<ObjectId> send(Collection<Ref> refs) throws IOException {
+		for (Ref ref : RefComparator.sort(refs)) {
+			// TODO(jrn) revive the SortedMap optimization e.g. by introducing
+			// SortedList
+			ObjectId objectId = ref.getObjectId();
+			if (objectId == null) {
+				continue;
+			}
+
+			if (useProtocolV2) {
+				String symrefPart = symrefs.containsKey(ref.getName())
+						? (" symref-target:" + symrefs.get(ref.getName())) //$NON-NLS-1$
+						: ""; //$NON-NLS-1$
+				String peelPart = ""; //$NON-NLS-1$
+				if (derefTags) {
+					if (!ref.isPeeled() && repository != null) {
+						ref = repository.peel(ref);
+					}
+					ObjectId peeledObjectId = ref.getPeeledObjectId();
+					if (peeledObjectId != null) {
+						peelPart = " peeled:" + peeledObjectId.getName(); //$NON-NLS-1$
+					}
+				}
+				writeOne(objectId.getName() + " " + ref.getName() + symrefPart //$NON-NLS-1$
+						+ peelPart + "\n"); //$NON-NLS-1$
+				continue;
+			}
+
+			advertiseAny(objectId, ref.getName());
+
+			if (!derefTags)
+				continue;
+
+			if (!ref.isPeeled()) {
+				if (repository == null)
+					continue;
+				ref = repository.peel(ref);
+			}
+
+			if (ref.getPeeledObjectId() != null)
+				advertiseAny(ref.getPeeledObjectId(), ref.getName() + "^{}"); //$NON-NLS-1$
+		}
+		return sent;
+	}
+
