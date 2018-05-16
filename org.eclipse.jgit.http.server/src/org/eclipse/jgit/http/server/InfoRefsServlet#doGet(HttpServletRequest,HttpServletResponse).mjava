@@ -28,10 +28,7 @@
 			};
 			adv.init(db);
 			adv.setDerefTags(true);
-
-			Map<String, Ref> refs = db.getRefDatabase().getRefs(ALL);
-			refs.remove(Constants.HEAD);
-			adv.send(refs);
+			adv.send(db.getRefDatabase().getRefsByPrefix(Constants.R_REFS));
 		}
 	}
 
