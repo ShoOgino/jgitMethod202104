@@ -2,7 +2,7 @@
 		final RevCommit commit = (RevCommit) obj;
 		markLocalCommitsComplete(commit.getCommitTime());
 		needs(commit.getTree());
-		for (final RevCommit p : commit.getParents())
+		for (RevCommit p : commit.getParents())
 			needs(p);
 		obj.add(COMPLETE);
 	}

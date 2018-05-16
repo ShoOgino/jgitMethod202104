@@ -3,17 +3,17 @@
 		Set<ObjectId> remoteObjects = new HashSet<>();
 		Set<ObjectId> newObjects = new HashSet<>();
 
-		try (final PackWriter writer = new PackWriter(transport.getPackConfig(),
+		try (PackWriter writer = new PackWriter(transport.getPackConfig(),
 				local.newObjectReader())) {
 
-			for (final Ref r : getRefs()) {
+			for (Ref r : getRefs()) {
 				// only add objects that we actually have
 				ObjectId oid = r.getObjectId();
 				if (local.hasObject(oid))
 					remoteObjects.add(oid);
 			}
 			remoteObjects.addAll(additionalHaves);
-			for (final RemoteRefUpdate r : refUpdates.values()) {
+			for (RemoteRefUpdate r : refUpdates.values()) {
 				if (!ObjectId.zeroId().equals(r.getNewObjectId()))
 					newObjects.add(r.getNewObjectId());
 			}

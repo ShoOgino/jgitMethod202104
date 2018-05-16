@@ -11,7 +11,7 @@
 	 * @throws IncorrectObjectTypeException
 	 * @throws IOException
 	 */
-	TopoSortGenerator(final Generator s) throws MissingObjectException,
+	TopoSortGenerator(Generator s) throws MissingObjectException,
 			IncorrectObjectTypeException, IOException {
 		pending = new FIFORevQueue();
 		outputType = s.outputType() | SORT_TOPO;
@@ -20,7 +20,7 @@
 			final RevCommit c = s.next();
 			if (c == null)
 				break;
-			for (final RevCommit p : c.parents)
+			for (RevCommit p : c.parents)
 				p.inDegree++;
 			pending.add(c);
 		}

@@ -14,7 +14,7 @@
 	 *             when some error occurred during operation, like I/O, protocol
 	 *             error, or local database consistency error.
 	 */
-	PushResult execute(final ProgressMonitor monitor)
+	PushResult execute(ProgressMonitor monitor)
 			throws NotSupportedException, TransportException {
 		try {
 			monitor.beginTask(PROGRESS_OPENING_CONNECTION,
@@ -40,7 +40,7 @@
 			}
 			if (!transport.isDryRun())
 				updateTrackingRefs();
-			for (final RemoteRefUpdate rru : toPush.values()) {
+			for (RemoteRefUpdate rru : toPush.values()) {
 				final TrackingRefUpdate tru = rru.getTrackingRefUpdate();
 				if (tru != null)
 					res.add(tru);

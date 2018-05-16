@@ -14,12 +14,12 @@
 		// new connection has offered to us.
 		//
 		final HashMap<ObjectId, Ref> avail = new HashMap<>();
-		for (final Ref r : conn.getRefs())
+		for (Ref r : conn.getRefs())
 			avail.put(r.getObjectId(), r);
 
 		final Collection<Ref> wants = new ArrayList<>(askFor.values());
 		askFor.clear();
-		for (final Ref want : wants) {
+		for (Ref want : wants) {
 			final Ref newRef = avail.get(want.getObjectId());
 			if (newRef != null) {
 				askFor.put(newRef.getObjectId(), newRef);

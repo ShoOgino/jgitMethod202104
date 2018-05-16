@@ -4,9 +4,9 @@
 		final List<Ref> localRefs = db.getRefDatabase().getRefs();
 		final Collection<RefSpec> procRefs = new LinkedHashSet<>();
 
-		for (final RefSpec spec : specs) {
+		for (RefSpec spec : specs) {
 			if (spec.isWildcard()) {
-				for (final Ref localRef : localRefs) {
+				for (Ref localRef : localRefs) {
 					if (spec.matchSource(localRef))
 						procRefs.add(spec.expandFromSource(localRef));
 				}

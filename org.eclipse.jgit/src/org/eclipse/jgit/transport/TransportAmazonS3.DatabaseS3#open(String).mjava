@@ -1,5 +1,5 @@
 		@Override
-		FileStream open(final String path) throws IOException {
+		FileStream open(String path) throws IOException {
 			final URLConnection c = s3.get(bucket, resolveKey(path));
 			final InputStream raw = c.getInputStream();
 			final InputStream in = s3.decrypt(c);

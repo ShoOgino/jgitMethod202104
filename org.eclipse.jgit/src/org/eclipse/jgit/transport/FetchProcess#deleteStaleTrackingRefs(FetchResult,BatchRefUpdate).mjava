@@ -1,8 +1,8 @@
 	private void deleteStaleTrackingRefs(FetchResult result,
 			BatchRefUpdate batch) throws IOException {
-		for (final Ref ref : localRefs().values()) {
+		for (Ref ref : localRefs().values()) {
 			final String refname = ref.getName();
-			for (final RefSpec spec : toFetch) {
+			for (RefSpec spec : toFetch) {
 				if (spec.matchDestination(refname)) {
 					final RefSpec s = spec.expandFromDestination(refname);
 					if (result.getAdvertisedRef(s.getSource()) == null) {

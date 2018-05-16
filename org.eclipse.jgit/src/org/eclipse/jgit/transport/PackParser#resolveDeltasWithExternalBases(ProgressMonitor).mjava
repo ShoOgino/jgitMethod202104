@@ -6,7 +6,7 @@
 			baseObjectIds = new ObjectIdSubclassMap<>();
 
 		final List<DeltaChain> missing = new ArrayList<>(64);
-		for (final DeltaChain baseId : baseById) {
+		for (DeltaChain baseId : baseById) {
 			if (baseId.head == null)
 				continue;
 
@@ -38,7 +38,7 @@
 						JGitText.get().downloadCancelledDuringIndexing);
 		}
 
-		for (final DeltaChain base : missing) {
+		for (DeltaChain base : missing) {
 			if (base.head != null)
 				throw new MissingObjectException(base, "delta base"); //$NON-NLS-1$
 		}

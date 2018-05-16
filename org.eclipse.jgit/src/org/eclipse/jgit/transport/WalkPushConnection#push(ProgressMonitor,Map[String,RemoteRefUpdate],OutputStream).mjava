@@ -13,7 +13,7 @@
 		// ref using the directory name being created.
 		//
 		final List<RemoteRefUpdate> updates = new ArrayList<>();
-		for (final RemoteRefUpdate u : refUpdates.values()) {
+		for (RemoteRefUpdate u : refUpdates.values()) {
 			final String n = u.getRemoteName();
 			if (!n.startsWith("refs/") || !Repository.isValidRefName(n)) { //$NON-NLS-1$
 				u.setStatus(Status.REJECTED_OTHER_REASON);
@@ -33,7 +33,7 @@
 		//
 		if (!updates.isEmpty())
 			sendpack(updates, monitor);
-		for (final RemoteRefUpdate u : updates)
+		for (RemoteRefUpdate u : updates)
 			updateCommand(u);
 
 		// Is this a new repository? If so we should create additional
@@ -52,10 +52,10 @@
 		if (!packedRefUpdates.isEmpty()) {
 			try {
 				refWriter.writePackedRefs();
-				for (final RemoteRefUpdate u : packedRefUpdates)
+				for (RemoteRefUpdate u : packedRefUpdates)
 					u.setStatus(Status.OK);
 			} catch (IOException err) {
-				for (final RemoteRefUpdate u : packedRefUpdates) {
+				for (RemoteRefUpdate u : packedRefUpdates) {
 					u.setStatus(Status.REJECTED_OTHER_REASON);
 					u.setMessage(err.getMessage());
 				}

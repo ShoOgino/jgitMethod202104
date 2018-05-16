@@ -1,4 +1,4 @@
-		void openIndex(final ProgressMonitor pm) throws IOException {
+		void openIndex(ProgressMonitor pm) throws IOException {
 			if (index != null)
 				return;
 			if (tmpIdx == null)
@@ -17,7 +17,7 @@
 			pm.beginTask("Get " + idxName.substring(0, 12) + "..idx", //$NON-NLS-1$ //$NON-NLS-2$
 					s.length < 0 ? ProgressMonitor.UNKNOWN
 							: (int) (s.length / 1024));
-			try (final FileOutputStream fos = new FileOutputStream(tmpIdx)) {
+			try (FileOutputStream fos = new FileOutputStream(tmpIdx)) {
 				final byte[] buf = new byte[2048];
 				int cnt;
 				while (!pm.isCancelled() && (cnt = s.in.read(buf)) >= 0) {

@@ -7,7 +7,7 @@
 			if (lock.lock()) {
 				try (Writer w = new OutputStreamWriter(
 						lock.getOutputStream())) {
-					for (final FetchHeadRecord h : fetchHeadUpdates) {
+					for (FetchHeadRecord h : fetchHeadUpdates) {
 						h.write(w);
 						result.add(h);
 					}
