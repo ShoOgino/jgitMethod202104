@@ -4,9 +4,10 @@
 	 * advertisement by the server.
 	 */
 	private ByteArrayInputStream uploadPackV2(RequestPolicy requestPolicy,
-			RefFilter refFilter, String... inputLines) throws Exception {
+			RefFilter refFilter, ProtocolV2Hook hook, String... inputLines)
+			throws Exception {
 		ByteArrayInputStream recvStream =
-			uploadPackV2Setup(requestPolicy, refFilter, inputLines);
+				uploadPackV2Setup(requestPolicy, refFilter, hook, inputLines);
 		PacketLineIn pckIn = new PacketLineIn(recvStream);
 
 		// drain capabilities

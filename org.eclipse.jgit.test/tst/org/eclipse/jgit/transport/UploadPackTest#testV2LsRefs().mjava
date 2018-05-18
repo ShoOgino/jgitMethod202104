@@ -6,9 +6,12 @@
 		RevTag tag = remote.tag("tag", tip);
 		remote.update("refs/tags/tag", tag);
 
-		ByteArrayInputStream recvStream = uploadPackV2("command=ls-refs\n", PacketLineIn.END);
+		TestV2Hook hook = new TestV2Hook();
+		ByteArrayInputStream recvStream = uploadPackV2(null, null, hook,
+				"command=ls-refs\n", PacketLineIn.END);
 		PacketLineIn pckIn = new PacketLineIn(recvStream);
 
+		assertThat(hook.lsRefsRequest, notNullValue());
 		assertThat(pckIn.readString(), is(tip.toObjectId().getName() + " HEAD"));
 		assertThat(pckIn.readString(), is(tip.toObjectId().getName() + " refs/heads/master"));
 		assertThat(pckIn.readString(), is(tag.toObjectId().getName() + " refs/tags/tag"));

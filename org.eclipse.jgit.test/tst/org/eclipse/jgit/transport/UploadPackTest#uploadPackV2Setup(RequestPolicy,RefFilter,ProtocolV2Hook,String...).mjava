@@ -3,7 +3,8 @@
 	 * and returns UploadPack's output stream.
 	 */
 	private ByteArrayInputStream uploadPackV2Setup(RequestPolicy requestPolicy,
-			RefFilter refFilter, String... inputLines) throws Exception {
+			RefFilter refFilter, ProtocolV2Hook hook, String... inputLines)
+			throws Exception {
 
 		ByteArrayOutputStream send = new ByteArrayOutputStream();
 		PacketLineOut pckOut = new PacketLineOut(send);
@@ -24,6 +25,9 @@
 		if (refFilter != null)
 			up.setRefFilter(refFilter);
 		up.setExtraParameters(Sets.of("version=2"));
+		if (hook != null) {
+			up.setProtocolV2Hook(hook);
+		}
 
 		ByteArrayOutputStream recv = new ByteArrayOutputStream();
 		up.upload(new ByteArrayInputStream(send.toByteArray()), recv, null);

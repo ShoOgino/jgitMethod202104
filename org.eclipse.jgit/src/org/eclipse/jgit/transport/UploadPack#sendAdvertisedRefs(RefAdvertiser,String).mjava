@@ -20,6 +20,8 @@
 		if (useProtocolV2()) {
 			// The equivalent in v2 is only the capabilities
 			// advertisement.
+			protocolV2Hook
+					.onCapabilities(CapabilitiesV2Request.builder().build());
 			for (String s : getV2CapabilityAdvertisement()) {
 				adv.writeOne(s);
 			}
