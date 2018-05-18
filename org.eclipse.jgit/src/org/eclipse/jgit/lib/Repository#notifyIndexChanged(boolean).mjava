@@ -1,10 +1,16 @@
 	/**
 	 * Notify that the index changed by firing an IndexChangedEvent.
+	 * <p>
+	 * The default implementation calls {@link #notifyIndexChanged()} for
+	 * backward compatibility but will no longer do so in the next JGit minor
+	 * release. Implementors should override this method directly instead.
 	 *
 	 * @param internal
 	 *                     {@code true} if the index was changed by the same
 	 *                     JGit process
 	 * @since 5.0
 	 */
-	public abstract void notifyIndexChanged(boolean internal);
+	public void notifyIndexChanged(boolean internal) {
+		notifyIndexChanged();
+	}
 
