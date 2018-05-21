@@ -1,12 +1,8 @@
 	@Test
 	public void testTagDelete() throws Exception {
 		git.tag().setName("test").call();
-
-		Ref ref = git.getRepository().getTags().get("test");
-		assertEquals("refs/tags/test", ref.getName());
-
+		assertNotNull(git.getRepository().exactRef("refs/tags/test"));
 		assertEquals("", executeUnchecked("git tag -d test")[0]);
-		Ref deletedRef = git.getRepository().getTags().get("test");
-		assertEquals(null, deletedRef);
+		assertNull(git.getRepository().exactRef("refs/tags/test"));
 	}
 
