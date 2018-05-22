@@ -12,10 +12,10 @@
 		final Map<String, List<String>> headers = conn.getHeaderFields();
 		HttpAuthMethod authentication = Type.NONE.method(EMPTY_STRING);
 
-		for (final Entry<String, List<String>> entry : headers.entrySet()) {
+		for (Entry<String, List<String>> entry : headers.entrySet()) {
 			if (HDR_WWW_AUTHENTICATE.equalsIgnoreCase(entry.getKey())) {
 				if (entry.getValue() != null) {
-					for (final String value : entry.getValue()) {
+					for (String value : entry.getValue()) {
 						if (value != null && value.length() != 0) {
 							final String[] valuePart = value.split(
 									SCHEMA_NAME_SEPARATOR, 2);

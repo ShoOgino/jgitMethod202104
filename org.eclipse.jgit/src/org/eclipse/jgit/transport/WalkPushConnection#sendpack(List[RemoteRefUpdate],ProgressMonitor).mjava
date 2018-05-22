@@ -3,14 +3,14 @@
 		String pathPack = null;
 		String pathIdx = null;
 
-		try (final PackWriter writer = new PackWriter(transport.getPackConfig(),
+		try (PackWriter writer = new PackWriter(transport.getPackConfig(),
 				local.newObjectReader())) {
 
 			final Set<ObjectId> need = new HashSet<>();
 			final Set<ObjectId> have = new HashSet<>();
-			for (final RemoteRefUpdate r : updates)
+			for (RemoteRefUpdate r : updates)
 				need.add(r.getNewObjectId());
-			for (final Ref r : getRefs()) {
+			for (Ref r : getRefs()) {
 				have.add(r.getObjectId());
 				if (r.getPeeledObjectId() != null)
 					have.add(r.getPeeledObjectId());
@@ -25,7 +25,7 @@
 				return;
 
 			packNames = new LinkedHashMap<>();
-			for (final String n : dest.getPackNames())
+			for (String n : dest.getPackNames())
 				packNames.put(n, n);
 
 			final String base = "pack-" + writer.computeName().name(); //$NON-NLS-1$

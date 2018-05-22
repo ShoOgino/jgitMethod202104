@@ -2,7 +2,7 @@
 	@Override
 	protected void run() throws Exception {
 		walk = createWalk();
-		for (final RevSort s : sorting)
+		for (RevSort s : sorting)
 			walk.sort(s, true);
 
 		if (pathFilter == TreeFilter.ALL) {
@@ -38,7 +38,7 @@
 				throw die(MessageFormat.format(CLIText.get().cannotResolve, Constants.HEAD));
 			commits.add(walk.parseCommit(head));
 		}
-		for (final RevCommit c : commits) {
+		for (RevCommit c : commits) {
 			final RevCommit real = argWalk == walk ? c : walk.parseCommit(c);
 			if (c.has(RevFlag.UNINTERESTING))
 				walk.markUninteresting(real);

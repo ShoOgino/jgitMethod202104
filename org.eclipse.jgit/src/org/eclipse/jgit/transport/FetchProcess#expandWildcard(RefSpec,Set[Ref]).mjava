@@ -1,6 +1,6 @@
 	private void expandWildcard(RefSpec spec, Set<Ref> matched)
 			throws TransportException {
-		for (final Ref src : conn.getRefs()) {
+		for (Ref src : conn.getRefs()) {
 			if (spec.matchSource(src) && matched.add(src))
 				want(src, spec.expandFromSource(src));
 		}

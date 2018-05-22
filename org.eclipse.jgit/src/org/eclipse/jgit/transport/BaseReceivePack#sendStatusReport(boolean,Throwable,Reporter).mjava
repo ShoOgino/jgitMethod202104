@@ -16,7 +16,7 @@
 		if (unpackError != null) {
 			out.sendString("unpack error " + unpackError.getMessage()); //$NON-NLS-1$
 			if (forClient) {
-				for (final ReceiveCommand cmd : commands) {
+				for (ReceiveCommand cmd : commands) {
 					out.sendString("ng " + cmd.getRefName() //$NON-NLS-1$
 							+ " n/a (unpacker error)"); //$NON-NLS-1$
 				}
@@ -26,7 +26,7 @@
 
 		if (forClient)
 			out.sendString("unpack ok"); //$NON-NLS-1$
-		for (final ReceiveCommand cmd : commands) {
+		for (ReceiveCommand cmd : commands) {
 			if (cmd.getResult() == Result.OK) {
 				if (forClient)
 					out.sendString("ok " + cmd.getRefName()); //$NON-NLS-1$

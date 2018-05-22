@@ -5,14 +5,14 @@
 		} catch (IOException e) {
 			throw new TransportException(e.getMessage(), e);
 		}
-		for (final Ref r : refs) {
+		for (Ref r : refs) {
 			try {
 				markLocalObjComplete(revWalk.parseAny(r.getObjectId()));
 			} catch (IOException readError) {
 				throw new TransportException(MessageFormat.format(JGitText.get().localRefIsMissingObjects, r.getName()), readError);
 			}
 		}
-		for (final ObjectId id : have) {
+		for (ObjectId id : have) {
 			try {
 				markLocalObjComplete(revWalk.parseAny(id));
 			} catch (IOException readError) {

@@ -1,7 +1,7 @@
-	void authorize(final HttpURLConnection c) throws IOException {
+	void authorize(HttpURLConnection c) throws IOException {
 		final Map<String, List<String>> reqHdr = c.getRequestProperties();
 		final SortedMap<String, String> sigHdr = new TreeMap<>();
-		for (final Map.Entry<String, List<String>> entry : reqHdr.entrySet()) {
+		for (Map.Entry<String, List<String>> entry : reqHdr.entrySet()) {
 			final String hdr = entry.getKey();
 			if (isSignedHeader(hdr))
 				sigHdr.put(StringUtils.toLowerCase(hdr), toCleanString(entry.getValue()));
@@ -20,7 +20,7 @@
 		s.append(remove(sigHdr, "date")); //$NON-NLS-1$
 		s.append('\n');
 
-		for (final Map.Entry<String, String> e : sigHdr.entrySet()) {
+		for (Map.Entry<String, String> e : sigHdr.entrySet()) {
 			s.append(e.getKey());
 			s.append(':');
 			s.append(e.getValue());

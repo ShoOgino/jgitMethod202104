@@ -1,0 +1,17 @@
+	@Test
+	public void testIgnoredDirectory() throws Exception {
+		writeTrashFile(".gitignore", "src/ignored");
+		writeTrashFile("src/ignored/sub/foo.txt", "1");
+		try (Git git = new Git(db)) {
+			git.add().addFilepattern(".").call();
+			RevCommit commit = git.commit().setMessage("adding .gitignore")
+					.call();
+			writeTrashFile("foo.txt", "2");
+			writeTrashFile("zzz.txt", "3");
+			git.add().addFilepattern("foo.txt").call();
+			git.commit().setMessage("add file").call();
+			assertEquals("Should not have entered ignored directory", 1,
+					resetHardAndCount(commit));
+		}
+	}
+

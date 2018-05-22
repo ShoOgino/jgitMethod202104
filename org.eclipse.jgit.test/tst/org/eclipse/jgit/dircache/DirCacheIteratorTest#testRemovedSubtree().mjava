@@ -6,7 +6,7 @@
 		final DirCache dc = DirCache.read(path, FS.DETECTED);
 		assertEquals(2, dc.getEntryCount());
 
-		try (final TreeWalk tw = new TreeWalk(db)) {
+		try (TreeWalk tw = new TreeWalk(db)) {
 			tw.setRecursive(true);
 			tw.addTree(new DirCacheIterator(dc));
 

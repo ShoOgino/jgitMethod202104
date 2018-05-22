@@ -1,9 +1,9 @@
 	private boolean askForIsComplete() throws TransportException {
 		try {
-			try (final ObjectWalk ow = new ObjectWalk(transport.local)) {
-				for (final ObjectId want : askFor.keySet())
+			try (ObjectWalk ow = new ObjectWalk(transport.local)) {
+				for (ObjectId want : askFor.keySet())
 					ow.markStart(ow.parseAny(want));
-				for (final Ref ref : localRefs().values())
+				for (Ref ref : localRefs().values())
 					ow.markUninteresting(ow.parseAny(ref.getObjectId()));
 				ow.checkConnectivity();
 			}

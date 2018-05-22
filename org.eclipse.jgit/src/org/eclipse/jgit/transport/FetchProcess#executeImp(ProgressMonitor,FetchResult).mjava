@@ -6,7 +6,7 @@
 			result.setAdvertisedRefs(transport.getURI(), conn.getRefsMap());
 			result.peerUserAgent = conn.getPeerUserAgent();
 			final Set<Ref> matched = new HashSet<>();
-			for (final RefSpec spec : toFetch) {
+			for (RefSpec spec : toFetch) {
 				if (spec.getSource() == null)
 					throw new TransportException(MessageFormat.format(
 							JGitText.get().sourceRefNotSpecifiedForRefspec, spec));
@@ -43,7 +43,7 @@
 				//
 				have.addAll(askFor.keySet());
 				askFor.clear();
-				for (final Ref r : additionalTags) {
+				for (Ref r : additionalTags) {
 					ObjectId id = r.getPeeledObjectId();
 					if (id == null)
 						id = r.getObjectId();
@@ -65,7 +65,7 @@
 				.newBatchUpdate()
 				.setAllowNonFastForwards(true)
 				.setRefLogMessage("fetch", true); //$NON-NLS-1$
-		try (final RevWalk walk = new RevWalk(transport.local)) {
+		try (RevWalk walk = new RevWalk(transport.local)) {
 			if (monitor instanceof BatchingProgressMonitor) {
 				((BatchingProgressMonitor) monitor).setDelayStart(
 						250, TimeUnit.MILLISECONDS);

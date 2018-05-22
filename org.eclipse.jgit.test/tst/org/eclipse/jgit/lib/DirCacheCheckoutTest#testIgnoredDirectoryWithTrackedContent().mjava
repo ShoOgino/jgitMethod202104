@@ -1,0 +1,23 @@
+	@Test
+	public void testIgnoredDirectoryWithTrackedContent() throws Exception {
+		writeTrashFile("src/ignored/sub/foo.txt", "1");
+		try (Git git = new Git(db)) {
+			git.add().addFilepattern(".").call();
+			git.commit().setMessage("adding foo.txt").call();
+			writeTrashFile(".gitignore", "src/ignored");
+			writeTrashFile("src/ignored/sub/foo.txt", "2");
+			writeTrashFile("src/ignored/other/bar.txt", "3");
+			git.add().addFilepattern(".").call();
+			RevCommit commit = git.commit().setMessage("adding .gitignore")
+					.call();
+			writeTrashFile("foo.txt", "2");
+			writeTrashFile("zzz.txt", "3");
+			git.add().addFilepattern("foo.txt").call();
+			git.commit().setMessage("add file").call();
+			File file = writeTrashFile("src/ignored/sub/foo.txt", "3");
+			assertEquals("Should have entered ignored directory", 3,
+					resetHardAndCount(commit));
+			checkFile(file, "2");
+		}
+	}
+

@@ -15,7 +15,7 @@
 		final int clearFlags = ~retainFlags;
 
 		final FIFORevQueue q = new FIFORevQueue();
-		for (final RevCommit c : roots) {
+		for (RevCommit c : roots) {
 			if ((c.flags & clearFlags) == 0)
 				continue;
 			c.flags &= retainFlags;
@@ -29,7 +29,7 @@
 				break;
 			if (c.parents == null)
 				continue;
-			for (final RevCommit p : c.parents) {
+			for (RevCommit p : c.parents) {
 				if ((p.flags & clearFlags) == 0)
 					continue;
 				p.flags &= retainFlags;

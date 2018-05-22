@@ -3,11 +3,11 @@
 	public void close() {
 		inserter.close();
 		reader.close();
-		for (final RemotePack p : unfetchedPacks) {
+		for (RemotePack p : unfetchedPacks) {
 			if (p.tmpIdx != null)
 				p.tmpIdx.delete();
 		}
-		for (final WalkRemoteObjectDatabase r : remotes)
+		for (WalkRemoteObjectDatabase r : remotes)
 			r.close();
 	}
 

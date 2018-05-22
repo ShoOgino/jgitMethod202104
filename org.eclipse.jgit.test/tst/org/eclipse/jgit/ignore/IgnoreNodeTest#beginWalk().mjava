@@ -1,5 +1,7 @@
 	private void beginWalk() {
 		walk = new TreeWalk(db);
-		walk.addTree(new FileTreeIterator(db));
+		FileTreeIterator iter = new FileTreeIterator(db);
+		iter.setWalkIgnoredDirectories(true);
+		walk.addTree(iter);
 	}
 

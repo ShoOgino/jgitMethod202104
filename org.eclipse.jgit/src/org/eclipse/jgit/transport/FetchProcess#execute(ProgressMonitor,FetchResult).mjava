@@ -1,4 +1,4 @@
-	void execute(final ProgressMonitor monitor, final FetchResult result)
+	void execute(ProgressMonitor monitor, FetchResult result)
 			throws NotSupportedException, TransportException {
 		askFor.clear();
 		localUpdates.clear();
@@ -10,7 +10,7 @@
 			executeImp(monitor, result);
 		} finally {
 			try {
-			for (final PackLock lock : packLocks)
+			for (PackLock lock : packLocks)
 				lock.unlock();
 			} catch (IOException e) {
 				throw new TransportException(e.getMessage(), e);

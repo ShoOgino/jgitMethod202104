@@ -3,7 +3,7 @@
 	protected void writeImpl() throws IOException {
 		writeFanOutTable();
 
-		for (final PackedObjectInfo oe : entries) {
+		for (PackedObjectInfo oe : entries) {
 			if (!canStore(oe))
 				throw new IOException(JGitText.get().packTooLargeForIndexVersion1);
 			NB.encodeInt32(tmp, 0, (int) oe.getOffset());
