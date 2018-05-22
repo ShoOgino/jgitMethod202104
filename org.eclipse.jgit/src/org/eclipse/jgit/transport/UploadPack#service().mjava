@@ -3,6 +3,7 @@
 		// If it's a non-bidi request, we need to read the entire request before
 		// writing a response. Buffer the response until then.
 		PackStatistics.Accumulator accumulator = new PackStatistics.Accumulator();
+		List<ObjectId> unshallowCommits = new ArrayList<>();
 		try {
 			if (biDirectionalPipe)
 				sendAdvertisedRefs(new PacketLineOutRefAdvertiser(pckOut));
@@ -32,7 +33,7 @@
 			if (!clientShallowCommits.isEmpty())
 				verifyClientShallow();
 			if (depth != 0)
-				processShallow();
+				processShallow(unshallowCommits);
 			if (!clientShallowCommits.isEmpty())
 				walk.assumeShallow(clientShallowCommits);
 			sendPack = negotiate(accumulator);
@@ -84,7 +85,8 @@
 			rawOut.stopBuffering();
 		}
 
-		if (sendPack)
-			sendPack(accumulator, refs == null ? null : refs.values());
+		if (sendPack) {
+			sendPack(accumulator, refs == null ? null : refs.values(), unshallowCommits);
+		}
 	}
 

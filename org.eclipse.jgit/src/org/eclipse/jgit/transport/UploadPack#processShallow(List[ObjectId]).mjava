@@ -1,4 +1,8 @@
-	private void processShallow() throws IOException {
+	/*
+	 * Determines what "shallow" and "unshallow" lines to send to the user.
+	 * The information is written to pckOut and unshallowCommits.
+	 */
+	private void processShallow(List<ObjectId> unshallowCommits) throws IOException {
 		int walkDepth = depth - 1;
 		try (DepthWalk.RevWalk depthWalk = new DepthWalk.RevWalk(
 				walk.getObjectReader(), walkDepth)) {
