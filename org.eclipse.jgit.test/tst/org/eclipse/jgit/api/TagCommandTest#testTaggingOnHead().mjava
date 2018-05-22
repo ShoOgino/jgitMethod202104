@@ -4,7 +4,8 @@
 				RevWalk walk = new RevWalk(db)) {
 			RevCommit commit = git.commit().setMessage("initial commit").call();
 			Ref tagRef = git.tag().setName("tag").call();
-			assertEquals(commit.getId(), db.peel(tagRef).getPeeledObjectId());
+			assertEquals(commit.getId(),
+					db.getRefDatabase().peel(tagRef).getPeeledObjectId());
 			assertEquals("tag", walk.parseTag(tagRef.getObjectId()).getTagName());
 		}
 	}
