@@ -9,8 +9,8 @@
 	 */
 	@Test
 	public void testRefsCacheAfterUpdateLooseOnly() throws Exception {
-		// Do not use the defalt repo for this case.
-		Map<String, Ref> allRefs = db.getAllRefs();
+		// Do not use the default repo for this case.
+		List<Ref> allRefs = db.getRefDatabase().getRefs();
 		ObjectId oldValue = db.resolve("HEAD");
 		writeSymref(Constants.HEAD, "refs/heads/newref");
 		RefUpdate updateRef = db.updateRef(Constants.HEAD);
@@ -19,9 +19,9 @@
 		Result update = updateRef.update();
 		assertEquals(Result.NEW, update);
 
-		allRefs = db.getAllRefs();
-		Ref head = allRefs.get("HEAD");
-		Ref newref = allRefs.get("refs/heads/newref");
+		allRefs = db.getRefDatabase().getRefs();
+		Ref head = getRef(allRefs, "HEAD").get();
+		Ref newref = getRef(allRefs, "refs/heads/newref").get();
 		assertEquals("refs/heads/newref", newref.getName());
 		assertEquals("HEAD", head.getName());
 		assertTrue("is symbolic reference", head.isSymbolic());

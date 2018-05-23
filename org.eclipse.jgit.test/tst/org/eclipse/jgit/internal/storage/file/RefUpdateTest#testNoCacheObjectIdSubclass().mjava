@@ -6,8 +6,7 @@
 		ru.setNewObjectId(newid);
 		Result update = ru.update();
 		assertEquals(Result.NEW, update);
-		final Ref r = db.getAllRefs().get(newRef);
-		assertNotNull(r);
+		final Ref r = getRef(db, newRef).get();
 		assertEquals(newRef, r.getName());
 		assertNotNull(r.getObjectId());
 		assertNotSame(newid, r.getObjectId());
