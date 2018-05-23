@@ -14,7 +14,7 @@
 			final File pack, idx;
 			try (PackWriter pw = new PackWriter(db)) {
 				Set<ObjectId> all = new HashSet<>();
-				for (Ref r : db.getAllRefs().values())
+				for (Ref r : db.getRefDatabase().getRefs())
 					all.add(r.getObjectId());
 				pw.preparePack(m, all, PackWriter.NONE);
 

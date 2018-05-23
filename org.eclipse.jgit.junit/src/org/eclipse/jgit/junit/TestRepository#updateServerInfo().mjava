@@ -6,7 +6,7 @@
 	public void updateServerInfo() throws Exception {
 		if (db instanceof FileRepository) {
 			final FileRepository fr = (FileRepository) db;
-			RefWriter rw = new RefWriter(fr.getAllRefs().values()) {
+			RefWriter rw = new RefWriter(fr.getRefDatabase().getRefs()) {
 				@Override
 				protected void writeFile(String name, byte[] bin)
 						throws IOException {
