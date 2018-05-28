@@ -1,0 +1,13 @@
+	private String insanelyHugeCommitMessage() {
+		final String oneLine = "012345678901234567890123456789012345678901234567890123456789\n";
+		StringBuilder b = new StringBuilder(HUGE_SIZE + oneLine.length());
+		// Give the message a real header; otherwise even writing the reflog
+		// message may run into troubles because RevCommit.getShortMessage()
+		// will return the whole message.
+		b.append("An insanely huge commit message\n\n");
+		while (b.length() < HUGE_SIZE) {
+			b.append(oneLine);
+		}
+		return b.toString();
+	}
+
