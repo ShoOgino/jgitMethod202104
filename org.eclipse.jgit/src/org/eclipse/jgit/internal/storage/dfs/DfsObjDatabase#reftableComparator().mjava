@@ -8,8 +8,9 @@
 			DfsPackDescription a = fa.getPackDescription();
 			DfsPackDescription b = fb.getPackDescription();
 
-			// GC, COMPACT reftables first by higher category.
-			int c = b.getPackSource().category - a.getPackSource().category;
+			// GC, COMPACT reftables first by reversing default order.
+			int c = PackSource.DEFAULT_COMPARATOR.reversed()
+					.compare(a.getPackSource(), b.getPackSource());
 			if (c != 0) {
 				return c;
 			}
