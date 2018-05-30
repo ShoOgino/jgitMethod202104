@@ -1,0 +1,20 @@
+	@Test
+	public void objectLookupComparatorNonGcLastModified()
+			throws Exception {
+		// a is older and smaller.
+		DfsPackDescription a = create(INSERT);
+		a.setFileSize(PACK, 100);
+		a.setLastModified(1);
+		a.setObjectCount(2);
+
+		// b is newer and larger.
+		DfsPackDescription b = create(INSERT);
+		b.setFileSize(PACK, 200);
+		b.setLastModified(2);
+		b.setObjectCount(1);
+
+		// Since they have the same type but not GC, tiebreaker is last modified,
+		// and b comes first.
+		assertComparesLessThan(DfsPackDescription.objectLookupComparator(), b, a);
+	}
+

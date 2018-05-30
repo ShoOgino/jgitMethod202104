@@ -1,0 +1,13 @@
+	@Test
+	public void reftableComparatorMaxUpdateIndex() throws Exception {
+		DfsPackDescription a = create(INSERT);
+		a.setMaxUpdateIndex(1);
+		a.setLastModified(2);
+
+		DfsPackDescription b = create(INSERT);
+		b.setMaxUpdateIndex(2);
+		b.setLastModified(1);
+
+		assertComparesLessThan(DfsPackDescription.reftableComparator(), a, b);
+	}
+

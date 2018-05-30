@@ -1,0 +1,18 @@
+	@Test
+	public void objectLookupComparatorGcFileSize() throws Exception {
+		// a is older and smaller.
+		DfsPackDescription a = create(GC_REST);
+		a.setFileSize(PACK, 100);
+		a.setLastModified(1);
+		a.setObjectCount(2);
+
+		// b is newer and larger.
+		DfsPackDescription b = create(GC_REST);
+		b.setFileSize(PACK, 200);
+		b.setLastModified(2);
+		b.setObjectCount(1);
+
+		// Since they have the same GC type, tiebreaker is size, and a comes first.
+		assertComparesLessThan(DfsPackDescription.objectLookupComparator(), a, b);
+	}
+

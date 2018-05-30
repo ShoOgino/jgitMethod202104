@@ -1,0 +1,19 @@
+	@Test
+	public void reuseComparatorGcPackSize() throws Exception {
+		DfsPackDescription a = create(GC_REST);
+		a.setFileSize(PACK, 1);
+		a.setFileSize(INDEX, 1);
+		a.setLastModified(2);
+		a.setObjectCount(1);
+		a.setMaxUpdateIndex(1);
+
+		DfsPackDescription b = create(GC_REST);
+		b.setFileSize(PACK, 2);
+		b.setFileSize(INDEX, 2);
+		b.setLastModified(1);
+		b.setObjectCount(2);
+		b.setMaxUpdateIndex(2);
+
+		assertComparesLessThan(DfsPackDescription.reuseComparator(), b, a);
+	}
+

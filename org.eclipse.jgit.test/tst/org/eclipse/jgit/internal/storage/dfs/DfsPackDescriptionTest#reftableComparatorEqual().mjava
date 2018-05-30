@@ -1,0 +1,13 @@
+	@Test
+	public void reftableComparatorEqual() throws Exception {
+		DfsPackDescription a = create(INSERT);
+		a.setFileSize(PACK, 100);
+		a.setObjectCount(1);
+
+		DfsPackDescription b = create(INSERT);
+		b.setFileSize(PACK, 200);
+		a.setObjectCount(2);
+
+		assertComparesEqual(DfsPackDescription.reftableComparator(), a, b);
+	}
+

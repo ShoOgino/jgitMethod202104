@@ -1,0 +1,19 @@
+	@Test
+	public void objectLookupComparatorEqual() throws Exception {
+		DfsPackDescription a = create(RECEIVE);
+		a.setFileSize(PACK, 1);
+		a.setFileSize(INDEX, 1);
+		a.setLastModified(1);
+		a.setObjectCount(1);
+		a.setMaxUpdateIndex(1);
+
+		DfsPackDescription b = create(INSERT);
+		b.setFileSize(PACK, 1);
+		b.setFileSize(INDEX, 2);
+		b.setLastModified(1);
+		b.setObjectCount(1);
+		b.setMaxUpdateIndex(2);
+
+		assertComparesEqual(DfsPackDescription.objectLookupComparator(), a, b);
+	}
+

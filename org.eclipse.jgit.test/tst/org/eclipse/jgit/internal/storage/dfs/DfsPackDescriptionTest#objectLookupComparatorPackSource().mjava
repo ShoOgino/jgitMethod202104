@@ -1,0 +1,15 @@
+	@Test
+	public void objectLookupComparatorPackSource() throws Exception {
+		DfsPackDescription a = create(COMPACT);
+		a.setFileSize(PACK, 2);
+		a.setLastModified(1);
+		a.setObjectCount(2);
+
+		DfsPackDescription b = create(GC);
+		b.setFileSize(PACK, 1);
+		b.setLastModified(2);
+		b.setObjectCount(1);
+
+		assertComparesLessThan(DfsPackDescription.objectLookupComparator(), a, b);
+	}
+
