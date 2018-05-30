@@ -6,38 +6,12 @@
 	 * with more recent modification dates before older packs, and packs with
 	 * fewer objects before packs with more objects.
 	 * <p>
-	 * Uses {@link PackSource#DEFAULT_COMPARATOR} for sorting sources.
+	 * Uses {@link PackSource#DEFAULT_COMPARATOR} for the portion of comparison
+	 * where packs are sorted by source.
 	 *
 	 * @return comparator.
 	 */
 	public static Comparator<DfsPackDescription> objectLookupComparator() {
-		return Comparator.comparing(
-					DfsPackDescription::getPackSource, PackSource.DEFAULT_COMPARATOR)
-			.thenComparing((a, b) -> {
-				PackSource as = a.getPackSource();
-				PackSource bs = b.getPackSource();
-
-				// Tie break GC type packs by smallest first. There should be at most
-				// one of each source, but when multiple exist concurrent GCs may have
-				// run. Preferring the smaller file selects higher quality delta
-				// compression, placing less demand on the DfsBlockCache.
-				if (as == bs && isGC(as)) {
-					int cmp = Long.signum(a.getFileSize(PACK) - b.getFileSize(PACK));
-					if (cmp != 0) {
-						return cmp;
-					}
-				}
-
-				// Newer packs should sort first.
-				int cmp = Long.signum(b.getLastModified() - a.getLastModified());
-				if (cmp != 0) {
-					return cmp;
-				}
-
-				// Break ties on smaller index. Readers may get lucky and find
-				// the object they care about in the smaller index. This also pushes
-				// big historical packs to the end of the list, due to more objects.
-				return Long.signum(a.getObjectCount() - b.getObjectCount());
-			});
+		return objectLookupComparator(PackSource.DEFAULT_COMPARATOR);
 	}
 
