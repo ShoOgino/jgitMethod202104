@@ -1,9 +1,9 @@
 		@Override
 		protected DfsPackDescription newPack(PackSource source) {
 			int id = packId.incrementAndGet();
-			DfsPackDescription desc = new MemPack(
+			return new MemPack(
 					"pack-" + id + "-" + source.name(), //$NON-NLS-1$ //$NON-NLS-2$
-					getRepository().getDescription());
-			return desc.setPackSource(source);
+					getRepository().getDescription(),
+					source);
 		}
 
