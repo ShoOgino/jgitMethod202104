@@ -10,12 +10,16 @@
 	 *                refs to search for annotated tags to include in the pack
 	 *                if the {@link #OPTION_INCLUDE_TAG} capability was
 	 *                requested.
+	 * @param unshallowCommits
+	 *                shallow commits on the client that are now becoming
+	 *                unshallow
 	 * @throws IOException
 	 *                if an error occured while generating or writing the pack.
 	 */
 	private void sendPack(final boolean sideband,
 			PackStatistics.Accumulator accumulator,
-			@Nullable Collection<Ref> allTags) throws IOException {
+			@Nullable Collection<Ref> allTags,
+			List<ObjectId> unshallowCommits) throws IOException {
 		ProgressMonitor pm = NullProgressMonitor.INSTANCE;
 		OutputStream packOut = rawOut;
 

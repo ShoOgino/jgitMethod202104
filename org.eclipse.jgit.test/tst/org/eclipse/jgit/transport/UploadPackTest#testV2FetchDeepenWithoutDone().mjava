@@ -1,0 +1,22 @@
+	@Test
+	public void testV2FetchDeepenWithoutDone() throws Exception {
+		RevCommit parent = remote.commit().message("parent").create();
+		RevCommit child = remote.commit().message("x").parent(parent).create();
+		remote.update("branch1", child);
+
+		ByteArrayInputStream recvStream = uploadPackV2(
+			"command=fetch\n",
+			PacketLineIn.DELIM,
+			"want " + child.toObjectId().getName() + "\n",
+			"deepen 1\n",
+			PacketLineIn.END);
+		PacketLineIn pckIn = new PacketLineIn(recvStream);
+
+		// Verify that only the correct section is sent. "shallow-info"
+		// is not sent because, according to the specification, it is
+		// sent only if a packfile is sent.
+		assertThat(pckIn.readString(), is("acknowledgments"));
+		assertThat(pckIn.readString(), is("NAK"));
+		assertThat(pckIn.readString(), theInstance(PacketLineIn.END));
+	}
+

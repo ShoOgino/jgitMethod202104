@@ -1,0 +1,18 @@
+	@Test
+	public void testHttpClientWantsV2ButServerNotConfigured() throws Exception {
+		JDKHttpConnectionFactory f = new JDKHttpConnectionFactory();
+		String url = smartAuthNoneURI.toString() + "/info/refs?service=git-upload-pack";
+		HttpConnection c = f.create(new URL(url));
+		c.setRequestMethod("GET");
+		c.setRequestProperty("Git-Protocol", "version=2");
+		c.connect();
+		assertThat(c.getResponseCode(), is(200));
+
+		PacketLineIn pckIn = new PacketLineIn(c.getInputStream());
+
+		// Check that we get a v0 response.
+		assertThat(pckIn.readString(), is("# service=git-upload-pack"));
+		assertThat(pckIn.readString(), theInstance(PacketLineIn.END));
+		assertTrue(pckIn.readString().matches("[0-9a-f]{40} HEAD.*"));
+	}
+

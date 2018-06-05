@@ -4,63 +4,12 @@
 	 * @param adv
 	 *            the advertisement formatter.
 	 * @throws java.io.IOException
-	 *             the formatter failed to write an advertisement.
+	 *            the formatter failed to write an advertisement.
 	 * @throws org.eclipse.jgit.transport.ServiceMayNotContinueException
-	 *             the hook denied advertisement.
+	 *            the hook denied advertisement.
 	 */
 	public void sendAdvertisedRefs(RefAdvertiser adv) throws IOException,
 			ServiceMayNotContinueException {
-		if (useProtocolV2()) {
-			// The equivalent in v2 is only the capabilities
-			// advertisement.
-			for (String s : v2CapabilityAdvertisement) {
-				adv.writeOne(s);
-			}
-			adv.end();
-			return;
-		}
-
-		try {
-			advertiseRefsHook.advertiseRefs(this);
-		} catch (ServiceMayNotContinueException fail) {
-			if (fail.getMessage() != null) {
-				adv.writeOne("ERR " + fail.getMessage()); //$NON-NLS-1$
-				fail.setOutput();
-			}
-			throw fail;
-		}
-
-		adv.init(db);
-		adv.advertiseCapability(OPTION_INCLUDE_TAG);
-		adv.advertiseCapability(OPTION_MULTI_ACK_DETAILED);
-		adv.advertiseCapability(OPTION_MULTI_ACK);
-		adv.advertiseCapability(OPTION_OFS_DELTA);
-		adv.advertiseCapability(OPTION_SIDE_BAND);
-		adv.advertiseCapability(OPTION_SIDE_BAND_64K);
-		adv.advertiseCapability(OPTION_THIN_PACK);
-		adv.advertiseCapability(OPTION_NO_PROGRESS);
-		adv.advertiseCapability(OPTION_SHALLOW);
-		if (!biDirectionalPipe)
-			adv.advertiseCapability(OPTION_NO_DONE);
-		RequestPolicy policy = getRequestPolicy();
-		if (policy == RequestPolicy.TIP
-				|| policy == RequestPolicy.REACHABLE_COMMIT_TIP
-				|| policy == null)
-			adv.advertiseCapability(OPTION_ALLOW_TIP_SHA1_IN_WANT);
-		if (policy == RequestPolicy.REACHABLE_COMMIT
-				|| policy == RequestPolicy.REACHABLE_COMMIT_TIP
-				|| policy == null)
-			adv.advertiseCapability(OPTION_ALLOW_REACHABLE_SHA1_IN_WANT);
-		adv.advertiseCapability(OPTION_AGENT, UserAgent.get());
-		if (transferConfig.isAllowFilter()) {
-			adv.advertiseCapability(OPTION_FILTER);
-		}
-		adv.setDerefTags(true);
-		Map<String, Ref> advertisedOrDefaultRefs = getAdvertisedOrDefaultRefs();
-		findSymrefs(adv, advertisedOrDefaultRefs);
-		advertised = adv.send(advertisedOrDefaultRefs);
-		if (adv.isEmpty())
-			adv.advertiseId(ObjectId.zeroId(), "capabilities^{}"); //$NON-NLS-1$
-		adv.end();
+		sendAdvertisedRefs(adv, null);
 	}
 

@@ -1,0 +1,36 @@
+	@Test
+	public void testV2FetchDeepenAndDone() throws Exception {
+		RevCommit parent = remote.commit().message("parent").create();
+		RevCommit child = remote.commit().message("x").parent(parent).create();
+		remote.update("branch1", child);
+
+		// "deepen 1" sends only the child.
+		ByteArrayInputStream recvStream = uploadPackV2(
+			"command=fetch\n",
+			PacketLineIn.DELIM,
+			"want " + child.toObjectId().getName() + "\n",
+			"deepen 1\n",
+			"done\n",
+			PacketLineIn.END);
+		PacketLineIn pckIn = new PacketLineIn(recvStream);
+		assertThat(pckIn.readString(), is("shallow-info"));
+		assertThat(pckIn.readString(), is("shallow " + child.toObjectId().getName()));
+		assertThat(pckIn.readString(), theInstance(PacketLineIn.DELIM));
+		assertThat(pckIn.readString(), is("packfile"));
+		parsePack(recvStream);
+		assertTrue(client.hasObject(child.toObjectId()));
+		assertFalse(client.hasObject(parent.toObjectId()));
+
+		// Without that, the parent is sent too.
+		recvStream = uploadPackV2(
+			"command=fetch\n",
+			PacketLineIn.DELIM,
+			"want " + child.toObjectId().getName() + "\n",
+			"done\n",
+			PacketLineIn.END);
+		pckIn = new PacketLineIn(recvStream);
+		assertThat(pckIn.readString(), is("packfile"));
+		parsePack(recvStream);
+		assertTrue(client.hasObject(parent.toObjectId()));
+	}
+

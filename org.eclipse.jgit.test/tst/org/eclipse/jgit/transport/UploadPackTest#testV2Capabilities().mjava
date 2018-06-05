@@ -1,0 +1,19 @@
+	@Test
+	public void testV2Capabilities() throws Exception {
+		ByteArrayInputStream recvStream =
+			uploadPackV2Setup(null, null, PacketLineIn.END);
+		PacketLineIn pckIn = new PacketLineIn(recvStream);
+
+		assertThat(pckIn.readString(), is("version 2"));
+		assertThat(
+			Arrays.asList(pckIn.readString(), pckIn.readString()),
+			// TODO(jonathantanmy) This check is written this way
+			// to make it simple to see that we expect this list of
+			// capabilities, but probably should be loosened to
+			// allow additional commands to be added to the list,
+			// and additional capabilities to be added to existing
+			// commands without requiring test changes.
+			hasItems("ls-refs", "fetch=shallow"));
+		assertTrue(pckIn.readString() == PacketLineIn.END);
+	}
+
