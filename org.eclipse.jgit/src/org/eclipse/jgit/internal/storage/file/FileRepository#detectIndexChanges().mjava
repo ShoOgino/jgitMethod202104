@@ -5,18 +5,15 @@
 		}
 
 		File indexFile = getIndexFile();
-		snapshotLock.lock();
-		try {
+		synchronized (snapshotLock) {
 			if (snapshot == null) {
 				snapshot = FileSnapshot.save(indexFile);
-			} else if (snapshot.isModified(indexFile)) {
-				snapshotLock.unlock();
-				notifyIndexChanged(false);
+				return;
 			}
-		} finally {
-			if (snapshotLock.isHeldByCurrentThread()) {
-				snapshotLock.unlock();
+			if (!snapshot.isModified(indexFile)) {
+				return;
 			}
 		}
+		notifyIndexChanged(false);
 	}
 
