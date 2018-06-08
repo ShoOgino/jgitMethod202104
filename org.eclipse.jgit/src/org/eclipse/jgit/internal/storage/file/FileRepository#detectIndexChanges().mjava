@@ -5,8 +5,7 @@
 		}
 
 		File indexFile = getIndexFile();
-		snapshotLock.lock();
-		try {
+		synchronized (snapshotLock) {
 			if (snapshot == null) {
 				snapshot = FileSnapshot.save(indexFile);
 				return;
@@ -14,8 +13,6 @@
 			if (!snapshot.isModified(indexFile)) {
 				return;
 			}
-		} finally {
-			snapshotLock.unlock();
 		}
 		notifyIndexChanged(false);
 	}

@@ -1,11 +1,8 @@
 	/** {@inheritDoc} */
 	@Override
 	public void notifyIndexChanged(boolean internal) {
-		snapshotLock.lock();
-		try {
+		synchronized (snapshotLock) {
 			snapshot = FileSnapshot.save(getIndexFile());
-		} finally {
-			snapshotLock.unlock();
 		}
 		fireEvent(new IndexChangedEvent(internal));
 	}
