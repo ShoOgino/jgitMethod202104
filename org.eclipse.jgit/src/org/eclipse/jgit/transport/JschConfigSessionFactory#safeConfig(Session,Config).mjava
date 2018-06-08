@@ -1,0 +1,11 @@
+	private void safeConfig(Session session, Config cfg) {
+		// Ensure that Jsch checks all configured algorithms, not just its
+		// built-in ones. Otherwise it may propose an algorithm for which it
+		// doesn't have an implementation, and then run into an NPE if that
+		// algorithm ends up being chosen.
+		copyConfigValueToSession(session, cfg, "Ciphers", "CheckCiphers"); //$NON-NLS-1$ //$NON-NLS-2$
+		copyConfigValueToSession(session, cfg, "KexAlgorithms", "CheckKexes"); //$NON-NLS-1$ //$NON-NLS-2$
+		copyConfigValueToSession(session, cfg, "HostKeyAlgorithms", //$NON-NLS-1$
+				"CheckSignatures"); //$NON-NLS-1$
+	}
+
