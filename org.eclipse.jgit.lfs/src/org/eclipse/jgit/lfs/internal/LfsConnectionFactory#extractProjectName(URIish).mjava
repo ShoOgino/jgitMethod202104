@@ -1,5 +1,11 @@
 	private static String extractProjectName(URIish u) {
-		String path = u.getPath().substring(1);
+		String path = u.getPath();
+
+		// begins with a slash if the url contains a port (gerrit vs. github).
+		if (path.startsWith("/")) { //$NON-NLS-1$
+			path = path.substring(1);
+		}
+
 		if (path.endsWith(org.eclipse.jgit.lib.Constants.DOT_GIT)) {
 			return path.substring(0, path.length() - 4);
 		} else {
