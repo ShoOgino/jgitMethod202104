@@ -5,6 +5,7 @@
 		String lfsUrl = config.getString(ConfigConstants.CONFIG_SECTION_LFS,
 				null,
 				ConfigConstants.CONFIG_KEY_URL);
+		Exception ex = null;
 		if (lfsUrl == null) {
 			String remoteUrl = null;
 			for (String remote : db.getRemoteNames()) {
@@ -23,13 +24,22 @@
 				break;
 			}
 			if (lfsUrl == null && remoteUrl != null) {
-				lfsUrl = discoverLfsUrl(db, purpose, additionalHeaders,
-						remoteUrl);
+				try {
+					lfsUrl = discoverLfsUrl(db, purpose, additionalHeaders,
+							remoteUrl);
+				} catch (URISyntaxException | IOException
+						| CommandFailedException e) {
+					ex = e;
+				}
 			} else {
 				lfsUrl = lfsUrl + Protocol.INFO_LFS_ENDPOINT;
 			}
 		}
 		if (lfsUrl == null) {
+			if (ex != null) {
+				throw new LfsConfigInvalidException(
+						LfsText.get().lfsNoDownloadUrl, ex);
+			}
 			throw new LfsConfigInvalidException(LfsText.get().lfsNoDownloadUrl);
 		}
 		return lfsUrl;

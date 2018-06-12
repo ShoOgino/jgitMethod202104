@@ -1,6 +1,6 @@
 	private static Protocol.ExpiringAction getSshAuthentication(
 			Repository db, String purpose, String remoteUrl, URIish u)
-			throws IOException {
+			throws IOException, CommandFailedException {
 		AuthCache cached = sshAuthCache.get(remoteUrl);
 		Protocol.ExpiringAction action = null;
 		if (cached != null && cached.validUntil > System.currentTimeMillis()) {
