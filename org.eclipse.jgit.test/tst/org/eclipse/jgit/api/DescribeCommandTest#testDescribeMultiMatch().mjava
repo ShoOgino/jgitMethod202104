@@ -5,7 +5,14 @@
 		tag("v1.1.1");
 		ObjectId c2 = modify("bbb");
 
-		// Ensure that if we're interested in any tags, we get the first match as per Git behaviour
+		if (!useAnnotatedTags && !describeUseAllTags) {
+			assertEquals(null, describe(c1));
+			assertEquals(null, describe(c2));
+			return;
+		}
+
+		// Ensure that if we're interested in any tags, we get the first match
+		// as per Git behaviour
 		assertEquals("v1.0.0", describe(c1));
 		assertEquals("v1.0.0-1-g3747db3", describe(c2));
 

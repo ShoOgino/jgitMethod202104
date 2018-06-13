@@ -1,7 +1,8 @@
-	private void delete(Repository repo, final RefUpdate ref, final Result expected,
-			final boolean exists, final boolean removed) throws IOException {
-		assertEquals(exists, repo.getAllRefs().containsKey(ref.getName()));
+	private void delete(Repository repo, final RefUpdate ref,
+			final Result expected, final boolean exists, final boolean removed)
+			throws IOException {
+		assertEquals(exists, getRef(repo, ref.getName()).isPresent());
 		assertEquals(expected, ref.delete());
-		assertEquals(!removed, repo.getAllRefs().containsKey(ref.getName()));
+		assertEquals(!removed, getRef(repo, ref.getName()).isPresent());
 	}
 

@@ -10,8 +10,8 @@
 	 */
 	@Test
 	public void testRefsCacheAfterUpdate() throws Exception {
-		// Do not use the defalt repo for this case.
-		Map<String, Ref> allRefs = db.getAllRefs();
+		// Do not use the default repo for this case.
+		List<Ref> allRefs = db.getRefDatabase().getRefs();
 		ObjectId oldValue = db.resolve("HEAD");
 		ObjectId newValue = db.resolve("HEAD^");
 		// first make HEAD refer to loose ref
@@ -27,9 +27,9 @@
 		update = updateRef.update();
 		assertEquals(Result.FAST_FORWARD, update);
 
-		allRefs = db.getAllRefs();
-		Ref master = allRefs.get("refs/heads/master");
-		Ref head = allRefs.get("HEAD");
+		allRefs = db.getRefDatabase().getRefs();
+		Ref master = getRef(allRefs, "refs/heads/master").get();
+		Ref head = getRef(allRefs, "HEAD").get();
 		assertEquals("refs/heads/master", master.getName());
 		assertEquals("HEAD", head.getName());
 		assertTrue("is symbolic reference", head.isSymbolic());

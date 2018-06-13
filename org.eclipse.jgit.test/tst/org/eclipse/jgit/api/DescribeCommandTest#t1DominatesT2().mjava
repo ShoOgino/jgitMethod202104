@@ -20,13 +20,18 @@
 		branch("b", c1);
 
 		ObjectId c3 = modify("ccc");
+		assertNameStartsWith(c3, "0244e7f");
 
 		ObjectId c4 = merge(c2);
 
 		assertNameStartsWith(c4, "119892b");
-		assertEquals("t2-2-g119892b", describe(c4)); // 2 commits: c4 and c3
 
-		assertNameStartsWith(c3, "0244e7f");
-		assertEquals("t1-1-g0244e7f", describe(c3));
+		if (useAnnotatedTags || describeUseAllTags) {
+			assertEquals("t2-2-g119892b", describe(c4)); // 2 commits: c4 and c3
+			assertEquals("t1-1-g0244e7f", describe(c3));
+		} else {
+			assertEquals(null, describe(c4));
+			assertEquals(null, describe(c3));
+		}
 	}
 

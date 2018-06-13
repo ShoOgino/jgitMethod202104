@@ -8,13 +8,14 @@
 	public String call() throws GitAPIException {
 		try {
 			checkCallable();
-
-			if (target == null)
+			if (target == null) {
 				setTarget(Constants.HEAD);
+			}
 
 			Collection<Ref> tagList = repo.getRefDatabase()
 					.getRefsByPrefix(R_TAGS);
 			Map<ObjectId, List<Ref>> tags = tagList.stream()
+					.filter(this::filterLightweightTags)
 					.collect(Collectors.groupingBy(this::getObjectIdFromRef));
 
 			// combined flags of all the candidate instances

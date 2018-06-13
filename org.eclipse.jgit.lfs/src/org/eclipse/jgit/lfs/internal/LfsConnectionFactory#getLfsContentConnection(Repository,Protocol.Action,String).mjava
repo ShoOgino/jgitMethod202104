@@ -20,8 +20,10 @@
 				.create(contentUrl, HttpSupport
 						.proxyFor(ProxySelector.getDefault(), contentUrl));
 		contentServerConn.setRequestMethod(method);
-		action.header
-				.forEach((k, v) -> contentServerConn.setRequestProperty(k, v));
+		if (action.header != null) {
+			action.header.forEach(
+					(k, v) -> contentServerConn.setRequestProperty(k, v));
+		}
 		if (contentUrl.getProtocol().equals(SCHEME_HTTPS)
 				&& !repo.getConfig().getBoolean(HttpConfig.HTTP,
 						HttpConfig.SSL_VERIFY_KEY, true)) {

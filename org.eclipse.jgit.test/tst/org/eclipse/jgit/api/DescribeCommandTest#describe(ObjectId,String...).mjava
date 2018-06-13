@@ -1,4 +1,5 @@
-	private String describe(ObjectId c1, String... patterns) throws GitAPIException, IOException, InvalidPatternException {
-		return git.describe().setTarget(c1).setMatch(patterns).call();
+	private String describe(ObjectId c1, String... patterns) throws Exception {
+		return git.describe().setTarget(c1).setTags(describeUseAllTags)
+				.setMatch(patterns).call();
 	}
 

@@ -23,6 +23,10 @@
 		ObjectId c4 = merge(t1);
 
 		assertNameStartsWith(c4, "bb389a4");
-		assertEquals("t1-3-gbb389a4", describe(c4));
+		if (useAnnotatedTags || describeUseAllTags) {
+			assertEquals("t1-3-gbb389a4", describe(c4));
+		} else {
+			assertEquals(null, describe(c4));
+		}
 	}
 
