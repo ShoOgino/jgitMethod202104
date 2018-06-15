@@ -1,0 +1,15 @@
+	@Test
+	public void testHeaderStart() {
+		byte[] headerName = "some".getBytes(UTF_8);
+		byte[] commitBytes = commit.getBytes(UTF_8);
+		assertEquals(625, RawParseUtils.headerStart(headerName, commitBytes, 0));
+		assertEquals(625, RawParseUtils.headerStart(headerName, commitBytes, 4));
+
+		byte[] missingHeaderName = "missing".getBytes(UTF_8);
+		assertEquals(-1, RawParseUtils.headerStart(missingHeaderName,
+							   commitBytes, 0));
+
+		byte[] fauxHeaderName = "other".getBytes(UTF_8);
+		assertEquals(-1, RawParseUtils.headerStart(fauxHeaderName, commitBytes, 625 + 4));
+	}
+
