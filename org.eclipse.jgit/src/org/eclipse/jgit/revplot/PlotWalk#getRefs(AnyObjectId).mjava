@@ -1,8 +1,26 @@
 	private Ref[] getRefs(AnyObjectId commitId) {
+		if (reverseRefMap == null) {
+			reverseRefMap = repository.getAllRefsByPeeledObjectId();
+			for (Map.Entry<AnyObjectId, Set<Ref>> entry : additionalRefMap
+					.entrySet()) {
+				Set<Ref> set = reverseRefMap.get(entry.getKey());
+				Set<Ref> additional = entry.getValue();
+				if (set != null) {
+					if (additional.size() == 1) {
+						// It's an unmodifiable singleton set...
+						additional = new HashSet<>(additional);
+					}
+					additional.addAll(set);
+				}
+				reverseRefMap.put(entry.getKey(), additional);
+			}
+			additionalRefMap.clear();
+			additionalRefMap = null;
+		}
 		Collection<Ref> list = reverseRefMap.get(commitId);
-		if (list == null)
+		if (list == null) {
 			return PlotCommit.NO_REFS;
-		else {
+		} else {
 			Ref[] tags = list.toArray(new Ref[list.size()]);
 			Arrays.sort(tags, new PlotRefComparator());
 			return tags;
