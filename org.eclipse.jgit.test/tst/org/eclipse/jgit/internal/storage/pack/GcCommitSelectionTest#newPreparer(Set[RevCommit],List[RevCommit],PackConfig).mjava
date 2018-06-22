@@ -1,12 +1,9 @@
-	private PackWriterBitmapPreparer newPeparer(RevCommit want,
-			List<RevCommit> commits)
-			throws IOException {
+	private PackWriterBitmapPreparer newPreparer(Set<RevCommit> wants,
+			List<RevCommit> commits, PackConfig config) throws IOException {
 		List<ObjectToPack> objects = new ArrayList<>(commits.size());
 		for (RevCommit commit : commits) {
 			objects.add(new ObjectToPack(commit, Constants.OBJ_COMMIT));
 		}
-		Set<ObjectId> wants = Collections.singleton((ObjectId) want);
-		PackConfig config = new PackConfig();
 		PackBitmapIndexBuilder builder = new PackBitmapIndexBuilder(objects);
 		return new PackWriterBitmapPreparer(
 				tr.getRepository().newObjectReader(), builder,

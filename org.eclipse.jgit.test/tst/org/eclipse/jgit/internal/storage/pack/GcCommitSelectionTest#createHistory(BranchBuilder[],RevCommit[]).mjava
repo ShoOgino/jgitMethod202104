@@ -1,0 +1,37 @@
+	private List<RevCommit> createHistory(BranchBuilder[] branches,
+			RevCommit[] tips) throws Exception {
+		/*-
+		 * Create a history like this, where branches a, b and c branch off of the main branch
+		 * at commits 100, 200 and 300, and where commit times move forward alternating between
+		 * branches.
+		 *
+		 * o...o...o...o...o      commits root,m0,m1,...,m399
+		 *      \   \   \
+		 *       \   \   o...     commits branch_c,c300,c301,...,c399
+		 *        \   \
+		 *         \   o...o...   commits branch_b,b200,b201,...,b399
+		 *          \
+		 *           o...o...o... commits branch_a,b100,b101,...,a399
+		 */
+		List<RevCommit> commits = new ArrayList<>();
+		String[] prefixes = { "m", "a", "b", "c" };
+		int branchCount = branches.length;
+		tips[0] = addCommit(commits, branches[0], "root");
+		int counter = 0;
+
+		for (int b = 0; b < branchCount; b++) {
+			for (int i = 0; i < 100; i++, counter++) {
+				for (int j = 0; j <= b; j++) {
+					tips[j] = addCommit(commits, branches[j],
+							prefixes[j] + counter);
+				}
+			}
+			// Create a new branch from current value of the master branch
+			if (b < branchCount - 1) {
+				tips[b + 1] = addCommit(branches[b + 1],
+						"branch_" + prefixes[b + 1], tips[0]);
+			}
+		}
+		return commits;
+	}
+
