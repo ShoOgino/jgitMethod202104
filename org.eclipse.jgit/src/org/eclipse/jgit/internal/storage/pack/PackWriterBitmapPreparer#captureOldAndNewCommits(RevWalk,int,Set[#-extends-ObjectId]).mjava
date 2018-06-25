@@ -1,0 +1,81 @@
+	/**
+	 * Records which of the {@code wants} can be found in the previous GC pack's
+	 * bitmap indices and which are new.
+	 *
+	 * @param rw
+	 *            a {@link RevWalk} to find reachable objects in this repository
+	 * @param expectedCommitCount
+	 *            expected count of commits. The actual count may be less due to
+	 *            unreachable garbage.
+	 * @param excludeFromBitmapSelection
+	 *            commits that should be excluded from bitmap selection
+	 * @return a {@link CommitSelectionHelper} capturing which commits are
+	 *         covered by a previous pack's bitmaps and which new commits need
+	 *         bitmap coverage
+	 * @throws IncorrectObjectTypeException
+	 *             if any of the processed objects is not a commit
+	 * @throws IOException
+	 *             on errors reading pack or index files
+	 * @throws MissingObjectException
+	 *             if an expected object is missing
+	 */
+	private CommitSelectionHelper captureOldAndNewCommits(RevWalk rw,
+			int expectedCommitCount,
+			Set<? extends ObjectId> excludeFromBitmapSelection)
+			throws IncorrectObjectTypeException, IOException,
+			MissingObjectException {
+		// Track bitmaps and commits from the previous GC pack bitmap indices.
+		BitmapBuilder reuse = commitBitmapIndex.newBitmapBuilder();
+		List<BitmapCommit> reuseCommits = new ArrayList<>();
+		for (PackBitmapIndexRemapper.Entry entry : bitmapRemapper) {
+			// More recent commits did not have the reuse flag set, so skip them
+			if ((entry.getFlags() & FLAG_REUSE) != FLAG_REUSE) {
+				continue;
+			}
+			RevObject ro = rw.peel(rw.parseAny(entry));
+			if (!(ro instanceof RevCommit)) {
+				continue;
+			}
+
+			RevCommit rc = (RevCommit) ro;
+			reuseCommits.add(new BitmapCommit(rc, false, entry.getFlags()));
+			if (!reuse.contains(rc)) {
+				EWAHCompressedBitmap bitmap = bitmapRemapper.ofObjectType(
+						bitmapRemapper.getBitmap(rc), Constants.OBJ_COMMIT);
+				reuse.or(new CompressedBitmap(bitmap, commitBitmapIndex));
+			}
+		}
+
+		// Add branch tips that are not represented in a previous pack's bitmap
+		// indices. Set up a RevWalk to find new commits not in the old packs.
+		List<RevCommit> newWantsByNewest = new ArrayList<>(want.size());
+		Set<RevCommit> newWants = new HashSet<>(want.size());
+		for (AnyObjectId objectId : want) {
+			RevObject ro = rw.peel(rw.parseAny(objectId));
+			if (!(ro instanceof RevCommit) || reuse.contains(ro)
+					|| excludeFromBitmapSelection.contains(ro)) {
+				continue;
+			}
+
+			RevCommit rc = (RevCommit) ro;
+			rw.markStart(rc);
+			newWants.add(rc);
+			newWantsByNewest.add(rc);
+		}
+
+		// Create a list of commits in reverse order (older to newer) that are
+		// not in the previous bitmap indices and are reachable.
+		rw.setRevFilter(new NotInBitmapFilter(reuse));
+		RevCommit[] commits = new RevCommit[expectedCommitCount];
+		int pos = commits.length;
+		RevCommit rc;
+		while ((rc = rw.next()) != null && pos > 0) {
+			commits[--pos] = rc;
+		}
+
+		// Sort the new wants by reverse commit time.
+		Collections.sort(newWantsByNewest, ORDER_BY_REVERSE_TIMESTAMP);
+		return new CommitSelectionHelper(newWants, commits, pos,
+				newWantsByNewest, reuse, reuseCommits);
+	}
+
