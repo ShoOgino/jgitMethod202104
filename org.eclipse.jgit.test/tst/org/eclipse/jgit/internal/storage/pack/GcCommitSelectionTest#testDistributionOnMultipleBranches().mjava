@@ -1,0 +1,44 @@
+	@Test
+	public void testDistributionOnMultipleBranches() throws Exception {
+		BranchBuilder[] branches = { tr.branch("refs/heads/main"),
+				tr.branch("refs/heads/a"), tr.branch("refs/heads/b"),
+				tr.branch("refs/heads/c") };
+		RevCommit[] tips = new RevCommit[branches.length];
+		List<RevCommit> commits = createHistory(branches, tips);
+		PackConfig config = new PackConfig();
+		config.setBitmapContiguousCommitCount(1);
+		config.setBitmapRecentCommitSpan(5);
+		config.setBitmapDistantCommitSpan(20);
+		config.setBitmapRecentCommitCount(100);
+		Set<RevCommit> wants = new HashSet<>(Arrays.asList(tips));
+		PackWriterBitmapPreparer preparer = newPreparer(wants, commits, config);
+		List<BitmapCommit> selection = new ArrayList<>(
+				preparer.selectCommits(commits.size(), PackWriter.NONE));
+		Set<ObjectId> selected = new HashSet<>();
+		for (BitmapCommit c : selection) {
+			selected.add(c.toObjectId());
+		}
+
+		// Verify that each branch has uniform bitmap selection coverage
+		for (RevCommit c : wants) {
+			assertTrue(selected.contains(c.toObjectId()));
+			int count = 1;
+			int selectedCount = 1;
+			RevCommit parent = c;
+			while (parent.getParentCount() != 0) {
+				parent = parent.getParent(0);
+				count++;
+				if (selected.contains(parent.toObjectId())) {
+					selectedCount++;
+				}
+			}
+			// The selection algorithm prefers merges and will look in the
+			// current range plus the recent commit span before selecting a
+			// commit. Since this history has no merges, we expect the recent
+			// span should have 100/10=10 and distant commit spans should have
+			// 100/25=4 per 100 commit range.
+			int expectedCount = 10 + (count - 100 - 24) / 25;
+			assertTrue(expectedCount <= selectedCount);
+		}
+	}
+
