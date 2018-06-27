@@ -11,7 +11,7 @@
 	 *            the root tree for the commit.
 	 * @param parents
 	 *            zero or more parents of the commit.
-	 * @return the new commit.
+	 * @return the new, fully parsed commit.
 	 * @throws Exception
 	 */
 	public RevCommit commit(final int secDelta, final RevTree tree,
@@ -31,6 +31,6 @@
 			id = ins.insert(c);
 			ins.flush();
 		}
-		return pool.lookupCommit(id);
+		return pool.parseCommit(id);
 	}
 

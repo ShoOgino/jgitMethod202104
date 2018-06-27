@@ -11,7 +11,7 @@
 	 *            with {@code refs/tags/}.
 	 * @param dst
 	 *            object the tag should be pointed at.
-	 * @return the annotated tag object.
+	 * @return the new, fully parsed annotated tag object.
 	 * @throws Exception
 	 */
 	public RevTag tag(String name, RevObject dst) throws Exception {
@@ -25,6 +25,6 @@
 			id = ins.insert(t);
 			ins.flush();
 		}
-		return (RevTag) pool.lookupAny(id, Constants.OBJ_TAG);
+		return pool.parseTag(id);
 	}
 

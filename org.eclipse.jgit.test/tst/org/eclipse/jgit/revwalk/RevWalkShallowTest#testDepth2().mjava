@@ -1,16 +1,13 @@
 	@Test
 	public void testDepth2() throws Exception {
-		final RevCommit a = commit();
-		final RevCommit b = commit(a);
-		final RevCommit c = commit(b);
-		final RevCommit d = commit(c);
+		RevCommit[] commits = setupLinearChain();
 
-		createShallowFile(c);
+		createShallowFile(commits[2]);
+		updateCommits(commits);
 
-		rw.reset();
-		markStart(d);
-		assertCommit(d, rw.next());
-		assertCommit(c, rw.next());
+		rw.markStart(commits[3]);
+		assertCommit(commits[3], rw.next());
+		assertCommit(commits[2], rw.next());
 		assertNull(rw.next());
 	}
 
