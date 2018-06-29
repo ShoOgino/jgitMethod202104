@@ -4,20 +4,21 @@
 	 * @param entries
 	 *            the files to include in the tree. The collection does not need
 	 *            to be sorted properly and may be empty.
-	 * @return reference to the tree specified by the entry list.
+	 * @return the new, fully parsed tree specified by the entry list.
 	 * @throws Exception
 	 */
 	public RevTree tree(DirCacheEntry... entries) throws Exception {
 		final DirCache dc = DirCache.newInCore();
 		final DirCacheBuilder b = dc.builder();
-		for (DirCacheEntry e : entries)
+		for (DirCacheEntry e : entries) {
 			b.add(e);
+		}
 		b.finish();
 		ObjectId root;
 		try (ObjectInserter ins = inserter) {
 			root = dc.writeTree(ins);
 			ins.flush();
 		}
-		return pool.lookupTree(root);
+		return pool.parseTree(root);
 	}
 

@@ -1,40 +1,20 @@
 	@Test
 	public void testObjectDirectorySnapshot() throws Exception {
-		RevCommit a = commit();
-		RevCommit b = commit(a);
-		RevCommit c = commit(b);
-		RevCommit d = commit(c);
+		RevCommit[] commits = setupLinearChain();
 
-		createShallowFile(d);
+		createShallowFile(commits[3]);
+		updateCommits(commits);
 
-		rw.reset();
-		markStart(d);
-		assertCommit(d, rw.next());
+		markStart(commits[3]);
+		assertCommit(commits[3], rw.next());
 		assertNull(rw.next());
 
-		rw = createRevWalk();
-		a = rw.lookupCommit(a);
-		b = rw.lookupCommit(b);
-		c = rw.lookupCommit(c);
-		d = rw.lookupCommit(d);
+		createShallowFile(commits[2]);
+		updateCommits(commits);
 
-		rw.reset();
-		markStart(d);
-		assertCommit(d, rw.next());
-		assertNull(rw.next());
-
-		createShallowFile(c);
-
-		rw = createRevWalk();
-		a = rw.lookupCommit(a);
-		b = rw.lookupCommit(b);
-		c = rw.lookupCommit(c);
-		d = rw.lookupCommit(d);
-
-		rw.reset();
-		markStart(d);
-		assertCommit(d, rw.next());
-		assertCommit(c, rw.next());
+		markStart(commits[3]);
+		assertCommit(commits[3], rw.next());
+		assertCommit(commits[2], rw.next());
 		assertNull(rw.next());
 	}
 

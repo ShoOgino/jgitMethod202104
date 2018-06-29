@@ -1,8 +1,13 @@
 	private void createShallowFile(ObjectId... shallowCommits)
 			throws IOException {
-		final StringBuilder builder = new StringBuilder();
-		for (ObjectId commit : shallowCommits)
+		// Reset the RevWalk since the new shallow file invalidates the existing
+		// RevWalk's shallow state.
+		rw.close();
+		rw = createRevWalk();
+		StringBuilder builder = new StringBuilder();
+		for (ObjectId commit : shallowCommits) {
 			builder.append(commit.getName() + "\n");
+		}
 		JGitTestUtil.write(new File(db.getDirectory(), "shallow"),
 				builder.toString());
 	}

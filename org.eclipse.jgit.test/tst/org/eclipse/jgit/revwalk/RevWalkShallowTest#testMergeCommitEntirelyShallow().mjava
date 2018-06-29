@@ -1,19 +1,14 @@
 	@Test
 	public void testMergeCommitEntirelyShallow() throws Exception {
-		final RevCommit a = commit();
-		final RevCommit b = commit(a);
-		final RevCommit c = commit(b);
-		final RevCommit d = commit(b);
-		final RevCommit e = commit(d);
-		final RevCommit merge = commit(c, e);
+		RevCommit[] commits = setupMergeChain();
 
-		createShallowFile(c, e);
+		createShallowFile(commits[2], commits[4]);
+		updateCommits(commits);
 
-		rw.reset();
-		markStart(merge);
-		assertCommit(merge, rw.next());
-		assertCommit(e, rw.next());
-		assertCommit(c, rw.next());
+		markStart(commits[5]);
+		assertCommit(commits[5], rw.next());
+		assertCommit(commits[4], rw.next());
+		assertCommit(commits[2], rw.next());
 		assertNull(rw.next());
 	}
 
