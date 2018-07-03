@@ -1,0 +1,12 @@
+	private NoRemoteRepositoryException createNotFoundException(URIish u,
+			URL url, String msg) {
+		String text;
+		if (msg != null && !msg.isEmpty()) {
+			text = MessageFormat.format(JGitText.get().uriNotFoundWithMessage,
+					url, msg);
+		} else {
+			text = MessageFormat.format(JGitText.get().uriNotFound, url);
+		}
+		return new NoRemoteRepositoryException(u, text);
+	}
+

@@ -42,9 +42,8 @@
 						return;
 
 					case HttpConnection.HTTP_NOT_FOUND:
-						throw new NoRemoteRepositoryException(uri,
-								MessageFormat.format(JGitText.get().uriNotFound,
-										conn.getURL()));
+						throw createNotFoundException(uri, conn.getURL(),
+								conn.getResponseMessage());
 
 					case HttpConnection.HTTP_FORBIDDEN:
 						throw new TransportException(uri,
