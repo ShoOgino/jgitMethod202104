@@ -2,10 +2,10 @@
 	public void namespaceNotFound() throws IOException {
 		Ref exp = ref(MASTER, 1);
 		ReftableReader t = read(write(exp));
-		try (RefCursor rc = t.seekPrefix("refs/changes/")) {
+		try (RefCursor rc = t.seekRefsWithPrefix("refs/changes/")) {
 			assertFalse(rc.next());
 		}
-		try (RefCursor rc = t.seekPrefix("refs/tags/")) {
+		try (RefCursor rc = t.seekRefsWithPrefix("refs/tags/")) {
 			assertFalse(rc.next());
 		}
 	}

@@ -5,12 +5,12 @@
 		Ref v1 = tag(V1_0, 3, 4);
 
 		ReftableReader t = read(write(master, next, v1));
-		try (RefCursor rc = t.seekPrefix("refs/tags/")) {
+		try (RefCursor rc = t.seekRefsWithPrefix("refs/tags/")) {
 			assertTrue(rc.next());
 			assertEquals(V1_0, rc.getRef().getName());
 			assertFalse(rc.next());
 		}
-		try (RefCursor rc = t.seekPrefix("refs/heads/")) {
+		try (RefCursor rc = t.seekRefsWithPrefix("refs/heads/")) {
 			assertTrue(rc.next());
 			assertEquals(MASTER, rc.getRef().getName());
 

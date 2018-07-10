@@ -6,7 +6,7 @@
 		try {
 			Reftable table = reader();
 			try (RefCursor rc = ALL.equals(prefix) ? table.allRefs()
-					: table.seekPrefix(prefix)) {
+					: table.seekRefsWithPrefix(prefix)) {
 				while (rc.next()) {
 					Ref ref = table.resolve(rc.getRef());
 					if (ref != null && ref.getObjectId() != null) {
