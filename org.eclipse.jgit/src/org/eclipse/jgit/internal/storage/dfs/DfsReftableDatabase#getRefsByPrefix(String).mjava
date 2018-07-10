@@ -1,13 +1,12 @@
 	/** {@inheritDoc} */
 	@Override
-	public Map<String, Ref> getRefs(String prefix) throws IOException {
-		RefList.Builder<Ref> all = new RefList.Builder<>();
+	public List<Ref> getRefsByPrefix(String prefix) throws IOException {
+		List<Ref> all = new ArrayList<>();
 		lock.lock();
 		try {
 			Reftable table = reader();
 			try (RefCursor rc = ALL.equals(prefix) ? table.allRefs()
-					: (prefix.endsWith("/") ? table.seekPrefix(prefix) //$NON-NLS-1$
-							: table.seekRef(prefix))) {
+					: table.seekPrefix(prefix)) {
 				while (rc.next()) {
 					Ref ref = table.resolve(rc.getRef());
 					if (ref != null && ref.getObjectId() != null) {
@@ -19,7 +18,6 @@
 			lock.unlock();
 		}
 
-		RefList<Ref> none = RefList.emptyList();
-		return new RefMap(prefix, all.toRefList(), none, none);
+		return Collections.unmodifiableList(all);
 	}
 

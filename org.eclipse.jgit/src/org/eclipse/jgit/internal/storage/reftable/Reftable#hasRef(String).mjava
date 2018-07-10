@@ -14,8 +14,9 @@
 	 *             if references cannot be read.
 	 */
 	public boolean hasRef(String refName) throws IOException {
-		try (RefCursor rc = seekRef(refName)) {
-			return rc.next();
+		try (RefCursor rc = seekPrefix(refName)) {
+			return rc.next() && (refName.endsWith("/") //$NON-NLS-1$
+					|| refName.equals(rc.getRef().getName()));
 		}
 	}
 

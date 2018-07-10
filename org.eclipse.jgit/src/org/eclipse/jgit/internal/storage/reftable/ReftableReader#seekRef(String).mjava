@@ -4,9 +4,7 @@
 		initRefIndex();
 
 		byte[] key = refName.getBytes(CHARSET);
-		boolean prefix = key[key.length - 1] == '/';
-
-		RefCursorImpl i = new RefCursorImpl(refEnd, key, prefix);
+		RefCursorImpl i = new RefCursorImpl(refEnd, key, false);
 		i.block = seek(REF_BLOCK_TYPE, key, refIndex, 0, refEnd);
 		return i;
 	}

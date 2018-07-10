@@ -1,0 +1,11 @@
+	/** {@inheritDoc} */
+	@Override
+	public RefCursor seekPrefix(String prefix) throws IOException {
+		initRefIndex();
+
+		byte[] key = prefix.getBytes(CHARSET);
+		RefCursorImpl i = new RefCursorImpl(refEnd, key, true);
+		i.block = seek(REF_BLOCK_TYPE, key, refIndex, 0, refEnd);
+		return i;
+	}
+
