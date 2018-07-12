@@ -1,11 +1,13 @@
 	@Test
-	public void addSubmodule() throws Exception {
+	public void addSubmoduleWithName() throws Exception {
 		try (Git git = new Git(db)) {
 			writeTrashFile("file.txt", "content");
 			git.add().addFilepattern("file.txt").call();
 			RevCommit commit = git.commit().setMessage("create file").call();
 
 			SubmoduleAddCommand command = new SubmoduleAddCommand(db);
+			String name = "testsub";
+			command.setName(name);
 			String path = "sub";
 			command.setPath(path);
 			String uri = db.getDirectory().toURI().toString();
@@ -19,7 +21,7 @@
 			SubmoduleWalk generator = SubmoduleWalk.forIndex(db);
 			generator.loadModulesConfig();
 			assertTrue(generator.next());
-			assertEquals(path, generator.getModuleName());
+			assertEquals(name, generator.getModuleName());
 			assertEquals(path, generator.getPath());
 			assertEquals(commit, generator.getObjectId());
 			assertEquals(uri, generator.getModulesUrl());
