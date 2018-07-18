@@ -1,0 +1,56 @@
+	@Test
+	public void testRebaseWithAutoStashAndSubdirs() throws Exception {
+		// create file0, add and commit
+		db.getConfig().setBoolean(ConfigConstants.CONFIG_REBASE_SECTION, null,
+				ConfigConstants.CONFIG_KEY_AUTOSTASH, true);
+		writeTrashFile("sub/file0", "file0");
+		git.add().addFilepattern("sub/file0").call();
+		git.commit().setMessage("commit0").call();
+		// create file1, add and commit
+		writeTrashFile(FILE1, "file1");
+		git.add().addFilepattern(FILE1).call();
+		RevCommit commit = git.commit().setMessage("commit1").call();
+
+		// create topic branch and checkout / create file2, add and commit
+		createBranch(commit, "refs/heads/topic");
+		checkoutBranch("refs/heads/topic");
+		writeTrashFile("file2", "file2");
+		git.add().addFilepattern("file2").call();
+		git.commit().setMessage("commit2").call();
+
+		// checkout master branch / modify file1, add and commit
+		checkoutBranch("refs/heads/master");
+		writeTrashFile(FILE1, "modified file1");
+		git.add().addFilepattern(FILE1).call();
+		git.commit().setMessage("commit3").call();
+
+		// checkout topic branch / modify file0
+		checkoutBranch("refs/heads/topic");
+		writeTrashFile("sub/file0", "unstaged modified file0");
+
+		Set<String> modifiedFiles = new HashSet<>();
+		ListenerHandle handle = db.getListenerList()
+				.addWorkingTreeModifiedListener(
+						event -> modifiedFiles.addAll(event.getModified()));
+		try {
+			// rebase
+			assertEquals(Status.OK, git.rebase()
+					.setUpstream("refs/heads/master").call().getStatus());
+		} finally {
+			handle.remove();
+		}
+		checkFile(new File(new File(db.getWorkTree(), "sub"), "file0"),
+				"unstaged modified file0");
+		checkFile(new File(db.getWorkTree(), FILE1), "modified file1");
+		checkFile(new File(db.getWorkTree(), "file2"), "file2");
+		assertEquals(
+				"[file1, mode:100644, content:modified file1]"
+						+ "[file2, mode:100644, content:file2]"
+						+ "[sub/file0, mode:100644, content:file0]",
+				indexState(CONTENT));
+		assertEquals(RepositoryState.SAFE, db.getRepositoryState());
+		List<String> modified = new ArrayList<>(modifiedFiles);
+		Collections.sort(modified);
+		assertEquals("[file1, sub/file0]", modified.toString());
+	}
+
