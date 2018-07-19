@@ -1,0 +1,16 @@
+    @Test
+    public void testGetHeaderFieldsAllowMultipleValues() throws MalformedURLException {
+        HttpResponse responseMock = new HttpResponseMock();
+        String headerField = "WWW-Authenticate";
+        responseMock.addHeader(headerField, "Basic");
+        responseMock.addHeader(headerField, "Digest");
+        responseMock.addHeader(headerField, "NTLM");
+        HttpClientConnection connection = new HttpClientConnection("http://0.0.0.0/");
+        connection.resp = responseMock;
+        List<String> headerValues = connection.getHeaderFields().get(headerField);
+        assertEquals(3, headerValues.size());
+        assertTrue(headerValues.contains("Basic"));
+        assertTrue(headerValues.contains("Digest"));
+        assertTrue(headerValues.contains("NTLM"));
+    }
+
