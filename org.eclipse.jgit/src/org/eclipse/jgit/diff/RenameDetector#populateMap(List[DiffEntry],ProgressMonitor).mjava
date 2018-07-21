@@ -1,6 +1,7 @@
 	@SuppressWarnings("unchecked")
 	private HashMap<AbbreviatedObjectId, Object> populateMap(
-			List<DiffEntry> diffEntries, ProgressMonitor pm) {
+			List<DiffEntry> diffEntries, ProgressMonitor pm)
+			throws CanceledException {
 		HashMap<AbbreviatedObjectId, Object> map = new HashMap<>();
 		for (DiffEntry de : diffEntries) {
 			Object old = map.put(id(de), de);
@@ -14,7 +15,7 @@
 				((List<DiffEntry>) old).add(de);
 				map.put(id(de), old);
 			}
-			pm.update(1);
+			advanceOrCancel(pm);
 		}
 		return map;
 	}

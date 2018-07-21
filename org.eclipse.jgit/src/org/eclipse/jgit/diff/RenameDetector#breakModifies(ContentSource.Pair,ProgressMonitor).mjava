@@ -1,5 +1,5 @@
 	private void breakModifies(ContentSource.Pair reader, ProgressMonitor pm)
-			throws IOException {
+			throws IOException, CanceledException {
 		ArrayList<DiffEntry> newEntries = new ArrayList<>(entries.size());
 
 		pm.beginTask(JGitText.get().renamesBreakingModifies, entries.size());
@@ -20,7 +20,7 @@
 			} else {
 				newEntries.add(e);
 			}
-			pm.update(1);
+			advanceOrCancel(pm);
 		}
 
 		entries = newEntries;

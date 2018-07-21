@@ -1,5 +1,5 @@
 	@SuppressWarnings("unchecked")
-	private void findExactRenames(ProgressMonitor pm) {
+	private void findExactRenames(ProgressMonitor pm) throws CanceledException {
 		pm.beginTask(JGitText.get().renamesFindingExact, //
 				added.size() + added.size() + deleted.size()
 						+ added.size() * deleted.size());
@@ -45,7 +45,7 @@
 			} else {
 				left.add(a);
 			}
-			pm.update(1);
+			advanceOrCancel(pm);
 		}
 
 		for (List<DiffEntry> adds : nonUniqueAdds) {
@@ -87,6 +87,10 @@
 						int score = SimilarityRenameDetector.nameScore(addedName, deletedName);
 						matrix[mNext] = SimilarityRenameDetector.encode(score, delIdx, addIdx);
 						mNext++;
+						if (pm.isCancelled()) {
+							throw new CanceledException(
+									JGitText.get().renameCancelled);
+						}
 					}
 				}
 
@@ -100,7 +104,7 @@
 					DiffEntry a = adds.get(addIdx);
 
 					if (a == null) {
-						pm.update(1);
+						advanceOrCancel(pm);
 						continue; // was already matched earlier
 					}
 
@@ -118,11 +122,12 @@
 
 					entries.add(DiffEntry.pair(type, d, a, 100));
 					adds.set(addIdx, null); // Claim the destination was matched.
-					pm.update(1);
+					advanceOrCancel(pm);
 				}
 			} else {
 				left.addAll(adds);
 			}
+			advanceOrCancel(pm);
 		}
 		added = left;
 

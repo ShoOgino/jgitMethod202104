@@ -9,9 +9,11 @@
 	 *         representing all files that have been changed.
 	 * @throws java.io.IOException
 	 *             file contents cannot be read from the repository.
+	 * @throws CanceledException
+	 *             if rename detection was cancelled
 	 */
 	public List<DiffEntry> compute(ObjectReader reader, ProgressMonitor pm)
-			throws IOException {
+			throws IOException, CanceledException {
 		final ContentSource cs = ContentSource.create(reader);
 		return compute(new ContentSource.Pair(cs, cs), pm);
 	}

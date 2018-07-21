@@ -1,4 +1,4 @@
-	void compute(ProgressMonitor pm) throws IOException {
+	void compute(ProgressMonitor pm) throws IOException, CanceledException {
 		if (pm == null)
 			pm = NullProgressMonitor.INSTANCE;
 
@@ -12,6 +12,9 @@
 		// we have looked at everything that is above our minimum score.
 		//
 		for (--mNext; mNext >= 0; mNext--) {
+			if (pm.isCancelled()) {
+				throw new CanceledException(JGitText.get().renameCancelled);
+			}
 			long ent = matrix[mNext];
 			int sIdx = srcFile(ent);
 			int dIdx = dstFile(ent);

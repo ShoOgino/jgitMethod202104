@@ -1,4 +1,5 @@
-	private boolean processMerge(Candidate n) throws IOException {
+	private boolean processMerge(Candidate n)
+			throws IOException {
 		int pCnt = n.getParentCount();
 
 		// If any single parent exactly matches the merge, follow only
@@ -25,9 +26,15 @@
 				if (ids != null && ids[pIdx] != null)
 					continue;
 
-				DiffEntry r = findRename(parent, n.sourceCommit, n.sourcePath);
-				if (r == null)
+				DiffEntry r;
+				try {
+					r = findRename(parent, n.sourceCommit, n.sourcePath);
+					if (r == null) {
+						continue;
+					}
+				} catch (CanceledException e) {
 					continue;
+				}
 
 				if (n instanceof ReverseCandidate) {
 					if (ids == null)

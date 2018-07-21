@@ -1,4 +1,4 @@
-	private void rejoinModifies(ProgressMonitor pm) {
+	private void rejoinModifies(ProgressMonitor pm) throws CanceledException {
 		HashMap<String, DiffEntry> nameMap = new HashMap<>();
 		ArrayList<DiffEntry> newAdded = new ArrayList<>(added.size());
 
@@ -7,7 +7,7 @@
 
 		for (DiffEntry src : deleted) {
 			nameMap.put(src.oldPath, src);
-			pm.update(1);
+			advanceOrCancel(pm);
 		}
 
 		for (DiffEntry dst : added) {
@@ -23,7 +23,7 @@
 			} else {
 				newAdded.add(dst);
 			}
-			pm.update(1);
+			advanceOrCancel(pm);
 		}
 
 		added = newAdded;

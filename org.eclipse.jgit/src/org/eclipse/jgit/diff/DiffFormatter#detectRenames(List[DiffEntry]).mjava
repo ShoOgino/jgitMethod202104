@@ -2,6 +2,10 @@
 			throws IOException {
 		renameDetector.reset();
 		renameDetector.addAll(files);
-		return renameDetector.compute(reader, progressMonitor);
+		try {
+			return renameDetector.compute(reader, progressMonitor);
+		} catch (CanceledException e) {
+			return Collections.emptyList();
+		}
 	}
 

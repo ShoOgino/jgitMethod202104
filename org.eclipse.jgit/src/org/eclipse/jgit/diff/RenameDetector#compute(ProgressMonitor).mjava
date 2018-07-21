@@ -7,8 +7,11 @@
 	 *         representing all files that have been changed.
 	 * @throws java.io.IOException
 	 *             file contents cannot be read from the repository.
+	 * @throws CanceledException
+	 *             if rename detection was cancelled
 	 */
-	public List<DiffEntry> compute(ProgressMonitor pm) throws IOException {
+	public List<DiffEntry> compute(ProgressMonitor pm)
+			throws IOException, CanceledException {
 		if (!done) {
 			try {
 				return compute(objectReader, pm);
