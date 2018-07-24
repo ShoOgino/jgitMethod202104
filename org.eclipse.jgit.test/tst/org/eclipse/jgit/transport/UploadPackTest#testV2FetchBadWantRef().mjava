@@ -1,0 +1,24 @@
+	@Test
+	public void testV2FetchBadWantRef() throws Exception {
+		RevCommit one = remote.commit().message("1").create();
+		remote.update("one", one);
+
+		server.getConfig().setBoolean("uploadpack", null, "allowrefinwant", true);
+
+		try {
+			uploadPackV2(
+				"command=fetch\n",
+				PacketLineIn.DELIM,
+				"want-ref refs/heads/one\n",
+				"want-ref refs/heads/nonExistentRef\n",
+				"done\n",
+				PacketLineIn.END);
+		} catch (PackProtocolException e) {
+			assertThat(
+				e.getMessage(),
+				containsString("Invalid ref name: refs/heads/nonExistentRef"));
+			return;
+		}
+		fail("expected PackProtocolException");
+	}
+

@@ -1,0 +1,14 @@
+	@Test
+	public void testV2CapabilitiesRefInWantNotAdvertisedIfUnallowed() throws Exception {
+		server.getConfig().setBoolean("uploadpack", null, "allowrefinwant", false);
+		ByteArrayInputStream recvStream =
+			uploadPackV2Setup(null, null, PacketLineIn.END);
+		PacketLineIn pckIn = new PacketLineIn(recvStream);
+
+		assertThat(pckIn.readString(), is("version 2"));
+		assertThat(
+			Arrays.asList(pckIn.readString(), pckIn.readString()),
+			hasItems("ls-refs", "fetch=shallow"));
+		assertTrue(pckIn.readString() == PacketLineIn.END);
+	}
+

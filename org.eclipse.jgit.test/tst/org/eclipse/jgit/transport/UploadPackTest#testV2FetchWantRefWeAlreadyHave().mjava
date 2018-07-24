@@ -1,0 +1,31 @@
+	@Test
+	public void testV2FetchWantRefWeAlreadyHave() throws Exception {
+		RevCommit one = remote.commit().message("1").create();
+		remote.update("one", one);
+
+		server.getConfig().setBoolean("uploadpack", null, "allowrefinwant", true);
+
+		ByteArrayInputStream recvStream = uploadPackV2(
+			"command=fetch\n",
+			PacketLineIn.DELIM,
+			"want-ref refs/heads/one\n",
+			"have " + one.toObjectId().getName(),
+			"done\n",
+			PacketLineIn.END);
+		PacketLineIn pckIn = new PacketLineIn(recvStream);
+
+		// The client still needs to know the hash of the object that
+		// refs/heads/one points to, even though it already has the
+		// object ...
+		assertThat(pckIn.readString(), is("wanted-refs"));
+		assertThat(
+				pckIn.readString(),
+				is(one.toObjectId().getName() + " refs/heads/one"));
+		assertThat(pckIn.readString(), theInstance(PacketLineIn.DELIM));
+
+		// ... but the client does not need the object itself.
+		assertThat(pckIn.readString(), is("packfile"));
+		parsePack(recvStream);
+		assertFalse(client.hasObject(one.toObjectId()));
+	}
+

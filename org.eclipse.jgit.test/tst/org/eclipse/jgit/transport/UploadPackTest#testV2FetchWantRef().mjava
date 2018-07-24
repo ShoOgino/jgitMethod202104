@@ -1,0 +1,34 @@
+	@Test
+	public void testV2FetchWantRef() throws Exception {
+		RevCommit one = remote.commit().message("1").create();
+		RevCommit two = remote.commit().message("2").create();
+		RevCommit three = remote.commit().message("3").create();
+		remote.update("one", one);
+		remote.update("two", two);
+		remote.update("three", three);
+
+		server.getConfig().setBoolean("uploadpack", null, "allowrefinwant", true);
+
+		ByteArrayInputStream recvStream = uploadPackV2(
+			"command=fetch\n",
+			PacketLineIn.DELIM,
+			"want-ref refs/heads/one\n",
+			"want-ref refs/heads/two\n",
+			"done\n",
+			PacketLineIn.END);
+		PacketLineIn pckIn = new PacketLineIn(recvStream);
+		assertThat(pckIn.readString(), is("wanted-refs"));
+		assertThat(
+				Arrays.asList(pckIn.readString(), pckIn.readString()),
+				hasItems(
+					one.toObjectId().getName() + " refs/heads/one",
+					two.toObjectId().getName() + " refs/heads/two"));
+		assertThat(pckIn.readString(), theInstance(PacketLineIn.DELIM));
+		assertThat(pckIn.readString(), is("packfile"));
+		parsePack(recvStream);
+
+		assertTrue(client.hasObject(one.toObjectId()));
+		assertTrue(client.hasObject(two.toObjectId()));
+		assertFalse(client.hasObject(three.toObjectId()));
+	}
+
