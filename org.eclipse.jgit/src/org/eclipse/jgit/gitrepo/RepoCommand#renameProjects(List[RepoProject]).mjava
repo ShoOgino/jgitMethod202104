@@ -1,0 +1,38 @@
+	/**
+	 * Rename the projects if there's a conflict when converted to submodules.
+	 *
+	 * @param projects
+	 *            parsed projects
+	 * @return projects that are renamed if necessary
+	 */
+	private List<RepoProject> renameProjects(List<RepoProject> projects) {
+		Map<String, List<RepoProject>> m = new HashMap<>();
+		for (RepoProject proj : projects) {
+			List<RepoProject> l = m.get(proj.getName());
+			if (l == null) {
+				l = new ArrayList<>();
+				m.put(proj.getName(), l);
+			}
+			l.add(proj);
+		}
+
+		List<RepoProject> ret = new ArrayList<>();
+		for (List<RepoProject> ps : m.values()) {
+			boolean nameConflict = ps.size() != 1;
+			for (RepoProject proj : ps) {
+				String name = proj.getName();
+				if (nameConflict) {
+					name += SLASH + proj.getPath();
+				}
+				RepoProject p = new RepoProject(name,
+						proj.getPath(), proj.getRevision(), null,
+						proj.getGroups(), proj.getRecommendShallow());
+				p.setUrl(proj.getUrl());
+				p.addCopyFiles(proj.getCopyFiles());
+				p.addLinkFiles(proj.getLinkFiles());
+				ret.add(p);
+			}
+		}
+		return ret;
+	}
+
