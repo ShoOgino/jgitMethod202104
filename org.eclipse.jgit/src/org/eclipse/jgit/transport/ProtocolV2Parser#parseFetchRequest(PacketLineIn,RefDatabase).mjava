@@ -27,13 +27,18 @@
 		// lengths.
 		reqBuilder.addClientCapability(OPTION_SIDE_BAND_64K);
 
-		String line;
+		String line = consumeCapabilities(pckIn,
+				serverOption -> reqBuilder.addServerOption(serverOption),
+				agent -> reqBuilder.setAgent(agent));
 
-		// Currently, we do not support any capabilities, so the next
-		// line is DELIM.
-		if ((line = pckIn.readString()) != PacketLineIn.DELIM) {
-			throw new PackProtocolException(MessageFormat
-					.format(JGitText.get().unexpectedPacketLine, line));
+		if (line == PacketLineIn.END) {
+			return reqBuilder.build();
+		}
+
+		if (line != PacketLineIn.DELIM) {
+			throw new PackProtocolException(
+					MessageFormat.format(JGitText.get().unexpectedPacketLine,
+							line));
 		}
 
 		boolean filterReceived = false;

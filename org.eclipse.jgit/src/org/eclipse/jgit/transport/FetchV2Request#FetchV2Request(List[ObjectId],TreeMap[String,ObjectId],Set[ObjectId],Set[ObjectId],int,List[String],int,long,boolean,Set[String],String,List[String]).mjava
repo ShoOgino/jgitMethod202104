@@ -4,11 +4,14 @@
 			@NonNull Set<ObjectId> clientShallowCommits, int deepenSince,
 			@NonNull List<String> deepenNotRefs, int depth,
 			long filterBlobLimit,
-			boolean doneReceived, @NonNull Set<String> clientCapabilities) {
+			boolean doneReceived, @NonNull Set<String> clientCapabilities,
+			@Nullable String agent, @NonNull List<String> serverOptions) {
 		super(wantIds, depth, clientShallowCommits, filterBlobLimit,
 				clientCapabilities, deepenSince, deepenNotRefs);
 		this.peerHas = requireNonNull(peerHas);
 		this.wantedRefs = requireNonNull(wantedRefs);
 		this.doneReceived = doneReceived;
+		this.agent = agent;
+		this.serverOptions = requireNonNull(serverOptions);
 	}
 

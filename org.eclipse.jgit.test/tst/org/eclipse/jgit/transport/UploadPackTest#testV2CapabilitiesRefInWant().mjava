@@ -7,10 +7,12 @@
 
 		assertThat(pckIn.readString(), is("version 2"));
 		assertThat(
-			Arrays.asList(pckIn.readString(), pckIn.readString()),
-			// TODO(jonathantanmy) This check overspecifies the
-			// order of the capabilities of "fetch".
-			hasItems("ls-refs", "fetch=ref-in-want shallow"));
+				Arrays.asList(pckIn.readString(), pckIn.readString(),
+						pckIn.readString()),
+				// TODO(jonathantanmy) This check overspecifies the
+				// order of the capabilities of "fetch".
+				hasItems("ls-refs", "fetch=ref-in-want shallow",
+						"server-option"));
 		assertTrue(pckIn.readString() == PacketLineIn.END);
 	}
 

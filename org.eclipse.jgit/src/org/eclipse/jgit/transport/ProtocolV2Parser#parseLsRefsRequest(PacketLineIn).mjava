@@ -19,25 +19,31 @@
 			throws PackProtocolException, IOException {
 		LsRefsV2Request.Builder builder = LsRefsV2Request.builder();
 		List<String> prefixes = new ArrayList<>();
-		String line = pckIn.readString();
-		// Currently, we do not support any capabilities, so the next
-		// line is DELIM if there are arguments or END if not.
-		if (line == PacketLineIn.DELIM) {
-			while ((line = pckIn.readString()) != PacketLineIn.END) {
-				if (line.equals("peel")) { //$NON-NLS-1$
-					builder.setPeel(true);
-				} else if (line.equals("symrefs")) { //$NON-NLS-1$
-					builder.setSymrefs(true);
-				} else if (line.startsWith("ref-prefix ")) { //$NON-NLS-1$
-					prefixes.add(line.substring("ref-prefix ".length())); //$NON-NLS-1$
-				} else {
-					throw new PackProtocolException(MessageFormat
-							.format(JGitText.get().unexpectedPacketLine, line));
-				}
-			}
-		} else if (line != PacketLineIn.END) {
+
+		String line = consumeCapabilities(pckIn,
+				serverOption -> builder.addServerOption(serverOption),
+				agent -> builder.setAgent(agent));
+
+		if (line == PacketLineIn.END) {
+			return builder.build();
+		}
+
+		if (line != PacketLineIn.DELIM) {
 			throw new PackProtocolException(MessageFormat
 					.format(JGitText.get().unexpectedPacketLine, line));
+		}
+
+		while ((line = pckIn.readString()) != PacketLineIn.END) {
+			if (line.equals("peel")) { //$NON-NLS-1$
+				builder.setPeel(true);
+			} else if (line.equals("symrefs")) { //$NON-NLS-1$
+				builder.setSymrefs(true);
+			} else if (line.startsWith("ref-prefix ")) { //$NON-NLS-1$
+				prefixes.add(line.substring("ref-prefix ".length())); //$NON-NLS-1$
+			} else {
+				throw new PackProtocolException(MessageFormat
+						.format(JGitText.get().unexpectedPacketLine, line));
+			}
 		}
 
 		return builder.setRefPrefixes(prefixes).build();

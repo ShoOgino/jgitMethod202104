@@ -1,0 +1,15 @@
+	@Test
+	public void testV2LsRefsServerOptions() throws Exception {
+		String[] lines = { "command=ls-refs\n",
+				"server-option=one\n", "server-option=two\n",
+				PacketLineIn.DELIM,
+				PacketLineIn.END };
+
+		TestV2Hook testHook = new TestV2Hook();
+		uploadPackV2Setup(null, null, testHook, lines);
+
+		LsRefsV2Request req = testHook.lsRefsRequest;
+		assertEquals(2, req.getServerOptions().size());
+		assertThat(req.getServerOptions(), hasItems("one", "two"));
+	}
+
