@@ -1,0 +1,9 @@
+	private void setLastModifiedTime(FileTime fileTime, Path path, String folder) throws IOException {
+		long numParents = folder.chars().filter(c -> c == '/').count();
+		Path folderPath = path.resolve(folder);
+		for(int folderLevel = 0; folderLevel <= numParents; folderLevel ++ ) {
+			Files.setLastModifiedTime(folderPath, fileTime);
+			folderPath = folderPath.getParent();
+		}
+	}
+
