@@ -1,0 +1,12 @@
+	private boolean canBeSafelyDeleted(Path path, Instant threshold) {
+		try {
+			return Files.getLastModifiedTime(path).toInstant().isBefore(threshold);
+		}
+		catch (IOException e) {
+			LOG.warn(MessageFormat.format(
+					JGitText.get().cannotAccessLastModifiedForSafeDeletion,
+					path), e);
+			return false;
+		}
+	}
+
