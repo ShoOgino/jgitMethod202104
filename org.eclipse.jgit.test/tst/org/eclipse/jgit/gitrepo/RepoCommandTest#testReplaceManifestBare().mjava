@@ -21,9 +21,9 @@
 				.append("<manifest>")
 				.append("<remote name=\"remote1\" fetch=\".\" />")
 				.append("<default revision=\"master\" remote=\"remote1\" />")
-				.append("<project path=\"bar\" name=\"").append(defaultUri)
-				.append("\" revision=\"").append(BRANCH).append("\" >")
-				.append("<copyfile src=\"hello.txt\" dest=\"Hello.txt\" />")
+				.append("<project path=\"bar\" name=\"").append(notDefaultUri)
+				.append("\" >")
+				.append("<copyfile src=\"world.txt\" dest=\"World.txt\" />")
 				.append("</project>").append("</manifest>");
 		JGitTestUtil.writeTrashFile(tempDb, "new.xml", xmlContent.toString());
 		command = new RepoCommand(remoteDb);
@@ -39,8 +39,8 @@
 			File hello = new File(localDb.getWorkTree(), "Hello");
 			assertFalse("The Hello file shouldn't exist", hello.exists());
 			// The Hello.txt file should exist
-			File hellotxt = new File(localDb.getWorkTree(), "Hello.txt");
-			assertTrue("The Hello.txt file should exist", hellotxt.exists());
+			File hellotxt = new File(localDb.getWorkTree(), "World.txt");
+			assertTrue("The World.txt file should exist", hellotxt.exists());
 			dotmodules = new File(localDb.getWorkTree(),
 					Constants.DOT_GIT_MODULES);
 		}
@@ -55,9 +55,9 @@
 				String line = reader.readLine();
 				if (line == null)
 					break;
-				if (line.contains("submodule \"foo\""))
+				if (line.contains("submodule \"" + defaultUri + "\""))
 					foo = true;
-				if (line.contains("submodule \"bar\""))
+				if (line.contains("submodule \"" + notDefaultUri + "\""))
 					bar = true;
 			}
 			assertTrue("The bar submodule should exist", bar);

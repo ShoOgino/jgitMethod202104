@@ -29,9 +29,7 @@
 				Constants.DOT_GIT_MODULES);
 		}
 
-		// The .gitmodules file should have 'submodule "foo"' and shouldn't
-		// have
-		// 'submodule "foo/bar"' lines.
+		// Check .gitmodules file
 		try (BufferedReader reader = new BufferedReader(
 				new FileReader(dotmodules))) {
 			boolean foo = false;
@@ -41,16 +39,17 @@
 				String line = reader.readLine();
 				if (line == null)
 					break;
-				if (line.contains("submodule \"foo\""))
+				if (line.contains("submodule \"" + defaultUri + "\""))
 					foo = true;
-				if (line.contains("submodule \"foo/bar\""))
+				if (line.contains("submodule \"" + groupBUri + "\""))
 					foobar = true;
-				if (line.contains("submodule \"a\""))
+				if (line.contains("submodule \"" + groupAUri + "\""))
 					a = true;
 			}
-			assertTrue("The foo submodule should exist", foo);
-			assertFalse("The foo/bar submodule shouldn't exist", foobar);
-			assertTrue("The a submodule should exist", a);
+			assertTrue("The " + defaultUri + " submodule should exist", foo);
+			assertFalse("The " + groupBUri + " submodule shouldn't exist",
+					foobar);
+			assertTrue("The " + groupAUri + " submodule should exist", a);
 		}
 	}
 
