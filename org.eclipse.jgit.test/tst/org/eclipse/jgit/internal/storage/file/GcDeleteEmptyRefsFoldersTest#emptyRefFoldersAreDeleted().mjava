@@ -1,0 +1,19 @@
+	@Test
+	public void emptyRefFoldersAreDeleted() throws Exception {
+		FileTime fileTime = FileTime.from(Instant.now().minusSeconds(31));
+		Path refDir01 = Files.createDirectories(heads.resolve(REF_FOLDER_01));
+		Path refDir02 = Files.createDirectories(heads.resolve(REF_FOLDER_02));
+		setLastModifiedTime(fileTime, heads, REF_FOLDER_01);
+		setLastModifiedTime(fileTime, heads, REF_FOLDER_02);
+		assertTrue(refDir01.toFile().exists());
+		assertTrue(refDir02.toFile().exists());
+		gc.gc();
+
+		assertFalse(refDir01.toFile().exists());
+		assertFalse(refDir01.getParent().toFile().exists());
+		assertFalse(refDir01.getParent().getParent().toFile().exists());
+		assertFalse(refDir02.toFile().exists());
+		assertFalse(refDir02.getParent().toFile().exists());
+		assertFalse(refDir02.getParent().getParent().toFile().exists());
+	}
+
