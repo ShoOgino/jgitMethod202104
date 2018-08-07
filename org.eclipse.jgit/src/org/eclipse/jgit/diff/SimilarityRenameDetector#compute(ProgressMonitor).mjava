@@ -1,4 +1,4 @@
-	void compute(ProgressMonitor pm) throws IOException, CanceledException {
+	void compute(ProgressMonitor pm) throws IOException, CancelledException {
 		if (pm == null)
 			pm = NullProgressMonitor.INSTANCE;
 
@@ -13,7 +13,9 @@
 		//
 		for (--mNext; mNext >= 0; mNext--) {
 			if (pm.isCancelled()) {
-				throw new CanceledException(JGitText.get().renameCancelled);
+				// TODO(ms): use org.eclipse.jgit.api.errors.CanceledException
+				// in next major version
+				throw new CancelledException(JGitText.get().renameCancelled);
 			}
 			long ent = matrix[mNext];
 			int sIdx = srcFile(ent);

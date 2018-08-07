@@ -1,5 +1,5 @@
 	private int buildMatrix(ProgressMonitor pm)
-			throws IOException, CanceledException {
+			throws IOException, CancelledException {
 		// Allocate for the worst-case scenario where every pair has a
 		// score that we need to consider. We might not need that many.
 		//
@@ -25,7 +25,11 @@
 
 			for (int dstIdx = 0; dstIdx < dsts.size(); dstIdx++) {
 				if (pm.isCancelled()) {
-					throw new CanceledException(JGitText.get().renameCancelled);
+					// TODO(ms): use
+					// org.eclipse.jgit.api.errors.CanceledException in next
+					// major version
+					throw new CancelledException(
+							JGitText.get().renameCancelled);
 				}
 
 				DiffEntry dstEnt = dsts.get(dstIdx);

@@ -9,11 +9,13 @@
 	 *         representing all files that have been changed.
 	 * @throws java.io.IOException
 	 *             file contents cannot be read from the repository.
-	 * @throws CanceledException
+	 * @throws CancelledException
 	 *             if rename detection was cancelled
 	 */
+	// TODO(ms): use org.eclipse.jgit.api.errors.CanceledException in next major
+	// version
 	public List<DiffEntry> compute(ObjectReader reader, ProgressMonitor pm)
-			throws IOException, CanceledException {
+			throws IOException, CancelledException {
 		final ContentSource cs = ContentSource.create(reader);
 		return compute(new ContentSource.Pair(cs, cs), pm);
 	}

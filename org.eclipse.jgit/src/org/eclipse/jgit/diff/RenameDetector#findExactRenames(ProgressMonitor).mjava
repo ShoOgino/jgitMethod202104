@@ -1,5 +1,6 @@
 	@SuppressWarnings("unchecked")
-	private void findExactRenames(ProgressMonitor pm) throws CanceledException {
+	private void findExactRenames(ProgressMonitor pm)
+			throws CancelledException {
 		pm.beginTask(JGitText.get().renamesFindingExact, //
 				added.size() + added.size() + deleted.size()
 						+ added.size() * deleted.size());
@@ -88,7 +89,7 @@
 						matrix[mNext] = SimilarityRenameDetector.encode(score, delIdx, addIdx);
 						mNext++;
 						if (pm.isCancelled()) {
-							throw new CanceledException(
+							throw new CancelledException(
 									JGitText.get().renameCancelled);
 						}
 					}

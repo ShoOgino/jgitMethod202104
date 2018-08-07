@@ -4,7 +4,10 @@
 		renameDetector.addAll(files);
 		try {
 			return renameDetector.compute(reader, progressMonitor);
-		} catch (CanceledException e) {
+		} catch (CancelledException e) {
+			// TODO: consider propagating once bug 536323 is tackled
+			// (making DiffEntry.scan() and DiffFormatter.scan() and
+			// format() cancellable).
 			return Collections.emptyList();
 		}
 	}

@@ -13,15 +13,9 @@
 		if (n.sourceCommit == null)
 			return result(n);
 
-		DiffEntry r;
-		try {
-			r = findRename(parent, n.sourceCommit, n.sourcePath);
-			if (r == null) {
-				return result(n);
-			}
-		} catch (CanceledException e) {
+		DiffEntry r = findRename(parent, n.sourceCommit, n.sourcePath);
+		if (r == null)
 			return result(n);
-		}
 
 		if (0 == r.getOldId().prefixCompare(n.sourceBlob)) {
 			// A 100% rename without any content change can also
