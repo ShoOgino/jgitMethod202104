@@ -20,10 +20,12 @@
 		DirCache dc = nonNullRepo().readDirCache();
 		Iterator<String> mpathsIt=modifiedFiles.iterator();
 		while(mpathsIt.hasNext()) {
-			String mpath=mpathsIt.next();
+			String mpath = mpathsIt.next();
 			DirCacheEntry entry = dc.getEntry(mpath);
-			if (entry != null)
-				DirCacheCheckout.checkoutEntry(db, entry, reader);
+			if (entry != null) {
+				DirCacheCheckout.checkoutEntry(db, entry, reader, false,
+						checkoutMetadata.get(mpath));
+			}
 			mpathsIt.remove();
 		}
 	}

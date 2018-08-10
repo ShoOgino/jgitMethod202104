@@ -104,7 +104,7 @@
 						// This will happen later. Set these values to 0 for know.
 						DirCacheEntry e = add(tw.getRawPath(), theirs,
 								DirCacheEntry.STAGE_0, 0, 0);
-						toBeCheckedOut.put(tw.getPathString(), e);
+						addToCheckout(tw.getPathString(), e, attributes);
 					}
 					return true;
 				} else {
@@ -145,8 +145,9 @@
 				// This will happen later. Set these values to 0 for know.
 				DirCacheEntry e = add(tw.getRawPath(), theirs,
 						DirCacheEntry.STAGE_0, 0, 0);
-				if (e != null)
-					toBeCheckedOut.put(tw.getPathString(), e);
+				if (e != null) {
+					addToCheckout(tw.getPathString(), e, attributes);
+				}
 				return true;
 			} else {
 				// we want THEIRS ... but THEIRS contains a folder or the
@@ -160,7 +161,7 @@
 					// Base, ours, and theirs all contain a folder: don't delete
 					return true;
 				}
-				toBeDeleted.add(tw.getPathString());
+				addDeletion(tw.getPathString(), nonTree(modeO), attributes);
 				return true;
 			}
 		}
@@ -244,9 +245,12 @@
 				result.setContainsConflicts(false);
 			}
 			updateIndex(base, ours, theirs, result, attributes);
-			if (result.containsConflicts() && !ignoreConflicts)
-				unmergedPaths.add(tw.getPathString());
-			modifiedFiles.add(tw.getPathString());
+			String currentPath = tw.getPathString();
+			if (result.containsConflicts() && !ignoreConflicts) {
+				unmergedPaths.add(currentPath);
+			}
+			modifiedFiles.add(currentPath);
+			addCheckoutMetadata(currentPath, attributes);
 		} else if (modeO != modeT) {
 			// OURS or THEIRS has been deleted
 			if (((modeO != 0 && !tw.idEqual(T_BASE, T_OURS)) || (modeT != 0 && !tw
@@ -265,8 +269,9 @@
 					if (isWorktreeDirty(work, ourDce))
 						return false;
 					if (nonTree(modeT)) {
-						if (e != null)
-							toBeCheckedOut.put(tw.getPathString(), e);
+						if (e != null) {
+							addToCheckout(tw.getPathString(), e, attributes);
+						}
 					}
 				}
 

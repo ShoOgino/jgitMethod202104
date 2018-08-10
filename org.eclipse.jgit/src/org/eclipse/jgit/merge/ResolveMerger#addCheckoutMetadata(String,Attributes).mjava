@@ -1,0 +1,23 @@
+	/**
+	 * Remembers the {@link CheckoutMetadata} for the given path; it may be
+	 * needed in {@link #checkout()} or in {@link #cleanUp()}.
+	 *
+	 * @param path
+	 *            of the current node
+	 * @param attributes
+	 *            for the current node
+	 * @throws IOException
+	 *             if the smudge filter cannot be determined
+	 * @since 5.1
+	 */
+	protected void addCheckoutMetadata(String path, Attributes attributes)
+			throws IOException {
+		if (checkoutMetadata != null) {
+			EolStreamType eol = EolStreamTypeUtil.detectStreamType(
+					OperationType.CHECKOUT_OP, workingTreeOptions, attributes);
+			CheckoutMetadata data = new CheckoutMetadata(eol,
+					tw.getFilterCommand(Constants.ATTR_FILTER_TYPE_SMUDGE));
+			checkoutMetadata.put(path, data);
+		}
+	}
+

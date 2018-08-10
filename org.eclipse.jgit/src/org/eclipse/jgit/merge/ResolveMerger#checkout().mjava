@@ -17,7 +17,8 @@
 			if (cacheEntry.getFileMode() == FileMode.GITLINK) {
 				new File(nonNullRepo().getWorkTree(), entry.getKey()).mkdirs();
 			} else {
-				DirCacheCheckout.checkoutEntry(db, cacheEntry, reader);
+				DirCacheCheckout.checkoutEntry(db, cacheEntry, reader, false,
+						checkoutMetadata.get(entry.getKey()));
 				modifiedFiles.add(entry.getKey());
 			}
 		}
