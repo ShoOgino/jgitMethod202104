@@ -6,6 +6,8 @@
 			writeTrashFile(".gitignore", "bar");
 			git.add().addFilepattern("subdir").call();
 			git.commit().setOnly("subdir").setMessage("first commit").call();
+			assertEquals("[subdir/foo, mode:100644, content:Hello World]",
+					indexState(CONTENT));
 		}
 	}
 

@@ -1,0 +1,24 @@
+	/**
+	 * Determine heuristically whether a byte array represents text content
+	 * using CR-LF as line separator.
+	 *
+	 * @param raw
+	 *            the raw file content.
+	 * @param length
+	 *            number of bytes in {@code raw} to evaluate.
+	 * @return {@code true} if raw is likely to be CR-LF delimited text,
+	 *         {@code false} otherwise
+	 * @since 5.3
+	 */
+	public static boolean isCrLfText(byte[] raw, int length) {
+		boolean has_crlf = false;
+		for (int ptr = 0; ptr < length - 1; ptr++) {
+			if (raw[ptr] == '\0') {
+				return false; // binary
+			} else if (raw[ptr] == '\r' && raw[ptr + 1] == '\n') {
+				has_crlf = true;
+			}
+		}
+		return has_crlf;
+	}
+
