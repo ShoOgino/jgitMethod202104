@@ -1,0 +1,30 @@
+	private void verifyNativeCheckout(SystemReader systemReader)
+			throws Exception {
+		SystemReader.setInstance(systemReader);
+		Git git = Git.wrap(db);
+		FileBasedConfig config = db.getConfig();
+		config.setString("core", null, "autocrlf", "false");
+		config.setString("core", null, "eol", "native");
+		config.save();
+		// core.eol is active only if text is set, or if text=auto
+		writeTrashFile(".gitattributes", "*.txt text\n");
+		File file = writeTrashFile("file.txt", "line 1\nline 2\n");
+		git.add().addFilepattern("file.txt").addFilepattern(".gitattributes")
+				.call();
+		git.commit().setMessage("Initial").call();
+		// Check-in with core.eol=native normalization
+		assertEquals(
+				"[.gitattributes, mode:100644, content:*.txt text\n]"
+						+ "[file.txt, mode:100644, content:line 1\nline 2\n]",
+				indexState(CONTENT));
+		writeTrashFile("file.txt", "something else");
+		git.add().addFilepattern("file.txt").call();
+		git.commit().setMessage("New commit").call();
+		git.reset().setMode(ResetType.HARD).setRef("HEAD~").call();
+		// Check-out should convert to the native line separator
+		checkFile(file, systemReader.isWindows() ? "line 1\r\nline 2\r\n"
+				: "line 1\nline 2\n");
+		Status status = git.status().call();
+		assertTrue("git status should be clean", status.isClean());
+	}
+

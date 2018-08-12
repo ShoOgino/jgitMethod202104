@@ -7,57 +7,35 @@
 
 		// old git system
 		if (attrs.isSet("crlf")) {//$NON-NLS-1$
-			return FORCE_EOL_LF_ON_CHECKOUT ? EolStreamType.TEXT_LF
-					: EolStreamType.DIRECT;
+			return getOutputFormat(options); // Same as isSet("text")
 		} else if (attrs.isUnset("crlf")) {//$NON-NLS-1$
-			return EolStreamType.DIRECT;
+			return EolStreamType.DIRECT; // Same as isUnset("text")
 		} else if ("input".equals(attrs.getValue("crlf"))) {//$NON-NLS-1$ //$NON-NLS-2$
-			return EolStreamType.DIRECT;
+			return EolStreamType.DIRECT; // Same as eol=lf
 		}
 
 		// new git system
 		String eol = attrs.getValue("eol"); //$NON-NLS-1$
-		if (eol != null && "crlf".equals(eol)) //$NON-NLS-1$
-			return EolStreamType.TEXT_CRLF;
-		if (eol != null && "lf".equals(eol)) //$NON-NLS-1$
-			return FORCE_EOL_LF_ON_CHECKOUT ? EolStreamType.TEXT_LF
-					: EolStreamType.DIRECT;
-
-		if (attrs.isSet("text")) { //$NON-NLS-1$
-			switch (options.getAutoCRLF()) {
-			case TRUE:
+		if (eol != null) {
+			if ("crlf".equals(eol)) {//$NON-NLS-1$
 				return EolStreamType.TEXT_CRLF;
-			default:
-				// no decision
-			}
-			switch (options.getEOL()) {
-			case CRLF:
-				return EolStreamType.TEXT_CRLF;
-			case LF:
-				return FORCE_EOL_LF_ON_CHECKOUT ? EolStreamType.TEXT_LF
-						: EolStreamType.DIRECT;
-			case NATIVE:
-			default:
+			} else if ("lf".equals(eol)) { //$NON-NLS-1$
 				return EolStreamType.DIRECT;
 			}
 		}
+		if (attrs.isSet("text")) { //$NON-NLS-1$
+			return getOutputFormat(options);
+		}
 
 		if ("auto".equals(attrs.getValue("text"))) { //$NON-NLS-1$ //$NON-NLS-2$
-			switch (options.getAutoCRLF()) {
-			case TRUE:
+			EolStreamType basic = getOutputFormat(options);
+			switch (basic) {
+			case TEXT_CRLF:
 				return EolStreamType.AUTO_CRLF;
+			case TEXT_LF:
+				return EolStreamType.AUTO_LF;
 			default:
-				// no decision
-			}
-			switch (options.getEOL()) {
-			case CRLF:
-				return EolStreamType.AUTO_CRLF;
-			case LF:
-				return FORCE_EOL_LF_ON_CHECKOUT ? EolStreamType.TEXT_LF
-						: EolStreamType.DIRECT;
-			case NATIVE:
-			default:
-				return EolStreamType.DIRECT;
+				return basic;
 			}
 		}
 

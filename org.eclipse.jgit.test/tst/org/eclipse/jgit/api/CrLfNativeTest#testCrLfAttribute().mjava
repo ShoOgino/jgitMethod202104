@@ -1,0 +1,41 @@
+	/**
+	 * Verifies the handling of the crlf attribute: crlf == text, -crlf ==
+	 * -text, crlf=input == eol=lf
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void testCrLfAttribute() throws Exception {
+		FileBasedConfig config = db.getConfig();
+		config.setString("core", null, "autocrlf", "false");
+		config.setString("core", null, "eol", "crlf");
+		config.save();
+		writeTrashFile(".gitattributes",
+				"*.txt text\n*.crlf crlf\n*.bin -text\n*.nocrlf -crlf\n*.input crlf=input\n*.eol eol=lf");
+		writeTrashFile("foo.txt", "");
+		writeTrashFile("foo.crlf", "");
+		writeTrashFile("foo.bin", "");
+		writeTrashFile("foo.nocrlf", "");
+		writeTrashFile("foo.input", "");
+		writeTrashFile("foo.eol", "");
+		Map<String, EolStreamType> inTypes = new HashMap<>();
+		Map<String, EolStreamType> outTypes = new HashMap<>();
+		try (TreeWalk walk = new TreeWalk(db)) {
+			walk.addTree(new FileTreeIterator(db));
+			while (walk.next()) {
+				String path = walk.getPathString();
+				if (".gitattributes".equals(path)) {
+					continue;
+				}
+				EolStreamType in = walk
+						.getEolStreamType(OperationType.CHECKIN_OP);
+				EolStreamType out = walk
+						.getEolStreamType(OperationType.CHECKOUT_OP);
+				inTypes.put(path, in);
+				outTypes.put(path, out);
+			}
+		}
+		assertEquals("", checkTypes("check-in", inTypes));
+		assertEquals("", checkTypes("check-out", outTypes));
+	}
+

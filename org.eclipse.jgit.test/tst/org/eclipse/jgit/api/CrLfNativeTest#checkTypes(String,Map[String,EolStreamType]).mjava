@@ -1,0 +1,14 @@
+	private String checkTypes(String prefix, Map<String, EolStreamType> types) {
+		StringBuilder result = new StringBuilder();
+		EolStreamType a = types.get("foo.crlf");
+		EolStreamType b = types.get("foo.txt");
+		report(result, prefix, "crlf != text", a, b);
+		a = types.get("foo.nocrlf");
+		b = types.get("foo.bin");
+		report(result, prefix, "-crlf != -text", a, b);
+		a = types.get("foo.input");
+		b = types.get("foo.eol");
+		report(result, prefix, "crlf=input != eol=lf", a, b);
+		return result.toString();
+	}
+
