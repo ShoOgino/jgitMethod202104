@@ -1,0 +1,20 @@
+	/**
+	 * Adds a {@link DirCacheEntry} for direct checkout and remembers its
+	 * {@link CheckoutMetadata}.
+	 *
+	 * @param path
+	 *            of the entry
+	 * @param entry
+	 *            to add
+	 * @param attributes
+	 *            for the current entry
+	 * @throws IOException
+	 *             if the {@link CheckoutMetadata} cannot be determined
+	 * @since 5.1
+	 */
+	protected void addToCheckout(String path, DirCacheEntry entry,
+			Attributes attributes) throws IOException {
+		toBeCheckedOut.put(path, entry);
+		addCheckoutMetadata(path, attributes);
+	}
+

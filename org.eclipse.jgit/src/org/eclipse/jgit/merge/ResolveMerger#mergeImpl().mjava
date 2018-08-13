@@ -1,15 +1,20 @@
 	/** {@inheritDoc} */
 	@Override
 	protected boolean mergeImpl() throws IOException {
-		if (implicitDirCache)
+		if (implicitDirCache) {
 			dircache = nonNullRepo().lockDirCache();
-
+		}
+		if (!inCore) {
+			checkoutMetadata = new HashMap<>();
+		}
 		try {
 			return mergeTrees(mergeBase(), sourceTrees[0], sourceTrees[1],
 					false);
 		} finally {
-			if (implicitDirCache)
+			checkoutMetadata = null;
+			if (implicitDirCache) {
 				dircache.unlock();
+			}
 		}
 	}
 
