@@ -1,0 +1,15 @@
+	private boolean autoGcBlockedByOldLockFile() {
+		try {
+			FileTime lastModified = Files.getLastModifiedTime(FileUtils.toPath(logFile));
+			if (lastModified.toInstant().compareTo(getLogExpiry()) > 0) {
+				// There is an existing log file, which is too recent to ignore
+				return true;
+			}
+		} catch (NoSuchFileException e) {
+			// No existing log file, OK.
+		} catch (IOException | ParseException e) {
+			throw new JGitInternalException(e.getMessage(), e);
+		}
+		return false;
+	}
+
