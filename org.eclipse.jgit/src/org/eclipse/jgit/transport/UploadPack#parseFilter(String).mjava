@@ -1,9 +1,11 @@
-	private void parseFilter(String arg) throws PackProtocolException {
+	private long parseFilter(String arg) throws PackProtocolException {
+		long blobLimit = -1;
+
 		if (arg.equals("blob:none")) { //$NON-NLS-1$
-			filterBlobLimit = 0;
+			blobLimit = 0;
 		} else if (arg.startsWith("blob:limit=")) { //$NON-NLS-1$
 			try {
-				filterBlobLimit = Long.parseLong(
+				blobLimit = Long.parseLong(
 						arg.substring("blob:limit=".length())); //$NON-NLS-1$
 			} catch (NumberFormatException e) {
 				throw new PackProtocolException(
@@ -18,10 +20,12 @@
 		 * latter, then it must be nonnegative. Throw
 		 * if (1) or (2) is not met.
 		 */
-		if (filterBlobLimit < 0) {
+		if (blobLimit < 0) {
 			throw new PackProtocolException(
 					MessageFormat.format(JGitText.get().invalidFilter,
 							arg));
 		}
+
+		return blobLimit;
 	}
 
