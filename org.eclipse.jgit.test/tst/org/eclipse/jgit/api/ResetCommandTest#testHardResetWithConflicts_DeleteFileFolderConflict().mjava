@@ -1,0 +1,14 @@
+	@Test
+	public void testHardResetWithConflicts_DeleteFileFolderConflict() throws Exception {
+		setupRepository();
+
+		writeTrashFile("dir-or-file/c.txt", "content");
+		git.add().addFilepattern("dir-or-file/c.txt").call();
+
+		FileUtils.delete(new File(db.getWorkTree(), "dir-or-file"), FileUtils.RECURSIVE);
+		writeTrashFile("dir-or-file", "content");
+
+		git.reset().setMode(ResetType.HARD).setRef(Constants.HEAD).call();
+		assertFalse(new File(db.getWorkTree(), "dir-or-file").exists());
+	}
+
