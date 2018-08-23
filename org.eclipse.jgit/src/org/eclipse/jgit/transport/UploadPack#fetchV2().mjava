@@ -77,16 +77,12 @@
 					throw new PackProtocolException(
 							JGitText.get().deepenSinceWithDeepen);
 				}
-				if (shallowExcludeRefs != null) {
+				if (!shallowExcludeRefs.isEmpty()) {
 					throw new PackProtocolException(
 							JGitText.get().deepenNotWithDeepen);
 				}
 			} else if (line.startsWith("deepen-not ")) { //$NON-NLS-1$
-				List<String> exclude = shallowExcludeRefs;
-				if (exclude == null) {
-					exclude = shallowExcludeRefs = new ArrayList<>();
-				}
-				exclude.add(line.substring(11));
+				shallowExcludeRefs.add(line.substring(11));
 				if (depth != 0) {
 					throw new PackProtocolException(
 							JGitText.get().deepenNotWithDeepen);
@@ -125,7 +121,7 @@
 		if (!clientShallowCommits.isEmpty()) {
 			verifyClientShallow();
 		}
-		if (depth != 0 || shallowSince != 0 || shallowExcludeRefs != null) {
+		if (depth != 0 || shallowSince != 0 || !shallowExcludeRefs.isEmpty()) {
 			shallowCommits = new ArrayList<>();
 			processShallow(shallowCommits, unshallowCommits, false);
 		}
