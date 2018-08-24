@@ -1,0 +1,17 @@
+	@Theory
+	public void testMissingIfDirectoryGone(IgnoreSubmoduleMode mode)
+			throws Exception {
+		recursiveDelete(submodule_trash);
+		IndexDiff indexDiff = new IndexDiff(db, Constants.HEAD,
+				new FileTreeIterator(db));
+		indexDiff.setIgnoreSubmoduleMode(mode);
+		boolean hasChanges = indexDiff.diff();
+		if (mode != IgnoreSubmoduleMode.ALL) {
+			assertTrue(hasChanges);
+			assertEquals("[modules/submodule]",
+					indexDiff.getMissing().toString());
+		} else {
+			assertFalse(hasChanges);
+		}
+	}
+
