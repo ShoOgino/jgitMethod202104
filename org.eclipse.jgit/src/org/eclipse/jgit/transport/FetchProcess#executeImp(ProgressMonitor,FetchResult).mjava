@@ -70,12 +70,10 @@
 				((BatchingProgressMonitor) monitor).setDelayStart(
 						250, TimeUnit.MILLISECONDS);
 			}
-			if (transport.isRemoveDeletedRefs())
+			if (transport.isRemoveDeletedRefs()) {
 				deleteStaleTrackingRefs(result, batch);
-			for (TrackingRefUpdate u : localUpdates) {
-				result.add(u);
-				batch.addCommand(u.asReceiveCommand());
 			}
+			addUpdateBatchCommands(result, batch);
 			for (ReceiveCommand cmd : batch.getCommands()) {
 				cmd.updateType(walk);
 				if (cmd.getType() == UPDATE_NONFASTFORWARD
@@ -88,8 +86,11 @@
 					if (cmd.getResult() == NOT_ATTEMPTED)
 						cmd.setResult(OK);
 				}
-			} else
+			} else {
 				batch.execute(walk, monitor);
+			}
+		} catch (TransportException e) {
+			throw e;
 		} catch (IOException err) {
 			throw new TransportException(MessageFormat.format(
 					JGitText.get().failureUpdatingTrackingRef,
