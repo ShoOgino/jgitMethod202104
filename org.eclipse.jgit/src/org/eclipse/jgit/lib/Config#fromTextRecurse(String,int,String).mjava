@@ -1,5 +1,5 @@
-	private List<ConfigLine> fromTextRecurse(String text, int depth)
-			throws ConfigInvalidException {
+	private List<ConfigLine> fromTextRecurse(String text, int depth,
+			String includedFrom) throws ConfigInvalidException {
 		if (depth > MAX_DEPTH) {
 			throw new ConfigInvalidException(
 					JGitText.get().tooManyIncludeRecursions);
@@ -8,6 +8,7 @@
 		final StringReader in = new StringReader(text);
 		ConfigLine last = null;
 		ConfigLine e = new ConfigLine();
+		e.includedFrom = includedFrom;
 		for (;;) {
 			int input = in.read();
 			if (-1 == input) {
@@ -23,7 +24,7 @@
 				if (e.section != null)
 					last = e;
 				e = new ConfigLine();
-
+				e.includedFrom = includedFrom;
 			} else if (e.suffix != null) {
 				// Everything up until the end-of-line is in the suffix.
 				e.suffix += c;
