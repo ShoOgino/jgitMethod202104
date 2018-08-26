@@ -12,9 +12,12 @@
 	 * multiple clients manage to create the same lock file nlink would be
 	 * greater than 2 showing the error.
 	 *
-	 * @see https://www.time-travellers.org/shane/papers/NFS_considered_harmful.html
+	 * @see "https://www.time-travellers.org/shane/papers/NFS_considered_harmful.html"
+	 *
+	 * @deprecated use {@link FS_POSIX#createNewFileAtomic(File)} instead
 	 * @since 4.5
 	 */
+	@Deprecated
 	public boolean createNewFile(File lock) throws IOException {
 		if (!lock.createNewFile()) {
 			return false;
