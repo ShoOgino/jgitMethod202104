@@ -1,0 +1,12 @@
+	@Test
+	public void testFetchWithBlobSizeFilter() throws IOException {
+		PacketLineIn pckIn = formatAsPacketLine(PacketLineIn.DELIM,
+				"filter blob:limit=15",
+				PacketLineIn.END);
+		ProtocolV2Parser parser = new ProtocolV2Parser(
+				ConfigBuilder.start().allowFilter().done());
+		FetchV2Request request = parser.parseFetchRequest(pckIn,
+				testRepo.getRepository().getRefDatabase());
+		assertEquals(15, request.getFilterBlobLimit());
+	}
+

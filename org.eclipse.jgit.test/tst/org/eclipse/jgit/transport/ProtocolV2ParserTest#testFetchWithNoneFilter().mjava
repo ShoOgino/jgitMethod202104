@@ -1,0 +1,12 @@
+	@Test
+	public void testFetchWithNoneFilter() throws IOException {
+		PacketLineIn pckIn = formatAsPacketLine(PacketLineIn.DELIM,
+				"filter blob:none",
+				PacketLineIn.END);
+		ProtocolV2Parser parser = new ProtocolV2Parser(
+				ConfigBuilder.start().allowFilter().done());
+		FetchV2Request request = parser.parseFetchRequest(pckIn,
+				testRepo.getRepository().getRefDatabase());
+		assertEquals(0, request.getFilterBlobLimit());
+	}
+
