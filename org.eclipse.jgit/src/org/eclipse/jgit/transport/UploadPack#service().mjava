@@ -14,18 +14,28 @@
 
 			long negotiateStart = System.currentTimeMillis();
 			accumulator.advertised = advertised.size();
-			recvWants();
-			if (wantIds.isEmpty()) {
-				preUploadHook.onBeginNegotiateRound(this, wantIds, 0);
-				preUploadHook.onEndNegotiateRound(this, wantIds, 0, 0, false);
+
+			ProtocolV0Parser parser = new ProtocolV0Parser(transferConfig);
+			FetchV0Request req = parser.recvWants(pckIn);
+
+			wantIds = req.getWantIds();
+			clientShallowCommits = req.getClientShallowCommits();
+			filterBlobLimit = req.getFilterBlobLimit();
+			options = req.getClientCapabilities();
+			depth = req.getDepth();
+
+			if (req.getWantIds().isEmpty()) {
+				preUploadHook.onBeginNegotiateRound(this, req.getWantIds(), 0);
+				preUploadHook.onEndNegotiateRound(this, req.getWantIds(), 0, 0,
+						false);
 				return;
 			}
-			accumulator.wants = wantIds.size();
+			accumulator.wants = req.getWantIds().size();
 
-			if (options.contains(OPTION_MULTI_ACK_DETAILED)) {
+			if (req.getClientCapabilities().contains(OPTION_MULTI_ACK_DETAILED)) {
 				multiAck = MultiAck.DETAILED;
-				noDone = options.contains(OPTION_NO_DONE);
-			} else if (options.contains(OPTION_MULTI_ACK))
+				noDone = req.getClientCapabilities().contains(OPTION_NO_DONE);
+			} else if (req.getClientCapabilities().contains(OPTION_MULTI_ACK))
 				multiAck = MultiAck.CONTINUE;
 			else
 				multiAck = MultiAck.OFF;
