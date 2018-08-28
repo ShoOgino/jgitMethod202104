@@ -1,0 +1,13 @@
+	@Test
+	public void testLsRefsMinimalReq() throws IOException {
+		PacketLineIn pckIn = formatAsPacketLine(PacketLineIn.DELIM,
+				PacketLineIn.END);
+
+		ProtocolV2Parser parser = new ProtocolV2Parser(
+				ConfigBuilder.getDefault());
+		LsRefsV2Request req = parser.parseLsRefsRequest(pckIn);
+		assertFalse(req.getPeel());
+		assertFalse(req.getSymrefs());
+		assertEquals(0, req.getRefPrefixes().size());
+	}
+

@@ -1,0 +1,15 @@
+	@Test
+	public void testLsRefsPeel() throws IOException {
+		PacketLineIn pckIn = formatAsPacketLine(
+				PacketLineIn.DELIM,
+				"peel",
+				PacketLineIn.END);
+
+		ProtocolV2Parser parser = new ProtocolV2Parser(
+				ConfigBuilder.getDefault());
+		LsRefsV2Request req = parser.parseLsRefsRequest(pckIn);
+		assertTrue(req.getPeel());
+		assertFalse(req.getSymrefs());
+		assertEquals(0, req.getRefPrefixes().size());
+	}
+

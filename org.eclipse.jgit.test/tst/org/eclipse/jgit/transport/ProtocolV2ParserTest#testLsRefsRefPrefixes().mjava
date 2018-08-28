@@ -1,0 +1,15 @@
+	@Test
+	public void testLsRefsRefPrefixes() throws IOException {
+		PacketLineIn pckIn = formatAsPacketLine(PacketLineIn.DELIM,
+				"ref-prefix refs/for", "ref-prefix refs/heads",
+				PacketLineIn.END);
+
+		ProtocolV2Parser parser = new ProtocolV2Parser(
+				ConfigBuilder.getDefault());
+		LsRefsV2Request req = parser.parseLsRefsRequest(pckIn);
+		assertFalse(req.getPeel());
+		assertFalse(req.getSymrefs());
+		assertEquals(2, req.getRefPrefixes().size());
+		assertThat(req.getRefPrefixes(), hasItems("refs/for", "refs/heads"));
+	}
+

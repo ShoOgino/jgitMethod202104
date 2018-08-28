@@ -1,0 +1,14 @@
+	@Test
+	public void testLsRefsSymrefs() throws IOException {
+		PacketLineIn pckIn = formatAsPacketLine(PacketLineIn.DELIM, "symrefs",
+				PacketLineIn.END);
+
+		ProtocolV2Parser parser = new ProtocolV2Parser(
+				ConfigBuilder.getDefault());
+		LsRefsV2Request req = parser.parseLsRefsRequest(pckIn);
+		assertFalse(req.getPeel());
+		assertTrue(req.getSymrefs());
+		assertEquals(0, req.getRefPrefixes().size());
+
+	}
+
