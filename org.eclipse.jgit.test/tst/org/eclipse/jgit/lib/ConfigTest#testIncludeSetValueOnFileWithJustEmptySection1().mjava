@@ -1,0 +1,22 @@
+	@Test
+	public void testIncludeSetValueOnFileWithJustEmptySection1()
+			throws IOException, ConfigInvalidException {
+		File includedFile = createAllTypesIncludedContent();
+
+		File configFile = tmp.newFile("config");
+		String content = "[user]\n[include]\npath="
+				+ pathToString(includedFile);
+		Files.write(configFile.toPath(), content.getBytes());
+
+		FileBasedConfig fbConfig = loadConfig(configFile);
+		assertValuesAsIncluded(fbConfig, REFS_UPSTREAM);
+		assertSections(fbConfig, "user", "include", "core", "remote");
+
+		setAllValuesNew(fbConfig);
+		assertValuesAsIsSaveLoad(fbConfig, config -> {
+			assertValuesAsNewWithName(config, "Alice Muller", REFS_UPSTREAM,
+					REFS_BACKUP);
+			assertSections(fbConfig, "user", "include", "core", "remote");
+		});
+	}
+

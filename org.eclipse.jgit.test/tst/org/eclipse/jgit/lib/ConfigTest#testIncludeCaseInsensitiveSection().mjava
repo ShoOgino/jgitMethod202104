@@ -9,9 +9,7 @@
 		content = "[Include]\npath=" + pathToString(included) + "\n";
 		Files.write(config.toPath(), content.getBytes());
 
-		FileBasedConfig fbConfig = new FileBasedConfig(null, config,
-				FS.DETECTED);
-		fbConfig.load();
+		FileBasedConfig fbConfig = loadConfig(config);
 		assertTrue(fbConfig.getBoolean("foo", "bar", false));
 	}
 

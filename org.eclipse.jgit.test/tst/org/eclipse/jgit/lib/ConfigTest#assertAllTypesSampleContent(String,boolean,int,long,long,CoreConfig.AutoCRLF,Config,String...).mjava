@@ -1,0 +1,23 @@
+	private static void assertAllTypesSampleContent(String name,
+			boolean fileMode, int deltaBaseCacheLimit, long packedGitLimit,
+			long repositoryCacheExpireAfter, CoreConfig.AutoCRLF autoCRLF,
+			Config config, String... fetchRefSpecs) {
+		assertEquals(name, config.getString("user", null, "name"));
+		assertEquals(fileMode,
+				config.getBoolean("core", "fileMode", !fileMode));
+		assertEquals(deltaBaseCacheLimit,
+				config.getInt("core", "deltaBaseCacheLimit", -1));
+		assertEquals(packedGitLimit,
+				config.getLong("core", "packedGitLimit", -1));
+		assertEquals(repositoryCacheExpireAfter, config.getTimeUnit("core",
+				null, "repositoryCacheExpireAfter", -1, MILLISECONDS));
+		assertEquals(autoCRLF, config.getEnum("core", null, "autocrlf",
+				CoreConfig.AutoCRLF.INPUT));
+		final List<RefSpec> refspecs = new ArrayList<>();
+		for (String fetchRefSpec : fetchRefSpecs) {
+			refspecs.add(new RefSpec(fetchRefSpec));
+		}
+
+		assertEquals(refspecs, config.getRefSpecs("remote", "origin", "fetch"));
+	}
+

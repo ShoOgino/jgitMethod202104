@@ -1,0 +1,38 @@
+	private static String createAllTypesSampleContent(String name,
+			boolean fileMode, int deltaBaseCacheLimit, long packedGitLimit,
+			long repositoryCacheExpireAfter, CoreConfig.AutoCRLF autoCRLF,
+			String fetchRefSpec) {
+		final StringBuilder builder = new StringBuilder();
+		builder.append("[user]\n");
+		builder.append("name=");
+		builder.append(name);
+		builder.append("\n");
+
+		builder.append("[core]\n");
+		builder.append("fileMode=");
+		builder.append(fileMode);
+		builder.append("\n");
+
+		builder.append("deltaBaseCacheLimit=");
+		builder.append(deltaBaseCacheLimit);
+		builder.append("\n");
+
+		builder.append("packedGitLimit=");
+		builder.append(packedGitLimit);
+		builder.append("\n");
+
+		builder.append("repositoryCacheExpireAfter=");
+		builder.append(repositoryCacheExpireAfter);
+		builder.append("\n");
+
+		builder.append("autocrlf=");
+		builder.append(autoCRLF.name());
+		builder.append("\n");
+
+		builder.append("[remote \"origin\"]\n");
+		builder.append("fetch=");
+		builder.append(fetchRefSpec);
+		builder.append("\n");
+		return builder.toString();
+	}
+

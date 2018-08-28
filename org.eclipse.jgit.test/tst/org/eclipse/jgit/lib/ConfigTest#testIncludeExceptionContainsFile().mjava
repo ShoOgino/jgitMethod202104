@@ -8,10 +8,8 @@
 		File config = tmp.newFile("config");
 		String include = "[include]\npath=" + includedPath + "\n";
 		Files.write(config.toPath(), include.getBytes());
-		FileBasedConfig fbConfig = new FileBasedConfig(null, config,
-				FS.DETECTED);
 		try {
-			fbConfig.load();
+			loadConfig(config);
 			fail("Expected ConfigInvalidException");
 		} catch (ConfigInvalidException e) {
 			// Check that there is some exception in the chain that contains

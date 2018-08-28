@@ -10,7 +10,7 @@
 		//
 		while (entryIndex < entries.size() && valueIndex < values.size()) {
 			final ConfigLine e = entries.get(entryIndex);
-			if (e.match(section, subsection, name)) {
+			if (e.includedFrom == null && e.match(section, subsection, name)) {
 				entries.set(entryIndex, e.forValue(values.get(valueIndex++)));
 				insertPosition = entryIndex + 1;
 			}
@@ -22,7 +22,8 @@
 		if (valueIndex == values.size() && entryIndex < entries.size()) {
 			while (entryIndex < entries.size()) {
 				final ConfigLine e = entries.get(entryIndex++);
-				if (e.match(section, subsection, name))
+				if (e.includedFrom == null
+						&& e.match(section, subsection, name))
 					entries.remove(--entryIndex);
 			}
 		}
@@ -35,7 +36,8 @@
 				// is already a section available that matches. Insert
 				// after the last key of that section.
 				//
-				insertPosition = findSectionEnd(entries, section, subsection);
+				insertPosition = findSectionEnd(entries, section, subsection,
+						true);
 			}
 			if (insertPosition < 0) {
 				// We didn't find any matching section header for this key,

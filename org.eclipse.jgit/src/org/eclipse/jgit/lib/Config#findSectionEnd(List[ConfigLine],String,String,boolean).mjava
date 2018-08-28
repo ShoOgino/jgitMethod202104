@@ -1,7 +1,12 @@
 	private static int findSectionEnd(final List<ConfigLine> entries,
-			final String section, final String subsection) {
+			final String section, final String subsection,
+			boolean skipIncludedLines) {
 		for (int i = 0; i < entries.size(); i++) {
 			ConfigLine e = entries.get(i);
+			if (e.includedFrom != null && skipIncludedLines) {
+				continue;
+			}
+
 			if (e.match(section, subsection, null)) {
 				i++;
 				while (i < entries.size()) {

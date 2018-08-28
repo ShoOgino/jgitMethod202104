@@ -1,0 +1,12 @@
+	private static void assertValuesAsIsSaveLoad(FileBasedConfig fbConfig,
+			Consumer<FileBasedConfig> assertion)
+			throws IOException, ConfigInvalidException {
+		assertion.accept(fbConfig);
+
+		fbConfig.save();
+		assertion.accept(fbConfig);
+
+		fbConfig = loadConfig(fbConfig.getFile());
+		assertion.accept(fbConfig);
+	}
+

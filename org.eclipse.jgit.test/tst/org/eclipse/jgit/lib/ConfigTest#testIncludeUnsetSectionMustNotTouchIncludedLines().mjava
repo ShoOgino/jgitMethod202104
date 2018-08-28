@@ -1,0 +1,30 @@
+	@Test
+	public void testIncludeUnsetSectionMustNotTouchIncludedLines()
+			throws IOException, ConfigInvalidException {
+		File includedFile = tmp.newFile("included");
+		RefSpec includedRefSpec = new RefSpec(REFS_UPSTREAM);
+		String includedContent = "[remote \"origin\"]\n" + "fetch="
+				+ includedRefSpec;
+		Files.write(includedFile.toPath(), includedContent.getBytes());
+
+		File configFile = tmp.newFile("config");
+		RefSpec refSpec = new RefSpec(REFS_ORIGIN);
+		String content = "[include]\npath=" + pathToString(includedFile) + "\n"
+				+ "[remote \"origin\"]\n" + "fetch=" + refSpec;
+		Files.write(configFile.toPath(), content.getBytes());
+
+		FileBasedConfig fbConfig = loadConfig(configFile);
+
+		Consumer<FileBasedConfig> assertion = config -> {
+			assertEquals(Arrays.asList(includedRefSpec, refSpec),
+					config.getRefSpecs("remote", "origin", "fetch"));
+		};
+		assertion.accept(fbConfig);
+
+		fbConfig.unsetSection("remote", "origin");
+		assertValuesAsIsSaveLoad(fbConfig, config -> {
+			assertEquals(Collections.singletonList(includedRefSpec),
+					config.getRefSpecs("remote", "origin", "fetch"));
+		});
+	}
+

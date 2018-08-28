@@ -3,10 +3,8 @@
 		File config = tmp.newFile("config");
 		String include = "[include]\npath=" + pathToString(config) + "\n";
 		Files.write(config.toPath(), include.getBytes());
-		FileBasedConfig fbConfig = new FileBasedConfig(null, config,
-				FS.DETECTED);
 		try {
-			fbConfig.load();
+			loadConfig(config);
 			fail();
 		} catch (ConfigInvalidException cie) {
 			for (Throwable t = cie; t != null; t = t.getCause()) {

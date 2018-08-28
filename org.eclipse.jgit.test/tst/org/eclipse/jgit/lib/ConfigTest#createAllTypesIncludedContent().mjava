@@ -1,0 +1,9 @@
+	private File createAllTypesIncludedContent() throws IOException {
+		File includedFile = tmp.newFile("included");
+		String includedContent = createAllTypesSampleContent("Alice Muller",
+				true, 10, 20, 30, CoreConfig.AutoCRLF.TRUE,
+				"+refs/heads/*:refs/remotes/upstream/*");
+		Files.write(includedFile.toPath(), includedContent.getBytes());
+		return includedFile;
+	}
+

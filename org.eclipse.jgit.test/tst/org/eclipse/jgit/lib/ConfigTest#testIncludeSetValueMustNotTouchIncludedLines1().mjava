@@ -1,0 +1,23 @@
+	@Test
+	public void testIncludeSetValueMustNotTouchIncludedLines1()
+			throws IOException, ConfigInvalidException {
+		File includedFile = createAllTypesIncludedContent();
+
+		File configFile = tmp.newFile("config");
+		String content = createAllTypesSampleContent("Alice Parker", false, 11,
+				21, 31, CoreConfig.AutoCRLF.FALSE,
+				"+refs/heads/*:refs/remotes/origin/*") + "\n[include]\npath="
+				+ pathToString(includedFile);
+		Files.write(configFile.toPath(), content.getBytes());
+
+		FileBasedConfig fbConfig = loadConfig(configFile);
+		assertValuesAsIncluded(fbConfig, REFS_ORIGIN, REFS_UPSTREAM);
+		assertSections(fbConfig, "user", "core", "remote", "include");
+
+		setAllValuesNew(fbConfig);
+		assertValuesAsIsSaveLoad(fbConfig, config -> {
+			assertValuesAsIncluded(config, REFS_BACKUP, REFS_UPSTREAM);
+			assertSections(fbConfig, "user", "core", "remote", "include");
+		});
+	}
+
