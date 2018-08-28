@@ -39,7 +39,9 @@
 			verifyClientShallow(req.getClientShallowCommits());
 		}
 		if (mayHaveShallow) {
-			processShallow(shallowCommits, unshallowCommits, false);
+			computeShallowsAndUnshallows(req.getWantsIds(),
+					shallowCommit -> shallowCommits.add(shallowCommit),
+					unshallowCommit -> unshallowCommits.add(unshallowCommit));
 		}
 		if (!req.getClientShallowCommits().isEmpty())
 			walk.assumeShallow(req.getClientShallowCommits());

@@ -32,8 +32,15 @@
 
 			if (!clientShallowCommits.isEmpty())
 				verifyClientShallow(clientShallowCommits);
-			if (depth != 0)
-				processShallow(null, unshallowCommits, true);
+			if (depth != 0) {
+				computeShallowsAndUnshallows(wantIds, shallow -> {
+					pckOut.writeString("shallow " + shallow.name() + '\n'); //$NON-NLS-1$
+				}, unshallow -> {
+					pckOut.writeString("unshallow " + unshallow.name() + '\n'); //$NON-NLS-1$
+					unshallowCommits.add(unshallow);
+				});
+				pckOut.end();
+			}
 			if (!clientShallowCommits.isEmpty())
 				walk.assumeShallow(clientShallowCommits);
 			sendPack = negotiate(accumulator);
