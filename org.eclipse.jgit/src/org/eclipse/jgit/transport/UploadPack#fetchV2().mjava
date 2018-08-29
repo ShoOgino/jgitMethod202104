@@ -123,7 +123,7 @@
 		// copying data back to class fields
 		options = req.getOptions();
 		wantIds.addAll(req.getWantsIds());
-		clientShallowCommits.addAll(req.getClientShallowCommits());
+		clientShallowCommits = req.getClientShallowCommits();
 		depth = req.getDepth();
 		shallowSince = req.getShallowSince();
 		filterBlobLimit = req.getFilterBlobLimit();
@@ -134,7 +134,7 @@
 		List<ObjectId> unshallowCommits = new ArrayList<>();
 
 		if (!req.getClientShallowCommits().isEmpty()) {
-			verifyClientShallow();
+			verifyClientShallow(req.getClientShallowCommits());
 		}
 		if (req.getDepth() != 0 || req.getShallowSince() != 0
 				|| !req.getShallowExcludeRefs().isEmpty()) {
