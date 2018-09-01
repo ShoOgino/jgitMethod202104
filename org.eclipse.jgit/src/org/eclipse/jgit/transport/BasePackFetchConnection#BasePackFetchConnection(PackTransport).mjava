@@ -10,12 +10,12 @@
 		if (local != null) {
 			final FetchConfig cfg = getFetchConfig();
 			allowOfsDelta = cfg.allowOfsDelta;
-			if (cfg.minimalNegotiation) {
-				minimalNegotiationSet = new HashSet<>();
-			}
+			maxHaves = cfg.maxHaves;
 		} else {
 			allowOfsDelta = true;
+			maxHaves = Integer.MAX_VALUE;
 		}
+
 		includeTags = transport.getTagOpt() != TagOpt.NO_TAGS;
 		thinPack = transport.isFetchThin();
 		filterBlobLimit = transport.getFilterBlobLimit();
