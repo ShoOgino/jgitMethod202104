@@ -28,7 +28,7 @@
 			merger.getMergeResults().get("file");
 			try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 				fmt.formatMerge(out, merger.getMergeResults().get("file"),
-						"BASE", "OURS", "THEIRS", CHARSET.name());
+						"BASE", "OURS", "THEIRS", UTF_8.name());
 				String expected = "<<<<<<< OURS\n"
 						+ "1master\n"
 						+ "=======\n"
@@ -36,7 +36,7 @@
 						+ ">>>>>>> THEIRS\n"
 						+ "2\n"
 						+ "3";
-				assertEquals(expected, new String(out.toByteArray(), CHARSET));
+				assertEquals(expected, new String(out.toByteArray(), UTF_8));
 			}
 		}
 	}

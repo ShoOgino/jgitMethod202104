@@ -9,8 +9,9 @@
 			final String[] r = new String[tmp.length];
 			for (int i = 0; i < tmp.length; i++) {
 				Charset cs = csGuess != null ? csGuess[i] : null;
-				if (cs == null)
-					cs = Constants.CHARSET;
+				if (cs == null) {
+					cs = UTF_8;
+				}
 				r[i] = RawParseUtils.decode(cs, tmp[i].toByteArray());
 			}
 			return r;

@@ -7,12 +7,12 @@
 				+ "D\r\n" //
 				+ "B\r\n";
 		SimilarityIndex src = new SimilarityIndex();
-		byte[] bytes1 = text.getBytes(CHARSET);
+		byte[] bytes1 = text.getBytes(UTF_8);
 		src.hash(new ByteArrayInputStream(bytes1), bytes1.length, true);
 		src.sort();
 
 		SimilarityIndex dst = new SimilarityIndex();
-		byte[] bytes2 = text.replace("\r", "").getBytes(CHARSET);
+		byte[] bytes2 = text.replace("\r", "").getBytes(UTF_8);
 		dst.hash(new ByteArrayInputStream(bytes2), bytes2.length, true);
 		dst.sort();
 
