@@ -2,7 +2,8 @@
 		this.hosts.clear();
 		this.lastModified = this.netrc.lastModified();
 
-		try (BufferedReader r = new BufferedReader(new FileReader(netrc))) {
+		try (BufferedReader r = new BufferedReader(
+				new InputStreamReader(new FileInputStream(netrc), UTF_8))) {
 			String line = null;
 
 			NetRCEntry entry = new NetRCEntry();

@@ -68,7 +68,8 @@
 		if (sb.length() > 0) {
 			sb.deleteCharAt(sb.length() - 1);
 		}
-		try (FileWriter fw = new FileWriter(f)) {
+		try (Writer fw = new OutputStreamWriter(new FileOutputStream(f),
+				UTF_8)) {
 			fw.write(sb.toString());
 		}
 
