@@ -9,7 +9,7 @@
 			switch (tokenCount) {
 			case 0:
 				String actionToken = new String(buf, tokenBegin,
-						nextSpace - tokenBegin - 1, CHARSET);
+						nextSpace - tokenBegin - 1, UTF_8);
 				tokenBegin = nextSpace;
 				action = RebaseTodoLine.Action.parse(actionToken);
 				if (action == null)
@@ -18,7 +18,7 @@
 			case 1:
 				nextSpace = RawParseUtils.next(buf, tokenBegin, ' ');
 				String commitToken = new String(buf, tokenBegin,
-						nextSpace - tokenBegin - 1, CHARSET);
+						nextSpace - tokenBegin - 1, UTF_8);
 				tokenBegin = nextSpace;
 				commit = AbbreviatedObjectId.fromString(commitToken);
 				break;

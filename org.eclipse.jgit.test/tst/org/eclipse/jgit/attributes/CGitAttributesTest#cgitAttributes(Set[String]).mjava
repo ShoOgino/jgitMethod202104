@@ -10,14 +10,14 @@
 		builder.directory(db.getWorkTree());
 		builder.environment().put("HOME", fs.userHome().getAbsolutePath());
 		ExecutionResult result = fs.execute(builder, new ByteArrayInputStream(
-				input.toString().getBytes(Constants.CHARSET)));
+				input.toString().getBytes(UTF_8)));
 		String errorOut = toString(result.getStderr());
 		assertEquals("External git failed", "exit 0\n",
 				"exit " + result.getRc() + '\n' + errorOut);
 		LinkedHashMap<String, Attributes> map = new LinkedHashMap<>();
 		try (BufferedReader r = new BufferedReader(new InputStreamReader(
 				new BufferedInputStream(result.getStdout().openInputStream()),
-				Constants.CHARSET))) {
+				UTF_8))) {
 			r.lines().forEach(line -> {
 				// Parse the line and add to result map
 				int start = 0;

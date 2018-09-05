@@ -1,0 +1,26 @@
+	@Test
+	public void testFetchWithRefInWant() throws Exception {
+		RevCommit one = testRepo.commit().message("1").create();
+		RevCommit two = testRepo.commit().message("2").create();
+		testRepo.update("branchA", one);
+		testRepo.update("branchB", two);
+
+		PacketLineIn pckIn = formatAsPacketLine(PacketLineIn.DELIM,
+				"want e4980cdc48cfa1301493ca94eb70523f6788b819",
+				"want-ref refs/heads/branchA",
+				PacketLineIn.END);
+		ProtocolV2Parser parser = new ProtocolV2Parser(
+				ConfigBuilder.start().allowRefInWant().done());
+
+
+		FetchV2Request request = parser.parseFetchRequest(pckIn,
+				testRepo.getRepository().getRefDatabase());
+		assertEquals(1, request.getWantedRefs().size());
+		assertThat(request.getWantedRefs().keySet(),
+				hasItems("refs/heads/branchA"));
+		assertEquals(2, request.getWantsIds().size());
+		assertThat(objIdsAsStrings(request.getWantsIds()),
+				hasItems("e4980cdc48cfa1301493ca94eb70523f6788b819",
+						one.getName()));
+	}
+

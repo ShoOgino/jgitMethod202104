@@ -3,7 +3,7 @@
 	public RefCursor seekRefsWithPrefix(String prefix) throws IOException {
 		initRefIndex();
 
-		byte[] key = prefix.getBytes(CHARSET);
+		byte[] key = prefix.getBytes(UTF_8);
 		RefCursorImpl i = new RefCursorImpl(refEnd, key, true);
 		i.block = seek(REF_BLOCK_TYPE, key, refIndex, 0, refEnd);
 		return i;

@@ -1,16 +1,17 @@
 	private FetchV2Request(List<ObjectId> peerHas,
 			TreeMap<String, ObjectId> wantedRefs, Set<ObjectId> wantsIds,
-			Set<ObjectId> clientShallowCommits, int shallowSince,
-			List<String> shallowExcludeRefs, int depth, long filterBlobLimit,
-			Set<String> options) {
+			Set<ObjectId> clientShallowCommits, int deepenSince,
+			List<String> deepenNotRefs, int depth, long filterBlobLimit,
+			boolean doneReceived, Set<String> options) {
 		this.peerHas = peerHas;
 		this.wantedRefs = wantedRefs;
 		this.wantsIds = wantsIds;
 		this.clientShallowCommits = clientShallowCommits;
-		this.shallowSince = shallowSince;
-		this.shallowExcludeRefs = shallowExcludeRefs;
+		this.deepenSince = deepenSince;
+		this.deepenNotRefs = deepenNotRefs;
 		this.depth = depth;
 		this.filterBlobLimit = filterBlobLimit;
+		this.doneReceived = doneReceived;
 		this.options = options;
 	}
 

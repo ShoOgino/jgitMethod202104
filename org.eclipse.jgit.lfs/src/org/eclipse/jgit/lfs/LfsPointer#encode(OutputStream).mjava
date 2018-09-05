@@ -7,7 +7,7 @@
 	 */
 	public void encode(OutputStream out) {
 		try (PrintStream ps = new PrintStream(out, false,
-				CHARSET.name())) {
+				UTF_8.name())) {
 			ps.print("version "); //$NON-NLS-1$
 			ps.print(VERSION + "\n"); //$NON-NLS-1$
 			ps.print("oid " + HASH_FUNCTION_NAME + ":"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -16,7 +16,7 @@
 			ps.print(size + "\n"); //$NON-NLS-1$
 		} catch (UnsupportedEncodingException e) {
 			// should not happen, we are using a standard charset
-			throw new UnsupportedCharsetException(CHARSET.name());
+			throw new UnsupportedCharsetException(UTF_8.name());
 		}
 	}
 

@@ -18,8 +18,9 @@
 
 		if (trySimpleConversion(charsetGuess)) {
 			Charset cs = charsetGuess != null ? charsetGuess[0] : null;
-			if (cs == null)
-				cs = Constants.CHARSET;
+			if (cs == null) {
+				cs = UTF_8;
+			}
 			try {
 				return decodeNoFallback(cs, buf, startOffset, endOffset);
 			} catch (CharacterCodingException cee) {
