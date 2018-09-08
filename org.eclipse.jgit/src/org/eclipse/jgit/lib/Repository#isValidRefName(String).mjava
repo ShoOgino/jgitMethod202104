@@ -11,10 +11,12 @@
 	 */
 	public static boolean isValidRefName(final String refName) {
 		final int len = refName.length();
-		if (len == 0)
+		if (len == 0) {
 			return false;
-		if (refName.endsWith(".lock")) //$NON-NLS-1$
+		}
+		if (refName.endsWith(LOCK_SUFFIX)) {
 			return false;
+		}
 
 		// Refs may be stored as loose files so invalid paths
 		// on the local system must also be invalid refs.
