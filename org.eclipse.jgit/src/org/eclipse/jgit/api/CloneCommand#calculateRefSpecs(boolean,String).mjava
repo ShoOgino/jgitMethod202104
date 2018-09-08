@@ -1,10 +1,9 @@
-	private List<RefSpec> calculateRefSpecs(String dst) {
+	private List<RefSpec> calculateRefSpecs(boolean fetchAll, String dst) {
 		RefSpec wcrs = new RefSpec();
 		wcrs = wcrs.setForceUpdate(true);
-		wcrs = wcrs.setSourceDestination(Constants.R_HEADS + "*", dst); //$NON-NLS-1$
+		wcrs = wcrs.setSourceDestination(Constants.R_HEADS + '*', dst);
 		List<RefSpec> specs = new ArrayList<>();
-		if (!cloneAllBranches && branchesToClone != null
-				&& !branchesToClone.isEmpty()) {
+		if (!fetchAll) {
 			for (String selectedRef : branchesToClone) {
 				if (wcrs.matchSource(selectedRef)) {
 					specs.add(wcrs.expandFromSource(selectedRef));
