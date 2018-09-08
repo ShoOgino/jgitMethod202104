@@ -9,7 +9,8 @@
 	 */
 	public boolean lock() throws IOException {
 		FileUtils.mkdirs(lck.getParentFile(), true);
-		if (FS.DETECTED.createNewFile(lck)) {
+		token = FS.DETECTED.createNewFileAtomic(lck);
+		if (token.isCreated()) {
 			haveLck = true;
 			try {
 				os = new FileOutputStream(lck);
@@ -17,6 +18,8 @@
 				unlock();
 				throw ioe;
 			}
+		} else {
+			closeToken();
 		}
 		return haveLck;
 	}
