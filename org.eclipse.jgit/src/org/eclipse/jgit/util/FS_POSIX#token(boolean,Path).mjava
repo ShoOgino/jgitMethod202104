@@ -1,0 +1,6 @@
+	private static LockToken token(boolean created, @Nullable Path p) {
+		return ((p != null) && Files.exists(p))
+				? new LockToken(created, Optional.of(p))
+				: new LockToken(created, Optional.empty());
+	}
+

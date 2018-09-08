@@ -1,0 +1,16 @@
+	/**
+	 * Create a new file. See {@link java.io.File#createNewFile()}. Subclasses
+	 * of this class may take care to provide a safe implementation for this
+	 * even if {@link #supportsAtomicCreateNewFile()} is <code>false</code>
+	 *
+	 * @param path
+	 *            the file to be created
+	 * @return LockToken this token must be closed after the created file was
+	 *         deleted
+	 * @throws IOException
+	 * @since 4.7
+	 */
+	public LockToken createNewFileAtomic(File path) throws IOException {
+		return new LockToken(path.createNewFile(), Optional.empty());
+	}
+
