@@ -1,6 +1,8 @@
 	private void delete(Path d) {
 		try {
 			Files.delete(d);
+		} catch (DirectoryNotEmptyException e) {
+			// Don't log
 		} catch (IOException e) {
 			LOG.error(MessageFormat.format(JGitText.get().cannotDeleteFile, d),
 					e);
