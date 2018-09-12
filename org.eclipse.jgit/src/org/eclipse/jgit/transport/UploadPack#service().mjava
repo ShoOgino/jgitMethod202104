@@ -32,7 +32,7 @@
 
 			if (!clientShallowCommits.isEmpty())
 				verifyClientShallow(clientShallowCommits);
-			if (depth != 0) {
+			if (depth != 0 || shallowSince != 0) {
 				computeShallowsAndUnshallows(wantIds, shallow -> {
 					pckOut.writeString("shallow " + shallow.name() + '\n'); //$NON-NLS-1$
 				}, unshallow -> {

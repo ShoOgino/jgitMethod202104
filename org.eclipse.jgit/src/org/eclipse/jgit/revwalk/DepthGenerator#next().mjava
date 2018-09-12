@@ -23,12 +23,24 @@
 				// this depth is guaranteed to be the smallest value that
 				// any path could produce.
 				if (dp.depth == -1) {
+					boolean failsDeepenSince = false;
+					if (deepenSince != 0) {
+						if ((p.flags & RevWalk.PARSED) == 0) {
+							p.parseHeaders(walk);
+						}
+						failsDeepenSince =
+							p.getCommitTime() < deepenSince;
+					}
+
 					dp.depth = newDepth;
 
 					// If the parent is not too deep, add it to the queue
 					// so that we can produce it later
-					if (newDepth <= depth)
+					if (newDepth <= depth && !failsDeepenSince) {
 						pending.add(p);
+					} else {
+						c.isBoundary = true;
+					}
 				}
 
 				// If the current commit has become unshallowed, everything

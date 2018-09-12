@@ -95,9 +95,11 @@
 			}
 
 			RevWalk rw = walk;
-			if (depth > 0) {
+			if (depth > 0 || shallowSince != 0) {
+				int walkDepth = depth == 0 ? Integer.MAX_VALUE : depth - 1;
 				pw.setShallowPack(depth, unshallowCommits);
-				rw = new DepthWalk.RevWalk(walk.getObjectReader(), depth - 1);
+				rw = new DepthWalk.RevWalk(walk.getObjectReader(), walkDepth);
+				((DepthWalk.RevWalk) rw).setDeepenSince(shallowSince);
 				rw.assumeShallow(clientShallowCommits);
 			}
 
