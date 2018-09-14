@@ -1,0 +1,13 @@
+	@Test
+	public void testSshCloneWithUnknownKexAlgorithmsInConfig()
+			throws Exception {
+		// Bug 535672
+		cloneWith("ssh://git/doesntmatter", null, //
+				"Host git", //
+				"HostName localhost", //
+				"Port " + testPort, //
+				"User " + TEST_USER, //
+				"IdentityFile " + privateKey1.getAbsolutePath(), //
+				"KexAlgorithms foobar,diffie-hellman-group14-sha1,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521");
+	}
+

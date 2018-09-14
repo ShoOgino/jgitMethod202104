@@ -1,0 +1,16 @@
+	@Test
+	public void testSshCloneWithAliasInConfig() throws Exception {
+		// Bug 531118
+		cloneWith("ssh://git/doesntmatter", null, //
+				"Host git", //
+				"HostName localhost", //
+				"Port " + testPort, //
+				"User " + TEST_USER, //
+				"IdentityFile " + privateKey1.getAbsolutePath(), "", //
+				"Host localhost", //
+				"HostName localhost", //
+				"Port 22", //
+				"User someone_else", //
+				"IdentityFile " + privateKey2.getAbsolutePath());
+	}
+

@@ -1,0 +1,72 @@
+	/**
+	 * Creates a ssh git <em>test</em> server. It serves one single repository,
+	 * and accepts public-key authentication for exactly one test user.
+	 *
+	 * @param testUser
+	 *            user name of the test user
+	 * @param testKey
+	 *            <em>private</em> key file of the test user; the server will
+	 *            only user the public key from it
+	 * @param repository
+	 *            to serve
+	 * @param hostKey
+	 *            the unencrypted private key to use as host key
+	 * @throws IOException
+	 * @throws GeneralSecurityException
+	 */
+	public SshTestGitServer(@NonNull String testUser, @NonNull Path testKey,
+			@NonNull Repository repository, @NonNull byte[] hostKey)
+			throws IOException, GeneralSecurityException {
+		this.testUser = testUser;
+		this.testKey = IdentityUtils
+				.loadIdentities(Collections.singletonMap("A", testKey), null)
+				.get("A").getPublic();
+		this.repository = repository;
+		server = SshServer.setUpDefaultServer();
+		// Set host key
+		server.setKeyPairProvider(new KeyPairProvider() {
+
+			@Override
+			public Iterable<KeyPair> loadKeys() {
+				try (ByteArrayInputStream in = new ByteArrayInputStream(
+						hostKey)) {
+					return Collections.singletonList(
+							SecurityUtils.loadKeyPairIdentity("", in, null));
+				} catch (IOException | GeneralSecurityException e) {
+					return null;
+				}
+			}
+
+		});
+		// SFTP.
+		server.setFileSystemFactory(new VirtualFileSystemFactory() {
+
+			@Override
+			protected Path computeRootDir(Session session) throws IOException {
+				return SshTestGitServer.this.repository.getDirectory()
+						.getParentFile().getAbsoluteFile().toPath();
+			}
+		});
+		server.setSubsystemFactories(Collections
+				.singletonList((new SftpSubsystemFactory.Builder()).build()));
+		// No shell
+		server.setShellFactory(null);
+		// Disable some authentications
+		server.setPasswordAuthenticator(null);
+		server.setKeyboardInteractiveAuthenticator(null);
+		server.setGSSAuthenticator(null);
+		server.setHostBasedAuthenticator(null);
+		// Accept only the test user/public key
+		server.setPublickeyAuthenticator((userName, publicKey, session) -> {
+			return SshTestGitServer.this.testUser.equals(userName) && KeyUtils
+					.compareKeys(SshTestGitServer.this.testKey, publicKey);
+		});
+		server.setCommandFactory(command -> {
+			if (command.startsWith("git-upload-pack")
+					|| command.startsWith("git upload-pack")) {
+				return new GitUploadPackCommand(command, executorService);
+			}
+			return new UnknownCommand(command);
+		});
+	}
+

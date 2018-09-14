@@ -1,0 +1,10 @@
+	@Test(expected = TransportException.class)
+	public void testSshCloneWithConfigWrongKey() throws Exception {
+		cloneWith("ssh://localhost/doesntmatter", null, //
+				"Host localhost", //
+				"HostName localhost", //
+				"Port " + testPort, //
+				"User " + TEST_USER, //
+				"IdentityFile " + privateKey2.getAbsolutePath());
+	}
+

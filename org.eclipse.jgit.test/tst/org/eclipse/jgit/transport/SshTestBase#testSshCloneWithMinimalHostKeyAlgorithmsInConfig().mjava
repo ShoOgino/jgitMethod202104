@@ -1,0 +1,13 @@
+	@Test
+	public void testSshCloneWithMinimalHostKeyAlgorithmsInConfig()
+			throws Exception {
+		// Bug 537790
+		cloneWith("ssh://git/doesntmatter", null, //
+				"Host git", //
+				"HostName localhost", //
+				"Port " + testPort, //
+				"User " + TEST_USER, //
+				"IdentityFile " + privateKey1.getAbsolutePath(), //
+				"HostKeyAlgorithms ssh-rsa,ssh-dss");
+	}
+

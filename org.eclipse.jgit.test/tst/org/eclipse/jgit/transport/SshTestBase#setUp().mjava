@@ -1,0 +1,37 @@
+	@Override
+	public void setUp() throws Exception {
+		super.setUp();
+		writeTrashFile("file.txt", "something");
+		try (Git git = new Git(db)) {
+			git.add().addFilepattern("file.txt").call();
+			git.commit().setMessage("Initial commit").call();
+		}
+		mockSystemReader.setProperty("user.home",
+				getTemporaryDirectory().getAbsolutePath());
+		mockSystemReader.setProperty("HOME",
+				getTemporaryDirectory().getAbsolutePath());
+		homeDir = FS.DETECTED.userHome();
+		FS.DETECTED.setUserHome(getTemporaryDirectory().getAbsoluteFile());
+		sshDir = new File(getTemporaryDirectory(), ".ssh");
+		assertTrue(sshDir.mkdir());
+		File serverDir = new File(getTemporaryDirectory(), "srv");
+		assertTrue(serverDir.mkdir());
+		// Create two key pairs. Let's not call them "id_rsa".
+		privateKey1 = new File(sshDir, "first_key");
+		privateKey2 = new File(sshDir, "second_key");
+		createKeyPair(privateKey1);
+		createKeyPair(privateKey2);
+		ByteArrayOutputStream publicHostKey = new ByteArrayOutputStream();
+		// Start a server with our test user and the first key.
+		server = new SshTestGitServer(TEST_USER, privateKey1.toPath(), db,
+				createHostKey(publicHostKey));
+		testPort = server.start();
+		assertTrue(testPort > 0);
+		knownHosts = new File(sshDir, "known_hosts");
+		Files.write(knownHosts.toPath(), Collections.singleton("[localhost]:"
+				+ testPort + ' '
+				+ publicHostKey.toString(StandardCharsets.US_ASCII.name())));
+		factory = createSessionFactory();
+		SshSessionFactory.setInstance(factory);
+	}
+

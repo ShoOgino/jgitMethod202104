@@ -1,0 +1,12 @@
+	@Test
+	public void testSshCloneWithUnknownCiphersInConfig() throws Exception {
+		// Bug 535672
+		cloneWith("ssh://git/doesntmatter", null, //
+				"Host git", //
+				"HostName localhost", //
+				"Port " + testPort, //
+				"User " + TEST_USER, //
+				"IdentityFile " + privateKey1.getAbsolutePath(), //
+				"Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr");
+	}
+

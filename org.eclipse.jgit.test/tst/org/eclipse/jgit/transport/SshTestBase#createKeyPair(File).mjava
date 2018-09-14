@@ -1,0 +1,15 @@
+	private static void createKeyPair(File privateKeyFile) throws Exception {
+		// Found no way to do this with MINA sshd except rolling it all
+		// ourselves...
+		JSch jsch = new JSch();
+		KeyPair pair = KeyPair.genKeyPair(jsch, KeyPair.RSA, 2048);
+		try (OutputStream out = new FileOutputStream(privateKeyFile)) {
+			pair.writePrivateKey(out);
+		}
+		File publicKeyFile = new File(privateKeyFile.getParentFile(),
+				privateKeyFile.getName() + ".pub");
+		try (OutputStream out = new FileOutputStream(publicKeyFile)) {
+			pair.writePublicKey(out, TEST_USER);
+		}
+	}
+

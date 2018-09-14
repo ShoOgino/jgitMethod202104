@@ -1,0 +1,13 @@
+	@Test
+	public void testSshCloneWithUnknownHostKeyAlgorithmsInConfig()
+			throws Exception {
+		// Bug 535672
+		cloneWith("ssh://git/doesntmatter", null, //
+				"Host git", //
+				"HostName localhost", //
+				"Port " + testPort, //
+				"User " + TEST_USER, //
+				"IdentityFile " + privateKey1.getAbsolutePath(), //
+				"HostKeyAlgorithms foobar,ssh-rsa,ssh-dss");
+	}
+

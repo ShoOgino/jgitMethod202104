@@ -1,0 +1,11 @@
+	@After
+	public void shutdownServer() throws Exception {
+		if (server != null) {
+			server.stop();
+			server = null;
+		}
+		FS.DETECTED.setUserHome(homeDir);
+		SshSessionFactory.setInstance(null);
+		factory = null;
+	}
+

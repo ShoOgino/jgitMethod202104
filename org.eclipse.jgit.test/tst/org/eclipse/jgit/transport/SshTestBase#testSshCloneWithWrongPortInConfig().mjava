@@ -1,0 +1,14 @@
+	@Test
+	public void testSshCloneWithWrongPortInConfig() throws Exception {
+		// Bug 526778
+		cloneWith(
+				"ssh://" + TEST_USER + "@localhost:" + testPort
+						+ "/doesntmatter",
+				null, //
+				"Host localhost", //
+				"HostName localhost", //
+				"Port 22", //
+				"User " + TEST_USER, //
+				"IdentityFile " + privateKey1.getAbsolutePath());
+	}
+
