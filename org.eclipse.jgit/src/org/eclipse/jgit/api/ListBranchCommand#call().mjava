@@ -7,17 +7,18 @@
 			Collection<Ref> refs = new ArrayList<>();
 
 			// Also return HEAD if it's detached
-			Ref head = repo.exactRef(Constants.HEAD);
-			if (head != null && head.getLeaf().getName().equals(Constants.HEAD))
+			Ref head = repo.exactRef(HEAD);
+			if (head != null && head.getLeaf().getName().equals(HEAD)) {
 				refs.add(head);
+			}
 
 			if (listMode == null) {
-				refs.addAll(getRefs(Constants.R_HEADS));
+				refs.addAll(repo.getRefDatabase().getRefsByPrefix(R_HEADS));
 			} else if (listMode == ListMode.REMOTE) {
-				refs.addAll(getRefs(Constants.R_REMOTES));
+				refs.addAll(repo.getRefDatabase().getRefsByPrefix(R_REMOTES));
 			} else {
-				refs.addAll(getRefs(Constants.R_HEADS));
-				refs.addAll(getRefs(Constants.R_REMOTES));
+				refs.addAll(repo.getRefDatabase().getRefsByPrefix(R_HEADS,
+						R_REMOTES));
 			}
 			resultRefs = new ArrayList<>(filterRefs(refs));
 		} catch (IOException e) {
