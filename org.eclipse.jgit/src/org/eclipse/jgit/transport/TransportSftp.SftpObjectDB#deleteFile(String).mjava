@@ -2,12 +2,15 @@
 		void deleteFile(String path) throws IOException {
 			try {
 				ftp.rm(path);
-			} catch (SftpException je) {
-				if (je.id == ChannelSftp.SSH_FX_NO_SUCH_FILE)
+			} catch (FileNotFoundException e) {
+				return;
+			} catch (FtpChannel.FtpException f) {
+				if (f.getStatus() == FtpChannel.FtpException.NO_SUCH_FILE) {
 					return;
+				}
 				throw new TransportException(MessageFormat.format(
 						JGitText.get().cannotDeleteObjectsPath, objectsPath,
-						path, je.getMessage()), je);
+						path, f.getMessage()), f);
 			}
 
 			// Prune any now empty directories.
@@ -19,7 +22,7 @@
 					dir = dir.substring(0, s);
 					ftp.rmdir(dir);
 					s = dir.lastIndexOf('/');
-				} catch (SftpException je) {
+				} catch (IOException je) {
 					// If we cannot delete it, leave it alone. It may have
 					// entries still in it, or maybe we lack write access on
 					// the parent. Either way it isn't a fatal error.

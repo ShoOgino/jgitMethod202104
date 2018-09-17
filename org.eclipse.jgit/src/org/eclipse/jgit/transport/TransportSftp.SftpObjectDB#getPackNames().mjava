@@ -2,41 +2,32 @@
 		Collection<String> getPackNames() throws IOException {
 			final List<String> packs = new ArrayList<>();
 			try {
-				@SuppressWarnings("unchecked")
-				final Collection<ChannelSftp.LsEntry> list = ftp.ls("pack"); //$NON-NLS-1$
-				final HashMap<String, ChannelSftp.LsEntry> files;
-				final HashMap<String, Integer> mtimes;
+				Collection<FtpChannel.DirEntry> list = ftp.ls("pack"); //$NON-NLS-1$
+				Set<String> files = list.stream()
+						.map(FtpChannel.DirEntry::getFilename)
+						.collect(Collectors.toSet());
+				HashMap<String, Long> mtimes = new HashMap<>();
 
-				files = new HashMap<>();
-				mtimes = new HashMap<>();
-
-				for (ChannelSftp.LsEntry ent : list)
-					files.put(ent.getFilename(), ent);
-				for (ChannelSftp.LsEntry ent : list) {
-					final String n = ent.getFilename();
-					if (!n.startsWith("pack-") || !n.endsWith(".pack")) //$NON-NLS-1$ //$NON-NLS-2$
+				for (FtpChannel.DirEntry ent : list) {
+					String n = ent.getFilename();
+					if (!n.startsWith("pack-") || !n.endsWith(".pack")) { //$NON-NLS-1$ //$NON-NLS-2$
 						continue;
-
-					final String in = n.substring(0, n.length() - 5) + ".idx"; //$NON-NLS-1$
-					if (!files.containsKey(in))
+					}
+					String in = n.substring(0, n.length() - 5) + ".idx"; //$NON-NLS-1$
+					if (!files.contains(in)) {
 						continue;
-
-					mtimes.put(n, Integer.valueOf(ent.getAttrs().getMTime()));
+					}
+					mtimes.put(n, Long.valueOf(ent.getModifiedTime()));
 					packs.add(n);
 				}
 
-				Collections.sort(packs, new Comparator<String>() {
-					@Override
-					public int compare(String o1, String o2) {
-						return mtimes.get(o2).intValue()
-								- mtimes.get(o1).intValue();
-					}
-				});
-			} catch (SftpException je) {
+				Collections.sort(packs,
+						(o1, o2) -> mtimes.get(o2).compareTo(mtimes.get(o1)));
+			} catch (FtpChannel.FtpException f) {
 				throw new TransportException(
 						MessageFormat.format(JGitText.get().cannotListPackPath,
-								objectsPath, je.getMessage()),
-						je);
+								objectsPath, f.getMessage()),
+						f);
 			}
 			return packs;
 		}

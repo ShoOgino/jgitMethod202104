@@ -11,10 +11,10 @@
 						err.getMessage()), err);
 			}
 
-			if (line == null)
+			if (line == null) {
 				throw new TransportException(
 						MessageFormat.format(JGitText.get().emptyRef, name));
-
+			}
 			if (line.startsWith("ref: ")) { //$NON-NLS-1$
 				final String target = line.substring("ref: ".length()); //$NON-NLS-1$
 				Ref r = avail.get(target);

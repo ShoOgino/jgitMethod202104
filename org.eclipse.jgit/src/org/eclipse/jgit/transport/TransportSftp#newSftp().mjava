@@ -1,14 +1,6 @@
-	ChannelSftp newSftp() throws TransportException {
-		final int tms = getTimeout() > 0 ? getTimeout() * 1000 : 0;
-		try {
-			// @TODO: Fix so that this operation is generic and casting to
-			// JschSession is no longer necessary.
-			final Channel channel = ((JschSession) getSession())
-					.getSftpChannel();
-			channel.connect(tms);
-			return (ChannelSftp) channel;
-		} catch (JSchException je) {
-			throw new TransportException(uri, je.getMessage(), je);
-		}
+	FtpChannel newSftp() throws IOException {
+		FtpChannel channel = getSession().getFtpChannel();
+		channel.connect(getTimeout(), TimeUnit.SECONDS);
+		return channel;
 	}
 

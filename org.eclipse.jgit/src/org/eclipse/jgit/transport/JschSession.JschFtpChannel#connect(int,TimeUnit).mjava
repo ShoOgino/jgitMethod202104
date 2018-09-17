@@ -1,0 +1,11 @@
+		@Override
+		public void connect(int timeout, TimeUnit unit) throws IOException {
+			try {
+				ftp = (ChannelSftp) sock.openChannel("sftp"); //$NON-NLS-1$
+				ftp.connect((int) unit.toMillis(timeout));
+			} catch (JSchException e) {
+				ftp = null;
+				throw new IOException(e.getLocalizedMessage(), e);
+			}
+		}
+

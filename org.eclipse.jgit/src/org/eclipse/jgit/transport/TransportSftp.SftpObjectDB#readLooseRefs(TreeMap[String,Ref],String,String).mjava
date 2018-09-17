@@ -1,25 +1,25 @@
-		@SuppressWarnings("unchecked")
 		private void readLooseRefs(TreeMap<String, Ref> avail, String dir,
 				String prefix) throws TransportException {
-			final Collection<ChannelSftp.LsEntry> list;
+			final Collection<FtpChannel.DirEntry> list;
 			try {
 				list = ftp.ls(dir);
-			} catch (SftpException je) {
+			} catch (IOException e) {
 				throw new TransportException(MessageFormat.format(
 						JGitText.get().cannotListObjectsPath, objectsPath, dir,
-						je.getMessage()), je);
+						e.getMessage()), e);
 			}
 
-			for (ChannelSftp.LsEntry ent : list) {
-				final String n = ent.getFilename();
+			for (FtpChannel.DirEntry ent : list) {
+				String n = ent.getFilename();
 				if (".".equals(n) || "..".equals(n)) //$NON-NLS-1$ //$NON-NLS-2$
 					continue;
 
-				final String nPath = dir + "/" + n; //$NON-NLS-1$
-				if (ent.getAttrs().isDir())
+				String nPath = dir + "/" + n; //$NON-NLS-1$
+				if (ent.isDirectory()) {
 					readLooseRefs(avail, nPath, prefix + n + "/"); //$NON-NLS-1$
-				else
+				} else {
 					readRef(avail, nPath, prefix + n);
+				}
 			}
 		}
 

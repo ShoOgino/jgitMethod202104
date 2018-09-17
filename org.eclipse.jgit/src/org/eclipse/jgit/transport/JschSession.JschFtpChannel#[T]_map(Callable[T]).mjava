@@ -1,0 +1,12 @@
+		private <T> T map(Callable<T> op) throws IOException {
+			try {
+				return op.call();
+			} catch (Exception e) {
+				if (e instanceof SftpException) {
+					throw new FtpChannel.FtpException(e.getLocalizedMessage(),
+							((SftpException) e).id, e);
+				}
+				throw new IOException(e.getLocalizedMessage(), e);
+			}
+		}
+

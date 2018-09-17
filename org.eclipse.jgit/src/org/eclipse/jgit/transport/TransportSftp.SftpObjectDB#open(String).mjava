@@ -1,14 +1,14 @@
 		@Override
 		FileStream open(String path) throws IOException {
 			try {
-				final SftpATTRS a = ftp.lstat(path);
-				return new FileStream(ftp.get(path), a.getSize());
-			} catch (SftpException je) {
-				if (je.id == ChannelSftp.SSH_FX_NO_SUCH_FILE)
+				return new FileStream(ftp.get(path));
+			} catch (FtpChannel.FtpException f) {
+				if (f.getStatus() == FtpChannel.FtpException.NO_SUCH_FILE) {
 					throw new FileNotFoundException(path);
+				}
 				throw new TransportException(MessageFormat.format(
 						JGitText.get().cannotGetObjectsPath, objectsPath, path,
-						je.getMessage()), je);
+						f.getMessage()), f);
 			}
 		}
 

@@ -5,15 +5,15 @@
 				super.writeFile(lock, data);
 				try {
 					ftp.rename(lock, path);
-				} catch (SftpException je) {
+				} catch (IOException e) {
 					throw new TransportException(MessageFormat.format(
 							JGitText.get().cannotWriteObjectsPath, objectsPath,
-							path, je.getMessage()), je);
+							path, e.getMessage()), e);
 				}
 			} catch (IOException err) {
 				try {
 					ftp.rm(lock);
-				} catch (SftpException e) {
+				} catch (IOException e) {
 					// Ignore deletion failure, we are already
 					// failing anyway.
 				}

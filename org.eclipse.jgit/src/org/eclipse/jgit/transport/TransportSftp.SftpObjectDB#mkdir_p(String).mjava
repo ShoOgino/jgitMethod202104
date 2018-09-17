@@ -4,22 +4,29 @@
 				return;
 
 			path = path.substring(0, s);
+			Throwable err = null;
 			try {
 				ftp.mkdir(path);
-			} catch (SftpException je) {
-				if (je.id == ChannelSftp.SSH_FX_NO_SUCH_FILE) {
+				return;
+			} catch (FileNotFoundException f) {
+				mkdir_p(path);
+			} catch (FtpChannel.FtpException je) {
+				if (je.getStatus() == FtpChannel.FtpException.NO_SUCH_FILE) {
 					mkdir_p(path);
-					try {
-						ftp.mkdir(path);
-						return;
-					} catch (SftpException je2) {
-						je = je2;
-					}
+				} else {
+					err = je;
 				}
-
-				throw new TransportException(MessageFormat.format(
-						JGitText.get().cannotMkdirObjectPath, objectsPath, path,
-						je.getMessage()), je);
 			}
+			if (err == null) {
+				try {
+					ftp.mkdir(path);
+					return;
+				} catch (IOException e) {
+					err = e;
+				}
+			}
+			throw new TransportException(MessageFormat.format(
+						JGitText.get().cannotMkdirObjectPath, objectsPath, path,
+					err.getMessage()), err);
 		}
 

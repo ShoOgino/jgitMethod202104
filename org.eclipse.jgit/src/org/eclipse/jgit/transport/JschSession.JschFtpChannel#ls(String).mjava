@@ -1,0 +1,28 @@
+		@Override
+		public Collection<DirEntry> ls(String path) throws IOException {
+			return map(() -> {
+				List<DirEntry> result = new ArrayList<>();
+				for (Object e : ftp.ls(path)) {
+					ChannelSftp.LsEntry entry = (ChannelSftp.LsEntry) e;
+					result.add(new DirEntry() {
+
+						@Override
+						public String getFilename() {
+							return entry.getFilename();
+						}
+
+						@Override
+						public long getModifiedTime() {
+							return entry.getAttrs().getMTime();
+						}
+
+						@Override
+						public boolean isDirectory() {
+							return entry.getAttrs().isDir();
+						}
+					});
+				}
+				return result;
+			});
+		}
+

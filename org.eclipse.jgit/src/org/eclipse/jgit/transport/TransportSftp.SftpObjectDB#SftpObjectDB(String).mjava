@@ -8,13 +8,13 @@
 				ftp.cd(path);
 				ftp.cd("objects"); //$NON-NLS-1$
 				objectsPath = ftp.pwd();
-			} catch (TransportException err) {
-				close();
-				throw err;
-			} catch (SftpException je) {
+			} catch (FtpChannel.FtpException f) {
 				throw new TransportException(MessageFormat.format(
 						JGitText.get().cannotEnterObjectsPath, path,
-						je.getMessage()), je);
+						f.getMessage()), f);
+			} catch (IOException ioe) {
+				close();
+				throw new TransportException(uri, ioe.getMessage(), ioe);
 			}
 		}
 
