@@ -1,22 +1,8 @@
 		/**
-		 * Parse the first line of a receive-pack request.
-		 *
 		 * @param line
 		 *            line from the client.
 		 */
 		public FirstLine(String line) {
-			if (line.length() > 45) {
-				final HashSet<String> opts = new HashSet<>();
-				String opt = line.substring(45);
-				if (opt.startsWith(" ")) //$NON-NLS-1$
-					opt = opt.substring(1);
-				for (String c : opt.split(" ")) //$NON-NLS-1$
-					opts.add(c);
-				this.line = line.substring(0, 45);
-				this.options = Collections.unmodifiableSet(opts);
-			} else {
-				this.line = line;
-				this.options = Collections.emptySet();
-			}
+			firstWant = FirstWant.fromLine(line);
 		}
 

@@ -1,0 +1,30 @@
+	/**
+	 * Parse the first want line in the protocol v0/v1 pack negotiation.
+	 *
+	 * @param line
+	 *            line from the client.
+	 * @return an instance of FirstWant
+	 */
+	public static FirstWant fromLine(String line) {
+		String wantLine;
+		Set<String> capabilities;
+
+		if (line.length() > 45) {
+			final HashSet<String> opts = new HashSet<>();
+			String opt = line.substring(45);
+			if (opt.startsWith(" ")) { //$NON-NLS-1$
+				opt = opt.substring(1);
+			}
+			for (String c : opt.split(" ")) { //$NON-NLS-1$
+				opts.add(c);
+			}
+			wantLine = line.substring(0, 45);
+			capabilities = Collections.unmodifiableSet(opts);
+		} else {
+			wantLine = line;
+			capabilities = Collections.emptySet();
+		}
+
+		return new FirstWant(wantLine, capabilities);
+	}
+
