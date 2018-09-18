@@ -1,4 +1,5 @@
-	private boolean negotiate(PackStatistics.Accumulator accumulator)
+	private boolean negotiate(FetchRequest req,
+			PackStatistics.Accumulator accumulator)
 			throws IOException {
 		okToGiveUp = Boolean.FALSE;
 
@@ -14,7 +15,7 @@
 				// disconnected, and will try another request with actual want/have.
 				// Don't report the EOF here, its a bug in the protocol that the client
 				// just disconnects without sending an END.
-				if (!biDirectionalPipe && depth > 0)
+				if (!biDirectionalPipe && req.getDepth() > 0)
 					return false;
 				throw eof;
 			}

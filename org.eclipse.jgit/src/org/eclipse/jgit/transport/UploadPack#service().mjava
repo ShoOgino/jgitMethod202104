@@ -18,11 +18,11 @@
 
 			ProtocolV0Parser parser = new ProtocolV0Parser(transferConfig);
 			req = parser.recvWants(pckIn);
+			currentRequest = req;
 
 			wantIds = req.getWantIds();
 			clientShallowCommits = req.getClientShallowCommits();
 			options = req.getClientCapabilities();
-			depth = req.getDepth();
 
 			if (req.getWantIds().isEmpty()) {
 				preUploadHook.onBeginNegotiateRound(this, req.getWantIds(), 0);
@@ -42,7 +42,7 @@
 
 			if (!clientShallowCommits.isEmpty())
 				verifyClientShallow(clientShallowCommits);
-			if (depth != 0 || req.getDeepenSince() != 0) {
+			if (req.getDepth() != 0 || req.getDeepenSince() != 0) {
 				computeShallowsAndUnshallows(req, shallow -> {
 					pckOut.writeString("shallow " + shallow.name() + '\n'); //$NON-NLS-1$
 				}, unshallow -> {
@@ -53,7 +53,7 @@
 			}
 			if (!clientShallowCommits.isEmpty())
 				walk.assumeShallow(clientShallowCommits);
-			sendPack = negotiate(accumulator);
+			sendPack = negotiate(req, accumulator);
 			accumulator.timeNegotiating += System.currentTimeMillis()
 					- negotiateStart;
 

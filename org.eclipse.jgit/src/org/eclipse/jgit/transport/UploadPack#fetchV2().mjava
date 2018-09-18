@@ -14,6 +14,7 @@
 		ProtocolV2Parser parser = new ProtocolV2Parser(transferConfig);
 		FetchV2Request req = parser.parseFetchRequest(pckIn,
 				db.getRefDatabase());
+		currentRequest = req;
 		rawOut.stopBuffering();
 
 		protocolV2Hook.onFetch(req);
@@ -23,7 +24,6 @@
 		options = req.getClientCapabilities();
 		wantIds = req.getWantIds();
 		clientShallowCommits = req.getClientShallowCommits();
-		depth = req.getDepth();
 
 		boolean sectionSent = false;
 		boolean mayHaveShallow = req.getDepth() != 0
