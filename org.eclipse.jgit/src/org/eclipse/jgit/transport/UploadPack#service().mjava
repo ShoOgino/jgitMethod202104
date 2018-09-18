@@ -21,7 +21,6 @@
 			currentRequest = req;
 
 			wantIds = req.getWantIds();
-			clientShallowCommits = req.getClientShallowCommits();
 			options = req.getClientCapabilities();
 
 			if (req.getWantIds().isEmpty()) {
@@ -40,8 +39,10 @@
 			else
 				multiAck = MultiAck.OFF;
 
-			if (!clientShallowCommits.isEmpty())
-				verifyClientShallow(clientShallowCommits);
+			if (!req.getClientShallowCommits().isEmpty()) {
+				verifyClientShallow(req.getClientShallowCommits());
+			}
+
 			if (req.getDepth() != 0 || req.getDeepenSince() != 0) {
 				computeShallowsAndUnshallows(req, shallow -> {
 					pckOut.writeString("shallow " + shallow.name() + '\n'); //$NON-NLS-1$
@@ -51,8 +52,9 @@
 				});
 				pckOut.end();
 			}
-			if (!clientShallowCommits.isEmpty())
-				walk.assumeShallow(clientShallowCommits);
+
+			if (!req.getClientShallowCommits().isEmpty())
+				walk.assumeShallow(req.getClientShallowCommits());
 			sendPack = negotiate(req, accumulator);
 			accumulator.timeNegotiating += System.currentTimeMillis()
 					- negotiateStart;
