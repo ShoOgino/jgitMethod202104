@@ -2,25 +2,26 @@
 	 * Send the requested objects to the client.
 	 *
 	 * @param accumulator
-	 *                where to write statistics about the content of the pack.
+	 *            where to write statistics about the content of the pack.
+	 * @param req
+	 *            request in process
 	 * @param allTags
-	 *                refs to search for annotated tags to include in the pack
-	 *                if the {@link #OPTION_INCLUDE_TAG} capability was
-	 *                requested.
+	 *            refs to search for annotated tags to include in the pack if
+	 *            the {@link #OPTION_INCLUDE_TAG} capability was requested.
 	 * @param unshallowCommits
-	 *                shallow commits on the client that are now becoming
-	 *                unshallow
+	 *            shallow commits on the client that are now becoming unshallow
 	 * @throws IOException
-	 *                if an error occured while generating or writing the pack.
+	 *             if an error occured while generating or writing the pack.
 	 */
 	private void sendPack(PackStatistics.Accumulator accumulator,
+			FetchRequest req,
 			@Nullable Collection<Ref> allTags,
 			List<ObjectId> unshallowCommits) throws IOException {
 		final boolean sideband = options.contains(OPTION_SIDE_BAND)
 				|| options.contains(OPTION_SIDE_BAND_64K);
 		if (sideband) {
 			try {
-				sendPack(true, accumulator, allTags, unshallowCommits);
+				sendPack(true, req, accumulator, allTags, unshallowCommits);
 			} catch (ServiceMayNotContinueException noPack) {
 				// This was already reported on (below).
 				throw noPack;
@@ -41,7 +42,7 @@
 					throw err;
 			}
 		} else {
-			sendPack(false, accumulator, allTags, unshallowCommits);
+			sendPack(false, req, accumulator, allTags, unshallowCommits);
 		}
 	}
 

@@ -4,6 +4,7 @@
 		// writing a response. Buffer the response until then.
 		PackStatistics.Accumulator accumulator = new PackStatistics.Accumulator();
 		List<ObjectId> unshallowCommits = new ArrayList<>();
+		FetchRequest req;
 		try {
 			if (biDirectionalPipe)
 				sendAdvertisedRefs(new PacketLineOutRefAdvertiser(pckOut));
@@ -16,11 +17,10 @@
 			accumulator.advertised = advertised.size();
 
 			ProtocolV0Parser parser = new ProtocolV0Parser(transferConfig);
-			FetchV0Request req = parser.recvWants(pckIn);
+			req = parser.recvWants(pckIn);
 
 			wantIds = req.getWantIds();
 			clientShallowCommits = req.getClientShallowCommits();
-			filterBlobLimit = req.getFilterBlobLimit();
 			options = req.getClientCapabilities();
 			depth = req.getDepth();
 
@@ -103,7 +103,8 @@
 		}
 
 		if (sendPack) {
-			sendPack(accumulator, refs == null ? null : refs.values(), unshallowCommits);
+			sendPack(accumulator, req, refs == null ? null : refs.values(),
+					unshallowCommits);
 		}
 	}
 

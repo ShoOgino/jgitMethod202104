@@ -2,21 +2,22 @@
 	 * Send the requested objects to the client.
 	 *
 	 * @param sideband
-	 *                whether to wrap the pack in side-band pkt-lines,
-	 *                interleaved with progress messages and errors.
+	 *            whether to wrap the pack in side-band pkt-lines, interleaved
+	 *            with progress messages and errors.
+	 * @param req
+	 *            request being processed
 	 * @param accumulator
-	 *                where to write statistics about the content of the pack.
+	 *            where to write statistics about the content of the pack.
 	 * @param allTags
-	 *                refs to search for annotated tags to include in the pack
-	 *                if the {@link #OPTION_INCLUDE_TAG} capability was
-	 *                requested.
+	 *            refs to search for annotated tags to include in the pack if
+	 *            the {@link #OPTION_INCLUDE_TAG} capability was requested.
 	 * @param unshallowCommits
-	 *                shallow commits on the client that are now becoming
-	 *                unshallow
+	 *            shallow commits on the client that are now becoming unshallow
 	 * @throws IOException
-	 *                if an error occured while generating or writing the pack.
+	 *             if an error occured while generating or writing the pack.
 	 */
 	private void sendPack(final boolean sideband,
+			FetchRequest req,
 			PackStatistics.Accumulator accumulator,
 			@Nullable Collection<Ref> allTags,
 			List<ObjectId> unshallowCommits) throws IOException {
@@ -66,8 +67,8 @@
 				accumulator);
 		try {
 			pw.setIndexDisabled(true);
-			if (filterBlobLimit >= 0) {
-				pw.setFilterBlobLimit(filterBlobLimit);
+			if (req.getFilterBlobLimit() >= 0) {
+				pw.setFilterBlobLimit(req.getFilterBlobLimit());
 				pw.setUseCachedPacks(false);
 			} else {
 				pw.setUseCachedPacks(true);

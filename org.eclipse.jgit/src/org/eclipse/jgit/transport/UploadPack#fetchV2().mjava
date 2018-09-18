@@ -25,7 +25,6 @@
 		clientShallowCommits = req.getClientShallowCommits();
 		depth = req.getDepth();
 		shallowSince = req.getDeepenSince();
-		filterBlobLimit = req.getFilterBlobLimit();
 		deepenNotRefs = req.getDeepenNotRefs();
 
 		boolean sectionSent = false;
@@ -97,6 +96,7 @@
 				pckOut.writeDelim();
 			pckOut.writeString("packfile\n"); //$NON-NLS-1$
 			sendPack(new PackStatistics.Accumulator(),
+					req,
 					req.getClientCapabilities().contains(OPTION_INCLUDE_TAG)
 						? db.getRefDatabase().getRefsByPrefix(R_TAGS)
 						: null,
