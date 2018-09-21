@@ -2,9 +2,10 @@
 		final long mtime = configFile.lastModified();
 		if (mtime != lastModified) {
 			State newState = new State();
-			try (FileInputStream in = new FileInputStream(configFile)) {
-				newState.entries = parse(in);
-			} catch (IOException none) {
+			try (BufferedReader br = Files
+					.newBufferedReader(configFile.toPath(), UTF_8)) {
+				newState.entries = parse(br);
+			} catch (IOException | RuntimeException none) {
 				// Ignore -- we'll set and return an empty state
 			}
 			lastModified = mtime;

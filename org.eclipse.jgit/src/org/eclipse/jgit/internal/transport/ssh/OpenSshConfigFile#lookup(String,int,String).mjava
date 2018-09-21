@@ -1,0 +1,37 @@
+	/**
+	 * Locate the configuration for a specific host request.
+	 *
+	 * @param hostName
+	 *            the name the user has supplied to the SSH tool. This may be a
+	 *            real host name, or it may just be a "Host" block in the
+	 *            configuration file.
+	 * @param port
+	 *            the user supplied; <= 0 if none
+	 * @param userName
+	 *            the user supplied, may be {@code null} or empty if none given
+	 * @return r configuration for the requested name.
+	 */
+	@NonNull
+	public HostEntry lookup(@NonNull String hostName, int port,
+			String userName) {
+		final State cache = refresh();
+		String cacheKey = toCacheKey(hostName, port, userName);
+		HostEntry h = cache.hosts.get(cacheKey);
+		if (h != null) {
+			return h;
+		}
+		HostEntry fullConfig = new HostEntry();
+		// Initialize with default entries at the top of the file, before the
+		// first Host block.
+		fullConfig.merge(cache.entries.get(DEFAULT_NAME));
+		for (Map.Entry<String, HostEntry> e : cache.entries.entrySet()) {
+			String pattern = e.getKey();
+			if (isHostMatch(pattern, hostName)) {
+				fullConfig.merge(e.getValue());
+			}
+		}
+		fullConfig.substitute(hostName, port, userName, localUserName, home);
+		cache.hosts.put(cacheKey, fullConfig);
+		return fullConfig;
+	}
+

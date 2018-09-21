@@ -1,0 +1,81 @@
+		void substitute(String originalHostName, int port, String userName,
+				String localUserName, File home) {
+			int p = port >= 0 ? port : positive(getValue(SshConstants.PORT));
+			if (p < 0) {
+				p = SshConstants.SSH_DEFAULT_PORT;
+			}
+			String u = userName != null && !userName.isEmpty() ? userName
+					: getValue(SshConstants.USER);
+			if (u == null || u.isEmpty()) {
+				u = localUserName;
+			}
+			Replacer r = new Replacer(originalHostName, p, u, localUserName,
+					home);
+			if (options != null) {
+				// HOSTNAME first
+				String hostName = options.get(SshConstants.HOST_NAME);
+				if (hostName == null || hostName.isEmpty()) {
+					options.put(SshConstants.HOST_NAME, originalHostName);
+				} else {
+					hostName = r.substitute(hostName, "h"); //$NON-NLS-1$
+					options.put(SshConstants.HOST_NAME, hostName);
+					r.update('h', hostName);
+				}
+			}
+			if (multiOptions != null) {
+				List<String> values = multiOptions
+						.get(SshConstants.IDENTITY_FILE);
+				if (values != null) {
+					values = substitute(values, "dhlru", r); //$NON-NLS-1$
+					values = replaceTilde(values, home);
+					multiOptions.put(SshConstants.IDENTITY_FILE, values);
+				}
+				values = multiOptions.get(SshConstants.CERTIFICATE_FILE);
+				if (values != null) {
+					values = substitute(values, "dhlru", r); //$NON-NLS-1$
+					values = replaceTilde(values, home);
+					multiOptions.put(SshConstants.CERTIFICATE_FILE, values);
+				}
+			}
+			if (listOptions != null) {
+				List<String> values = listOptions
+						.get(SshConstants.USER_KNOWN_HOSTS_FILE);
+				if (values != null) {
+					values = replaceTilde(values, home);
+					listOptions.put(SshConstants.USER_KNOWN_HOSTS_FILE, values);
+				}
+			}
+			if (options != null) {
+				// HOSTNAME already done above
+				String value = options.get(SshConstants.IDENTITY_AGENT);
+				if (value != null) {
+					value = r.substitute(value, "dhlru"); //$NON-NLS-1$
+					value = toFile(value, home).getPath();
+					options.put(SshConstants.IDENTITY_AGENT, value);
+				}
+				value = options.get(SshConstants.CONTROL_PATH);
+				if (value != null) {
+					value = r.substitute(value, "ChLlnpru"); //$NON-NLS-1$
+					value = toFile(value, home).getPath();
+					options.put(SshConstants.CONTROL_PATH, value);
+				}
+				value = options.get(SshConstants.LOCAL_COMMAND);
+				if (value != null) {
+					value = r.substitute(value, "CdhlnprTu"); //$NON-NLS-1$
+					options.put(SshConstants.LOCAL_COMMAND, value);
+				}
+				value = options.get(SshConstants.REMOTE_COMMAND);
+				if (value != null) {
+					value = r.substitute(value, "Cdhlnpru"); //$NON-NLS-1$
+					options.put(SshConstants.REMOTE_COMMAND, value);
+				}
+				value = options.get(SshConstants.PROXY_COMMAND);
+				if (value != null) {
+					value = r.substitute(value, "hpr"); //$NON-NLS-1$
+					options.put(SshConstants.PROXY_COMMAND, value);
+				}
+			}
+			// Match is not implemented and would need to be done elsewhere
+			// anyway.
+		}
+

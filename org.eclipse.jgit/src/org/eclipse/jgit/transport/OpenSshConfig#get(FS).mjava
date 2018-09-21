@@ -16,9 +16,8 @@
 		if (home == null)
 			home = new File(".").getAbsoluteFile(); //$NON-NLS-1$
 
-		final File config = new File(new File(home, ".ssh"), Constants.CONFIG); //$NON-NLS-1$
-		final OpenSshConfig osc = new OpenSshConfig(home, config);
-		osc.refresh();
-		return osc;
+		final File config = new File(new File(home, SshConstants.SSH_DIR),
+				SshConstants.CONFIG);
+		return new OpenSshConfig(home, config);
 	}
 

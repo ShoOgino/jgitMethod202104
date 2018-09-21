@@ -1,0 +1,22 @@
+		/**
+		 * Retrieves an unmodifiable map of all multi-valued options, with
+		 * case-insensitive lookup by keys.
+		 *
+		 * @return all multi-valued options
+		 */
+		@NonNull
+		public Map<String, List<String>> getMultiValuedOptions() {
+			if (listOptions == null && multiOptions == null) {
+				return Collections.emptyMap();
+			}
+			Map<String, List<String>> allValues = new TreeMap<>(
+					String.CASE_INSENSITIVE_ORDER);
+			if (multiOptions != null) {
+				allValues.putAll(multiOptions);
+			}
+			if (listOptions != null) {
+				allValues.putAll(listOptions);
+			}
+			return Collections.unmodifiableMap(allValues);
+		}
+

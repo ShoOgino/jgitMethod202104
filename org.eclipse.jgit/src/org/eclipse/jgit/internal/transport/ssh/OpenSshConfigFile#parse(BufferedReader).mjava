@@ -1,26 +1,24 @@
-	private Map<String, HostEntry> parse(InputStream in)
+	private Map<String, HostEntry> parse(BufferedReader reader)
 			throws IOException {
-		final Map<String, HostEntry> m = new LinkedHashMap<>();
-		final BufferedReader br = new BufferedReader(
-				new InputStreamReader(in, UTF_8));
+		final Map<String, HostEntry> entries = new LinkedHashMap<>();
 		final List<HostEntry> current = new ArrayList<>(4);
 		String line;
 
-		// The man page doesn't say so, but the OpenSSH parser (readconf.c)
+		// The man page doesn't say so, but the openssh parser (readconf.c)
 		// starts out in active mode and thus always applies any lines that
 		// occur before the first host block. We gather those options in a
 		// HostEntry for DEFAULT_NAME.
 		HostEntry defaults = new HostEntry();
 		current.add(defaults);
-		m.put(HostEntry.DEFAULT_NAME, defaults);
+		entries.put(DEFAULT_NAME, defaults);
 
-		while ((line = br.readLine()) != null) {
+		while ((line = reader.readLine()) != null) {
 			line = line.trim();
 			if (line.isEmpty() || line.startsWith("#")) { //$NON-NLS-1$
 				continue;
 			}
 			String[] parts = line.split("[ \t]*[= \t]", 2); //$NON-NLS-1$
-			// Although the ssh-config man page doesn't say so, the OpenSSH
+			// Although the ssh-config man page doesn't say so, the openssh
 			// parser does allow quoted keywords.
 			String keyword = dequote(parts[0].trim());
 			// man 5 ssh-config says lines had the format "keyword arguments",
@@ -28,17 +26,17 @@
 			// not crap out on missing arguments. See bug 444319.
 			String argValue = parts.length > 1 ? parts[1].trim() : ""; //$NON-NLS-1$
 
-			if (StringUtils.equalsIgnoreCase("Host", keyword)) { //$NON-NLS-1$
+			if (StringUtils.equalsIgnoreCase(SshConstants.HOST, keyword)) {
 				current.clear();
-				for (String name : HostEntry.parseList(argValue)) {
+				for (String name : parseList(argValue)) {
 					if (name == null || name.isEmpty()) {
 						// null should not occur, but better be safe than sorry.
 						continue;
 					}
-					HostEntry c = m.get(name);
+					HostEntry c = entries.get(name);
 					if (c == null) {
 						c = new HostEntry();
-						m.put(name, c);
+						entries.put(name, c);
 					}
 					current.add(c);
 				}
@@ -52,18 +50,18 @@
 			}
 
 			if (HostEntry.isListKey(keyword)) {
-				List<String> args = HostEntry.parseList(argValue);
+				List<String> args = validate(keyword, parseList(argValue));
 				for (HostEntry entry : current) {
 					entry.setValue(keyword, args);
 				}
 			} else if (!argValue.isEmpty()) {
-				argValue = dequote(argValue);
+				argValue = validate(keyword, dequote(argValue));
 				for (HostEntry entry : current) {
 					entry.setValue(keyword, argValue);
 				}
 			}
 		}
 
-		return m;
+		return entries;
 	}
 

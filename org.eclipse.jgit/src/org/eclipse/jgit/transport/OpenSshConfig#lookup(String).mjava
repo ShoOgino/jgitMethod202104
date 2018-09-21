@@ -8,24 +8,7 @@
 	 * @return r configuration for the requested name. Never null.
 	 */
 	public Host lookup(String hostName) {
-		final State cache = refresh();
-		Host h = cache.hosts.get(hostName);
-		if (h != null) {
-			return h;
-		}
-		HostEntry fullConfig = new HostEntry();
-		// Initialize with default entries at the top of the file, before the
-		// first Host block.
-		fullConfig.merge(cache.entries.get(HostEntry.DEFAULT_NAME));
-		for (Map.Entry<String, HostEntry> e : cache.entries.entrySet()) {
-			String key = e.getKey();
-			if (isHostMatch(key, hostName)) {
-				fullConfig.merge(e.getValue());
-			}
-		}
-		fullConfig.substitute(hostName, home);
-		h = new Host(fullConfig, hostName, home);
-		cache.hosts.put(hostName, h);
-		return h;
+		HostEntry entry = configFile.lookup(hostName, -1, null);
+		return new Host(entry, hostName, configFile.getLocalUserName());
 	}
 

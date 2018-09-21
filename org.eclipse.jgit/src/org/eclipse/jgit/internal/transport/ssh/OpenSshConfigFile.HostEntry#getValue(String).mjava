@@ -1,0 +1,27 @@
+		/**
+		 * Retrieves the value of a single-valued key, or the first is the key
+		 * has multiple values. Keys are case-insensitive, so
+		 * {@code getValue("HostName") == getValue("HOSTNAME")}.
+		 *
+		 * @param key
+		 *            to get the value of
+		 * @return the value, or {@code null} if none
+		 */
+		public String getValue(String key) {
+			String result = options != null ? options.get(key) : null;
+			if (result == null) {
+				// Let's be lenient and return at least the first value from
+				// a list-valued or multi-valued key.
+				List<String> values = listOptions != null ? listOptions.get(key)
+						: null;
+				if (values == null) {
+					values = multiOptions != null ? multiOptions.get(key)
+							: null;
+				}
+				if (values != null && !values.isEmpty()) {
+					result = values.get(0);
+				}
+			}
+			return result;
+		}
+

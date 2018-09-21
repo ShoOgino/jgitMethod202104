@@ -1,11 +1,11 @@
-		protected void merge(HostEntry entry) {
+		void merge(HostEntry entry) {
 			if (entry == null) {
 				// Can occur if we could not read the config file
 				return;
 			}
 			if (entry.options != null) {
 				if (options == null) {
-					options = new HashMap<>();
+					options = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 				}
 				for (Map.Entry<String, String> item : entry.options
 						.entrySet()) {
@@ -16,7 +16,7 @@
 			}
 			if (entry.listOptions != null) {
 				if (listOptions == null) {
-					listOptions = new HashMap<>(2 * LIST_KEYS.size());
+					listOptions = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 				}
 				for (Map.Entry<String, List<String>> item : entry.listOptions
 						.entrySet()) {
@@ -28,7 +28,7 @@
 			}
 			if (entry.multiOptions != null) {
 				if (multiOptions == null) {
-					multiOptions = new HashMap<>(2 * MULTI_KEYS.size());
+					multiOptions = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 				}
 				for (Map.Entry<String, List<String>> item : entry.multiOptions
 						.entrySet()) {

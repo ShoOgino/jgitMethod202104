@@ -1,0 +1,13 @@
+	@NonNull
+	private String toCacheKey(@NonNull String hostName, int port,
+			String userName) {
+		String key = hostName;
+		if (port > 0) {
+			key = key + ':' + Integer.toString(port);
+		}
+		if (userName != null && !userName.isEmpty()) {
+			key = userName + '@' + key;
+		}
+		return key;
+	}
+

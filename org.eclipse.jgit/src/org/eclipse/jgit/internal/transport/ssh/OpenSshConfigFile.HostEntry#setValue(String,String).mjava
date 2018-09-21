@@ -1,0 +1,43 @@
+		/**
+		 * Sets the value of a single-valued key if it not set yet, or adds a
+		 * value to a multi-valued key. If the value is {@code null}, the key is
+		 * removed altogether, whether it is single-, list-, or multi-valued.
+		 *
+		 * @param key
+		 *            to modify
+		 * @param value
+		 *            to set or add
+		 */
+		public void setValue(String key, String value) {
+			if (value == null) {
+				if (multiOptions != null) {
+					multiOptions.remove(key);
+				}
+				if (listOptions != null) {
+					listOptions.remove(key);
+				}
+				if (options != null) {
+					options.remove(key);
+				}
+				return;
+			}
+			if (MULTI_KEYS.contains(key)) {
+				if (multiOptions == null) {
+					multiOptions = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+				}
+				List<String> values = multiOptions.get(key);
+				if (values == null) {
+					values = new ArrayList<>(4);
+					multiOptions.put(key, values);
+				}
+				values.add(value);
+			} else {
+				if (options == null) {
+					options = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+				}
+				if (!options.containsKey(key)) {
+					options.put(key, value);
+				}
+			}
+		}
+

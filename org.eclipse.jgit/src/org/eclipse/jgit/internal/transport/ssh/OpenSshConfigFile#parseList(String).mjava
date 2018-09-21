@@ -1,0 +1,41 @@
+	/**
+	 * Splits the argument into a list of whitespace-separated elements.
+	 * Elements containing whitespace must be quoted and will be de-quoted.
+	 *
+	 * @param argument
+	 *            argument part of the configuration line as read from the
+	 *            config file
+	 * @return a {@link List} of elements, possibly empty and possibly
+	 *         containing empty elements, but not containing {@code null}
+	 */
+	private List<String> parseList(String argument) {
+		List<String> result = new ArrayList<>(4);
+		int start = 0;
+		int length = argument.length();
+		while (start < length) {
+			// Skip whitespace
+			if (Character.isSpaceChar(argument.charAt(start))) {
+				start++;
+				continue;
+			}
+			if (argument.charAt(start) == '"') {
+				int stop = argument.indexOf('"', ++start);
+				if (stop < start) {
+					// No closing double quote: skip
+					break;
+				}
+				result.add(argument.substring(start, stop));
+				start = stop + 1;
+			} else {
+				int stop = start + 1;
+				while (stop < length
+						&& !Character.isSpaceChar(argument.charAt(stop))) {
+					stop++;
+				}
+				result.add(argument.substring(start, stop));
+				start = stop + 1;
+			}
+		}
+		return result;
+	}
+

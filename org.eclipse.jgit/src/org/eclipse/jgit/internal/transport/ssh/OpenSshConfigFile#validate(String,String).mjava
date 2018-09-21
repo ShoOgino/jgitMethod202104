@@ -1,0 +1,18 @@
+	/**
+	 * Hook to perform validation on a single value, or to sanitize it. If this
+	 * throws an (unchecked) exception, parsing of the file is abandoned.
+	 *
+	 * @param key
+	 *            of the entry
+	 * @param value
+	 *            as read from the config file
+	 * @return the validated and possibly sanitized value
+	 */
+	protected String validate(String key, String value) {
+		if (String.CASE_INSENSITIVE_ORDER.compare(key,
+				SshConstants.PREFERRED_AUTHENTICATIONS) == 0) {
+			return stripWhitespace(value);
+		}
+		return value;
+	}
+

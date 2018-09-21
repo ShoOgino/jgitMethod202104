@@ -1,0 +1,33 @@
+		private void complete(String initialHostName, String localUserName) {
+			// Try to set values from the options.
+			hostName = entry.getValue(SshConstants.HOST_NAME);
+			user = entry.getValue(SshConstants.USER);
+			port = positive(entry.getValue(SshConstants.PORT));
+			connectionAttempts = positive(
+					entry.getValue(SshConstants.CONNECTION_ATTEMPTS));
+			strictHostKeyChecking = entry
+					.getValue(SshConstants.STRICT_HOST_KEY_CHECKING);
+			batchMode = Boolean.valueOf(OpenSshConfigFile
+					.flag(entry.getValue(SshConstants.BATCH_MODE)));
+			preferredAuthentications = entry
+					.getValue(SshConstants.PREFERRED_AUTHENTICATIONS);
+			// Fill in defaults if still not set
+			if (hostName == null || hostName.isEmpty()) {
+				hostName = initialHostName;
+			}
+			if (user == null || user.isEmpty()) {
+				user = localUserName;
+			}
+			if (port <= 0) {
+				port = SshConstants.SSH_DEFAULT_PORT;
+			}
+			if (connectionAttempts <= 0) {
+				connectionAttempts = 1;
+			}
+			List<String> identityFiles = entry
+					.getValues(SshConstants.IDENTITY_FILE);
+			if (identityFiles != null && !identityFiles.isEmpty()) {
+				identityFile = new File(identityFiles.get(0));
+			}
+		}
+
