@@ -1,0 +1,17 @@
+	/**
+	 * Assert that all and only the received {@link ObjectId object ids} are in
+	 * the expected set.
+	 * <p>
+	 * ObjectIds are compared by SHA1.
+	 *
+	 * @param oids
+	 *            Object ids to examine.
+	 * @return true if examined and specified sets contains exactly the same
+	 *         elements.
+	 */
+	@Factory
+	static Matcher<Collection<ObjectId>> hasOnlyObjectIds(
+			String... oids) {
+		return new ObjectIdMatcher(Sets.of(oids));
+	}
+
