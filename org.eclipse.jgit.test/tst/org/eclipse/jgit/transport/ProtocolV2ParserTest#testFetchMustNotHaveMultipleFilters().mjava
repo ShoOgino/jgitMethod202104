@@ -1,14 +1,14 @@
 	@Test
 	public void testFetchMustNotHaveMultipleFilters() throws IOException {
-		thrown.expect(PackProtocolException.class);
 		PacketLineIn pckIn = formatAsPacketLine(PacketLineIn.DELIM,
 				"filter blob:none",
 				"filter blob:limit=12",
 				PacketLineIn.END);
 		ProtocolV2Parser parser = new ProtocolV2Parser(
 				ConfigBuilder.start().allowFilter().done());
-		FetchV2Request request = parser.parseFetchRequest(pckIn,
+
+		thrown.expect(PackProtocolException.class);
+		parser.parseFetchRequest(pckIn,
 				testRepo.getRepository().getRefDatabase());
-		assertEquals(0, request.getFilterBlobLimit());
 	}
 
