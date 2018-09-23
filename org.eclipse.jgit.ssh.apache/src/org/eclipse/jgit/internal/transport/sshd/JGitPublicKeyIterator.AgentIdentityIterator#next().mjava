@@ -1,0 +1,10 @@
+		@Override
+		public PublicKeyIdentity next() {
+			if (iter == null) {
+				throw new NoSuchElementException();
+			}
+			Map.Entry<PublicKey, String> entry = iter.next();
+			return new KeyAgentIdentity(agent, entry.getKey(),
+					entry.getValue());
+		}
+

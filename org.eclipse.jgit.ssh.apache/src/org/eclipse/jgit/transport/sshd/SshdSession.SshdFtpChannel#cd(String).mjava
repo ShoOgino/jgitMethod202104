@@ -1,0 +1,8 @@
+		@Override
+		public void cd(String path) throws IOException {
+			cwd = map(() -> ftp.canonicalPath(absolute(path)));
+			if (cwd.isEmpty()) {
+				cwd += '/';
+			}
+		}
+

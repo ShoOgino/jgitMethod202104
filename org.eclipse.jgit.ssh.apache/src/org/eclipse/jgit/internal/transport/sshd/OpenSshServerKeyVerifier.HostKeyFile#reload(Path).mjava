@@ -1,0 +1,36 @@
+		private List<HostEntryPair> reload(Path path) throws IOException {
+			try {
+				List<KnownHostEntry> rawEntries = KnownHostEntry
+						.readKnownHostEntries(path);
+				updateReloadAttributes();
+				if (rawEntries == null || rawEntries.isEmpty()) {
+					return Collections.emptyList();
+				}
+				List<HostEntryPair> newEntries = new LinkedList<>();
+				for (KnownHostEntry entry : rawEntries) {
+					AuthorizedKeyEntry keyPart = entry.getKeyEntry();
+					if (keyPart == null) {
+						continue;
+					}
+					try {
+						PublicKey serverKey = keyPart.resolvePublicKey(
+								PublicKeyEntryResolver.IGNORING);
+						if (serverKey == null) {
+							LOG.warn(format(
+									SshdText.get().knownHostsUnknownKeyType,
+									getPath(), entry.getConfigLine()));
+						} else {
+							newEntries.add(new HostEntryPair(entry, serverKey));
+						}
+					} catch (GeneralSecurityException e) {
+						LOG.warn(format(SshdText.get().knownHostsInvalidLine,
+								getPath(), entry.getConfigLine()));
+					}
+				}
+				return newEntries;
+			} catch (FileNotFoundException e) {
+				resetReloadAttributes();
+				return Collections.emptyList();
+			}
+		}
+

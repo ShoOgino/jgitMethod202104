@@ -1,0 +1,19 @@
+	/**
+	 * Creates a {@link URIish} from the given remote address and user name.
+	 *
+	 * @param userName
+	 *            for the uri
+	 * @param remote
+	 *            address of the remote host
+	 * @return the uri, with {@link SshConstants#SSH_SCHEME} as scheme
+	 */
+	public static URIish toURI(String userName, InetSocketAddress remote) {
+		String host = remote.getHostString();
+		int port = remote.getPort();
+		return new URIish() //
+				.setScheme(SshConstants.SSH_SCHEME) //
+				.setHost(host) //
+				.setPort(port) //
+				.setUser(userName);
+	}
+

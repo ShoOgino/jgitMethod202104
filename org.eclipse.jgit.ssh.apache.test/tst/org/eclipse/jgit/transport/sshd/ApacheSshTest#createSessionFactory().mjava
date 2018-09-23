@@ -1,0 +1,9 @@
+	@Override
+	protected SshSessionFactory createSessionFactory() {
+		SshdSessionFactory result = new SshdSessionFactory(new JGitKeyCache());
+		// The home directory is mocked at this point!
+		result.setHomeDirectory(FS.DETECTED.userHome());
+		result.setSshDirectory(sshDir);
+		return result;
+	}
+

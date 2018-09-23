@@ -1,0 +1,17 @@
+		private String absolute(String path) {
+			if (path.isEmpty()) {
+				return cwd;
+			}
+			// Note: there is no path injection vulnerability here. If
+			// path has too many ".." components, we rely on the server
+			// catching it and returning an error.
+			if (path.charAt(0) != '/') {
+				if (cwd.charAt(cwd.length() - 1) == '/') {
+					return cwd + path;
+				} else {
+					return cwd + '/' + path;
+				}
+			}
+			return path;
+		}
+

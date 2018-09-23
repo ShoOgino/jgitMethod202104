@@ -1,0 +1,35 @@
+	private SshFutureListener<IoConnectFuture> createConnectCompletionListener(
+			ConnectFuture connectFuture, String username,
+			InetSocketAddress address, HostConfigEntry hostConfig) {
+		return new SshFutureListener<IoConnectFuture>() {
+
+			@Override
+			public void operationComplete(IoConnectFuture future) {
+				if (future.isCanceled()) {
+					connectFuture.cancel();
+					return;
+				}
+				Throwable t = future.getException();
+				if (t != null) {
+					connectFuture.setException(t);
+					return;
+				}
+				IoSession ioSession = future.getSession();
+				try {
+					JGitClientSession session = createSession(ioSession,
+							username, address, hostConfig);
+					connectFuture.setSession(session);
+				} catch (RuntimeException e) {
+					connectFuture.setException(e);
+					ioSession.close(true);
+				}
+			}
+
+			@Override
+			public String toString() {
+				return "JGitSshClient$ConnectCompletionListener[" + username //$NON-NLS-1$
+						+ '@' + address + ']';
+			}
+		};
+	}
+

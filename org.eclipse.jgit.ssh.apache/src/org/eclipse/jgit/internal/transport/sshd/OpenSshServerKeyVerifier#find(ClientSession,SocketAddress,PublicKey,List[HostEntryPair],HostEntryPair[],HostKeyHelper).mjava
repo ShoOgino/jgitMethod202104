@@ -1,0 +1,32 @@
+	private boolean find(ClientSession clientSession,
+			SocketAddress remoteAddress, PublicKey serverKey,
+			List<HostEntryPair> entries, HostEntryPair[] modified,
+			HostKeyHelper helper) throws RevokedKeyException {
+		Collection<SshdSocketAddress> candidates = helper
+				.resolveHostNetworkIdentities(clientSession, remoteAddress);
+		for (HostEntryPair current : entries) {
+			KnownHostEntry entry = current.getHostEntry();
+			for (SshdSocketAddress host : candidates) {
+				if (entry.isHostMatch(host.getHostName(), host.getPort())) {
+					boolean isRevoked = MARKER_REVOKED
+							.equals(entry.getMarker());
+					if (KeyUtils.compareKeys(serverKey,
+							current.getServerKey())) {
+						// Exact match
+						if (isRevoked) {
+							throw new RevokedKeyException();
+						}
+						modified[0] = null;
+						return true;
+					} else if (!isRevoked) {
+						// Server sent a different key
+						modified[0] = current;
+						// Keep going -- maybe there's another entry for this
+						// host
+					}
+				}
+			}
+		}
+		return false;
+	}
+

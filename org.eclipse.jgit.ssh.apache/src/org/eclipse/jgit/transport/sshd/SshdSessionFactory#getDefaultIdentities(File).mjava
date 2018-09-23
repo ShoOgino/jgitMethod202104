@@ -1,0 +1,19 @@
+	/**
+	 * Gets a list of default identities, i.e., private key files that shall
+	 * always be tried for public key authentication. Typically those are
+	 * ~/.ssh/id_dsa, ~/.ssh/id_rsa, and so on. The default implementation
+	 * returns the files defined in {@link SshConstants#DEFAULT_IDENTITIES}.
+	 *
+	 * @param sshDir
+	 *            the directory that represents ~/.ssh/
+	 * @return a possibly empty list of paths containing default identities
+	 *         (private keys)
+	 */
+	@NonNull
+	protected List<Path> getDefaultIdentities(@NonNull File sshDir) {
+		return Arrays
+				.asList(SshConstants.DEFAULT_IDENTITIES).stream()
+				.map(s -> new File(sshDir, s).toPath()).filter(Files::exists)
+				.collect(Collectors.toList());
+	}
+

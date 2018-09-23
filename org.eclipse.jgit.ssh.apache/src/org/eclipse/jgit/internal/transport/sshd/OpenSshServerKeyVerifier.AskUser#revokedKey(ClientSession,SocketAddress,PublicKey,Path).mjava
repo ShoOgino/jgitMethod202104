@@ -1,0 +1,22 @@
+		public void revokedKey(ClientSession clientSession,
+				SocketAddress remoteAddress, PublicKey serverKey, Path path) {
+			CredentialsProvider provider = getCredentialsProvider(
+					clientSession);
+			if (provider == null) {
+				return;
+			}
+			InetSocketAddress remote = (InetSocketAddress) remoteAddress;
+			URIish uri = JGitUserInteraction.toURI(clientSession.getUsername(),
+					remote);
+			String sha256 = KeyUtils.getFingerPrint(BuiltinDigests.sha256,
+					serverKey);
+			String md5 = KeyUtils.getFingerPrint(BuiltinDigests.md5, serverKey);
+			String keyAlgorithm = serverKey.getAlgorithm();
+			askUser(provider, uri, null, //
+					format(SshdText.get().knownHostsRevokedKeyMsg,
+							remote.getHostString(), path),
+					format(SshdText.get().knownHostsKeyFingerprints,
+							keyAlgorithm),
+					md5, sha256);
+		}
+

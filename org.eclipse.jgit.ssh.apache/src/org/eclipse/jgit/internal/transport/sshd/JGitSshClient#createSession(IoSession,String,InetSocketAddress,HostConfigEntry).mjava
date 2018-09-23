@@ -1,0 +1,45 @@
+	private JGitClientSession createSession(IoSession ioSession,
+			String username, InetSocketAddress address,
+			HostConfigEntry hostConfig) {
+		AbstractSession rawSession = AbstractSession.getSession(ioSession);
+		if (!(rawSession instanceof JGitClientSession)) {
+			throw new IllegalStateException("Wrong session type: " //$NON-NLS-1$
+					+ rawSession.getClass().getCanonicalName());
+		}
+		JGitClientSession session = (JGitClientSession) rawSession;
+		session.setUsername(username);
+		session.setConnectAddress(address);
+		session.setHostConfigEntry(hostConfig);
+		if (session.getCredentialsProvider() == null) {
+			session.setCredentialsProvider(getCredentialsProvider());
+		}
+		FileKeyPairProvider ourConfiguredKeysProvider = null;
+		List<Path> identities = hostConfig.getIdentities().stream()
+				.map(s -> {
+					try {
+						return Paths.get(s);
+					} catch (InvalidPathException e) {
+						log.warn(format(SshdText.get().configInvalidPath,
+								SshConstants.IDENTITY_FILE, s), e);
+						return null;
+					}
+				}).filter(p -> p != null && Files.exists(p))
+				.collect(Collectors.toList());
+		ourConfiguredKeysProvider = new CachingKeyPairProvider(identities,
+				keyCache);
+		ourConfiguredKeysProvider.setPasswordFinder(getFilePasswordProvider());
+		if (hostConfig.isIdentitiesOnly()) {
+			session.setKeyPairProvider(ourConfiguredKeysProvider);
+		} else {
+			KeyPairProvider defaultKeysProvider = getKeyPairProvider();
+			if (defaultKeysProvider instanceof FileKeyPairProvider) {
+				((FileKeyPairProvider) defaultKeysProvider)
+						.setPasswordFinder(getFilePasswordProvider());
+			}
+			KeyPairProvider combinedProvider = new CombinedKeyPairProvider(
+					ourConfiguredKeysProvider, defaultKeysProvider);
+			session.setKeyPairProvider(combinedProvider);
+		}
+		return session;
+	}
+

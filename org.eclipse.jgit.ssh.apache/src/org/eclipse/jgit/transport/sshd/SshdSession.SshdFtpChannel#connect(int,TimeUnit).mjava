@@ -1,0 +1,19 @@
+		@Override
+		public void connect(int timeout, TimeUnit unit) throws IOException {
+			if (timeout <= 0) {
+				session.getProperties().put(
+						SftpClient.SFTP_CHANNEL_OPEN_TIMEOUT,
+						Long.valueOf(Long.MAX_VALUE));
+			} else {
+				session.getProperties().put(
+						SftpClient.SFTP_CHANNEL_OPEN_TIMEOUT,
+						Long.valueOf(unit.toMillis(timeout)));
+			}
+			ftp = SftpClientFactory.instance().createSftpClient(session);
+			try {
+				cd(cwd);
+			} catch (IOException e) {
+				ftp.close();
+			}
+		}
+

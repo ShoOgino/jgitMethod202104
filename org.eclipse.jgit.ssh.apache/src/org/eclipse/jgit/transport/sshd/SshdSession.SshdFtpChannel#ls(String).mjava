@@ -1,0 +1,40 @@
+		@Override
+		public Collection<DirEntry> ls(String path) throws IOException {
+			return map(() -> {
+				List<DirEntry> result = new ArrayList<>();
+				try (CloseableHandle handle = ftp.openDir(absolute(path))) {
+					AtomicReference<Boolean> atEnd = new AtomicReference<>(
+							Boolean.FALSE);
+					while (!atEnd.get().booleanValue()) {
+						List<SftpClient.DirEntry> chunk = ftp.readDir(handle,
+								atEnd);
+						if (chunk == null) {
+							break;
+						}
+						for (SftpClient.DirEntry remote : chunk) {
+							result.add(new DirEntry() {
+
+								@Override
+								public String getFilename() {
+									return remote.getFilename();
+								}
+
+								@Override
+								public long getModifiedTime() {
+									return remote.getAttributes()
+											.getModifyTime().toMillis();
+								}
+
+								@Override
+								public boolean isDirectory() {
+									return remote.getAttributes().isDirectory();
+								}
+
+							});
+						}
+					}
+				}
+				return result;
+			});
+		}
+

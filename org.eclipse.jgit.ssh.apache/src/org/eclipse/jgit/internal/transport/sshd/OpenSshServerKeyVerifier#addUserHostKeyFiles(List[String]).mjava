@@ -1,0 +1,19 @@
+	private List<HostKeyFile> addUserHostKeyFiles(List<String> fileNames) {
+		if (fileNames == null || fileNames.isEmpty()) {
+			return Collections.emptyList();
+		}
+		List<HostKeyFile> userFiles = new ArrayList<>();
+		for (String name : fileNames) {
+			try {
+				Path path = Paths.get(name);
+				HostKeyFile file = knownHostsFiles.computeIfAbsent(path,
+						p -> new HostKeyFile(path));
+				userFiles.add(file);
+			} catch (InvalidPathException e) {
+				LOG.warn(format(SshdText.get().knownHostsInvalidPath,
+						name));
+			}
+		}
+		return userFiles;
+	}
+

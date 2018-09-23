@@ -1,0 +1,26 @@
+		public boolean acceptUnknownKey(ClientSession clientSession,
+				SocketAddress remoteAddress, PublicKey serverKey) {
+			Check check = checkMode(clientSession, remoteAddress, false);
+			if (check != Check.ASK) {
+				return check == Check.ALLOW;
+			}
+			CredentialsProvider provider = getCredentialsProvider(
+					clientSession);
+			InetSocketAddress remote = (InetSocketAddress) remoteAddress;
+			// Ask the user
+			String sha256 = KeyUtils.getFingerPrint(BuiltinDigests.sha256,
+					serverKey);
+			String md5 = KeyUtils.getFingerPrint(BuiltinDigests.md5, serverKey);
+			String keyAlgorithm = serverKey.getAlgorithm();
+			String remoteHost = remote.getHostString();
+			URIish uri = JGitUserInteraction.toURI(clientSession.getUsername(),
+					remote);
+			String prompt = SshdText.get().knownHostsUnknownKeyPrompt;
+			return askUser(provider, uri, prompt, //
+					format(SshdText.get().knownHostsUnknownKeyMsg,
+							remoteHost),
+					format(SshdText.get().knownHostsKeyFingerprints,
+							keyAlgorithm),
+					md5, sha256);
+		}
+

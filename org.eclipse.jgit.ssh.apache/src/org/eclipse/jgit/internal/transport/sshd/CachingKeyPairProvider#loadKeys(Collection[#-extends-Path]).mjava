@@ -1,0 +1,8 @@
+	@Override
+	protected Iterable<KeyPair> loadKeys(Collection<? extends Path> resources) {
+		if (resources.isEmpty()) {
+			return Collections.emptyList();
+		}
+		return () -> new CancellingKeyPairIterator(resources);
+	}
+

@@ -1,0 +1,55 @@
+		public ModifiedKeyHandling acceptModifiedServerKey(
+				ClientSession clientSession,
+				SocketAddress remoteAddress, PublicKey expected,
+				PublicKey actual, Path path) {
+			Check check = checkMode(clientSession, remoteAddress, true);
+			if (check == Check.ALLOW) {
+				// Never auto-store on CHECK.ALLOW
+				return ModifiedKeyHandling.ALLOW;
+			}
+			InetSocketAddress remote = (InetSocketAddress) remoteAddress;
+			String keyAlgorithm = actual.getAlgorithm();
+			String remoteHost = remote.getHostString();
+			URIish uri = JGitUserInteraction.toURI(clientSession.getUsername(),
+					remote);
+			List<String> messages = new ArrayList<>();
+			String warning = format(
+					SshdText.get().knownHostsModifiedKeyWarning,
+					keyAlgorithm, expected.getAlgorithm(), remoteHost,
+					KeyUtils.getFingerPrint(BuiltinDigests.md5, expected),
+					KeyUtils.getFingerPrint(BuiltinDigests.sha256, expected),
+					KeyUtils.getFingerPrint(BuiltinDigests.md5, actual),
+					KeyUtils.getFingerPrint(BuiltinDigests.sha256, actual));
+			for (String line : warning.split("\n")) { //$NON-NLS-1$
+				messages.add(line);
+			}
+
+			CredentialsProvider provider = getCredentialsProvider(
+					clientSession);
+			if (check == Check.DENY) {
+				if (provider != null) {
+					messages.add(format(
+							SshdText.get().knownHostsModifiedKeyDenyMsg, path));
+					askUser(provider, uri, null,
+							messages.toArray(new String[0]));
+				}
+				return ModifiedKeyHandling.DENY;
+			}
+			// ASK -- two questions: procceed? and store?
+			List<CredentialItem> items = new ArrayList<>(messages.size() + 2);
+			for (String message : messages) {
+				items.add(new CredentialItem.InformationalMessage(message));
+			}
+			CredentialItem.YesNoType proceed = new CredentialItem.YesNoType(
+					SshdText.get().knownHostsModifiedKeyAcceptPrompt);
+			CredentialItem.YesNoType store = new CredentialItem.YesNoType(
+					SshdText.get().knownHostsModifiedKeyStorePrompt);
+			items.add(proceed);
+			items.add(store);
+			if (provider.get(uri, items) && proceed.getValue()) {
+				return store.getValue() ? ModifiedKeyHandling.ALLOW_AND_STORE
+						: ModifiedKeyHandling.ALLOW;
+			}
+			return ModifiedKeyHandling.DENY;
+		}
+

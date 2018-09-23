@@ -1,0 +1,29 @@
+	@Override
+	protected KeyPair doLoadKey(Path resource)
+			throws IOException, GeneralSecurityException {
+		// By calling doLoadKey(String, Path, FilePasswordProvider) instead of
+		// super.doLoadKey(Path) we can bypass the key caching in
+		// AbstractResourceKeyPairProvider, over which we have no real control.
+		String resourceId = resource.toString();
+		if (cache == null) {
+			return doLoadKey(resourceId, resource, getPasswordFinder());
+		}
+		Throwable t[] = { null };
+		KeyPair key = cache.get(resource, p -> {
+			try {
+				return doLoadKey(resourceId, p, getPasswordFinder());
+			} catch (IOException | GeneralSecurityException e) {
+				t[0] = e;
+				return null;
+			}
+		});
+		if (t[0] != null) {
+			if (t[0] instanceof CancellationException) {
+				throw (CancellationException) t[0];
+			}
+			throw new IOException(
+					format(SshdText.get().keyLoadFailed, resource), t[0]);
+		}
+		return key;
+	}
+

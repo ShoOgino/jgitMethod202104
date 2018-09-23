@@ -1,0 +1,12 @@
+	private void register(SshdSession newSession) throws IOException {
+		if (newSession == null) {
+			return;
+		}
+		if (closing.get()) {
+			throw new IOException(SshdText.get().sshClosingDown);
+		}
+		synchronized (this) {
+			sessions.add(newSession);
+		}
+	}
+

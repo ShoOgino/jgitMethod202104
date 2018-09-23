@@ -1,0 +1,31 @@
+	/**
+	 * Creates a new {@link SshdSessionFactory} using the given
+	 * {@link KeyCache}. The {@code keyCache} is used for all sessions created
+	 * through this session factory; cached keys are destroyed when the session
+	 * factory is {@link #close() closed}.
+	 * <p>
+	 * Caching ssh keys in memory for an extended period of time is generally
+	 * considered bad practice, but there may be circumstances where using a
+	 * {@link KeyCache} is still the right choice, for instance to avoid that a
+	 * user gets prompted several times for the same password for the same key.
+	 * In general, however, it is preferable <em>not</em> to use a key cache but
+	 * to use a {@link #createFilePasswordProvider(CredentialsProvider)
+	 * FilePasswordProvider} that has access to some secure storage and can save
+	 * and retrieve passwords from there without user interaction. Another
+	 * approach is to use an ssh agent.
+	 * </p>
+	 * <p>
+	 * Note that the underlying ssh library (Apache MINA sshd) may or may not
+	 * keep ssh keys in memory for unspecified periods of time irrespective of
+	 * the use of a {@link KeyCache}.
+	 * </p>
+	 *
+	 * @param keyCache
+	 *            {@link KeyCache} to use for caching ssh keys, or {@code null}
+	 *            to not use a key cache
+	 */
+	public SshdSessionFactory(KeyCache keyCache) {
+		super();
+		this.keyCache = keyCache;
+	}
+

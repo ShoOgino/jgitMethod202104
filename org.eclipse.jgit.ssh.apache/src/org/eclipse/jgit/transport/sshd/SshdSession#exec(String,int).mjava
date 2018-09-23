@@ -1,0 +1,31 @@
+	@Override
+	public Process exec(String commandName, int timeout) throws IOException {
+		@SuppressWarnings("resource")
+		ChannelExec exec = session.createExecChannel(commandName);
+		long timeoutMillis = TimeUnit.SECONDS.toMillis(timeout);
+		try {
+			if (timeout <= 0) {
+				exec.open().verify();
+			} else {
+				long start = System.nanoTime();
+				exec.open().verify(timeoutMillis);
+				timeoutMillis -= TimeUnit.NANOSECONDS
+						.toMillis(System.nanoTime() - start);
+			}
+		} catch (IOException e) {
+			exec.close(true);
+			throw e;
+		} catch (RuntimeException e) {
+			exec.close(true);
+			throw e;
+		}
+		if (timeout > 0 && timeoutMillis <= 0) {
+			// We have used up the whole timeout for opening the channel
+			exec.close(true);
+			throw new InterruptedIOException(
+					format(SshdText.get().sshCommandTimeout, commandName,
+							Integer.valueOf(timeout)));
+		}
+		return new SshdExecProcess(exec, commandName, timeoutMillis);
+	}
+

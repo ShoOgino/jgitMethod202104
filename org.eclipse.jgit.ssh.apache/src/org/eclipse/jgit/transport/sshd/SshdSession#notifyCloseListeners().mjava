@@ -1,0 +1,10 @@
+	private void notifyCloseListeners() {
+		for (SessionCloseListener l : listeners) {
+			try {
+				l.sessionClosed(this);
+			} catch (RuntimeException e) {
+				LOG.warn(SshdText.get().closeListenerFailed, e);
+			}
+		}
+	}
+

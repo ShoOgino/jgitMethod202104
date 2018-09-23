@@ -1,0 +1,14 @@
+	private void unregister(SshdSession oldSession) {
+		boolean cleanKeys = false;
+		synchronized (this) {
+			sessions.remove(oldSession);
+			cleanKeys = closing.get() && sessions.isEmpty();
+		}
+		if (cleanKeys) {
+			KeyCache cache = getKeyCache();
+			if (cache != null) {
+				cache.close();
+			}
+		}
+	}
+

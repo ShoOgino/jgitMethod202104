@@ -1,0 +1,17 @@
+	@Override
+	public void close() {
+		Map<Path, KeyPair> map = cache.getAndSet(null);
+		if (map == null) {
+			return;
+		}
+		for (KeyPair k : map.values()) {
+			PrivateKey p = k.getPrivate();
+			try {
+				p.destroy();
+			} catch (DestroyFailedException e) {
+				// Ignore here. We did our best.
+			}
+		}
+		map.clear();
+	}
+

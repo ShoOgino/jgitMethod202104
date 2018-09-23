@@ -1,0 +1,20 @@
+	/**
+	 * Obtain a {@link HostConfigEntryResolver} to read the ssh config file and
+	 * to determine host entries for connections.
+	 *
+	 * @param homeDir
+	 *            home directory to use for ~ replacement
+	 * @param sshDir
+	 *            to use for looking for the config file
+	 * @return the resolver
+	 */
+	@NonNull
+	protected HostConfigEntryResolver getHostConfigEntryResolver(
+			@NonNull File homeDir, @NonNull File sshDir) {
+		return defaultHostConfigEntryResolver.computeIfAbsent(
+				new Tuple(homeDir, sshDir),
+				t -> new JGitSshConfig(homeDir,
+						new File(sshDir, SshConstants.CONFIG),
+						getLocalUserName()));
+	}
+

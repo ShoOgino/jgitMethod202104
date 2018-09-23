@@ -1,0 +1,46 @@
+		@Override
+		public Iterable<KeyPair> loadKeys() {
+			return () -> new Iterator<KeyPair>() {
+
+				private Iterator<KeyPairProvider> factories = providers.iterator();
+				private Iterator<KeyPair> current;
+
+				private Boolean hasElement;
+
+				@Override
+				public boolean hasNext() {
+					if (hasElement != null) {
+						return hasElement.booleanValue();
+					}
+					while (current == null || !current.hasNext()) {
+						if (factories.hasNext()) {
+							current = factories.next().loadKeys().iterator();
+						} else {
+							current = null;
+							hasElement = Boolean.FALSE;
+							return false;
+						}
+					}
+					hasElement = Boolean.TRUE;
+					return true;
+				}
+
+				@Override
+				public KeyPair next() {
+					if (hasElement == null && !hasNext()
+							|| !hasElement.booleanValue()) {
+						throw new NoSuchElementException();
+					}
+					hasElement = null;
+					KeyPair result;
+					try {
+						result = current.next();
+					} catch (NoSuchElementException e) {
+						result = null;
+					}
+					return result;
+				}
+
+			};
+		}
+

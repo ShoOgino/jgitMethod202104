@@ -1,0 +1,18 @@
+	private void disconnect(Throwable reason) {
+		try {
+			if (session != null) {
+				session.close();
+				session = null;
+			}
+		} catch (IOException e) {
+			if (reason != null) {
+				reason.addSuppressed(e);
+			} else {
+				LOG.error(SshdText.get().sessionCloseFailed, e);
+			}
+		} finally {
+			client.stop();
+			client = null;
+		}
+	}
+

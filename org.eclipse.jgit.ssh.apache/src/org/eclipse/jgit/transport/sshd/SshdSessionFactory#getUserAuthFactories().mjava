@@ -1,0 +1,15 @@
+	/**
+	 * Gets the user authentication mechanisms (or rather, factories for them).
+	 * By default this returns public-key, keyboard-interactive, and password,
+	 * in that order. (I.e., we don't do gssapi-with-mic or hostbased (yet)).
+	 *
+	 * @return the non-empty list of factories.
+	 */
+	@NonNull
+	protected List<NamedFactory<UserAuth>> getUserAuthFactories() {
+		return Collections.unmodifiableList(
+				Arrays.asList(JGitPublicKeyAuthFactory.INSTANCE,
+						UserAuthKeyboardInteractiveFactory.INSTANCE,
+						UserAuthPasswordFactory.INSTANCE));
+	}
+

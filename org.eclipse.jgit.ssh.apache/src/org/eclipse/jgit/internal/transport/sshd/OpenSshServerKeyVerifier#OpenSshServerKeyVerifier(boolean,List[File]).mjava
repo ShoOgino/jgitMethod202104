@@ -1,0 +1,23 @@
+	/**
+	 * Creates a new {@link OpenSshServerKeyVerifier}.
+	 *
+	 * @param askAboutNewFile
+	 *            whether to ask the user, if possible, about creating a new
+	 *            non-existing known_hosts file
+	 * @param defaultFiles
+	 *            typically ~/.ssh/known_hosts and ~/.ssh/known_hosts2. May be
+	 *            empty or {@code null}, in which case no default files are
+	 *            installed. The files need not exist.
+	 */
+	public OpenSshServerKeyVerifier(boolean askAboutNewFile, List<File> defaultFiles) {
+		if (defaultFiles != null) {
+			for (File file : defaultFiles) {
+				Path p = file.toPath();
+				HostKeyFile newFile = new HostKeyFile(p);
+				knownHostsFiles.put(p, newFile);
+				this.defaultFiles.add(newFile);
+			}
+		}
+		this.askAboutNewFile = askAboutNewFile;
+	}
+

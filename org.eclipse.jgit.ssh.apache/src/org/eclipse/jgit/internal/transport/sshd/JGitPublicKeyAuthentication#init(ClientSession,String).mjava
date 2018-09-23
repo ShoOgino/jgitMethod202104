@@ -1,0 +1,12 @@
+	@Override
+	public void init(ClientSession session, String service) throws Exception {
+		// Do *not* call super.init(); it'll create a UserAuthPublicKeyIterator
+		// and that's where things then go wrong. Instead, do the whole
+		// initialization directly here.
+		clientSession = session;
+		serviceName = service;
+		releaseKeys();
+		// Use our own iterator!
+		keys = new JGitPublicKeyIterator(session, this);
+	}
+

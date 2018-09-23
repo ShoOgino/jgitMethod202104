@@ -1,0 +1,52 @@
+	private void updateModifiedServerKey(ClientSession clientSession,
+			SocketAddress remoteAddress, PublicKey serverKey,
+			HostEntryPair entry, Path path, HostKeyHelper helper)
+			throws IOException {
+		KnownHostEntry hostEntry = entry.getHostEntry();
+		String oldLine = hostEntry.getConfigLine();
+		String newLine = helper.prepareModifiedServerKeyLine(clientSession,
+				remoteAddress, hostEntry, oldLine, entry.getServerKey(),
+				serverKey);
+		if (newLine == null || newLine.isEmpty()) {
+			return;
+		}
+		if (oldLine == null || oldLine.isEmpty() || newLine.equals(oldLine)) {
+			// Shouldn't happen.
+			return;
+		}
+		LockFile lock = new LockFile(path.toFile());
+		if (lock.lock()) {
+			try {
+				try (BufferedWriter writer = new BufferedWriter(
+						new OutputStreamWriter(lock.getOutputStream(),
+								StandardCharsets.UTF_8));
+						BufferedReader reader = Files.newBufferedReader(path,
+								StandardCharsets.UTF_8)) {
+					boolean done = false;
+					String line;
+					while ((line = reader.readLine()) != null) {
+						String toWrite = line;
+						if (!done) {
+							int pos = line.indexOf('#');
+							String toTest = pos < 0 ? line
+									: line.substring(0, pos);
+							if (toTest.trim().equals(oldLine)) {
+								toWrite = newLine;
+								done = true;
+							}
+						}
+						writer.write(toWrite);
+						writer.newLine();
+					}
+				}
+				lock.commit();
+			} catch (IOException e) {
+				lock.unlock();
+				throw e;
+			}
+		} else {
+			LOG.warn(format(SshdText.get().knownHostsFileLockedUpdate,
+					path));
+		}
+	}
+

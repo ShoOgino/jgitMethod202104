@@ -1,0 +1,46 @@
+	/**
+	 * Creates a new {@link JGitPublicKeyIterator}.
+	 *
+	 * @param session
+	 *            we're trying to authenticate
+	 * @param signatureFactories
+	 *            to use
+	 * @throws Exception
+	 *             if an {@link SshAgentFactory} is configured and getting
+	 *             identities from the agent fails
+	 */
+	public JGitPublicKeyIterator(ClientSession session,
+			SignatureFactoriesManager signatureFactories) throws Exception {
+		super(session);
+		boolean useAgent = true;
+		if (session instanceof JGitClientSession) {
+			HostConfigEntry config = ((JGitClientSession) session)
+					.getHostConfigEntry();
+			useAgent = !config.isIdentitiesOnly();
+		}
+		if (useAgent) {
+			FactoryManager manager = session.getFactoryManager();
+			SshAgentFactory factory = manager == null ? null
+					: manager.getAgentFactory();
+			if (factory != null) {
+				try {
+					agent = factory.createClient(manager);
+					keys.add(new AgentIdentityIterator(agent));
+				} catch (IOException e) {
+					try {
+						closeAgent();
+					} catch (IOException err) {
+						e.addSuppressed(err);
+					}
+					throw e;
+				}
+			}
+		}
+		keys.add(
+				new KeyPairIdentityIterator(session.getRegisteredIdentities(),
+						session, signatureFactories));
+		keys.add(new KeyPairIdentityIterator(session.getKeyPairProvider(),
+				session, signatureFactories));
+		keyIter = keys.iterator();
+	}
+

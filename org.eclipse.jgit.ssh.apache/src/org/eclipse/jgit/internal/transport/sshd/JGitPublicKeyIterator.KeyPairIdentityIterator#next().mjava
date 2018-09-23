@@ -1,0 +1,9 @@
+		@Override
+		public PublicKeyIdentity next() {
+			if (keyPairs == null) {
+				throw new NoSuchElementException();
+			}
+			KeyPair key = keyPairs.next();
+			return new KeyPairIdentity(signatureFactories, session, key);
+		}
+

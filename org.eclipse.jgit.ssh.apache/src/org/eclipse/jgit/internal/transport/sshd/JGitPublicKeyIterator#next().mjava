@@ -1,0 +1,16 @@
+	@Override
+	public PublicKeyIdentity next() {
+		if (!isOpen() || hasElement == null && !hasNext()
+				|| !hasElement.booleanValue()) {
+			throw new NoSuchElementException();
+		}
+		hasElement = null;
+		PublicKeyIdentity result;
+		try {
+			result = current.next();
+		} catch (NoSuchElementException e) {
+			result = null;
+		}
+		return result;
+	}
+

@@ -1,0 +1,14 @@
+		@Override
+		public KeyPair next() {
+			if (!nextSet && !hasNext()) {
+				throw new NoSuchElementException();
+			}
+			KeyPair result = nextItem;
+			nextItem = null;
+			nextSet = false;
+			if (result == null) {
+				throw new NoSuchElementException();
+			}
+			return result;
+		}
+

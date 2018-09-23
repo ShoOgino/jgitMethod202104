@@ -1,0 +1,15 @@
+	@Override
+	public void close() {
+		closing.set(true);
+		boolean cleanKeys = false;
+		synchronized (this) {
+			cleanKeys = sessions.isEmpty();
+		}
+		if (cleanKeys) {
+			KeyCache cache = getKeyCache();
+			if (cache != null) {
+				cache.close();
+			}
+		}
+	}
+

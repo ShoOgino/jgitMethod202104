@@ -1,0 +1,21 @@
+	@Override
+	public ConnectFuture connect(HostConfigEntry hostConfig)
+			throws IOException {
+		if (connector == null) {
+			throw new IllegalStateException("SshClient not started."); //$NON-NLS-1$
+		}
+		Objects.requireNonNull(hostConfig, "No host configuration"); //$NON-NLS-1$
+		String host = ValidateUtils.checkNotNullAndNotEmpty(
+				hostConfig.getHostName(), "No target host"); //$NON-NLS-1$
+		int port = hostConfig.getPort();
+		ValidateUtils.checkTrue(port > 0, "Invalid port: %d", port); //$NON-NLS-1$
+		String userName = hostConfig.getUsername();
+		InetSocketAddress address = new InetSocketAddress(host, port);
+		ConnectFuture connectFuture = new DefaultConnectFuture(
+				userName + '@' + address, null);
+		SshFutureListener<IoConnectFuture> listener = createConnectCompletionListener(
+				connectFuture, userName, address, hostConfig);
+		connector.connect(address).addListener(listener);
+		return connectFuture;
+	}
+

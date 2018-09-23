@@ -1,0 +1,14 @@
+	/**
+	 * Determines a {@link KeyPairProvider} to use to load the default keys.
+	 *
+	 * @param sshDir
+	 *            to look in for keys
+	 * @return the {@link KeyPairProvider}
+	 */
+	@NonNull
+	protected KeyPairProvider getDefaultKeysProvider(@NonNull File sshDir) {
+		return defaultKeys.computeIfAbsent(new Tuple(sshDir),
+				t -> new CachingKeyPairProvider(getDefaultIdentities(sshDir),
+						getKeyCache()));
+	}
+

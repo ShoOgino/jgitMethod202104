@@ -1,0 +1,80 @@
+	@Override
+	public boolean verifyServerKey(ClientSession clientSession,
+			SocketAddress remoteAddress, PublicKey serverKey) {
+		List<HostKeyFile> filesToUse = defaultFiles;
+		if (clientSession instanceof JGitClientSession) {
+			HostConfigEntry entry = ((JGitClientSession) clientSession)
+					.getHostConfigEntry();
+			if (entry instanceof JGitHostConfigEntry) {
+				// Always true!
+				List<HostKeyFile> userFiles = addUserHostKeyFiles(
+						((JGitHostConfigEntry) entry).getMultiValuedOptions()
+								.get(SshConstants.USER_KNOWN_HOSTS_FILE));
+				if (!userFiles.isEmpty()) {
+					filesToUse = userFiles;
+				}
+			}
+		}
+		AskUser ask = new AskUser();
+		HostEntryPair[] modified = { null };
+		Path path = null;
+		HostKeyHelper helper = new HostKeyHelper();
+		for (HostKeyFile file : filesToUse) {
+			try {
+				if (find(clientSession, remoteAddress, serverKey, file.get(),
+						modified, helper)) {
+					return true;
+				}
+			} catch (RevokedKeyException e) {
+				ask.revokedKey(clientSession, remoteAddress, serverKey,
+						file.getPath());
+				return false;
+			}
+			if (path == null && modified[0] != null) {
+				// Remember the file in which we might need to update the
+				// entry
+				path = file.getPath();
+			}
+		}
+		if (modified[0] != null) {
+			// We found an entry, but with a different key
+			ModifiedKeyHandling toDo = ask.acceptModifiedServerKey(
+					clientSession, remoteAddress, modified[0].getServerKey(),
+					serverKey, path);
+			if (toDo == ModifiedKeyHandling.ALLOW_AND_STORE) {
+				try {
+					updateModifiedServerKey(clientSession, remoteAddress,
+							serverKey, modified[0], path, helper);
+					knownHostsFiles.get(path).resetReloadAttributes();
+				} catch (IOException e) {
+					LOG.warn(format(SshdText.get().knownHostsCouldNotUpdate,
+							path));
+				}
+			}
+			if (toDo == ModifiedKeyHandling.DENY) {
+				return false;
+			}
+			// TODO: OpenSsh disables password and keyboard-interactive
+			// authentication in this case. Also agent and local port forwarding
+			// are switched off. (Plus a few other things such as X11 forwarding
+			// that are of no interest to a git client.)
+			return true;
+		} else if (ask.acceptUnknownKey(clientSession, remoteAddress,
+				serverKey)) {
+			if (!filesToUse.isEmpty()) {
+				HostKeyFile toUpdate = filesToUse.get(0);
+				path = toUpdate.getPath();
+				try {
+					updateKnownHostsFile(clientSession, remoteAddress,
+							serverKey, path, helper);
+					toUpdate.resetReloadAttributes();
+				} catch (IOException e) {
+					LOG.warn(format(SshdText.get().knownHostsCouldNotUpdate,
+							path));
+				}
+			}
+			return true;
+		}
+		return false;
+	}
+

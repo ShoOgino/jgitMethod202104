@@ -1,0 +1,11 @@
+		@Override
+		public int exitValue() {
+			Integer exitCode = channel.getExitStatus();
+			if (exitCode == null) {
+				throw new IllegalThreadStateException(
+						format(SshdText.get().sshProcessStillRunning,
+								commandName));
+			}
+			return exitCode.intValue();
+		}
+
