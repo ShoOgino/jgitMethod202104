@@ -18,9 +18,7 @@
 			@NonNull Repository repository, @NonNull byte[] hostKey)
 			throws IOException, GeneralSecurityException {
 		this.testUser = testUser;
-		this.testKey = IdentityUtils
-				.loadIdentities(Collections.singletonMap("A", testKey), null)
-				.get("A").getPublic();
+		setTestUserPublicKey(testKey);
 		this.repository = repository;
 		server = SshServer.setUpDefaultServer();
 		// Set host key
@@ -62,9 +60,10 @@
 					.compareKeys(SshTestGitServer.this.testKey, publicKey);
 		});
 		server.setCommandFactory(command -> {
-			if (command.startsWith("git-upload-pack")
-					|| command.startsWith("git upload-pack")) {
+			if (command.startsWith(RemoteConfig.DEFAULT_UPLOAD_PACK)) {
 				return new GitUploadPackCommand(command, executorService);
+			} else if (command.startsWith(RemoteConfig.DEFAULT_RECEIVE_PACK)) {
+				return new GitReceivePackCommand(command, executorService);
 			}
 			return new UnknownCommand(command);
 		});

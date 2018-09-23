@@ -1,0 +1,18 @@
+	@Test(expected = TransportException.class)
+	public void testSshModifiedHostKeyDeny()
+			throws Exception {
+		File copiedHosts = new File(knownHosts.getParentFile(),
+				"copiedKnownHosts");
+		assertTrue("Failed to rename known_hosts",
+				knownHosts.renameTo(copiedHosts));
+		// Now produce a new known_hosts file containing some other key.
+		createKnownHostsFile(knownHosts, "localhost", testPort, publicKey1);
+		cloneWith("ssh://localhost/doesntmatter", defaultCloneDir, null, //
+				"Host localhost", //
+				"HostName localhost", //
+				"Port " + testPort, //
+				"User " + TEST_USER, //
+				"StrictHostKeyChecking yes", //
+				"IdentityFile " + privateKey1.getAbsolutePath());
+	}
+

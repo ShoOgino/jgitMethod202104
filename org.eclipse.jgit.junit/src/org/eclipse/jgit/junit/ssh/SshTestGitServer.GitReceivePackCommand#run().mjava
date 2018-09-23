@@ -1,0 +1,14 @@
+		@Override
+		public void run() {
+			try {
+				new ReceivePack(repository).receive(getInputStream(),
+						getOutputStream(), getErrorStream());
+				onExit(0);
+			} catch (IOException e) {
+				log.warn(
+						MessageFormat.format("Could not run {0}", getCommand()),
+						e);
+				onExit(-1, e.toString());
+			}
+		}
+

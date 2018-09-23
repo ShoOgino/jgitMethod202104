@@ -1,0 +1,26 @@
+	private void checkKnownHostsModifiedHostKey(File backup, File newFile,
+			String wrongKey) throws IOException {
+		List<String> oldLines = Files.readAllLines(backup.toPath(),
+				StandardCharsets.UTF_8);
+		// Find the original entry. We should have that again in known_hosts.
+		String oldKeyPart = null;
+		for (String oldLine : oldLines) {
+			if (oldLine.contains("[localhost]:")) {
+				String[] parts = oldLine.split("\\s+");
+				if (parts.length > 2) {
+					oldKeyPart = parts[parts.length - 2] + ' '
+							+ parts[parts.length - 1];
+					break;
+				}
+			}
+		}
+		assertNotNull("Old key not found", oldKeyPart);
+		List<String> newLines = Files.readAllLines(newFile.toPath(),
+				StandardCharsets.UTF_8);
+		assertFalse("Old host key still found in known_hosts file" + newFile,
+				hasHostKey("localhost", testPort, wrongKey, newLines));
+		assertTrue("New host key not found in known_hosts file" + newFile,
+				hasHostKey("localhost", testPort, oldKeyPart, newLines));
+
+	}
+

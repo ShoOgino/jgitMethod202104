@@ -1,0 +1,21 @@
+	@Test
+	public void testSshWithConfigEncryptedUnusedKeyInConfigLast()
+			throws Exception {
+		// Copy the encrypted test key from the bundle.
+		File encryptedKey = new File(sshDir, "id_dsa_test_key");
+		copyTestResource("id_dsa_testpass", encryptedKey);
+		TestCredentialsProvider provider = new TestCredentialsProvider(
+				"testpass");
+		cloneWith("ssh://localhost/doesntmatter", defaultCloneDir, provider, //
+				"Host localhost", //
+				"HostName localhost", //
+				"Port " + testPort, //
+				"User " + TEST_USER, //
+				"IdentityFile " + privateKey1.getAbsolutePath(),
+				"IdentityFile " + encryptedKey.getAbsolutePath());
+		// This test passes with JSch per chance because JSch completely ignores
+		// the second IdentityFile
+		assertEquals("CredentialsProvider should not have been called", 0,
+				provider.getLog().size());
+	}
+

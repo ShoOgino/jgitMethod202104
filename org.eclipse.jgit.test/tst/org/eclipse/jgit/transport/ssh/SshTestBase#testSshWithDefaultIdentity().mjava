@@ -1,9 +1,9 @@
 	@Test
-	public void testSshCloneWithDefaultIdentity() throws Exception {
+	public void testSshWithDefaultIdentity() throws Exception {
 		File idRsa = new File(privateKey1.getParentFile(), "id_rsa");
 		Files.copy(privateKey1.toPath(), idRsa.toPath());
 		// We expect the session factory to pick up these keys...
 		cloneWith("ssh://" + TEST_USER + "@localhost:" + testPort
-				+ "/doesntmatter", null);
+				+ "/doesntmatter", defaultCloneDir, null);
 	}
 

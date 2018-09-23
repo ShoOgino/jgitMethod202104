@@ -1,17 +1,20 @@
 	@Test
-	public void testSshCloneWithoutKnownHostsWithProvider() throws Exception {
+	public void testSshModifiedHostKeyAsk() throws Exception {
 		File copiedHosts = new File(knownHosts.getParentFile(),
 				"copiedKnownHosts");
 		assertTrue("Failed to rename known_hosts",
 				knownHosts.renameTo(copiedHosts));
+		String wrongKeyPart = createKnownHostsFile(knownHosts, "localhost",
+				testPort, publicKey1);
 		TestCredentialsProvider provider = new TestCredentialsProvider();
-		cloneWith("ssh://localhost/doesntmatter", provider, //
+		cloneWith("ssh://localhost/doesntmatter", defaultCloneDir, provider, //
 				"Host localhost", //
 				"HostName localhost", //
 				"Port " + testPort, //
 				"User " + TEST_USER, //
 				"IdentityFile " + privateKey1.getAbsolutePath());
-		Map<URIish, List<CredentialItem>> messages = provider.getLog();
-		assertFalse("Expected user iteraction", messages.isEmpty());
+		checkKnownHostsModifiedHostKey(copiedHosts, knownHosts, wrongKeyPart);
+		assertEquals("Expected to be asked about the modified key", 1,
+				provider.getLog().size());
 	}
 

@@ -1,0 +1,31 @@
+	/**
+	 * Creates a new known_hosts file with one entry for the given host and port
+	 * taken from the given public key file.
+	 *
+	 * @param file
+	 *            to write the known_hosts file to
+	 * @param host
+	 *            for the entry
+	 * @param port
+	 *            for the entry
+	 * @param publicKey
+	 *            to use
+	 * @return the public-key part of the line
+	 * @throws IOException
+	 */
+	protected static String createKnownHostsFile(File file, String host,
+			int port, File publicKey) throws IOException {
+		List<String> lines = Files.readAllLines(publicKey.toPath(),
+				StandardCharsets.UTF_8);
+		assertEquals("Public key has too many lines", 1, lines.size());
+		String pubKey = lines.get(0);
+		// Strip off the comment.
+		String[] parts = pubKey.split("\\s+");
+		assertTrue("Unexpected key content",
+				parts.length == 2 || parts.length == 3);
+		String keyPart = parts[0] + ' ' + parts[1];
+		String line = '[' + host + "]:" + port + ' ' + keyPart;
+		Files.write(file.toPath(), Collections.singletonList(line));
+		return keyPart;
+	}
+

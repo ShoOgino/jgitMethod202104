@@ -1,0 +1,27 @@
+	@Test(expected = TransportException.class)
+	public void testSshModifiedHostKeyWithProviderDeny() throws Exception {
+		File copiedHosts = new File(knownHosts.getParentFile(),
+				"copiedKnownHosts");
+		assertTrue("Failed to rename known_hosts",
+				knownHosts.renameTo(copiedHosts));
+		// Now produce a new known_hosts file containing some other key.
+		createKnownHostsFile(knownHosts, "localhost", testPort, publicKey1);
+		TestCredentialsProvider provider = new TestCredentialsProvider();
+		try {
+			cloneWith("ssh://localhost/doesntmatter", defaultCloneDir, provider, //
+					"Host localhost", //
+					"HostName localhost", //
+					"Port " + testPort, //
+					"User " + TEST_USER, //
+					"StrictHostKeyChecking yes", //
+					"IdentityFile " + privateKey1.getAbsolutePath());
+		} catch (Exception e) {
+			assertEquals("Expected to be told about the modified key", 1,
+					provider.getLog().size());
+			assertTrue("Only messages expected", provider.getLog().values()
+					.stream().flatMap(List::stream).allMatch(
+							c -> c instanceof CredentialItem.InformationalMessage));
+			throw e;
+		}
+	}
+

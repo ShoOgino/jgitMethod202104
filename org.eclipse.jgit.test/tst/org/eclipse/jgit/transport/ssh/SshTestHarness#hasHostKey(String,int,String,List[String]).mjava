@@ -1,0 +1,21 @@
+	/**
+	 * Checks whether there is a line for the given host and port that also
+	 * matches the given key part in the list of lines.
+	 *
+	 * @param host
+	 *            to look for
+	 * @param port
+	 *            to look for
+	 * @param keyPart
+	 *            to look for
+	 * @param lines
+	 *            to look in
+	 * @return {@code true} if found, {@code false} otherwise
+	 */
+	protected boolean hasHostKey(String host, int port, String keyPart,
+			List<String> lines) {
+		String h = '[' + host + "]:" + port;
+		return lines.stream()
+				.anyMatch(l -> l.contains(h) && l.contains(keyPart));
+	}
+

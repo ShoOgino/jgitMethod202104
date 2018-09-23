@@ -19,11 +19,11 @@
 		// Create two key pairs. Let's not call them "id_rsa".
 		privateKey1 = new File(sshDir, "first_key");
 		privateKey2 = new File(sshDir, "second_key");
-		createKeyPair(privateKey1);
+		publicKey1 = createKeyPair(privateKey1);
 		createKeyPair(privateKey2);
 		ByteArrayOutputStream publicHostKey = new ByteArrayOutputStream();
 		// Start a server with our test user and the first key.
-		server = new SshTestGitServer(TEST_USER, privateKey1.toPath(), db,
+		server = new SshTestGitServer(TEST_USER, publicKey1.toPath(), db,
 				createHostKey(publicHostKey));
 		testPort = server.start();
 		assertTrue(testPort > 0);

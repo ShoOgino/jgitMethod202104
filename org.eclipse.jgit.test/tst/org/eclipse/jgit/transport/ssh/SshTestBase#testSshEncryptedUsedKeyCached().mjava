@@ -1,0 +1,23 @@
+	@Test
+	public void testSshEncryptedUsedKeyCached() throws Exception {
+		// Make sure we are asked for the password only once if we do several
+		// operations with an encrypted key.
+		File encryptedKey = new File(sshDir, "id_dsa_test_key");
+		copyTestResource("id_dsa_testpass", encryptedKey);
+		File encryptedPublicKey = new File(sshDir, "id_dsa_test_key.pub");
+		copyTestResource("id_dsa_testpass.pub", encryptedPublicKey);
+		server.setTestUserPublicKey(encryptedPublicKey.toPath());
+		TestCredentialsProvider provider = new TestCredentialsProvider(
+				"testpass");
+		pushTo(provider,
+				cloneWith("ssh://localhost/doesntmatter", //
+						defaultCloneDir, provider, //
+						"Host localhost", //
+						"HostName localhost", //
+						"Port " + testPort, //
+						"User " + TEST_USER, //
+						"IdentityFile " + encryptedKey.getAbsolutePath()));
+		assertEquals("CredentialsProvider should have been called once", 1,
+				provider.getLog().size());
+	}
+

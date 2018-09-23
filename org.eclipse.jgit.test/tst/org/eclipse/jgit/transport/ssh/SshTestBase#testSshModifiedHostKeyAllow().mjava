@@ -1,0 +1,24 @@
+	@Test
+	public void testSshModifiedHostKeyAllow() throws Exception {
+		assertTrue("Failed to delete known_hosts", knownHosts.delete());
+		createKnownHostsFile(knownHosts, "localhost", testPort, publicKey1);
+		File backup = new File(getTemporaryDirectory(), "backupKnownHosts");
+		Files.copy(knownHosts.toPath(), backup.toPath());
+		cloneWith("ssh://localhost/doesntmatter", defaultCloneDir, null, //
+				"Host localhost", //
+				"HostName localhost", //
+				"Port " + testPort, //
+				"User " + TEST_USER, //
+				"StrictHostKeyChecking no", //
+				"IdentityFile " + privateKey1.getAbsolutePath());
+		// File should not have been updated!
+		String[] oldLines = Files
+				.readAllLines(backup.toPath(), StandardCharsets.UTF_8)
+				.toArray(new String[0]);
+		String[] newLines = Files
+				.readAllLines(knownHosts.toPath(), StandardCharsets.UTF_8)
+				.toArray(new String[0]);
+		assertArrayEquals("Known hosts file should not be modified", oldLines,
+				newLines);
+	}
+

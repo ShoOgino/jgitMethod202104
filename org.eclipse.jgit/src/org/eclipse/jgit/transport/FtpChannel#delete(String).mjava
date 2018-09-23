@@ -1,0 +1,22 @@
+	/**
+	 * Deletes a file on the remote file system. If the file does not exist, no
+	 * exception is thrown.
+	 *
+	 * @param path
+	 *            to delete
+	 * @throws IOException
+	 *             if the file exist but could not be deleted
+	 */
+	default void delete(String path) throws IOException {
+		try {
+			rm(path);
+		} catch (FileNotFoundException e) {
+			// Ignore; it's OK if the file doesn't exist
+		} catch (FtpException f) {
+			if (f.getStatus() == FtpException.NO_SUCH_FILE) {
+				return;
+			}
+			throw f;
+		}
+	}
+

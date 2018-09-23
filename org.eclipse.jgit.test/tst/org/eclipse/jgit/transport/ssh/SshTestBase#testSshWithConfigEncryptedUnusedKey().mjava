@@ -1,14 +1,11 @@
 	@Test
-	public void testSshCloneWithConfigEncryptedUnusedKey() throws Exception {
+	public void testSshWithConfigEncryptedUnusedKey() throws Exception {
 		// Copy the encrypted test key from the bundle.
 		File encryptedKey = new File(sshDir, "id_dsa");
-		try (InputStream in = SshTestBase.class
-				.getResourceAsStream("id_dsa_test")) {
-			Files.copy(in, encryptedKey.toPath());
-		}
+		copyTestResource("id_dsa_testpass", encryptedKey);
 		TestCredentialsProvider provider = new TestCredentialsProvider(
 				"testpass");
-		cloneWith("ssh://localhost/doesntmatter", provider, //
+		cloneWith("ssh://localhost/doesntmatter", defaultCloneDir, provider, //
 				"Host localhost", //
 				"HostName localhost", //
 				"Port " + testPort, //

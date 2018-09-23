@@ -1,0 +1,20 @@
+	/**
+	 * Copies a test data file contained in the test bundle to the given file,
+	 * using {@link Class#getResourceAsStream(String)} to get the test resource.
+	 *
+	 * @param loader
+	 *            {@link Class} to use to load the resource
+	 * @param resourceName
+	 *            of the test resource to copy
+	 * @param to
+	 *            file to copy the resource to
+	 * @throws IOException
+	 *             if the resource cannot be copied
+	 */
+	protected void copyTestResource(Class<?> loader, String resourceName,
+			File to) throws IOException {
+		try (InputStream in = loader.getResourceAsStream(resourceName)) {
+			Files.copy(in, to.toPath());
+		}
+	}
+
