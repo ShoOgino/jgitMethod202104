@@ -12,7 +12,8 @@
 		c = ((HttpURLConnection) uri.resolve("/a").toURL()
 				.openConnection());
 		assertEquals(200, c.getResponseCode());
-		r = new BufferedReader(new InputStreamReader(c.getInputStream()));
+		r = new BufferedReader(
+				new InputStreamReader(c.getInputStream(), UTF_8));
 		assertEquals("test", r.readLine());
 		assertEquals("", r.readLine());
 		assertEquals("/a", r.readLine());
@@ -21,7 +22,8 @@
 		c = ((HttpURLConnection) uri.resolve("/b").toURL()
 				.openConnection());
 		assertEquals(200, c.getResponseCode());
-		r = new BufferedReader(new InputStreamReader(c.getInputStream()));
+		r = new BufferedReader(
+				new InputStreamReader(c.getInputStream(), UTF_8));
 		assertEquals("test", r.readLine());
 		assertEquals("", r.readLine());
 		assertEquals("/b", r.readLine());

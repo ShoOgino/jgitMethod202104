@@ -13,7 +13,8 @@
 		c = ((HttpURLConnection) uri.resolve("/a").toURL()
 				.openConnection());
 		assertEquals(200, c.getResponseCode());
-		r = new BufferedReader(new InputStreamReader(c.getInputStream()));
+		r = new BufferedReader(
+				new InputStreamReader(c.getInputStream(), UTF_8));
 		assertEquals("test1", r.readLine());
 		assertEquals("", r.readLine());
 		assertEquals("/a", r.readLine());

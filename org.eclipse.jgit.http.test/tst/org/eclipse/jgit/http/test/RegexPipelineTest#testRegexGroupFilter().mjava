@@ -19,7 +19,8 @@
 		c = ((HttpURLConnection) uri.resolve("/a/b").toURL()
 				.openConnection());
 		assertEquals(200, c.getResponseCode());
-		r = new BufferedReader(new InputStreamReader(c.getInputStream()));
+		r = new BufferedReader(
+				new InputStreamReader(c.getInputStream(), UTF_8));
 		assertEquals("test1", r.readLine());
 		assertEquals("", r.readLine());
 		// No RegexGroupFilter defaults to first group.
@@ -29,7 +30,8 @@
 		c = ((HttpURLConnection) uri.resolve("/c/d").toURL()
 				.openConnection());
 		assertEquals(200, c.getResponseCode());
-		r = new BufferedReader(new InputStreamReader(c.getInputStream()));
+		r = new BufferedReader(
+				new InputStreamReader(c.getInputStream(), UTF_8));
 		assertEquals("test2", r.readLine());
 		assertEquals("", r.readLine());
 		assertEquals("/c", r.readLine());
@@ -38,7 +40,8 @@
 		c = ((HttpURLConnection) uri.resolve("/e/f/g").toURL()
 				.openConnection());
 		assertEquals(200, c.getResponseCode());
-		r = new BufferedReader(new InputStreamReader(c.getInputStream()));
+		r = new BufferedReader(
+				new InputStreamReader(c.getInputStream(), UTF_8));
 		assertEquals("test3", r.readLine());
 		assertEquals("/e/f", r.readLine());
 		assertEquals("/g", r.readLine());
