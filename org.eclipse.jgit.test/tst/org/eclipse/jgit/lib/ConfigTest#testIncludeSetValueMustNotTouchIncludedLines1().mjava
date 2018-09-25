@@ -8,7 +8,7 @@
 				21, 31, CoreConfig.AutoCRLF.FALSE,
 				"+refs/heads/*:refs/remotes/origin/*") + "\n[include]\npath="
 				+ pathToString(includedFile);
-		Files.write(configFile.toPath(), content.getBytes());
+		Files.write(configFile.toPath(), content.getBytes(UTF_8));
 
 		FileBasedConfig fbConfig = loadConfig(configFile);
 		assertValuesAsIncluded(fbConfig, REFS_ORIGIN, REFS_UPSTREAM);

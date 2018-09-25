@@ -5,13 +5,13 @@
 		RefSpec includedRefSpec = new RefSpec(REFS_UPSTREAM);
 		String includedContent = "[remote \"origin\"]\n" + "fetch="
 				+ includedRefSpec;
-		Files.write(includedFile.toPath(), includedContent.getBytes());
+		Files.write(includedFile.toPath(), includedContent.getBytes(UTF_8));
 
 		File configFile = tmp.newFile("config");
 		RefSpec refSpec = new RefSpec(REFS_ORIGIN);
 		String content = "[include]\npath=" + pathToString(includedFile) + "\n"
 				+ "[remote \"origin\"]\n" + "fetch=" + refSpec;
-		Files.write(configFile.toPath(), content.getBytes());
+		Files.write(configFile.toPath(), content.getBytes(UTF_8));
 
 		FileBasedConfig fbConfig = loadConfig(configFile);
 

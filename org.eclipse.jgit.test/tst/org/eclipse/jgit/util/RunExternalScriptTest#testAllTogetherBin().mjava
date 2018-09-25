@@ -4,7 +4,7 @@
 		File script = writeTempFile("echo $#,$1,$2,$3,$4,$5,$6 >&2 ; cat -; exit 5");
 		int rc = FS.DETECTED.runProcess(
 				new ProcessBuilder("sh", script.getPath(), "a", "b", "c"),
-				out, err, new ByteArrayInputStream(inputStr.getBytes()));
+				out, err, new ByteArrayInputStream(inputStr.getBytes(UTF_8)));
 		assertEquals(5, rc);
 		assertEquals(inputStr, new String(out.toByteArray(), UTF_8));
 		assertEquals("3,a,b,c,,," + LF, new String(err.toByteArray(), UTF_8));

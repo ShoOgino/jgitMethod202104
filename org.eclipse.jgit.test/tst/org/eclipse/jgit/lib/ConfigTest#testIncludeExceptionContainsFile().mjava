@@ -3,11 +3,11 @@
 		File included = tmp.newFile("included");
 		String includedPath = pathToString(included);
 		String content = "[include]\npath=\n";
-		Files.write(included.toPath(), content.getBytes());
+		Files.write(included.toPath(), content.getBytes(UTF_8));
 
 		File config = tmp.newFile("config");
 		String include = "[include]\npath=" + includedPath + "\n";
-		Files.write(config.toPath(), include.getBytes());
+		Files.write(config.toPath(), include.getBytes(UTF_8));
 		try {
 			loadConfig(config);
 			fail("Expected ConfigInvalidException");

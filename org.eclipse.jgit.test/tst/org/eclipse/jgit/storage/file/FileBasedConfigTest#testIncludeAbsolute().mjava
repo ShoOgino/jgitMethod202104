@@ -1,10 +1,10 @@
 	@Test
 	public void testIncludeAbsolute()
 			throws IOException, ConfigInvalidException {
-		final File includedFile = createFile(CONTENT1.getBytes());
+		final File includedFile = createFile(CONTENT1.getBytes(UTF_8));
 		final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		bos.write("[include]\npath=".getBytes());
-		bos.write(pathToString(includedFile).getBytes());
+		bos.write("[include]\npath=".getBytes(UTF_8));
+		bos.write(pathToString(includedFile).getBytes(UTF_8));
 
 		final File file = createFile(bos.toByteArray());
 		final FileBasedConfig config = new FileBasedConfig(file, FS.DETECTED);

@@ -1,10 +1,10 @@
 	@Test
 	public void testIncludeRelativeDot()
 			throws IOException, ConfigInvalidException {
-		final File includedFile = createFile(CONTENT1.getBytes(), "dir1");
+		final File includedFile = createFile(CONTENT1.getBytes(UTF_8), "dir1");
 		final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		bos.write("[include]\npath=".getBytes());
-		bos.write(("./" + includedFile.getName()).getBytes());
+		bos.write("[include]\npath=".getBytes(UTF_8));
+		bos.write(("./" + includedFile.getName()).getBytes(UTF_8));
 
 		final File file = createFile(bos.toByteArray(), "dir1");
 		final FileBasedConfig config = new FileBasedConfig(file, FS.DETECTED);

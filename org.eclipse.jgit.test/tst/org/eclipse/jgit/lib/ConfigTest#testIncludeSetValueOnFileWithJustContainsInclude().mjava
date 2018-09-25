@@ -5,7 +5,7 @@
 
 		File configFile = tmp.newFile("config");
 		String content = "[include]\npath=" + pathToString(includedFile);
-		Files.write(configFile.toPath(), content.getBytes());
+		Files.write(configFile.toPath(), content.getBytes(UTF_8));
 
 		FileBasedConfig fbConfig = loadConfig(configFile);
 		assertValuesAsIncluded(fbConfig, REFS_UPSTREAM);

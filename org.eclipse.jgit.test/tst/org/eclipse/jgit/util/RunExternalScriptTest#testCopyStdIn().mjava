@@ -4,7 +4,7 @@
 		File script = writeTempFile("cat -");
 		int rc = FS.DETECTED.runProcess(
 				new ProcessBuilder("sh", script.getPath()), out, err,
-				new ByteArrayInputStream(inputStr.getBytes()));
+				new ByteArrayInputStream(inputStr.getBytes(UTF_8)));
 		assertEquals(0, rc);
 		assertEquals(inputStr, new String(out.toByteArray(), UTF_8));
 		assertEquals("", new String(err.toByteArray(), UTF_8));

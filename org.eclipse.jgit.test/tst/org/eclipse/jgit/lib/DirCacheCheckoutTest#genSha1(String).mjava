@@ -1,6 +1,6 @@
 	ObjectId genSha1(String data) {
 		try (ObjectInserter w = db.newObjectInserter()) {
-			ObjectId id = w.insert(Constants.OBJ_BLOB, data.getBytes());
+			ObjectId id = w.insert(Constants.OBJ_BLOB, data.getBytes(UTF_8));
 			w.flush();
 			return id;
 		} catch (IOException e) {
