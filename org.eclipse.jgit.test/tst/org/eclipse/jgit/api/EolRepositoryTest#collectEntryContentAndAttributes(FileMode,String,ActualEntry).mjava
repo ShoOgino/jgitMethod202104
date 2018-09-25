@@ -12,10 +12,10 @@
 			}
 			e.attrs = e.attrs.trim();
 			e.file = new String(
-					IO.readFully(new File(db.getWorkTree(), pathName)));
+					IO.readFully(new File(db.getWorkTree(), pathName)), UTF_8);
 			DirCacheEntry dce = dirCache.getEntry(pathName);
 			ObjectLoader open = walk.getObjectReader().open(dce.getObjectId());
-			e.index = new String(open.getBytes());
+			e.index = new String(open.getBytes(), UTF_8);
 			e.indexContentLength = dce.getLength();
 		}
 

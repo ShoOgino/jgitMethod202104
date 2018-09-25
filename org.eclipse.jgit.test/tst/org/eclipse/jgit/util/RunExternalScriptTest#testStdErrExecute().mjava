@@ -4,7 +4,8 @@
 		ProcessBuilder pb = new ProcessBuilder("sh", script.getPath());
 		ExecutionResult res = FS.DETECTED.execute(pb, null);
 		assertEquals(0, res.getRc());
-		assertEquals("", new String(res.getStdout().toByteArray()));
-		assertEquals("hi" + LF, new String(res.getStderr().toByteArray()));
+		assertEquals("", new String(res.getStdout().toByteArray(), UTF_8));
+		assertEquals("hi" + LF,
+				new String(res.getStderr().toByteArray(), UTF_8));
 	}
 
