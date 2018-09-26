@@ -3,7 +3,8 @@
 		Repository repo1 = createWorkRepository();
 		File dir = createTempDirectory("dir");
 		File dotGit = new File(dir, Constants.DOT_GIT);
-		try (FileWriter writer = new FileWriter(dotGit)) {
+		try (BufferedWriter writer = Files.newBufferedWriter(dotGit.toPath(),
+				UTF_8)) {
 			writer.append(
 					"gitdir: " + repo1.getDirectory().getAbsolutePath()).close();
 			FileRepositoryBuilder builder = new FileRepositoryBuilder();

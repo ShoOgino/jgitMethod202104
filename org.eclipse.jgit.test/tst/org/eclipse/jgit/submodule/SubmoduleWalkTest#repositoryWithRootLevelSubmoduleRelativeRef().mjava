@@ -12,9 +12,11 @@
 
 		File modulesGitDir = new File(db.getDirectory(), "modules"
 				+ File.separatorChar + path);
-		new FileWriter(dotGit).append(
-				"gitdir: " + "../" + Constants.DOT_GIT + "/modules/" + path)
-				.close();
+		try (BufferedWriter fw = Files.newBufferedWriter(dotGit.toPath(),
+				UTF_8)) {
+			fw.append("gitdir: " + "../" + Constants.DOT_GIT + "/modules/"
+					+ path);
+		}
 		FileRepositoryBuilder builder = new FileRepositoryBuilder();
 		builder.setWorkTree(new File(db.getWorkTree(), path));
 		builder.build().create();

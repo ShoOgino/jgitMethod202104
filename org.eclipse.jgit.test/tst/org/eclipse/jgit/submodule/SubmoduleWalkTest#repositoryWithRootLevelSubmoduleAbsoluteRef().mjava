@@ -10,10 +10,12 @@
 		if (!dotGit.getParentFile().exists())
 			dotGit.getParentFile().mkdirs();
 
-		File modulesGitDir = new File(db.getDirectory(), "modules"
-				+ File.separatorChar + path);
-		new FileWriter(dotGit).append(
-				"gitdir: " + modulesGitDir.getAbsolutePath()).close();
+		File modulesGitDir = new File(db.getDirectory(),
+				"modules" + File.separatorChar + path);
+		try (BufferedWriter fw = Files.newBufferedWriter(dotGit.toPath(),
+				UTF_8)) {
+			fw.append("gitdir: " + modulesGitDir.getAbsolutePath());
+		}
 		FileRepositoryBuilder builder = new FileRepositoryBuilder();
 		builder.setWorkTree(new File(db.getWorkTree(), path));
 		builder.build().create();
