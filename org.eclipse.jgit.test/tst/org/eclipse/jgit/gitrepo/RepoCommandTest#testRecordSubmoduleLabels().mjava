@@ -29,8 +29,9 @@
 					".gitattributes");
 			assertTrue("The .gitattributes file should exist",
 					gitattributes.exists());
-			try (BufferedReader reader = new BufferedReader(
-					new FileReader(gitattributes));) {
+			try (BufferedReader reader = Files
+					.newBufferedReader(gitattributes.toPath(),
+					UTF_8)) {
 				String content = reader.readLine();
 				assertEquals(".gitattributes content should be as expected",
 						"/test a1 a2", content);

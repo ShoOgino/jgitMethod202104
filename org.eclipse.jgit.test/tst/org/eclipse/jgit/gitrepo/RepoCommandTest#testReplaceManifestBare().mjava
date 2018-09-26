@@ -47,8 +47,8 @@
 		// The .gitmodules file should have 'submodule "bar"' and shouldn't
 		// have
 		// 'submodule "foo"' lines.
-		try (BufferedReader reader = new BufferedReader(
-				new FileReader(dotmodules))) {
+		try (BufferedReader reader = Files
+				.newBufferedReader(dotmodules.toPath(), UTF_8)) {
 			boolean foo = false;
 			boolean bar = false;
 			while (true) {

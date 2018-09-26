@@ -22,8 +22,8 @@
 		// The original file should exist
 		File hello = new File(localDb.getWorkTree(), "foo/hello.txt");
 		assertTrue("The original file should exist", hello.exists());
-		try (BufferedReader reader = new BufferedReader(
-				new FileReader(hello))) {
+		try (BufferedReader reader = Files.newBufferedReader(hello.toPath(),
+				UTF_8)) {
 			String content = reader.readLine();
 			assertEquals("The original file should have expected content",
 					"master world", content);
@@ -31,8 +31,8 @@
 		// The dest file should also exist
 		hello = new File(localDb.getWorkTree(), "Hello");
 		assertTrue("The destination file should exist", hello.exists());
-		try (BufferedReader reader = new BufferedReader(
-				new FileReader(hello))) {
+		try (BufferedReader reader = Files.newBufferedReader(hello.toPath(),
+				UTF_8)) {
 			String content = reader.readLine();
 			assertEquals("The destination file should have expected content",
 					"master world", content);

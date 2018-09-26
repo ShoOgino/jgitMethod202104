@@ -17,8 +17,8 @@
 			.setURI(rootUri)
 			.call();
 		File hello = new File(db.getWorkTree(), "foo/hello.txt");
-		try (BufferedReader reader = new BufferedReader(
-				new FileReader(hello))) {
+		try (BufferedReader reader = Files.newBufferedReader(hello.toPath(),
+				UTF_8)) {
 			String content = reader.readLine();
 			assertEquals("submodule content should be as expected",
 					"branch world", content);
