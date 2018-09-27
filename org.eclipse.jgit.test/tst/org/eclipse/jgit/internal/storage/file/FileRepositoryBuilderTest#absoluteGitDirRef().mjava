@@ -5,16 +5,16 @@
 		File dotGit = new File(dir, Constants.DOT_GIT);
 		try (BufferedWriter writer = Files.newBufferedWriter(dotGit.toPath(),
 				UTF_8)) {
-			writer.append("gitdir: " + repo1.getDirectory().getAbsolutePath()).close();
-			FileRepositoryBuilder builder = new FileRepositoryBuilder();
-
-			builder.setWorkTree(dir);
-			builder.setMustExist(true);
-			Repository repo2 = builder.build();
-
-			assertEquals(repo1.getDirectory().getAbsolutePath(), repo2
-					.getDirectory().getAbsolutePath());
-			assertEquals(dir, repo2.getWorkTree());
+			writer.append("gitdir: " + repo1.getDirectory().getAbsolutePath());
 		}
+		FileRepositoryBuilder builder = new FileRepositoryBuilder();
+
+		builder.setWorkTree(dir);
+		builder.setMustExist(true);
+		Repository repo2 = builder.build();
+
+		assertEquals(repo1.getDirectory().getAbsolutePath(),
+				repo2.getDirectory().getAbsolutePath());
+		assertEquals(dir, repo2.getWorkTree());
 	}
 
