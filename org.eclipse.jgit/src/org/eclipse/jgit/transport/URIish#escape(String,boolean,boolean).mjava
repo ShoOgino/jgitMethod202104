@@ -14,12 +14,7 @@
 		if (s == null)
 			return null;
 		ByteArrayOutputStream os = new ByteArrayOutputStream(s.length());
-		byte[] bytes;
-		try {
-			bytes = s.getBytes(Constants.CHARACTER_ENCODING);
-		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException(e); // cannot happen
-		}
+		byte[] bytes = s.getBytes(UTF_8);
 		for (int i = 0; i < bytes.length; ++i) {
 			int b = bytes[i] & 0xFF;
 			if (b <= 32 || (encodeNonAscii && b > 127) || b == '%'

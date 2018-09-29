@@ -10,7 +10,7 @@
 		assertFalse(new File(db.getDirectory(), "MERGE_MSG").exists());
 		try (FileOutputStream fos = new FileOutputStream(
 				new File(db.getDirectory(), Constants.MERGE_MSG))) {
-			fos.write(mergeMsg.getBytes(Constants.CHARACTER_ENCODING));
+			fos.write(mergeMsg.getBytes(UTF_8));
 		}
 		assertEquals(db.readMergeCommitMsg(), mergeMsg);
 	}
