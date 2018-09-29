@@ -3,13 +3,13 @@
 		FileUtils.mkdir(new File(db.getWorkTree(), "sub"));
 		File file = new File(db.getWorkTree(), "sub/a.txt");
 		FileUtils.createNewFile(file);
-		try (PrintWriter writer = new PrintWriter(file)) {
+		try (PrintWriter writer = new PrintWriter(file, UTF_8.name())) {
 			writer.print("content");
 		}
 
 		File file2 = new File(db.getWorkTree(), "sub/b.txt");
 		FileUtils.createNewFile(file2);
-		try (PrintWriter writer = new PrintWriter(file2)) {
+		try (PrintWriter writer = new PrintWriter(file2, UTF_8.name())) {
 			writer.print("content b");
 		}
 

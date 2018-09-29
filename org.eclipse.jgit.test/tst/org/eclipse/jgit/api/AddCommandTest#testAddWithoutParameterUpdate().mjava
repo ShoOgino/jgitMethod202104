@@ -7,13 +7,13 @@
 		FileUtils.mkdir(new File(db.getWorkTree(), "sub"));
 		File file = new File(db.getWorkTree(), "sub/a.txt");
 		FileUtils.createNewFile(file);
-		try (PrintWriter writer = new PrintWriter(file)) {
+		try (PrintWriter writer = new PrintWriter(file, UTF_8.name())) {
 			writer.print("content");
 		}
 
 		File file2 = new File(db.getWorkTree(), "sub/b.txt");
 		FileUtils.createNewFile(file2);
-		try (PrintWriter writer = new PrintWriter(file2)) {
+		try (PrintWriter writer = new PrintWriter(file2, UTF_8.name())) {
 			writer.print("content b");
 		}
 
@@ -30,12 +30,12 @@
 			// new unstaged file sub/c.txt
 			File file3 = new File(db.getWorkTree(), "sub/c.txt");
 			FileUtils.createNewFile(file3);
-			try (PrintWriter writer = new PrintWriter(file3)) {
+			try (PrintWriter writer = new PrintWriter(file3, UTF_8.name())) {
 				writer.print("content c");
 			}
 
 			// file sub/a.txt is modified
-			try (PrintWriter writer = new PrintWriter(file)) {
+			try (PrintWriter writer = new PrintWriter(file, UTF_8.name())) {
 				writer.print("modified content");
 			}
 

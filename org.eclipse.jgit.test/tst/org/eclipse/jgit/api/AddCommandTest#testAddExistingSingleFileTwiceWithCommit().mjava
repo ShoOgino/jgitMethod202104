@@ -2,7 +2,7 @@
 	public void testAddExistingSingleFileTwiceWithCommit() throws Exception {
 		File file = new File(db.getWorkTree(), "a.txt");
 		FileUtils.createNewFile(file);
-		try (PrintWriter writer = new PrintWriter(file)) {
+		try (PrintWriter writer = new PrintWriter(file, UTF_8.name())) {
 			writer.print("content");
 		}
 
@@ -13,7 +13,7 @@
 
 			git.commit().setMessage("commit a.txt").call();
 
-			try (PrintWriter writer = new PrintWriter(file)) {
+			try (PrintWriter writer = new PrintWriter(file, UTF_8.name())) {
 				writer.print("other content");
 			}
 

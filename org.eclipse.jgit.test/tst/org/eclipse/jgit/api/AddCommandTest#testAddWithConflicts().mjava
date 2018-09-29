@@ -4,13 +4,13 @@
 
 		File file = new File(db.getWorkTree(), "a.txt");
 		FileUtils.createNewFile(file);
-		try (PrintWriter writer = new PrintWriter(file)) {
+		try (PrintWriter writer = new PrintWriter(file, UTF_8.name())) {
 			writer.print("content");
 		}
 
 		File file2 = new File(db.getWorkTree(), "b.txt");
 		FileUtils.createNewFile(file2);
-		try (PrintWriter writer = new PrintWriter(file2)) {
+		try (PrintWriter writer = new PrintWriter(file2, UTF_8.name())) {
 			writer.print("content b");
 		}
 
@@ -21,12 +21,12 @@
 		addEntryToBuilder("b.txt", file2, newObjectInserter, builder, 0);
 		addEntryToBuilder("a.txt", file, newObjectInserter, builder, 1);
 
-		try (PrintWriter writer = new PrintWriter(file)) {
+		try (PrintWriter writer = new PrintWriter(file, UTF_8.name())) {
 			writer.print("other content");
 		}
 		addEntryToBuilder("a.txt", file, newObjectInserter, builder, 3);
 
-		try (PrintWriter writer = new PrintWriter(file)) {
+		try (PrintWriter writer = new PrintWriter(file, UTF_8.name())) {
 			writer.print("our content");
 		}
 		addEntryToBuilder("a.txt", file, newObjectInserter, builder, 2)

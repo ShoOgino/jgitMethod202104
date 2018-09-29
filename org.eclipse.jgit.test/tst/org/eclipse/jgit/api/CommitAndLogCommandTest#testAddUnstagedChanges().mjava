@@ -3,7 +3,7 @@
 			JGitInternalException, GitAPIException {
 		File file = new File(db.getWorkTree(), "a.txt");
 		FileUtils.createNewFile(file);
-		try (PrintWriter writer = new PrintWriter(file)) {
+		try (PrintWriter writer = new PrintWriter(file, UTF_8.name())) {
 			writer.print("content");
 		}
 
@@ -14,7 +14,7 @@
 			assertEquals("6b584e8ece562ebffc15d38808cd6b98fc3d97ea",
 					tw.getObjectId(0).getName());
 
-			try (PrintWriter writer = new PrintWriter(file)) {
+			try (PrintWriter writer = new PrintWriter(file, UTF_8.name())) {
 				writer.print("content2");
 			}
 			commit = git.commit().setMessage("second commit").call();

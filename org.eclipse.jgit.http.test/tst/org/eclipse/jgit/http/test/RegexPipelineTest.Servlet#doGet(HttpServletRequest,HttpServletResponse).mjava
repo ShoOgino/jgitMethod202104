@@ -2,7 +2,8 @@
 		protected void doGet(HttpServletRequest req, HttpServletResponse res)
 				throws IOException {
 			res.setStatus(200);
-			PrintWriter out = new PrintWriter(res.getOutputStream());
+			PrintWriter out = new PrintWriter(new BufferedWriter(
+					new OutputStreamWriter(res.getOutputStream(), UTF_8)));
 			out.write(name);
 			out.write("\n");
 			out.write(String.valueOf(req.getServletPath()));
