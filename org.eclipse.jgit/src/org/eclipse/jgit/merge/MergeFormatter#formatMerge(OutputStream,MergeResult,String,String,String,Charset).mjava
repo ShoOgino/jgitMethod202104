@@ -16,18 +16,19 @@
 	 *            the name ranges from ours should get
 	 * @param theirsName
 	 *            the name ranges from theirs should get
-	 * @param charsetName
-	 *            the name of the character set used when writing conflict
-	 *            metadata
+	 * @param charset
+	 *            the character set used when writing conflict metadata
 	 * @throws java.io.IOException
-	 * @deprecated use
-	 *             {@link #formatMerge(OutputStream, MergeResult, String, String, String, Charset)}
-	 *             instead.
+	 * @since 5.2
 	 */
-	@Deprecated
+	@SuppressWarnings("unchecked")
 	public void formatMerge(OutputStream out, MergeResult res, String baseName,
-			String oursName, String theirsName, String charsetName) throws IOException {
-		formatMerge(out, res, baseName, oursName, theirsName,
-				Charset.forName(charsetName));
+			String oursName, String theirsName, Charset charset)
+			throws IOException {
+		List<String> names = new ArrayList<>(3);
+		names.add(baseName);
+		names.add(oursName);
+		names.add(theirsName);
+		formatMerge(out, res, names, charset);
 	}
 

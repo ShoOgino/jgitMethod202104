@@ -15,17 +15,13 @@
 	 *            name. This name is following the "&lt;&lt;&lt;&lt;&lt;&lt;&lt;
 	 *            " or "&gt;&gt;&gt;&gt;&gt;&gt;&gt; " conflict markers. The
 	 *            names for the sequences are given in this list
-	 * @param charsetName
-	 *            the name of the character set used when writing conflict
-	 *            metadata
+	 * @param charset
+	 *            the character set used when writing conflict metadata
 	 * @throws java.io.IOException
-	 * @deprecated Use
-	 *             {@link #formatMerge(OutputStream, MergeResult, List, Charset)}
-	 *             instead.
+	 * @since 5.2
 	 */
-	@Deprecated
 	public void formatMerge(OutputStream out, MergeResult<RawText> res,
-			List<String> seqName, String charsetName) throws IOException {
-		new MergeFormatterPass(out, res, seqName, charsetName).formatMerge();
+			List<String> seqName, Charset charset) throws IOException {
+		new MergeFormatterPass(out, res, seqName, charset).formatMerge();
 	}
 
