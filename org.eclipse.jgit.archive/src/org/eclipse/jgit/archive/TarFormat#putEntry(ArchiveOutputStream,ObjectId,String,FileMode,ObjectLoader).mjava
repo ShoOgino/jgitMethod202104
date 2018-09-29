@@ -6,8 +6,7 @@
 		if (mode == FileMode.SYMLINK) {
 			final TarArchiveEntry entry = new TarArchiveEntry(
 					path, TarConstants.LF_SYMLINK);
-			entry.setLinkName(new String(
-					loader.getCachedBytes(100), CHARACTER_ENCODING));
+			entry.setLinkName(new String(loader.getCachedBytes(100), UTF_8));
 			out.putArchiveEntry(entry);
 			out.closeArchiveEntry();
 			return;

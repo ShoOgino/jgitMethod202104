@@ -11,7 +11,7 @@
 		assertFalse(new File(db.getDirectory(), Constants.SQUASH_MSG).exists());
 		try (FileOutputStream fos = new FileOutputStream(
 				new File(db.getDirectory(), Constants.SQUASH_MSG))) {
-			fos.write(squashMsg.getBytes(Constants.CHARACTER_ENCODING));
+			fos.write(squashMsg.getBytes(UTF_8));
 		}
 		assertEquals(db.readSquashCommitMsg(), squashMsg);
 	}
