@@ -8,20 +8,7 @@
 	 *            {@code repository} is null.
 	 */
 	protected void init(Repository repository, String gitDir) {
-		Charset charset = UTF_8;
-		if (repository != null) {
-			String logOutputEncoding = repository.getConfig().getString(
-					CONFIG_SECTION_I18N,
-					null,
-					CONFIG_KEY_LOG_OUTPUT_ENCODING);
-			if (logOutputEncoding != null) {
-				try {
-					charset = Charset.forName(logOutputEncoding);
-				} catch (IllegalArgumentException e) {
-					throw die(CLIText.get().cannotCreateOutputStream);
-				}
-			}
-		}
+		Charset charset = getLogOutputEncodingCharset(repository);
 
 		if (ins == null)
 			ins = new FileInputStream(FileDescriptor.in);
