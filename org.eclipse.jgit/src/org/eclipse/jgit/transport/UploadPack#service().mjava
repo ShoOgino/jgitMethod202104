@@ -48,7 +48,7 @@
 				}, unshallow -> {
 					pckOut.writeString("unshallow " + unshallow.name() + '\n'); //$NON-NLS-1$
 					unshallowCommits.add(unshallow);
-				});
+				}, Collections.emptyList());
 				pckOut.end();
 			}
 
@@ -105,7 +105,7 @@
 
 		if (sendPack) {
 			sendPack(accumulator, req, refs == null ? null : refs.values(),
-					unshallowCommits);
+					unshallowCommits, Collections.emptyList());
 		}
 	}
 

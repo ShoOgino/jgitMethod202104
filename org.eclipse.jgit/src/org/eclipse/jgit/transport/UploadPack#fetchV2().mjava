@@ -23,6 +23,16 @@
 		// copying data back to class fields
 		wantIds = req.getWantIds();
 
+		List<ObjectId> deepenNots = new ArrayList<>();
+		for (String s : req.getDeepenNotRefs()) {
+			Ref ref = db.getRefDatabase().getRef(s);
+			if (ref == null) {
+				throw new PackProtocolException(MessageFormat
+						.format(JGitText.get().invalidRefName, s));
+			}
+			deepenNots.add(ref.getObjectId());
+		}
+
 		boolean sectionSent = false;
 		boolean mayHaveShallow = req.getDepth() != 0
 				|| req.getDeepenSince() != 0
@@ -36,7 +46,8 @@
 		if (mayHaveShallow) {
 			computeShallowsAndUnshallows(req,
 					shallowCommit -> shallowCommits.add(shallowCommit),
-					unshallowCommit -> unshallowCommits.add(unshallowCommit));
+					unshallowCommit -> unshallowCommits.add(unshallowCommit),
+					deepenNots);
 		}
 		if (!req.getClientShallowCommits().isEmpty())
 			walk.assumeShallow(req.getClientShallowCommits());
@@ -96,7 +107,7 @@
 					req.getClientCapabilities().contains(OPTION_INCLUDE_TAG)
 						? db.getRefDatabase().getRefsByPrefix(R_TAGS)
 						: null,
-					unshallowCommits);
+					unshallowCommits, deepenNots);
 			// sendPack invokes pckOut.end() for us, so we do not
 			// need to invoke it here.
 		} else {

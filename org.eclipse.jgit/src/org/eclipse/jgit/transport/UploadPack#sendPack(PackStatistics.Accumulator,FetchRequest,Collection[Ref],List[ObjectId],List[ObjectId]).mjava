@@ -10,19 +10,23 @@
 	 *            the {@link #OPTION_INCLUDE_TAG} capability was requested.
 	 * @param unshallowCommits
 	 *            shallow commits on the client that are now becoming unshallow
+	 * @param deepenNots
+	 *            objects that the client specified using --shallow-exclude
 	 * @throws IOException
 	 *             if an error occured while generating or writing the pack.
 	 */
 	private void sendPack(PackStatistics.Accumulator accumulator,
 			FetchRequest req,
 			@Nullable Collection<Ref> allTags,
-			List<ObjectId> unshallowCommits) throws IOException {
+			List<ObjectId> unshallowCommits,
+			List<ObjectId> deepenNots) throws IOException {
 		Set<String> caps = req.getClientCapabilities();
 		boolean sideband = caps.contains(OPTION_SIDE_BAND)
 				|| caps.contains(OPTION_SIDE_BAND_64K);
 		if (sideband) {
 			try {
-				sendPack(true, req, accumulator, allTags, unshallowCommits);
+				sendPack(true, req, accumulator, allTags, unshallowCommits,
+						deepenNots);
 			} catch (ServiceMayNotContinueException noPack) {
 				// This was already reported on (below).
 				throw noPack;
@@ -43,7 +47,7 @@
 					throw err;
 			}
 		} else {
-			sendPack(false, req, accumulator, allTags, unshallowCommits);
+			sendPack(false, req, accumulator, allTags, unshallowCommits, deepenNots);
 		}
 	}
 

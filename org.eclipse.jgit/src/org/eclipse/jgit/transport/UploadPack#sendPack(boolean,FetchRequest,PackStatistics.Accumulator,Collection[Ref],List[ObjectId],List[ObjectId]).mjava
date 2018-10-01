@@ -13,6 +13,8 @@
 	 *            the {@link #OPTION_INCLUDE_TAG} capability was requested.
 	 * @param unshallowCommits
 	 *            shallow commits on the client that are now becoming unshallow
+	 * @param deepenNots
+	 *            objects that the client specified using --shallow-exclude
 	 * @throws IOException
 	 *             if an error occured while generating or writing the pack.
 	 */
@@ -20,7 +22,8 @@
 			FetchRequest req,
 			PackStatistics.Accumulator accumulator,
 			@Nullable Collection<Ref> allTags,
-			List<ObjectId> unshallowCommits) throws IOException {
+			List<ObjectId> unshallowCommits,
+			List<ObjectId> deepenNots) throws IOException {
 		ProgressMonitor pm = NullProgressMonitor.INSTANCE;
 		OutputStream packOut = rawOut;
 
@@ -99,13 +102,17 @@
 			}
 
 			RevWalk rw = walk;
-			if (req.getDepth() > 0 || req.getDeepenSince() != 0) {
+			if (req.getDepth() > 0 || req.getDeepenSince() != 0 || !deepenNots.isEmpty()) {
 				int walkDepth = req.getDepth() == 0 ? Integer.MAX_VALUE
 						: req.getDepth() - 1;
 				pw.setShallowPack(req.getDepth(), unshallowCommits);
-				rw = new DepthWalk.RevWalk(walk.getObjectReader(), walkDepth);
-				((DepthWalk.RevWalk) rw).setDeepenSince(req.getDeepenSince());
-				rw.assumeShallow(req.getClientShallowCommits());
+
+				DepthWalk.RevWalk dw = new DepthWalk.RevWalk(
+						walk.getObjectReader(), walkDepth);
+				dw.setDeepenSince(req.getDeepenSince());
+				dw.setDeepenNots(deepenNots);
+				dw.assumeShallow(req.getClientShallowCommits());
+				rw = dw;
 			}
 
 			if (wantAll.isEmpty()) {

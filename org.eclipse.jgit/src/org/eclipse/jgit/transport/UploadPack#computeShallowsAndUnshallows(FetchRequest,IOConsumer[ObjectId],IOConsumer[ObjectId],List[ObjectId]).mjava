@@ -4,12 +4,11 @@
 	 */
 	private void computeShallowsAndUnshallows(FetchRequest req,
 			IOConsumer<ObjectId> shallowFunc,
-			IOConsumer<ObjectId> unshallowFunc)
+			IOConsumer<ObjectId> unshallowFunc,
+			List<ObjectId> deepenNots)
 			throws IOException {
-		if (req.getClientCapabilities().contains(OPTION_DEEPEN_RELATIVE)
-				|| !req.getDeepenNotRefs().isEmpty()) {
+		if (req.getClientCapabilities().contains(OPTION_DEEPEN_RELATIVE)) {
 			// TODO(jonathantanmy): Implement deepen-relative
-			// and deepen-not.
 			throw new UnsupportedOperationException();
 		}
 
@@ -28,6 +27,8 @@
 					// Ignore non-commits in this loop.
 				}
 			}
+
+			depthWalk.setDeepenNots(deepenNots);
 
 			RevCommit o;
 			boolean atLeastOne = false;

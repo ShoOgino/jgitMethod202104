@@ -1,0 +1,30 @@
+	@Test
+	public void testV2FetchDeepenNot_supportAnnotatedTags() throws Exception {
+		RevCommit one = remote.commit().message("one").create();
+		RevCommit two = remote.commit().message("two").parent(one).create();
+		RevCommit three = remote.commit().message("three").parent(two).create();
+		RevCommit four = remote.commit().message("four").parent(three).create();
+		RevTag twoTag = remote.tag("twotag", two);
+
+		remote.update("refs/tags/twotag", twoTag);
+		remote.update("four", four);
+
+		ByteArrayInputStream recvStream = uploadPackV2(
+			"command=fetch\n",
+			PacketLineIn.DELIM,
+			"deepen-not twotag\n",
+			"want " + four.toObjectId().getName() + "\n",
+			"done\n",
+			PacketLineIn.END);
+		PacketLineIn pckIn = new PacketLineIn(recvStream);
+		assertThat(pckIn.readString(), is("shallow-info"));
+		assertThat(pckIn.readString(), is("shallow " + three.toObjectId().getName()));
+		assertThat(pckIn.readString(), theInstance(PacketLineIn.DELIM));
+		assertThat(pckIn.readString(), is("packfile"));
+		parsePack(recvStream);
+		assertFalse(client.hasObject(one.toObjectId()));
+		assertFalse(client.hasObject(two.toObjectId()));
+		assertTrue(client.hasObject(three.toObjectId()));
+		assertTrue(client.hasObject(four.toObjectId()));
+	}
+
