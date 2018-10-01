@@ -15,6 +15,14 @@
 				userName + '@' + address, null);
 		SshFutureListener<IoConnectFuture> listener = createConnectCompletionListener(
 				connectFuture, userName, address, hostConfig);
+		// sshd needs some entries from the host config already in the
+		// constructor of the session. Put those as properties on this client,
+		// where it will find them. We can set the host config only once the
+		// session object has been created.
+		copyProperty(
+				hostConfig.getProperty(SshConstants.PREFERRED_AUTHENTICATIONS,
+						getAttribute(PREFERRED_AUTHENTICATIONS)),
+				PREFERRED_AUTHS);
 		connector.connect(address).addListener(listener);
 		return connectFuture;
 	}
