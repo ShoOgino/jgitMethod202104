@@ -1,0 +1,12 @@
+	private void sendToken(ClientSession session, byte[] receivedToken)
+			throws IOException, GSSException {
+		state = ProtocolState.TOKENS;
+		byte[] token = context.initSecContext(receivedToken, 0,
+				receivedToken.length);
+		if (token != null) {
+			Buffer buffer = session.createBuffer(SSH_MSG_USERAUTH_GSSAPI_TOKEN);
+			buffer.putBytes(token);
+			session.writePacket(buffer);
+		}
+	}
+

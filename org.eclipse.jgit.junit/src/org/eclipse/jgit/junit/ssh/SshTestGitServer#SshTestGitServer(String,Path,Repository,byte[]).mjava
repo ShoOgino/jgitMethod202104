@@ -45,6 +45,7 @@
 						.getParentFile().getAbsoluteFile().toPath();
 			}
 		});
+		server.setUserAuthFactories(getAuthFactories());
 		server.setSubsystemFactories(Collections
 				.singletonList((new SftpSubsystemFactory.Builder()).build()));
 		// No shell
@@ -52,8 +53,15 @@
 		// Disable some authentications
 		server.setPasswordAuthenticator(null);
 		server.setKeyboardInteractiveAuthenticator(null);
-		server.setGSSAuthenticator(null);
 		server.setHostBasedAuthenticator(null);
+		// Pretend we did gssapi-with-mic.
+		server.setGSSAuthenticator(new GSSAuthenticator() {
+			@Override
+			public boolean validateInitialUser(ServerSession session,
+					String user) {
+				return false;
+			}
+		});
 		// Accept only the test user/public key
 		server.setPublickeyAuthenticator((userName, publicKey, session) -> {
 			return SshTestGitServer.this.testUser.equals(userName) && KeyUtils

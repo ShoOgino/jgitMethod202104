@@ -1,0 +1,24 @@
+	private String getHostName(ClientSession session) {
+		SocketAddress remote = session.getConnectAddress();
+		if (remote instanceof InetSocketAddress) {
+			InetAddress address = GssApiMechanisms
+					.resolve((InetSocketAddress) remote);
+			if (address != null) {
+				return address.getCanonicalHostName();
+			}
+		}
+		if (session instanceof JGitClientSession) {
+			String hostName = ((JGitClientSession) session).getHostConfigEntry()
+					.getHostName();
+			try {
+				hostName = InetAddress.getByName(hostName)
+						.getCanonicalHostName();
+			} catch (UnknownHostException e) {
+				// Ignore here; try with the non-canonical name
+			}
+			return hostName;
+		}
+		throw new IllegalStateException(
+				"Wrong session class :" + session.getClass().getName()); //$NON-NLS-1$
+	}
+

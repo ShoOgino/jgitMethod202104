@@ -1,0 +1,13 @@
+	private void close(boolean silent) {
+		try {
+			if (context != null) {
+				context.dispose();
+				context = null;
+			}
+		} catch (GSSException e) {
+			if (!silent) {
+				log.warn(SshdText.get().gssapiFailure, e);
+			}
+		}
+	}
+

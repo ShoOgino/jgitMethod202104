@@ -1,0 +1,17 @@
+	/**
+	 * Closes (disposes of) a {@link GSSContext} ignoring any
+	 * {@link GSSException}s.
+	 *
+	 * @param context
+	 *            to dispose
+	 */
+	public static void closeContextSilently(GSSContext context) {
+		if (context != null) {
+			try {
+				context.dispose();
+			} catch (GSSException e) {
+				// Ignore
+			}
+		}
+	}
+

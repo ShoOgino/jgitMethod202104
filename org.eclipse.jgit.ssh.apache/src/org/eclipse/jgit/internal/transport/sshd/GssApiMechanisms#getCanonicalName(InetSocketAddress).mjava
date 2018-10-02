@@ -1,0 +1,17 @@
+	/**
+	 * Determines a canonical host name for use use with GSS-API.
+	 *
+	 * @param remote
+	 *            to get the host name from
+	 * @return the canonical host name, if it can be determined, otherwise the
+	 *         {@link InetSocketAddress#getHostString() unprocessed host name}.
+	 */
+	@NonNull
+	public static String getCanonicalName(@NonNull InetSocketAddress remote) {
+		InetAddress address = resolve(remote);
+		if (address == null) {
+			return remote.getHostString();
+		}
+		return address.getCanonicalHostName();
+	}
+

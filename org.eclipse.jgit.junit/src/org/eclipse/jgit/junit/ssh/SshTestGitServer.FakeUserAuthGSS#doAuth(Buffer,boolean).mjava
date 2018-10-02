@@ -1,0 +1,19 @@
+		@Override
+		protected Boolean doAuth(Buffer buffer, boolean initial)
+				throws Exception {
+			// We always reply that we did do this, but then we fail at the
+			// first token message. That way we can test that the client-side
+			// sends the correct initial request and then is skipped correctly,
+			// even if it causes a GSSException if Kerberos isn't configured at
+			// all.
+			if (initial) {
+				ServerSession session = getServerSession();
+				Buffer b = session.createBuffer(
+						SshConstants.SSH_MSG_USERAUTH_INFO_REQUEST);
+				b.putBytes(KRB5_MECH.getDER());
+				session.writePacket(b);
+				return null;
+			}
+			return Boolean.FALSE;
+		}
+

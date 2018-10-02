@@ -1,0 +1,42 @@
+	@Override
+	protected boolean processAuthDataRequest(ClientSession session,
+			String service, Buffer in) throws Exception {
+		// SSH_MSG_USERAUTH_FAILURE and SSH_MSG_USERAUTH_SUCCESS, as well as
+		// SSH_MSG_USERAUTH_BANNER are handled by the framework.
+		int command = in.getUByte();
+		if (context == null) {
+			return false;
+		}
+		try {
+			switch (command) {
+			case SSH_MSG_USERAUTH_GSSAPI_RESPONSE: {
+				if (state != ProtocolState.STARTED) {
+					return unexpectedMessage(command);
+				}
+				// Initial reply from the server with the mechanism to use.
+				Oid mechanism = new Oid(in.getBytes());
+				if (!currentMechanism.equals(mechanism)) {
+					return false;
+				}
+				replyToken(session, service, new byte[0]);
+				return true;
+			}
+			case SSH_MSG_USERAUTH_GSSAPI_TOKEN: {
+				if (context.isEstablished() || state != ProtocolState.TOKENS) {
+					return unexpectedMessage(command);
+				}
+				// Server sent us a token
+				replyToken(session, service, in.getBytes());
+				return true;
+			}
+			default:
+				return unexpectedMessage(command);
+			}
+		} catch (GSSException e) {
+			log.warn(format(SshdText.get().gssapiFailure,
+					currentMechanism.toString()), e);
+			state = ProtocolState.FAILED;
+			return false;
+		}
+	}
+

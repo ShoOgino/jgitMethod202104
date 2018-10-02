@@ -1,0 +1,26 @@
+	/**
+	 * Retrieves an immutable collection of the supported mechanisms.
+	 *
+	 * @return the supported mechanisms
+	 */
+	@NonNull
+	public static Collection<Oid> getSupportedMechanisms() {
+		synchronized (LOCK) {
+			if (supportedMechanisms == null) {
+				GSSManager manager = GSSManager.getInstance();
+				Oid[] mechs = manager.getMechs();
+				Map<Oid, Boolean> mechanisms = new LinkedHashMap<>();
+				if (mechs != null) {
+					for (Oid oid : mechs) {
+						// RFC 4462 states that SPNEGO must not be used with ssh
+						if (!SPNEGO.equals(oid)) {
+							mechanisms.put(oid, Boolean.FALSE);
+						}
+					}
+				}
+				supportedMechanisms = mechanisms;
+			}
+			return Collections.unmodifiableSet(supportedMechanisms.keySet());
+		}
+	}
+

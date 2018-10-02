@@ -1,0 +1,19 @@
+	private void sendMic(ClientSession session, String service)
+			throws IOException, GSSException {
+		state = ProtocolState.MIC_SENT;
+		// Produce MIC
+		Buffer micBuffer = new ByteArrayBuffer();
+		micBuffer.putBytes(session.getSessionId());
+		micBuffer.putByte(SshConstants.SSH_MSG_USERAUTH_REQUEST);
+		micBuffer.putString(session.getUsername());
+		micBuffer.putString(service);
+		micBuffer.putString(getName());
+		byte[] micBytes = micBuffer.getCompactData();
+		byte[] mic = context.getMIC(micBytes, 0, micBytes.length,
+				new MessageProp(0, true));
+		Buffer buffer = session
+				.createBuffer(SshConstants.SSH_MSG_USERAUTH_GSSAPI_MIC);
+		buffer.putBytes(mic);
+		session.writePacket(buffer);
+	}
+

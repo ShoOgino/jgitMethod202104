@@ -1,0 +1,8 @@
+	private void replyToken(ClientSession session, String service, byte[] bytes)
+			throws IOException, GSSException {
+		sendToken(session, bytes);
+		if (context.isEstablished()) {
+			sendMic(session, service);
+		}
+	}
+

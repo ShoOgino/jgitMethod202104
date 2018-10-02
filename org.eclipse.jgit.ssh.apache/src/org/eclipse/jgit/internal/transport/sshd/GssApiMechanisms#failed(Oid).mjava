@@ -1,0 +1,16 @@
+	/**
+	 * Mark the mechanisms as failed.
+	 *
+	 * @param mechanism
+	 *            to mark
+	 */
+	public static void failed(@NonNull Oid mechanism) {
+		synchronized (LOCK) {
+			Boolean worked = supportedMechanisms.get(mechanism);
+			if (worked != null && !worked.booleanValue()) {
+				// If it never worked, remove it
+				supportedMechanisms.remove(mechanism);
+			}
+		}
+	}
+

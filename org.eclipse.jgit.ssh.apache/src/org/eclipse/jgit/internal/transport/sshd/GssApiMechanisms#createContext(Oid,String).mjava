@@ -1,0 +1,30 @@
+	/**
+	 * Creates a {@link GSSContext} for the given mechanism to authenticate with
+	 * the host given by {@code fqdn}.
+	 *
+	 * @param mechanism
+	 *            {@link Oid} of the mechanism to use
+	 * @param fqdn
+	 *            fully qualified domain name of the host to authenticate with
+	 * @return the context, if the mechanism is available and the context could
+	 *         be created, or {@code null} otherwise
+	 */
+	public static GSSContext createContext(@NonNull Oid mechanism,
+			@NonNull String fqdn) {
+		GSSContext context = null;
+		try {
+			GSSManager manager = GSSManager.getInstance();
+			context = manager.createContext(
+					manager.createName(
+							GssApiMechanisms.GSSAPI_HOST_PREFIX + fqdn,
+							GSSName.NT_HOSTBASED_SERVICE),
+					mechanism, null, GSSContext.DEFAULT_LIFETIME);
+		} catch (GSSException e) {
+			closeContextSilently(context);
+			failed(mechanism);
+			return null;
+		}
+		worked(mechanism);
+		return context;
+	}
+
