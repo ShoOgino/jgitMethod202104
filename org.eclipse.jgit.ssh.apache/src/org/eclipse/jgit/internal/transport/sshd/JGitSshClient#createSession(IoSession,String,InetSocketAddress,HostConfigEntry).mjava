@@ -13,6 +13,9 @@
 		if (session.getCredentialsProvider() == null) {
 			session.setCredentialsProvider(getCredentialsProvider());
 		}
+		int numberOfPasswordPrompts = getNumberOfPasswordPrompts(hostConfig);
+		session.getProperties().put(PASSWORD_PROMPTS,
+				Integer.valueOf(numberOfPasswordPrompts));
 		FileKeyPairProvider ourConfiguredKeysProvider = null;
 		List<Path> identities = hostConfig.getIdentities().stream()
 				.map(s -> {
