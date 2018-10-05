@@ -1,0 +1,18 @@
+	@Test
+	public void addSubmoduleWithInvalidPath() throws Exception {
+		SubmoduleAddCommand command = new SubmoduleAddCommand(db);
+		command.setPath("-invalid-path");
+		// TODO(ms) set name to a valid value in 5.1.0 and adapt expected
+		// message below
+		command.setURI("http://example.com/repo/x.git");
+		try {
+			command.call().close();
+			fail("Exception not thrown");
+		} catch (IllegalArgumentException e) {
+			// TODO(ms) should check for submodule path, but can't set name
+			// before 5.1.0
+			assertEquals("Invalid submodule name '-invalid-path'",
+					e.getMessage());
+		}
+	}
+

@@ -6,8 +6,10 @@
 	 */
 	protected void receivePackAndCheckConnectivity() throws IOException {
 		receivePack();
-		if (needCheckConnectivity())
+		if (needCheckConnectivity()) {
+			checkSubmodules();
 			checkConnectivity();
+		}
 		parser = null;
 	}
 

@@ -1,0 +1,47 @@
+	// .gitmodules, case-insensitive, or an 8.3 abbreviation of the same.
+	private boolean isNTFSGitmodules(byte[] buf, int start, int end) {
+		if (end - start == 11) {
+			return matchLowerCase(buf, start, dotGitmodules);
+		}
+
+		if (end - start != 8) {
+			return false;
+		}
+
+		// "gitmod" or a prefix of "gi7eba", followed by...
+		byte[] gitmod = new byte[]{'g', 'i', 't', 'm', 'o', 'd', '~'};
+		if (matchLowerCase(buf, start, gitmod)) {
+			start += 6;
+		} else {
+			byte[] gi7eba = new byte[]{'g', 'i', '7', 'e', 'b', 'a'};
+			for (int i = 0; i < gi7eba.length; i++, start++) {
+				byte c = (byte) toLower(buf[start]);
+				if (c == '~') {
+					break;
+				}
+				if (c != gi7eba[i]) {
+					return false;
+				}
+			}
+		}
+
+		// ... ~ and a number
+		if (end - start < 2) {
+			return false;
+		}
+		if (buf[start] != '~') {
+			return false;
+		}
+		start++;
+		if (buf[start] < '1' || buf[start] > '9') {
+			return false;
+		}
+		start++;
+		for (; start != end; start++) {
+			if (buf[start] < '0' || buf[start] > '9') {
+				return false;
+			}
+		}
+		return true;
+	}
+
