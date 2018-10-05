@@ -82,8 +82,14 @@
 				throw new CorruptObjectException(
 						JGitText.get().corruptObjectTruncatedInObjectId);
 			}
+
 			if (ObjectId.zeroId().compareTo(raw, ptr - OBJECT_ID_LENGTH) == 0) {
 				report(NULL_SHA1, id, JGitText.get().corruptObjectZeroId);
+			}
+
+			if (id != null && isGitmodules(raw, lastNameB, lastNameE, id)) {
+				ObjectId blob = ObjectId.fromRaw(raw, ptr - OBJECT_ID_LENGTH);
+				gitsubmodules.add(new GitmoduleEntry(id, blob));
 			}
 		}
 	}
