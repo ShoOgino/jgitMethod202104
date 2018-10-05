@@ -1,0 +1,23 @@
+	private void removeFromList(Set<String> current, String key,
+			String patterns) {
+		for (String toRemove : patterns.split("\\s*,\\s*")) { //$NON-NLS-1$
+			if (toRemove.indexOf('*') < 0 && toRemove.indexOf('?') < 0) {
+				current.remove(toRemove);
+				continue;
+			}
+			try {
+				FileNameMatcher matcher = new FileNameMatcher(toRemove, null);
+				for (Iterator<String> i = current.iterator(); i.hasNext();) {
+					matcher.reset();
+					matcher.append(i.next());
+					if (matcher.isMatch()) {
+						i.remove();
+					}
+				}
+			} catch (InvalidPatternException e) {
+				log.warn(format(SshdText.get().configInvalidPattern, key,
+						toRemove));
+			}
+		}
+	}
+

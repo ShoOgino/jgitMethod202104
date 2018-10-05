@@ -1,0 +1,20 @@
+	@Test
+	public void testEcDsaHostKey() throws Exception {
+		// See https://git.eclipse.org/r/#/c/130402/ : server has RSA
+		// (preferred), EcDSA, we have EcDSA in known_hosts: client and server
+		// should agree on EcDSA.
+		File newHostKey = new File(getTemporaryDirectory(), "newhostkey");
+		copyTestResource("id_ecdsa_256", newHostKey);
+		server.addHostKey(newHostKey.toPath(), false);
+		File newHostKeyPub = new File(getTemporaryDirectory(),
+				"newhostkey.pub");
+		copyTestResource("id_ecdsa_256.pub", newHostKeyPub);
+		createKnownHostsFile(knownHosts, "localhost", testPort, newHostKeyPub);
+		cloneWith("ssh://git/doesntmatter", defaultCloneDir, null, //
+				"Host git", //
+				"HostName localhost", //
+				"Port " + testPort, //
+				"User " + TEST_USER, //
+				"IdentityFile " + privateKey1.getAbsolutePath());
+	}
+

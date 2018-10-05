@@ -1,0 +1,47 @@
+	private static KnownHostEntry parseHostEntry(String line) {
+		KnownHostEntry entry = new KnownHostEntry();
+		entry.setConfigLine(line);
+		String tmp = line;
+		int i = 0;
+		if (tmp.charAt(0) == KnownHostEntry.MARKER_INDICATOR) {
+			// A marker
+			i = tmp.indexOf(' ', 1);
+			if (i < 0) {
+				return null;
+			}
+			entry.setMarker(tmp.substring(1, i));
+			tmp = tmp.substring(i + 1).trim();
+		}
+		i = tmp.indexOf(' ');
+		if (i < 0) {
+			return null;
+		}
+		// Hash, or host patterns
+		if (tmp.charAt(0) == KnownHostHashValue.HASHED_HOST_DELIMITER) {
+			// Hashed host entry
+			KnownHostHashValue hash = KnownHostHashValue
+					.parse(tmp.substring(0, i));
+			if (hash == null) {
+				return null;
+			}
+			entry.setHashedEntry(hash);
+			entry.setPatterns(null);
+		} else {
+			Collection<HostPatternValue> patterns = parsePatterns(
+					tmp.substring(0, i));
+			if (patterns == null || patterns.isEmpty()) {
+				return null;
+			}
+			entry.setHashedEntry(null);
+			entry.setPatterns(patterns);
+		}
+		tmp = tmp.substring(i + 1).trim();
+		AuthorizedKeyEntry key = AuthorizedKeyEntry
+				.parseAuthorizedKeyEntry(tmp);
+		if (key == null) {
+			return null;
+		}
+		entry.setKeyEntry(key);
+		return entry;
+	}
+

@@ -1,0 +1,28 @@
+	private static Collection<HostPatternValue> parsePatterns(String text) {
+		if (text.isEmpty()) {
+			return null;
+		}
+		List<String> items = Arrays.stream(text.split(",")) //$NON-NLS-1$
+				.filter(item -> item != null && !item.isEmpty()).map(item -> {
+					if (NON_STANDARD_PORT_PATTERN_ENCLOSURE_START_DELIM == item
+							.charAt(0)) {
+						return item;
+					}
+					int firstColon = item.indexOf(':');
+					if (firstColon < 0) {
+						return item;
+					}
+					int secondColon = item.indexOf(':', firstColon + 1);
+					if (secondColon > 0) {
+						// Assume an IPv6 address (without port).
+						return item;
+					}
+					// We have "host:port", should be "[host]:port"
+					return NON_STANDARD_PORT_PATTERN_ENCLOSURE_START_DELIM
+							+ item.substring(0, firstColon)
+							+ NON_STANDARD_PORT_PATTERN_ENCLOSURE_END_DELIM
+							+ item.substring(firstColon);
+				}).collect(Collectors.toList());
+		return items.isEmpty() ? null : HostPatternsHolder.parsePatterns(items);
+	}
+

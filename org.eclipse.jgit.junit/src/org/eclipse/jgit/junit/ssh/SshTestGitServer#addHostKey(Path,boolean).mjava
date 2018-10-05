@@ -1,0 +1,26 @@
+	/**
+	 * Adds an additional host key to the server.
+	 * 
+	 * @param key
+	 *            path to the private key file; should not be encrypted
+	 * @param inFront
+	 *            whether to add the new key before other existing keys
+	 * @throws IOException
+	 *             if the file denoted by the {@link Path} {@code key} cannot be
+	 *             read
+	 * @throws GeneralSecurityException
+	 *             if the key contained in the file cannot be read
+	 */
+	public void addHostKey(@NonNull Path key, boolean inFront)
+			throws IOException, GeneralSecurityException {
+		try (InputStream in = Files.newInputStream(key)) {
+			KeyPair pair = SecurityUtils.loadKeyPairIdentity(key.toString(), in,
+					null);
+			if (inFront) {
+				hostKeys.add(0, pair);
+			} else {
+				hostKeys.add(pair);
+			}
+		}
+	}
+

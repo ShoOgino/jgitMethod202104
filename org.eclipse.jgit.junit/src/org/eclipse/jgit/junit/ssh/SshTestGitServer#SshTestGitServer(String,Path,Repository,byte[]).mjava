@@ -22,17 +22,16 @@
 		this.repository = repository;
 		server = SshServer.setUpDefaultServer();
 		// Set host key
+		try (ByteArrayInputStream in = new ByteArrayInputStream(hostKey)) {
+			hostKeys.add(SecurityUtils.loadKeyPairIdentity("", in, null));
+		} catch (IOException | GeneralSecurityException e) {
+			// Ignore.
+		}
 		server.setKeyPairProvider(new KeyPairProvider() {
 
 			@Override
 			public Iterable<KeyPair> loadKeys() {
-				try (ByteArrayInputStream in = new ByteArrayInputStream(
-						hostKey)) {
-					return Collections.singletonList(
-							SecurityUtils.loadKeyPairIdentity("", in, null));
-				} catch (IOException | GeneralSecurityException e) {
-					return null;
-				}
+				return hostKeys;
 			}
 
 		});

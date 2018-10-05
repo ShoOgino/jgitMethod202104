@@ -1,20 +1,7 @@
 	@Override
 	public boolean verifyServerKey(ClientSession clientSession,
 			SocketAddress remoteAddress, PublicKey serverKey) {
-		List<HostKeyFile> filesToUse = defaultFiles;
-		if (clientSession instanceof JGitClientSession) {
-			HostConfigEntry entry = ((JGitClientSession) clientSession)
-					.getHostConfigEntry();
-			if (entry instanceof JGitHostConfigEntry) {
-				// Always true!
-				List<HostKeyFile> userFiles = addUserHostKeyFiles(
-						((JGitHostConfigEntry) entry).getMultiValuedOptions()
-								.get(SshConstants.USER_KNOWN_HOSTS_FILE));
-				if (!userFiles.isEmpty()) {
-					filesToUse = userFiles;
-				}
-			}
-		}
+		List<HostKeyFile> filesToUse = getFilesToUse(clientSession);
 		AskUser ask = new AskUser();
 		HostEntryPair[] modified = { null };
 		Path path = null;
