@@ -1,0 +1,39 @@
+	/**
+	 * Check if the filename contained in buf[start:end] could be read as a
+	 * .gitmodules file when checked out to the working directory.
+	 *
+	 * This ought to be a simple comparison, but some filesystems have peculiar
+	 * rules for normalizing filenames:
+	 *
+	 * NTFS has backward-compatibility support for 8.3 synonyms of long file
+	 * names (see
+	 * https://web.archive.org/web/20160318181041/https://usn.pw/blog/gen/2015/06/09/filenames/
+	 * for details). NTFS is also case-insensitive.
+	 *
+	 * MacOS's HFS+ folds away ignorable Unicode characters in addition to case
+	 * folding.
+	 *
+	 * @param buf
+	 *            byte array to decode
+	 * @param start
+	 *            position where a supposed filename is starting
+	 * @param end
+	 *            position where a supposed filename is ending
+	 * @param id
+	 *            object id for error reporting
+	 *
+	 * @return true if the filename in buf could be a ".gitmodules" file
+	 * @throws CorruptObjectException
+	 */
+	private boolean isGitmodules(byte[] buf, int start, int end, @Nullable AnyObjectId id)
+			throws CorruptObjectException {
+		// Simple cases first.
+		if (end - start < 8) {
+			return false;
+		}
+		return (end - start == dotGitmodules.length
+				&& RawParseUtils.match(buf, start, dotGitmodules) != -1)
+			|| (macosx && isMacHFSGitmodules(buf, start, end, id))
+			|| (windows && isNTFSGitmodules(buf, start, end));
+	}
+

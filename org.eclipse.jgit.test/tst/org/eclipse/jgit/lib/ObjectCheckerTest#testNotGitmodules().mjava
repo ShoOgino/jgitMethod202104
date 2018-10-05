@@ -1,0 +1,19 @@
+	@Test
+	public void testNotGitmodules() throws CorruptObjectException {
+		for (String notGitmodules : new String[] {
+			".gitmodu",
+			".gitmodules oh never mind",
+		}) {
+			checker = new ObjectChecker(); // Reset the ObjectChecker state.
+			checker.setSafeForWindows(true);
+			ObjectId treeId = ObjectId
+					.fromString("0123012301230123012301230123012301230123");
+			StringBuilder b = new StringBuilder();
+			entry(b, "100644 " + notGitmodules);
+
+			byte[] data = encodeASCII(b.toString());
+			checker.checkTree(treeId, data);
+			assertEquals(0, checker.getGitsubmodules().size());
+		}
+	}
+

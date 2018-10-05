@@ -1,0 +1,18 @@
+	/**
+	 * Validate path for a submodule
+	 *
+	 * @param path
+	 *            path of a submodule
+	 * @throws SubmoduleValidationException
+	 *             path doesn't look right
+	 */
+	public static void assertValidSubmodulePath(String path)
+			throws SubmoduleValidationException {
+
+		if (path.startsWith("-")) { //$NON-NLS-1$
+			throw new SubmoduleValidationException(
+					MessageFormat.format(
+							JGitText.get().submodulePathInvalid, path));
+		}
+	}
+
