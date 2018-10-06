@@ -1,0 +1,14 @@
+	/**
+	 * A record of (tree, blob) for a .gitmodule file in a pack
+	 *
+	 * @param treeId
+	 *            tree id containing a .gitmodules entry
+	 * @param blobId
+	 *            id of the blob of the .gitmodules file
+	 */
+	public GitmoduleEntry(AnyObjectId treeId, AnyObjectId blobId) {
+		// AnyObjectId's are reused, must keep a copy.
+		this.treeId = treeId.copy();
+		this.blobId = blobId.copy();
+	}
+

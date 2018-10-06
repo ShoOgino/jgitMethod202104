@@ -1,0 +1,13 @@
+	@Test
+	public void testTreeWithInvalidGitmodules() throws CorruptObjectException {
+		ObjectId treeId = ObjectId
+				.fromString("0123012301230123012301230123012301230123");
+		StringBuilder b = new StringBuilder();
+		entry(b, "100644 .gitmodulez");
+
+		byte[] data = encodeASCII(b.toString());
+		checker.checkTree(treeId, data);
+		checker.setSafeForWindows(true);
+		assertEquals(0, checker.getGitsubmodules().size());
+	}
+
