@@ -1,0 +1,17 @@
+	/**
+	 * Validate URI for a submodule
+	 *
+	 * @param uri
+	 *            uri of a submodule
+	 * @throws SubmoduleValidationException
+	 *             uri doesn't seem valid
+	 */
+	public static void assertValidSubmoduleUri(String uri)
+			throws SubmoduleValidationException {
+		if (uri.startsWith("-")) { //$NON-NLS-1$
+			throw new SubmoduleValidationException(
+					MessageFormat.format(
+							JGitText.get().submoduleUrlInvalid, uri));
+		}
+	}
+
