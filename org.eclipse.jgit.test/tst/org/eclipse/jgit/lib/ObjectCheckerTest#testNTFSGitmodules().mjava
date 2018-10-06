@@ -1,0 +1,39 @@
+	/*
+	 * Windows case insensitivity and long file name handling
+	 * means that .gitmodules has many synonyms.
+	 *
+	 * Examples inspired by git.git's t/t0060-path-utils.sh, by
+	 * Johannes Schindelin and Congyi Wu.
+	 */
+	@Test
+	public void testNTFSGitmodules() throws CorruptObjectException {
+		for (String gitmodules : new String[] {
+			".GITMODULES",
+			".gitmodules",
+			".Gitmodules",
+			".gitmoduleS",
+			"gitmod~1",
+			"GITMOD~1",
+			"gitmod~4",
+			"GI7EBA~1",
+			"gi7eba~9",
+			"GI7EB~10",
+			"GI7E~123",
+			"~1000000",
+			"~9999999"
+		}) {
+			checker = new ObjectChecker(); // Reset the ObjectChecker state.
+			checker.setSafeForWindows(true);
+			ObjectId treeId = ObjectId
+					.fromString("0123012301230123012301230123012301230123");
+			StringBuilder b = new StringBuilder();
+			ObjectId blobId = entry(b, "100644 " + gitmodules);
+
+			byte[] data = encodeASCII(b.toString());
+			checker.checkTree(treeId, data);
+			assertEquals(1, checker.getGitsubmodules().size());
+			assertEquals(treeId, checker.getGitsubmodules().get(0).getTreeId());
+			assertEquals(blobId, checker.getGitsubmodules().get(0).getBlobId());
+		}
+	}
+
