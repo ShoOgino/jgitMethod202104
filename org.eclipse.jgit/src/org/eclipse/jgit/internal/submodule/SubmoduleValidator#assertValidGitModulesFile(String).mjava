@@ -10,19 +10,21 @@
 		Config c = new Config();
 		try {
 			c.fromText(gitModulesContents);
-			for (String subsection : c.getSubsections(
-					ConfigConstants.CONFIG_SUBMODULE_SECTION)) {
-				String url = c.getString(
-						ConfigConstants.CONFIG_SUBMODULE_SECTION,
-						subsection, ConfigConstants.CONFIG_KEY_URL);
-				assertValidSubmoduleUri(url);
-
+			for (String subsection :
+					c.getSubsections(CONFIG_SUBMODULE_SECTION)) {
 				assertValidSubmoduleName(subsection);
 
+				String url = c.getString(
+						CONFIG_SUBMODULE_SECTION, subsection, CONFIG_KEY_URL);
+				if (url != null) {
+					assertValidSubmoduleUri(url);
+				}
+
 				String path = c.getString(
-						ConfigConstants.CONFIG_SUBMODULE_SECTION, subsection,
-						ConfigConstants.CONFIG_KEY_PATH);
-				assertValidSubmodulePath(path);
+						CONFIG_SUBMODULE_SECTION, subsection, CONFIG_KEY_PATH);
+				if (path != null) {
+					assertValidSubmodulePath(path);
+				}
 			}
 		} catch (ConfigInvalidException e) {
 			throw new IOException(
