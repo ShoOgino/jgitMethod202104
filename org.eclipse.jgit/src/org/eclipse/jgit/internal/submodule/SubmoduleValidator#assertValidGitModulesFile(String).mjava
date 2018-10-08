@@ -1,12 +1,14 @@
 	/**
+	 * Validate a .gitmodules file
+	 *
 	 * @param gitModulesContents
 	 *            Contents of a .gitmodule file. They will be parsed internally.
-	 * @throws IOException
-	 *             If the contents
+	 * @throws SubmoduleValidationException
+	 *             if the contents don't look like a configuration file or field
+	 *             values are not valid
 	 */
 	public static void assertValidGitModulesFile(String gitModulesContents)
-			throws IOException {
-		// Validate .gitmodules file
+			throws SubmoduleValidationException {
 		Config c = new Config();
 		try {
 			c.fromText(gitModulesContents);
@@ -27,12 +29,9 @@
 				}
 			}
 		} catch (ConfigInvalidException e) {
-			throw new IOException(
-					MessageFormat.format(
-							JGitText.get().invalidGitModules,
-							e));
-		} catch (SubmoduleValidationException e) {
-			throw new IOException(e.getMessage(), e);
+			throw new SubmoduleValidationException(
+					JGitText.get().invalidGitModules,
+					GITMODULES_PARSE);
 		}
 	}
 

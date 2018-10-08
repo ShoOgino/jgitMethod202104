@@ -21,13 +21,15 @@
 			// Since Path class is platform dependent, we manually check '/' and
 			// '\\' patterns here.
 			throw new SubmoduleValidationException(MessageFormat
-					.format(JGitText.get().invalidNameContainsDotDot, name));
+					.format(JGitText.get().invalidNameContainsDotDot, name),
+					GITMODULES_NAME);
 		}
 
 		if (name.startsWith("-")) { //$NON-NLS-1$
 			throw new SubmoduleValidationException(
 					MessageFormat.format(
-							JGitText.get().submoduleNameInvalid, name));
+							JGitText.get().submoduleNameInvalid, name),
+					GITMODULES_NAME);
 		}
 	}
 

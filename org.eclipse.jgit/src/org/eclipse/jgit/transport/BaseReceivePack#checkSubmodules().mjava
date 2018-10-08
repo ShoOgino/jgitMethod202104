@@ -8,8 +8,12 @@
 			AnyObjectId blobId = entry.getBlobId();
 			ObjectLoader blob = odb.open(blobId, Constants.OBJ_BLOB);
 
-			SubmoduleValidator.assertValidGitModulesFile(
-					new String(blob.getBytes(), UTF_8));
+			try {
+				SubmoduleValidator.assertValidGitModulesFile(
+						new String(blob.getBytes(), UTF_8));
+			} catch (LargeObjectException | SubmoduleValidationException e) {
+				throw new IOException(e);
+			}
 		}
 	}
 
