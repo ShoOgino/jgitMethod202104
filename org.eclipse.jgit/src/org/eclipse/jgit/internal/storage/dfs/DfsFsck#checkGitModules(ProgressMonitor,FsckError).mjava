@@ -1,0 +1,22 @@
+	private void checkGitModules(ProgressMonitor pm, FsckError errors)
+			throws IOException {
+		pm.beginTask(JGitText.get().validatingGitModules,
+				objChecker.getGitsubmodules().size());
+		for (GitmoduleEntry entry : objChecker.getGitsubmodules()) {
+			AnyObjectId blobId = entry.getBlobId();
+			ObjectLoader blob = objdb.open(blobId, Constants.OBJ_BLOB);
+
+			try {
+				SubmoduleValidator.assertValidGitModulesFile(
+						new String(blob.getBytes(), UTF_8));
+			} catch (SubmoduleValidationException e) {
+				CorruptObject co = new FsckError.CorruptObject(
+						blobId.toObjectId(), Constants.OBJ_BLOB,
+						e.getFsckMessageId());
+				errors.getCorruptObjects().add(co);
+			}
+			pm.update(1);
+		}
+		pm.endTask();
+	}
+

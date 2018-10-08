@@ -1,0 +1,18 @@
+	@Test
+	public void testValidGitModules() throws Exception {
+		String fakeGitmodules = new StringBuilder()
+				.append("[submodule \"test\"]\n")
+				.append("    path = xlib\n")
+				.append("    url = https://example.com/repo/xlib.git\n\n")
+				.append("[submodule \"test2\"]\n")
+				.append("    path = zlib\n")
+				.append("    url = ok/path\n")
+				.toString();
+
+		insertGitModules(fakeGitmodules);
+
+		DfsFsck fsck = new DfsFsck(repo);
+		FsckError errors = fsck.check(null);
+		assertEquals(errors.getCorruptObjects().size(), 0);
+	}
+
