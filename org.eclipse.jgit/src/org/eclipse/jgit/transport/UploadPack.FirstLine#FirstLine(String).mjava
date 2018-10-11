@@ -3,6 +3,10 @@
 		 *            line from the client.
 		 */
 		public FirstLine(String line) {
-			firstWant = FirstWant.fromLine(line);
+			try {
+				firstWant = FirstWant.fromLine(line);
+			} catch (PackProtocolException e) {
+				throw new UncheckedIOException(e);
+			}
 		}
 

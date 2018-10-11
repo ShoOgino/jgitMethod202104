@@ -1,0 +1,15 @@
+	@Test
+	public void testFirstWantValidCapabilityNames()
+			throws PackProtocolException {
+		List<String> validNames = Arrays.asList(
+				"c", "cap", "C", "CAP", "1", "1cap", "cap-64k_test",
+				"-", "-cap",
+				"_", "_cap", "agent=pack.age/Version");
+
+		for (String capability: validNames) {
+			FirstWant r = FirstWant.fromLine(makeFirstWantLine(capability));
+			assertEquals(r.getCapabilities().size(), 1);
+			assertTrue(r.getCapabilities().contains(capability));
+		}
+	}
+
