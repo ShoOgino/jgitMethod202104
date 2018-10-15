@@ -1,0 +1,29 @@
+	/**
+	 * Initialize the common fields of a fetch request.
+	 *
+	 * @param wantIds
+	 *            list of want ids
+	 * @param depth
+	 *            how deep to go in the tree
+	 * @param clientShallowCommits
+	 *            commits the client has without history
+	 * @param filterBlobLimit
+	 *            to exclude blobs on certain conditions
+	 * @param clientCapabilities
+	 *            capabilities sent in the request
+	 */
+	FetchRequest(Set<ObjectId> wantIds, int depth,
+			Set<ObjectId> clientShallowCommits, long filterBlobLimit,
+			Set<String> clientCapabilities) {
+		if (wantIds == null || clientShallowCommits == null
+				|| clientCapabilities == null) {
+			throw new NullPointerException();
+		}
+
+		this.wantIds = wantIds;
+		this.depth = depth;
+		this.clientShallowCommits = clientShallowCommits;
+		this.filterBlobLimit = filterBlobLimit;
+		this.clientCapabilities = clientCapabilities;
+	}
+
