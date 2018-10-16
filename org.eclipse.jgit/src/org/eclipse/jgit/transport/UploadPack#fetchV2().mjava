@@ -25,7 +25,6 @@
 		clientShallowCommits = req.getClientShallowCommits();
 		depth = req.getDepth();
 		shallowSince = req.getDeepenSince();
-		deepenNotRefs = req.getDeepenNotRefs();
 
 		boolean sectionSent = false;
 		boolean mayHaveShallow = req.getDepth() != 0
@@ -38,7 +37,7 @@
 			verifyClientShallow(req.getClientShallowCommits());
 		}
 		if (mayHaveShallow) {
-			computeShallowsAndUnshallows(req.getWantIds(),
+			computeShallowsAndUnshallows(req,
 					shallowCommit -> shallowCommits.add(shallowCommit),
 					unshallowCommit -> unshallowCommits.add(unshallowCommit));
 		}

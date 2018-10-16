@@ -2,24 +2,26 @@
 	 * Determines what object ids must be marked as shallow or unshallow for the
 	 * client.
 	 */
-	private void computeShallowsAndUnshallows(Iterable<ObjectId> wants,
+	private void computeShallowsAndUnshallows(FetchRequest req,
 			IOConsumer<ObjectId> shallowFunc,
 			IOConsumer<ObjectId> unshallowFunc)
 			throws IOException {
-		if (options.contains(OPTION_DEEPEN_RELATIVE) || !deepenNotRefs.isEmpty()) {
+		if (req.getClientCapabilities().contains(OPTION_DEEPEN_RELATIVE)
+				|| !req.getDeepenNotRefs().isEmpty()) {
 			// TODO(jonathantanmy): Implement deepen-relative
 			// and deepen-not.
 			throw new UnsupportedOperationException();
 		}
 
-		int walkDepth = depth == 0 ? Integer.MAX_VALUE : depth - 1;
+		int walkDepth = req.getDepth() == 0 ? Integer.MAX_VALUE
+				: req.getDepth() - 1;
 		try (DepthWalk.RevWalk depthWalk = new DepthWalk.RevWalk(
 				walk.getObjectReader(), walkDepth)) {
 
-			depthWalk.setDeepenSince(shallowSince);
+			depthWalk.setDeepenSince(req.getDeepenSince());
 
 			// Find all the commits which will be shallow
-			for (ObjectId o : wants) {
+			for (ObjectId o : req.getWantIds()) {
 				try {
 					depthWalk.markRoot(depthWalk.parseCommit(o));
 				} catch (IncorrectObjectTypeException notCommit) {
@@ -35,13 +37,13 @@
 
 				// Commits at the boundary which aren't already shallow in
 				// the client need to be marked as such
-				if (isBoundary && !clientShallowCommits.contains(c)) {
+				if (isBoundary && !req.getClientShallowCommits().contains(c)) {
 					shallowFunc.accept(c.copy());
 				}
 
 				// Commits not on the boundary which are shallow in the client
 				// need to become unshallowed
-				if (!isBoundary && clientShallowCommits.remove(c)) {
+				if (!isBoundary && req.getClientShallowCommits().remove(c)) {
 					unshallowFunc.accept(c.copy());
 				}
 			}
