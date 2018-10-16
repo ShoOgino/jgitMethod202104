@@ -14,6 +14,11 @@
 	 * @since 4.0
 	 */
 	public String getPeerUserAgent() {
-		return UserAgent.getAgent(options, userAgent);
+		if (currentRequest == null) {
+			return userAgent;
+		}
+
+		return UserAgent.getAgent(currentRequest.getClientCapabilities(),
+				userAgent);
 	}
 
