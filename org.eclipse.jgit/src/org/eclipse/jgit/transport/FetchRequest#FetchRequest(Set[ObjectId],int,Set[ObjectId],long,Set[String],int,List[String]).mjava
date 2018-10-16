@@ -11,14 +11,23 @@
 	 *            to exclude blobs on certain conditions
 	 * @param clientCapabilities
 	 *            capabilities sent in the request
+	 * @param deepenNotRefs
+	 *            Requests that the shallow clone/fetch should be cut at these
+	 *            specific revisions instead of a depth.
+	 * @param deepenSince
+	 *            Requests that the shallow clone/fetch should be cut at a
+	 *            specific time, instead of depth
 	 */
 	FetchRequest(@NonNull Set<ObjectId> wantIds, int depth,
 			@NonNull Set<ObjectId> clientShallowCommits, long filterBlobLimit,
-			@NonNull Set<String> clientCapabilities) {
+			@NonNull Set<String> clientCapabilities, int deepenSince,
+			@NonNull List<String> deepenNotRefs) {
 		this.wantIds = requireNonNull(wantIds);
 		this.depth = depth;
 		this.clientShallowCommits = requireNonNull(clientShallowCommits);
 		this.filterBlobLimit = filterBlobLimit;
 		this.clientCapabilities = requireNonNull(clientCapabilities);
+		this.deepenSince = deepenSince;
+		this.deepenNotRefs = requireNonNull(deepenNotRefs);
 	}
 
