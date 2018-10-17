@@ -16,6 +16,11 @@
 		int numberOfPasswordPrompts = getNumberOfPasswordPrompts(hostConfig);
 		session.getProperties().put(PASSWORD_PROMPTS,
 				Integer.valueOf(numberOfPasswordPrompts));
+		FilePasswordProvider provider = getFilePasswordProvider();
+		if (provider instanceof RepeatingFilePasswordProvider) {
+			((RepeatingFilePasswordProvider) provider)
+					.setAttempts(numberOfPasswordPrompts);
+		}
 		FileKeyPairProvider ourConfiguredKeysProvider = null;
 		List<Path> identities = hostConfig.getIdentities().stream()
 				.map(s -> {
