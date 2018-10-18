@@ -1,0 +1,23 @@
+	private static void setPreferredKeyTypesOrder(Session session) {
+		HostKeyRepository hkr = session.getHostKeyRepository();
+		List<String> known = Stream.of(hkr.getHostKey(hostName(session), null))
+				.map(HostKey::getType)
+				.collect(toList());
+
+		if (!known.isEmpty()) {
+			String serverHostKey = "server_host_key"; //$NON-NLS-1$
+			String current = session.getConfig(serverHostKey);
+			if (current == null) {
+				session.setConfig(serverHostKey, String.join(",", known)); //$NON-NLS-1$
+				return;
+			}
+
+			String knownFirst = Stream.concat(
+							known.stream(),
+							Stream.of(current.split(",")) //$NON-NLS-1$
+									.filter(s -> !known.contains(s)))
+					.collect(joining(",")); //$NON-NLS-1$
+			session.setConfig(serverHostKey, knownFirst);
+		}
+	}
+
