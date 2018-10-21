@@ -1,0 +1,26 @@
+	private InetSocketAddress configureProxy(ProxyData proxyData,
+			InetSocketAddress remoteAddress) {
+		Proxy proxy = proxyData.getProxy();
+		if (proxy.type() == Proxy.Type.DIRECT
+				|| !(proxy.address() instanceof InetSocketAddress)) {
+			return remoteAddress;
+		}
+		InetSocketAddress address = (InetSocketAddress) proxy.address();
+		switch (proxy.type()) {
+		case HTTP:
+			setClientProxyConnector(
+					new HttpClientConnector(address, remoteAddress,
+							proxyData.getUser(), proxyData.getPassword()));
+			return address;
+		case SOCKS:
+			setClientProxyConnector(
+					new Socks5ClientConnector(address, remoteAddress,
+							proxyData.getUser(), proxyData.getPassword()));
+			return address;
+		default:
+			LOG.warn(format(SshdText.get().unknownProxyProtocol,
+					proxy.type().name()));
+			return remoteAddress;
+		}
+	}
+

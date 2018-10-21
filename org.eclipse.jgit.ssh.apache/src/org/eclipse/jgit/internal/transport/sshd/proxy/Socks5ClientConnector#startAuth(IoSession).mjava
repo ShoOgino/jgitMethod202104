@@ -1,0 +1,21 @@
+	private void startAuth(IoSession session) throws Exception {
+		Buffer buffer = null;
+		try {
+			authenticator.setParams(null);
+			authenticator.start();
+			buffer = authenticator.getToken();
+			state = ProtocolState.AUTHENTICATING;
+			if (buffer == null) {
+				// Internal error; no translation
+				throw new IOException(
+						"No data for proxy authentication with " //$NON-NLS-1$
+								+ proxyAddress);
+			}
+			session.writePacket(buffer).verify(getTimeout());
+		} finally {
+			if (buffer != null) {
+				buffer.clear(true);
+			}
+		}
+	}
+

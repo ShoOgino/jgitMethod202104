@@ -1,0 +1,24 @@
+	/**
+	 * Creates a new {@link ProxyData} instance.
+	 *
+	 * @param proxy
+	 *            to connect to; must not be {@link java.net.Proxy.Type#DIRECT}
+	 *            and must have an {@link InetSocketAddress}.
+	 * @param proxyUser
+	 *            to use for log-in to the proxy, may be {@code null}
+	 * @param proxyPassword
+	 *            to use for log-in to the proxy, may be {@code null}
+	 */
+	public ProxyData(@NonNull Proxy proxy, String proxyUser,
+			char[] proxyPassword) {
+		this.proxy = proxy;
+		if (!(proxy.address() instanceof InetSocketAddress)) {
+			// Internal error not translated
+			throw new IllegalArgumentException(
+					"Proxy does not have an InetSocketAddress"); //$NON-NLS-1$
+		}
+		this.proxyUser = proxyUser;
+		this.proxyPassword = proxyPassword == null ? null
+				: proxyPassword.clone();
+	}
+

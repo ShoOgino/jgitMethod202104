@@ -1,0 +1,43 @@
+	private void establishConnection(Buffer data) throws Exception {
+		byte reply = data.getByte();
+		switch (reply) {
+		case SOCKS_REPLY_SUCCESS:
+			state = ProtocolState.CONNECTED;
+			setDone(true);
+			return;
+		case SOCKS_REPLY_FAILURE:
+			throw new IOException(format(
+					SshdText.get().proxySocksFailureGeneral, proxyAddress));
+		case SOCKS_REPLY_FORBIDDEN:
+			throw new IOException(
+					format(SshdText.get().proxySocksFailureForbidden,
+							proxyAddress, remoteAddress));
+		case SOCKS_REPLY_NETWORK_UNREACHABLE:
+			throw new IOException(
+					format(SshdText.get().proxySocksFailureNetworkUnreachable,
+							proxyAddress, remoteAddress));
+		case SOCKS_REPLY_HOST_UNREACHABLE:
+			throw new IOException(
+					format(SshdText.get().proxySocksFailureHostUnreachable,
+							proxyAddress, remoteAddress));
+		case SOCKS_REPLY_CONNECTION_REFUSED:
+			throw new IOException(
+					format(SshdText.get().proxySocksFailureRefused,
+							proxyAddress, remoteAddress));
+		case SOCKS_REPLY_TTL_EXPIRED:
+			throw new IOException(
+					format(SshdText.get().proxySocksFailureTTL, proxyAddress));
+		case SOCKS_REPLY_COMMAND_UNSUPPORTED:
+			throw new IOException(
+					format(SshdText.get().proxySocksFailureUnsupportedCommand,
+							proxyAddress));
+		case SOCKS_REPLY_ADDRESS_UNSUPPORTED:
+			throw new IOException(
+					format(SshdText.get().proxySocksFailureUnsupportedAddress,
+							proxyAddress));
+		default:
+			throw new IOException(format(
+					SshdText.get().proxySocksFailureUnspecified, proxyAddress));
+		}
+	}
+

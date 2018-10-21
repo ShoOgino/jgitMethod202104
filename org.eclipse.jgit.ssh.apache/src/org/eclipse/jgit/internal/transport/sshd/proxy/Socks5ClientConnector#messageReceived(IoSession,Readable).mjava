@@ -1,0 +1,25 @@
+	@Override
+	public void messageReceived(IoSession session, Readable buffer)
+			throws Exception {
+		try {
+			// Dispatch according to protocol state
+			ByteArrayBuffer data = new ByteArrayBuffer(buffer.available(),
+					false);
+			data.putBuffer(buffer);
+			data.compact();
+			state.handleMessage(this, session, data);
+		} catch (Exception e) {
+			state = ProtocolState.FAILED;
+			if (authenticator != null) {
+				authenticator.close();
+				authenticator = null;
+			}
+			try {
+				setDone(false);
+			} catch (Exception inner) {
+				e.addSuppressed(inner);
+			}
+			throw e;
+		}
+	}
+

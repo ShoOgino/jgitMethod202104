@@ -1,0 +1,22 @@
+	private static void parseChallenges(
+			List<AuthenticationChallenge> challenges,
+			String header) {
+		// Comma-separated list of challenges, each itself a scheme name
+		// followed optionally by either: a comma-separated list of key=value
+		// pairs, where the value may be a quoted string with backslash escapes,
+		// or a single token value, which itself may end in zero or more '='
+		// characters. Ugh.
+		int length = header.length();
+		for (int i = 0; i < length;) {
+			int start = skipWhiteSpace(header, i);
+			int end = scanToken(header, start);
+			if (end <= start) {
+				break;
+			}
+			AuthenticationChallenge challenge = new AuthenticationChallenge(
+					header.substring(start, end));
+			challenges.add(challenge);
+			i = parseChallenge(challenge, header, end);
+		}
+	}
+

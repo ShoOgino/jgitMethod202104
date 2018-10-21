@@ -1,0 +1,14 @@
+	private byte[] convert(char[] pass) {
+		if (pass == null) {
+			return new byte[0];
+		}
+		ByteBuffer bytes = StandardCharsets.UTF_8.encode(CharBuffer.wrap(pass));
+		byte[] pwd = new byte[bytes.remaining()];
+		bytes.get(pwd);
+		if (bytes.hasArray()) {
+			Arrays.fill(bytes.array(), (byte) 0);
+		}
+		Arrays.fill(pass, '\000');
+		return pwd;
+	}
+

@@ -1,0 +1,38 @@
+	/**
+	 * Parse a HTTP response status line.
+	 *
+	 * @param line
+	 *            to parse
+	 * @return the {@link StatusLine}
+	 * @throws ParseException
+	 *             if the line cannot be parsed or has the wrong HTTP version
+	 */
+	public static StatusLine parseStatusLine(String line)
+			throws ParseException {
+		// Format is HTTP/<version> Code Reason
+		int firstBlank = line.indexOf(' ');
+		if (firstBlank < 0) {
+			throw new ParseException();
+		}
+		int secondBlank = line.indexOf(' ', firstBlank + 1);
+		if (secondBlank < 0) {
+			// Accept the line even if the (according to RFC 2616 mandatory)
+			// reason is missing.
+			secondBlank = line.length();
+		}
+		int resultCode;
+		try {
+			resultCode = Integer.parseUnsignedInt(
+					line.substring(firstBlank + 1, secondBlank));
+		} catch (NumberFormatException e) {
+			throw new ParseException();
+		}
+		// Again, accept even if the reason is missing
+		String reason = ""; //$NON-NLS-1$
+		if (secondBlank < line.length()) {
+			reason = line.substring(secondBlank + 1);
+		}
+		return new StatusLine(line.substring(0, firstBlank), resultCode,
+				reason);
+	}
+

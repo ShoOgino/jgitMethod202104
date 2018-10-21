@@ -1,0 +1,51 @@
+	/**
+	 * Extract the authentication headers from the header lines. It is assumed
+	 * that the first element in {@code reply} is the raw status line as
+	 * received from the server. It is skipped. Line processing stops on the
+	 * first empty line thereafter.
+	 *
+	 * @param reply
+	 *            The complete (header) lines of the HTTP response
+	 * @param authenticationHeader
+	 *            to look for (including the terminating ':'!)
+	 * @return a list of {@link AuthenticationChallenge}s found.
+	 */
+	public static List<AuthenticationChallenge> getAuthenticationHeaders(
+			List<String> reply, String authenticationHeader) {
+		List<AuthenticationChallenge> challenges = new ArrayList<>();
+		Iterator<String> lines = reply.iterator();
+		// We know we have at least one line. Skip the response line.
+		lines.next();
+		StringBuilder value = null;
+		while (lines.hasNext()) {
+			String line = lines.next();
+			if (line.isEmpty()) {
+				break;
+			}
+			if (Character.isWhitespace(line.charAt(0))) {
+				// Continuation line.
+				if (value == null) {
+					// Skip if we have no current value
+					continue;
+				}
+				// Skip leading whitespace
+				int i = skipWhiteSpace(line, 1);
+				value.append(' ').append(line, i, line.length());
+				continue;
+			}
+			if (value != null) {
+				parseChallenges(challenges, value.toString());
+				value = null;
+			}
+			int firstColon = line.indexOf(':');
+			if (firstColon > 0 && authenticationHeader
+					.equalsIgnoreCase(line.substring(0, firstColon + 1))) {
+				value = new StringBuilder(line.substring(firstColon + 1));
+			}
+		}
+		if (value != null) {
+			parseChallenges(challenges, value.toString());
+		}
+		return challenges;
+	}
+

@@ -1,0 +1,16 @@
+	/**
+	 * {@inheritDoc}
+	 *
+	 * As long as we're still setting up the proxy connection, diverts messages
+	 * to the {@link StatefulProxyConnector}.
+	 */
+	@Override
+	public void messageReceived(Readable buffer) throws Exception {
+		StatefulProxyConnector proxy = proxyHandler;
+		if (proxy != null) {
+			proxy.messageReceived(getIoSession(), buffer);
+		} else {
+			super.messageReceived(buffer);
+		}
+	}
+

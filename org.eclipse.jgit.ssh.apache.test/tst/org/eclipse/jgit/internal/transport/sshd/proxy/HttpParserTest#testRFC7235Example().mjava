@@ -1,0 +1,30 @@
+	@Test
+	public void testRFC7235Example() throws Exception {
+		// The example from RFC 7235, sec. 4.1, slightly modified ("kind"
+		// argument with whitespace around '=')
+		String[] lines = { STATUS_LINE,
+				"WWW-Authenticate: Newauth realm=\"apps\", type=1  , kind = \t2 ",
+				"   \t  title=\"Login to \\\"apps\\\"\", Basic realm=\"simple\"" };
+		List<AuthenticationChallenge> challenges = HttpParser
+				.getAuthenticationHeaders(Arrays.asList(lines),
+						"WWW-Authenticate:");
+		assertEquals("Unexpected number of challenges", 2, challenges.size());
+		assertNull("No token expected", challenges.get(0).getToken());
+		assertNull("No token expected", challenges.get(1).getToken());
+		assertEquals("Unexpected mechanism", "Newauth",
+				challenges.get(0).getMechanism());
+		assertEquals("Unexpected mechanism", "Basic",
+				challenges.get(1).getMechanism());
+		Map<String, String> expectedArguments = new LinkedHashMap<>();
+		expectedArguments.put("realm", "apps");
+		expectedArguments.put("type", "1");
+		expectedArguments.put("kind", "2");
+		expectedArguments.put("title", "Login to \"apps\"");
+		assertEquals("Unexpected arguments", expectedArguments,
+				challenges.get(0).getArguments());
+		expectedArguments.clear();
+		expectedArguments.put("realm", "simple");
+		assertEquals("Unexpected arguments", expectedArguments,
+				challenges.get(1).getArguments());
+	}
+

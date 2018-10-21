@@ -1,0 +1,22 @@
+	private static String scanQuotedString(String header, int from, int[] to) {
+		StringBuilder result = new StringBuilder();
+		int length = header.length();
+		boolean quoted = false;
+		int i = from;
+		while (i < length) {
+			char c = header.charAt(i++);
+			if (quoted) {
+				result.append(c);
+				quoted = false;
+			} else if (c == '\\') {
+				quoted = true;
+			} else if (c == '"') {
+				break;
+			} else {
+				result.append(c);
+			}
+		}
+		to[0] = i;
+		return result.toString();
+	}
+

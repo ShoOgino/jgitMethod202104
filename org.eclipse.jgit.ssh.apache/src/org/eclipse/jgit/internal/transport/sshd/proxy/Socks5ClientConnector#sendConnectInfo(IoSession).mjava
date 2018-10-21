@@ -1,0 +1,48 @@
+	private void sendConnectInfo(IoSession session) throws Exception {
+		GssApiMechanisms.closeContextSilently(context);
+
+		byte[] rawAddress = getRawAddress(remoteAddress);
+		byte[] remoteName = null;
+		byte type;
+		int length = 0;
+		if (rawAddress == null) {
+			remoteName = remoteAddress.getHostString()
+					.getBytes(StandardCharsets.US_ASCII);
+			if (remoteName == null || remoteName.length == 0) {
+				throw new IOException(
+						format(SshdText.get().proxySocksNoRemoteHostName,
+								remoteAddress));
+			} else if (remoteName.length > 255) {
+				// Should not occur; host names must not be longer than 255
+				// US_ASCII characters. Internal error, no translation.
+				throw new IOException(format(
+						"Proxy host name too long for SOCKS (at most 255 characters): {0}", //$NON-NLS-1$
+						remoteAddress.getHostString()));
+			}
+			type = SOCKS_ADDRESS_FQDN;
+			length = remoteName.length + 1;
+		} else {
+			length = rawAddress.length;
+			type = length == 4 ? SOCKS_ADDRESS_IPv4 : SOCKS_ADDRESS_IPv6;
+		}
+		Buffer buffer = new ByteArrayBuffer(4 + length + 2, false);
+		buffer.putByte(SOCKS_VERSION_5);
+		buffer.putByte(SOCKS_CMD_CONNECT);
+		buffer.putByte((byte) 0); // Reserved
+		buffer.putByte(type);
+		if (remoteName != null) {
+			buffer.putByte((byte) remoteName.length);
+			buffer.putRawBytes(remoteName);
+		} else {
+			buffer.putRawBytes(rawAddress);
+		}
+		int port = remoteAddress.getPort();
+		if (port <= 0) {
+			port = SshConstants.SSH_DEFAULT_PORT;
+		}
+		buffer.putByte((byte) ((port >> 8) & 0xFF));
+		buffer.putByte((byte) (port & 0xFF));
+		state = ProtocolState.CONNECTING;
+		session.writePacket(buffer).verify(getTimeout());
+	}
+

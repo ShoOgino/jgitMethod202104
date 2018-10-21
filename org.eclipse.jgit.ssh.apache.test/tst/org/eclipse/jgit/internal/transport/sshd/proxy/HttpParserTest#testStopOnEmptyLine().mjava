@@ -1,0 +1,16 @@
+	@Test
+	public void testStopOnEmptyLine() {
+		String[] lines = { STATUS_LINE, "Server: Apache",
+				"WWW-Authenticate: Newauth realm=\"apps\", type=1  , kind = \t2 ",
+				"   \t  title=\"Login to \\\"apps\\\"\", Basic realm=\"simple\"",
+				"Content-Type: text/plain",
+				"WWW-Authenticate: Other 0123456789===", "",
+				// Not headers anymore; this would be the body
+				"WWW-Authenticate: Negotiate   ",
+				"WWW-Authenticate: Negotiate a87421000492aa874209af8bc028" };
+		List<AuthenticationChallenge> challenges = HttpParser
+				.getAuthenticationHeaders(Arrays.asList(lines),
+						"WWW-Authenticate:");
+		assertEquals("Unexpected number of challenges", 3, challenges.size());
+	}
+

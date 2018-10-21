@@ -1,0 +1,24 @@
+	/**
+	 * Sets the "done" flag.
+	 *
+	 * @param success
+	 *            whether the connector terminated successfully.
+	 * @throws Exception
+	 *             if starting ssh fails
+	 */
+	protected void setDone(boolean success) throws Exception {
+		Callable<Void> starter;
+		Runnable unset = unregister.getAndSet(null);
+		if (unset != null) {
+			unset.run();
+		}
+		synchronized (lock) {
+			done = true;
+			starter = startSsh;
+			startSsh = null;
+		}
+		if (success && starter != null) {
+			starter.call();
+		}
+	}
+

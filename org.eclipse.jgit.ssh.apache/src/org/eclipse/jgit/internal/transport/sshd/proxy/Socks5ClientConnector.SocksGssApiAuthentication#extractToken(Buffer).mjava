@@ -1,0 +1,35 @@
+		@Override
+		protected byte[] extractToken(Buffer input) throws Exception {
+			if (context == null) {
+				return null;
+			}
+			int version = input.getUByte();
+			if (version != SOCKS5_GSSAPI_VERSION) {
+				throw new IOException(
+						format(SshdText.get().proxySocksGssApiVersionMismatch,
+								remoteAddress, Integer.toString(version)));
+			}
+			int msgType = input.getUByte();
+			if (msgType == SOCKS5_GSSAPI_FAILURE) {
+				throw new IOException(format(
+						SshdText.get().proxySocksGssApiFailure, remoteAddress));
+			} else if (msgType != SOCKS5_GSSAPI_TOKEN) {
+				throw new IOException(format(
+						SshdText.get().proxySocksGssApiUnknownMessage,
+						remoteAddress, Integer.toHexString(msgType & 0xFF)));
+			}
+			if (input.available() >= 2) {
+				int length = (input.getUByte() << 8) + input.getUByte();
+				if (input.available() >= length) {
+					byte[] value = new byte[length];
+					if (length > 0) {
+						input.getRawBytes(value);
+					}
+					return value;
+				}
+			}
+			throw new IOException(
+					format(SshdText.get().proxySocksGssApiMessageTooShort,
+							remoteAddress));
+		}
+

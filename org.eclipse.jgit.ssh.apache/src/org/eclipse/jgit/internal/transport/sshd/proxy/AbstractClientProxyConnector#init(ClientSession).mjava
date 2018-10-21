@@ -1,0 +1,25 @@
+	/**
+	 * Initializes this instance. Installs itself as proxy handler on the
+	 * session.
+	 *
+	 * @param session
+	 *            to initialize for
+	 */
+	protected void init(ClientSession session) {
+		remainingProxyProtocolTime = session.getLongProperty(
+				StatefulProxyConnector.TIMEOUT_PROPERTY,
+				DEFAULT_PROXY_TIMEOUT_MILLIS);
+		if (remainingProxyProtocolTime <= 0L) {
+			remainingProxyProtocolTime = DEFAULT_PROXY_TIMEOUT_MILLIS;
+		}
+		if (session instanceof JGitClientSession) {
+			JGitClientSession s = (JGitClientSession) session;
+			unregister.set(() -> s.setProxyHandler(null));
+			s.setProxyHandler(this);
+		} else {
+			// Internal error, no translation
+			throw new IllegalStateException(
+					"Not a JGit session: " + session.getClass().getName()); //$NON-NLS-1$
+		}
+	}
+

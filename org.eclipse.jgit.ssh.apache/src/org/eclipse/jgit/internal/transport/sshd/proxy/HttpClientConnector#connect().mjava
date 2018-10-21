@@ -1,0 +1,10 @@
+	private StringBuilder connect() {
+		StringBuilder msg = new StringBuilder();
+		// Persistent connections are the default in HTTP 1.1 (see RFC 2616),
+		// but let's be explicit.
+		return msg.append(format(
+				"CONNECT {0}:{1} HTTP/1.1\r\nProxy-Connection: keep-alive\r\nConnection: keep-alive\r\nHost: {0}:{1}\r\n", //$NON-NLS-1$
+				remoteAddress.getHostString(),
+				Integer.toString(remoteAddress.getPort())));
+	}
+

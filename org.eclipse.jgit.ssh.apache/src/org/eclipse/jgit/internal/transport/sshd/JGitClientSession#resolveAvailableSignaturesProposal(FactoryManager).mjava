@@ -46,8 +46,10 @@
 		// keys first.
 		ServerKeyVerifier verifier = getServerKeyVerifier();
 		if (verifier instanceof ServerKeyLookup) {
+			SocketAddress remoteAddress = resolvePeerAddress(
+					resolveAttribute(JGitSshClient.ORIGINAL_REMOTE_ADDRESS));
 			List<HostEntryPair> allKnownKeys = ((ServerKeyLookup) verifier)
-					.lookup(this, this.getIoSession().getRemoteAddress());
+					.lookup(this, remoteAddress);
 			Set<String> reordered = new LinkedHashSet<>();
 			for (HostEntryPair h : allKnownKeys) {
 				PublicKey key = h.getServerKey();

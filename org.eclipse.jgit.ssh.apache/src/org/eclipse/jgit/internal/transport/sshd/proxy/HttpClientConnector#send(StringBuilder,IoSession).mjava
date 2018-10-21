@@ -1,0 +1,7 @@
+	private void send(StringBuilder msg, IoSession session) throws Exception {
+		byte[] data = eol(msg).toString().getBytes(StandardCharsets.US_ASCII);
+		Buffer buffer = new ByteArrayBuffer(data.length, false);
+		buffer.putRawBytes(data);
+		session.writePacket(buffer).verify(getTimeout());
+	}
+

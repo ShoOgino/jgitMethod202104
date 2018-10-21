@@ -24,6 +24,13 @@
 						getAttribute(PREFERRED_AUTHENTICATIONS)),
 				PREFERRED_AUTHS);
 		setAttribute(HOST_CONFIG_ENTRY, hostConfig);
+		setAttribute(ORIGINAL_REMOTE_ADDRESS, address);
+		// Proxy support
+		ProxyData proxy = getProxyData(hostConfig, address);
+		if (proxy != null) {
+			address = configureProxy(proxy, address);
+			proxy.clearPassword();
+		}
 		connector.connect(address).addListener(listener);
 		return connectFuture;
 	}

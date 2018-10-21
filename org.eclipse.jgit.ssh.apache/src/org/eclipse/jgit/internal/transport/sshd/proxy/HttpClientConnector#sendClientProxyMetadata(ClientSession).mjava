@@ -1,0 +1,25 @@
+	@Override
+	public void sendClientProxyMetadata(ClientSession sshSession)
+			throws Exception {
+		init(sshSession);
+		IoSession session = sshSession.getIoSession();
+		session.addCloseFutureListener(f -> close());
+		StringBuilder msg = connect();
+		if (proxyUser != null && !proxyUser.isEmpty()
+				|| proxyPassword != null && proxyPassword.length > 0) {
+			authenticator = basic;
+			basic.setParams(null);
+			basic.start();
+			msg = authenticate(msg, basic.getToken());
+			clearPassword();
+			proxyUser = null;
+		}
+		ongoing = true;
+		try {
+			send(msg, session);
+		} catch (Exception e) {
+			ongoing = false;
+			throw e;
+		}
+	}
+

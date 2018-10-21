@@ -1,0 +1,19 @@
+	private void authStep(IoSession session, Buffer input) throws Exception {
+		Buffer buffer = null;
+		try {
+			authenticator.setParams(input);
+			authenticator.process();
+			buffer = authenticator.getToken();
+			if (buffer != null) {
+				session.writePacket(buffer).verify(getTimeout());
+			}
+		} finally {
+			if (buffer != null) {
+				buffer.clear(true);
+			}
+		}
+		if (authenticator.isDone()) {
+			sendConnectInfo(session);
+		}
+	}
+

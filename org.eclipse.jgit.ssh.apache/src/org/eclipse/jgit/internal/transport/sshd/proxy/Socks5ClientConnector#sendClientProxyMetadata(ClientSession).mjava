@@ -1,0 +1,16 @@
+	@Override
+	public void sendClientProxyMetadata(ClientSession sshSession)
+			throws Exception {
+		init(sshSession);
+		IoSession session = sshSession.getIoSession();
+		// Send the initial request
+		Buffer buffer = new ByteArrayBuffer(5, false);
+		buffer.putByte(SOCKS_VERSION_5);
+		context = getGSSContext(remoteAddress);
+		authenticationProposals = getAuthenticationProposals();
+		buffer.putByte((byte) authenticationProposals.length);
+		buffer.putRawBytes(authenticationProposals);
+		state = ProtocolState.INIT;
+		session.writePacket(buffer).verify(getTimeout());
+	}
+

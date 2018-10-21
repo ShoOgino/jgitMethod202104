@@ -1,0 +1,24 @@
+	@Override
+	protected byte[] sendKexInit() throws IOException {
+		StatefulProxyConnector proxy = proxyHandler;
+		if (proxy != null) {
+			try {
+				// We must not block here; the framework starts reading messages
+				// from the peer only once sendKexInit() has returned!
+				proxy.runWhenDone(() -> {
+					sendStartSsh();
+					return null;
+				});
+				// sendKexInit() is called only from the ClientSessionImpl
+				// constructor, where the return value is ignored.
+				return null;
+			} catch (IOException e) {
+				throw e;
+			} catch (Exception other) {
+				throw new IOException(other.getLocalizedMessage(), other);
+			}
+		} else {
+			return sendStartSsh();
+		}
+	}
+

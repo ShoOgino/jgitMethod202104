@@ -1,0 +1,18 @@
+		@Override
+		public String getToken() throws Exception {
+			if (user.indexOf(':') >= 0) {
+				throw new IOException(format(
+						SshdText.get().proxyHttpInvalidUserName, proxy, user));
+			}
+			byte[] rawUser = user.getBytes(StandardCharsets.UTF_8);
+			byte[] toEncode = new byte[rawUser.length + 1 + password.length];
+			System.arraycopy(rawUser, 0, toEncode, 0, rawUser.length);
+			toEncode[rawUser.length] = ':';
+			System.arraycopy(password, 0, toEncode, rawUser.length + 1,
+					password.length);
+			Arrays.fill(password, (byte) 0);
+			String result = Base64.encodeBytes(toEncode);
+			Arrays.fill(toEncode, (byte) 0);
+			return getName() + ' ' + result;
+		}
+

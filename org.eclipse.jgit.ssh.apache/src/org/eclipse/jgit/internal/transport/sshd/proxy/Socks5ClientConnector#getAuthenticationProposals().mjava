@@ -1,0 +1,17 @@
+	private byte[] getAuthenticationProposals() {
+		byte[] proposals = new byte[3];
+		int i = 0;
+		proposals[i++] = SocksAuthenticationMethod.ANONYMOUS.getValue();
+		proposals[i++] = SocksAuthenticationMethod.PASSWORD.getValue();
+		if (context != null) {
+			proposals[i++] = SocksAuthenticationMethod.GSSAPI.getValue();
+		}
+		if (i == proposals.length) {
+			return proposals;
+		} else {
+			byte[] result = new byte[i];
+			System.arraycopy(proposals, 0, result, 0, i);
+			return result;
+		}
+	}
+

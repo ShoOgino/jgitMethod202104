@@ -1,0 +1,16 @@
+	@Override
+	public final void process() throws Exception {
+		if (context == null) {
+			throw new IOException(
+					format(SshdText.get().proxyCannotAuthenticate, proxy));
+		}
+		try {
+			byte[] received = extractToken(params);
+			token = context.initSecContext(received, 0, received.length);
+			checkDone();
+		} catch (Exception e) {
+			close();
+			throw e;
+		}
+	}
+

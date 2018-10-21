@@ -1,0 +1,17 @@
+	private SocksAuthenticationMethod getAuthMethod(byte value) {
+		if (value != SocksAuthenticationMethod.NONE_ACCEPTABLE.getValue()) {
+			for (byte proposed : authenticationProposals) {
+				if (proposed == value) {
+					for (SocksAuthenticationMethod method : SocksAuthenticationMethod
+							.values()) {
+						if (method.getValue() == value) {
+							return method;
+						}
+					}
+					break;
+				}
+			}
+		}
+		return SocksAuthenticationMethod.NONE_ACCEPTABLE;
+	}
+

@@ -1,0 +1,10 @@
+	private static GSSContext getGSSContext(
+			@NonNull InetSocketAddress address) {
+		if (!GssApiMechanisms.getSupportedMechanisms()
+				.contains(GssApiMechanisms.KERBEROS_5)) {
+			return null;
+		}
+		return GssApiMechanisms.createContext(GssApiMechanisms.KERBEROS_5,
+				GssApiMechanisms.getCanonicalName(address));
+	}
+

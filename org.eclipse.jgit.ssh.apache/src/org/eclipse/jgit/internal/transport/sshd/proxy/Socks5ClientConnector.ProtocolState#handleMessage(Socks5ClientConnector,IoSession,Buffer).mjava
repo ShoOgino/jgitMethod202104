@@ -1,0 +1,9 @@
+		public void handleMessage(Socks5ClientConnector connector,
+				@SuppressWarnings("unused") IoSession session, Buffer data)
+				throws Exception {
+			throw new IOException(
+					format(SshdText.get().proxySocksUnexpectedMessage,
+							connector.proxyAddress, this,
+							BufferUtils.toHex(data.array())));
+		}
+

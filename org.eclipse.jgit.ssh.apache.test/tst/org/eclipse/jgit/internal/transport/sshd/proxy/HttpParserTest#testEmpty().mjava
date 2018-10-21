@@ -1,0 +1,9 @@
+	@Test
+	public void testEmpty() throws Exception {
+		String[] lines = { STATUS_LINE };
+		List<AuthenticationChallenge> challenges = HttpParser
+				.getAuthenticationHeaders(Arrays.asList(lines),
+						"WWW-Authenticate:");
+		assertTrue("No challenges expected", challenges.isEmpty());
+	}
+

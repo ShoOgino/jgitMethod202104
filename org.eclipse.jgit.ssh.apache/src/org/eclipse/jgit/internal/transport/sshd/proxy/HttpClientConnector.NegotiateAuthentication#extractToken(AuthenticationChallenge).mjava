@@ -1,0 +1,10 @@
+		@Override
+		protected byte[] extractToken(AuthenticationChallenge input)
+				throws Exception {
+			String received = input.getToken();
+			if (received == null) {
+				return new byte[0];
+			}
+			return Base64.decode(received);
+		}
+

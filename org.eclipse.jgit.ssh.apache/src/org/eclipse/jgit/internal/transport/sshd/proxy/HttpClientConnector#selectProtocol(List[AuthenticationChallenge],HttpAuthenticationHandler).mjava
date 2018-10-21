@@ -1,0 +1,30 @@
+	private HttpAuthenticationHandler selectProtocol(
+			List<AuthenticationChallenge> challenges,
+			HttpAuthenticationHandler current) throws Exception {
+		if (current != null && !current.isDone()) {
+			AuthenticationChallenge challenge = getByName(challenges,
+					current.getName());
+			if (challenge != null) {
+				current.setParams(challenge);
+				current.process();
+				return current;
+			}
+		}
+		if (current != null) {
+			current.close();
+		}
+		while (clientAuthentications.hasNext()) {
+			HttpAuthenticationHandler next = clientAuthentications.next();
+			if (!next.isDone()) {
+				AuthenticationChallenge challenge = getByName(challenges,
+						next.getName());
+				if (challenge != null) {
+					next.setParams(challenge);
+					next.start();
+					return next;
+				}
+			}
+		}
+		return null;
+	}
+

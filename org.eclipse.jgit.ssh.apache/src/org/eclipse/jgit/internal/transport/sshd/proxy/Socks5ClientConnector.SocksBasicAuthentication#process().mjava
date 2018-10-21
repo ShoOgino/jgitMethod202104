@@ -1,0 +1,12 @@
+		@Override
+		public void process() throws Exception {
+			// Retries impossible. RFC 1929 specifies that the server MUST
+			// close the connection if authentication is unsuccessful.
+			done = true;
+			if (params.getByte() != SOCKS_BASIC_PROTOCOL_VERSION
+					|| params.getByte() != SOCKS_BASIC_AUTH_SUCCESS) {
+				throw new IOException(format(
+						SshdText.get().proxySocksAuthenticationFailed, proxy));
+			}
+		}
+

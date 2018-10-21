@@ -12,10 +12,7 @@
 				Map<Oid, Boolean> mechanisms = new LinkedHashMap<>();
 				if (mechs != null) {
 					for (Oid oid : mechs) {
-						// RFC 4462 states that SPNEGO must not be used with ssh
-						if (!SPNEGO.equals(oid)) {
-							mechanisms.put(oid, Boolean.FALSE);
-						}
+						mechanisms.put(oid, Boolean.FALSE);
 					}
 				}
 				supportedMechanisms = mechanisms;
