@@ -10,6 +10,7 @@
 	public static FirstWant fromLine(String line) throws PackProtocolException {
 		String wantLine;
 		Set<String> capabilities;
+		String agent = null;
 
 		if (line.length() > 45) {
 			String opt = line.substring(45);
@@ -17,8 +18,15 @@
 				throw new PackProtocolException(JGitText.get().wantNoSpaceWithCapabilities);
 			}
 			opt = opt.substring(1);
-			HashSet<String> opts = new HashSet<>(
-					Arrays.asList(opt.split(" "))); //$NON-NLS-1$
+
+			HashSet<String> opts = new HashSet<>();
+			for (String clientCapability : opt.split(" ")) { //$NON-NLS-1$
+				if (clientCapability.startsWith(AGENT_PREFIX)) {
+					agent = clientCapability.substring(AGENT_PREFIX.length());
+				} else {
+					opts.add(clientCapability);
+				}
+			}
 			wantLine = line.substring(0, 45);
 			capabilities = Collections.unmodifiableSet(opts);
 		} else {
@@ -26,6 +34,6 @@
 			capabilities = Collections.emptySet();
 		}
 
-		return new FirstWant(wantLine, capabilities);
+		return new FirstWant(wantLine, capabilities, agent);
 	}
 

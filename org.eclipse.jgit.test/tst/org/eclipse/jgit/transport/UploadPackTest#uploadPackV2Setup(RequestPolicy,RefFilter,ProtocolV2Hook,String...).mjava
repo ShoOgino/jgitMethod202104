@@ -6,17 +6,7 @@
 			RefFilter refFilter, ProtocolV2Hook hook, String... inputLines)
 			throws Exception {
 
-		ByteArrayOutputStream send = new ByteArrayOutputStream();
-		PacketLineOut pckOut = new PacketLineOut(send);
-		for (String line : inputLines) {
-			if (line == PacketLineIn.END) {
-				pckOut.end();
-			} else if (line == PacketLineIn.DELIM) {
-				pckOut.writeDelim();
-			} else {
-				pckOut.writeString(line);
-			}
-		}
+		ByteArrayInputStream send = linesAsInputStream(inputLines);
 
 		server.getConfig().setString("protocol", null, "version", "2");
 		UploadPack up = new UploadPack(server);
@@ -30,7 +20,7 @@
 		}
 
 		ByteArrayOutputStream recv = new ByteArrayOutputStream();
-		up.upload(new ByteArrayInputStream(send.toByteArray()), recv, null);
+		up.upload(send, recv, null);
 
 		return new ByteArrayInputStream(recv.toByteArray());
 	}

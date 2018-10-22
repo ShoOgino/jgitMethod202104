@@ -1,0 +1,17 @@
+	@Test
+	public void testGetPeerAgentProtocolV0() throws Exception {
+		RevCommit one = remote.commit().message("1").create();
+		remote.update("one", one);
+
+		UploadPack up = new UploadPack(server);
+		ByteArrayInputStream send = linesAsInputStream(
+				"want " + one.getName() + " agent=JGit-test/1.2.3\n",
+				PacketLineIn.END,
+				"have 11cedf1b796d44207da702f7d420684022fc0f09\n", "done\n");
+
+		ByteArrayOutputStream recv = new ByteArrayOutputStream();
+		up.upload(send, recv, null);
+
+		assertEquals(up.getPeerUserAgent(), "JGit-test/1.2.3");
+	}
+
