@@ -22,10 +22,14 @@
 		// The original file should exist
 		File hello = new File(localDb.getWorkTree(), "foo/hello.txt");
 		assertTrue("The original file should exist", hello.exists());
+		assertFalse("The original file should not be executable",
+				hello.canExecute());
 		assertContents(hello.toPath(), "master world");
 		// The dest file should also exist
 		hello = new File(localDb.getWorkTree(), "Hello");
 		assertTrue("The destination file should exist", hello.exists());
+		assertFalse("The destination file should not be executable",
+				hello.canExecute());
 		assertContents(hello.toPath(), "master world");
 	}
 
