@@ -32,12 +32,7 @@
 			assertFalse("The foo/Hello file should be skipped",
 					foohello.exists());
 			// The content of Hello file should be expected
-			try (BufferedReader reader = Files.newBufferedReader(hello.toPath(),
-					UTF_8)) {
-				String content = reader.readLine();
-				assertEquals("The Hello file should have expected content",
-						"branch world", content);
-			}
+			assertContents(hello.toPath(), "branch world");
 		}
 	}
 
