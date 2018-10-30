@@ -1,0 +1,12 @@
+	@Test
+	public void isSignCommits_false() throws Exception {
+		Config c = parse("" //
+				+ "[gpg]\n" //
+				+ "  format = x509\n" //
+				+ "[commit]\n" //
+				+ "  gpgSign = false\n" //
+		);
+
+		assertFalse(new GpgConfig(c).isSignCommits());
+	}
+
