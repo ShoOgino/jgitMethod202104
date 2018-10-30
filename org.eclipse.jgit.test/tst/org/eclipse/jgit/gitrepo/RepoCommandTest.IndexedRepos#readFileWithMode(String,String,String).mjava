@@ -1,0 +1,18 @@
+		@Override
+		public RemoteFile readFileWithMode(String uri, String ref, String path)
+				throws GitAPIException, IOException {
+			Repository repo = uriRepoMap.get(uri);
+			ObjectId refCommitId = sha1(uri, ref);
+			if (refCommitId == null) {
+				throw new InvalidRefNameException(MessageFormat
+						.format(JGitText.get().refNotResolved, ref));
+			}
+			RevCommit commit = repo.parseCommit(refCommitId);
+			TreeWalk tw = TreeWalk.forPath(repo, path, commit.getTree());
+
+			// TODO(ifrade): Cope better with big files (e.g. using InputStream
+			// instead of byte[])
+			return new RemoteFile(tw.getObjectReader().open(tw.getObjectId(0))
+					.getCachedBytes(Integer.MAX_VALUE), tw.getFileMode(0));
+		}
+

@@ -1,0 +1,26 @@
+		@Override
+		public RemoteFile readFileWithMode(String uri, String ref, String path)
+				throws GitAPIException, IOException {
+			File dir = FileUtils.createTempDir("jgit_", ".git", null); //$NON-NLS-1$ //$NON-NLS-2$
+			try (Git git = Git.cloneRepository().setBare(true).setDirectory(dir)
+					.setURI(uri).call()) {
+				Repository repo = git.getRepository();
+				ObjectId refCommitId = sha1(uri, ref);
+				if (refCommitId == null) {
+					throw new InvalidRefNameException(MessageFormat
+							.format(JGitText.get().refNotResolved, ref));
+				}
+				RevCommit commit = repo.parseCommit(refCommitId);
+				TreeWalk tw = TreeWalk.forPath(repo, path, commit.getTree());
+
+				// TODO(ifrade): Cope better with big files (e.g. using
+				// InputStream instead of byte[])
+				return new RemoteFile(
+						tw.getObjectReader().open(tw.getObjectId(0))
+								.getCachedBytes(Integer.MAX_VALUE),
+						tw.getFileMode(0));
+			} finally {
+				FileUtils.delete(dir, FileUtils.RECURSIVE);
+			}
+		}
+

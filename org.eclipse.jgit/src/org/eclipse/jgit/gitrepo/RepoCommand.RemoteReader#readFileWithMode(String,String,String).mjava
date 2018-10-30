@@ -1,0 +1,25 @@
+		/**
+		 * Read contents and mode (i.e. permissions) of the file from a remote
+		 * repository.
+		 *
+		 * @param uri
+		 *            The URI of the remote repository
+		 * @param ref
+		 *            Name of the ref to lookup. May be a short-hand form, e.g.
+		 *            "master" which is is automatically expanded to
+		 *            "refs/heads/master" if "refs/heads/master" already exists.
+		 * @param path
+		 *            The relative path (inside the repo) to the file to read
+		 * @return The contents and file mode of the file in the given
+		 *         repository and branch. Never null.
+		 * @throws GitAPIException
+		 *             If the ref have an invalid or ambiguous name, or it does
+		 *             not exist in the repository,
+		 * @throws IOException
+		 *             If the object does not exist or is too large
+		 * @since 5.2
+		 */
+		@NonNull
+		public RemoteFile readFileWithMode(String uri, String ref, String path)
+				throws GitAPIException, IOException;
+

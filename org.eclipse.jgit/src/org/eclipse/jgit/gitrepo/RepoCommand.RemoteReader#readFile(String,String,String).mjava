@@ -11,7 +11,13 @@
 		 * @throws GitAPIException
 		 * @throws IOException
 		 * @since 3.5
+		 *
+		 * @deprecated Use {@link #readFileWithMode(String, String, String)}
+		 *             instead
 		 */
-		public byte[] readFile(String uri, String ref, String path)
-				throws GitAPIException, IOException;
+		@Deprecated
+		public default byte[] readFile(String uri, String ref, String path)
+				throws GitAPIException, IOException {
+			return readFileWithMode(uri, ref, path).getContents();
+		}
 
