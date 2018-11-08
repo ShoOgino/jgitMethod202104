@@ -1,0 +1,27 @@
+	/**
+	 * Configures the authentication mechanisms of this test server. Invoked
+	 * from the constructor. The default sets up public key authentication for
+	 * the test user, and a gssapi-with-mic authenticator that pretends to
+	 * support this mechanism, but that then refuses to authenticate anyone.
+	 */
+	protected void configureAuthentication() {
+		server.setUserAuthFactories(getAuthFactories());
+		// Disable some authentications
+		server.setPasswordAuthenticator(null);
+		server.setKeyboardInteractiveAuthenticator(null);
+		server.setHostBasedAuthenticator(null);
+		// Pretend we did gssapi-with-mic.
+		server.setGSSAuthenticator(new GSSAuthenticator() {
+			@Override
+			public boolean validateInitialUser(ServerSession session,
+					String user) {
+				return false;
+			}
+		});
+		// Accept only the test user/public key
+		server.setPublickeyAuthenticator((userName, publicKey, session) -> {
+			return SshTestGitServer.this.testUser.equals(userName) && KeyUtils
+					.compareKeys(SshTestGitServer.this.testKey, publicKey);
+		});
+	}
+

@@ -1,0 +1,23 @@
+	/**
+	 * Configures the test server's subsystems (sftp, scp). Invoked from the
+	 * constructor. The default provides a simple SFTP setup with the root
+	 * directory as the given repository's .git directory's parent. (I.e., at
+	 * the directory containing the .git directory.)
+	 *
+	 * @return A possibly empty collection of subsystems.
+	 */
+	@NonNull
+	protected List<NamedFactory<Command>> configureSubsystems() {
+		// SFTP.
+		server.setFileSystemFactory(new VirtualFileSystemFactory() {
+
+			@Override
+			protected Path computeRootDir(Session session) throws IOException {
+				return SshTestGitServer.this.repository.getDirectory()
+						.getParentFile().getAbsoluteFile().toPath();
+			}
+		});
+		return Collections
+				.singletonList((new SftpSubsystemFactory.Builder()).build());
+	}
+

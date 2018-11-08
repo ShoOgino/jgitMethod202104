@@ -27,45 +27,17 @@
 		} catch (IOException | GeneralSecurityException e) {
 			// Ignore.
 		}
-		server.setKeyPairProvider(new KeyPairProvider() {
+		server.setKeyPairProvider(() -> hostKeys);
 
-			@Override
-			public Iterable<KeyPair> loadKeys() {
-				return hostKeys;
-			}
+		configureAuthentication();
 
-		});
-		// SFTP.
-		server.setFileSystemFactory(new VirtualFileSystemFactory() {
+		List<NamedFactory<Command>> subsystems = configureSubsystems();
+		if (!subsystems.isEmpty()) {
+			server.setSubsystemFactories(subsystems);
+		}
 
-			@Override
-			protected Path computeRootDir(Session session) throws IOException {
-				return SshTestGitServer.this.repository.getDirectory()
-						.getParentFile().getAbsoluteFile().toPath();
-			}
-		});
-		server.setUserAuthFactories(getAuthFactories());
-		server.setSubsystemFactories(Collections
-				.singletonList((new SftpSubsystemFactory.Builder()).build()));
-		// No shell
-		server.setShellFactory(null);
-		// Disable some authentications
-		server.setPasswordAuthenticator(null);
-		server.setKeyboardInteractiveAuthenticator(null);
-		server.setHostBasedAuthenticator(null);
-		// Pretend we did gssapi-with-mic.
-		server.setGSSAuthenticator(new GSSAuthenticator() {
-			@Override
-			public boolean validateInitialUser(ServerSession session,
-					String user) {
-				return false;
-			}
-		});
-		// Accept only the test user/public key
-		server.setPublickeyAuthenticator((userName, publicKey, session) -> {
-			return SshTestGitServer.this.testUser.equals(userName) && KeyUtils
-					.compareKeys(SshTestGitServer.this.testKey, publicKey);
-		});
+		configureShell();
+
 		server.setCommandFactory(command -> {
 			if (command.startsWith(RemoteConfig.DEFAULT_UPLOAD_PACK)) {
 				return new GitUploadPackCommand(command, executorService);
