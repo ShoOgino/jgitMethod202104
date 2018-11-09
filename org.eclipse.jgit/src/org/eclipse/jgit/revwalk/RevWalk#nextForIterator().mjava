@@ -1,0 +1,16 @@
+	/**
+	 * Like {@link #next()}, but if a checked exception is thrown during the
+	 * walk it is rethrown as a {@link RevWalkException}.
+	 *
+	 * @throws RevWalkException if an {@link IOException} was thrown.
+	 * @return next most recent commit; null if traversal is over.
+	 */
+	@Nullable
+	private RevCommit nextForIterator() {
+		try {
+			return next();
+		} catch (IOException e) {
+			throw new RevWalkException(e);
+		}
+	}
+
