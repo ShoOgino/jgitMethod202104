@@ -39,20 +39,6 @@
 			}
 
 			if (reportStatus) {
-				if (echoCommandFailures && msgOut != null) {
-					sendStatusReport(false, unpackError, new Reporter() {
-						@Override
-						void sendString(String s) throws IOException {
-							msgOut.write(Constants.encode(s + "\n")); //$NON-NLS-1$
-						}
-					});
-					msgOut.flush();
-					try {
-						Thread.sleep(500);
-					} catch (InterruptedException wakeUp) {
-						// Ignore an early wake up.
-					}
-				}
 				sendStatusReport(true, unpackError, new Reporter() {
 					@Override
 					void sendString(String s) throws IOException {

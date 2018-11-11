@@ -7,13 +7,6 @@
 			return;
 		}
 
-		int[] version = parseVersion(req.getHeader(HDR_USER_AGENT));
-		if (hasChunkedEncodingRequestBug(version, req)) {
-			GitSmartHttpTools.sendError(req, rsp, SC_BAD_REQUEST, "\n\n"
-					+ HttpServerText.get().clientHas175ChunkedEncodingBug);
-			return;
-		}
-
 		SmartOutputStream out = new SmartOutputStream(req, rsp, false) {
 			@Override
 			public void flush() throws IOException {
@@ -24,7 +17,6 @@
 		ReceivePack rp = (ReceivePack) req.getAttribute(ATTRIBUTE_HANDLER);
 		try {
 			rp.setBiDirectionalPipe(false);
-			rp.setEchoCommandFailures(hasPushStatusBug(version));
 			rsp.setContentType(RECEIVE_PACK_RESULT_TYPE);
 
 			rp.receive(getInputStream(req), out, null);
