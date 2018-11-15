@@ -6,7 +6,7 @@
 	 * @return the {@link KeyPairProvider}
 	 */
 	@NonNull
-	protected KeyPairProvider getDefaultKeysProvider(@NonNull File sshDir) {
+	private KeyPairProvider getDefaultKeysProvider(@NonNull File sshDir) {
 		return defaultKeys.computeIfAbsent(new Tuple(sshDir),
 				t -> new CachingKeyPairProvider(getDefaultIdentities(sshDir),
 						getKeyCache()));

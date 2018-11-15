@@ -13,14 +13,11 @@
 	 * @return the resolver
 	 */
 	@NonNull
-	protected ServerKeyVerifier getServerKeyVerifier(@NonNull File homeDir,
+	private ServerKeyVerifier getServerKeyVerifier(@NonNull File homeDir,
 			@NonNull File sshDir) {
 		return defaultServerKeyVerifier.computeIfAbsent(
 				new Tuple(homeDir, sshDir),
 				t -> new OpenSshServerKeyVerifier(true,
-						Arrays.asList(
-								new File(sshDir, SshConstants.KNOWN_HOSTS),
-								new File(sshDir,
-										SshConstants.KNOWN_HOSTS + '2'))));
+						getDefaultKnownHostsFiles(sshDir)));
 	}
 

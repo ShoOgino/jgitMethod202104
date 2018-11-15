@@ -1,0 +1,14 @@
+	/**
+	 * Gets the list of default user known hosts files. The default returns
+	 * ~/.ssh/known_hosts and ~/.ssh/known_hosts2. The ssh config
+	 * {@code UserKnownHostsFile} overrides this default.
+	 *
+	 * @param sshDir
+	 * @return the possibly empty list of default known host file paths.
+	 */
+	@NonNull
+	protected List<Path> getDefaultKnownHostsFiles(@NonNull File sshDir) {
+		return Arrays.asList(sshDir.toPath().resolve(SshConstants.KNOWN_HOSTS),
+				sshDir.toPath().resolve(SshConstants.KNOWN_HOSTS + '2'));
+	}
+
