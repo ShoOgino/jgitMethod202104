@@ -1,0 +1,13 @@
+	/**
+	 * Enable keyboard-interactive authentication. The server will accept the
+	 * test user's name, converted to all upper-case, as password.
+	 */
+	public void enableKeyboardInteractiveAuthentication() {
+		server.setPasswordAuthenticator((user, pwd, session) -> {
+			return testUser.equals(user)
+					&& testUser.toUpperCase(Locale.ROOT).equals(pwd);
+		});
+		server.setKeyboardInteractiveAuthenticator(
+				DefaultKeyboardInteractiveAuthenticator.INSTANCE);
+	}
+

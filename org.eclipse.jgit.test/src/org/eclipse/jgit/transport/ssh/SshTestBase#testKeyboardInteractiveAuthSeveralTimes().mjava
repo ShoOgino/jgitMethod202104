@@ -1,0 +1,13 @@
+	@Test
+	public void testKeyboardInteractiveAuthSeveralTimes() throws Exception {
+		server.enableKeyboardInteractiveAuthentication();
+		TestCredentialsProvider provider = new TestCredentialsProvider(
+				"wrongpass", "wrongpass", TEST_USER.toUpperCase(Locale.ROOT));
+		cloneWith("ssh://git/doesntmatter", defaultCloneDir, provider, //
+				"Host git", //
+				"HostName localhost", //
+				"Port " + testPort, //
+				"User " + TEST_USER, //
+				"PreferredAuthentications keyboard-interactive");
+	}
+
