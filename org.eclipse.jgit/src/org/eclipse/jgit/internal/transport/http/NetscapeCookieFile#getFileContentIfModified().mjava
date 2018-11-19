@@ -1,0 +1,52 @@
+	/**
+	 * Read the underying file and return its content but only in case it has
+	 * been modified since the last access. Internally calculates the hash and
+	 * maintains {@link FileSnapshot}s to prevent issues described as <a href=
+	 * "https://github.com/git/git/blob/master/Documentation/technical/racy-git.txt">"Racy
+	 * Git problem"</a>. Inspired by {@link FileBasedConfig#load()}.
+	 *
+	 * @return the file contents in case the file has been modified since the
+	 *         last access, otherwise {@code null}
+	 * @throws IOException
+	 */
+	private byte[] getFileContentIfModified() throws IOException {
+		final int maxStaleRetries = 5;
+		int retries = 0;
+		File file = getPath().toFile();
+		while (true) {
+			final FileSnapshot oldSnapshot = snapshot;
+			final FileSnapshot newSnapshot = FileSnapshot.save(file);
+			try {
+				final byte[] in = IO.readFully(file);
+				byte[] newHash = hash(in);
+				if (Arrays.equals(hash, newHash)) {
+					if (oldSnapshot.equals(newSnapshot)) {
+						oldSnapshot.setClean(newSnapshot);
+					} else {
+						snapshot = newSnapshot;
+					}
+				} else {
+					snapshot = newSnapshot;
+					hash = newHash;
+				}
+				return in;
+			} catch (FileNotFoundException e) {
+				throw e;
+			} catch (IOException e) {
+				if (FileUtils.isStaleFileHandle(e)
+						&& retries < maxStaleRetries) {
+					if (LOG.isDebugEnabled()) {
+						LOG.debug(MessageFormat.format(
+								JGitText.get().configHandleIsStale,
+								Integer.valueOf(retries)), e);
+					}
+					retries++;
+					continue;
+				}
+				throw new IOException(MessageFormat
+						.format(JGitText.get().cannotReadFile, getPath()), e);
+			}
+		}
+
+	}
+

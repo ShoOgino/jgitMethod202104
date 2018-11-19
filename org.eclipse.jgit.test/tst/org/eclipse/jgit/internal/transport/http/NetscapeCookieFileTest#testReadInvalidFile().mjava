@@ -1,0 +1,11 @@
+	@Test
+	public void testReadInvalidFile() throws IOException {
+		try (InputStream input = this.getClass()
+				.getResourceAsStream("cookies-invalid.txt")) {
+			Files.copy(input, tmpFile, StandardCopyOption.REPLACE_EXISTING);
+		}
+
+		new NetscapeCookieFile(tmpFile)
+				.getCookies(true);
+	}
+

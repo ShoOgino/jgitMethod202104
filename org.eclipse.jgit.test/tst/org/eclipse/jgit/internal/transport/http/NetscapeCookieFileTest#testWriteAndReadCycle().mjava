@@ -1,0 +1,29 @@
+	@Test
+	public void testWriteAndReadCycle() throws IOException {
+		Set<HttpCookie> cookies = new LinkedHashSet<>();
+
+		HttpCookie cookie = new HttpCookie("key1", "value1");
+		cookie.setPath("/some/path1");
+		cookie.setDomain("some-domain1");
+		cookie.setMaxAge(1000);
+		cookies.add(cookie);
+		cookie = new HttpCookie("key2", "value2");
+		cookie.setSecure(true);
+		cookie.setPath("/some/path2");
+		cookie.setDomain("some-domain2");
+		cookie.setMaxAge(1000);
+		cookie.setHttpOnly(true);
+		cookies.add(cookie);
+
+		Date creationDate = new Date();
+
+		try (Writer writer = Files.newBufferedWriter(tmpFile,
+				StandardCharsets.US_ASCII)) {
+			NetscapeCookieFile.write(writer, cookies, baseUrl, creationDate);
+		}
+		Set<HttpCookie> actualCookies = new NetscapeCookieFile(tmpFile,
+				creationDate).getCookies(true);
+		Assert.assertThat(actualCookies,
+				HttpCookiesMatcher.containsInOrder(cookies));
+	}
+

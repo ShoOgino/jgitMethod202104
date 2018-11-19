@@ -1,0 +1,35 @@
+	@Test
+	public void testWriteAfterAnotherJgitProcessModifiedTheFile()
+			throws IOException, InterruptedException {
+		try (InputStream input = this.getClass()
+				.getResourceAsStream("cookies-simple1.txt")) {
+			Files.copy(input, tmpFile, StandardCopyOption.REPLACE_EXISTING);
+		}
+		NetscapeCookieFile cookieFile = new NetscapeCookieFile(tmpFile);
+		cookieFile.getCookies(true);
+		// now modify file externally
+		try (InputStream input = this.getClass()
+				.getResourceAsStream("cookies-simple2.txt")) {
+			Files.copy(input, tmpFile, StandardCopyOption.REPLACE_EXISTING);
+		}
+		// now try to write
+		cookieFile.write(baseUrl);
+
+		// validate that the external changes are there as well
+		// due to rounding errors (conversion from ms to sec to ms)
+		// the expiration date might not be exact
+		List<String> lines = Files.readAllLines(tmpFile,
+				StandardCharsets.US_ASCII);
+
+		Assert.assertEquals("Expected 3 lines", 3, lines.size());
+		assertStringMatchesPatternWithInexactNumber(lines.get(0),
+				"some-domain1\tTRUE\t/some/path1\tFALSE\t(\\d*)\tkey1\tvalueFromSimple2",
+				JAN_01_2030_NOON, 1000);
+		assertStringMatchesPatternWithInexactNumber(lines.get(1),
+				"some-domain1\tTRUE\t/some/path1\tFALSE\t(\\d*)\tkey3\tvalueFromSimple2",
+				JAN_01_2030_NOON, 1000);
+		assertStringMatchesPatternWithInexactNumber(lines.get(2),
+				"some-domain1\tTRUE\t/some/path1\tFALSE\t(\\d*)\tkey2\tvalueFromSimple1",
+				JAN_01_2030_NOON, 1000);
+	}
+

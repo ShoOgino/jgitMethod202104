@@ -1,0 +1,27 @@
+	@Test
+	public void testProcessResponseCookiesNotPersistingWithSaveCookiesFalse()
+			throws IOException {
+		HttpConnection connection = Mockito.mock(HttpConnection.class);
+		Mockito.when(
+				connection.getHeaderFields(ArgumentMatchers.eq("Set-Cookie")))
+				.thenReturn(Arrays.asList(
+						"id=a3fWa; Expires=Thu, 21 Oct 2100 11:00:00 GMT; Secure; HttpOnly",
+						"sessionid=38afes7a8; HttpOnly; Path=/"));
+		Mockito.when(
+				connection.getHeaderFields(ArgumentMatchers.eq("Set-Cookie2")))
+				.thenReturn(Collections.singletonList(
+						"cookie2=some value; Max-Age=1234; Path=/"));
+
+		// tweak config
+		final Config config = db.getConfig();
+		config.setBoolean("http", null, "saveCookies", false);
+
+		try (TransportHttp transportHttp = new TransportHttp(db, uri)) {
+			transportHttp.processResponseCookies(connection);
+
+			// evaluate written cookie file
+			Assert.assertFalse("Cookie file was not supposed to be written!",
+					cookieFile.exists());
+		}
+	}
+

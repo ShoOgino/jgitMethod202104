@@ -1,0 +1,28 @@
+	@Test
+	public void testWriteToNewFile() throws IOException {
+		Set<HttpCookie> cookies = new LinkedHashSet<>();
+		cookies.add(new HttpCookie("key1", "value"));
+		// first cookie is a session cookie (and should be ignored)
+
+		HttpCookie cookie = new HttpCookie("key2", "value");
+		cookie.setSecure(true);
+		cookie.setDomain("mydomain.com");
+		cookie.setPath("/");
+		cookie.setMaxAge(1000);
+		cookies.add(cookie);
+		Date creationDate = new Date();
+		try (Writer writer = Files.newBufferedWriter(tmpFile,
+				StandardCharsets.US_ASCII)) {
+			NetscapeCookieFile.write(writer, cookies, baseUrl, creationDate);
+		}
+
+		String expectedExpiration = String
+				.valueOf(creationDate.getTime() + (cookie.getMaxAge() * 1000));
+
+		Assert.assertThat(
+				Files.readAllLines(tmpFile, StandardCharsets.US_ASCII),
+				CoreMatchers
+						.equalTo(Arrays.asList("mydomain.com\tTRUE\t/\tTRUE\t"
+								+ expectedExpiration + "\tkey2\tvalue")));
+	}
+

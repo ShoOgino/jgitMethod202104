@@ -1,0 +1,21 @@
+	@Test
+	public void testReadAndWriteCycle() throws IOException {
+		try (InputStream input = this.getClass()
+				.getResourceAsStream("cookies-simple1.txt")) {
+			Files.copy(input, tmpFile, StandardCopyOption.REPLACE_EXISTING);
+		}
+		// round up to the next second (to prevent rounding errors)
+		Date creationDate = new Date(
+				(System.currentTimeMillis() / 1000) * 1000);
+		Set<HttpCookie> cookies = new NetscapeCookieFile(tmpFile, creationDate)
+				.getCookies(true);
+		Path tmpFile2 = folder.newFile().toPath();
+		try (Writer writer = Files.newBufferedWriter(tmpFile2,
+				StandardCharsets.US_ASCII)) {
+			NetscapeCookieFile.write(writer, cookies, baseUrl, creationDate);
+		}
+		// compare original file with newly written one, they should not differ
+		Assert.assertEquals(Files.readAllLines(tmpFile),
+				Files.readAllLines(tmpFile2));
+	}
+

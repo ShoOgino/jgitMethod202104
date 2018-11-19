@@ -1,0 +1,17 @@
+	@SuppressWarnings("boxing")
+	private static final void assertStringMatchesPatternWithInexactNumber(
+			String string, String pattern, long expectedNumericValue,
+			long delta) {
+		java.util.regex.Matcher matcher = Pattern.compile(pattern)
+				.matcher(string);
+		Assert.assertTrue("Given string '" + string + "' does not match '"
+				+ pattern + "'", matcher.matches());
+		// extract numeric value
+		Long actualNumericValue = Long.decode(matcher.group(1));
+
+		Assert.assertTrue(
+				"Value is supposed to be close to " + expectedNumericValue
+						+ " but is " + actualNumericValue + ".",
+				Math.abs(expectedNumericValue - actualNumericValue) <= delta);
+	}
+

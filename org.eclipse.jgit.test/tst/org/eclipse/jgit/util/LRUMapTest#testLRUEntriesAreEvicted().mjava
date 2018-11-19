@@ -1,0 +1,25 @@
+	@SuppressWarnings("boxing")
+	@Test
+	public void testLRUEntriesAreEvicted() {
+		Map<Integer, Integer> map = new LRUMap<>(3, 3);
+		for (int i = 0; i < 3; i++) {
+			map.put(i, i);
+		}
+		// access the last ones
+		map.get(2);
+		map.get(0);
+
+		// put another one which exceeds the limit (entry with key "1" is
+		// evicted)
+		map.put(3, 3);
+
+		Map<Integer, Integer> expectedMap = new LinkedHashMap<>();
+		expectedMap.put(2, 2);
+		expectedMap.put(0, 0);
+		expectedMap.put(3, 3);
+
+		Assert.assertThat(map.entrySet(),
+				IsIterableContainingInOrder
+						.contains(expectedMap.entrySet().toArray()));
+	}
+

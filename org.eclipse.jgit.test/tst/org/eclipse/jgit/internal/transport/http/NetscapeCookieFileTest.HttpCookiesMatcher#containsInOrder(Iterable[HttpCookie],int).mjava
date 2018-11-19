@@ -1,0 +1,10 @@
+		public static Matcher<Iterable<? extends HttpCookie>> containsInOrder(
+				Iterable<HttpCookie> expectedCookies, int allowedMaxAgeDelta) {
+			final List<Matcher<? super HttpCookie>> cookieMatchers = new LinkedList<>();
+			for (HttpCookie cookie : expectedCookies) {
+				cookieMatchers
+						.add(new HttpCookieMatcher(cookie, allowedMaxAgeDelta));
+			}
+			return new IsIterableContainingInOrder<>(cookieMatchers);
+		}
+

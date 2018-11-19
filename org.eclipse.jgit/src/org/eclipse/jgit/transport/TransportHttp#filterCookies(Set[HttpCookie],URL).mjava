@@ -1,0 +1,31 @@
+	/**
+	 *
+	 * @param allCookies
+	 *            a list of cookies.
+	 * @param url
+	 *            the url for which to filter the list of cookies.
+	 * @return only the cookies from {@code allCookies} which are relevant (i.e.
+	 *         are not expired, have a matching domain, have a matching path and
+	 *         have a matching secure attribute)
+	 */
+	private static Set<HttpCookie> filterCookies(Set<HttpCookie> allCookies,
+			URL url) {
+		Set<HttpCookie> filteredCookies = new HashSet<>();
+		for (HttpCookie cookie : allCookies) {
+			if (cookie.hasExpired()) {
+				continue;
+			}
+			if (!matchesCookieDomain(url.getHost(), cookie.getDomain())) {
+				continue;
+			}
+			if (!matchesCookiePath(url.getPath(), cookie.getPath())) {
+				continue;
+			}
+			if (cookie.getSecure() && !"https".equals(url.getProtocol())) { //$NON-NLS-1$
+				continue;
+			}
+			filteredCookies.add(cookie);
+		}
+		return filteredCookies;
+	}
+

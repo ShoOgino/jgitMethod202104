@@ -1,0 +1,22 @@
+	@Test
+	public void testMatchesCookieDomain() {
+		Assert.assertTrue(TransportHttp.matchesCookieDomain("example.com",
+				"example.com"));
+		Assert.assertTrue(TransportHttp.matchesCookieDomain("Example.Com",
+				"example.cOM"));
+		Assert.assertTrue(TransportHttp.matchesCookieDomain(
+				"some.subdomain.example.com", "example.com"));
+		Assert.assertFalse(TransportHttp
+				.matchesCookieDomain("someotherexample.com", "example.com"));
+		Assert.assertFalse(TransportHttp.matchesCookieDomain("example.com",
+				"example1.com"));
+		Assert.assertFalse(TransportHttp
+				.matchesCookieDomain("sub.sub.example.com", ".example.com"));
+		Assert.assertTrue(TransportHttp.matchesCookieDomain("host.example.com",
+				"example.com"));
+		Assert.assertTrue(TransportHttp.matchesCookieDomain(
+				"something.example.com", "something.example.com"));
+		Assert.assertTrue(TransportHttp.matchesCookieDomain(
+				"host.something.example.com", "something.example.com"));
+	}
+
