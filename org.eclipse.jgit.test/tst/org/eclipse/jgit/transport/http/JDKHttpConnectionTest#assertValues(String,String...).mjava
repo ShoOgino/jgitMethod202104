@@ -1,0 +1,14 @@
+	private void assertValues(String key, String... values) {
+		List<String> l = new LinkedList<>();
+		List<String> hf = c.getHeaderFields(key);
+		if (hf != null) {
+			l.addAll(hf);
+		}
+		for (String v : values) {
+			if (!l.remove(v)) {
+				fail("value " + v + " not found");
+			}
+		}
+		assertTrue("found unexpected entries " + l, l.isEmpty());
+	}
+

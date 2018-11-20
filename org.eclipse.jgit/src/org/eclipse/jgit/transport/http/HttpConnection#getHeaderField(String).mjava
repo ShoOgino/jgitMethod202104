@@ -1,5 +1,11 @@
 	/**
-	 * Get header field
+	 * Get header field. According to
+	 * {@link <a href="https://tools.ietf.org/html/rfc2616#section-4.2">RFC
+	 * 2616</a>} header field names are case insensitive. Header fields defined
+	 * as a comma separated list can have multiple header fields with the same
+	 * field name. This method only returns one of these header fields. If you
+	 * want the union of all values of all multiple header fields with the same
+	 * field name then use {@link #getHeaderFields(String)}
 	 *
 	 * @see HttpURLConnection#getHeaderField(String)
 	 * @param name
@@ -7,5 +13,5 @@
 	 * @return the value of the named header field, or <code>null</code> if
 	 *         there is no such field in the header.
 	 */
-	String getHeaderField(String name);
+	String getHeaderField(@NonNull String name);
 

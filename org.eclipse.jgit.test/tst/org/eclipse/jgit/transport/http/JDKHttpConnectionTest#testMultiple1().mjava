@@ -1,0 +1,10 @@
+	@Test
+	public void testMultiple1() {
+		headers.put("abc", asList("a"));
+		headers.put("aBC", asList("d", "e"));
+		headers.put("ABc", Collections.emptyList());
+		headers.put("AbC", (List<String>) null);
+		when(u.getHeaderFields()).thenReturn(headers);
+		assertValues("AbC", "a", "d", "e", "x");
+	}
+
