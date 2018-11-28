@@ -1,0 +1,14 @@
+	@Theory
+	public void testSubmoduleReplacedByFile(IgnoreSubmoduleMode mode)
+			throws Exception {
+		recursiveDelete(submodule_trash);
+		writeTrashFile("modules/submodule", "nonsense");
+		IndexDiff indexDiff = new IndexDiff(db, Constants.HEAD,
+				new FileTreeIterator(db));
+		indexDiff.setIgnoreSubmoduleMode(mode);
+		assertTrue(indexDiff.diff());
+		assertEquals("[]", indexDiff.getMissing().toString());
+		assertEquals("[]", indexDiff.getUntracked().toString());
+		assertEquals("[modules/submodule]", indexDiff.getModified().toString());
+	}
+

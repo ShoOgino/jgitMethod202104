@@ -1,0 +1,12 @@
+	private Repository cloneWithoutCloningSubmodule() throws Exception {
+		File directory = createTempDirectory(
+				"testCloneWithoutCloningSubmodules");
+		CloneCommand clone = Git.cloneRepository();
+		clone.setDirectory(directory);
+		clone.setCloneSubmodules(false);
+		clone.setURI(db.getDirectory().toURI().toString());
+		Git git2 = clone.call();
+		addRepoToClose(git2.getRepository());
+		return git2.getRepository();
+	}
+
