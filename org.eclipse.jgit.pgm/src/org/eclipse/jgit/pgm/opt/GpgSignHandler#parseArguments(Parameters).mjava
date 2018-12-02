@@ -1,0 +1,25 @@
+	/** {@inheritDoc} */
+	@Override
+	public int parseArguments(Parameters params) throws CmdLineException {
+		String alias = params.getParameter(-1);
+		if ("--gpg-sign".equals(alias) || "-S".equals(alias)) { //$NON-NLS-1$ //$NON-NLS-2$
+			try {
+				String key = params.getParameter(0);
+				if (key == null || key.startsWith("-")) { //$NON-NLS-1$
+					// ignore invalid values and assume default
+					setter.addValue(DEFAULT);
+					return 0;
+				}
+
+				// use what we have
+				setter.addValue(key);
+				return 1;
+			} catch (CmdLineException e) {
+				// no additional value, assume default
+				setter.addValue(DEFAULT);
+				return 0;
+			}
+		}
+		return 0;
+	}
+

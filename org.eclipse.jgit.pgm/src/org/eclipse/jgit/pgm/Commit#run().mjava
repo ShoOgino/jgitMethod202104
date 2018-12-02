@@ -8,6 +8,14 @@
 				commitCmd.setAuthor(RawParseUtils.parsePersonIdent(author));
 			if (message != null)
 				commitCmd.setMessage(message);
+			if (noGpgSign) {
+				commitCmd.setSign(Boolean.FALSE);
+			} else if (gpgSigningKey != null) {
+				commitCmd.setSign(Boolean.TRUE);
+				if (!gpgSigningKey.equals(GpgSignHandler.DEFAULT)) {
+					commitCmd.setSigningKey(gpgSigningKey);
+				}
+			}
 			if (only && paths.isEmpty())
 				throw die(CLIText.get().pathsRequired);
 			if (only && all)
