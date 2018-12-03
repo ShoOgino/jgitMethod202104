@@ -1,0 +1,27 @@
+	/**
+	 * Finds a public key associated with the signing key.
+	 *
+	 * @param keyboxFile
+	 *            the KeyBox file
+	 * @return publicKey the public key (maybe <code>null</code>)
+	 * @throws IOException
+	 *             in case of problems reading the file
+	 */
+	private PGPPublicKey findPublicKeyInKeyBox(Path keyboxFile)
+			throws IOException {
+		KeyBox keyBox = readKeyBoxFile(keyboxFile);
+		for (KeyBlob keyBlob : keyBox.getKeyBlobs()) {
+			if (keyBlob.getType() == BlobType.OPEN_PGP_BLOB) {
+				PGPPublicKey key = findPublicKeyByKeyId(keyBlob);
+				if (key != null) {
+					return key;
+				}
+				key = findPublicKeyByUserId(keyBlob);
+				if (key != null) {
+					return key;
+				}
+			}
+		}
+		return null;
+	}
+

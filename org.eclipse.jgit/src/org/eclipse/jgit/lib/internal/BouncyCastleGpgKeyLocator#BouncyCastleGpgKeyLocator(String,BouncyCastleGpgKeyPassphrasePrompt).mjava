@@ -1,0 +1,20 @@
+	/**
+	 * Create a new key locator for the specified signing key.
+	 * <p>
+	 * The signing key must either be a hex representation of a specific key or
+	 * a user identity substring (eg., email address). All keys in the KeyBox
+	 * will be looked up in the order as returned by the KeyBox. A key id will
+	 * be searched before attempting to find a key by user id.
+	 * </p>
+	 *
+	 * @param signingKey
+	 *            the signing key to search for
+	 * @param passphrasePrompt
+	 *            the provider to use when asking for key passphrase
+	 */
+	public BouncyCastleGpgKeyLocator(String signingKey,
+			@NonNull BouncyCastleGpgKeyPassphrasePrompt passphrasePrompt) {
+		this.signingKey = signingKey;
+		this.passphrasePrompt = passphrasePrompt;
+	}
+
