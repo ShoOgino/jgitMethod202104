@@ -1,0 +1,46 @@
+	@Test
+	public void callSignerOnlyWhenSigning() throws Exception {
+		try (Git git = new Git(db)) {
+			writeTrashFile("file1", "file1");
+			git.add().addFilepattern("file1").call();
+
+			AtomicInteger callCount = new AtomicInteger();
+			GpgSigner.setDefault(new GpgSigner() {
+				@Override
+				public void sign(CommitBuilder commit, String gpgSigningKey) {
+					callCount.incrementAndGet();
+				}
+			});
+
+			// first call should use config, which is expected to be null at
+			// this time
+			git.commit().setMessage("initial commit").call();
+			assertEquals(0, callCount.get());
+
+			writeTrashFile("file2", "file2");
+			git.add().addFilepattern("file2").call();
+
+			// now force signing
+			git.commit().setSign(Boolean.TRUE).setMessage("commit").call();
+			assertEquals(1, callCount.get());
+
+			writeTrashFile("file3", "file3");
+			git.add().addFilepattern("file3").call();
+
+			// now rely on config
+			StoredConfig config = git.getRepository().getConfig();
+			config.setBoolean("commit", null, "gpgSign", true);
+			config.save();
+
+			git.commit().setMessage("commit").call();
+			assertEquals(2, callCount.get());
+
+			writeTrashFile("file4", "file4");
+			git.add().addFilepattern("file4").call();
+
+			// now force "no-sign" (even though config is true)
+			git.commit().setSign(Boolean.FALSE).setMessage("commit").call();
+			assertEquals(2, callCount.get());
+		}
+	}
+

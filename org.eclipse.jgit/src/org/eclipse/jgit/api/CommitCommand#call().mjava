@@ -100,6 +100,11 @@
 
 				commit.setParentIds(parents);
 				commit.setTreeId(indexTreeId);
+
+				if (signCommit.booleanValue()) {
+					gpgSigner.sign(commit, signingKey);
+				}
+
 				ObjectId commitId = odi.insert(commit);
 				odi.flush();
 

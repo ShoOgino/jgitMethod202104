@@ -1,0 +1,18 @@
+	@Test
+	public void writeGpgSignatureString_preservesRandomWhitespace()
+			throws Exception {
+		// @formatter:off
+		String signature = "    String with    \n"
+				+ "Line 2\n"
+				+ " Line 3\n"
+				+ "Line 4   \n"
+				+ "  Line 5  ";
+		String expectedOutcome = "    String with    \n"
+				+ " Line 2\n"
+				+ "  Line 3\n"
+				+ " Line 4   \n"
+				+ "   Line 5  ";
+		// @formatter:on
+		assertGpgSignatureStringOutcome(signature, expectedOutcome);
+	}
+

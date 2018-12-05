@@ -1,0 +1,24 @@
+	/**
+	 * Signs the specified commit.
+	 *
+	 * <p>
+	 * Implementors should obtain the payload for signing from the specified
+	 * commit via {@link CommitBuilder#build()} and create a proper
+	 * {@link GpgSignature}. The generated signature must be set on the
+	 * specified {@code commit} (see
+	 * {@link CommitBuilder#setGpgSignature(GpgSignature)}).
+	 * </p>
+	 * <p>
+	 * Any existing signature on the commit must be discarded prior obtaining
+	 * the payload via {@link CommitBuilder#build()}.
+	 * </p>
+	 *
+	 * @param commit
+	 *            the commit to sign (must not be <code>null</code> and must be
+	 *            complete to allow proper calculation of payload)
+	 * @param gpgSigningKey
+	 *            the signing key (passed as is to the GPG signing tool)
+	 */
+	public abstract void sign(@NonNull CommitBuilder commit,
+			String gpgSigningKey);
+

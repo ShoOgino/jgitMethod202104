@@ -35,6 +35,13 @@
 			w.flush();
 			os.write('\n');
 
+			if (getGpgSignature() != null) {
+				os.write(hgpgsig);
+				os.write(' ');
+				writeGpgSignatureString(getGpgSignature().toExternalString(), os);
+				os.write('\n');
+			}
+
 			if (getEncoding() != UTF_8) {
 				os.write(hencoding);
 				os.write(' ');

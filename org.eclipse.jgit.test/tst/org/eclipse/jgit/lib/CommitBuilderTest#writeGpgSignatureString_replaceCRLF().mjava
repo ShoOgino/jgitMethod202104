@@ -1,0 +1,17 @@
+	@Test
+	public void writeGpgSignatureString_replaceCRLF() throws Exception {
+		// @formatter:off
+		String signature = "String with \r\n"
+				+ "Line 2\r\n"
+				+ "Line 3\r\n"
+				+ "Line 4\r\n"
+				+ "Line 5";
+		String expectedOutcome = "String with \n"
+				+ " Line 2\n"
+				+ " Line 3\n"
+				+ " Line 4\n"
+				+ " Line 5";
+		// @formatter:on
+		assertGpgSignatureStringOutcome(signature, expectedOutcome);
+	}
+

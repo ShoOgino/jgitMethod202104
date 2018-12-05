@@ -1,0 +1,15 @@
+	@Test
+	public void writeGpgSignatureString_failsForNonAscii() throws Exception {
+		String signature = "Ü Ä";
+		try {
+			CommitBuilder.writeGpgSignatureString(signature,
+					new ByteArrayOutputStream());
+			fail("Exception expected");
+		} catch (IllegalArgumentException e) {
+			// good
+			String message = MessageFormat.format(JGitText.get().notASCIIString,
+					signature);
+			assertEquals(message, e.getMessage());
+		}
+	}
+
