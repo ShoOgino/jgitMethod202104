@@ -1,0 +1,14 @@
+	@Test
+	public void renameToStupidName() throws Exception {
+		Ref ref = git.branchRename().setNewName(Constants.R_HEADS + "foo")
+				.call();
+		assertEquals("Unexpected ref name",
+				Constants.R_HEADS + Constants.R_HEADS + "foo",
+				ref.getName());
+		// And check that we can rename it back to a sane name
+		ref = git.branchRename().setNewName("foo").call();
+		assertNotNull(ref);
+		assertEquals("Unexpected ref name", Constants.R_HEADS + "foo",
+				ref.getName());
+	}
+

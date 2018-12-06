@@ -1,0 +1,18 @@
+	@Test
+	public void renameToTag() throws Exception {
+		Ref ref = git.tag().setName("foo").call();
+		assertNotNull(ref);
+		assertEquals("Unexpected tag name", Constants.R_TAGS + "foo",
+				ref.getName());
+		ref = git.branchRename().setNewName("foo").call();
+		assertNotNull(ref);
+		assertEquals("Unexpected ref name", Constants.R_HEADS + "foo",
+				ref.getName());
+		// Check that we can rename it back
+		ref = git.branchRename().setOldName("foo").setNewName(Constants.MASTER)
+				.call();
+		assertNotNull(ref);
+		assertEquals("Unexpected ref name",
+				Constants.R_HEADS + Constants.MASTER, ref.getName());
+	}
+
