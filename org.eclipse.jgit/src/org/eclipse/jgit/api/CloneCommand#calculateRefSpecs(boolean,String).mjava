@@ -1,16 +1,23 @@
 	private List<RefSpec> calculateRefSpecs(boolean fetchAll, String dst) {
-		RefSpec wcrs = new RefSpec();
-		wcrs = wcrs.setForceUpdate(true);
-		wcrs = wcrs.setSourceDestination(Constants.R_HEADS + '*', dst);
+		RefSpec heads = new RefSpec();
+		heads = heads.setForceUpdate(true);
+		heads = heads.setSourceDestination(Constants.R_HEADS + '*', dst);
 		List<RefSpec> specs = new ArrayList<>();
 		if (!fetchAll) {
+			RefSpec tags = new RefSpec();
+			tags = tags.setForceUpdate(true);
+			tags = tags.setSourceDestination(Constants.R_TAGS + '*',
+					Constants.R_TAGS + '*');
 			for (String selectedRef : branchesToClone) {
-				if (wcrs.matchSource(selectedRef)) {
-					specs.add(wcrs.expandFromSource(selectedRef));
+				if (heads.matchSource(selectedRef)) {
+					specs.add(heads.expandFromSource(selectedRef));
+				} else if (tags.matchSource(selectedRef)) {
+					specs.add(tags.expandFromSource(selectedRef));
 				}
 			}
 		} else {
-			specs.add(wcrs);
+			// We'll fetch the tags anyway.
+			specs.add(heads);
 		}
 		return specs;
 	}
