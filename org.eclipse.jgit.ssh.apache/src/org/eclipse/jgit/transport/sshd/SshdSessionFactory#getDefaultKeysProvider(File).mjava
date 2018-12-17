@@ -7,8 +7,10 @@
 	 */
 	@NonNull
 	private KeyPairProvider getDefaultKeysProvider(@NonNull File sshDir) {
-		return defaultKeys.computeIfAbsent(new Tuple(sshDir),
-				t -> new CachingKeyPairProvider(getDefaultIdentities(sshDir),
+		List<Path> defaultIdentities = getDefaultIdentities(sshDir);
+		return defaultKeys.computeIfAbsent(
+				new Tuple(defaultIdentities.toArray(new Path[0])),
+				t -> new CachingKeyPairProvider(defaultIdentities,
 						getKeyCache()));
 	}
 

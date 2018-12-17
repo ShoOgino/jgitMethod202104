@@ -12,7 +12,7 @@
 	private HostConfigEntryResolver getHostConfigEntryResolver(
 			@NonNull File homeDir, @NonNull File sshDir) {
 		return defaultHostConfigEntryResolver.computeIfAbsent(
-				new Tuple(homeDir, sshDir),
+				new Tuple(new Object[] { homeDir, sshDir }),
 				t -> new JGitSshConfig(homeDir,
 						new File(sshDir, SshConstants.CONFIG),
 						getLocalUserName()));

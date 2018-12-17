@@ -1,6 +1,10 @@
 	@Override
 	protected KeyPair doLoadKey(Path resource)
 			throws IOException, GeneralSecurityException {
+		if (!Files.exists(resource)) {
+			log.warn(format(SshdText.get().identityFileNotFound, resource));
+			return null;
+		}
 		// By calling doLoadKey(String, Path, FilePasswordProvider) instead of
 		// super.doLoadKey(Path) we can bypass the key caching in
 		// AbstractResourceKeyPairProvider, over which we have no real control.

@@ -16,7 +16,7 @@
 	private ServerKeyVerifier getServerKeyVerifier(@NonNull File homeDir,
 			@NonNull File sshDir) {
 		return defaultServerKeyVerifier.computeIfAbsent(
-				new Tuple(homeDir, sshDir),
+				new Tuple(new Object[] { homeDir, sshDir }),
 				t -> new OpenSshServerKeyVerifier(true,
 						getDefaultKnownHostsFiles(sshDir)));
 	}
