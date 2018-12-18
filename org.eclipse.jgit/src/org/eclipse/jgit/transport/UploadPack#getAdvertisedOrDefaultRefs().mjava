@@ -4,8 +4,12 @@
 		}
 
 		advertiseRefsHook.advertiseRefs(this);
+		advertiseRefsHookCalled = true;
 		if (refs == null) {
-			setAdvertisedRefs(db.getRefDatabase().getRefs(ALL));
+			// Fall back to all refs.
+			setAdvertisedRefs(
+					db.getRefDatabase().getRefs().stream()
+						.collect(toMap(Ref::getName, identity())));
 		}
 		return refs;
 	}
