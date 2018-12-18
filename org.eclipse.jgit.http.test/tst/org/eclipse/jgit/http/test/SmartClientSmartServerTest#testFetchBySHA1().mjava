@@ -1,0 +1,13 @@
+	@Test
+	public void testFetchBySHA1() throws Exception {
+		Repository dst = createBareRepository();
+		assertFalse(dst.hasObject(A_txt));
+
+		try (Transport t = Transport.open(dst, remoteURI)) {
+			t.fetch(NullProgressMonitor.INSTANCE,
+					Collections.singletonList(new RefSpec(B.name())));
+		}
+
+		assertTrue(dst.hasObject(A_txt));
+	}
+

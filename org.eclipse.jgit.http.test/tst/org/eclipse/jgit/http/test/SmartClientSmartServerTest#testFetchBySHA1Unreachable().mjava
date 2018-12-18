@@ -1,0 +1,14 @@
+	@Test
+	public void testFetchBySHA1Unreachable() throws Exception {
+		Repository dst = createBareRepository();
+		assertFalse(dst.hasObject(A_txt));
+
+		try (Transport t = Transport.open(dst, remoteURI)) {
+			thrown.expect(TransportException.class);
+			thrown.expectMessage(Matchers.containsString(
+					"want " + unreachableCommit.name() + " not valid"));
+			t.fetch(NullProgressMonitor.INSTANCE, Collections
+					.singletonList(new RefSpec(unreachableCommit.name())));
+		}
+	}
+
