@@ -1,14 +1,19 @@
-	void copyPackAsIs(PackOutputStream out, DfsReader ctx)
-			throws IOException {
+	void copyPackAsIs(PackOutputStream out, DfsReader ctx) throws IOException {
 		// If the length hasn't been determined yet, pin to set it.
 		if (length == -1) {
 			ctx.pin(this, 0);
 			ctx.unpin();
 		}
-		if (cache.shouldCopyThroughCache(length)) {
-			copyPackThroughCache(out, ctx);
-		} else {
-			copyPackBypassCache(out, ctx);
+		try (ReadableChannel rc = ctx.db.openFile(desc, PACK)) {
+			int sz = ctx.getOptions().getStreamPackBufferSize();
+			if (sz > 0) {
+				rc.setReadAheadBytes(sz);
+			}
+			if (cache.shouldCopyThroughCache(length)) {
+				copyPackThroughCache(out, ctx, rc);
+			} else {
+				copyPackBypassCache(out, rc);
+			}
 		}
 	}
 

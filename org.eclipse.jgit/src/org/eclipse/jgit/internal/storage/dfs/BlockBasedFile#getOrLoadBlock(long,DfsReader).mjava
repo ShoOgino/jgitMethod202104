@@ -1,4 +1,6 @@
 	DfsBlock getOrLoadBlock(long pos, DfsReader ctx) throws IOException {
-		return cache.getOrLoad(this, pos, ctx, null);
+		try (ReadableChannel rc = ctx.db.openFile(desc, ext)) {
+			return cache.getOrLoad(this, pos, ctx, () -> rc);
+		}
 	}
 
