@@ -29,7 +29,7 @@
 		wantIds.addAll(req.getWantsIds());
 		Map<String, ObjectId> wantedRefs = new TreeMap<>();
 		for (String refName : req.getWantedRefs()) {
-			Ref ref = db.getRefDatabase().exactRef(refName);
+			Ref ref = getRef(refName);
 			if (ref == null) {
 				throw new PackProtocolException(MessageFormat
 						.format(JGitText.get().invalidRefName, refName));
