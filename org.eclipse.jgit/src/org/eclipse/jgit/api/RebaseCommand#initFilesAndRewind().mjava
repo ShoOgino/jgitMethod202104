@@ -39,7 +39,10 @@
 		rebaseState.createFile(HEAD_NAME, headName);
 		rebaseState.createFile(ONTO, upstreamCommit.name());
 		rebaseState.createFile(ONTO_NAME, upstreamCommitName);
-		if (isInteractive()) {
+		if (isInteractive() || preserveMerges) {
+			// --preserve-merges is an interactive mode for native git. Without
+			// this, native git rebase --continue after a conflict would fall
+			// into merge mode.
 			rebaseState.createFile(INTERACTIVE, ""); //$NON-NLS-1$
 		}
 		rebaseState.createFile(QUIET, ""); //$NON-NLS-1$
