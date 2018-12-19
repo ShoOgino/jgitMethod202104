@@ -1,8 +1,5 @@
 	@Test
 	public void testFetchWithRefInWantUnknownRef() throws Exception {
-		thrown.expect(PackProtocolException.class);
-		thrown.expectMessage(containsString("refs/heads/branchC"));
-
 		PacketLineIn pckIn = formatAsPacketLine(PacketLineIn.DELIM,
 				"want e4980cdc48cfa1301493ca94eb70523f6788b819",
 				"want-ref refs/heads/branchC",
@@ -15,7 +12,8 @@
 		testRepo.update("branchA", one);
 		testRepo.update("branchB", two);
 
-		parser.parseFetchRequest(pckIn,
-				testRepo.getRepository().getRefDatabase());
+		FetchV2Request request = parser.parseFetchRequest(pckIn);
+		assertEquals(1, request.getWantedRefs().size());
+		assertThat(request.getWantedRefs(), hasItems("refs/heads/branchC"));
 	}
 

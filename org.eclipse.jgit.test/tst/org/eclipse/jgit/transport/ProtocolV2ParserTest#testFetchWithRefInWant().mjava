@@ -12,15 +12,11 @@
 		ProtocolV2Parser parser = new ProtocolV2Parser(
 				ConfigBuilder.start().allowRefInWant().done());
 
-
-		FetchV2Request request = parser.parseFetchRequest(pckIn,
-				testRepo.getRepository().getRefDatabase());
+		FetchV2Request request = parser.parseFetchRequest(pckIn);
 		assertEquals(1, request.getWantedRefs().size());
-		assertThat(request.getWantedRefs().keySet(),
-				hasItems("refs/heads/branchA"));
-		assertEquals(2, request.getWantsIds().size());
+		assertThat(request.getWantedRefs(), hasItems("refs/heads/branchA"));
+		assertEquals(1, request.getWantsIds().size());
 		assertThat(objIdsAsStrings(request.getWantsIds()),
-				hasItems("e4980cdc48cfa1301493ca94eb70523f6788b819",
-						one.getName()));
+				hasItems("e4980cdc48cfa1301493ca94eb70523f6788b819"));
 	}
 
