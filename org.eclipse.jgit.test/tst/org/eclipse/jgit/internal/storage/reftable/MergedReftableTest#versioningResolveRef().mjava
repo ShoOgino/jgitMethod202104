@@ -1,0 +1,21 @@
+	@Test
+	public void versioningResolveRef() throws IOException {
+		List<Ref> delta1 = Arrays.asList(sym(HEAD, "refs/heads/tmp"),
+				sym("refs/heads/tmp", MASTER), ref(MASTER, 100));
+		List<Ref> delta2 = Arrays.asList(ref(MASTER, 200));
+		List<Ref> delta3 = Arrays.asList(ref(MASTER, 300));
+
+		MergedReftable mr = merge(write(delta1, 1), write(delta2, 2),
+				write(delta3, 3));
+		Ref head = mr.exactRef(HEAD);
+		Ref resolvedHead = mr.resolve(head);
+		assertEquals(resolvedHead.getObjectId(), id(300));
+		assertEquals("HEAD has not moved", resolvedHead.getUpdateIndex(), 1);
+
+		Ref master = mr.exactRef(MASTER);
+		Ref resolvedMaster = mr.resolve(master);
+		assertEquals(resolvedMaster.getObjectId(), id(300));
+		assertEquals("master also has update index",
+				resolvedMaster.getUpdateIndex(), 3);
+	}
+

@@ -8,13 +8,16 @@
 		Ref head = t.exactRef(HEAD);
 		assertNull(head.getObjectId());
 		assertEquals("refs/heads/tmp", head.getTarget().getName());
+		assertEquals(0, head.getUpdateIndex());
 
 		head = t.resolve(head);
 		assertNotNull(head);
 		assertEquals(id(1), head.getObjectId());
+		assertEquals(0, head.getUpdateIndex());
 
 		Ref master = t.exactRef(MASTER);
 		assertNotNull(master);
 		assertSame(master, t.resolve(master));
+		assertEquals(0, master.getUpdateIndex());
 	}
 

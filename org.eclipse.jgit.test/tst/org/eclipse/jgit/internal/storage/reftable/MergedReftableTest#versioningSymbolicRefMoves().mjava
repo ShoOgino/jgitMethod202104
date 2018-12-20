@@ -1,0 +1,21 @@
+	@Test
+	public void versioningSymbolicRefMoves() throws IOException {
+		Ref branchX = ref("refs/heads/branchX", 200);
+
+		List<Ref> delta1 = Arrays.asList(ref(MASTER, 100), branchX,
+				sym(HEAD, MASTER));
+		List<Ref> delta2 = Arrays.asList(sym(HEAD, "refs/heads/branchX"));
+		List<Ref> delta3 = Arrays.asList(sym(HEAD, MASTER));
+
+		MergedReftable mr = merge(write(delta1, 1), write(delta2, 2),
+				write(delta3, 3));
+		Ref head = mr.exactRef(HEAD);
+		assertEquals(head.getUpdateIndex(), 3);
+
+		Ref masterRef = mr.exactRef(MASTER);
+		assertEquals(masterRef.getUpdateIndex(), 1);
+
+		Ref branchRef = mr.exactRef(MASTER);
+		assertEquals(branchRef.getUpdateIndex(), 1);
+	}
+

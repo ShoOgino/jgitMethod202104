@@ -21,8 +21,7 @@
 				}
 
 				block.parseKey();
-				updateIndex = minUpdateIndex + block.readUpdateIndexDelta();
-				ref = block.readRef();
+				ref = block.readRef(minUpdateIndex);
 				ObjectId id = ref.getObjectId();
 				if (id != null && match.equals(id)
 						&& (includeDeletes || !wasDeleted())) {

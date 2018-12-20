@@ -1,0 +1,15 @@
+	@Test
+	public void versioningSymbolicReftargetMoves() throws IOException {
+		Ref master = ref(MASTER, 100);
+
+		List<Ref> delta1 = Arrays.asList(master, sym(HEAD, MASTER));
+		List<Ref> delta2 = Arrays.asList(ref(MASTER, 200));
+
+		MergedReftable mr = merge(write(delta1, 1), write(delta2, 2));
+		Ref head = mr.exactRef(HEAD);
+		assertEquals(head.getUpdateIndex(), 1);
+
+		Ref masterRef = mr.exactRef(MASTER);
+		assertEquals(masterRef.getUpdateIndex(), 2);
+	}
+

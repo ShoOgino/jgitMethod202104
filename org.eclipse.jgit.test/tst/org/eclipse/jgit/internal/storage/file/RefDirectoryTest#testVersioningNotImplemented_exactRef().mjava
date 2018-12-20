@@ -1,0 +1,9 @@
+	@Test(expected = UnsupportedOperationException.class)
+	public void testVersioningNotImplemented_exactRef() throws IOException {
+		assertFalse(refdir.hasVersioning());
+
+		Ref ref = refdir.exactRef(HEAD);
+		assertNotNull(ref);
+		ref.getUpdateIndex(); // Not implemented on FS
+	}
+

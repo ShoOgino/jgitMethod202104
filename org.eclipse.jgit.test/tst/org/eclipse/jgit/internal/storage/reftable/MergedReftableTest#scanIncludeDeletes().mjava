@@ -11,12 +11,14 @@
 			Ref r = rc.getRef();
 			assertEquals("refs/heads/master", r.getName());
 			assertEquals(id(8), r.getObjectId());
+			assertEquals(1, rc.getRef().getUpdateIndex());
 
 			assertTrue(rc.next());
 			r = rc.getRef();
 			assertEquals("refs/heads/next", r.getName());
 			assertEquals(NEW, r.getStorage());
 			assertNull(r.getObjectId());
+			assertEquals(1, rc.getRef().getUpdateIndex());
 
 			assertFalse(rc.next());
 		}
