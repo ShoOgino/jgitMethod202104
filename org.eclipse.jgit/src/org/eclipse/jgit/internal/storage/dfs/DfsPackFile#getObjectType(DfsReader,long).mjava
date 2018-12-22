@@ -14,8 +14,9 @@
 
 			case Constants.OBJ_OFS_DELTA: {
 				int p = 1;
-				while ((c & 0x80) != 0)
+				while ((c & 0x80) != 0) {
 					c = ib[p++] & 0xff;
+				}
 				c = ib[p++] & 0xff;
 				long ofs = c & 127;
 				while ((c & 128) != 0) {
@@ -30,8 +31,9 @@
 
 			case Constants.OBJ_REF_DELTA: {
 				int p = 1;
-				while ((c & 0x80) != 0)
+				while ((c & 0x80) != 0) {
 					c = ib[p++] & 0xff;
+				}
 				readFully(pos + p, ib, 0, 20, ctx);
 				pos = findDeltaBase(ctx, ObjectId.fromRaw(ib));
 				continue;

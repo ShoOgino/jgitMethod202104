@@ -2,12 +2,14 @@
 		DfsBlockCache.Ref<PackIndex> idxref = index;
 		if (idxref != null) {
 			PackIndex idx = idxref.get();
-			if (idx != null)
+			if (idx != null) {
 				return idx;
+			}
 		}
 
-		if (invalid)
+		if (invalid) {
 			throw new PackInvalidException(getFileName());
+		}
 
 		Repository.getGlobalListenerList()
 				.dispatch(new BeforeDfsPackIndexLoadedEvent(this));
@@ -16,50 +18,55 @@
 			idxref = index;
 			if (idxref != null) {
 				PackIndex idx = idxref.get();
-				if (idx != null)
+				if (idx != null) {
 					return idx;
+				}
 			}
 
 			DfsStreamKey idxKey = desc.getStreamKey(INDEX);
-			idxref = cache.getRef(idxKey);
-			if (idxref != null) {
-				PackIndex idx = idxref.get();
-				if (idx != null) {
-					index = idxref;
-					return idx;
-				}
-			}
-
-			PackIndex idx;
 			try {
-				ctx.stats.readIdx++;
-				long start = System.nanoTime();
-				try (ReadableChannel rc = ctx.db.openFile(desc, INDEX)) {
-					InputStream in = Channels.newInputStream(rc);
-					int wantSize = 8192;
-					int bs = rc.blockSize();
-					if (0 < bs && bs < wantSize)
-						bs = (wantSize / bs) * bs;
-					else if (bs <= 0)
-						bs = wantSize;
-					idx = PackIndex.read(new BufferedInputStream(in, bs));
-					ctx.stats.readIdxBytes += rc.position();
-				} finally {
-					ctx.stats.readIdxMicros += elapsedMicros(start);
-				}
-			} catch (EOFException e) {
-				invalid = true;
-				throw new IOException(MessageFormat.format(
-						DfsText.get().shortReadOfIndex,
-						desc.getFileName(INDEX)), e);
+				idxref = cache.getOrLoadRef(idxKey, () -> {
+					try {
+						ctx.stats.readIdx++;
+						long start = System.nanoTime();
+						try (ReadableChannel rc = ctx.db.openFile(desc,
+								INDEX)) {
+							InputStream in = Channels.newInputStream(rc);
+							int wantSize = 8192;
+							int bs = rc.blockSize();
+							if (0 < bs && bs < wantSize) {
+								bs = (wantSize / bs) * bs;
+							} else if (bs <= 0) {
+								bs = wantSize;
+							}
+							PackIndex idx = PackIndex
+									.read(new BufferedInputStream(in, bs));
+							int sz = (int) Math.min(
+									idx.getObjectCount() * REC_SIZE,
+									Integer.MAX_VALUE);
+							ctx.stats.readIdxBytes += rc.position();
+							return new DfsBlockCache.Ref<>(idxKey, 0, sz, idx);
+						} finally {
+							ctx.stats.readIdxMicros += elapsedMicros(start);
+						}
+					} catch (EOFException e) {
+						throw new IOException(MessageFormat.format(
+								DfsText.get().shortReadOfIndex,
+								desc.getFileName(INDEX)), e);
+					} catch (IOException e) {
+						throw new IOException(MessageFormat.format(
+								DfsText.get().cannotReadIndex,
+								desc.getFileName(INDEX)), e);
+					}
+				});
 			} catch (IOException e) {
 				invalid = true;
-				throw new IOException(MessageFormat.format(
-						DfsText.get().cannotReadIndex,
-						desc.getFileName(INDEX)), e);
+				throw e;
 			}
-
-			setPackIndex(idx);
+			PackIndex idx = idxref.get();
+			if (idx != null) {
+				index = idxref;
+			}
 			return idx;
 		}
 	}

@@ -1,13 +1,19 @@
 	@SuppressWarnings("unchecked")
 	private DfsBlockCache(DfsBlockCacheConfig cfg) {
 		tableSize = tableSize(cfg);
-		if (tableSize < 1)
+		if (tableSize < 1) {
 			throw new IllegalArgumentException(JGitText.get().tSizeMustBeGreaterOrEqual1);
+		}
 
 		table = new AtomicReferenceArray<>(tableSize);
 		loadLocks = new ReentrantLock[cfg.getConcurrencyLevel()];
-		for (int i = 0; i < loadLocks.length; i++)
+		for (int i = 0; i < loadLocks.length; i++) {
 			loadLocks[i] = new ReentrantLock(true /* fair */);
+		}
+		refLocks = new ReentrantLock[cfg.getConcurrencyLevel()];
+		for (int i = 0; i < refLocks.length; i++) {
+			refLocks[i] = new ReentrantLock(true /* fair */);
+		}
 
 		maxBytes = cfg.getBlockLimit();
 		maxStreamThroughCache = (long) (maxBytes * cfg.getStreamRatio());
@@ -25,5 +31,7 @@
 		statMiss = new AtomicReference<>(newCounters());
 		statEvict = new AtomicReference<>(newCounters());
 		liveBytes = new AtomicReference<>(newCounters());
+
+		refLockWaitTime = cfg.getRefLockWaitTimeConsumer();
 	}
 

@@ -1,9 +1,10 @@
 	private long findDeltaBase(DfsReader ctx, ObjectId baseId)
 			throws IOException, MissingObjectException {
 		long ofs = idx(ctx).findOffset(baseId);
-		if (ofs < 0)
+		if (ofs < 0) {
 			throw new MissingObjectException(baseId,
 					JGitText.get().missingDeltaBase);
+		}
 		return ofs;
 	}
 

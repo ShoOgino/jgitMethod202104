@@ -1,10 +1,11 @@
 	@SuppressWarnings("unchecked")
 	<T> T get(DfsStreamKey key, long position) {
 		T val = (T) scan(table.get(slot(key, position)), key, position);
-		if (val == null)
+		if (val == null) {
 			getStat(statMiss, key).incrementAndGet();
-		else
+		} else {
 			getStat(statHit, key).incrementAndGet();
+		}
 		return val;
 	}
 

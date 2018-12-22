@@ -1,5 +1,5 @@
 	/**
-	 * Lookup a cached object, creating and loading it if it doesn't exist.
+	 * Look up a cached object, creating and loading it if it doesn't exist.
 	 *
 	 * @param file
 	 *            the pack that "contains" the cached object.
@@ -49,8 +49,9 @@
 				v = file.readOneBlock(requestedPosition, ctx, fileChannel);
 				credit = false;
 			} finally {
-				if (credit)
+				if (credit) {
 					creditSpace(blockSize, key);
+				}
 			}
 			if (position != v.start) {
 				// The file discovered its blockSize and adjusted.
@@ -63,8 +64,9 @@
 			ref.hot = true;
 			for (;;) {
 				HashEntry n = new HashEntry(clean(e2), ref);
-				if (table.compareAndSet(slot, e2, n))
+				if (table.compareAndSet(slot, e2, n)) {
 					break;
+				}
 				e2 = table.get(slot);
 			}
 			addToClock(ref, blockSize - v.size());
@@ -74,8 +76,9 @@
 
 		// If the block size changed from the default, it is possible the block
 		// that was loaded is the wrong block for the requested position.
-		if (v.contains(file.key, requestedPosition))
+		if (v.contains(file.key, requestedPosition)) {
 			return v;
+		}
 		return getOrLoad(file, requestedPosition, ctx, fileChannel);
 	}
 

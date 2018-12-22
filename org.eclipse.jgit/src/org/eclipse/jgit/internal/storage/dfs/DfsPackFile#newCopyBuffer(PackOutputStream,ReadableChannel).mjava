@@ -1,8 +1,9 @@
 	private ByteBuffer newCopyBuffer(PackOutputStream out, ReadableChannel rc) {
 		int bs = blockSize(rc);
 		byte[] copyBuf = out.getCopyBuffer();
-		if (bs > copyBuf.length)
+		if (bs > copyBuf.length) {
 			copyBuf = new byte[bs];
+		}
 		return ByteBuffer.wrap(copyBuf, 0, bs);
 	}
 

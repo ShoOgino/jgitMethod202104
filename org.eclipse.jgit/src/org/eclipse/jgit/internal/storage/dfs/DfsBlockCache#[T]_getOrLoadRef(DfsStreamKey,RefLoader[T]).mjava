@@ -1,0 +1,57 @@
+	/**
+	 * Look up a cached object, creating and loading it if it doesn't exist.
+	 *
+	 * @param key
+	 *            the stream key of the pack.
+	 * @param loader
+	 *            the function to load the reference.
+	 * @return the object reference.
+	 * @throws IOException
+	 *             the reference was not in the cache and could not be loaded.
+	 */
+	<T> Ref<T> getOrLoadRef(DfsStreamKey key, RefLoader<T> loader)
+			throws IOException {
+		int slot = slot(key, 0);
+		HashEntry e1 = table.get(slot);
+		Ref<T> ref = scanRef(e1, key, 0);
+		if (ref != null) {
+			getStat(statHit, key).incrementAndGet();
+			return ref;
+		}
+
+		ReentrantLock regionLock = lockForRef(key);
+		long lockStart = System.currentTimeMillis();
+		regionLock.lock();
+		try {
+			HashEntry e2 = table.get(slot);
+			if (e2 != e1) {
+				ref = scanRef(e2, key, 0);
+				if (ref != null) {
+					getStat(statHit, key).incrementAndGet();
+					return ref;
+				}
+			}
+
+			if (refLockWaitTime != null) {
+				refLockWaitTime.accept(
+						Long.valueOf(System.currentTimeMillis() - lockStart));
+			}
+			getStat(statMiss, key).incrementAndGet();
+			ref = loader.load();
+			ref.hot = true;
+			// Reserve after loading to get the size of the object
+			reserveSpace(ref.size, key);
+			for (;;) {
+				HashEntry n = new HashEntry(clean(e2), ref);
+				if (table.compareAndSet(slot, e2, n)) {
+					break;
+				}
+				e2 = table.get(slot);
+			}
+			addToClock(ref, 0);
+		} finally {
+			regionLock.unlock();
+		}
+		return ref;
+	}
+

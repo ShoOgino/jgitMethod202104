@@ -2,8 +2,9 @@
 			throws IOException {
 		try (ReadableChannel rc = ctx.db.openFile(desc, PACK)) {
 			ByteBuffer buf = newCopyBuffer(out, rc);
-			if (ctx.getOptions().getStreamPackBufferSize() > 0)
+			if (ctx.getOptions().getStreamPackBufferSize() > 0) {
 				rc.setReadAheadBytes(ctx.getOptions().getStreamPackBufferSize());
+			}
 			long position = 12;
 			long remaining = length - (12 + 20);
 			boolean packHeadSkipped = false;
@@ -22,10 +23,11 @@
 
 				buf.position(0);
 				int n = read(rc, buf);
-				if (n <= 0)
+				if (n <= 0) {
 					throw packfileIsTruncated();
-				else if (n > remaining)
+				} else if (n > remaining) {
 					n = (int) remaining;
+				}
 
 				if (!packHeadSkipped) {
 					// Need skip the 'PACK' header for the first read

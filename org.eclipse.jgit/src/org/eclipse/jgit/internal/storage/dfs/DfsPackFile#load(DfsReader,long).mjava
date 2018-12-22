@@ -33,8 +33,9 @@
 
 					if (sz < ctx.getStreamFileThreshold()) {
 						data = decompress(pos + p, (int) sz, ctx);
-						if (data != null)
+						if (data != null) {
 							return new ObjectLoader.SmallObject(typeCode, data);
+						}
 					}
 					return new LargePackedWholeObject(typeCode, sz, pos, p, this, ctx.db);
 				}
@@ -50,8 +51,9 @@
 					}
 					base = pos - base;
 					delta = new Delta(delta, pos, (int) sz, p, base);
-					if (sz != delta.deltaSize)
+					if (sz != delta.deltaSize) {
 						break SEARCH;
+					}
 
 					DeltaBaseCache.Entry e = ctx.getDeltaBaseCache().get(key, base);
 					if (e != null) {
@@ -68,8 +70,9 @@
 					readFully(pos + p, ib, 0, 20, ctx);
 					long base = findDeltaBase(ctx, ObjectId.fromRaw(ib));
 					delta = new Delta(delta, pos, (int) sz, p + 20, base);
-					if (sz != delta.deltaSize)
+					if (sz != delta.deltaSize) {
 						break SEARCH;
+					}
 
 					DeltaBaseCache.Entry e = ctx.getDeltaBaseCache().get(key, base);
 					if (e != null) {
@@ -97,10 +100,11 @@
 			assert(delta != null);
 			do {
 				// Cache only the base immediately before desired object.
-				if (cached)
+				if (cached) {
 					cached = false;
-				else if (delta.next == null)
+				} else if (delta.next == null) {
 					ctx.getDeltaBaseCache().put(key, delta.basePos, type, data);
+				}
 
 				pos = delta.deltaPos;
 
@@ -111,8 +115,9 @@
 				}
 
 				final long sz = BinaryDelta.getResultSize(cmds);
-				if (Integer.MAX_VALUE <= sz)
+				if (Integer.MAX_VALUE <= sz) {
 					throw new LargeObjectException.ExceedsByteArrayLimit();
+				}
 
 				final byte[] result;
 				try {

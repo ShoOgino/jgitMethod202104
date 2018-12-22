@@ -1,10 +1,12 @@
 	private static int tableSize(DfsBlockCacheConfig cfg) {
 		final int wsz = cfg.getBlockSize();
 		final long limit = cfg.getBlockLimit();
-		if (wsz <= 0)
+		if (wsz <= 0) {
 			throw new IllegalArgumentException(JGitText.get().invalidWindowSize);
-		if (limit < wsz)
+		}
+		if (limit < wsz) {
 			throw new IllegalArgumentException(JGitText.get().windowSizeMustBeLesserThanLimit);
+		}
 		return (int) Math.min(5 * (limit / wsz) / 2, Integer.MAX_VALUE);
 	}
 

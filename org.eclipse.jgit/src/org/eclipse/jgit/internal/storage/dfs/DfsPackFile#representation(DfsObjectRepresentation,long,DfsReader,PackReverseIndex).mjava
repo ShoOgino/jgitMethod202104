@@ -7,8 +7,9 @@
 		int c = ib[0] & 0xff;
 		int p = 1;
 		final int typeCode = (c >> 4) & 7;
-		while ((c & 0x80) != 0)
+		while ((c & 0x80) != 0) {
 			c = ib[p++] & 0xff;
+		}
 
 		long len = rev.findNextOffset(pos, length - 20) - pos;
 		switch (typeCode) {

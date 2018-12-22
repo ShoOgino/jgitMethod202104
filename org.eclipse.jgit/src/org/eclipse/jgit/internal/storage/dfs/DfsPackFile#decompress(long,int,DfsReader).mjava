@@ -14,10 +14,11 @@
 			return null;
 		}
 
-		if (ctx.inflate(this, position, dstbuf, false) != sz)
+		if (ctx.inflate(this, position, dstbuf, false) != sz) {
 			throw new EOFException(MessageFormat.format(
 					JGitText.get().shortCompressedStreamAt,
 					Long.valueOf(position)));
+		}
 		return dstbuf;
 	}
 

@@ -2,33 +2,33 @@
 		DfsBlockCache.Ref<PackReverseIndex> revref = reverseIndex;
 		if (revref != null) {
 			PackReverseIndex revidx = revref.get();
-			if (revidx != null)
+			if (revidx != null) {
 				return revidx;
+			}
 		}
 
 		synchronized (initLock) {
 			revref = reverseIndex;
 			if (revref != null) {
 				PackReverseIndex revidx = revref.get();
-				if (revidx != null)
+				if (revidx != null) {
 					return revidx;
-			}
-
-			DfsStreamKey revKey =
-					new DfsStreamKey.ForReverseIndex(desc.getStreamKey(INDEX));
-			revref = cache.getRef(revKey);
-			if (revref != null) {
-				PackReverseIndex idx = revref.get();
-				if (idx != null) {
-					reverseIndex = revref;
-					return idx;
 				}
 			}
 
 			PackIndex idx = idx(ctx);
-			PackReverseIndex revidx = new PackReverseIndex(idx);
-			long cnt = idx.getObjectCount();
-			reverseIndex = cache.putRef(revKey, cnt * 8, revidx);
+			DfsStreamKey revKey = new DfsStreamKey.ForReverseIndex(
+					desc.getStreamKey(INDEX));
+			revref = cache.getOrLoadRef(revKey, () -> {
+				PackReverseIndex revidx = new PackReverseIndex(idx);
+				int sz = (int) Math.min(idx.getObjectCount() * 8,
+						Integer.MAX_VALUE);
+				return new DfsBlockCache.Ref<>(revKey, 0, sz, revidx);
+			});
+			PackReverseIndex revidx = revref.get();
+			if (revidx != null) {
+				reverseIndex = revref;
+			}
 			return revidx;
 		}
 	}
