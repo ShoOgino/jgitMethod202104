@@ -1,0 +1,23 @@
+	@Test
+	public void testFetchBySHA1UnreachableByAdvertiseRefsHook()
+			throws Exception {
+		Repository dst = createBareRepository();
+		assertFalse(dst.hasObject(A_txt));
+
+		advertiseRefsHook = new AbstractAdvertiseRefsHook() {
+			@Override
+			protected Map<String, Ref> getAdvertisedRefs(Repository repository,
+					RevWalk revWalk) {
+				return Collections.emptyMap();
+			}
+		};
+
+		try (Transport t = Transport.open(dst, remoteURI)) {
+			thrown.expect(TransportException.class);
+			thrown.expectMessage(Matchers.containsString(
+					"want " + A.name() + " not valid"));
+			t.fetch(NullProgressMonitor.INSTANCE, Collections
+					.singletonList(new RefSpec(A.name())));
+		}
+	}
+

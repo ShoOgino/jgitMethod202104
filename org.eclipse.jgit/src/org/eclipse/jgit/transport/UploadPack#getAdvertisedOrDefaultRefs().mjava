@@ -1,6 +1,12 @@
 	private Map<String, Ref> getAdvertisedOrDefaultRefs() throws IOException {
-		if (refs == null)
-			setAdvertisedRefs(db.getRefDatabase().getRefs(RefDatabase.ALL));
+		if (refs != null) {
+			return refs;
+		}
+
+		advertiseRefsHook.advertiseRefs(this);
+		if (refs == null) {
+			setAdvertisedRefs(db.getRefDatabase().getRefs(ALL));
+		}
 		return refs;
 	}
 
