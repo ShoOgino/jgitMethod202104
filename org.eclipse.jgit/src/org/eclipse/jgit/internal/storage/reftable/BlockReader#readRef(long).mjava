@@ -1,0 +1,28 @@
+	Ref readRef(long minUpdateIndex) throws IOException {
+		long updateIndex = minUpdateIndex + readUpdateIndexDelta();
+		String name = RawParseUtils.decode(UTF_8, nameBuf, 0, nameLen);
+		switch (valueType & VALUE_TYPE_MASK) {
+		case VALUE_NONE: // delete
+			return newRef(name, updateIndex);
+
+		case VALUE_1ID:
+			return new ObjectIdRef.PeeledNonTag(PACKED, name, readValueId(),
+					updateIndex);
+
+		case VALUE_2ID: { // annotated tag
+			ObjectId id1 = readValueId();
+			ObjectId id2 = readValueId();
+			return new ObjectIdRef.PeeledTag(PACKED, name, id1, id2,
+					updateIndex);
+		}
+
+		case VALUE_SYMREF: {
+			String val = readValueString();
+			return new SymbolicRef(name, newRef(val, updateIndex), updateIndex);
+		}
+
+		default:
+			throw invalidBlock();
+		}
+	}
+

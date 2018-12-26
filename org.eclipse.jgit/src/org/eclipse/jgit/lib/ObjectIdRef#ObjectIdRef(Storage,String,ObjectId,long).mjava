@@ -8,11 +8,15 @@
 	 * @param id
 	 *            current value of the ref. May be {@code null} to indicate a
 	 *            ref that does not exist yet.
+	 * @param updateIndex
+	 *            number that increases with each ref update. Set to -1 if the
+	 *            storage doesn't support versioning.
 	 */
 	protected ObjectIdRef(@NonNull Storage st, @NonNull String name,
-			@Nullable ObjectId id) {
+			@Nullable ObjectId id, long updateIndex) {
 		this.name = name;
 		this.storage = st;
 		this.objectId = id;
+		this.updateIndex = updateIndex;
 	}
 

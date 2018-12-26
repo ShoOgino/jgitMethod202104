@@ -1,0 +1,17 @@
+	@Test
+	public void testUpdateIndexNotSet() {
+		List<ObjectIdRef> r = Arrays.asList(
+				new ObjectIdRef.Unpeeled(Ref.Storage.LOOSE, name, ID_A),
+				new ObjectIdRef.PeeledTag(Ref.Storage.LOOSE, name, ID_A, ID_B),
+				new ObjectIdRef.PeeledNonTag(Ref.Storage.LOOSE, name, ID_A));
+
+		for (ObjectIdRef ref : r) {
+			try {
+				ref.getUpdateIndex();
+				fail("Update index wasn't set. It must throw");
+			} catch (UnsupportedOperationException u) {
+				// Ok
+			}
+		}
+	}
+

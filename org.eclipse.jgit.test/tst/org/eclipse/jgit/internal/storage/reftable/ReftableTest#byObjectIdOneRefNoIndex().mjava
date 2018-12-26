@@ -14,6 +14,7 @@
 			assertTrue("has 42", rc.next());
 			assertEquals("refs/heads/42", rc.getRef().getName());
 			assertEquals(id(42), rc.getRef().getObjectId());
+			assertEquals(0, rc.getRef().getUpdateIndex());
 			assertFalse(rc.next());
 		}
 		try (RefCursor rc = t.byObjectId(id(100))) {
@@ -24,6 +25,7 @@
 			assertTrue("has master", rc.next());
 			assertEquals("refs/heads/master", rc.getRef().getName());
 			assertEquals(id(100), rc.getRef().getObjectId());
+			assertEquals(0, rc.getRef().getUpdateIndex());
 
 			assertFalse(rc.next());
 		}

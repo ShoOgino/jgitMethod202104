@@ -8,14 +8,17 @@
 		try (RefCursor rc = t.seekRefsWithPrefix("refs/tags/")) {
 			assertTrue(rc.next());
 			assertEquals(V1_0, rc.getRef().getName());
+			assertEquals(0, rc.getRef().getUpdateIndex());
 			assertFalse(rc.next());
 		}
 		try (RefCursor rc = t.seekRefsWithPrefix("refs/heads/")) {
 			assertTrue(rc.next());
 			assertEquals(MASTER, rc.getRef().getName());
+			assertEquals(0, rc.getRef().getUpdateIndex());
 
 			assertTrue(rc.next());
 			assertEquals(NEXT, rc.getRef().getName());
+			assertEquals(0, rc.getRef().getUpdateIndex());
 
 			assertFalse(rc.next());
 		}
