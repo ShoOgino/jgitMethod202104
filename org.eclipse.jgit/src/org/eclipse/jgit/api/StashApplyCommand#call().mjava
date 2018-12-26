@@ -36,7 +36,7 @@
 					.getParent(1));
 			ObjectId stashHeadCommit = stashCommit.getParent(0);
 			ObjectId untrackedCommit = null;
-			if (applyUntracked && stashCommit.getParentCount() == 3)
+			if (restoreUntracked && stashCommit.getParentCount() == 3)
 				untrackedCommit = revWalk.parseCommit(stashCommit.getParent(2));
 
 			ResolveMerger merger = (ResolveMerger) strategy.newMerger(repo);
@@ -56,7 +56,7 @@
 						dc, merger.getResultTreeId());
 				dco.setFailOnConflict(true);
 				dco.checkout(); // Ignoring failed deletes....
-				if (applyIndex) {
+				if (restoreIndex) {
 					ResolveMerger ixMerger = (ResolveMerger) strategy
 							.newMerger(repo, true);
 					ixMerger.setCommitNames(new String[] { "stashed HEAD", //$NON-NLS-1$

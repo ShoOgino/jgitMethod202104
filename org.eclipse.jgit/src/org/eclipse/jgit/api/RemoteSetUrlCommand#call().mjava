@@ -10,8 +10,8 @@
 
 		try {
 			StoredConfig config = repo.getConfig();
-			RemoteConfig remote = new RemoteConfig(config, name);
-			if (push) {
+			RemoteConfig remote = new RemoteConfig(config, remoteName);
+			if (type == UriType.PUSH) {
 				List<URIish> uris = remote.getPushURIs();
 				if (uris.size() > 1) {
 					throw new JGitInternalException(
@@ -19,7 +19,7 @@
 				} else if (uris.size() == 1) {
 					remote.removePushURI(uris.get(0));
 				}
-				remote.addPushURI(uri);
+				remote.addPushURI(remoteUri);
 			} else {
 				List<URIish> uris = remote.getURIs();
 				if (uris.size() > 1) {
@@ -28,7 +28,7 @@
 				} else if (uris.size() == 1) {
 					remote.removeURI(uris.get(0));
 				}
-				remote.addURI(uri);
+				remote.addURI(remoteUri);
 			}
 
 			remote.update(config);

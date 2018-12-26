@@ -4,8 +4,14 @@
 	 * @param push
 	 *            <code>true</code> to set the push url, <code>false</code> to
 	 *            set the fetch url
+	 * @deprecated use {@link #setUriType} instead
 	 */
+	@Deprecated
 	public void setPush(boolean push) {
-		this.push = push;
+		if (push) {
+			setUriType(UriType.PUSH);
+		} else {
+			setUriType(UriType.FETCH);
+		}
 	}
 
