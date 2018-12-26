@@ -1,0 +1,20 @@
+	/**
+	 * Parse the first line of a receive-pack request.
+	 *
+	 * @param line
+	 *            line from the client.
+	 * @return an instance of FirstCommand with capabilities parsed out
+	 */
+	@NonNull
+	public static FirstCommand fromLine(String line) {
+		int nul = line.indexOf('\0');
+		if (nul < 0) {
+			return new FirstCommand(line, emptySet());
+		}
+		Set<String> opts =
+				asList(line.substring(nul + 1).split(" ")) //$NON-NLS-1$
+					.stream()
+					.collect(toSet());
+		return new FirstCommand(line.substring(0, nul), unmodifiableSet(opts));
+	}
+
