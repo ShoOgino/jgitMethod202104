@@ -1,0 +1,19 @@
+	/** {@inheritDoc} */
+	@Override
+	@NonNull
+	public Map<String, Ref> exactRef(String... refs) throws IOException {
+		try {
+			RefList<Ref> packed = getPackedRefs();
+			Map<String, Ref> result = new HashMap<>(refs.length);
+			for (String name : refs) {
+				Ref ref = readAndResolve(name, packed);
+				if (ref != null) {
+					result.put(name, ref);
+				}
+			}
+			return result;
+		} finally {
+			fireRefsChanged();
+		}
+	}
+
