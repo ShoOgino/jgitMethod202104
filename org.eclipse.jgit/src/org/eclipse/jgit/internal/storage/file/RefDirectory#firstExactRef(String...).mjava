@@ -1,10 +1,11 @@
 	/** {@inheritDoc} */
 	@Override
-	public Ref getRef(String needle) throws IOException {
+	@Nullable
+	public Ref firstExactRef(String... refs) throws IOException {
 		try {
 			RefList<Ref> packed = getPackedRefs();
-			for (String prefix : SEARCH_PATH) {
-				Ref ref = readAndResolve(prefix + needle, packed);
+			for (String name : refs) {
+				Ref ref = readAndResolve(name, packed);
 				if (ref != null) {
 					return ref;
 				}

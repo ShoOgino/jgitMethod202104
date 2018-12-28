@@ -1,0 +1,27 @@
+	/**
+	 * Read a single reference.
+	 * <p>
+	 * Aside from taking advantage of {@link #SEARCH_PATH}, this method may be
+	 * able to more quickly resolve a single reference name than obtaining the
+	 * complete namespace by {@code getRefs(ALL).get(name)}.
+	 * <p>
+	 * To read a specific reference without using @{link #SEARCH_PATH}, see
+	 * {@link #exactRef(String)}.
+	 *
+	 * @param name
+	 *            the name of the reference. May be a short name which must be
+	 *            searched for using the standard {@link #SEARCH_PATH}.
+	 * @return the reference (if it exists); else {@code null}.
+	 * @throws java.io.IOException
+	 *             the reference space cannot be accessed.
+	 * @since 5.3
+	 */
+	@Nullable
+	public final Ref findRef(String name) throws IOException {
+		String[] names = new String[SEARCH_PATH.length];
+		for (int i = 0; i < SEARCH_PATH.length; i++) {
+			names[i] = SEARCH_PATH[i] + name;
+		}
+		return firstExactRef(names);
+	}
+
