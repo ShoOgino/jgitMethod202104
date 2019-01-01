@@ -13,7 +13,7 @@
 				: getRef().getLeaf().getName();
 		if (myName.startsWith(Constants.R_HEADS) && !getRepository().isBare()) {
 			// Don't allow the currently checked out branch to be deleted.
-			Ref head = getRefDatabase().getRef(Constants.HEAD);
+			Ref head = getRefDatabase().exactRef(Constants.HEAD);
 			while (head != null && head.isSymbolic()) {
 				head = head.getTarget();
 				if (myName.equals(head.getName()))

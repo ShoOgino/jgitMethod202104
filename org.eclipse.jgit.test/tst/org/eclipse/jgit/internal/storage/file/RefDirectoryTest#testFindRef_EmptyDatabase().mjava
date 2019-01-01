@@ -1,0 +1,19 @@
+	@Test
+	public void testFindRef_EmptyDatabase() throws IOException {
+		Ref r;
+
+		r = refdir.findRef(HEAD);
+		assertTrue(r.isSymbolic());
+		assertSame(LOOSE, r.getStorage());
+		assertEquals("refs/heads/master", r.getTarget().getName());
+		assertSame(NEW, r.getTarget().getStorage());
+		assertNull(r.getTarget().getObjectId());
+
+		assertNull(refdir.findRef("refs/heads/master"));
+		assertNull(refdir.findRef("refs/tags/v1.0"));
+		assertNull(refdir.findRef("FETCH_HEAD"));
+		assertNull(refdir.findRef("NOT.A.REF.NAME"));
+		assertNull(refdir.findRef("master"));
+		assertNull(refdir.findRef("v1.0"));
+	}
+

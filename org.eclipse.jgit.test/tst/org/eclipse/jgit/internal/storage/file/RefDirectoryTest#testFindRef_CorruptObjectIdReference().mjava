@@ -1,10 +1,10 @@
 	@Test
-	public void testGetRef_CorruptObjectIdReference() throws IOException {
+	public void testFindRef_CorruptObjectIdReference() throws IOException {
 		String name = "refs/heads/A";
 		String content = "zoo" + A.name();
 		writeLooseRef(name, content + "\n");
 		try {
-			refdir.getRef(name);
+			refdir.findRef(name);
 			fail("read an invalid reference");
 		} catch (IOException err) {
 			String msg = err.getMessage();

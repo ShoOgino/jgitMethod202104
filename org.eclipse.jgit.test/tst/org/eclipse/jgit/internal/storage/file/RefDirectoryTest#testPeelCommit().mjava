@@ -2,7 +2,7 @@
 	public void testPeelCommit() throws IOException {
 		writeLooseRef("refs/heads/master", A);
 
-		Ref master = refdir.getRef("refs/heads/master");
+		Ref master = refdir.findRef("refs/heads/master");
 		assertEquals(A, master.getObjectId());
 		assertFalse(master.isPeeled());
 		assertNull(master.getPeeledObjectId());
@@ -15,7 +15,7 @@
 
 		// reuses cached peeling later, but not immediately due to
 		// the implementation so we have to fetch it once.
-		Ref master_p2 = refdir.getRef("refs/heads/master");
+		Ref master_p2 = refdir.findRef("refs/heads/master");
 		assertNotSame(master, master_p2);
 		assertEquals(A, master_p2.getObjectId());
 		assertTrue(master_p2.isPeeled());

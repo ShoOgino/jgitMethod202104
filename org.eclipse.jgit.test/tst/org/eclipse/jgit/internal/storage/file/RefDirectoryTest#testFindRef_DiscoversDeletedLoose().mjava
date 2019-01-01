@@ -1,5 +1,5 @@
 	@Test
-	public void testGetRef_DiscoversDeletedLoose() throws IOException {
+	public void testFindRef_DiscoversDeletedLoose() throws IOException {
 		Map<String, Ref> all;
 
 		writeLooseRef("refs/heads/master", A);
@@ -7,7 +7,7 @@
 		assertEquals(A, all.get(HEAD).getObjectId());
 
 		deleteLooseRef("refs/heads/master");
-		assertNull(refdir.getRef("refs/heads/master"));
+		assertNull(refdir.findRef("refs/heads/master"));
 		assertTrue(refdir.getRefs(RefDatabase.ALL).isEmpty());
 	}
 

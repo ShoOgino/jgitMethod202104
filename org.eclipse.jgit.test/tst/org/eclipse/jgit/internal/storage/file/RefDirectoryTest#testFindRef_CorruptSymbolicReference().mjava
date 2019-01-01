@@ -1,9 +1,9 @@
 	@Test
-	public void testGetRef_CorruptSymbolicReference() throws IOException {
+	public void testFindRef_CorruptSymbolicReference() throws IOException {
 		String name = "refs/heads/A";
 		writeLooseRef(name, "ref: \n");
 		try {
-			refdir.getRef(name);
+			refdir.findRef(name);
 			fail("read an invalid reference");
 		} catch (IOException err) {
 			String msg = err.getMessage();

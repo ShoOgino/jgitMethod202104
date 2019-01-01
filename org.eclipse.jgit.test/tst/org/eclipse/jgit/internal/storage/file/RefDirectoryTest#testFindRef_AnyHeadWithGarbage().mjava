@@ -1,10 +1,10 @@
 	@Test
-	public void testGetRef_AnyHeadWithGarbage() throws IOException {
+	public void testFindRef_AnyHeadWithGarbage() throws IOException {
 		write(new File(diskRepo.getDirectory(), "refs/heads/A"), A.name()
 				+ "012345 . this is not a standard reference\n"
 				+ "#and even more junk\n");
 
-		Ref r = refdir.getRef("refs/heads/A");
+		Ref r = refdir.findRef("refs/heads/A");
 		assertFalse(r.isSymbolic());
 		assertEquals(A, r.getObjectId());
 		assertEquals("refs/heads/A", r.getName());

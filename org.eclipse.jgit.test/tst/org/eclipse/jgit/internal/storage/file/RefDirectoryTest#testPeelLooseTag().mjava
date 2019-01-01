@@ -3,8 +3,8 @@
 		writeLooseRef("refs/tags/v1_0", v1_0);
 		writeLooseRef("refs/tags/current", "ref: refs/tags/v1_0\n");
 
-		final Ref tag = refdir.getRef("refs/tags/v1_0");
-		final Ref cur = refdir.getRef("refs/tags/current");
+		final Ref tag = refdir.findRef("refs/tags/v1_0");
+		final Ref cur = refdir.findRef("refs/tags/current");
 
 		assertEquals(v1_0, tag.getObjectId());
 		assertFalse(tag.isSymbolic());
@@ -36,14 +36,14 @@
 
 		// reuses cached peeling later, but not immediately due to
 		// the implementation so we have to fetch it once.
-		final Ref tag_p2 = refdir.getRef("refs/tags/v1_0");
+		final Ref tag_p2 = refdir.findRef("refs/tags/v1_0");
 		assertFalse(tag_p2.isSymbolic());
 		assertTrue(tag_p2.isPeeled());
 		assertEquals(v1_0, tag_p2.getObjectId());
 		assertEquals(v1_0.getObject(), tag_p2.getPeeledObjectId());
 
-		assertSame(tag_p2, refdir.getRef("refs/tags/v1_0"));
-		assertSame(tag_p2, refdir.getRef("refs/tags/current").getTarget());
+		assertSame(tag_p2, refdir.findRef("refs/tags/v1_0"));
+		assertSame(tag_p2, refdir.findRef("refs/tags/current").getTarget());
 		assertSame(tag_p2, refdir.peel(tag_p2));
 	}
 

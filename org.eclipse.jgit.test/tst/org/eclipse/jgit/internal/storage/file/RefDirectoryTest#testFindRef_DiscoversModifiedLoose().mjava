@@ -1,5 +1,5 @@
 	@Test
-	public void testGetRef_DiscoversModifiedLoose() throws IOException {
+	public void testFindRef_DiscoversModifiedLoose() throws IOException {
 		Map<String, Ref> all;
 
 		writeLooseRef("refs/heads/master", A);
@@ -8,7 +8,7 @@
 
 		writeLooseRef("refs/heads/master", B);
 
-		Ref master = refdir.getRef("refs/heads/master");
+		Ref master = refdir.findRef("refs/heads/master");
 		assertEquals(B, master.getObjectId());
 	}
 

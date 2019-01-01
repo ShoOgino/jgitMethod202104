@@ -1,14 +1,14 @@
 	@Test
-	public void testGetRef_PackedNotPeeled_WrongSort() throws IOException {
+	public void testFindRef_PackedNotPeeled_WrongSort() throws IOException {
 		writePackedRefs("" + //
 				v1_0.name() + " refs/tags/v1.0\n" + //
 				B.name() + " refs/heads/other\n" + //
 				A.name() + " refs/heads/master\n");
 
-		final Ref head = refdir.getRef(HEAD);
-		final Ref master = refdir.getRef("refs/heads/master");
-		final Ref other = refdir.getRef("refs/heads/other");
-		final Ref tag = refdir.getRef("refs/tags/v1.0");
+		final Ref head = refdir.findRef(HEAD);
+		final Ref master = refdir.findRef("refs/heads/master");
+		final Ref other = refdir.findRef("refs/heads/other");
+		final Ref tag = refdir.findRef("refs/tags/v1.0");
 
 		assertEquals(A, master.getObjectId());
 		assertFalse(master.isPeeled());
