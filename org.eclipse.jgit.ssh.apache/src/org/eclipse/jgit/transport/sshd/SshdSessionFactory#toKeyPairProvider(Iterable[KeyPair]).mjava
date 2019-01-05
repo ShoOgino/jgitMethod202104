@@ -1,0 +1,15 @@
+	/**
+	 * Converts an {@link Iterable} of {link KeyPair}s into a
+	 * {@link KeyPairProvider}.
+	 *
+	 * @param keys
+	 *            to provide via the returned {@link KeyPairProvider}
+	 * @return a {@link KeyPairProvider} that provides the given {@code keys}
+	 */
+	private KeyPairProvider toKeyPairProvider(Iterable<KeyPair> keys) {
+		if (keys instanceof KeyPairProvider) {
+			return (KeyPairProvider) keys;
+		}
+		return () -> keys;
+	}
+

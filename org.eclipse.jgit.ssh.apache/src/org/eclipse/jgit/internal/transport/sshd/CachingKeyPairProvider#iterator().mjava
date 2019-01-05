@@ -1,0 +1,9 @@
+	@Override
+	public Iterator<KeyPair> iterator() {
+		Collection<? extends Path> resources = getPaths();
+		if (resources.isEmpty()) {
+			return Collections.emptyListIterator();
+		}
+		return new CancellingKeyPairIterator(resources);
+	}
+
