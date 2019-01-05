@@ -1,7 +1,7 @@
 	@Test
 	public void testInitialClone_SslFailure() throws Exception {
 		Repository dst = createBareRepository();
-		assertFalse(dst.hasObject(A_txt));
+		assertFalse(dst.getObjectDatabase().has(A_txt));
 
 		try (Transport t = Transport.open(dst, secureURI)) {
 			// Set a credentials provider that doesn't handle questions

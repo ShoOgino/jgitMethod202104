@@ -1,7 +1,7 @@
 	@Test
 	public void testInitialClone_RedirectOnPostForbidden() throws Exception {
 		Repository dst = createBareRepository();
-		assertFalse(dst.hasObject(A_txt));
+		assertFalse(dst.getObjectDatabase().has(A_txt));
 
 		URIish cloneFrom = extendPath(remoteURI, "/post");
 		try (Transport t = Transport.open(dst, cloneFrom)) {

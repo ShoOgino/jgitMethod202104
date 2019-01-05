@@ -24,7 +24,7 @@
 		assertThat(pckIn.readString(), theInstance(PacketLineIn.DELIM));
 		assertThat(pckIn.readString(), is("packfile"));
 		parsePack(recvStream);
-		assertTrue(client.hasObject(child.toObjectId()));
-		assertFalse(client.hasObject(parent.toObjectId()));
+		assertTrue(client.getObjectDatabase().has(child.toObjectId()));
+		assertFalse(client.getObjectDatabase().has(parent.toObjectId()));
 	}
 

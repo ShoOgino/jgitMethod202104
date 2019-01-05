@@ -15,7 +15,7 @@
 		PacketLineIn pckIn = new PacketLineIn(recvStream);
 		assertThat(pckIn.readString(), is("packfile"));
 		parsePack(recvStream);
-		assertFalse(client.hasObject(tag.toObjectId()));
+		assertFalse(client.getObjectDatabase().has(tag.toObjectId()));
 
 		// With tag.
 		recvStream = uploadPackV2(
@@ -28,6 +28,6 @@
 		pckIn = new PacketLineIn(recvStream);
 		assertThat(pckIn.readString(), is("packfile"));
 		parsePack(recvStream);
-		assertTrue(client.hasObject(tag.toObjectId()));
+		assertTrue(client.getObjectDatabase().has(tag.toObjectId()));
 	}
 

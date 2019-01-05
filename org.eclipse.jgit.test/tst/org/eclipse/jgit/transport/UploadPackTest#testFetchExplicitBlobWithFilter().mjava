@@ -30,9 +30,9 @@
 			tn.fetch(NullProgressMonitor.INSTANCE, Arrays.asList(
 						new RefSpec(commit.name()),
 						new RefSpec(blob1.name())));
-			assertTrue(client.hasObject(tree.toObjectId()));
-			assertTrue(client.hasObject(blob1.toObjectId()));
-			assertFalse(client.hasObject(blob2.toObjectId()));
+			assertTrue(client.getObjectDatabase().has(tree.toObjectId()));
+			assertTrue(client.getObjectDatabase().has(blob1.toObjectId()));
+			assertFalse(client.getObjectDatabase().has(blob2.toObjectId()));
 		}
 	}
 

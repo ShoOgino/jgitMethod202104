@@ -40,14 +40,14 @@
 
 		// The server does not send this because it is committed
 		// earlier than the given deepen-since time.
-		assertFalse(client.hasObject(tooOld.toObjectId()));
+		assertFalse(client.getObjectDatabase().has(tooOld.toObjectId()));
 
 		// The server does not send this because the client claims to
 		// have it.
-		assertFalse(client.hasObject(boundary.toObjectId()));
+		assertFalse(client.getObjectDatabase().has(boundary.toObjectId()));
 
 		// The server sends both these commits.
-		assertTrue(client.hasObject(beyondBoundary.toObjectId()));
-		assertTrue(client.hasObject(merge.toObjectId()));
+		assertTrue(client.getObjectDatabase().has(beyondBoundary.toObjectId()));
+		assertTrue(client.getObjectDatabase().has(merge.toObjectId()));
 	}
 

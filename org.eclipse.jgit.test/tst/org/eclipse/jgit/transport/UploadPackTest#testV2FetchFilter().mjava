@@ -20,7 +20,7 @@
 		assertThat(pckIn.readString(), is("packfile"));
 		parsePack(recvStream);
 
-		assertFalse(client.hasObject(big.toObjectId()));
-		assertTrue(client.hasObject(small.toObjectId()));
+		assertFalse(client.getObjectDatabase().has(big.toObjectId()));
+		assertTrue(client.getObjectDatabase().has(small.toObjectId()));
 	}
 
