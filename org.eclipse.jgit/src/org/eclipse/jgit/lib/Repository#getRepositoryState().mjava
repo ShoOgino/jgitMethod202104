@@ -36,9 +36,7 @@
 					return RepositoryState.MERGING_RESOLVED;
 				}
 			} catch (IOException e) {
-				// Can't decide whether unmerged paths exists. Return
-				// MERGING state to be on the safe side (in state MERGING
-				// you are not allow to do anything)
+				throw new UncheckedIOException(e);
 			}
 			return RepositoryState.MERGING;
 		}
@@ -53,7 +51,7 @@
 					return RepositoryState.CHERRY_PICKING_RESOLVED;
 				}
 			} catch (IOException e) {
-				// fall through to CHERRY_PICKING
+				throw new UncheckedIOException(e);
 			}
 
 			return RepositoryState.CHERRY_PICKING;
@@ -66,7 +64,7 @@
 					return RepositoryState.REVERTING_RESOLVED;
 				}
 			} catch (IOException e) {
-				// fall through to REVERTING
+				throw new UncheckedIOException(e);
 			}
 
 			return RepositoryState.REVERTING;

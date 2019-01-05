@@ -13,8 +13,7 @@
 		try {
 			return getObjectDatabase().has(objectId);
 		} catch (IOException e) {
-			// Legacy API, assume error means "no"
-			return false;
+			throw new UncheckedIOException(e);
 		}
 	}
 
