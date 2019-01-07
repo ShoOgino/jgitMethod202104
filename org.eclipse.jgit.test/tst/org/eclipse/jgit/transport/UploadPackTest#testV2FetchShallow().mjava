@@ -17,8 +17,8 @@
 		PacketLineIn pckIn = new PacketLineIn(recvStream);
 		assertThat(pckIn.readString(), is("packfile"));
 		parsePack(recvStream);
-		assertTrue(client.hasObject(barChild.toObjectId()));
-		assertFalse(client.hasObject(commonParent.toObjectId()));
+		assertTrue(client.getObjectDatabase().has(barChild.toObjectId()));
+		assertFalse(client.getObjectDatabase().has(commonParent.toObjectId()));
 
 		// With shallow, the server knows that we don't have
 		// commonParent, so it sends it.
@@ -33,6 +33,6 @@
 		pckIn = new PacketLineIn(recvStream);
 		assertThat(pckIn.readString(), is("packfile"));
 		parsePack(recvStream);
-		assertTrue(client.hasObject(commonParent.toObjectId()));
+		assertTrue(client.getObjectDatabase().has(commonParent.toObjectId()));
 	}
 

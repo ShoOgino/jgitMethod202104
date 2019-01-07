@@ -21,13 +21,13 @@
 				}, null);
 		uri = testProtocol.register(ctx, server);
 
-		assertFalse(client.hasObject(commit0.toObjectId()));
+		assertFalse(client.getObjectDatabase().has(commit0.toObjectId()));
 
 		// Fetch of the parent of the shallow commit
 		try (Transport tn = testProtocol.open(uri, client, "server")) {
 			tn.fetch(NullProgressMonitor.INSTANCE,
 					Collections.singletonList(new RefSpec(commit0.name())));
-			assertTrue(client.hasObject(commit0.toObjectId()));
+			assertTrue(client.getObjectDatabase().has(commit0.toObjectId()));
 		}
 	}
 

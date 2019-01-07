@@ -5,7 +5,7 @@
 		userConfig.setInt("http", null, "maxRedirects", 3);
 		userConfig.save();
 		Repository dst = createBareRepository();
-		assertFalse(dst.hasObject(A_txt));
+		assertFalse(dst.getObjectDatabase().has(A_txt));
 
 		URIish cloneFrom = extendPath(redirectURI, "/response/4/302");
 		String remoteUri = cloneFrom.toString();

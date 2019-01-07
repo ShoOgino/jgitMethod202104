@@ -28,9 +28,9 @@
 			tn.setFilterBlobLimit(0);
 			tn.fetch(NullProgressMonitor.INSTANCE,
 					Collections.singletonList(new RefSpec(commit.name())));
-			assertTrue(client.hasObject(tree.toObjectId()));
-			assertFalse(client.hasObject(blob1.toObjectId()));
-			assertFalse(client.hasObject(blob2.toObjectId()));
+			assertTrue(client.getObjectDatabase().has(tree.toObjectId()));
+			assertFalse(client.getObjectDatabase().has(blob1.toObjectId()));
+			assertFalse(client.getObjectDatabase().has(blob2.toObjectId()));
 		}
 	}
 

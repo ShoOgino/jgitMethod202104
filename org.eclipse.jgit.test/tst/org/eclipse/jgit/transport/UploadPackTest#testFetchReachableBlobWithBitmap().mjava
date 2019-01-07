@@ -8,12 +8,12 @@
 		testProtocol = generateReachableCommitUploadPackProtocol();
 		uri = testProtocol.register(ctx, server);
 
-		assertFalse(client.hasObject(blob.toObjectId()));
+		assertFalse(client.getObjectDatabase().has(blob.toObjectId()));
 
 		try (Transport tn = testProtocol.open(uri, client, "server")) {
 			tn.fetch(NullProgressMonitor.INSTANCE,
 					Collections.singletonList(new RefSpec(blob.name())));
-			assertTrue(client.hasObject(blob.toObjectId()));
+			assertTrue(client.getObjectDatabase().has(blob.toObjectId()));
 		}
 	}
 

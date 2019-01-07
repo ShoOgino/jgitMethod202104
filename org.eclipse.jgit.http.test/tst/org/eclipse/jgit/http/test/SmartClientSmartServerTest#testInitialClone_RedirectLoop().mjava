@@ -1,7 +1,7 @@
 	@Test
 	public void testInitialClone_RedirectLoop() throws Exception {
 		Repository dst = createBareRepository();
-		assertFalse(dst.hasObject(A_txt));
+		assertFalse(dst.getObjectDatabase().has(A_txt));
 
 		URIish cloneFrom = extendPath(redirectURI, "/loop");
 		try (Transport t = Transport.open(dst, cloneFrom)) {

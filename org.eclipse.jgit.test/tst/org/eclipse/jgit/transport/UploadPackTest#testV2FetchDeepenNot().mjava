@@ -41,15 +41,15 @@
 
 		// The server does not send these because they are excluded by
 		// deepen-not.
-		assertFalse(client.hasObject(side.toObjectId()));
-		assertFalse(client.hasObject(one.toObjectId()));
+		assertFalse(client.getObjectDatabase().has(side.toObjectId()));
+		assertFalse(client.getObjectDatabase().has(one.toObjectId()));
 
 		// The server does not send this because the client claims to
 		// have it.
-		assertFalse(client.hasObject(three.toObjectId()));
+		assertFalse(client.getObjectDatabase().has(three.toObjectId()));
 
 		// The server sends both these commits.
-		assertTrue(client.hasObject(merge.toObjectId()));
-		assertTrue(client.hasObject(two.toObjectId()));
+		assertTrue(client.getObjectDatabase().has(merge.toObjectId()));
+		assertTrue(client.getObjectDatabase().has(two.toObjectId()));
 	}
 
