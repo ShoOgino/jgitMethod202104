@@ -1,6 +1,6 @@
 	DfsBlock getOrLoadBlock(long pos, DfsReader ctx) throws IOException {
-		try (ReadableChannel rc = ctx.db.openFile(desc, ext)) {
-			return cache.getOrLoad(this, pos, ctx, () -> rc);
+		try (LazyChannel c = new LazyChannel(ctx, desc, ext)) {
+			return cache.getOrLoad(this, pos, ctx, c);
 		}
 	}
 

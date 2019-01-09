@@ -1,0 +1,12 @@
+		@Override
+		public ReadableChannel get() throws IOException {
+			if (rc == null) {
+				synchronized (this) {
+					if (rc == null) {
+						rc = ctx.db.openFile(desc, ext);
+					}
+				}
+			}
+			return rc;
+		}
+
