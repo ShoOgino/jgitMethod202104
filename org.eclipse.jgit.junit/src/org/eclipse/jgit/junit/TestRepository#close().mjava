@@ -1,0 +1,17 @@
+	/**
+	 * Closes the underlying {@link Repository} object and any other internal
+	 * resources.
+	 * <p>
+	 * {@link AutoCloseable} resources that may escape this object, such as
+	 * those returned by the {@link #git} and {@link #getRevWalk()} methods are
+	 * not closed.
+	 */
+	@Override
+	public void close() {
+		try {
+			inserter.close();
+		} finally {
+			db.close();
+		}
+	}
+
