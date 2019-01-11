@@ -1,0 +1,23 @@
+	/**
+	 * Returns the specified references.
+	 * <p>
+	 * This produces an immutable map containing whatever subset of the
+	 * refs named by the caller are present in the supplied {@code refs}
+	 * map.
+	 *
+	 * @param refs
+	 *            Map to search for refs to return.
+	 * @param names
+	 *            which refs to search for in {@code refs}.
+	 * @return the requested Refs, omitting any that are null or missing.
+	 */
+	@NonNull
+	private static Map<String, Ref> mapRefs(
+			Map<String, Ref> refs, List<String> names) {
+		return unmodifiableMap(
+				names.stream()
+					.map(refs::get)
+					.filter(Objects::nonNull)
+					.collect(toMap(Ref::getName, identity(), (a, b) -> b)));
+	}
+

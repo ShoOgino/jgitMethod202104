@@ -1,0 +1,25 @@
+	// Resolves ref names from the request's want-ref lines to
+	// object ids, throwing PackProtocolException if any are missing.
+	private Map<String, ObjectId> wantedRefs(FetchV2Request req)
+			throws IOException {
+		Map<String, ObjectId> result = new TreeMap<>();
+
+		List<String> wanted = req.getWantedRefs();
+		Map<String, Ref> resolved = exactRefs(wanted);
+
+		for (String refName : wanted) {
+			Ref ref = resolved.get(refName);
+			if (ref == null) {
+				throw new PackProtocolException(MessageFormat
+						.format(JGitText.get().invalidRefName, refName));
+			}
+			ObjectId oid = ref.getObjectId();
+			if (oid == null) {
+				throw new PackProtocolException(MessageFormat
+						.format(JGitText.get().invalidRefName, refName));
+			}
+			result.put(refName, oid);
+		}
+		return result;
+	}
+
