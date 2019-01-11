@@ -12,8 +12,7 @@
 		}
 
 		ProtocolV2Parser parser = new ProtocolV2Parser(transferConfig);
-		FetchV2Request req = parser.parseFetchRequest(pckIn,
-				db.getRefDatabase());
+		FetchV2Request req = parser.parseFetchRequest(pckIn);
 		currentRequest = req;
 		rawOut.stopBuffering();
 
@@ -21,17 +20,33 @@
 
 		// TODO(ifrade): Refactor to pass around the Request object, instead of
 		// copying data back to class fields
-		wantIds = req.getWantIds();
-
 		List<ObjectId> deepenNots = new ArrayList<>();
 		for (String s : req.getDeepenNotRefs()) {
-			Ref ref = db.getRefDatabase().findRef(s);
+			Ref ref = findRef(s);
 			if (ref == null) {
 				throw new PackProtocolException(MessageFormat
 						.format(JGitText.get().invalidRefName, s));
 			}
 			deepenNots.add(ref.getObjectId());
 		}
+
+		Map<String, ObjectId> wantedRefs = new TreeMap<>();
+		for (String refName : req.getWantedRefs()) {
+			Ref ref = getRef(refName);
+			if (ref == null) {
+				throw new PackProtocolException(MessageFormat
+						.format(JGitText.get().invalidRefName, refName));
+			}
+			ObjectId oid = ref.getObjectId();
+			if (oid == null) {
+				throw new PackProtocolException(MessageFormat
+						.format(JGitText.get().invalidRefName, refName));
+			}
+			// TODO(ifrade): Avoid mutating the parsed request.
+			req.getWantIds().add(oid);
+			wantedRefs.put(refName, oid);
+		}
+		wantIds = req.getWantIds();
 
 		boolean sectionSent = false;
 		boolean mayHaveShallow = req.getDepth() != 0
@@ -86,13 +101,13 @@
 				sectionSent = true;
 			}
 
-			if (!req.getWantedRefs().isEmpty()) {
+			if (!wantedRefs.isEmpty()) {
 				if (sectionSent) {
 					pckOut.writeDelim();
 				}
 				pckOut.writeString("wanted-refs\n"); //$NON-NLS-1$
-				for (Map.Entry<String, ObjectId> entry : req.getWantedRefs()
-						.entrySet()) {
+				for (Map.Entry<String, ObjectId> entry :
+						wantedRefs.entrySet()) {
 					pckOut.writeString(entry.getValue().getName() + ' ' +
 							entry.getKey() + '\n');
 				}

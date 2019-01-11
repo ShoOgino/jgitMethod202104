@@ -1,6 +1,18 @@
 	private Map<String, Ref> getAdvertisedOrDefaultRefs() throws IOException {
-		if (refs == null)
-			setAdvertisedRefs(db.getRefDatabase().getRefs(ALL));
+		if (refs != null) {
+			return refs;
+		}
+
+		if (!advertiseRefsHookCalled) {
+			advertiseRefsHook.advertiseRefs(this);
+			advertiseRefsHookCalled = true;
+		}
+		if (refs == null) {
+			// Fall back to all refs.
+			setAdvertisedRefs(
+					db.getRefDatabase().getRefs().stream()
+						.collect(toMap(Ref::getName, identity())));
+		}
 		return refs;
 	}
 

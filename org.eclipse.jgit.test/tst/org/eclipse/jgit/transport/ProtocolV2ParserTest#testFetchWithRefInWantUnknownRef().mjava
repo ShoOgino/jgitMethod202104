@@ -12,9 +12,8 @@
 		testRepo.update("branchA", one);
 		testRepo.update("branchB", two);
 
-		thrown.expect(PackProtocolException.class);
-		thrown.expectMessage(containsString("refs/heads/branchC"));
-		parser.parseFetchRequest(pckIn,
-				testRepo.getRepository().getRefDatabase());
+		FetchV2Request request = parser.parseFetchRequest(pckIn);
+		assertEquals(1, request.getWantedRefs().size());
+		assertThat(request.getWantedRefs(), hasItems("refs/heads/branchC"));
 	}
 

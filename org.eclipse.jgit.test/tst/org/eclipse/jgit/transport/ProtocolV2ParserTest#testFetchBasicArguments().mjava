@@ -14,8 +14,7 @@
 				PacketLineIn.END);
 		ProtocolV2Parser parser = new ProtocolV2Parser(
 				ConfigBuilder.getDefault());
-		FetchV2Request request = parser.parseFetchRequest(pckIn,
-				testRepo.getRepository().getRefDatabase());
+		FetchV2Request request = parser.parseFetchRequest(pckIn);
 		assertTrue(request.getClientCapabilities()
 				.contains(GitProtocolConstants.OPTION_THIN_PACK));
 		assertTrue(request.getClientCapabilities()
