@@ -1,0 +1,8 @@
+	private Iterator<KeyPair> iterator(SessionContext session) {
+		Collection<? extends Path> resources = getPaths();
+		if (resources.isEmpty()) {
+			return Collections.emptyListIterator();
+		}
+		return new CancellingKeyPairIterator(session, resources);
+	}
+

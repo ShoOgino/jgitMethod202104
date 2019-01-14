@@ -36,16 +36,16 @@
 				identities, keyCache);
 		ourConfiguredKeysProvider.setPasswordFinder(passwordProvider);
 		if (hostConfig.isIdentitiesOnly()) {
-			session.setKeyPairProvider(ourConfiguredKeysProvider);
+			session.setKeyIdentityProvider(ourConfiguredKeysProvider);
 		} else {
-			KeyPairProvider defaultKeysProvider = getKeyPairProvider();
+			KeyIdentityProvider defaultKeysProvider = getKeyIdentityProvider();
 			if (defaultKeysProvider instanceof AbstractResourceKeyPairProvider<?>) {
 				((AbstractResourceKeyPairProvider<?>) defaultKeysProvider)
 						.setPasswordFinder(passwordProvider);
 			}
-			KeyPairProvider combinedProvider = new CombinedKeyPairProvider(
+			KeyIdentityProvider combinedProvider = new CombinedKeyIdentityProvider(
 					ourConfiguredKeysProvider, defaultKeysProvider);
-			session.setKeyPairProvider(combinedProvider);
+			session.setKeyIdentityProvider(combinedProvider);
 		}
 		return session;
 	}

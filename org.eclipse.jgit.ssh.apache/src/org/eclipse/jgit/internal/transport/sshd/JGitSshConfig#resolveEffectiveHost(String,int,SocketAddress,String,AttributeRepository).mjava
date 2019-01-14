@@ -1,6 +1,7 @@
 	@Override
 	public HostConfigEntry resolveEffectiveHost(String host, int port,
-			String username) throws IOException {
+			SocketAddress localAddress, String username,
+			AttributeRepository attributes) throws IOException {
 		HostEntry entry = configFile.lookup(host, port, username);
 		JGitHostConfigEntry config = new JGitHostConfigEntry();
 		// Apache MINA conflates all keys, even multi-valued ones, in one map

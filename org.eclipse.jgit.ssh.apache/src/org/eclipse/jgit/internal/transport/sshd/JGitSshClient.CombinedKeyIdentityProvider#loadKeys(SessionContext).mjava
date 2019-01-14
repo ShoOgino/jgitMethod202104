@@ -1,8 +1,9 @@
 		@Override
-		public Iterable<KeyPair> loadKeys() {
+		public Iterable<KeyPair> loadKeys(SessionContext context) {
 			return () -> new Iterator<KeyPair>() {
 
-				private Iterator<KeyPairProvider> factories = providers.iterator();
+				private Iterator<KeyIdentityProvider> factories = providers
+						.iterator();
 				private Iterator<KeyPair> current;
 
 				private Boolean hasElement;
@@ -14,7 +15,12 @@
 					}
 					while (current == null || !current.hasNext()) {
 						if (factories.hasNext()) {
-							current = factories.next().loadKeys().iterator();
+							try {
+								current = factories.next().loadKeys(context)
+										.iterator();
+							} catch (IOException | GeneralSecurityException e) {
+								throw new RuntimeException(e);
+							}
 						} else {
 							current = null;
 							hasElement = Boolean.FALSE;

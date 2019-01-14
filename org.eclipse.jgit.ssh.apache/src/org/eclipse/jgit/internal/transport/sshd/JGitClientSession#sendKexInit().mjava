@@ -1,5 +1,6 @@
 	@Override
-	protected byte[] sendKexInit() throws IOException {
+	protected byte[] sendKexInit()
+			throws IOException, GeneralSecurityException {
 		StatefulProxyConnector proxy = proxyHandler;
 		if (proxy != null) {
 			try {
@@ -13,7 +14,7 @@
 				// This is called only from the ClientSessionImpl
 				// constructor, where the return value is ignored.
 				return null;
-			} catch (IOException e) {
+			} catch (IOException | GeneralSecurityException e) {
 				throw e;
 			} catch (Exception other) {
 				throw new IOException(other.getLocalizedMessage(), other);

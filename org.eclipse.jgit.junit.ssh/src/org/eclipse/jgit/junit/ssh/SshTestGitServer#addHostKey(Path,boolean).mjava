@@ -14,8 +14,10 @@
 	public void addHostKey(@NonNull Path key, boolean inFront)
 			throws IOException, GeneralSecurityException {
 		try (InputStream in = Files.newInputStream(key)) {
-			KeyPair pair = SecurityUtils.loadKeyPairIdentity(key.toString(), in,
-					null);
+			KeyPair pair = SecurityUtils
+					.loadKeyPairIdentities(null,
+							NamedResource.ofName(key.toString()), in, null)
+					.iterator().next();
 			if (inFront) {
 				hostKeys.add(0, pair);
 			} else {

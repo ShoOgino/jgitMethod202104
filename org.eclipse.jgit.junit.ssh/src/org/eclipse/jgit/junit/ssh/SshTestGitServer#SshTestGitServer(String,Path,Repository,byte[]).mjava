@@ -23,11 +23,12 @@
 		server = SshServer.setUpDefaultServer();
 		// Set host key
 		try (ByteArrayInputStream in = new ByteArrayInputStream(hostKey)) {
-			hostKeys.add(SecurityUtils.loadKeyPairIdentity("", in, null));
+			SecurityUtils.loadKeyPairIdentities(null, null, in, null)
+					.forEach((k) -> hostKeys.add(k));
 		} catch (IOException | GeneralSecurityException e) {
 			// Ignore.
 		}
-		server.setKeyPairProvider(() -> hostKeys);
+		server.setKeyPairProvider((session) -> hostKeys);
 
 		configureAuthentication();
 

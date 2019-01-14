@@ -1,5 +1,6 @@
 	@Override
-	public ConnectFuture connect(HostConfigEntry hostConfig)
+	public ConnectFuture connect(HostConfigEntry hostConfig,
+			AttributeRepository context, SocketAddress localAddress)
 			throws IOException {
 		if (connector == null) {
 			throw new IllegalStateException("SshClient not started."); //$NON-NLS-1$
@@ -31,7 +32,7 @@
 			address = configureProxy(proxy, address);
 			proxy.clearPassword();
 		}
-		connector.connect(address).addListener(listener);
+		connector.connect(address, this, localAddress).addListener(listener);
 		return connectFuture;
 	}
 

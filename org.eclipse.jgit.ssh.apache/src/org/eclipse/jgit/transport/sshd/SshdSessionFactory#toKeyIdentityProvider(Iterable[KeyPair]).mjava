@@ -1,0 +1,16 @@
+	/**
+	 * Converts an {@link Iterable} of {link KeyPair}s into a
+	 * {@link KeyIdentityProvider}.
+	 *
+	 * @param keys
+	 *            to provide via the returned {@link KeyIdentityProvider}
+	 * @return a {@link KeyIdentityProvider} that provides the given
+	 *         {@code keys}
+	 */
+	private KeyIdentityProvider toKeyIdentityProvider(Iterable<KeyPair> keys) {
+		if (keys instanceof KeyIdentityProvider) {
+			return (KeyIdentityProvider) keys;
+		}
+		return (session) -> keys;
+	}
+

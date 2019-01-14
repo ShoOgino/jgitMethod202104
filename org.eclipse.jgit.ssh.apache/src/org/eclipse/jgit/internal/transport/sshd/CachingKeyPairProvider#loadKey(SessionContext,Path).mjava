@@ -1,0 +1,29 @@
+	private KeyPair loadKey(SessionContext session, Path path)
+			throws IOException, GeneralSecurityException {
+		if (!Files.exists(path)) {
+			log.warn(format(SshdText.get().identityFileNotFound, path));
+			return null;
+		}
+		IoResource<Path> resource = getIoResource(session, path);
+		if (cache == null) {
+			return loadKey(session, resource, path, getPasswordFinder());
+		}
+		Throwable t[] = { null };
+		KeyPair key = cache.get(path, p -> {
+			try {
+				return loadKey(session, resource, p, getPasswordFinder());
+			} catch (IOException | GeneralSecurityException e) {
+				t[0] = e;
+				return null;
+			}
+		});
+		if (t[0] != null) {
+			if (t[0] instanceof CancellationException) {
+				throw (CancellationException) t[0];
+			}
+			throw new IOException(
+					format(SshdText.get().keyLoadFailed, resource), t[0]);
+		}
+		return key;
+	}
+
