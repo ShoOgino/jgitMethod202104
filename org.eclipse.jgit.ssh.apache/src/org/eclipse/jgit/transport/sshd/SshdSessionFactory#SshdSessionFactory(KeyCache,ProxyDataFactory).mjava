@@ -32,5 +32,10 @@
 		super();
 		this.keyCache = keyCache;
 		this.proxies = proxies;
+		// sshd limits the number of BCrypt KDF rounds to 255 by default.
+		// Decrypting such a key takes about two seconds on my machine.
+		// I consider this limit too low. The time increases linearly with the
+		// number of rounds.
+		BCryptKdfOptions.setMaxAllowedRounds(16384);
 	}
 
