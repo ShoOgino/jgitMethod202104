@@ -1,6 +1,6 @@
 	/** {@inheritDoc} */
 	@Override
-	protected void run() throws Exception {
+	protected void run() {
 		if (file == null) {
 			if (revision == null)
 				throw die(CLIText.get().fileIsRequired);
@@ -110,6 +110,8 @@
 					outw.print('\n');
 				} while (++line < end && blame.getSourceCommit(line) == c);
 			}
+		} catch (NoWorkTreeException | IOException e) {
+			throw die(e.getMessage(), e);
 		}
 	}
 
