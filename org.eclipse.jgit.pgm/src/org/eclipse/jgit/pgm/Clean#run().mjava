@@ -1,6 +1,6 @@
 	/** {@inheritDoc} */
 	@Override
-	protected void run() throws Exception {
+	protected void run() {
 		try (Git git = new Git(db)) {
 			boolean requireForce = git.getRepository().getConfig()
 					.getBoolean("clean", "requireForce", true); //$NON-NLS-1$ //$NON-NLS-2$
@@ -18,6 +18,8 @@
 				outw.println(MessageFormat.format(CLIText.get().removing,
 						removedFile));
 			}
+		} catch (NoWorkTreeException | GitAPIException | IOException e) {
+			throw die(e.getMessage(), e);
 		}
 	}
 
