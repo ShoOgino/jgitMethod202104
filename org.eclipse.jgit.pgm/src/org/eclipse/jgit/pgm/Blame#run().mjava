@@ -21,8 +21,8 @@
 		else
 			dateFmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss ZZZZ"); //$NON-NLS-1$
 
-		reader = db.newObjectReader();
-		try (BlameGenerator generator = new BlameGenerator(db, file)) {
+		try (ObjectReader reader = db.newObjectReader();
+				BlameGenerator generator = new BlameGenerator(db, file)) {
 			RevFlag scanned = generator.newFlag("SCANNED"); //$NON-NLS-1$
 			generator.setTextComparator(comparator);
 
@@ -68,7 +68,7 @@
 				if (c != null && !c.has(scanned)) {
 					c.add(scanned);
 					if (autoAbbrev)
-						abbrev = Math.max(abbrev, uniqueAbbrevLen(c));
+						abbrev = Math.max(abbrev, uniqueAbbrevLen(reader, c));
 					authorWidth = Math.max(authorWidth, author(line).length());
 					dateWidth = Math.max(dateWidth, date(line).length());
 					pathWidth = Math.max(pathWidth, path(line).length());
@@ -88,7 +88,7 @@
 
 			for (int line = begin; line < end;) {
 				RevCommit c = blame.getSourceCommit(line);
-				String commit = abbreviate(c);
+				String commit = abbreviate(reader, c);
 				String author = null;
 				String date = null;
 				if (!noAuthor) {
@@ -110,8 +110,6 @@
 					outw.print('\n');
 				} while (++line < end && blame.getSourceCommit(line) == c);
 			}
-		} finally {
-			reader.close();
 		}
 	}
 
