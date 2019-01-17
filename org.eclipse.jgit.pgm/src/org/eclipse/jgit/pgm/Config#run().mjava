@@ -1,10 +1,13 @@
 	/** {@inheritDoc} */
 	@Override
-	protected void run() throws Exception {
-		if (list)
+	protected void run() {
+		if (!list) {
+			throw die(CLIText.get().configOnlyListOptionSupported);
+		}
+		try {
 			list();
-		else
-			throw new NotSupportedException(
-					"only --list option is currently supported"); //$NON-NLS-1$
+		} catch (IOException | ConfigInvalidException e) {
+			throw die(e.getMessage(), e);
+		}
 	}
 
