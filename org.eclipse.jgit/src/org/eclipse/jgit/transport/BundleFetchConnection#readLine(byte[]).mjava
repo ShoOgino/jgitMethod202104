@@ -4,9 +4,13 @@
 		while (!done) {
 			bin.mark(hdrbuf.length);
 			final int cnt = bin.read(hdrbuf);
+			if (cnt < 0) {
+				throw new EOFException(JGitText.get().shortReadOfBlock);
+			}
 			int lf = 0;
-			while (lf < cnt && hdrbuf[lf] != '\n')
+			while (lf < cnt && hdrbuf[lf] != '\n') {
 				lf++;
+			}
 			bin.reset();
 			IO.skipFully(bin, lf);
 			if (lf < cnt && hdrbuf[lf] == '\n') {
