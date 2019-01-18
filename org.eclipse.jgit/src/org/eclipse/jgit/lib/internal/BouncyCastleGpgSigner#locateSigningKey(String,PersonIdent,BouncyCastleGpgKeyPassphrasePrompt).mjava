@@ -1,0 +1,15 @@
+	private BouncyCastleGpgKey locateSigningKey(@Nullable String gpgSigningKey,
+			PersonIdent committer,
+			BouncyCastleGpgKeyPassphrasePrompt passphrasePrompt)
+			throws CanceledException, UnsupportedCredentialItem, IOException,
+			PGPException, URISyntaxException {
+		if (gpgSigningKey == null || gpgSigningKey.isEmpty()) {
+			gpgSigningKey = committer.getEmailAddress();
+		}
+
+		BouncyCastleGpgKeyLocator keyHelper = new BouncyCastleGpgKeyLocator(
+				gpgSigningKey, passphrasePrompt);
+
+		return keyHelper.findSecretKey();
+	}
+

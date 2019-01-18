@@ -11,6 +11,14 @@
 						PersonIdent signingCommitter, CredentialsProvider credentialsProvider) {
 					callCount.incrementAndGet();
 				}
+
+				@Override
+				public boolean canLocateSigningKey(String gpgSigningKey,
+						PersonIdent signingCommitter,
+						CredentialsProvider credentialsProvider)
+						throws CanceledException {
+					return false;
+				}
 			});
 
 			// first call should use config, which is expected to be null at
