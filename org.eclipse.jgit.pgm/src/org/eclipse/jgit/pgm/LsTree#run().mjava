@@ -1,6 +1,6 @@
 	/** {@inheritDoc} */
 	@Override
-	protected void run() throws Exception {
+	protected void run() {
 		try (TreeWalk walk = new TreeWalk(db)) {
 			walk.reset(); // drop the first empty tree, which we do not need here
 			if (paths.size() > 0)
@@ -23,6 +23,8 @@
 				outw.print(QuotedString.GIT_PATH.quote(walk.getPathString()));
 				outw.println();
 			}
+		} catch (IOException e) {
+			throw die(e.getMessage(), e);
 		}
 	}
 
