@@ -1,6 +1,6 @@
 	/** {@inheritDoc} */
 	@Override
-	protected void run() throws Exception {
+	protected void run() {
 		try (Git git = new Git(db)) {
 			PushCommand push = git.push();
 			push.setDryRun(dryRun);
@@ -25,6 +25,8 @@
 					printPushResult(reader, result.getURI(), result);
 				}
 			}
+		} catch (GitAPIException | IOException e) {
+			throw die(e.getMessage(), e);
 		}
 	}
 
