@@ -1,6 +1,6 @@
 	/** {@inheritDoc} */
 	@Override
-	protected void run() throws Exception {
+	protected void run() {
 		LsRemoteCommand command = Git.lsRemoteRepository().setRemote(remote)
 				.setTimeout(timeout).setHeads(heads).setTags(tags);
 		TreeSet<Ref> refs = new TreeSet<>(new Comparator<Ref>() {
@@ -10,11 +10,15 @@
 				return r1.getName().compareTo(r2.getName());
 			}
 		});
-		refs.addAll(command.call());
-		for (Ref r : refs) {
-			show(r.getObjectId(), r.getName());
-			if (r.getPeeledObjectId() != null)
-				show(r.getPeeledObjectId(), r.getName() + "^{}"); //$NON-NLS-1$
+		try {
+			refs.addAll(command.call());
+			for (Ref r : refs) {
+				show(r.getObjectId(), r.getName());
+				if (r.getPeeledObjectId() != null)
+					show(r.getPeeledObjectId(), r.getName() + "^{}"); //$NON-NLS-1$
+			}
+		} catch (GitAPIException | IOException e) {
+			throw die(e.getMessage(), e);
 		}
 	}
 
