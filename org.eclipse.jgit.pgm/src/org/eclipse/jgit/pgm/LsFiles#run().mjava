@@ -1,5 +1,5 @@
 	@Override
-	protected void run() throws Exception {
+	protected void run() {
 		try (RevWalk rw = new RevWalk(db);
 				TreeWalk tw = new TreeWalk(db)) {
 			final ObjectId head = db.resolve(Constants.HEAD);
@@ -23,6 +23,8 @@
 							QuotedString.GIT_PATH.quote(tw.getPathString()));
 				}
 			}
+		} catch (RevisionSyntaxException | IOException e) {
+			throw die(e.getMessage(), e);
 		}
 	}
 
