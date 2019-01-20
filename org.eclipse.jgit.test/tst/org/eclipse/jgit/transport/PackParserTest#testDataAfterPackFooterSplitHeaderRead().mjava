@@ -1,8 +1,10 @@
 	@Test
 	public void testDataAfterPackFooterSplitHeaderRead() throws Exception {
-		TestRepository d = new TestRepository<Repository>(db);
 		final byte[] data = Constants.encode("a");
-		RevBlob b = d.blob(data);
+		RevBlob b;
+		try (TestRepository d = new TestRepository<Repository>(db)) {
+			b = d.blob(data);
+		}
 
 		int objects = 248;
 		TemporaryBuffer.Heap pack = new TemporaryBuffer.Heap(32 * 1024);

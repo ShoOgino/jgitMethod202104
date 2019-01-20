@@ -1,8 +1,9 @@
 	@Test
 	public void testMaxObjectSizeFullBlob() throws Exception {
-		TestRepository d = new TestRepository<Repository>(db);
 		final byte[] data = Constants.encode("0123456789");
-		d.blob(data);
+		try (TestRepository d = new TestRepository<Repository>(db)) {
+			d.blob(data);
+		}
 
 		TemporaryBuffer.Heap pack = new TemporaryBuffer.Heap(1024);
 

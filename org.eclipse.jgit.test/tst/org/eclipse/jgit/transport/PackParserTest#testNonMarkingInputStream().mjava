@@ -1,7 +1,9 @@
 	@Test
 	public void testNonMarkingInputStream() throws Exception {
-		TestRepository d = new TestRepository<Repository>(db);
-		RevBlob a = d.blob("a");
+		RevBlob a;
+		try (TestRepository d = new TestRepository<Repository>(db)) {
+			a = d.blob("a");
+		}
 
 		TemporaryBuffer.Heap pack = new TemporaryBuffer.Heap(1024);
 		packHeader(pack, 1);
