@@ -5,10 +5,10 @@
 
 		// execute the command to change the push url
 		RemoteSetUrlCommand cmd = Git.wrap(db).remoteSetUrl();
-		cmd.setName(REMOTE_NAME);
+		cmd.setRemoteName(REMOTE_NAME);
 		URIish newUri = new URIish("git://test.com/test");
-		cmd.setUri(newUri);
-		cmd.setPush(true);
+		cmd.setRemoteUri(newUri);
+		cmd.setUriType(UriType.PUSH);
 		RemoteConfig remote = cmd.call();
 
 		// assert that the changed remote has the old fetch url and the new push
