@@ -2,7 +2,7 @@
 	public void testFetchBySHA1UnreachableByAdvertiseRefsHook()
 			throws Exception {
 		Repository dst = createBareRepository();
-		assertFalse(dst.hasObject(A_txt));
+		assertFalse(dst.getObjectDatabase().has(A_txt));
 
 		advertiseRefsHook = new AbstractAdvertiseRefsHook() {
 			@Override

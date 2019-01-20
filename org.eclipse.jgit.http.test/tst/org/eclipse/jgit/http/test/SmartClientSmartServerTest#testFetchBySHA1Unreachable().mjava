@@ -1,7 +1,7 @@
 	@Test
 	public void testFetchBySHA1Unreachable() throws Exception {
 		Repository dst = createBareRepository();
-		assertFalse(dst.hasObject(A_txt));
+		assertFalse(dst.getObjectDatabase().has(A_txt));
 
 		try (Transport t = Transport.open(dst, remoteURI)) {
 			thrown.expect(TransportException.class);
