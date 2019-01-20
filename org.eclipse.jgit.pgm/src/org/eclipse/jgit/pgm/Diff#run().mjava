@@ -1,6 +1,6 @@
 	/** {@inheritDoc} */
 	@Override
-	protected void run() throws Exception {
+	protected void run() {
 		diffFmt.setRepository(db);
 		try {
 			if (cached) {
@@ -40,6 +40,8 @@
 				diffFmt.format(oldTree, newTree);
 				diffFmt.flush();
 			}
+		} catch (RevisionSyntaxException | IOException e) {
+			throw die(e.getMessage(), e);
 		} finally {
 			diffFmt.close();
 		}
