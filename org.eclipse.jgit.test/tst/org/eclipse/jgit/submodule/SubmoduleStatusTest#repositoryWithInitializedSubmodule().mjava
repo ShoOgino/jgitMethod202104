@@ -6,8 +6,10 @@
 				.getRepository();
 		assertNotNull(subRepo);
 
-		TestRepository<?> subTr = new TestRepository<>(subRepo);
-		ObjectId id = subTr.branch(Constants.HEAD).commit().create().copy();
+		ObjectId id;
+		try (TestRepository<?> subTr = new TestRepository<>(subRepo)) {
+			id = subTr.branch(Constants.HEAD).commit().create().copy();
+		}
 
 		DirCache cache = db.lockDirCache();
 		DirCacheEditor editor = cache.editor();
