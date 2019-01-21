@@ -1,6 +1,6 @@
 	/** {@inheritDoc} */
 	@Override
-	protected void run() throws Exception {
+	protected void run() {
 		try (Git git = new Git(db)) {
 			StatusCommand statusCommand = git.status();
 			if (filterPaths != null && filterPaths.size() > 0)
@@ -8,6 +8,8 @@
 					statusCommand.addPath(path);
 			org.eclipse.jgit.api.Status status = statusCommand.call();
 			printStatus(status);
+		} catch (GitAPIException | NoWorkTreeException | IOException e) {
+			throw die(e.getMessage(), e);
 		}
 	}
 
