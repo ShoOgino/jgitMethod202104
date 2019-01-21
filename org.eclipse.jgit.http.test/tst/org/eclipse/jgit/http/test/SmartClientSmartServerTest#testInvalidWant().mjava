@@ -6,8 +6,8 @@
 					"testInvalidWant".getBytes(UTF_8));
 		}
 
-		Repository dst = createBareRepository();
-		try (Transport t = Transport.open(dst, remoteURI);
+		try (Repository dst = createBareRepository();
+				Transport t = Transport.open(dst, remoteURI);
 				FetchConnection c = t.openFetch()) {
 			Ref want = new ObjectIdRef.Unpeeled(Ref.Storage.NETWORK, id.name(),
 					id);
