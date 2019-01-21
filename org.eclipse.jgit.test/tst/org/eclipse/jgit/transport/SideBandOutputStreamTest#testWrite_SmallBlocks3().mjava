@@ -1,11 +1,11 @@
 	@Test
 	public void testWrite_SmallBlocks3() throws IOException {
-		@SuppressWarnings("resource" /* java 7 */)
-		final SideBandOutputStream out = new SideBandOutputStream(CH_DATA, 7,
-				rawOut);
-		out.write('a');
-		out.write(new byte[] { 'b', 'c' });
-		out.flush();
+		try (SideBandOutputStream out = new SideBandOutputStream(CH_DATA, 7,
+				rawOut)) {
+			out.write('a');
+			out.write(new byte[] { 'b', 'c' });
+			out.flush();
+		}
 		assertBuffer("0007\001ab0006\001c");
 	}
 
