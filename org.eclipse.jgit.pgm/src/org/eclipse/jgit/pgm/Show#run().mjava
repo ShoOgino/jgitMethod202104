@@ -1,7 +1,7 @@
 	/** {@inheritDoc} */
 	@SuppressWarnings("boxing")
 	@Override
-	protected void run() throws Exception {
+	protected void run() {
 		diffFmt.setRepository(db);
 		try {
 			diffFmt.setPathFilter(pathFilter);
@@ -50,6 +50,8 @@
 							obj.getType()));
 				}
 			}
+		} catch (RevisionSyntaxException | IOException e) {
+			throw die(e.getMessage(), e);
 		} finally {
 			diffFmt.close();
 		}
