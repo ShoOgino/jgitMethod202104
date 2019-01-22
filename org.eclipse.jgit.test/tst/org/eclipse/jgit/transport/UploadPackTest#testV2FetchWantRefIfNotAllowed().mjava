@@ -1,14 +1,7 @@
 	@Test
 	public void testV2FetchWantRefIfNotAllowed() throws Exception {
-		RevCommit one = remote.commit().message("1").create();
-		remote.update("one", one);
-
-		UploadPackInternalServerErrorException e = assertThrows(
-				UploadPackInternalServerErrorException.class,
-				() -> uploadPackV2("command=fetch\n", PacketLineIn.delimiter(),
-						"want-ref refs/heads/one\n", "done\n",
-						PacketLineIn.end()));
-		assertThat(e.getCause().getMessage(),
-				containsString("unexpected want-ref refs/heads/one"));
+		checkV2FetchWhenNotAllowed(
+			"want-ref refs/heads/one\n",
+			"unexpected want-ref refs/heads/one");
 	}
 

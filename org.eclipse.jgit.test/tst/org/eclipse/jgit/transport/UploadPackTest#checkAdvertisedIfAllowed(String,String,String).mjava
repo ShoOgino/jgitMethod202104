@@ -1,0 +1,24 @@
+	private void checkAdvertisedIfAllowed(String configSection, String configName,
+			String fetchCapability) throws Exception {
+		server.getConfig().setBoolean(configSection, null, configName, true);
+		ByteArrayInputStream recvStream =
+				uploadPackV2Setup(null, null, null, PacketLineIn.end());
+		PacketLineIn pckIn = new PacketLineIn(recvStream);
+
+		assertThat(pckIn.readString(), is("version 2"));
+
+		ArrayList<String> lines = new ArrayList<>();
+		String line;
+		while (!PacketLineIn.isEnd((line = pckIn.readString()))) {
+			if (line.startsWith("fetch=")) {
+				assertThat(
+					Arrays.asList(line.substring(6).split(" ")),
+					containsInAnyOrder(fetchCapability, "shallow"));
+				lines.add("fetch");
+			} else {
+				lines.add(line);
+			}
+		}
+		assertThat(lines, containsInAnyOrder("ls-refs", "fetch", "server-option"));
+	}
+

@@ -1,17 +1,6 @@
 	@Test
 	public void testV2CapabilitiesAllowFilter() throws Exception {
-		server.getConfig().setBoolean("uploadpack", null, "allowfilter", true);
-		ByteArrayInputStream recvStream =
-				uploadPackV2Setup(null, null, null, PacketLineIn.end());
-		PacketLineIn pckIn = new PacketLineIn(recvStream);
-
-		assertThat(pckIn.readString(), is("version 2"));
-		assertThat(
-				Arrays.asList(pckIn.readString(), pckIn.readString(),
-						pckIn.readString()),
-				// TODO(jonathantanmy) This check overspecifies the
-				// order of the capabilities of "fetch".
-				hasItems("ls-refs", "fetch=filter shallow", "server-option"));
-		assertTrue(PacketLineIn.isEnd(pckIn.readString()));
+		checkAdvertisedIfAllowed("uploadpack", "allowfilter", "filter");
+		checkUnadvertisedIfUnallowed("filter");
 	}
 
