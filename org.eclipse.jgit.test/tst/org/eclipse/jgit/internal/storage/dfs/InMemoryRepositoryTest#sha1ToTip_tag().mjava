@@ -1,0 +1,17 @@
+	@Test
+	public void sha1ToTip_tag() throws Exception {
+		InMemoryRepository repo = new InMemoryRepository(
+				new DfsRepositoryDescription());
+		try (TestRepository<InMemoryRepository> git = new TestRepository<>(
+				repo)) {
+			RevCommit commit = git.commit().message("first commit").create();
+			git.update("refs/tags/v0.2", commit);
+			Set<Ref> tipsWithSha1 = repo.getRefDatabase()
+					.getTipsWithSha1(commit.getId());
+			assertEquals(1, tipsWithSha1.size());
+			Ref ref = tipsWithSha1.iterator().next();
+			assertEquals(ref.getName(), "refs/tags/v0.2");
+			assertEquals(commit.getId(), ref.getObjectId());
+		}
+	}
+
