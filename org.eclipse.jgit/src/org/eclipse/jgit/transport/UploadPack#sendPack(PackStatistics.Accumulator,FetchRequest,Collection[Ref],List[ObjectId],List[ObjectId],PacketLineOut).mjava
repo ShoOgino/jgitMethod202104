@@ -12,6 +12,8 @@
 	 *            shallow commits on the client that are now becoming unshallow
 	 * @param deepenNots
 	 *            objects that the client specified using --shallow-exclude
+	 * @param pckOut
+	 *            output writer
 	 * @throws IOException
 	 *             if an error occurred while generating or writing the pack.
 	 */
@@ -19,14 +21,15 @@
 			FetchRequest req,
 			@Nullable Collection<Ref> allTags,
 			List<ObjectId> unshallowCommits,
-			List<ObjectId> deepenNots) throws IOException {
+			List<ObjectId> deepenNots,
+			PacketLineOut pckOut) throws IOException {
 		Set<String> caps = req.getClientCapabilities();
 		boolean sideband = caps.contains(OPTION_SIDE_BAND)
 				|| caps.contains(OPTION_SIDE_BAND_64K);
 		if (sideband) {
 			try {
 				sendPack(true, req, accumulator, allTags, unshallowCommits,
-						deepenNots);
+						deepenNots, pckOut);
 			} catch (ServiceMayNotContinueException err) {
 				String message = err.getMessage();
 				if (message == null) {
@@ -50,7 +53,8 @@
 				throw new UploadPackInternalServerErrorException(err);
 			}
 		} else {
-			sendPack(false, req, accumulator, allTags, unshallowCommits, deepenNots);
+			sendPack(false, req, accumulator, allTags, unshallowCommits, deepenNots,
+					pckOut);
 		}
 	}
 

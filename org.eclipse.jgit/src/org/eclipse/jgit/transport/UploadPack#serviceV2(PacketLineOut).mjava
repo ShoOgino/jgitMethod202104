@@ -1,4 +1,4 @@
-	private void serviceV2() throws IOException {
+	private void serviceV2(PacketLineOut pckOut) throws IOException {
 		if (biDirectionalPipe) {
 			// Just like in service(), the capability advertisement
 			// is sent only if this is a bidirectional pipe. (If
@@ -11,14 +11,14 @@
 			}
 			pckOut.end();
 
-			while (!serveOneCommandV2()) {
+			while (!serveOneCommandV2(pckOut)) {
 				// Repeat until an empty command or EOF.
 			}
 			return;
 		}
 
 		try {
-			serveOneCommandV2();
+			serveOneCommandV2(pckOut);
 		} finally {
 			while (0 < rawIn.skip(2048) || 0 <= rawIn.read()) {
 				// Discard until EOF.

@@ -2,7 +2,7 @@
 	 * Returns true if this is the last command and we should tear down the
 	 * connection.
 	 */
-	private boolean serveOneCommandV2() throws IOException {
+	private boolean serveOneCommandV2(PacketLineOut pckOut) throws IOException {
 		String command;
 		try {
 			command = pckIn.readString();
@@ -17,11 +17,11 @@
 			return true;
 		}
 		if (command.equals("command=" + COMMAND_LS_REFS)) { //$NON-NLS-1$
-			lsRefsV2();
+			lsRefsV2(pckOut);
 			return false;
 		}
 		if (command.equals("command=" + COMMAND_FETCH)) { //$NON-NLS-1$
-			fetchV2();
+			fetchV2(pckOut);
 			return false;
 		}
 		throw new PackProtocolException(MessageFormat

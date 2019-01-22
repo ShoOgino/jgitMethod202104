@@ -15,6 +15,8 @@
 	 *            shallow commits on the client that are now becoming unshallow
 	 * @param deepenNots
 	 *            objects that the client specified using --shallow-exclude
+	 * @param pckOut
+	 *            output writer
 	 * @throws IOException
 	 *             if an error occurred while generating or writing the pack.
 	 */
@@ -23,7 +25,8 @@
 			PackStatistics.Accumulator accumulator,
 			@Nullable Collection<Ref> allTags,
 			List<ObjectId> unshallowCommits,
-			List<ObjectId> deepenNots) throws IOException {
+			List<ObjectId> deepenNots,
+			PacketLineOut pckOut) throws IOException {
 		ProgressMonitor pm = NullProgressMonitor.INSTANCE;
 		OutputStream packOut = rawOut;
 

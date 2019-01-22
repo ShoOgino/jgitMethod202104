@@ -1,4 +1,4 @@
-	private void fetchV2() throws IOException {
+	private void fetchV2(PacketLineOut pckOut) throws IOException {
 		// Depending on the requestValidator, #processHaveLines may
 		// require that advertised be set. Set it only in the required
 		// circumstances (to avoid a full ref lookup in the case that
@@ -109,7 +109,7 @@
 					req.getClientCapabilities().contains(OPTION_INCLUDE_TAG)
 						? db.getRefDatabase().getRefsByPrefix(R_TAGS)
 						: null,
-					unshallowCommits, deepenNots);
+					unshallowCommits, deepenNots, pckOut);
 			// sendPack invokes pckOut.end() for us, so we do not
 			// need to invoke it here.
 		} else {

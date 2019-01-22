@@ -21,6 +21,7 @@
 	 */
 	public void upload(InputStream input, OutputStream output,
 			@Nullable OutputStream messages) throws IOException {
+		PacketLineOut pckOut = null;
 		try {
 			rawIn = input;
 			if (messages != null)
@@ -46,9 +47,9 @@
 			pckIn = new PacketLineIn(rawIn);
 			pckOut = new PacketLineOut(rawOut);
 			if (useProtocolV2()) {
-				serviceV2();
+				serviceV2(pckOut);
 			} else {
-				service();
+				service(pckOut);
 			}
 		} catch (UploadPackInternalServerErrorException err) {
 			// UploadPackInternalServerErrorException is a special exception

@@ -1,4 +1,4 @@
-	private void service() throws IOException {
+	private void service(PacketLineOut pckOut) throws IOException {
 		boolean sendPack = false;
 		// If it's a non-bidi request, we need to read the entire request before
 		// writing a response. Buffer the response until then.
@@ -54,7 +54,7 @@
 
 			if (!req.getClientShallowCommits().isEmpty())
 				walk.assumeShallow(req.getClientShallowCommits());
-			sendPack = negotiate(req, accumulator);
+			sendPack = negotiate(req, accumulator, pckOut);
 			accumulator.timeNegotiating += System.currentTimeMillis()
 					- negotiateStart;
 
@@ -80,7 +80,7 @@
 
 		if (sendPack) {
 			sendPack(accumulator, req, refs == null ? null : refs.values(),
-					unshallowCommits, Collections.emptyList());
+					unshallowCommits, Collections.emptyList(), pckOut);
 		}
 	}
 
