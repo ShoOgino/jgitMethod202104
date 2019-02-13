@@ -1,0 +1,17 @@
+	private void setupPack(int bs, int ps) throws IOException {
+		DfsBlockCacheConfig cfg = new DfsBlockCacheConfig().setBlockSize(bs)
+				.setBlockLimit(bs * 100).setStreamRatio(bypassCache ? 0F : 1F);
+		DfsBlockCache.reconfigure(cfg);
+
+		byte[] data = new TestRng(JGitTestUtil.getName()).nextBytes(ps);
+		DfsInserter ins = (DfsInserter) db.newObjectInserter();
+		ins.setCompressionLevel(Deflater.NO_COMPRESSION);
+		ins.insert(Constants.OBJ_BLOB, data);
+		ins.flush();
+
+		if (clearCache) {
+			DfsBlockCache.reconfigure(cfg);
+			db.getObjectDatabase().clearCache();
+		}
+	}
+

@@ -5,6 +5,9 @@
 		while (0 < remaining) {
 			DfsBlock b = cache.getOrLoad(this, position, ctx, () -> rc);
 			int ptr = (int) (position - b.start);
+			if (b.size() <= ptr) {
+				throw packfileIsTruncated();
+			}
 			int n = (int) Math.min(b.size() - ptr, remaining);
 			b.write(out, position, n);
 			position += n;
