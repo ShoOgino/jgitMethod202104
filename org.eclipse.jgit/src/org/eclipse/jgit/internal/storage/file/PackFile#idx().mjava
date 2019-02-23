@@ -11,7 +11,8 @@
 				} else if (!Arrays.equals(packChecksum, idx.packChecksum)) {
 					throw new PackMismatchException(MessageFormat.format(
 							JGitText.get().packChecksumMismatch,
-							packFile.getPath()));
+							packFile.getPath(), packChecksum,
+							idx.packChecksum));
 				}
 				loadedIdx = idx;
 			} catch (InterruptedIOException e) {
