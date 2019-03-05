@@ -10,12 +10,13 @@
 				PacketLineIn.end());
 
 		// This doesn't
-		TransportException e = assertThrows(TransportException.class,
+		UploadPackInternalServerErrorException e = assertThrows(
+				UploadPackInternalServerErrorException.class,
 				() -> uploadPackV2(RequestPolicy.ADVERTISED, null, null,
 						"command=fetch\n", PacketLineIn.delimiter(),
 						"want " + unadvertized.name() + "\n",
 						PacketLineIn.end()));
-		assertThat(e.getMessage(),
+		assertThat(e.getCause().getMessage(),
 				containsString("want " + unadvertized.name() + " not valid"));
 	}
 

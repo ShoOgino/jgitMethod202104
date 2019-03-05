@@ -69,27 +69,6 @@
 							"\\x" + Integer.toHexString(eof))); //$NON-NLS-1$
 				}
 			}
-		} catch (ServiceMayNotContinueException err) {
-			if (!err.isOutput() && err.getMessage() != null) {
-				try {
-					pckOut.writeString("ERR " + err.getMessage() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
-				} catch (IOException e) {
-					err.addSuppressed(e);
-					throw err;
-				}
-				err.setOutput();
-			}
-			throw err;
-		} catch (IOException | RuntimeException | Error err) {
-			String msg = err instanceof PackProtocolException ? err.getMessage()
-					: JGitText.get().internalServerError;
-			try {
-				pckOut.writeString("ERR " + msg + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
-			} catch (IOException e) {
-				err.addSuppressed(e);
-				throw err;
-			}
-			throw new UploadPackInternalServerErrorException(err);
 		} finally {
 			if (!sendPack && !biDirectionalPipe) {
 				while (0 < rawIn.skip(2048) || 0 <= rawIn.read()) {

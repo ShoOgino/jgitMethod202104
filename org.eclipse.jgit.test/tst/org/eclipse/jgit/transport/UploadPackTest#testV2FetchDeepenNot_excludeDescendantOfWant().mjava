@@ -9,12 +9,13 @@
 		remote.update("two", two);
 		remote.update("four", four);
 
-		PackProtocolException e = assertThrows(PackProtocolException.class,
+		UploadPackInternalServerErrorException e = assertThrows(
+				UploadPackInternalServerErrorException.class,
 				() -> uploadPackV2("command=fetch\n", PacketLineIn.delimiter(),
 						"deepen-not four\n",
 						"want " + two.toObjectId().getName() + "\n", "done\n",
 						PacketLineIn.end()));
-		assertThat(e.getMessage(),
+		assertThat(e.getCause().getMessage(),
 				containsString("No commits selected for shallow request"));
 	}
 

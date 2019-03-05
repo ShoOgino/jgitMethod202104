@@ -12,12 +12,13 @@
 				"want " + reachable.name() + "\n", PacketLineIn.end());
 
 		// This doesn't
-		TransportException e = assertThrows(TransportException.class,
+		UploadPackInternalServerErrorException e = assertThrows(
+				UploadPackInternalServerErrorException.class,
 				() -> uploadPackV2(RequestPolicy.REACHABLE_COMMIT, null, null,
 						"command=fetch\n", PacketLineIn.delimiter(),
 						"want " + unreachable.name() + "\n",
 						PacketLineIn.end()));
-		assertThat(e.getMessage(),
+		assertThat(e.getCause().getMessage(),
 				containsString("want " + unreachable.name() + " not valid"));
 	}
 

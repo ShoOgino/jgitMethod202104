@@ -5,11 +5,12 @@
 
 		server.getConfig().setBoolean("uploadpack", null, "allowfilter", false);
 
-		PackProtocolException e = assertThrows(PackProtocolException.class,
+		UploadPackInternalServerErrorException e = assertThrows(
+				UploadPackInternalServerErrorException.class,
 				() -> uploadPackV2("command=fetch\n", PacketLineIn.delimiter(),
 						"want " + commit.toObjectId().getName() + "\n",
 						"filter blob:limit=5\n", "done\n", PacketLineIn.end()));
-		assertThat(e.getMessage(),
+		assertThat(e.getCause().getMessage(),
 				containsString("unexpected filter blob:limit=5"));
 	}
 
