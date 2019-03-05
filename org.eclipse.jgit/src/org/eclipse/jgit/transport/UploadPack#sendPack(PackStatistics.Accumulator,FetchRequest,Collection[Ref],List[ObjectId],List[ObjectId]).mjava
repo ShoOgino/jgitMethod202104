@@ -31,11 +31,13 @@
 				// This was already reported on (below).
 				throw noPack;
 			} catch (IOException | RuntimeException | Error err) {
-				if (reportInternalServerErrorOverSideband()) {
-					throw new UploadPackInternalServerErrorException(err);
-				} else {
+				try {
+					reportInternalServerErrorOverSideband();
+				} catch (IOException e) {
+					err.addSuppressed(e);
 					throw err;
 				}
+				throw new UploadPackInternalServerErrorException(err);
 			}
 		} else {
 			sendPack(false, req, accumulator, allTags, unshallowCommits, deepenNots);
