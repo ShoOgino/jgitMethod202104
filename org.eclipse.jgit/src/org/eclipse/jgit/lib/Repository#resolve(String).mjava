@@ -53,6 +53,7 @@
 			throws AmbiguousObjectException, IncorrectObjectTypeException,
 			RevisionSyntaxException, IOException {
 		try (RevWalk rw = new RevWalk(this)) {
+			rw.setRetainBody(false);
 			Object resolved = resolve(rw, revstr);
 			if (resolved instanceof String) {
 				final Ref ref = findRef((String) resolved);
