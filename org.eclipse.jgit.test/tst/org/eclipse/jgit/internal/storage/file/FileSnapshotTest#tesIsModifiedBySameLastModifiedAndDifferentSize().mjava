@@ -1,0 +1,21 @@
+	/**
+	 * Check that file is modified by looking at its size.
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void tesIsModifiedBySameLastModifiedAndDifferentSize() throws Exception {
+		File f1 = createFile("foo", "lorem".getBytes());
+		File f2 = createFile("bar", "lorem ipsum".getBytes());
+
+		f1.setLastModified(f2.lastModified()); // Make sure f1 and f2 have the same lastModified
+		FileSnapshot save = FileSnapshot.save(f1);
+
+		// Make sure that the modified and read timestamps are far enough, so that
+		// check is done by size
+		Thread.sleep(3000L);
+
+		assertEquals(save.lastModified(), f2.lastModified());
+		assertTrue(save.isModified(f2));
+	}
+
