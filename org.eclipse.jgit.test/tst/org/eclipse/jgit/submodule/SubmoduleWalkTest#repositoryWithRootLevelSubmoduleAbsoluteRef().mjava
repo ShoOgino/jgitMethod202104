@@ -1,4 +1,3 @@
-	@SuppressWarnings("resource" /* java 7 */)
 	@Test
 	public void repositoryWithRootLevelSubmoduleAbsoluteRef()
 			throws IOException, ConfigInvalidException {
@@ -42,13 +41,13 @@
 		assertNull(gen.getModulesPath());
 		assertNull(gen.getModulesUpdate());
 		assertNull(gen.getModulesUrl());
-		Repository subRepo = gen.getRepository();
-		assertNotNull(subRepo);
-		assertEquals(modulesGitDir.getAbsolutePath(),
-				subRepo.getDirectory().getAbsolutePath());
-		assertEquals(new File(db.getWorkTree(), path).getAbsolutePath(),
-				subRepo.getWorkTree().getAbsolutePath());
-		subRepo.close();
+		try (Repository subRepo = gen.getRepository()) {
+			assertNotNull(subRepo);
+			assertEquals(modulesGitDir.getAbsolutePath(),
+					subRepo.getDirectory().getAbsolutePath());
+			assertEquals(new File(db.getWorkTree(), path).getAbsolutePath(),
+					subRepo.getWorkTree().getAbsolutePath());
+		}
 		assertFalse(gen.next());
 	}
 

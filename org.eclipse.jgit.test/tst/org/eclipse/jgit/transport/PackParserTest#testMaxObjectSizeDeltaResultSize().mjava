@@ -1,7 +1,9 @@
 	@Test
 	public void testMaxObjectSizeDeltaResultSize() throws Exception {
-		TestRepository d = new TestRepository<Repository>(db);
-		RevBlob a = d.blob("0123456789");
+		RevBlob a;
+		try (TestRepository d = new TestRepository<Repository>(db)) {
+			a = d.blob("0123456789");
+		}
 
 		TemporaryBuffer.Heap pack = new TemporaryBuffer.Heap(1024);
 

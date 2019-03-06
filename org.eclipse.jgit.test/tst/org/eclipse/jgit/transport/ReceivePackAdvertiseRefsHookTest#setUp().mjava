@@ -8,23 +8,25 @@
 
 		// Fill dst with a some common history.
 		//
-		TestRepository<Repository> d = new TestRepository<>(dst);
-		a = d.blob("a");
-		A = d.commit(d.tree(d.file("a", a)));
-		B = d.commit().parent(A).create();
-		d.update(R_MASTER, B);
+		try (TestRepository<Repository> d = new TestRepository<>(dst)) {
+			a = d.blob("a");
+			A = d.commit(d.tree(d.file("a", a)));
+			B = d.commit().parent(A).create();
+			d.update(R_MASTER, B);
 
-		// Clone from dst into src
-		//
-		try (Transport t = Transport.open(src, uriOf(dst))) {
-			t.fetch(PM, Collections.singleton(new RefSpec("+refs/*:refs/*")));
-			assertEquals(B, src.resolve(R_MASTER));
+			// Clone from dst into src
+			//
+			try (Transport t = Transport.open(src, uriOf(dst))) {
+				t.fetch(PM,
+						Collections.singleton(new RefSpec("+refs/*:refs/*")));
+				assertEquals(B, src.resolve(R_MASTER));
+			}
+
+			// Now put private stuff into dst.
+			//
+			b = d.blob("b");
+			P = d.commit(d.tree(d.file("b", b)), A);
+			d.update(R_PRIVATE, P);
 		}
-
-		// Now put private stuff into dst.
-		//
-		b = d.blob("b");
-		P = d.commit(d.tree(d.file("b", b)), A);
-		d.update(R_PRIVATE, P);
 	}
 

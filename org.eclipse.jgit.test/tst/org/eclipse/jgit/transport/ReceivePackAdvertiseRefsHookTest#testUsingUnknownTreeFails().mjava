@@ -1,48 +1,51 @@
 	@Test
 	public void testUsingUnknownTreeFails() throws Exception {
-		TestRepository<Repository> s = new TestRepository<>(src);
-		RevCommit N = s.commit().parent(B).add("q", s.blob("a")).create();
-		RevTree t = s.parseBody(N).getTree();
+		try (TestRepository<Repository> s = new TestRepository<>(src)) {
+			RevCommit N = s.commit().parent(B).add("q", s.blob("a")).create();
+			RevTree t = s.parseBody(N).getTree();
 
-		// Don't include the tree in the pack.
-		//
-		final TemporaryBuffer.Heap pack = new TemporaryBuffer.Heap(1024);
-		packHeader(pack, 1);
-		copy(pack, src.open(N));
-		digest(pack);
+			// Don't include the tree in the pack.
+			//
+			final TemporaryBuffer.Heap pack = new TemporaryBuffer.Heap(1024);
+			packHeader(pack, 1);
+			copy(pack, src.open(N));
+			digest(pack);
 
-		final TemporaryBuffer.Heap inBuf = new TemporaryBuffer.Heap(1024);
-		final PacketLineOut inPckLine = new PacketLineOut(inBuf);
-		inPckLine.writeString(ObjectId.zeroId().name() + ' ' + N.name() + ' '
-				+ "refs/heads/s" + '\0'
-				+ BasePackPushConnection.CAPABILITY_REPORT_STATUS);
-		inPckLine.end();
-		pack.writeTo(inBuf, PM);
+			final TemporaryBuffer.Heap inBuf = new TemporaryBuffer.Heap(1024);
+			final PacketLineOut inPckLine = new PacketLineOut(inBuf);
+			inPckLine.writeString(ObjectId.zeroId().name() + ' ' + N.name()
+					+ ' ' + "refs/heads/s" + '\0'
+					+ BasePackPushConnection.CAPABILITY_REPORT_STATUS);
+			inPckLine.end();
+			pack.writeTo(inBuf, PM);
 
-		final TemporaryBuffer.Heap outBuf = new TemporaryBuffer.Heap(1024);
-		final ReceivePack rp = new ReceivePack(dst);
-		rp.setCheckReceivedObjects(true);
-		rp.setCheckReferencedObjectsAreReachable(true);
-		rp.setAdvertiseRefsHook(new HidePrivateHook());
-		try {
-			receive(rp, inBuf, outBuf);
-			fail("Expected UnpackException");
-		} catch (UnpackException failed) {
-			Throwable err = failed.getCause();
-			assertTrue(err instanceof MissingObjectException);
-			MissingObjectException moe = (MissingObjectException) err;
-			assertEquals(t, moe.getObjectId());
+			final TemporaryBuffer.Heap outBuf = new TemporaryBuffer.Heap(1024);
+			final ReceivePack rp = new ReceivePack(dst);
+			rp.setCheckReceivedObjects(true);
+			rp.setCheckReferencedObjectsAreReachable(true);
+			rp.setAdvertiseRefsHook(new HidePrivateHook());
+			try {
+				receive(rp, inBuf, outBuf);
+				fail("Expected UnpackException");
+			} catch (UnpackException failed) {
+				Throwable err = failed.getCause();
+				assertTrue(err instanceof MissingObjectException);
+				MissingObjectException moe = (MissingObjectException) err;
+				assertEquals(t, moe.getObjectId());
+			}
+
+			final PacketLineIn r = asPacketLineIn(outBuf);
+			String master = r.readString();
+			int nul = master.indexOf('\0');
+			assertTrue("has capability list", nul > 0);
+			assertEquals(B.name() + ' ' + R_MASTER, master.substring(0, nul));
+			assertSame(PacketLineIn.END, r.readString());
+
+			assertEquals("unpack error Missing tree " + t.name(),
+					r.readString());
+			assertEquals("ng refs/heads/s n/a (unpacker error)",
+					r.readString());
+			assertSame(PacketLineIn.END, r.readString());
 		}
-
-		final PacketLineIn r = asPacketLineIn(outBuf);
-		String master = r.readString();
-		int nul = master.indexOf('\0');
-		assertTrue("has capability list", nul > 0);
-		assertEquals(B.name() + ' ' + R_MASTER, master.substring(0, nul));
-		assertSame(PacketLineIn.END, r.readString());
-
-		assertEquals("unpack error Missing tree " + t.name(), r.readString());
-		assertEquals("ng refs/heads/s n/a (unpacker error)", r.readString());
-		assertSame(PacketLineIn.END, r.readString());
 	}
 

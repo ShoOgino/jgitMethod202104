@@ -1,10 +1,10 @@
 	@Test
 	public void testWrite_CH_PROGRESS() throws IOException {
-		@SuppressWarnings("resource" /* java 7 */)
-		final SideBandOutputStream out = new SideBandOutputStream(CH_PROGRESS,
-				SMALL_BUF, rawOut);
-		out.write(new byte[] { 'a', 'b', 'c' });
-		out.flush();
+		try (SideBandOutputStream out = new SideBandOutputStream(CH_PROGRESS,
+				SMALL_BUF, rawOut)) {
+			out.write(new byte[] { 'a', 'b', 'c' });
+			out.flush();
+		}
 		assertBuffer("0008\002abc");
 	}
 

@@ -23,30 +23,32 @@
 
 		// Now use b but in a different commit than what is hidden.
 		//
-		TestRepository<Repository> s = new TestRepository<>(src);
-		RevCommit N = s.commit().parent(B).add("q", b).create();
-		s.update(R_MASTER, N);
+		try (TestRepository<Repository> s = new TestRepository<>(src)) {
+			RevCommit N = s.commit().parent(B).add("q", b).create();
+			s.update(R_MASTER, N);
 
-		// Push this new content to the remote, doing strict validation.
-		//
-		PushResult r;
-		RemoteRefUpdate u = new RemoteRefUpdate( //
-				src, //
-				R_MASTER, // src name
-				R_MASTER, // dst name
-				false, // do not force update
-				null, // local tracking branch
-				null // expected id
-		);
-		try (TransportLocal t = newTransportLocalWithStrictValidation()) {
-			t.setPushThin(true);
-			r = t.push(PM, Collections.singleton(u));
-			dst.close();
+			// Push this new content to the remote, doing strict validation.
+			//
+			PushResult r;
+			RemoteRefUpdate u = new RemoteRefUpdate( //
+					src, //
+					R_MASTER, // src name
+					R_MASTER, // dst name
+					false, // do not force update
+					null, // local tracking branch
+					null // expected id
+			);
+			try (TransportLocal t = newTransportLocalWithStrictValidation()) {
+				t.setPushThin(true);
+				r = t.push(PM, Collections.singleton(u));
+				dst.close();
+			}
+
+			assertNotNull("have result", r);
+			assertNull("private not advertised", r.getAdvertisedRef(R_PRIVATE));
+			assertSame("master updated", RemoteRefUpdate.Status.OK,
+					u.getStatus());
+			assertEquals(N, dst.resolve(R_MASTER));
 		}
-
-		assertNotNull("have result", r);
-		assertNull("private not advertised", r.getAdvertisedRef(R_PRIVATE));
-		assertSame("master updated", RemoteRefUpdate.Status.OK, u.getStatus());
-		assertEquals(N, dst.resolve(R_MASTER));
 	}
 

@@ -2,10 +2,12 @@
 	public void testDeltaStatistics() throws Exception {
 		config.setDeltaCompress(true);
 		FileRepository repo = createBareRepository();
-		TestRepository<FileRepository> testRepo = new TestRepository<>(repo);
 		ArrayList<RevObject> blobs = new ArrayList<>();
-		blobs.add(testRepo.blob(genDeltableData(1000)));
-		blobs.add(testRepo.blob(genDeltableData(1005)));
+		try (TestRepository<FileRepository> testRepo = new TestRepository<>(
+				repo)) {
+			blobs.add(testRepo.blob(genDeltableData(1000)));
+			blobs.add(testRepo.blob(genDeltableData(1005)));
+		}
 
 		try (PackWriter pw = new PackWriter(repo)) {
 			NullProgressMonitor m = NullProgressMonitor.INSTANCE;

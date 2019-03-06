@@ -1,11 +1,10 @@
 	@Test
 	public void testListRemote() throws IOException {
-		Repository dst = createBareRepository();
-
 		assertEquals("http", remoteURI.getScheme());
 
 		Map<String, Ref> map;
-		try (Transport t = Transport.open(dst, remoteURI)) {
+		try (Repository dst = createBareRepository();
+				Transport t = Transport.open(dst, remoteURI)) {
 			// I didn't make up these public interface names, I just
 			// approved them for inclusion into the code base. Sorry.
 			// --spearce

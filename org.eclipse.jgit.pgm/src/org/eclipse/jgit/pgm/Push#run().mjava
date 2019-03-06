@@ -1,6 +1,6 @@
 	/** {@inheritDoc} */
 	@Override
-	protected void run() throws Exception {
+	protected void run() {
 		try (Git git = new Git(db)) {
 			PushCommand push = git.push();
 			push.setDryRun(dryRun);
@@ -8,10 +8,12 @@
 			push.setProgressMonitor(new TextProgressMonitor(errw));
 			push.setReceivePack(receivePack);
 			push.setRefSpecs(refSpecs);
-			if (all)
+			if (all) {
 				push.setPushAll();
-			if (tags)
+			}
+			if (tags) {
 				push.setPushTags();
+			}
 			push.setRemote(remote);
 			push.setThin(thin);
 			push.setAtomic(atomic);
@@ -25,6 +27,8 @@
 					printPushResult(reader, result.getURI(), result);
 				}
 			}
+		} catch (GitAPIException | IOException e) {
+			throw die(e.getMessage(), e);
 		}
 	}
 

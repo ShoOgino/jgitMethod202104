@@ -22,7 +22,8 @@
 
 		if (foundCollision) {
 			ObjectId id = h.toObjectId();
-			LOG.warn("possible SHA-1 collision " + id.name()); //$NON-NLS-1$
+			LOG.warn(MessageFormat.format(JGitText.get().sha1CollisionDetected,
+					id.name()));
 			throw new Sha1CollisionException(id);
 		}
 	}

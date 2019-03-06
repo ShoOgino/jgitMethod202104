@@ -1,33 +1,32 @@
 	@Test
 	public void testReadSingleBytes() throws IOException {
-		@SuppressWarnings("resource" /* java 7 */)
-		final UnionInputStream u = new UnionInputStream();
+		try (UnionInputStream u = new UnionInputStream()) {
+			assertTrue(u.isEmpty());
+			u.add(new ByteArrayInputStream(new byte[] { 1, 0, 2 }));
+			u.add(new ByteArrayInputStream(new byte[] { 3 }));
+			u.add(new ByteArrayInputStream(new byte[] { 4, 5 }));
 
-		assertTrue(u.isEmpty());
-		u.add(new ByteArrayInputStream(new byte[] { 1, 0, 2 }));
-		u.add(new ByteArrayInputStream(new byte[] { 3 }));
-		u.add(new ByteArrayInputStream(new byte[] { 4, 5 }));
+			assertFalse(u.isEmpty());
+			assertEquals(3, u.available());
+			assertEquals(1, u.read());
+			assertEquals(0, u.read());
+			assertEquals(2, u.read());
+			assertEquals(0, u.available());
 
-		assertFalse(u.isEmpty());
-		assertEquals(3, u.available());
-		assertEquals(1, u.read());
-		assertEquals(0, u.read());
-		assertEquals(2, u.read());
-		assertEquals(0, u.available());
+			assertEquals(3, u.read());
+			assertEquals(0, u.available());
 
-		assertEquals(3, u.read());
-		assertEquals(0, u.available());
+			assertEquals(4, u.read());
+			assertEquals(1, u.available());
+			assertEquals(5, u.read());
+			assertEquals(0, u.available());
+			assertEquals(-1, u.read());
 
-		assertEquals(4, u.read());
-		assertEquals(1, u.available());
-		assertEquals(5, u.read());
-		assertEquals(0, u.available());
-		assertEquals(-1, u.read());
-
-		assertTrue(u.isEmpty());
-		u.add(new ByteArrayInputStream(new byte[] { (byte) 255 }));
-		assertEquals(255, u.read());
-		assertEquals(-1, u.read());
-		assertTrue(u.isEmpty());
+			assertTrue(u.isEmpty());
+			u.add(new ByteArrayInputStream(new byte[] { (byte) 255 }));
+			assertEquals(255, u.read());
+			assertEquals(-1, u.read());
+			assertTrue(u.isEmpty());
+		}
 	}
 

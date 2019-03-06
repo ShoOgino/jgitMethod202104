@@ -1,6 +1,6 @@
 	/** {@inheritDoc} */
 	@Override
-	protected void run() throws Exception {
+	protected void run() {
 		try (Git git = new Git(db)) {
 			if (tagName != null) {
 				if (delete) {
@@ -33,6 +33,8 @@
 					outw.println(Repository.shortenRefName(ref.getName()));
 				}
 			}
+		} catch (GitAPIException | IOException e) {
+			throw die(e.getMessage(), e);
 		}
 	}
 

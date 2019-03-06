@@ -1,0 +1,7 @@
+		private static String readFile(File file) throws IOException {
+			byte[] content = IO.readFully(file);
+			// strip off the last LF
+			int end = RawParseUtils.prevLF(content, content.length);
+			return RawParseUtils.decode(content, 0, end + 1);
+		}
+

@@ -1,9 +1,8 @@
 	@Test
 	public void testInitialClone_BrokenServer() throws Exception {
-		Repository dst = createBareRepository();
-		assertFalse(dst.getObjectDatabase().has(A_txt));
-
-		try (Transport t = Transport.open(dst, brokenURI)) {
+		try (Repository dst = createBareRepository();
+				Transport t = Transport.open(dst, brokenURI)) {
+			assertFalse(dst.getObjectDatabase().has(A_txt));
 			try {
 				t.fetch(NullProgressMonitor.INSTANCE, mirror(master));
 				fail("fetch completed despite upload-pack being broken");

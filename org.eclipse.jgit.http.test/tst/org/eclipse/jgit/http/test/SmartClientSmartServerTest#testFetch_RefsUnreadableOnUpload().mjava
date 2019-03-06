@@ -23,8 +23,8 @@
 			URIish badRefsURI = new URIish(noRefServer.getURI()
 					.resolve(app.getContextPath() + "/" + repoName).toString());
 
-			Repository dst = createBareRepository();
-			try (Transport t = Transport.open(dst, badRefsURI);
+			try (Repository dst = createBareRepository();
+					Transport t = Transport.open(dst, badRefsURI);
 					FetchConnection c = t.openFetch()) {
 				// We start failing here to exercise the post-advertisement
 				// upload pack handler.

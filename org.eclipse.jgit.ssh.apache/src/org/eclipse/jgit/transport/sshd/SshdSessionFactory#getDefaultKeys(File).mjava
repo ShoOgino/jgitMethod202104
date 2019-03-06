@@ -1,0 +1,40 @@
+	/**
+	 * Determines the default keys. The default implementation will lazy load
+	 * the {@link #getDefaultIdentities(File) default identity files}.
+	 * <p>
+	 * Subclasses may override and return an {@link Iterable} of whatever keys
+	 * are appropriate. If the returned iterable lazily loads keys, it should be
+	 * an instance of
+	 * {@link org.apache.sshd.common.keyprovider.AbstractResourceKeyPairProvider
+	 * AbstractResourceKeyPairProvider} so that the session can later pass it
+	 * the {@link #createKeyPasswordProvider(CredentialsProvider) password
+	 * provider} wrapped as a {@link FilePasswordProvider} via
+	 * {@link org.apache.sshd.common.keyprovider.AbstractResourceKeyPairProvider#setPasswordFinder(FilePasswordProvider)
+	 * AbstractResourceKeyPairProvider#setPasswordFinder(FilePasswordProvider)}
+	 * so that encrypted, password-protected keys can be loaded.
+	 * </p>
+	 * <p>
+	 * The default implementation uses exactly this mechanism; class
+	 * {@link CachingKeyPairProvider} may serve as a model for a customized
+	 * lazy-loading {@link Iterable} implementation
+	 * </p>
+	 * <p>
+	 * If the {@link Iterable} returned has the keys already pre-loaded or
+	 * otherwise doesn't need to decrypt encrypted keys, it can be any
+	 * {@link Iterable}, for instance a simple {@link java.util.List List}.
+	 * </p>
+	 *
+	 * @param sshDir
+	 *            to look in for keys
+	 * @return an {@link Iterable} over the default keys
+	 * @since 5.3
+	 */
+	@NonNull
+	protected Iterable<KeyPair> getDefaultKeys(@NonNull File sshDir) {
+		List<Path> defaultIdentities = getDefaultIdentities(sshDir);
+		return defaultKeys.computeIfAbsent(
+				new Tuple(defaultIdentities.toArray(new Path[0])),
+				t -> new CachingKeyPairProvider(defaultIdentities,
+						getKeyCache()));
+	}
+

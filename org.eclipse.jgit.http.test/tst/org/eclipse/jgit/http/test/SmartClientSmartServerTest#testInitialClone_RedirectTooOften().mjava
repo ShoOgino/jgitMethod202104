@@ -4,12 +4,12 @@
 				.openUserConfig(null, FS.DETECTED);
 		userConfig.setInt("http", null, "maxRedirects", 3);
 		userConfig.save();
-		Repository dst = createBareRepository();
-		assertFalse(dst.getObjectDatabase().has(A_txt));
 
 		URIish cloneFrom = extendPath(redirectURI, "/response/4/302");
 		String remoteUri = cloneFrom.toString();
-		try (Transport t = Transport.open(dst, cloneFrom)) {
+		try (Repository dst = createBareRepository();
+				Transport t = Transport.open(dst, cloneFrom)) {
+			assertFalse(dst.getObjectDatabase().has(A_txt));
 			t.fetch(NullProgressMonitor.INSTANCE, mirror(master));
 			fail("Should have failed (too many redirects)");
 		} catch (TransportException e) {

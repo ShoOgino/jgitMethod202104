@@ -1,6 +1,6 @@
 	/** {@inheritDoc} */
 	@Override
-	protected void run() throws Exception {
+	protected void run() {
 		BufferedInputStream in = new BufferedInputStream(ins);
 		try (ObjectInserter inserter = db.newObjectInserter()) {
 			PackParser p = inserter.newPackParser(in);
@@ -11,6 +11,8 @@
 			}
 			p.parse(new TextProgressMonitor(errw));
 			inserter.flush();
+		} catch (IOException e) {
+			throw die(e.getMessage(), e);
 		}
 	}
 

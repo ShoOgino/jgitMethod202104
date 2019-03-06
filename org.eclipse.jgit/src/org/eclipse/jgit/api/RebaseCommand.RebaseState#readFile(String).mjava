@@ -1,4 +1,17 @@
 		public String readFile(String name) throws IOException {
-			return readFile(getDir(), name);
+			try {
+				return readFile(getDir(), name);
+			} catch (FileNotFoundException e) {
+				if (ONTO_NAME.equals(name)) {
+					// Older JGit mistakenly wrote a file "onto-name" instead of
+					// "onto_name". Try that wrong name just in case somebody
+					// upgraded while a rebase started by JGit was in progress.
+					File oldFile = getFile(ONTO_NAME.replace('_', '-'));
+					if (oldFile.exists()) {
+						return readFile(oldFile);
+					}
+				}
+				throw e;
+			}
 		}
 

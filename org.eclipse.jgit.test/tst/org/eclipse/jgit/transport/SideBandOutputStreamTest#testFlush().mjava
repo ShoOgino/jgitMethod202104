@@ -1,4 +1,3 @@
-	@SuppressWarnings("resource" /* java 7 */)
 	@Test
 	public void testFlush() throws IOException {
 		final int[] flushCnt = new int[1];
@@ -14,7 +13,10 @@
 			}
 		};
 
-		new SideBandOutputStream(CH_DATA, SMALL_BUF, mockout).flush();
+		try (SideBandOutputStream out = new SideBandOutputStream(CH_DATA,
+				SMALL_BUF, mockout)) {
+			out.flush();
+		}
 		assertEquals(1, flushCnt[0]);
 	}
 

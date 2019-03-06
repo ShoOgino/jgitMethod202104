@@ -1,0 +1,13 @@
+	private void assertPackSize() throws IOException {
+		try (DfsReader ctx = db.getObjectDatabase().newReader();
+				PackWriter pw = new PackWriter(ctx);
+				ByteArrayOutputStream os = new ByteArrayOutputStream();
+				PackOutputStream out = new PackOutputStream(
+						NullProgressMonitor.INSTANCE, os, pw)) {
+			DfsPackFile pack = db.getObjectDatabase().getPacks()[0];
+			long packSize = pack.getPackDescription().getFileSize(PackExt.PACK);
+			pack.copyPackAsIs(out, ctx);
+			assertEquals(packSize - (12 + 20), os.size());
+		}
+	}
+

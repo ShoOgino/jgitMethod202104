@@ -1,10 +1,15 @@
 	/** {@inheritDoc} */
 	@Override
-	protected void run() throws Exception {
-		for (Ref r : getSortedRefs()) {
-			show(r.getObjectId(), r.getName());
-			if (r.getPeeledObjectId() != null)
-				show(r.getPeeledObjectId(), r.getName() + "^{}"); //$NON-NLS-1$
+	protected void run() {
+		try {
+			for (Ref r : getSortedRefs()) {
+				show(r.getObjectId(), r.getName());
+				if (r.getPeeledObjectId() != null) {
+					show(r.getPeeledObjectId(), r.getName() + "^{}"); //$NON-NLS-1$
+				}
+			}
+		} catch (IOException e) {
+			throw die(e.getMessage(), e);
 		}
 	}
 

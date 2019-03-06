@@ -1,0 +1,27 @@
+	private static Path findGpgDirectory() {
+		SystemReader system = SystemReader.getInstance();
+		if (system.isWindows()) {
+			// On Windows prefer %APPDATA%\gnupg if it exists, even if Cygwin is
+			// used.
+			String appData = system.getenv("APPDATA"); //$NON-NLS-1$
+			if (appData != null && !appData.isEmpty()) {
+				try {
+					Path directory = Paths.get(appData).resolve("gnupg"); //$NON-NLS-1$
+					if (Files.isDirectory(directory)) {
+						return directory;
+					}
+				} catch (SecurityException | InvalidPathException e) {
+					// Ignore and return the default location below.
+				}
+			}
+		}
+		// All systems, including Cygwin and even Windows if
+		// %APPDATA%\gnupg doesn't exist: ~/.gnupg
+		File home = FS.DETECTED.userHome();
+		if (home == null) {
+			// Oops. What now?
+			home = new File(".").getAbsoluteFile(); //$NON-NLS-1$
+		}
+		return home.toPath().resolve(".gnupg"); //$NON-NLS-1$
+	}
+

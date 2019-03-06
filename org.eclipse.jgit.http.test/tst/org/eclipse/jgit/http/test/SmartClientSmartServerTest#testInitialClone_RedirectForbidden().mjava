@@ -5,10 +5,9 @@
 		userConfig.setString("http", null, "followRedirects", "false");
 		userConfig.save();
 
-		Repository dst = createBareRepository();
-		assertFalse(dst.getObjectDatabase().has(A_txt));
-
-		try (Transport t = Transport.open(dst, redirectURI)) {
+		try (Repository dst = createBareRepository();
+				Transport t = Transport.open(dst, redirectURI)) {
+			assertFalse(dst.getObjectDatabase().has(A_txt));
 			t.fetch(NullProgressMonitor.INSTANCE, mirror(master));
 			fail("Should have failed (redirects forbidden)");
 		} catch (TransportException e) {
