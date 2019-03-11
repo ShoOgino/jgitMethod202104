@@ -7,7 +7,8 @@
 		Session session = createSession("ssh://egit/egit/egit");
 		assertEquals("egit", session.getHost());
 		// No user in URI, none in ssh config: default is OS user name
-		assertEquals(System.getProperty("user.name"), session.getUserName());
+		assertEquals(SystemReader.getInstance().getProperty("user.name"),
+				session.getUserName());
 		assertEquals(22, session.getPort());
 	}
 
