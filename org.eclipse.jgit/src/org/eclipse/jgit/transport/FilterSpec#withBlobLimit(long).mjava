@@ -1,0 +1,13 @@
+	/**
+	 * @param blobLimit
+	 *            the blob limit in a "blob:[limit]" or "blob:none" filter line
+	 * @return a filter spec which filters blobs above a certain size
+	 */
+	static FilterSpec withBlobLimit(long blobLimit) {
+		if (blobLimit < 0) {
+			throw new IllegalArgumentException(
+					"blobLimit cannot be negative: " + blobLimit); //$NON-NLS-1$
+		}
+		return new FilterSpec(blobLimit);
+	}
+
