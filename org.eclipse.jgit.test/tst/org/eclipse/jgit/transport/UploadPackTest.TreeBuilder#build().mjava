@@ -1,0 +1,14 @@
+		RevTree build() throws Exception {
+			DirCache dc = DirCache.newInCore();
+			DirCacheBuilder dcBuilder = dc.builder();
+			addElements(dcBuilder);
+			dcBuilder.finish();
+			ObjectId id;
+			try (ObjectInserter ins =
+					remote.getRepository().newObjectInserter()) {
+				id = dc.writeTree(ins);
+				ins.flush();
+			}
+			return remote.getRevWalk().parseTree(id);
+		}
+

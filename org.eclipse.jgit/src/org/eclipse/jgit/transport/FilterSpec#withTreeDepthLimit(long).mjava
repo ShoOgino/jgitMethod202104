@@ -1,0 +1,14 @@
+	/**
+	 * @param treeDepthLimit
+	 *            the tree depth limit in a "tree:[depth]" filter line
+	 * @return a filter spec which filters blobs and trees beyond a certain tree
+	 *         depth
+	 */
+	static FilterSpec withTreeDepthLimit(long treeDepthLimit) {
+		if (treeDepthLimit < 0) {
+			throw new IllegalArgumentException(
+					"treeDepthLimit cannot be negative: " + treeDepthLimit); //$NON-NLS-1$
+		}
+		return new FilterSpec(-1, treeDepthLimit);
+	}
+

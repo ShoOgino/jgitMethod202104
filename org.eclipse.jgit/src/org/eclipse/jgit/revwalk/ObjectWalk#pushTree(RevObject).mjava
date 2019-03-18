@@ -14,6 +14,11 @@
 		tv.buf = reader.open(obj, OBJ_TREE).getCachedBytes();
 		tv.parent = currVisit;
 		currVisit = tv;
+		if (tv.parent == null) {
+			tv.depth = 1;
+		} else {
+			tv.depth = tv.parent.depth + 1;
+		}
 
 		return obj;
 	}

@@ -30,24 +30,23 @@
 				}
 
 				RevObject obj = objects.get(idBuffer);
-				if (obj != null && (obj.flags & SEEN) != 0)
+				if (obj != null && !visitationPolicy.shouldVisit(obj))
 					continue;
 
 				int mode = parseMode(buf, startPtr, ptr, tv);
-				int flags;
 				switch (mode >>> TYPE_SHIFT) {
 				case TYPE_FILE:
 				case TYPE_SYMLINK:
 					if (obj == null) {
 						obj = new RevBlob(idBuffer);
-						obj.flags = SEEN;
+						visitationPolicy.visited(obj);
 						objects.add(obj);
 						return obj;
 					}
 					if (!(obj instanceof RevBlob))
 						throw new IncorrectObjectTypeException(obj, OBJ_BLOB);
-					obj.flags = flags = obj.flags | SEEN;
-					if ((flags & UNINTERESTING) == 0)
+					visitationPolicy.visited(obj);
+					if ((obj.flags & UNINTERESTING) == 0)
 						return obj;
 					if (boundary)
 						return obj;
@@ -56,14 +55,14 @@
 				case TYPE_TREE:
 					if (obj == null) {
 						obj = new RevTree(idBuffer);
-						obj.flags = SEEN;
+						visitationPolicy.visited(obj);
 						objects.add(obj);
 						return pushTree(obj);
 					}
 					if (!(obj instanceof RevTree))
 						throw new IncorrectObjectTypeException(obj, OBJ_TREE);
-					obj.flags = flags = obj.flags | SEEN;
-					if ((flags & UNINTERESTING) == 0)
+					visitationPolicy.visited(obj);
+					if ((obj.flags & UNINTERESTING) == 0)
 						return pushTree(obj);
 					if (boundary)
 						return pushTree(obj);
@@ -92,12 +91,11 @@
 			if (o == null) {
 				return null;
 			}
-			int flags = o.flags;
-			if ((flags & SEEN) != 0)
+			if (!visitationPolicy.shouldVisit(o)) {
 				continue;
-			flags |= SEEN;
-			o.flags = flags;
-			if ((flags & UNINTERESTING) == 0 | boundary) {
+			}
+			visitationPolicy.visited(o);
+			if ((o.flags & UNINTERESTING) == 0 | boundary) {
 				if (o instanceof RevTree) {
 					// The previous while loop should have exhausted the stack
 					// of trees.

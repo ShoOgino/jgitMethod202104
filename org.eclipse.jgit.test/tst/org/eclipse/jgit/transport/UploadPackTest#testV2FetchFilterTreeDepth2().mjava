@@ -1,0 +1,17 @@
+	@Test
+	public void testV2FetchFilterTreeDepth2() throws Exception {
+		DeepTreePreparator preparator = new DeepTreePreparator();
+		remote.update("master", preparator.commit);
+
+		uploadV2WithTreeDepthFilter(2, preparator.commit.toObjectId());
+
+		assertTrue(client.getObjectDatabase()
+				.has(preparator.rootTree.toObjectId()));
+		assertTrue(client.getObjectDatabase()
+				.has(preparator.subtree.toObjectId()));
+		assertTrue(client.getObjectDatabase()
+				.has(preparator.blobLowDepth.toObjectId()));
+		assertFalse(client.getObjectDatabase()
+				.has(preparator.blobHighDepth.toObjectId()));
+	}
+

@@ -1,0 +1,15 @@
+	@Test
+	public void testV2FetchFilterTreeDepth_iterateOverTreeAtTwoLevels()
+			throws Exception {
+		// Test tree:<depth> where a tree is iterated to twice - once where a
+		// subentry is too deep to be included, and again where the blob inside
+		// it is shallow enough to be included.
+		RepeatedSubtreePreparator preparator = new RepeatedSubtreePreparator();
+		remote.update("master", preparator.commit);
+
+		uploadV2WithTreeDepthFilter(4, preparator.commit.toObjectId());
+
+		assertTrue(client.getObjectDatabase()
+				.has(preparator.foo.toObjectId()));
+	}
+

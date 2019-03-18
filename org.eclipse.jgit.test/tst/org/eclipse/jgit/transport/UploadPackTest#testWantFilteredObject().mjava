@@ -1,0 +1,27 @@
+	@Test
+	public void testWantFilteredObject() throws Exception {
+		RepeatedSubtreePreparator preparator = new RepeatedSubtreePreparator();
+		remote.update("master", preparator.commit);
+
+		// Specify wanted blob objects that are deep enough to be filtered. We
+		// should still upload them.
+		uploadV2WithTreeDepthFilter(
+				3,
+				preparator.commit.toObjectId(),
+				preparator.foo.toObjectId());
+		assertTrue(client.getObjectDatabase()
+				.has(preparator.foo.toObjectId()));
+
+		client = newRepo("client");
+		// Specify a wanted tree object that is deep enough to be filtered. We
+		// should still upload it.
+		uploadV2WithTreeDepthFilter(
+				2,
+				preparator.commit.toObjectId(),
+				preparator.subtree3.toObjectId());
+		assertTrue(client.getObjectDatabase()
+				.has(preparator.foo.toObjectId()));
+		assertTrue(client.getObjectDatabase()
+				.has(preparator.subtree3.toObjectId()));
+	}
+

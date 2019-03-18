@@ -1,0 +1,27 @@
+	/**
+	 * Determines if the object should be omitted from the pack as a result of
+	 * its depth (probably because of the tree:<depth> filter).
+	 *
+	 * @param obj
+	 *            the object to check whether it should be omitted.
+	 * @param walker
+	 *            the walker being used for traveresal.
+	 * @return whether the given object should be skipped.
+	 */
+	private boolean depthSkip(@NonNull RevObject obj, ObjectWalk walker) {
+		long treeDepth = walker.getTreeDepth();
+
+		// Check if this object needs to be rejected because it is a tree or
+		// blob that is too deep from the root tree.
+
+		// A blob is considered one level deeper than the tree that contains it.
+		if (obj.getType() == OBJ_BLOB) {
+			treeDepth++;
+		}
+
+		// TODO: Do not continue traversing the tree, since its children
+		// will also be too deep.
+		return filterSpec.getTreeDepthLimit() != -1 &&
+				treeDepth > filterSpec.getTreeDepthLimit();
+	}
+

@@ -1,0 +1,21 @@
+	@Test
+	public void testV2FetchFilterTreeDepth1_serverHasBitmap() throws Exception {
+		DeepTreePreparator preparator = new DeepTreePreparator();
+		remote.update("master", preparator.commit);
+
+		// The bitmap should be ignored since we need to track the depth while
+		// traversing the trees.
+		generateBitmaps(server);
+
+		uploadV2WithTreeDepthFilter(1, preparator.commit.toObjectId());
+
+		assertTrue(client.getObjectDatabase()
+				.has(preparator.rootTree.toObjectId()));
+		assertFalse(client.getObjectDatabase()
+				.has(preparator.subtree.toObjectId()));
+		assertFalse(client.getObjectDatabase()
+				.has(preparator.blobLowDepth.toObjectId()));
+		assertFalse(client.getObjectDatabase()
+				.has(preparator.blobHighDepth.toObjectId()));
+	}
+

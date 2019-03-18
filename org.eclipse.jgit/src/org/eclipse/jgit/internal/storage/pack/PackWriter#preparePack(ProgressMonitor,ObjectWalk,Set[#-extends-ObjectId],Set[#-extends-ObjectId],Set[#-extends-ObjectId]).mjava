@@ -39,6 +39,9 @@
 		if (shallowPack && !(walk instanceof DepthWalk.ObjectWalk))
 			throw new IllegalArgumentException(
 					JGitText.get().shallowPacksRequireDepthWalk);
+		if (filterSpec.getTreeDepthLimit() >= 0) {
+			walk.setVisitationPolicy(ALWAYS_VISIT_POLICY);
+		}
 		findObjectsToPack(countingMonitor, walk, interestingObjects,
 				uninterestingObjects, noBitmaps);
 	}

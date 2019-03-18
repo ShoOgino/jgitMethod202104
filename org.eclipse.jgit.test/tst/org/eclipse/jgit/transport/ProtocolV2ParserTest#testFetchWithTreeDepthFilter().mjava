@@ -1,12 +1,12 @@
 	@Test
-	public void testFetchWithNoneFilter() throws IOException {
+	public void testFetchWithTreeDepthFilter() throws IOException {
 		PacketLineIn pckIn = formatAsPacketLine(PacketLineIn.DELIM,
-				"filter blob:none",
+				"filter tree:3",
 				PacketLineIn.END);
 		ProtocolV2Parser parser = new ProtocolV2Parser(
 				ConfigBuilder.start().allowFilter().done());
 		FetchV2Request request = parser.parseFetchRequest(pckIn);
-		assertEquals(0, request.getFilterSpec().getBlobLimit());
-		assertEquals(-1, request.getFilterSpec().getTreeDepthLimit());
+		assertEquals(-1, request.getFilterSpec().getBlobLimit());
+		assertEquals(3, request.getFilterSpec().getTreeDepthLimit());
 	}
 
