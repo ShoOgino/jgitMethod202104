@@ -1,0 +1,16 @@
+	/**
+	 * @return the filter line which describes this spec, e.g. "filter blob:limit=42"
+	 */
+	@Nullable
+	public String filterLine() {
+		if (blobLimit == 0) {
+			return GitProtocolConstants.OPTION_FILTER + " blob:none"; //$NON-NLS-1$
+		}
+
+		if (blobLimit > 0) {
+			return GitProtocolConstants.OPTION_FILTER + " blob:limit=" + blobLimit; //$NON-NLS-1$
+		}
+
+		return null;
+	}
+

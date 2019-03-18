@@ -33,7 +33,7 @@
 					OPTION_MULTI_ACK_DETAILED));
 		}
 
-		if (filterBlobLimit >= 0 && !wantCapability(line, OPTION_FILTER)) {
+		if (!filterSpec.isNoOp() && !wantCapability(line, OPTION_FILTER)) {
 			throw new PackProtocolException(uri,
 					JGitText.get().filterRequiresCapability);
 		}

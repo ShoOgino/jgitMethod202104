@@ -6,10 +6,10 @@
 
 		// Check if this object needs to be rejected, doing the cheaper
 		// checks first.
-		boolean reject = filterBlobLimit >= 0 &&
+		boolean reject = filterSpec.getBlobLimit() >= 0 &&
 			type == OBJ_BLOB &&
 			!want.contains(src) &&
-			reader.getObjectSize(src, OBJ_BLOB) > filterBlobLimit;
+			reader.getObjectSize(src, OBJ_BLOB) > filterSpec.getBlobLimit();
 		if (!reject) {
 			addObject(src, type, pathHashCode);
 		}

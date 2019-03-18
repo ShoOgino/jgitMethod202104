@@ -1,0 +1,15 @@
+	/**
+	 * Returns the filter spec for the current request. Valid only after
+	 * calling recvWants(). This may be a no-op filter spec, but it won't be
+	 * null.
+	 *
+	 * @return filter requested by the client
+	 * @since 5.4
+	 */
+	public final FilterSpec getFilterSpec() {
+		if (currentRequest == null) {
+			throw new RequestNotYetReadException();
+		}
+		return currentRequest.getFilterSpec();
+	}
+

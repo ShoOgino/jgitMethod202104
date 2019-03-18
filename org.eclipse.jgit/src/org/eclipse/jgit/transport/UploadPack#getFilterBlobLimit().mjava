@@ -1,14 +1,12 @@
 	/**
-	 * Returns the filter blob limit for the current request. Valid only after
-	 * calling recvWants(). A limit -1 means no limit.
+	 * Deprecated synonym for {@code getFilterSpec().getBlobLimit()}.
 	 *
 	 * @return filter blob limit requested by the client, or -1 if no limit
 	 * @since 5.3
+	 * @deprecated Use {@link #getFilterSpec()} instead
 	 */
-	public long getFilterBlobLimit() {
-		if (currentRequest == null) {
-			throw new RequestNotYetReadException();
-		}
-		return currentRequest.getFilterSpec().getBlobLimit();
+	@Deprecated
+	public final long getFilterBlobLimit() {
+		return getFilterSpec().getBlobLimit();
 	}
 

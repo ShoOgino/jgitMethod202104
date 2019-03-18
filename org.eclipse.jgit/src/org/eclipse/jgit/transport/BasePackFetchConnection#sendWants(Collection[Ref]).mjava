@@ -31,10 +31,8 @@
 		if (first) {
 			return false;
 		}
-		if (filterBlobLimit == 0) {
-			p.writeString(OPTION_FILTER + " blob:none"); //$NON-NLS-1$
-		} else if (filterBlobLimit > 0) {
-			p.writeString(OPTION_FILTER + " blob:limit=" + filterBlobLimit); //$NON-NLS-1$
+		if (!filterSpec.isNoOp()) {
+			p.writeString(filterSpec.filterLine());
 		}
 		p.end();
 		outNeedsEnd = false;
