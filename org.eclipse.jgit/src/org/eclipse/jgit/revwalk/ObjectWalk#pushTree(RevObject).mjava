@@ -1,4 +1,4 @@
-	private TreeVisit newTreeVisit(RevObject obj) throws LargeObjectException,
+	private RevObject pushTree(RevObject obj) throws LargeObjectException,
 			MissingObjectException, IncorrectObjectTypeException, IOException {
 		TreeVisit tv = freeVisit;
 		if (tv != null) {
@@ -12,6 +12,9 @@
 		}
 		tv.obj = obj;
 		tv.buf = reader.open(obj, OBJ_TREE).getCachedBytes();
-		return tv;
+		tv.parent = currVisit;
+		currVisit = tv;
+
+		return obj;
 	}
 

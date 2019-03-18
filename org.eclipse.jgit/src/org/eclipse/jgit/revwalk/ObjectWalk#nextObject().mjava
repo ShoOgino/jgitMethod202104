@@ -58,15 +58,15 @@
 						obj = new RevTree(idBuffer);
 						obj.flags = SEEN;
 						objects.add(obj);
-						return enterTree(obj);
+						return pushTree(obj);
 					}
 					if (!(obj instanceof RevTree))
 						throw new IncorrectObjectTypeException(obj, OBJ_TREE);
 					obj.flags = flags = obj.flags | SEEN;
 					if ((flags & UNINTERESTING) == 0)
-						return enterTree(obj);
+						return pushTree(obj);
 					if (boundary)
-						return enterTree(obj);
+						return pushTree(obj);
 					continue;
 
 				case TYPE_GITLINK:
@@ -99,9 +99,11 @@
 			o.flags = flags;
 			if ((flags & UNINTERESTING) == 0 | boundary) {
 				if (o instanceof RevTree) {
-					tv = newTreeVisit(o);
-					tv.parent = null;
-					currVisit = tv;
+					// The previous while loop should have exhausted the stack
+					// of trees.
+					assert currVisit == null;
+
+					pushTree(o);
 				}
 				return o;
 			}
