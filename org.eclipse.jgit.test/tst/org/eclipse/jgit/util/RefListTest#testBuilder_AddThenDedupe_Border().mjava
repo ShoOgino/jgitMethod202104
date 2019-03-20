@@ -1,0 +1,16 @@
+	@Test
+	public void testBuilder_AddThenDedupe_Border() {
+		RefList.Builder<Ref> builder = new RefList.Builder<>(1);
+		builder.sort();
+		builder.dedupe((a, b) -> b);
+		RefList<Ref> list = builder.toRefList();
+		assertTrue(list.isEmpty());
+
+		builder = new RefList.Builder<>(1);
+		builder.add(REF_A);
+		builder.sort();
+		builder.dedupe((a, b) -> b);
+		list = builder.toRefList();
+		assertEquals(1, list.size());
+	}
+

@@ -1,0 +1,15 @@
+	/**
+	 * Create a {@link Collector} for {@link Ref}.
+	 *
+	 * @param mergeFunction
+	 * @return {@link Collector} for {@link Ref}
+	 * @since 5.4
+	 */
+	public static Collector<Ref, ?, RefMap> toRefMap(
+			BinaryOperator<Ref> mergeFunction) {
+		return Collectors.collectingAndThen(RefList.toRefList(mergeFunction),
+				(refs) -> new RefMap("", //$NON-NLS-1$
+							refs, RefList.emptyList(),
+						RefList.emptyList()));
+	}
+

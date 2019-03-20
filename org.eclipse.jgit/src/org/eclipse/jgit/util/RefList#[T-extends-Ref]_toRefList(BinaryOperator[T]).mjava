@@ -1,0 +1,26 @@
+	/**
+	 * Create a {@link Collector} for {@link Ref}.
+	 *
+	 * @param mergeFunction
+	 *            if specified the result will be sorted and deduped.
+	 * @return {@link Collector} for {@link Ref}
+	 * @since 5.4
+	 */
+	public static <T extends Ref> Collector<T, ?, RefList<T>> toRefList(
+			@Nullable BinaryOperator<T> mergeFunction) {
+		return Collector.of(
+				() -> new Builder<>(),
+				Builder<T>::add, (b1, b2) -> {
+					Builder<T> b = new Builder<>();
+					b.addAll(b1);
+					b.addAll(b2);
+					return b;
+				}, (b) -> {
+					if (mergeFunction != null) {
+						b.sort();
+						b.dedupe(mergeFunction);
+					}
+					return b.toRefList();
+				});
+	}
+
