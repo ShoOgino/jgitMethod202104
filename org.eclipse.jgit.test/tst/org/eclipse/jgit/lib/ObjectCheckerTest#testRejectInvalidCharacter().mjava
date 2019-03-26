@@ -1,0 +1,11 @@
+	@Test
+	public void testRejectInvalidCharacter() {
+		try {
+			checkOneName("te/st");
+			fail("incorrectly accepted with /");
+		} catch (CorruptObjectException e) {
+
+			assertEquals("name contains '/'", e.getMessage());
+		}
+	}
+
