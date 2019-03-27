@@ -7,12 +7,16 @@
 						leaf.getStorage(),
 						leaf.getName(),
 						leaf.getObjectId(),
-						rw.peel(obj).copy());
+						rw.peel(obj).copy(),
+						hasVersioning() ? leaf.getUpdateIndex()
+								: UNDEFINED_UPDATE_INDEX);
 			} else {
 				return new ObjectIdRef.PeeledNonTag(
 						leaf.getStorage(),
 						leaf.getName(),
-						leaf.getObjectId());
+						leaf.getObjectId(),
+						hasVersioning() ? leaf.getUpdateIndex()
+								: UNDEFINED_UPDATE_INDEX);
 			}
 		}
 	}

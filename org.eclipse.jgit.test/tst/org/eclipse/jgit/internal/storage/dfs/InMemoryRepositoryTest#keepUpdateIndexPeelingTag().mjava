@@ -1,0 +1,20 @@
+	@Test
+	public void keepUpdateIndexPeelingTag() throws Exception {
+		InMemoryRepository repo = new InMemoryRepository(
+				new DfsRepositoryDescription());
+		try (TestRepository<InMemoryRepository> git = new TestRepository<>(
+				repo)) {
+			RevCommit commit = git.branch("master").commit()
+					.message("first commit").create();
+			RevTag tag = git.tag("v0.1", commit);
+			git.update("refs/tags/v0.1", tag);
+
+			Ref unpeeledTag = new ObjectIdRef.Unpeeled(Storage.LOOSE,
+					"refs/tags/v0.1", tag.getId(), 1000);
+
+			Ref peeledTag = repo.getRefDatabase().peel(unpeeledTag);
+			assertTrue(peeledTag instanceof ObjectIdRef.PeeledTag);
+			assertEquals(1000, peeledTag.getUpdateIndex());
+		}
+	}
+

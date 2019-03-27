@@ -1,0 +1,17 @@
+	@Test
+	public void keepUpdateIndexPeelingNonTag() throws Exception {
+		InMemoryRepository repo = new InMemoryRepository(
+				new DfsRepositoryDescription());
+		try (TestRepository<InMemoryRepository> git = new TestRepository<>(
+				repo)) {
+			RevCommit commit = git.branch("master").commit()
+					.message("first commit").create();
+
+			Ref unpeeledRef = new ObjectIdRef.Unpeeled(Storage.LOOSE,
+					"refs/heads/master", commit.getId(), 1000);
+			Ref peeledRef = repo.getRefDatabase().peel(unpeeledRef);
+			assertTrue(peeledRef instanceof ObjectIdRef.PeeledNonTag);
+			assertEquals(1000, peeledRef.getUpdateIndex());
+		}
+	}
+
