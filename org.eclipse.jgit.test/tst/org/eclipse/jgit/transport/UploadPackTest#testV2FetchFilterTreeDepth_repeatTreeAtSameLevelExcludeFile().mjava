@@ -1,0 +1,16 @@
+	@Test
+	public void testV2FetchFilterTreeDepth_repeatTreeAtSameLevelExcludeFile()
+			throws Exception {
+		RepeatedSubtreeAtSameLevelPreparator preparator =
+				new RepeatedSubtreeAtSameLevelPreparator();
+		remote.update("master", preparator.commit);
+
+		uploadV2WithTreeDepthFilter(4, preparator.commit.toObjectId());
+
+		assertFalse(client.getObjectDatabase()
+				.has(preparator.foo.toObjectId()));
+		assertFalse(client.getObjectDatabase()
+				.has(preparator.baz.toObjectId()));
+		assertEquals(8, stats.getTreesTraversed());
+	}
+

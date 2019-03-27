@@ -1,0 +1,9 @@
+		@Override
+		public boolean shouldVisit(RevObject o) {
+			Long lastDepth = lowestDepthVisited.get(o);
+			if (lastDepth == null) {
+				return true;
+			}
+			return walk.getTreeDepth() < lastDepth;
+		}
+

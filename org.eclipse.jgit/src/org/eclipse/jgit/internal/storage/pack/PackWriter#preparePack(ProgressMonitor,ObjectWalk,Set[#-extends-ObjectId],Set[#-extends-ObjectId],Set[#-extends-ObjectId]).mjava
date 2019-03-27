@@ -40,7 +40,7 @@
 			throw new IllegalArgumentException(
 					JGitText.get().shallowPacksRequireDepthWalk);
 		if (filterSpec.getTreeDepthLimit() >= 0) {
-			walk.setVisitationPolicy(ALWAYS_VISIT_POLICY);
+			walk.setVisitationPolicy(new DepthAwareVisitationPolicy(walk));
 		}
 		findObjectsToPack(countingMonitor, walk, interestingObjects,
 				uninterestingObjects, noBitmaps);
