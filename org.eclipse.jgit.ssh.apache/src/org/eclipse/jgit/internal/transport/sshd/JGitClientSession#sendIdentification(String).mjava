@@ -1,9 +1,26 @@
 	@Override
 	protected IoWriteFuture sendIdentification(String ident)
 			throws IOException {
-		// Nothing; we do this below together with the KEX init in
-		// sendStartSsh(). Called only from the ClientSessionImpl constructor,
-		// where the return value is ignored.
-		return null;
+		StatefulProxyConnector proxy = proxyHandler;
+		if (proxy != null) {
+			try {
+				// We must not block here; the framework starts reading messages
+				// from the peer only once the initial sendKexInit() following
+				// this call to sendIdentification() has returned!
+				proxy.runWhenDone(() -> {
+					JGitClientSession.super.sendIdentification(ident);
+					return null;
+				});
+				// Called only from the ClientSessionImpl constructor, where the
+				// return value is ignored.
+				return null;
+			} catch (IOException e) {
+				throw e;
+			} catch (Exception other) {
+				throw new IOException(other.getLocalizedMessage(), other);
+			}
+		} else {
+			return super.sendIdentification(ident);
+		}
 	}
 

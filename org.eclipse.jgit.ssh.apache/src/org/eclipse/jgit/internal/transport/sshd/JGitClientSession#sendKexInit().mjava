@@ -4,12 +4,13 @@
 		if (proxy != null) {
 			try {
 				// We must not block here; the framework starts reading messages
-				// from the peer only once sendKexInit() has returned!
+				// from the peer only once the initial sendKexInit() has
+				// returned!
 				proxy.runWhenDone(() -> {
-					sendStartSsh();
+					JGitClientSession.super.sendKexInit();
 					return null;
 				});
-				// sendKexInit() is called only from the ClientSessionImpl
+				// This is called only from the ClientSessionImpl
 				// constructor, where the return value is ignored.
 				return null;
 			} catch (IOException e) {
@@ -18,7 +19,7 @@
 				throw new IOException(other.getLocalizedMessage(), other);
 			}
 		} else {
-			return sendStartSsh();
+			return super.sendKexInit();
 		}
 	}
 

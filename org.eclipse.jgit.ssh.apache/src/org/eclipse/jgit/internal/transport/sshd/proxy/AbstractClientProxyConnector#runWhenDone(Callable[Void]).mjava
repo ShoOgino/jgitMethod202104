@@ -2,7 +2,7 @@
 	public void runWhenDone(Callable<Void> starter) throws Exception {
 		synchronized (lock) {
 			if (!done) {
-				this.startSsh = starter;
+				bufferedCommands.add(starter);
 				return;
 			}
 		}
