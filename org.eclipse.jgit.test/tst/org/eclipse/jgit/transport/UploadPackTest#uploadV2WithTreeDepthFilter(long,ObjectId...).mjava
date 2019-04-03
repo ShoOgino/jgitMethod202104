@@ -12,8 +12,9 @@
 		input.add("done\n");
 		input.add(PacketLineIn.end());
 		ByteArrayInputStream recvStream =
-				uploadPackV2(RequestPolicy.ANY, /*refFilter=*/null,
-							 /*hook=*/null, input.toArray(new String[0]));
+				uploadPackV2(
+						(UploadPack up) -> {up.setRequestPolicy(RequestPolicy.ANY);},
+						input.toArray(new String[0]));
 		PacketLineIn pckIn = new PacketLineIn(recvStream);
 		assertThat(pckIn.readString(), is("packfile"));
 		parsePack(recvStream);

@@ -7,16 +7,24 @@
 		remote.update("secret", tip);
 
 		// This works
-		uploadPackV2(RequestPolicy.REACHABLE_COMMIT_TIP,
-				new RejectAllRefFilter(), null, "command=fetch\n",
+		uploadPackV2(
+				(UploadPack up) -> {
+					up.setRequestPolicy(RequestPolicy.REACHABLE_COMMIT_TIP);
+					up.setRefFilter(new RejectAllRefFilter());
+				},
+				"command=fetch\n",
 				PacketLineIn.delimiter(), "want " + parentOfTip.name() + "\n",
 				PacketLineIn.end());
 
 		// This doesn't
 		UploadPackInternalServerErrorException e = assertThrows(
 				UploadPackInternalServerErrorException.class,
-				() -> uploadPackV2(RequestPolicy.REACHABLE_COMMIT_TIP,
-						new RejectAllRefFilter(), null, "command=fetch\n",
+				() -> uploadPackV2(
+						(UploadPack up) -> {
+							up.setRequestPolicy(RequestPolicy.REACHABLE_COMMIT_TIP);
+							up.setRefFilter(new RejectAllRefFilter());
+						},
+						"command=fetch\n",
 						PacketLineIn.delimiter(),
 						"want " + unreachable.name() + "\n",
 						PacketLineIn.end()));

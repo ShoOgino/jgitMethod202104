@@ -3,6 +3,7 @@
 		try (ByteArrayOutputStream send = new ByteArrayOutputStream()) {
 			PacketLineOut pckOut = new PacketLineOut(send);
 			for (String line : inputLines) {
+				Objects.requireNonNull(line);
 				if (PacketLineIn.isEnd(line)) {
 					pckOut.end();
 				} else if (PacketLineIn.isDelimiter(line)) {
