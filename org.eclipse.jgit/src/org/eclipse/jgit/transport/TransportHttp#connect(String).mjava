@@ -77,9 +77,7 @@
 					String err = status + " " + conn.getResponseMessage(); //$NON-NLS-1$
 					throw new TransportException(uri, err);
 				}
-			} catch (NotSupportedException e) {
-				throw e;
-			} catch (TransportException e) {
+			} catch (NotSupportedException | TransportException e) {
 				throw e;
 			} catch (SSLHandshakeException e) {
 				handleSslFailure(e);

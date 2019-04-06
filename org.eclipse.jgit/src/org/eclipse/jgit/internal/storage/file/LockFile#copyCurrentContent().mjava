@@ -45,13 +45,7 @@
 			// Don't worry about a file that doesn't exist yet, it
 			// conceptually has no current content to copy.
 			//
-		} catch (IOException ioe) {
-			unlock();
-			throw ioe;
-		} catch (RuntimeException ioe) {
-			unlock();
-			throw ioe;
-		} catch (Error ioe) {
+		} catch (IOException | RuntimeException | Error ioe) {
 			unlock();
 			throw ioe;
 		}

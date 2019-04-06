@@ -28,13 +28,7 @@
 
 		try {
 			c.read();
-		} catch (IOException e) {
-			c.unlock();
-			throw e;
-		} catch (RuntimeException e) {
-			c.unlock();
-			throw e;
-		} catch (Error e) {
+		} catch (IOException | RuntimeException | Error e) {
 			c.unlock();
 			throw e;
 		}
