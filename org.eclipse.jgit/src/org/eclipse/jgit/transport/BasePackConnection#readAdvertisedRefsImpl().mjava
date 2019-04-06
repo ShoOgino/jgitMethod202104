@@ -24,8 +24,8 @@
 				if (nul >= 0) {
 					// The first line (if any) may contain "hidden"
 					// capability values after a NUL byte.
-					for (String c : line.substring(nul + 1).split(" ")) //$NON-NLS-1$
-						remoteCapablities.add(c);
+					remoteCapablities.addAll(
+							Arrays.asList(line.substring(nul + 1).split(" "))); //$NON-NLS-1$
 					line = line.substring(0, nul);
 				}
 			}

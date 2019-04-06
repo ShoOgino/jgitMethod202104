@@ -20,9 +20,7 @@
 					KeyUtils.getFingerPrint(BuiltinDigests.sha256, expected),
 					KeyUtils.getFingerPrint(BuiltinDigests.md5, actual),
 					KeyUtils.getFingerPrint(BuiltinDigests.sha256, actual));
-			for (String line : warning.split("\n")) { //$NON-NLS-1$
-				messages.add(line);
-			}
+			messages.addAll(Arrays.asList(warning.split("\n"))); //$NON-NLS-1$
 
 			CredentialsProvider provider = getCredentialsProvider(
 					clientSession);
