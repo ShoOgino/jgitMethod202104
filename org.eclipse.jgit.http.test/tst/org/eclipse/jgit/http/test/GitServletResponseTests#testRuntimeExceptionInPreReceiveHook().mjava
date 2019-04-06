@@ -17,12 +17,8 @@
 
 		maxPackSize = 0;
 		postHook = null;
-		preHook = new PreReceiveHook() {
-			@Override
-			public void onPreReceive(ReceivePack rp,
-					Collection<ReceiveCommand> commands) {
-				throw new IllegalStateException();
-			}
+		preHook = (ReceivePack rp, Collection<ReceiveCommand> commands) -> {
+			throw new IllegalStateException();
 		};
 
 		try (Transport t = Transport.open(clientRepo, srvURI)) {

@@ -1,14 +1,11 @@
 	@Test
 	/** the branch-local config should be respected */
 	public void testPullWithRebasePreserveConfig3() throws Exception {
-		Callable<PullResult> setup = new Callable<PullResult>() {
-			@Override
-			public PullResult call() throws Exception {
-				StoredConfig config = dbTarget.getConfig();
-				config.setString("branch", "master", "rebase", "preserve");
-				config.save();
-				return target.pull().call();
-			}
+		Callable<PullResult> setup = () -> {
+			StoredConfig config = dbTarget.getConfig();
+			config.setString("branch", "master", "rebase", "preserve");
+			config.save();
+			return target.pull().call();
 		};
 		doTestPullWithRebase(setup, TestPullMode.REBASE_PREASERVE);
 	}

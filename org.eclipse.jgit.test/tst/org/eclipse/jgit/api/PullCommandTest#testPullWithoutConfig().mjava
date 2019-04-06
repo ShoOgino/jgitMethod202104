@@ -1,12 +1,7 @@
 	@Test
 	/** without config it should merge */
 	public void testPullWithoutConfig() throws Exception {
-		Callable<PullResult> setup = new Callable<PullResult>() {
-			@Override
-			public PullResult call() throws Exception {
-				return target.pull().call();
-			}
-		};
+		Callable<PullResult> setup = target.pull()::call;
 		doTestPullWithRebase(setup, TestPullMode.MERGE);
 	}
 

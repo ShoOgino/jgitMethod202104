@@ -8,12 +8,8 @@
 		final int[] count = new int[1];
 
 		ListenerHandle listener = Repository.getGlobalListenerList()
-				.addRefsChangedListener(new RefsChangedListener() {
-
-					@Override
-					public void onRefsChanged(RefsChangedEvent event) {
-						count[0]++;
-					}
+				.addRefsChangedListener((RefsChangedEvent event) -> {
+					count[0]++;
 				});
 
 		refs = refdir.getRefs(RefDatabase.ALL);

@@ -6,12 +6,8 @@
 				&& !"git receive-pack".equals(rp)) //$NON-NLS-1$
 			return new ForkLocalPushConnection();
 
-		ReceivePackFactory<Void> rpf = new ReceivePackFactory<Void>() {
-			@Override
-			public ReceivePack create(Void req, Repository db) {
-				return createReceivePack(db);
-			}
-		};
+		ReceivePackFactory<Void> rpf = (Void req,
+				Repository db) -> createReceivePack(db);
 		return new InternalPushConnection<>(this, rpf, null, openRepo());
 	}
 

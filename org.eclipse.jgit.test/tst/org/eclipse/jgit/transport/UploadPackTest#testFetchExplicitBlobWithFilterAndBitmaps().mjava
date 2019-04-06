@@ -18,14 +18,9 @@
 			new DfsGarbageCollector(server2).pack(null);
 			server2.scanForRepoChanges();
 
-			testProtocol = new TestProtocol<>(new UploadPackFactory<Object>() {
-				@Override
-				public UploadPack create(Object req, Repository db)
-						throws ServiceNotEnabledException,
-						ServiceNotAuthorizedException {
-					UploadPack up = new UploadPack(db);
-					return up;
-				}
+			testProtocol = new TestProtocol<>((Object req, Repository db) -> {
+				UploadPack up = new UploadPack(db);
+				return up;
 			}, null);
 			uri = testProtocol.register(ctx, server2);
 

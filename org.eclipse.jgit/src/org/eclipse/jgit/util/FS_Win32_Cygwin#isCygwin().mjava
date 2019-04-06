@@ -5,12 +5,9 @@
 	 */
 	public static boolean isCygwin() {
 		final String path = AccessController
-				.doPrivileged(new PrivilegedAction<String>() {
-					@Override
-					public String run() {
-						return System.getProperty("java.library.path"); //$NON-NLS-1$
-					}
-				});
+				.doPrivileged((PrivilegedAction<String>) () -> System
+						.getProperty("java.library.path") //$NON-NLS-1$
+				);
 		if (path == null)
 			return false;
 		File found = FS.searchPath(path, "cygpath.exe"); //$NON-NLS-1$

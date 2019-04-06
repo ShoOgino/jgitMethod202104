@@ -77,12 +77,8 @@
 			// Bug. To show the bug we sleep for more than 2500ms
 			Thread.sleep(2600);
 
-			File[] ret = packsFolder.listFiles(new FilenameFilter() {
-				@Override
-				public boolean accept(File dir, String name) {
-					return name.endsWith(".pack");
-				}
-			});
+			File[] ret = packsFolder.listFiles(
+					(File dir, String name) -> name.endsWith(".pack"));
 			assertTrue(ret != null && ret.length == 1);
 			Assume.assumeTrue(tmpFile.lastModified() == ret[0].lastModified());
 

@@ -8,18 +8,13 @@
 
 		ServletContextHandler app = server.addContext("/git");
 		GitServlet gs = new GitServlet();
-		gs.setRepositoryResolver(new RepositoryResolver<HttpServletRequest>() {
-			@Override
-			public Repository open(HttpServletRequest req, String name)
-					throws RepositoryNotFoundException,
-					ServiceNotEnabledException {
-				if (!name.equals(srcName))
-					throw new RepositoryNotFoundException(name);
-
-				final Repository db = src.getRepository();
-				db.incrementOpen();
-				return db;
+		gs.setRepositoryResolver((HttpServletRequest req, String name) -> {
+			if (!name.equals(srcName)) {
+				throw new RepositoryNotFoundException(name);
 			}
+			final Repository db = src.getRepository();
+			db.incrementOpen();
+			return db;
 		});
 		gs.setReceivePackFactory(new DefaultReceivePackFactory() {
 			@Override
@@ -27,14 +22,11 @@
 					throws ServiceNotEnabledException,
 					ServiceNotAuthorizedException {
 				ReceivePack recv = super.create(req, db);
-				recv.setPreReceiveHook(new PreReceiveHook() {
-					@Override
-					public void onPreReceive(ReceivePack rp,
-							Collection<ReceiveCommand> commands) {
-						rp.sendMessage("message line 1");
-						rp.sendError("no soup for you!");
-						rp.sendMessage("come back next year!");
-					}
+				recv.setPreReceiveHook((ReceivePack rp,
+						Collection<ReceiveCommand> commands) -> {
+					rp.sendMessage("message line 1");
+					rp.sendError("no soup for you!");
+					rp.sendMessage("come back next year!");
 				});
 				return recv;
 			}

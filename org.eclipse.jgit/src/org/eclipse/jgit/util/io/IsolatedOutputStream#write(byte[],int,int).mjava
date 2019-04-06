@@ -3,12 +3,9 @@
 	public void write(byte[] buf, int pos, int cnt)
 			throws IOException {
 		checkClosed();
-		execute(new Callable<Void>() {
-			@Override
-			public Void call() throws IOException {
-				dst.write(buf, pos, cnt);
-				return null;
-			}
+		execute(() -> {
+			dst.write(buf, pos, cnt);
+			return null;
 		});
 	}
 

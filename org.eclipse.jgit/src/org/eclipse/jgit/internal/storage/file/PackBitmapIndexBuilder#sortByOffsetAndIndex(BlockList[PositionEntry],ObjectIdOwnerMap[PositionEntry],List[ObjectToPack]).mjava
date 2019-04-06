@@ -4,12 +4,8 @@
 		for (int i = 0; i < entries.size(); i++) {
 			positionEntries.add(new PositionEntry(entries.get(i), i));
 		}
-		Collections.sort(entries, new Comparator<ObjectToPack>() {
-			@Override
-			public int compare(ObjectToPack a, ObjectToPack b) {
-				return Long.signum(a.getOffset() - b.getOffset());
-			}
-		});
+		Collections.sort(entries, (ObjectToPack a, ObjectToPack b) -> Long
+				.signum(a.getOffset() - b.getOffset()));
 		for (int i = 0; i < entries.size(); i++) {
 			PositionEntry e = positionEntries.get(entries.get(i));
 			e.offsetPosition = i;

@@ -6,12 +6,8 @@
 				&& !"git upload-pack".equals(up)) //$NON-NLS-1$
 			return new ForkLocalFetchConnection();
 
-		UploadPackFactory<Void> upf = new UploadPackFactory<Void>() {
-			@Override
-			public UploadPack create(Void req, Repository db) {
-				return createUploadPack(db);
-			}
-		};
+		UploadPackFactory<Void> upf = (Void req,
+				Repository db) -> createUploadPack(db);
 		return new InternalFetchConnection<>(this, upf, null, openRepo());
 	}
 

@@ -8,18 +8,13 @@
 
 		ServletContextHandler app = server.addContext("/git");
 		GitServlet gs = new GitServlet();
-		gs.setRepositoryResolver(new RepositoryResolver<HttpServletRequest>() {
-			@Override
-			public Repository open(HttpServletRequest req, String name)
-					throws RepositoryNotFoundException,
-					ServiceNotEnabledException {
-				if (!name.equals(srcName))
-					throw new RepositoryNotFoundException(name);
-
-				final Repository db = src.getRepository();
-				db.incrementOpen();
-				return db;
+		gs.setRepositoryResolver((HttpServletRequest req, String name) -> {
+			if (!name.equals(srcName)) {
+				throw new RepositoryNotFoundException(name);
 			}
+			final Repository db = src.getRepository();
+			db.incrementOpen();
+			return db;
 		});
 		gs.setReceivePackFactory(new DefaultReceivePackFactory() {
 			@Override
@@ -27,13 +22,9 @@
 					throws ServiceNotEnabledException,
 					ServiceNotAuthorizedException {
 				ReceivePack recv = super.create(req, db);
-				recv.setPostReceiveHook(new PostReceiveHook() {
-
-					@Override
-					public void onPostReceive(ReceivePack rp,
-							Collection<ReceiveCommand> commands) {
-						packSize = rp.getPackSize();
-					}
+				recv.setPostReceiveHook((ReceivePack rp,
+						Collection<ReceiveCommand> commands) -> {
+					packSize = rp.getPackSize();
 				});
 				return recv;
 			}
