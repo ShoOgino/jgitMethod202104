@@ -1,0 +1,15 @@
+	private FileRepository newTestRepositoryWithOnePackfile() throws Exception {
+		FileRepository repository = createBareRepository();
+		TestRepository<FileRepository> testRepository = new TestRepository<FileRepository>(repository);
+		testRepository.commit();
+		testRepository.packAndPrune();
+
+		FileBasedConfig repoConfig = repository.getConfig();
+		repoConfig.setBoolean(ConfigConstants.CONFIG_CORE_SECTION,null,
+				ConfigConstants.CONFIG_KEY_TRUSTFOLDERSTAT,
+				trustFolderStats.booleanValue());
+		repoConfig.save();
+
+		return repository;
+	}
+

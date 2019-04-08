@@ -1,0 +1,13 @@
+	@Test
+	public void testShouldNotSearchPacksAgainTheSecondTime() throws Exception {
+		FileRepository bareRepository = newTestRepositoryWithOnePackfile();
+		ObjectDirectory dir = bareRepository.getObjectDatabase();
+
+		// Make sure that timestamps are modified and read so that a full
+		// file snapshot check is performed
+		Thread.sleep(3000L);
+
+		assertTrue(dir.searchPacksAgain(dir.packList.get()));
+		assertFalse(dir.searchPacksAgain(dir.packList.get()));
+	}
+
