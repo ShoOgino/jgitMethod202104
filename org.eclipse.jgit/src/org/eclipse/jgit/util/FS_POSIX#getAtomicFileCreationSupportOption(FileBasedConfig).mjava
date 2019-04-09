@@ -12,7 +12,8 @@
 					? AtomicFileCreation.SUPPORTED
 					: AtomicFileCreation.NOT_SUPPORTED;
 		} catch (IOException | ConfigInvalidException e) {
-			return AtomicFileCreation.SUPPORTED;
+			LOG.error(e.getMessage(), e);
+			return AtomicFileCreation.UNDEFINED;
 		}
 	}
 
