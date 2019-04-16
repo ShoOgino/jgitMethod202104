@@ -1,11 +1,9 @@
-	private KeyBox readKeyBoxFile(Path keyboxFile) throws IOException {
+	private KeyBox readKeyBoxFile(Path keyboxFile) throws IOException,
+			NoSuchAlgorithmException, NoSuchProviderException {
 		KeyBox keyBox;
 		try (InputStream in = new BufferedInputStream(
 				newInputStream(keyboxFile))) {
-			// note: KeyBox constructor reads in the whole InputStream at once
-			// this code will change in 1.61 to
-			// either 'new BcKeyBox(in)' or 'new JcaKeyBoxBuilder().build(in)'
-			keyBox = new KeyBox(in, new JcaKeyFingerprintCalculator());
+			keyBox = new JcaKeyBoxBuilder().build(in);
 		}
 		return keyBox;
 	}
