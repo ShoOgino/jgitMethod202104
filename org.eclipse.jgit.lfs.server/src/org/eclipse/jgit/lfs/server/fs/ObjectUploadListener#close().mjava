@@ -12,6 +12,9 @@
 			if (!response.isCommitted()) {
 				response.setStatus(HttpServletResponse.SC_OK);
 			}
+			if (callback != null) {
+				callback.uploadCompleted(path.toString(), uploaded);
+			}
 		} finally {
 			context.complete();
 		}
