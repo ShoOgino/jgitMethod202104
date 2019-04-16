@@ -1,6 +1,8 @@
 	private IOException packfileIsTruncated() {
 		invalid = true;
-		return new IOException(MessageFormat.format(
+		IOException exc = new IOException(MessageFormat.format(
 				JGitText.get().packfileIsTruncated, getPackName()));
+		invalidatingCause = exc;
+		return exc;
 	}
 
