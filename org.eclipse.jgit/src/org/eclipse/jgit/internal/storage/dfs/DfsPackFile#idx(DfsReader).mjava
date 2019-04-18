@@ -6,8 +6,9 @@
 				return idx;
 		}
 
-		if (invalid)
-			throw new PackInvalidException(getFileName());
+		if (invalid) {
+			throw new PackInvalidException(getFileName(), invalidatingCause);
+		}
 
 		Repository.getGlobalListenerList()
 				.dispatch(new BeforeDfsPackIndexLoadedEvent(this));
@@ -51,11 +52,13 @@
 				}
 			} catch (EOFException e) {
 				invalid = true;
+				invalidatingCause = e;
 				throw new IOException(MessageFormat.format(
 						DfsText.get().shortReadOfIndex,
 						desc.getFileName(INDEX)), e);
 			} catch (IOException e) {
 				invalid = true;
+				invalidatingCause = e;
 				throw new IOException(MessageFormat.format(
 						DfsText.get().cannotReadIndex,
 						desc.getFileName(INDEX)), e);
