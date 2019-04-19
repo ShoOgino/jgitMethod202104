@@ -1,6 +1,6 @@
 	private void doOpen() throws IOException {
 		if (invalid) {
-			throw new PackInvalidException(packFile);
+			throw new PackInvalidException(packFile, invalidatingCause);
 		}
 		try {
 			synchronized (readLock) {
@@ -10,13 +10,13 @@
 			}
 		} catch (InterruptedIOException e) {
 			// don't invalidate the pack, we are interrupted from another thread
-			openFail(false);
+			openFail(false, e);
 			throw e;
 		} catch (FileNotFoundException fn) {
 			// don't invalidate the pack if opening an existing file failed
 			// since it may be related to a temporary lack of resources (e.g.
 			// max open files)
-			openFail(!packFile.exists());
+			openFail(!packFile.exists(), fn);
 			throw fn;
 		} catch (EOFException | AccessDeniedException | NoSuchFileException
 				| CorruptObjectException | NoPackSignatureException
@@ -24,12 +24,12 @@
 				| UnsupportedPackIndexVersionException
 				| UnsupportedPackVersionException pe) {
 			// exceptions signaling permanent problems with a pack
-			openFail(true);
+			openFail(true, pe);
 			throw pe;
 		} catch (IOException | RuntimeException ge) {
 			// generic exceptions could be transient so we should not mark the
 			// pack invalid to avoid false MissingObjectExceptions
-			openFail(false);
+			openFail(false, ge);
 			throw ge;
 		}
 	}
