@@ -1,0 +1,15 @@
+	@Test
+	public void reachable_longChain() throws Exception {
+		RevCommit root = repo.commit().create();
+		RevCommit head = root;
+		for (int i = 0; i < 10000; i++) {
+			head = repo.commit(head);
+		}
+		repo.update("refs/heads/master", head);
+
+		ReachabilityChecker checker = getChecker(repo);
+
+		assertReachable("reachable with long chain in the middle", checker
+				.areAllReachable(Arrays.asList(root), Arrays.asList(head)));
+	}
+

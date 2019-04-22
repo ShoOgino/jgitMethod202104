@@ -1,0 +1,14 @@
+	@Test
+	public void unreachable_differentBranch() throws Exception {
+		RevCommit a = repo.commit().create();
+		RevCommit b1 = repo.commit(a);
+		RevCommit b2 = repo.commit(b1);
+		RevCommit c1 = repo.commit(a);
+		repo.update("refs/heads/checker", b2);
+
+		ReachabilityChecker checker = getChecker(repo);
+
+		assertUnreachable("unreachable from different branch",
+				checker.areAllReachable(Arrays.asList(c1), Arrays.asList(b2)));
+	}
+

@@ -1,0 +1,21 @@
+	@Override
+	public Optional<RevCommit> areAllReachable(Collection<RevCommit> targets,
+			Collection<RevCommit> starters)
+					throws MissingObjectException, IncorrectObjectTypeException,
+					IOException {
+		walk.reset();
+		if (topoSort) {
+			walk.sort(RevSort.TOPO);
+		}
+
+		for (RevCommit target: targets) {
+			walk.markStart(target);
+		}
+
+		for (RevCommit starter : starters) {
+			walk.markUninteresting(starter);
+		}
+
+		return Optional.ofNullable(walk.next());
+	}
+
