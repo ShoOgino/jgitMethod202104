@@ -8,12 +8,13 @@
 		while (in.isReady()) {
 			if (inChannel.read(buffer) > 0) {
 				buffer.flip();
-				channel.write(buffer);
+				uploaded += Integer.valueOf(channel.write(buffer)).longValue();
 				buffer.compact();
 			} else {
 				buffer.flip();
 				while (buffer.hasRemaining()) {
-					channel.write(buffer);
+					uploaded += Integer.valueOf(channel.write(buffer))
+							.longValue();
 				}
 				close();
 				return;

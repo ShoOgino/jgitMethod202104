@@ -4,7 +4,7 @@
 		}
 
 		if (invalid) {
-			throw new PackInvalidException(getFileName());
+			throw new PackInvalidException(getFileName(), invalidatingCause);
 		}
 
 		Repository.getGlobalListenerList()
@@ -63,6 +63,7 @@
 				return index;
 			} catch (IOException e) {
 				invalid = true;
+				invalidatingCause = e;
 				throw e;
 			}
 		}

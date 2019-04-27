@@ -7,18 +7,20 @@
 	 *             if starting ssh fails
 	 */
 	protected void setDone(boolean success) throws Exception {
-		Callable<Void> starter;
+		List<Callable<Void>> buffered;
 		Runnable unset = unregister.getAndSet(null);
 		if (unset != null) {
 			unset.run();
 		}
 		synchronized (lock) {
 			done = true;
-			starter = startSsh;
-			startSsh = null;
+			buffered = bufferedCommands;
+			bufferedCommands = null;
 		}
-		if (success && starter != null) {
-			starter.call();
+		if (success && buffered != null) {
+			for (Callable<Void> starter : buffered) {
+				starter.call();
+			}
 		}
 	}
 
