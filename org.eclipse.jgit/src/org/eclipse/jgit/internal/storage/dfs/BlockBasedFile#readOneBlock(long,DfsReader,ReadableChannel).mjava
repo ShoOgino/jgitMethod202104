@@ -1,7 +1,8 @@
 	DfsBlock readOneBlock(long pos, DfsReader ctx, ReadableChannel rc)
 			throws IOException {
-		if (invalid)
-			throw new PackInvalidException(getFileName());
+		if (invalid) {
+			throw new PackInvalidException(getFileName(), invalidatingCause);
+		}
 
 		ctx.stats.readBlock++;
 		long start = System.nanoTime();

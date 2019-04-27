@@ -113,9 +113,15 @@
 				if (dirCacheIterator != null) {
 					if (workingTreeIterator == null) {
 						// in index, not in workdir => missing
-						if (!isEntryGitLink(dirCacheIterator)
-								|| ignoreSubmoduleMode != IgnoreSubmoduleMode.ALL)
-							missing.add(treeWalk.getPathString());
+						boolean isGitLink = isEntryGitLink(dirCacheIterator);
+						if (!isGitLink
+								|| ignoreSubmoduleMode != IgnoreSubmoduleMode.ALL) {
+							String path = treeWalk.getPathString();
+							missing.add(path);
+							if (isGitLink) {
+								missingSubmodules.add(path);
+							}
+						}
 					} else {
 						if (workingTreeIterator.isModified(
 								dirCacheIterator.getDirCacheEntry(), true,
@@ -155,8 +161,8 @@
 							smw.getPath()), e);
 				}
 				try (Repository subRepo = smw.getRepository()) {
+					String subRepoPath = smw.getPath();
 					if (subRepo != null) {
-						String subRepoPath = smw.getPath();
 						ObjectId subHead = subRepo.resolve("HEAD"); //$NON-NLS-1$
 						if (subHead != null
 								&& !subHead.equals(smw.getObjectId())) {
@@ -183,6 +189,21 @@
 								}
 								modified.add(subRepoPath);
 								recordFileMode(subRepoPath, FileMode.GITLINK);
+							}
+						}
+					} else if (missingSubmodules.remove(subRepoPath)) {
+						// If the directory is there and empty but the submodule
+						// repository in .git/modules doesn't exist yet it isn't
+						// "missing".
+						File gitDir = new File(
+								new File(repository.getDirectory(),
+										Constants.MODULES),
+								subRepoPath);
+						if (!gitDir.isDirectory()) {
+							File dir = SubmoduleWalk.getSubmoduleDirectory(
+									repository, subRepoPath);
+							if (dir.isDirectory() && !hasFiles(dir)) {
+								missing.remove(subRepoPath);
 							}
 						}
 					}
