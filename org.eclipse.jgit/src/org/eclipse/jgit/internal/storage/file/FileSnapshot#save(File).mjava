@@ -12,6 +12,8 @@
 		long read = System.currentTimeMillis();
 		long modified;
 		long size;
+		Duration fsTimerResolution = FS
+				.getFsTimerResolution(path.toPath().getParent());
 		try {
 			BasicFileAttributes fileAttributes = FS.DETECTED.fileAttributes(path);
 			modified = fileAttributes.lastModifiedTime().toMillis();
@@ -20,6 +22,6 @@
 			modified = path.lastModified();
 			size = path.length();
 		}
-		return new FileSnapshot(read, modified, size);
+		return new FileSnapshot(read, modified, size, fsTimerResolution);
 	}
 

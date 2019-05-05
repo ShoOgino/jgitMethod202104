@@ -1,0 +1,9 @@
+	private FileSnapshot(long read, long modified, long size,
+			@NonNull Duration fsTimestampResolution) {
+		this.lastRead = read;
+		this.lastModified = modified;
+		this.fsTimestampResolution = fsTimestampResolution;
+		this.size = size;
+		this.cannotBeRacilyClean = notRacyClean(read);
+	}
+
