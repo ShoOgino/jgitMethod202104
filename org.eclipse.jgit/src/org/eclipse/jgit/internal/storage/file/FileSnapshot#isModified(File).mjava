@@ -8,14 +8,19 @@
 	public boolean isModified(File path) {
 		long currLastModified;
 		long currSize;
+		Object currFileKey;
 		try {
 			BasicFileAttributes fileAttributes = FS.DETECTED.fileAttributes(path);
 			currLastModified = fileAttributes.lastModifiedTime().toMillis();
 			currSize = fileAttributes.size();
+			currFileKey = getFileKey(fileAttributes);
 		} catch (IOException e) {
 			currLastModified = path.lastModified();
 			currSize = path.length();
+			currFileKey = MISSING_FILEKEY;
 		}
-		return (currSize != UNKNOWN_SIZE && currSize != size) || isModified(currLastModified);
+		return isSizeChanged(currSize)
+				|| isFileKeyChanged(currFileKey)
+				|| isModified(currLastModified);
 	}
 
