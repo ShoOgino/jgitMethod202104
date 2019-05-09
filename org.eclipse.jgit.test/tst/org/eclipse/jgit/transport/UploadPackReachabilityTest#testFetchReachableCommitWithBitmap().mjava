@@ -1,0 +1,19 @@
+	@Test
+	public void testFetchReachableCommitWithBitmap() throws Exception {
+		RevCommit commit = remote
+				.commit(remote.tree(remote.file("foo", remote.blob("foo"))));
+		remote.update("master", commit);
+		generateBitmaps(server);
+
+		testProtocol = generateReachableCommitUploadPackProtocol();
+		uri = testProtocol.register(ctx, server);
+
+		assertFalse(client.getObjectDatabase().has(commit.toObjectId()));
+
+		try (Transport tn = testProtocol.open(uri, client, "server")) {
+			tn.fetch(NullProgressMonitor.INSTANCE,
+					Collections.singletonList(new RefSpec(commit.name())));
+			assertTrue(client.getObjectDatabase().has(commit.toObjectId()));
+		}
+	}
+
