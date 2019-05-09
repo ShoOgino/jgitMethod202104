@@ -1,0 +1,13 @@
+	@Test
+	public void validateUnreachableCommitWithBitmaps()
+			throws PackProtocolException, IOException {
+		if (!isUnreachableCommitValid()) {
+			thrown.expect(TransportException.class);
+			thrown.expectMessage(Matchers.containsString(
+					"want " + unreachableCommit.name() + " not valid"));
+
+		}
+		createValidator().checkWants(getUploadPack(getRepoWithBitmaps()),
+				Arrays.asList(unreachableCommit));
+	}
+

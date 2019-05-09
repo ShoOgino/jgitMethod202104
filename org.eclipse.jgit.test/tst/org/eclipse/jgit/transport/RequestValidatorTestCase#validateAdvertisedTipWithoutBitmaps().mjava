@@ -1,0 +1,13 @@
+	@Test
+	public void validateAdvertisedTipWithoutBitmaps()
+			throws PackProtocolException, IOException {
+		if (!isAdvertisedTipValid()) {
+			thrown.expect(TransportException.class);
+			thrown.expectMessage(Matchers.containsString(
+					"want " + tipAdvertisedCommit.name() + " not valid"));
+
+		}
+		createValidator().checkWants(getUploadPack(getRepoWithoutBitmaps()),
+				Arrays.asList(tipAdvertisedCommit));
+	}
+

@@ -1,0 +1,12 @@
+	@Test
+	public void validateReachableBlobWithBitmaps()
+			throws PackProtocolException, IOException {
+		if (!isReachableBlobValid_withBitmaps()) {
+			thrown.expect(TransportException.class);
+			thrown.expectMessage(Matchers.containsString(
+					"want " + reachableBlob.name() + " not valid"));
+		}
+		createValidator().checkWants(getUploadPack(getRepoWithBitmaps()),
+				Arrays.asList(reachableBlob));
+	}
+

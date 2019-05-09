@@ -1,0 +1,20 @@
+	@Before
+	public void setUp() throws Exception {
+		repo = new InMemoryRepository(new DfsRepositoryDescription());
+		try (TestRepository<InMemoryRepository> git = new TestRepository<>(
+				repo)) {
+			reachableBlob = git.blob("foo");
+			reachableCommit = git
+					.commit(git.tree(git.file("foo", reachableBlob)));
+			tipAdvertisedCommit = git.commit(reachableCommit);
+			git.update("advertised", tipAdvertisedCommit);
+
+			tipUnadvertisedCommit = git.commit(reachableCommit);
+			git.update("unadvertised", tipUnadvertisedCommit);
+
+			unreachableBlob = git.blob("unreachableFoo");
+			unreachableCommit = git
+					.commit(git.tree(git.file("foo", unreachableBlob)));
+		}
+	}
+
