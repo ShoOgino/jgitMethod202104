@@ -28,12 +28,18 @@
 		if (!file.createNewFile()) {
 			return token(false, null);
 		}
-		if (supportsAtomicCreateNewFile() || !supportsUnixNLink) {
+		if (supportsAtomicCreateNewFile()) {
 			return token(true, null);
 		}
 		Path link = null;
 		Path path = file.toPath();
+		FileStore store = Files.getFileStore(path);
 		try {
+			Boolean canLink = CAN_HARD_LINK.computeIfAbsent(store,
+					s -> Boolean.TRUE);
+			if (canLink == Boolean.FALSE) {
+				return token(true, null);
+			}
 			link = Files.createLink(Paths.get(uniqueLinkPath(file)), path);
 			Integer nlink = (Integer) (Files.getAttribute(path,
 					"unix:nlink")); //$NON-NLS-1$
@@ -42,12 +48,12 @@
 						JGitText.get().failedAtomicFileCreation, path, nlink));
 				return token(false, link);
 			} else if (nlink.intValue() < 2) {
-				supportsUnixNLink = false;
+				CAN_HARD_LINK.put(store, Boolean.FALSE);
 			}
 			return token(true, link);
 		} catch (UnsupportedOperationException | IllegalArgumentException
-				| AccessDeniedException | SecurityException e) {
-			supportsUnixNLink = false;
+				| FileSystemException | SecurityException e) {
+			CAN_HARD_LINK.put(store, Boolean.FALSE);
 			return token(true, link);
 		}
 	}

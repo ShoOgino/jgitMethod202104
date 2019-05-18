@@ -24,12 +24,18 @@
 		if (!lock.createNewFile()) {
 			return false;
 		}
-		if (supportsAtomicCreateNewFile() || !supportsUnixNLink) {
+		if (supportsAtomicCreateNewFile()) {
 			return true;
 		}
 		Path lockPath = lock.toPath();
 		Path link = null;
+		FileStore store = Files.getFileStore(lockPath);
 		try {
+			Boolean canLink = CAN_HARD_LINK.computeIfAbsent(store,
+					s -> Boolean.TRUE);
+			if (canLink == Boolean.FALSE) {
+				return true;
+			}
 			link = Files.createLink(
 					Paths.get(lock.getAbsolutePath() + ".lnk"), //$NON-NLS-1$
 					lockPath);
@@ -41,11 +47,11 @@
 						nlink));
 				return false;
 			} else if (nlink < 2) {
-				supportsUnixNLink = false;
+				CAN_HARD_LINK.put(store, Boolean.FALSE);
 			}
 			return true;
 		} catch (UnsupportedOperationException | IllegalArgumentException e) {
-			supportsUnixNLink = false;
+			CAN_HARD_LINK.put(store, Boolean.FALSE);
 			return true;
 		} finally {
 			if (link != null) {
