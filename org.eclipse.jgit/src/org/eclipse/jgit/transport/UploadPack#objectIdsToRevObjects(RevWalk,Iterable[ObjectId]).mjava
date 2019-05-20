@@ -1,0 +1,12 @@
+	// Resolve the ObjectIds into RevObjects. Any missing object raises an
+	// exception
+	private static List<RevObject> objectIdsToRevObjects(RevWalk walk,
+			Iterable<ObjectId> objectIds)
+			throws MissingObjectException, IOException {
+		List<RevObject> result = new ArrayList<>();
+		for (ObjectId objectId : objectIds) {
+			result.add(walk.parseAny(objectId));
+		}
+		return result;
+	}
+
