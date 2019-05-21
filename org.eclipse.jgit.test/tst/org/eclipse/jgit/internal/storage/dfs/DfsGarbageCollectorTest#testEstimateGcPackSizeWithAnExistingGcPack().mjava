@@ -16,12 +16,16 @@
 		long inputPacksSize = 32;
 		for (DfsPackFile pack : odb.getPacks()) {
 			DfsPackDescription d = pack.getPackDescription();
-			if (d.getPackSource() == GC) {
+			switch (d.getPackSource()) {
+			case GC:
 				gcPackFound = true;
-			} else if (d.getPackSource() == INSERT) {
+				break;
+			case INSERT:
 				insertPackFound = true;
-			} else {
+				break;
+			default:
 				fail("unexpected " + d.getPackSource());
+				break;
 			}
 			inputPacksSize += d.getFileSize(PACK) - 32;
 		}

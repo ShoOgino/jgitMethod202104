@@ -1,11 +1,14 @@
 	void addChild(PlotCommit c) {
 		final int cnt = children.length;
-		if (cnt == 0)
+		switch (cnt) {
+		case 0:
 			children = new PlotCommit[] { c };
-		else if (cnt == 1) {
+			break;
+		case 1:
 			if (!c.getId().equals(children[0].getId()))
 				children = new PlotCommit[] { children[0], c };
-		} else {
+			break;
+		default:
 			for (PlotCommit pc : children)
 				if (c.getId().equals(pc.getId()))
 					return;
@@ -13,6 +16,7 @@
 			System.arraycopy(children, 0, n, 0, cnt);
 			n[cnt] = c;
 			children = n;
+			break;
 		}
 	}
 

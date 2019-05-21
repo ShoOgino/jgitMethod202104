@@ -20,17 +20,22 @@
 		long insertPackSize = 0;
 		for (DfsPackFile pack : odb.getPacks()) {
 			DfsPackDescription d = pack.getPackDescription();
-			if (d.getPackSource() == GC) {
+			switch (d.getPackSource()) {
+			case GC:
 				gcPackFound = true;
 				gcPackSize = d.getFileSize(PACK);
-			} else if (d.getPackSource() == GC_REST) {
+				break;
+			case GC_REST:
 				gcRestPackFound = true;
 				gcRestPackSize = d.getFileSize(PACK);
-			} else if (d.getPackSource() == INSERT) {
+				break;
+			case INSERT:
 				insertPackFound = true;
 				insertPackSize = d.getFileSize(PACK);
-			} else {
+				break;
+			default:
 				fail("unexpected " + d.getPackSource());
+				break;
 			}
 		}
 		assertTrue(gcPackFound);
@@ -48,16 +53,20 @@
 		gcRestPackFound = false;
 		for (DfsPackFile pack : odb.getPacks()) {
 			DfsPackDescription d = pack.getPackDescription();
-			if (d.getPackSource() == GC) {
+			switch (d.getPackSource()) {
+			case GC:
 				gcPackFound = true;
 				assertEquals(gcPackSize + insertPackSize - 32,
 						pack.getPackDescription().getEstimatedPackSize());
-			} else if (d.getPackSource() == GC_REST) {
+				break;
+			case GC_REST:
 				gcRestPackFound = true;
 				assertEquals(gcRestPackSize + insertPackSize - 32,
 						pack.getPackDescription().getEstimatedPackSize());
-			} else {
+				break;
+			default:
 				fail("unexpected " + d.getPackSource());
+				break;
 			}
 		}
 		assertTrue(gcPackFound);

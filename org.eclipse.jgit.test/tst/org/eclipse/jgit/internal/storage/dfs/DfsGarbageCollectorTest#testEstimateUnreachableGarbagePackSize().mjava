@@ -28,18 +28,22 @@
 		assertEquals(2, odb.getPacks().length);
 		for (DfsPackFile pack : odb.getPacks()) {
 			DfsPackDescription d = pack.getPackDescription();
-			if (d.getPackSource() == GC) {
+			switch (d.getPackSource()) {
+			case GC:
 				// Even though just commit0 will end up in GC pack, because
 				// there is no good way to know that up front, both the pack
 				// sizes are considered while computing the estimated size of GC
 				// pack.
 				assertEquals(packSize0 + packSize1 - 32,
 						d.getEstimatedPackSize());
-			} else if (d.getPackSource() == UNREACHABLE_GARBAGE) {
+				break;
+			case UNREACHABLE_GARBAGE:
 				// commit1 is moved to UNREACHABLE_GARBAGE pack.
 				assertEquals(packSize1, d.getEstimatedPackSize());
-			} else {
+				break;
+			default:
 				fail("unexpected " + d.getPackSource());
+				break;
 			}
 		}
 	}
