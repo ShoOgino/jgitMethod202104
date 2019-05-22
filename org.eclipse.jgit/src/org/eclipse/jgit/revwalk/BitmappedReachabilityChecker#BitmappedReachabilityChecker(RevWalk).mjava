@@ -1,0 +1,20 @@
+	/**
+	 * @param walk
+	 *            walk on the repository to get or create the bitmaps for the
+	 *            commits. It must have bitmaps.
+	 * @throws AssertionError
+	 *             runtime exception if walk is over a repository without
+	 *             bitmaps
+	 * @throws IOException
+	 *             if the index or the object reader cannot be opened.
+	 */
+	public BitmappedReachabilityChecker(RevWalk walk)
+			throws IOException {
+		this.walk = walk;
+		if (walk.getObjectReader().getBitmapIndex() == null) {
+			throw new AssertionError(
+					"Trying to use bitmapped reachability check " //$NON-NLS-1$
+							+ "on a repository without bitmaps"); //$NON-NLS-1$
+		}
+	}
+

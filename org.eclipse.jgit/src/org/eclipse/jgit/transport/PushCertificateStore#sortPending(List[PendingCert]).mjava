@@ -1,10 +1,5 @@
 	private static void sortPending(List<PendingCert> pending) {
-		Collections.sort(pending, new Comparator<PendingCert>() {
-			@Override
-			public int compare(PendingCert a, PendingCert b) {
-				return Long.signum(
-						a.ident.getWhen().getTime() - b.ident.getWhen().getTime());
-			}
-		});
+		Collections.sort(pending, (PendingCert a, PendingCert b) -> Long.signum(
+				a.ident.getWhen().getTime() - b.ident.getWhen().getTime()));
 	}
 

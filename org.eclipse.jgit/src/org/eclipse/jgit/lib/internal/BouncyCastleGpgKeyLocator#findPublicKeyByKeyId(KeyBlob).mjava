@@ -1,9 +1,10 @@
 	private PGPPublicKey findPublicKeyByKeyId(KeyBlob keyBlob)
 			throws IOException {
+		String keyId = signingKey.toLowerCase(Locale.ROOT);
 		for (KeyInformation keyInfo : keyBlob.getKeyInformation()) {
-			if (signingKey.toLowerCase(Locale.ROOT)
-					.equals(Hex.toHexString(keyInfo.getKeyID())
-							.toLowerCase(Locale.ROOT))) {
+			String fingerprint = Hex.toHexString(keyInfo.getFingerprint())
+					.toLowerCase(Locale.ROOT);
+			if (fingerprint.endsWith(keyId)) {
 				return getFirstPublicKey(keyBlob);
 			}
 		}

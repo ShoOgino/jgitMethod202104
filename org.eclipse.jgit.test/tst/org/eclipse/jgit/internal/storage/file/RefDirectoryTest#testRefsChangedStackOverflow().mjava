@@ -7,19 +7,15 @@
 		final AtomicReference<StackOverflowError> error = new AtomicReference<>();
 		final AtomicReference<IOException> exception = new AtomicReference<>();
 		final AtomicInteger changeCount = new AtomicInteger();
-		newRepo.getListenerList().addRefsChangedListener(
-				new RefsChangedListener() {
-
-					@Override
-					public void onRefsChanged(RefsChangedEvent event) {
-						try {
-							refDb.getRefsByPrefix("ref");
-							changeCount.incrementAndGet();
-						} catch (StackOverflowError soe) {
-							error.set(soe);
-						} catch (IOException ioe) {
-							exception.set(ioe);
-						}
+		newRepo.getListenerList()
+				.addRefsChangedListener((RefsChangedEvent event) -> {
+					try {
+						refDb.getRefsByPrefix("ref");
+						changeCount.incrementAndGet();
+					} catch (StackOverflowError soe) {
+						error.set(soe);
+					} catch (IOException ioe) {
+						exception.set(ioe);
 					}
 				});
 		refDb.getRefsByPrefix("ref");

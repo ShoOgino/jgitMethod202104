@@ -3,16 +3,12 @@
 		ObjectId master = remote.branch("master").commit().create();
 
 		final AtomicInteger rejected = new AtomicInteger();
-		TestProtocol<User> proto = registerProto(new UploadPackFactory<User>() {
-			@Override
-			public UploadPack create(User req, Repository db)
-					throws ServiceNotAuthorizedException {
-				if (!"user2".equals(req.name)) {
-					rejected.incrementAndGet();
-					throw new ServiceNotAuthorizedException();
-				}
-				return new UploadPack(db);
+		TestProtocol<User> proto = registerProto((User req, Repository db) -> {
+			if (!"user2".equals(req.name)) {
+				rejected.incrementAndGet();
+				throw new ServiceNotAuthorizedException();
 			}
+			return new UploadPack(db);
 		}, new DefaultReceive());
 
 		// Same repository, different users.

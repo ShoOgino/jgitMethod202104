@@ -1,0 +1,23 @@
+	@Test
+	public void reachable_merge() throws Exception {
+		RevCommit a = repo.commit().create();
+		RevCommit b1 = repo.commit(a);
+		RevCommit b2 = repo.commit(b1);
+		RevCommit c1 = repo.commit(a);
+		RevCommit c2 = repo.commit(c1);
+		RevCommit merge = repo.commit(c2, b2);
+		repo.update("refs/heads/checker", merge);
+
+		ReachabilityChecker checker = getChecker(repo);
+
+		assertReachable("reachable through one branch",
+				checker.areAllReachable(Arrays.asList(b1),
+						Arrays.asList(merge)));
+		assertReachable("reachable through another branch",
+				checker.areAllReachable(Arrays.asList(c1),
+						Arrays.asList(merge)));
+		assertReachable("reachable, before the branching",
+				checker.areAllReachable(Arrays.asList(a),
+						Arrays.asList(merge)));
+	}
+

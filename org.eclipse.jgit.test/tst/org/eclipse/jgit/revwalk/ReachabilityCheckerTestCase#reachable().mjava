@@ -1,0 +1,19 @@
+	@Test
+	public void reachable() throws Exception {
+		RevCommit a = repo.commit().create();
+		RevCommit b1 = repo.commit(a);
+		RevCommit b2 = repo.commit(b1);
+		RevCommit c1 = repo.commit(a);
+		RevCommit c2 = repo.commit(c1);
+		repo.update("refs/heads/checker", b2);
+
+		ReachabilityChecker checker = getChecker(repo);
+
+		assertReachable("reachable from one tip",
+				checker.areAllReachable(Arrays.asList(a), Arrays.asList(c2)));
+		assertReachable("reachable from another tip",
+				checker.areAllReachable(Arrays.asList(a), Arrays.asList(b2)));
+		assertReachable("reachable from itself",
+				checker.areAllReachable(Arrays.asList(a), Arrays.asList(b2)));
+	}
+

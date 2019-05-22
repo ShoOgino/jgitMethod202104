@@ -38,14 +38,11 @@
 			// asynchronous execution.  Wrap everything and hope it
 			// can schedule these for us.
 			for (DeltaTask task : taskBlock.tasks) {
-				executor.execute(new Runnable() {
-					@Override
-					public void run() {
-						try {
-							task.call();
-						} catch (Throwable failure) {
-							errors.add(failure);
-						}
+				executor.execute(() -> {
+					try {
+						task.call();
+					} catch (Throwable failure) {
+						errors.add(failure);
 					}
 				});
 			}

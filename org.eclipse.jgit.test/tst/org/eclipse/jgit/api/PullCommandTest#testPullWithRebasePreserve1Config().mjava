@@ -1,14 +1,11 @@
 	@Test
 	/** global rebase config should be respected */
 	public void testPullWithRebasePreserve1Config() throws Exception {
-		Callable<PullResult> setup = new Callable<PullResult>() {
-			@Override
-			public PullResult call() throws Exception {
-				StoredConfig config = dbTarget.getConfig();
-				config.setString("pull", null, "rebase", "preserve");
-				config.save();
-				return target.pull().call();
-			}
+		Callable<PullResult> setup = () -> {
+			StoredConfig config = dbTarget.getConfig();
+			config.setString("pull", null, "rebase", "preserve");
+			config.save();
+			return target.pull().call();
 		};
 		doTestPullWithRebase(setup, TestPullMode.REBASE_PREASERVE);
 	}

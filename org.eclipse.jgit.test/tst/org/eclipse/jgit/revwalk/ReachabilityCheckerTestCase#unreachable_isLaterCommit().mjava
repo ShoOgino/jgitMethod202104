@@ -1,0 +1,13 @@
+	@Test
+	public void unreachable_isLaterCommit() throws Exception {
+		RevCommit a = repo.commit().create();
+		RevCommit b1 = repo.commit(a);
+		RevCommit b2 = repo.commit(b1);
+		repo.update("refs/heads/checker", b2);
+
+		ReachabilityChecker checker = getChecker(repo);
+
+		assertUnreachable("unreachable from the future",
+				checker.areAllReachable(Arrays.asList(b2), Arrays.asList(b1)));
+	}
+

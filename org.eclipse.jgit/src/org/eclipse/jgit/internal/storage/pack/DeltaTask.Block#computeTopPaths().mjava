@@ -35,12 +35,8 @@
 			}
 
 			// Sort by starting index to identify gaps later.
-			Collections.sort(topPaths, new Comparator<WeightedPath>() {
-				@Override
-				public int compare(WeightedPath a, WeightedPath b) {
-					return a.slice.beginIndex - b.slice.beginIndex;
-				}
-			});
+			Collections.sort(topPaths, (WeightedPath a,
+					WeightedPath b) -> a.slice.beginIndex - b.slice.beginIndex);
 
 			bytesPerUnit = 1;
 			while (MAX_METER <= (totalWeight / bytesPerUnit)) {

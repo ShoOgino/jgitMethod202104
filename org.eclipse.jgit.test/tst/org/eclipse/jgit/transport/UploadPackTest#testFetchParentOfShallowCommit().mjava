@@ -5,20 +5,14 @@
 		RevCommit tip = remote.commit().message("2").parent(commit1).create();
 		remote.update("master", tip);
 
-		testProtocol = new TestProtocol<>(
-				new UploadPackFactory<Object>() {
-					@Override
-					public UploadPack create(Object req, Repository db)
-							throws ServiceNotEnabledException,
-							ServiceNotAuthorizedException {
-						UploadPack up = new UploadPack(db);
-						up.setRequestPolicy(RequestPolicy.REACHABLE_COMMIT);
-						// assume client has a shallow commit
-						up.getRevWalk().assumeShallow(
-								Collections.singleton(commit1.getId()));
-						return up;
-					}
-				}, null);
+		testProtocol = new TestProtocol<>((Object req, Repository db) -> {
+			UploadPack up = new UploadPack(db);
+			up.setRequestPolicy(RequestPolicy.REACHABLE_COMMIT);
+			// assume client has a shallow commit
+			up.getRevWalk()
+					.assumeShallow(Collections.singleton(commit1.getId()));
+			return up;
+		}, null);
 		uri = testProtocol.register(ctx, server);
 
 		assertFalse(client.getObjectDatabase().has(commit0.toObjectId()));

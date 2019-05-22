@@ -22,15 +22,11 @@
 		maxPackSize = 100;
 		// this PostReceiveHook when called after an unsuccesfull unpack will
 		// lead to an IllegalStateException
-		postHook = new PostReceiveHook() {
-			@Override
-			public void onPostReceive(ReceivePack rp,
-					Collection<ReceiveCommand> commands) {
-				// the maxPackSize setting caused that the packfile couldn't be
-				// saved to disk. Calling getPackSize() now will lead to a
-				// IllegalStateException.
-				rp.getPackSize();
-			}
+		postHook = (ReceivePack rp, Collection<ReceiveCommand> commands) -> {
+			// the maxPackSize setting caused that the packfile couldn't be
+			// saved to disk. Calling getPackSize() now will lead to a
+			// IllegalStateException.
+			rp.getPackSize();
 		};
 
 		try (Transport t = Transport.open(clientRepo, srvURI)) {

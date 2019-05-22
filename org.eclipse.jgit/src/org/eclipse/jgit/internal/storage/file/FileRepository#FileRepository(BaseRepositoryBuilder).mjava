@@ -37,12 +37,7 @@
 		loadUserConfig();
 		loadRepoConfig();
 
-		repoConfig.addChangeListener(new ConfigChangedListener() {
-			@Override
-			public void onConfigChanged(ConfigChangedEvent event) {
-				fireEvent(event);
-			}
-		});
+		repoConfig.addChangeListener(this::fireEvent);
 
 		final long repositoryFormatVersion = getConfig().getLong(
 				ConfigConstants.CONFIG_CORE_SECTION, null,

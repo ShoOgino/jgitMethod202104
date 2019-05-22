@@ -1,55 +1,56 @@
 	private static void checkNotAdvertisedWants(UploadPack up,
 			List<ObjectId> notAdvertisedWants, Set<ObjectId> reachableFrom)
-			throws MissingObjectException, IncorrectObjectTypeException, IOException {
-		// Walk the requested commits back to the provided set of commits. If any
-		// commit exists, a branch was deleted or rewound and the repository owner
-		// no longer exports that requested item. If the requested commit is merged
-		// into an advertised branch it will be marked UNINTERESTING and no commits
-		// return.
+			throws IOException {
 
 		ObjectReader reader = up.getRevWalk().getObjectReader();
 		try (RevWalk walk = new RevWalk(reader)) {
 			walk.setRetainBody(false);
-			AsyncRevObjectQueue q = walk.parseAny(notAdvertisedWants, true);
-			try {
-				RevObject obj;
-				while ((obj = q.next()) != null) {
-					if (!(obj instanceof RevCommit)) {
-						// If unadvertized non-commits are requested, use
-						// bitmaps. If there are no bitmaps, instead of
-						// incurring the expense of a manual walk, reject
-						// the request.
-						BitmapIndex bitmapIndex = reader.getBitmapIndex();
-						if (bitmapIndex != null) {
-							checkNotAdvertisedWantsUsingBitmap(
-									reader,
-									bitmapIndex,
-									notAdvertisedWants,
-									reachableFrom);
-							return;
-						}
-						throw new WantNotValidException(obj);
-					}
-					walk.markStart((RevCommit) obj);
+			// Missing "wants" throw exception here
+			List<RevObject> wantsAsObjs = objectIdsToRevObjects(walk,
+					notAdvertisedWants);
+			List<RevCommit> wantsAsCommits = wantsAsObjs.stream()
+					.filter(obj -> obj instanceof RevCommit)
+					.map(obj -> (RevCommit) obj)
+					.collect(Collectors.toList());
+			boolean allWantsAreCommits = wantsAsObjs.size() == wantsAsCommits
+					.size();
+			boolean repoHasBitmaps = reader.getBitmapIndex() != null;
+
+			if (!allWantsAreCommits) {
+				if (!repoHasBitmaps) {
+					// If unadvertized non-commits are requested, use
+					// bitmaps. If there are no bitmaps, instead of
+					// incurring the expense of a manual walk, reject
+					// the request.
+					RevObject nonCommit = wantsAsObjs
+							.stream()
+							.filter(obj -> !(obj instanceof RevCommit))
+							.limit(1)
+							.collect(Collectors.toList()).get(0);
+					throw new WantNotValidException(nonCommit);
+
 				}
-			} catch (MissingObjectException notFound) {
-				throw new WantNotValidException(notFound.getObjectId(),
-						notFound);
-			} finally {
-				q.release();
-			}
-			for (ObjectId id : reachableFrom) {
-				try {
-					walk.markUninteresting(walk.parseCommit(id));
-				} catch (IncorrectObjectTypeException notCommit) {
-					continue;
-				}
+				checkNotAdvertisedWantsUsingBitmap(reader,
+						reader.getBitmapIndex(), notAdvertisedWants,
+						reachableFrom);
+				return;
 			}
 
-			RevCommit bad = walk.next();
-			if (bad != null) {
-				throw new WantNotValidException(bad);
+			// All wants are commits, we can use ReachabilityChecker
+			ReachabilityChecker reachabilityChecker = repoHasBitmaps
+					? new BitmappedReachabilityChecker(walk)
+					: new PedestrianReachabilityChecker(true, walk);
+
+			List<RevCommit> starters = objectIdsToRevCommits(walk,
+					reachableFrom);
+			Optional<RevCommit> unreachable = reachabilityChecker
+					.areAllReachable(wantsAsCommits, starters);
+			if (unreachable.isPresent()) {
+				throw new WantNotValidException(unreachable.get());
 			}
+
+		} catch (MissingObjectException notFound) {
+			throw new WantNotValidException(notFound.getObjectId(), notFound);
 		}
 	}
 

@@ -2,13 +2,9 @@
 	@Override
 	protected void service(HttpServletRequest req, HttpServletResponse res)
 			throws ServletException, IOException {
-		filter.doFilter(req, res, new FilterChain() {
-			@Override
-			public void doFilter(ServletRequest request,
-					ServletResponse response) throws IOException,
-					ServletException {
-				((HttpServletResponse) response).sendError(SC_NOT_FOUND);
-			}
-		});
+		filter.doFilter(req, res,
+				(ServletRequest request, ServletResponse response) -> {
+					((HttpServletResponse) response).sendError(SC_NOT_FOUND);
+				});
 	}
 

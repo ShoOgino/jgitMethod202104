@@ -8,12 +8,9 @@
 
 		Future<Void> close;
 		try {
-			close = copier.submit(new Callable<Void>() {
-				@Override
-				public Void call() throws IOException {
-					dst.close();
-					return null;
-				}
+			close = copier.submit(() -> {
+				dst.close();
+				return null;
 			});
 		} catch (RejectedExecutionException e) {
 			throw new IOException(e);
