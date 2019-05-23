@@ -18,6 +18,17 @@
 
 			if (!allWantsAreCommits) {
 				if (!repoHasBitmaps) {
+					if (up.transferConfig.isAllowFilter()) {
+						// Use allowFilter as an indication that the server
+						// operator is willing to pay the cost of these
+						// reachability checks.
+						try (ObjectWalk objWalk = walk.toObjectWalkWithSameObjects()) {
+							checkReachabilityByWalkingObjects(objWalk,
+									wantsAsObjs, reachableFrom);
+						}
+						return;
+					}
+
 					// If unadvertized non-commits are requested, use
 					// bitmaps. If there are no bitmaps, instead of
 					// incurring the expense of a manual walk, reject
