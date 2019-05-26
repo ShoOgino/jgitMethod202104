@@ -12,6 +12,8 @@
 
 						if (packChecksum == null) {
 							packChecksum = idx.packChecksum;
+							fileSnapshot.setChecksum(
+									ObjectId.fromRaw(packChecksum));
 						} else if (!Arrays.equals(packChecksum,
 								idx.packChecksum)) {
 							throw new PackMismatchException(MessageFormat

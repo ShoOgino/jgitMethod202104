@@ -1,0 +1,27 @@
+	/**
+	 * Record a snapshot for a specific file path.
+	 * <p>
+	 * This method should be invoked before the file is accessed.
+	 *
+	 * @param path
+	 *            the path to later remember. The path's current status
+	 *            information is saved.
+	 */
+	protected FileSnapshot(File path) {
+		this.lastRead = System.currentTimeMillis();
+		this.fsTimestampResolution = FS
+				.getFsTimerResolution(path.toPath().getParent());
+		BasicFileAttributes fileAttributes = null;
+		try {
+			fileAttributes = FS.DETECTED.fileAttributes(path);
+		} catch (IOException e) {
+			this.lastModified = path.lastModified();
+			this.size = path.length();
+			this.fileKey = MISSING_FILEKEY;
+			return;
+		}
+		this.lastModified = fileAttributes.lastModifiedTime().toMillis();
+		this.size = fileAttributes.size();
+		this.fileKey = getFileKey(fileAttributes);
+	}
+

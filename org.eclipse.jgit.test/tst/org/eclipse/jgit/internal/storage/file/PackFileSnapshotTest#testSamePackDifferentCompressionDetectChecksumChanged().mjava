@@ -1,0 +1,35 @@
+	@Test
+	public void testSamePackDifferentCompressionDetectChecksumChanged()
+			throws Exception {
+		Git git = Git.wrap(db);
+		File f = writeTrashFile("file", "foobar ");
+		for (int i = 0; i < 10; i++) {
+			appendRandomLine(f);
+			git.add().addFilepattern("file").call();
+			git.commit().setMessage("message" + i).call();
+		}
+
+		FileBasedConfig c = db.getConfig();
+		c.setInt(ConfigConstants.CONFIG_GC_SECTION, null,
+				ConfigConstants.CONFIG_KEY_AUTOPACKLIMIT, 1);
+		c.save();
+		Collection<PackFile> packs = gc(Deflater.NO_COMPRESSION);
+		assertEquals("expected 1 packfile after gc", 1, packs.size());
+		PackFile p1 = packs.iterator().next();
+		PackFileSnapshot snapshot = p1.getFileSnapshot();
+
+		packs = gc(Deflater.BEST_COMPRESSION);
+		assertEquals("expected 1 packfile after gc", 1, packs.size());
+		PackFile p2 = packs.iterator().next();
+		File pf = p2.getPackFile();
+
+		// changing compression level with aggressive gc may change size,
+		// fileKey (on *nix) and checksum. Hence FileSnapshot.isModified can
+		// return true already based on size or fileKey.
+		// So the only thing we can test here is that we ensure that checksum
+		// also changed when we read it here in this test
+		assertTrue("expected snapshot to detect modified pack",
+				snapshot.isModified(pf));
+		assertTrue("expected checksum changed", snapshot.isChecksumChanged(pf));
+	}
+
