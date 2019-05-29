@@ -8,6 +8,7 @@
 	 */
 	@Test
 	public void testSimulatePackfileReplacement() throws Exception {
+		Assume.assumeFalse(SystemReader.getInstance().isWindows());
 		File f1 = createFile("file"); // inode y
 		File f2 = createFile("fool"); // Guarantees new inode x
 		// wait on f2 since this method resets lastModified of the file
