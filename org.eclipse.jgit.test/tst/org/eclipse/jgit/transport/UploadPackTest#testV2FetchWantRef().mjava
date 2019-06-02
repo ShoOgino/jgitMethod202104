@@ -23,7 +23,7 @@
 				hasItems(
 					one.toObjectId().getName() + " refs/heads/one",
 					two.toObjectId().getName() + " refs/heads/two"));
-		assertThat(pckIn.readString(), theInstance(PacketLineIn.DELIM));
+		assertTrue(PacketLineIn.isDelimiter(pckIn.readString()));
 		assertThat(pckIn.readString(), is("packfile"));
 		parsePack(recvStream);
 

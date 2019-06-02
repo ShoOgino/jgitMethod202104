@@ -24,11 +24,11 @@
 				serverOption -> reqBuilder.addServerOption(serverOption),
 				agent -> reqBuilder.setAgent(agent));
 
-		if (line == PacketLineIn.END) {
+		if (PacketLineIn.isEnd(line)) {
 			return reqBuilder.build();
 		}
 
-		if (line != PacketLineIn.DELIM) {
+		if (!PacketLineIn.isDelimiter(line)) {
 			throw new PackProtocolException(
 					MessageFormat.format(JGitText.get().unexpectedPacketLine,
 							line));

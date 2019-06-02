@@ -23,11 +23,11 @@
 				is("shallow " + one.toObjectId().getName()));
 		assertThat(pckIn.readString(),
 				is("unshallow " + two.toObjectId().getName()));
-		assertThat(pckIn.readString(), theInstance(PacketLineIn.DELIM));
+		assertTrue(PacketLineIn.isDelimiter(pckIn.readString()));
 		assertThat(pckIn.readString(), is("wanted-refs"));
 		assertThat(pckIn.readString(),
 				is(three.toObjectId().getName() + " refs/heads/three"));
-		assertThat(pckIn.readString(), theInstance(PacketLineIn.DELIM));
+		assertTrue(PacketLineIn.isDelimiter(pckIn.readString()));
 		assertThat(pckIn.readString(), is("packfile"));
 		parsePack(recvStream);
 

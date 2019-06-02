@@ -17,6 +17,6 @@
 		// sent only if a packfile is sent.
 		assertThat(pckIn.readString(), is("acknowledgments"));
 		assertThat(pckIn.readString(), is("NAK"));
-		assertThat(pckIn.readString(), theInstance(PacketLineIn.END));
+		assertTrue(PacketLineIn.isEnd(pckIn.readString()));
 	}
 

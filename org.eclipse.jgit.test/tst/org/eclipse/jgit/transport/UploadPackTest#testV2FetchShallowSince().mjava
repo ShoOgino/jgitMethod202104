@@ -34,7 +34,7 @@
 		// later than the given deepen-since time.
 		assertThat(pckIn.readString(), is("unshallow " + boundary.toObjectId().getName()));
 
-		assertThat(pckIn.readString(), theInstance(PacketLineIn.DELIM));
+		assertTrue(PacketLineIn.isDelimiter(pckIn.readString()));
 		assertThat(pckIn.readString(), is("packfile"));
 		parsePack(recvStream);
 

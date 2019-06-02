@@ -20,7 +20,7 @@
 				throw eof;
 			}
 
-			if (line == PacketLineIn.END) {
+			if (PacketLineIn.isEnd(line)) {
 				last = processHaveLines(peerHas, last, pckOut);
 				if (commonBase.isEmpty() || multiAck != MultiAck.OFF)
 					pckOut.writeString("NAK\n"); //$NON-NLS-1$
