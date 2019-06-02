@@ -33,16 +33,16 @@
 					.format(JGitText.get().unexpectedPacketLine, line));
 		}
 
-		while ((line = pckIn.readString()) != PacketLineIn.END) {
-			if (line.equals("peel")) { //$NON-NLS-1$
+		for (String line2 : pckIn.readStrings()) {
+			if (line2.equals("peel")) { //$NON-NLS-1$
 				builder.setPeel(true);
-			} else if (line.equals("symrefs")) { //$NON-NLS-1$
+			} else if (line2.equals("symrefs")) { //$NON-NLS-1$
 				builder.setSymrefs(true);
-			} else if (line.startsWith("ref-prefix ")) { //$NON-NLS-1$
-				prefixes.add(line.substring("ref-prefix ".length())); //$NON-NLS-1$
+			} else if (line2.startsWith("ref-prefix ")) { //$NON-NLS-1$
+				prefixes.add(line2.substring("ref-prefix ".length())); //$NON-NLS-1$
 			} else {
 				throw new PackProtocolException(MessageFormat
-						.format(JGitText.get().unexpectedPacketLine, line));
+						.format(JGitText.get().unexpectedPacketLine, line2));
 			}
 		}
 
