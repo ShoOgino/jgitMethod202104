@@ -11,7 +11,7 @@
 		// Without ofs-delta.
 		ByteArrayInputStream recvStream = uploadPackV2(
 			"command=fetch\n",
-			PacketLineIn.DELIM,
+			PacketLineIn.delimiter(),
 			"want " + child.toObjectId().getName() + "\n",
 			"done\n",
 			PacketLineIn.END);
@@ -23,7 +23,7 @@
 		// With ofs-delta.
 		recvStream = uploadPackV2(
 			"command=fetch\n",
-			PacketLineIn.DELIM,
+			PacketLineIn.delimiter(),
 			"want " + child.toObjectId().getName() + "\n",
 			"ofs-delta\n",
 			"done\n",

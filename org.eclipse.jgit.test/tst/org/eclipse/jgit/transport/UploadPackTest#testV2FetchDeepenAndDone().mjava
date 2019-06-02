@@ -7,7 +7,7 @@
 		// "deepen 1" sends only the child.
 		ByteArrayInputStream recvStream = uploadPackV2(
 			"command=fetch\n",
-			PacketLineIn.DELIM,
+			PacketLineIn.delimiter(),
 			"want " + child.toObjectId().getName() + "\n",
 			"deepen 1\n",
 			"done\n",
@@ -24,7 +24,7 @@
 		// Without that, the parent is sent too.
 		recvStream = uploadPackV2(
 			"command=fetch\n",
-			PacketLineIn.DELIM,
+			PacketLineIn.delimiter(),
 			"want " + child.toObjectId().getName() + "\n",
 			"done\n",
 			PacketLineIn.END);
