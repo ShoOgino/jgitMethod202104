@@ -6,7 +6,8 @@
 		RevTag tag = remote.tag("tag", tip);
 		remote.update("refs/tags/tag", tag);
 
-		ByteArrayInputStream recvStream = uploadPackV2("command=ls-refs\n", PacketLineIn.delimiter(), "peel", PacketLineIn.END);
+		ByteArrayInputStream recvStream = uploadPackV2("command=ls-refs\n",
+				PacketLineIn.delimiter(), "peel", PacketLineIn.end());
 		PacketLineIn pckIn = new PacketLineIn(recvStream);
 
 		assertThat(pckIn.readString(), is(tip.toObjectId().getName() + " HEAD"));

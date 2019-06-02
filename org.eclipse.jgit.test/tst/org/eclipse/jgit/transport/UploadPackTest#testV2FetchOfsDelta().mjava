@@ -14,7 +14,7 @@
 			PacketLineIn.delimiter(),
 			"want " + child.toObjectId().getName() + "\n",
 			"done\n",
-			PacketLineIn.END);
+				PacketLineIn.end());
 		PacketLineIn pckIn = new PacketLineIn(recvStream);
 		assertThat(pckIn.readString(), is("packfile"));
 		ReceivedPackStatistics receivedStats = parsePack(recvStream);
@@ -27,7 +27,7 @@
 			"want " + child.toObjectId().getName() + "\n",
 			"ofs-delta\n",
 			"done\n",
-			PacketLineIn.END);
+				PacketLineIn.end());
 		pckIn = new PacketLineIn(recvStream);
 		assertThat(pckIn.readString(), is("packfile"));
 		receivedStats = parsePack(recvStream);

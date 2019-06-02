@@ -10,7 +10,7 @@
 			PacketLineIn.delimiter(),
 			"want " + commit.toObjectId().getName() + "\n",
 			"done\n",
-			PacketLineIn.END);
+				PacketLineIn.end());
 		PacketLineIn pckIn = new PacketLineIn(recvStream);
 		assertThat(pckIn.readString(), is("packfile"));
 		parsePack(recvStream, new TextProgressMonitor(sw));
@@ -24,7 +24,7 @@
 			"want " + commit.toObjectId().getName() + "\n",
 			"no-progress\n",
 			"done\n",
-			PacketLineIn.END);
+				PacketLineIn.end());
 		pckIn = new PacketLineIn(recvStream);
 		assertThat(pckIn.readString(), is("packfile"));
 		parsePack(recvStream, new TextProgressMonitor(sw));

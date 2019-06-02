@@ -7,8 +7,9 @@
 		remote.update("refs/tags/tag", tag);
 
 		ByteArrayInputStream recvStream = uploadPackV2(
-			"command=ls-refs\n", PacketLineIn.delimiter(), "symrefs", "peel", PacketLineIn.END,
-			"command=ls-refs\n", PacketLineIn.delimiter(), PacketLineIn.END);
+				"command=ls-refs\n", PacketLineIn.delimiter(), "symrefs",
+				"peel", PacketLineIn.end(), "command=ls-refs\n",
+				PacketLineIn.delimiter(), PacketLineIn.end());
 		PacketLineIn pckIn = new PacketLineIn(recvStream);
 
 		assertThat(pckIn.readString(), is(tip.toObjectId().getName() + " HEAD symref-target:refs/heads/master"));

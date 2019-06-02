@@ -11,7 +11,7 @@
 			"want " + child.toObjectId().getName() + "\n",
 			"deepen 1\n",
 			"done\n",
-			PacketLineIn.END);
+				PacketLineIn.end());
 		PacketLineIn pckIn = new PacketLineIn(recvStream);
 		assertThat(pckIn.readString(), is("shallow-info"));
 		assertThat(pckIn.readString(), is("shallow " + child.toObjectId().getName()));
@@ -27,7 +27,7 @@
 			PacketLineIn.delimiter(),
 			"want " + child.toObjectId().getName() + "\n",
 			"done\n",
-			PacketLineIn.END);
+				PacketLineIn.end());
 		pckIn = new PacketLineIn(recvStream);
 		assertThat(pckIn.readString(), is("packfile"));
 		parsePack(recvStream);
