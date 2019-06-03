@@ -1,0 +1,17 @@
+	@Test
+	public void testDepthWalk() throws Exception {
+		RevCommit a = commit();
+		RevCommit b1 = commit(a);
+		RevCommit b2 = commit(a);
+		RevCommit c = commit(b1, b2);
+
+		try (DepthWalk.RevWalk dw = new DepthWalk.RevWalk(db, 1)) {
+			dw.setFirstParent(true);
+			dw.markRoot(dw.parseCommit(c));
+			dw.markStart(dw.parseCommit(c));
+			assertEquals(c, dw.next());
+			assertEquals(b1, dw.next());
+			assertNull(dw.next());
+		}
+	}
+

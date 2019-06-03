@@ -1,0 +1,23 @@
+	@Test
+	public void testReachableAlongFirstAndLaterParents() throws Exception {
+		RevCommit a = commit();
+		RevCommit b1 = commit(a);
+		RevCommit b2 = commit(a);
+		RevCommit b3 = commit(a);
+		RevCommit c = commit(b1, b2);
+		RevCommit d = commit(b2, b3);
+
+		rw.reset();
+		rw.setFirstParent(true);
+		markStart(c);
+		markStart(d);
+		assertCommit(d, rw.next());
+		assertCommit(c, rw.next());
+		// b3 is only reachable from c's second parent.
+		// b2 is reachable from c's second parent but d's first parent.
+		assertCommit(b2, rw.next());
+		assertCommit(b1, rw.next());
+		assertCommit(a, rw.next());
+		assertNull(rw.next());
+	}
+

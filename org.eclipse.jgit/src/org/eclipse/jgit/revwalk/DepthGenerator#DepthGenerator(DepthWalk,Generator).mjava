@@ -7,7 +7,8 @@
 	 */
 	DepthGenerator(DepthWalk w, Generator s) throws MissingObjectException,
 			IncorrectObjectTypeException, IOException {
-		pending = new FIFORevQueue();
+		super(s.firstParent);
+		pending = new FIFORevQueue(firstParent);
 		walk = (RevWalk)w;
 
 		this.depth = w.getDepth();

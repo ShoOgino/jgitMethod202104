@@ -1,0 +1,13 @@
+	/**
+	 * Throws an exception if any commits have been marked as start.
+	 * <p>
+	 * If {@link #markStart(RevCommit)} has already been called,
+	 * {@link #reset()} can be called to satisfy this condition.
+	 */
+	protected void assertNoCommitsMarkedStart() {
+		if (roots.isEmpty())
+			return;
+		throw new IllegalStateException(
+				JGitText.get().commitsHaveAlreadyBeenMarkedAsStart);
+	}
+

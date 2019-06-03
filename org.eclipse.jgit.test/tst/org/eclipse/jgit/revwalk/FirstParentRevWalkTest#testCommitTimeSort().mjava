@@ -1,0 +1,17 @@
+	@Test
+	public void testCommitTimeSort() throws Exception {
+		RevCommit a = commit();
+		RevCommit b1 = commit(a);
+		RevCommit b2 = commit(a);
+		RevCommit c = commit(b1, b2);
+
+		rw.reset();
+		rw.sort(RevSort.COMMIT_TIME_DESC);
+		rw.setFirstParent(true);
+		markStart(c);
+		assertCommit(c, rw.next());
+		assertCommit(b1, rw.next());
+		assertCommit(a, rw.next());
+		assertNull(rw.next());
+	}
+

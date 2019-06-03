@@ -1,0 +1,15 @@
+	@Test
+	public void testSecondParentAncestorOfFirstParent() throws Exception {
+		RevCommit a = commit();
+		RevCommit b = commit(a);
+		RevCommit c = commit(b, a);
+
+		rw.reset();
+		rw.setFirstParent(true);
+		markStart(c);
+		assertCommit(c, rw.next());
+		assertCommit(b, rw.next());
+		assertCommit(a, rw.next());
+		assertNull(rw.next());
+	}
+

@@ -1,6 +1,7 @@
 		InitialGenerator(RevWalk w, Generator s) {
+			super(s.firstParent);
 			walk = w;
-			held = new FIFORevQueue();
+			held = new FIFORevQueue(firstParent);
 			source = s;
 			source.shareFreeList(held);
 		}

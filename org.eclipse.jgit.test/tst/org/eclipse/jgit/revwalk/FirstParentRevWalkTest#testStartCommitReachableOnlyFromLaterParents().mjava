@@ -1,0 +1,21 @@
+	@Test
+	public void testStartCommitReachableOnlyFromLaterParents()
+			throws Exception {
+		RevCommit a = commit();
+		RevCommit b1 = commit(a);
+		RevCommit b2 = commit(a);
+		RevCommit c = commit(b1, b2);
+
+		rw.reset();
+		rw.setFirstParent(true);
+		markStart(c);
+		markStart(b2);
+		assertCommit(c, rw.next());
+		// b2 is only reachable from second parent, but is itself a start
+		// commit.
+		assertCommit(b2, rw.next());
+		assertCommit(b1, rw.next());
+		assertCommit(a, rw.next());
+		assertNull(rw.next());
+	}
+

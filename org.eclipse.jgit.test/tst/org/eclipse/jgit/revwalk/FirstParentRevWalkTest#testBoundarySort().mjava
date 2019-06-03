@@ -1,0 +1,20 @@
+	@Test
+	public void testBoundarySort() throws Exception {
+		RevCommit a = commit();
+		RevCommit b = commit(a);
+		RevCommit c1 = commit(b);
+		RevCommit c2 = commit(b);
+		RevCommit d = commit(c1, c2);
+
+		rw.reset();
+		rw.sort(RevSort.BOUNDARY);
+		rw.setFirstParent(true);
+		markStart(d);
+		markUninteresting(a);
+		assertCommit(d, rw.next());
+		assertCommit(c1, rw.next());
+		assertCommit(b, rw.next());
+		assertCommit(a, rw.next());
+		assertNull(rw.next());
+	}
+

@@ -1,0 +1,15 @@
+	@Test
+	public void testRevFilter() throws Exception {
+		RevCommit a = commit();
+		RevCommit b1 = commitBuilder().parent(a).message("commit b1").create();
+		RevCommit b2 = commitBuilder().parent(a).message("commit b2").create();
+		RevCommit c = commit(b1, b2);
+
+		rw.reset();
+		rw.setFirstParent(true);
+		rw.setRevFilter(MessageRevFilter.create("commit b"));
+		rw.markStart(c);
+		assertCommit(b1, rw.next());
+		assertNull(rw.next());
+	}
+

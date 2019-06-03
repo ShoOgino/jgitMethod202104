@@ -3,7 +3,8 @@
 	 * <p>
 	 * Unlike {@link #dispose()} previously acquired RevObject (and RevCommit)
 	 * instances are not invalidated. RevFlag instances are not invalidated, but
-	 * are removed from all RevObjects.
+	 * are removed from all RevObjects. The value of {@code firstParent} is
+	 * retained.
 	 *
 	 * @param retainFlags
 	 *            application flags that should <b>not</b> be cleared from
@@ -39,7 +40,7 @@
 		}
 
 		roots.clear();
-		queue = new DateRevQueue();
+		queue = new DateRevQueue(firstParent);
 		pending = new StartGenerator(this);
 	}
 

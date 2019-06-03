@@ -1,0 +1,15 @@
+	@Test
+	public void testFirstParentMarkedUninteresting() throws Exception {
+		RevCommit a = commit();
+		RevCommit b1 = commit(a);
+		RevCommit b2 = commit(a);
+		RevCommit c = commit(b1, b2);
+
+		rw.reset();
+		rw.setFirstParent(true);
+		markStart(c);
+		markUninteresting(b1);
+		assertCommit(c, rw.next());
+		assertNull(rw.next());
+	}
+

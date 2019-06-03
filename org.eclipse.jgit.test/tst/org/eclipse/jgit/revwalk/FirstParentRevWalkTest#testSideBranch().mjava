@@ -1,0 +1,19 @@
+	@Test
+	public void testSideBranch() throws Exception {
+		RevCommit a = commit();
+		RevCommit b1 = commit(a);
+		RevCommit b2 = commit(a);
+		RevCommit c1 = commit(b1);
+		RevCommit c2 = commit(b2);
+		RevCommit d = commit(c1, c2);
+
+		rw.reset();
+		rw.setFirstParent(true);
+		markStart(d);
+		assertCommit(d, rw.next());
+		assertCommit(c1, rw.next());
+		assertCommit(b1, rw.next());
+		assertCommit(a, rw.next());
+		assertNull(rw.next());
+	}
+

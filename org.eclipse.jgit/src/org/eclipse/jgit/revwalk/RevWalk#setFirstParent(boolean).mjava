@@ -1,0 +1,19 @@
+	/**
+	 * Set whether or not only first parent links should be followed.
+	 * <p>
+	 * If set, second- and higher-parent links are not traversed at all.
+	 * <p>
+	 * This must be called prior to {@link #markStart(RevCommit)}.
+	 *
+	 * @param enable
+	 *            true to walk only first-parent links.
+	 * @since 5.4
+	 */
+	public void setFirstParent(boolean enable) {
+		assertNotStarted();
+		assertNoCommitsMarkedStart();
+		firstParent = enable;
+		queue = new DateRevQueue(firstParent);
+		pending = new StartGenerator(this);
+	}
+

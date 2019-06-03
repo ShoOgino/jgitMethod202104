@@ -13,15 +13,21 @@
 	 */
 	TopoSortGenerator(Generator s) throws MissingObjectException,
 			IncorrectObjectTypeException, IOException {
-		pending = new FIFORevQueue();
+		super(s.firstParent);
+		pending = new FIFORevQueue(firstParent);
 		outputType = s.outputType() | SORT_TOPO;
 		s.shareFreeList(pending);
 		for (;;) {
 			final RevCommit c = s.next();
-			if (c == null)
+			if (c == null) {
 				break;
-			for (RevCommit p : c.parents)
-				p.inDegree++;
+			}
+			for (int i = 0; i < c.parents.length; i++) {
+				if (firstParent && i > 0) {
+					break;
+				}
+				c.parents[i].inDegree++;
+			}
 			pending.add(c);
 		}
 	}
