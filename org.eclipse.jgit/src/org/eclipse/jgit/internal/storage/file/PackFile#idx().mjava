@@ -8,7 +8,17 @@
 						throw new PackInvalidException(packFile, invalidatingCause);
 					}
 					try {
+						long start = System.currentTimeMillis();
 						idx = PackIndex.open(extFile(INDEX));
+						if (LOG.isDebugEnabled()) {
+							LOG.debug(String.format(
+									"Opening pack index %s, size %.3f MB took %d ms", //$NON-NLS-1$
+									extFile(INDEX).getAbsolutePath(),
+									Float.valueOf(extFile(INDEX).length()
+											/ (1024f * 1024)),
+									Long.valueOf(System.currentTimeMillis()
+											- start)));
+						}
 
 						if (packChecksum == null) {
 							packChecksum = idx.packChecksum;
