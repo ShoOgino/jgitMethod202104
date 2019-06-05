@@ -1,0 +1,13 @@
+	/** {@inheritDoc} */
+	@Override
+	public boolean isModified(File packFile) {
+		if (!super.isModified(packFile)) {
+			return false;
+		}
+		if (wasSizeChanged() || wasFileKeyChanged()
+				|| !wasLastModifiedRacilyClean()) {
+			return true;
+		}
+		return isChecksumChanged(packFile);
+	}
+

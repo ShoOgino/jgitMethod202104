@@ -1,0 +1,20 @@
+	private ObjectId createTestRepo(int testDataSeed, int testDataLength)
+			throws IOException, GitAPIException, NoFilepatternException,
+			NoHeadException, NoMessageException, UnmergedPathsException,
+			ConcurrentRefUpdateException, WrongRepositoryStateException,
+			AbortedByHookException {
+		// Create a repo with two commits and one file. Each commit adds
+		// testDataLength number of bytes. Data are random bytes. Since the
+		// seed for the random number generator is specified we will get
+		// the same set of bytes for every run and for every platform
+		Random r = new Random(testDataSeed);
+		Git git = Git.wrap(db);
+		File f = writeTrashFile("file", "foobar ");
+		appendRandomLine(f, testDataLength, r);
+		git.add().addFilepattern("file").call();
+		git.commit().setMessage("message1").call();
+		appendRandomLine(f, testDataLength, r);
+		git.add().addFilepattern("file").call();
+		return git.commit().setMessage("message2").call().getId();
+	}
+

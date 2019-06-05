@@ -3,6 +3,11 @@
 	 * already known.
 	 * <p>
 	 * This method should be invoked before the file is accessed.
+	 * <p>
+	 * Note that this method cannot rely on measuring file timestamp resolution
+	 * to avoid racy git issues caused by finite file timestamp resolution since
+	 * it's unknown in which filesystem the file is located. Hence the worst
+	 * case fallback for timestamp resolution is used.
 	 *
 	 * @param modified
 	 *            the last modification time of the file
@@ -10,6 +15,7 @@
 	 */
 	public static FileSnapshot save(long modified) {
 		final long read = System.currentTimeMillis();
-		return new FileSnapshot(read, modified, -1);
+		return new FileSnapshot(read, modified, -1, Duration.ZERO,
+				MISSING_FILEKEY);
 	}
 
