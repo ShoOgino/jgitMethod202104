@@ -1,0 +1,54 @@
+	// Try repacking so fast that you get two new packs which differ only in
+	// content/chksum but have same name, size and lastmodified.
+	// Since this is done with standard gc (which creates new tmp files and
+	// renames them) the filekeys of the new packfiles differ helping jgit
+	// to detect the fast modification
+	@Test
+	public void testDetectModificationAlthoughSameSizeAndModificationtime()
+			throws Exception {
+		int testDataSeed = 1;
+		int testDataLength = 100;
+		FileBasedConfig config = db.getConfig();
+		// don't use mtime of the parent folder to detect pack file
+		// modification.
+		config.setBoolean(ConfigConstants.CONFIG_CORE_SECTION, null,
+				ConfigConstants.CONFIG_KEY_TRUSTFOLDERSTAT, false);
+		config.save();
+
+		createTestRepo(testDataSeed, testDataLength);
+
+		// repack to create initial packfile
+		PackFile pf = repackAndCheck(5, null, null, null);
+		Path packFilePath = pf.getPackFile().toPath();
+		AnyObjectId chk1 = pf.getPackChecksum();
+		String name = pf.getPackName();
+		Long length = Long.valueOf(pf.getPackFile().length());
+		long m1 = packFilePath.toFile().lastModified();
+
+		// Wait for a filesystem timer tick to enhance probability the rest of
+		// this test is done before the filesystem timer ticks again.
+		fsTick(packFilePath.toFile());
+
+		// Repack to create packfile with same name, length. Lastmodified and
+		// content and checksum are different since compression level differs
+		AnyObjectId chk2 = repackAndCheck(6, name, length, chk1)
+				.getPackChecksum();
+		long m2 = packFilePath.toFile().lastModified();
+		assumeFalse(m2 == m1);
+
+		// Repack to create packfile with same name, length. Lastmodified is
+		// equal to the previous one because we are in the same filesystem timer
+		// slot. Content and its checksum are different
+		AnyObjectId chk3 = repackAndCheck(7, name, length, chk2)
+				.getPackChecksum();
+		long m3 = packFilePath.toFile().lastModified();
+
+		// ask for an unknown git object to force jgit to rescan the list of
+		// available packs. If we would ask for a known objectid then JGit would
+		// skip searching for new/modified packfiles
+		db.getObjectDatabase().has(unknownID);
+		assertEquals(chk3, getSinglePack(db.getObjectDatabase().getPacks())
+				.getPackChecksum());
+		assumeTrue(m3 == m2);
+	}
+

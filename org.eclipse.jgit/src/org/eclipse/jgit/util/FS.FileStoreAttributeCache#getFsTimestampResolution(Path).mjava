@@ -1,0 +1,25 @@
+		static Duration getFsTimestampResolution(Path file) {
+			try {
+				Path dir = Files.isDirectory(file) ? file : file.getParent();
+				if (!dir.toFile().canWrite()) {
+					// can not determine FileStore of an unborn directory or in
+					// a read-only directory
+					return FALLBACK_TIMESTAMP_RESOLUTION;
+				}
+				FileStore s = Files.getFileStore(dir);
+				FileStoreAttributeCache c = attributeCache.get(s);
+				if (c == null) {
+					c = new FileStoreAttributeCache(dir);
+					attributeCache.put(s, c);
+					if (LOG.isDebugEnabled()) {
+						LOG.debug(c.toString());
+					}
+				}
+				return c.getFsTimestampResolution();
+
+			} catch (IOException | InterruptedException e) {
+				LOG.warn(e.getMessage(), e);
+				return FALLBACK_TIMESTAMP_RESOLUTION;
+			}
+		}
+
