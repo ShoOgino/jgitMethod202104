@@ -1,0 +1,18 @@
+	/**
+	 * Get whether we wait before opening a newly written pack to prevent its
+	 * lastModified timestamp could be racy. Returns {@code true} if
+	 * {@code waitToPreventRacyPack = true} and
+	 * {@code packSize > minSizePreventRacyPack}, {@code false} otherwise.
+	 *
+	 * @param packSize
+	 *            size of the pack file
+	 *
+	 * @return whether we wait before opening a newly written pack to prevent
+	 *         its lastModified timestamp could be racy
+	 * @since 5.1.8
+	 */
+	public boolean doWaitPreventRacyPack(long packSize) {
+		return isWaitPreventRacyPack()
+				&& packSize > getMinSizePreventRacyPack();
+	}
+

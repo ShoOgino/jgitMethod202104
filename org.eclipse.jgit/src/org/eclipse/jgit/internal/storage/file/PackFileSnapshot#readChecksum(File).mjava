@@ -1,0 +1,11 @@
+	private AnyObjectId readChecksum(File packFile) {
+		try (RandomAccessFile fd = new RandomAccessFile(packFile, "r")) { //$NON-NLS-1$
+			fd.seek(fd.length() - 20);
+			final byte[] buf = new byte[20];
+			fd.readFully(buf, 0, 20);
+			return ObjectId.fromRaw(buf);
+		} catch (IOException e) {
+			return MISSING_CHECKSUM;
+		}
+	}
+

@@ -1,28 +1,27 @@
 	private boolean isModified(long currLastModified) {
 		// Any difference indicates the path was modified.
-		//
-		if (lastModified != currLastModified)
+
+		lastModifiedChanged = lastModified != currLastModified;
+		if (lastModifiedChanged) {
 			return true;
+		}
 
 		// We have already determined the last read was far enough
 		// after the last modification that any new modifications
 		// are certain to change the last modified time.
-		//
-		if (cannotBeRacilyClean)
+		if (cannotBeRacilyClean) {
 			return false;
-
-		if (notRacyClean(lastRead)) {
+		}
+		if (!isRacyClean(lastRead)) {
 			// Our last read should have marked cannotBeRacilyClean,
 			// but this thread may not have seen the change. The read
 			// of the volatile field lastRead should have fixed that.
-			//
 			return false;
 		}
 
 		// We last read this path too close to its last observed
 		// modification time. We may have missed a modification.
 		// Scan again, to ensure we still see the same state.
-		//
 		return true;
 	}
 
