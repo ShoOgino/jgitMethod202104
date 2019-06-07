@@ -5,7 +5,7 @@
 		StatusCommand command = git.status();
 		Status status = command.call();
 		Set<String> files = status.getUntracked();
-		assertTrue(files.size() > 0);
+		assertFalse(files.isEmpty());
 
 		// run clean
 		Set<String> cleanedFiles = git.clean().setDryRun(true).call();
