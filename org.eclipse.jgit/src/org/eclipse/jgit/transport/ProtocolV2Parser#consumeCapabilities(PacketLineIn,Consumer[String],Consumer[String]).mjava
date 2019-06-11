@@ -12,7 +12,7 @@
 		String agentPrefix = OPTION_AGENT + '=';
 
 		String line = pckIn.readString();
-		while (line != PacketLineIn.DELIM && line != PacketLineIn.END) {
+		while (!PacketLineIn.isDelimiter(line) && !PacketLineIn.isEnd(line)) {
 			if (line.startsWith(serverOptionPrefix)) {
 				serverOptionConsumer
 						.accept(line.substring(serverOptionPrefix.length()));

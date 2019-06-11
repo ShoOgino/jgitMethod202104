@@ -10,12 +10,13 @@
 				| InternalError e) {
 			supportSymlinks = Boolean.FALSE;
 		} finally {
-			if (tempFile != null)
+			if (tempFile != null) {
 				try {
 					FileUtils.delete(tempFile);
 				} catch (IOException e) {
 					throw new RuntimeException(e); // panic
 				}
+			}
 		}
 	}
 

@@ -7,8 +7,9 @@
 		remote.update("refs/tags/tag", tag);
 
 		ByteArrayInputStream recvStream = uploadPackV2(
-			"command=ls-refs\n", PacketLineIn.DELIM, "symrefs", "peel", PacketLineIn.END,
-			"command=ls-refs\n", PacketLineIn.DELIM, PacketLineIn.END);
+				"command=ls-refs\n", PacketLineIn.delimiter(), "symrefs",
+				"peel", PacketLineIn.end(), "command=ls-refs\n",
+				PacketLineIn.delimiter(), PacketLineIn.end());
 		PacketLineIn pckIn = new PacketLineIn(recvStream);
 
 		assertThat(pckIn.readString(), is(tip.toObjectId().getName() + " HEAD symref-target:refs/heads/master"));
@@ -17,10 +18,10 @@
 			pckIn.readString(),
 			is(tag.toObjectId().getName() + " refs/tags/tag peeled:"
 				+ tip.toObjectId().getName()));
-		assertTrue(pckIn.readString() == PacketLineIn.END);
+		assertTrue(PacketLineIn.isEnd(pckIn.readString()));
 		assertThat(pckIn.readString(), is(tip.toObjectId().getName() + " HEAD"));
 		assertThat(pckIn.readString(), is(tip.toObjectId().getName() + " refs/heads/master"));
 		assertThat(pckIn.readString(), is(tag.toObjectId().getName() + " refs/tags/tag"));
-		assertTrue(pckIn.readString() == PacketLineIn.END);
+		assertTrue(PacketLineIn.isEnd(pckIn.readString()));
 	}
 

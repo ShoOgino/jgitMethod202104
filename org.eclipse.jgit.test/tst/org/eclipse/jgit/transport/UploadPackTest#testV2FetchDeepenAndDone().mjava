@@ -7,15 +7,15 @@
 		// "deepen 1" sends only the child.
 		ByteArrayInputStream recvStream = uploadPackV2(
 			"command=fetch\n",
-			PacketLineIn.DELIM,
+			PacketLineIn.delimiter(),
 			"want " + child.toObjectId().getName() + "\n",
 			"deepen 1\n",
 			"done\n",
-			PacketLineIn.END);
+				PacketLineIn.end());
 		PacketLineIn pckIn = new PacketLineIn(recvStream);
 		assertThat(pckIn.readString(), is("shallow-info"));
 		assertThat(pckIn.readString(), is("shallow " + child.toObjectId().getName()));
-		assertThat(pckIn.readString(), theInstance(PacketLineIn.DELIM));
+		assertTrue(PacketLineIn.isDelimiter(pckIn.readString()));
 		assertThat(pckIn.readString(), is("packfile"));
 		parsePack(recvStream);
 		assertTrue(client.getObjectDatabase().has(child.toObjectId()));
@@ -24,10 +24,10 @@
 		// Without that, the parent is sent too.
 		recvStream = uploadPackV2(
 			"command=fetch\n",
-			PacketLineIn.DELIM,
+			PacketLineIn.delimiter(),
 			"want " + child.toObjectId().getName() + "\n",
 			"done\n",
-			PacketLineIn.END);
+				PacketLineIn.end());
 		pckIn = new PacketLineIn(recvStream);
 		assertThat(pckIn.readString(), is("packfile"));
 		parsePack(recvStream);

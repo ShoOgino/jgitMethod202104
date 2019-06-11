@@ -11,7 +11,7 @@
 		PacketLineIn pckIn = new PacketLineIn(recvStream);
 
 		// drain capabilities
-		while (pckIn.readString() != PacketLineIn.END) {
+		while (!PacketLineIn.isEnd(pckIn.readString())) {
 			// do nothing
 		}
 		return recvStream;

@@ -6,9 +6,12 @@
 	 * @return publicKey the public key (maybe <code>null</code>)
 	 * @throws IOException
 	 *             in case of problems reading the file
+	 * @throws NoSuchAlgorithmException
+	 * @throws NoSuchProviderException
 	 */
 	private PGPPublicKey findPublicKeyInKeyBox(Path keyboxFile)
-			throws IOException {
+			throws IOException, NoSuchAlgorithmException,
+			NoSuchProviderException {
 		KeyBox keyBox = readKeyBoxFile(keyboxFile);
 		for (KeyBlob keyBlob : keyBox.getKeyBlobs()) {
 			if (keyBlob.getType() == BlobType.OPEN_PGP_BLOB) {

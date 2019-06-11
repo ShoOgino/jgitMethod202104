@@ -1,0 +1,16 @@
+	/**
+	 * @param path
+	 *            the path of the cookie file to retrieve
+	 * @return the cache entry belonging to the requested file
+	 */
+	public NetscapeCookieFile getEntry(Path path) {
+		if (!cookieFileMap.containsKey(path)) {
+			synchronized (NetscapeCookieFileCache.class) {
+				if (!cookieFileMap.containsKey(path)) {
+					cookieFileMap.put(path, new NetscapeCookieFile(path));
+				}
+			}
+		}
+		return cookieFileMap.get(path);
+	}
+

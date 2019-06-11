@@ -11,12 +11,12 @@
 		// Pretend that we have parent to get a thin pack based on it.
 		ByteArrayInputStream recvStream = uploadPackV2(
 			"command=fetch\n",
-			PacketLineIn.DELIM,
+			PacketLineIn.delimiter(),
 			"want " + child.toObjectId().getName() + "\n",
 			"have " + parent.toObjectId().getName() + "\n",
 			"thin-pack\n",
 			"done\n",
-			PacketLineIn.END);
+				PacketLineIn.end());
 		PacketLineIn pckIn = new PacketLineIn(recvStream);
 
 		assertThat(pckIn.readString(), is("packfile"));

@@ -1,0 +1,17 @@
+		@Override
+		protected boolean matchesSafely(HttpCookie otherCookie) {
+			// the equals method in HttpCookie is not specific enough, we want
+			// to consider all attributes!
+			return (equals(cookie.getName(), otherCookie.getName())
+					&& equals(cookie.getValue(), otherCookie.getValue())
+					&& equals(cookie.getDomain(), otherCookie.getDomain())
+					&& equals(cookie.getPath(), otherCookie.getPath())
+					&& (cookie.getMaxAge() >= otherCookie.getMaxAge()
+							- allowedMaxAgeDelta)
+					&& (cookie.getMaxAge() <= otherCookie.getMaxAge()
+							+ allowedMaxAgeDelta)
+					&& cookie.isHttpOnly() == otherCookie.isHttpOnly()
+					&& cookie.getSecure() == otherCookie.getSecure()
+					&& cookie.getVersion() == otherCookie.getVersion());
+		}
+

@@ -15,11 +15,12 @@
 		ExecutorService e = Executors.newFixedThreadPool(count);
 		try {
 			for (Path p : paths) {
-				e.submit(() -> {
+				Future<Object> result = e.submit(() -> {
 					barrier.await();
 					putContent(p);
 					return null;
 				});
+				assertNotNull(result);
 			}
 		} finally {
 			e.shutdown();

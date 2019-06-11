@@ -11,6 +11,10 @@
 		if (redirectLimit < 0) {
 			redirectLimit = MAX_REDIRECTS;
 		}
+		cookieFile = config.getString(HTTP, null, COOKIE_FILE_KEY);
+		saveCookies = config.getBoolean(HTTP, SAVE_COOKIES_KEY, false);
+		cookieFileCacheLimit = config.getInt(HTTP, COOKIE_FILE_CACHE_LIMIT_KEY,
+				DEFAULT_COOKIE_FILE_CACHE_LIMIT);
 		String match = findMatch(config.getSubsections(HTTP), uri);
 		if (match != null) {
 			// Override with more specific items
@@ -25,6 +29,13 @@
 			if (newMaxRedirects >= 0) {
 				redirectLimit = newMaxRedirects;
 			}
+			String urlSpecificCookieFile = config.getString(HTTP, match,
+					COOKIE_FILE_KEY);
+			if (urlSpecificCookieFile != null) {
+				cookieFile = urlSpecificCookieFile;
+			}
+			saveCookies = config.getBoolean(HTTP, match, SAVE_COOKIES_KEY,
+					saveCookies);
 		}
 		postBuffer = postBufferSize;
 		sslVerify = sslVerifyFlag;

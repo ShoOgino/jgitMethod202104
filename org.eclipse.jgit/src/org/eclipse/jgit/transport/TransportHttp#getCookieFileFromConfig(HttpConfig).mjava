@@ -1,0 +1,16 @@
+	private static NetscapeCookieFile getCookieFileFromConfig(
+			HttpConfig config) {
+		if (!StringUtils.isEmptyOrNull(config.getCookieFile())) {
+			try {
+				Path cookieFilePath = Paths.get(config.getCookieFile());
+				return NetscapeCookieFileCache.getInstance(config)
+						.getEntry(cookieFilePath);
+			} catch (InvalidPathException e) {
+				LOG.warn(MessageFormat.format(
+						JGitText.get().couldNotReadCookieFile,
+						config.getCookieFile()), e);
+			}
+		}
+		return null;
+	}
+

@@ -6,12 +6,13 @@
 		RevTag tag = remote.tag("tag", tip);
 		remote.update("refs/tags/tag", tag);
 
-		ByteArrayInputStream recvStream = uploadPackV2("command=ls-refs\n", PacketLineIn.DELIM, "symrefs", PacketLineIn.END);
+		ByteArrayInputStream recvStream = uploadPackV2("command=ls-refs\n",
+				PacketLineIn.delimiter(), "symrefs", PacketLineIn.end());
 		PacketLineIn pckIn = new PacketLineIn(recvStream);
 
 		assertThat(pckIn.readString(), is(tip.toObjectId().getName() + " HEAD symref-target:refs/heads/master"));
 		assertThat(pckIn.readString(), is(tip.toObjectId().getName() + " refs/heads/master"));
 		assertThat(pckIn.readString(), is(tag.toObjectId().getName() + " refs/tags/tag"));
-		assertTrue(pckIn.readString() == PacketLineIn.END);
+		assertTrue(PacketLineIn.isEnd(pckIn.readString()));
 	}
 

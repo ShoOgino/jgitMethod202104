@@ -1,0 +1,20 @@
+	/**
+	 * Merge the given sets in the following way. All cookies from
+	 * {@code cookies1} and {@code cookies2} are contained in the resulting set
+	 * which have unique names. If there is a duplicate entry for one name only
+	 * the entry from set {@code cookies1} ends up in the resulting set.
+	 *
+	 * @param cookies1
+	 * @param cookies2
+	 *
+	 * @return the merged cookies
+	 */
+	static Set<HttpCookie> mergeCookies(Set<HttpCookie> cookies1,
+			@Nullable Set<HttpCookie> cookies2) {
+		Set<HttpCookie> mergedCookies = new LinkedHashSet<>(cookies1);
+		if (cookies2 != null) {
+			mergedCookies.addAll(cookies2);
+		}
+		return mergedCookies;
+	}
+

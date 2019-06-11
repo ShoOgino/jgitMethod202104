@@ -12,7 +12,7 @@
 
 		// Check that we get a v0 response.
 		assertThat(pckIn.readString(), is("# service=git-upload-pack"));
-		assertThat(pckIn.readString(), theInstance(PacketLineIn.END));
+		assertTrue(PacketLineIn.isEnd(pckIn.readString()));
 		assertTrue(pckIn.readString().matches("[0-9a-f]{40} HEAD.*"));
 	}
 

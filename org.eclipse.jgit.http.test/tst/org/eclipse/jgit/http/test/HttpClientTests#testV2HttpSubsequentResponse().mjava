@@ -26,8 +26,7 @@
 		PacketLineIn pckIn = new PacketLineIn(c.getInputStream());
 
 		// Just check that we get what looks like a ref advertisement.
-		String s;
-		while ((s = pckIn.readString()) != PacketLineIn.END) {
+		for (String s : pckIn.readStrings()) {
 			assertTrue(s.matches("[0-9a-f]{40} [A-Za-z/]*"));
 		}
 

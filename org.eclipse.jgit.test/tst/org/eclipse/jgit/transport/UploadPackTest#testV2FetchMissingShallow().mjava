@@ -9,13 +9,13 @@
 				true);
 
 		ByteArrayInputStream recvStream = uploadPackV2("command=fetch\n",
-				PacketLineIn.DELIM,
+				PacketLineIn.delimiter(),
 				"want-ref refs/heads/three\n",
 				"deepen 3",
 				"shallow 0123012301230123012301230123012301230123",
 				"shallow " + two.getName() + '\n',
 				"done\n",
-				PacketLineIn.END);
+				PacketLineIn.end());
 		PacketLineIn pckIn = new PacketLineIn(recvStream);
 
 		assertThat(pckIn.readString(), is("shallow-info"));
@@ -23,11 +23,11 @@
 				is("shallow " + one.toObjectId().getName()));
 		assertThat(pckIn.readString(),
 				is("unshallow " + two.toObjectId().getName()));
-		assertThat(pckIn.readString(), theInstance(PacketLineIn.DELIM));
+		assertTrue(PacketLineIn.isDelimiter(pckIn.readString()));
 		assertThat(pckIn.readString(), is("wanted-refs"));
 		assertThat(pckIn.readString(),
 				is(three.toObjectId().getName() + " refs/heads/three"));
-		assertThat(pckIn.readString(), theInstance(PacketLineIn.DELIM));
+		assertTrue(PacketLineIn.isDelimiter(pckIn.readString()));
 		assertThat(pckIn.readString(), is("packfile"));
 		parsePack(recvStream);
 

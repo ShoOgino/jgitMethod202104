@@ -16,13 +16,13 @@
 		// Report that we only have "boundary" as a shallow boundary.
 		ByteArrayInputStream recvStream = uploadPackV2(
 			"command=fetch\n",
-			PacketLineIn.DELIM,
+			PacketLineIn.delimiter(),
 			"shallow " + boundary.toObjectId().getName() + "\n",
 			"deepen-since 1510000\n",
 			"want " + merge.toObjectId().getName() + "\n",
 			"have " + boundary.toObjectId().getName() + "\n",
 			"done\n",
-			PacketLineIn.END);
+				PacketLineIn.end());
 		PacketLineIn pckIn = new PacketLineIn(recvStream);
 		assertThat(pckIn.readString(), is("shallow-info"));
 
@@ -34,7 +34,7 @@
 		// later than the given deepen-since time.
 		assertThat(pckIn.readString(), is("unshallow " + boundary.toObjectId().getName()));
 
-		assertThat(pckIn.readString(), theInstance(PacketLineIn.DELIM));
+		assertTrue(PacketLineIn.isDelimiter(pckIn.readString()));
 		assertThat(pckIn.readString(), is("packfile"));
 		parsePack(recvStream);
 

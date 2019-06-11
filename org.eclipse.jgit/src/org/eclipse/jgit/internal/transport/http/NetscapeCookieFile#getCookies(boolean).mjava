@@ -1,0 +1,39 @@
+	/**
+	 * @param refresh
+	 *            if {@code true} updates the list from the underlying cookie
+	 *            file if it has been modified since the last read otherwise
+	 *            returns the current transient state. In case the cookie file
+	 *            has never been read before will always read from the
+	 *            underlying file disregarding the value of this parameter.
+	 * @return all cookies (may contain session cookies as well). This does not
+	 *         return a copy of the list but rather the original one. Every
+	 *         addition to the returned list can afterwards be persisted via
+	 *         {@link #write(URL)}. Errors in the underlying file will not lead
+	 *         to exceptions but rather to an empty set being returned and the
+	 *         underlying error being logged.
+	 */
+	public Set<HttpCookie> getCookies(boolean refresh) {
+		if (cookies == null || refresh) {
+			try {
+				byte[] in = getFileContentIfModified();
+				Set<HttpCookie> newCookies = parseCookieFile(in, creationDate);
+				if (cookies != null) {
+					cookies = mergeCookies(newCookies, cookies);
+				} else {
+					cookies = newCookies;
+				}
+				return cookies;
+			} catch (IOException | IllegalArgumentException e) {
+				LOG.warn(
+						MessageFormat.format(
+								JGitText.get().couldNotReadCookieFile, path),
+						e);
+				if (cookies == null) {
+					cookies = new LinkedHashSet<>();
+				}
+			}
+		}
+		return cookies;
+
+	}
+

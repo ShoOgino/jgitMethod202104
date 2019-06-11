@@ -1,0 +1,32 @@
+	void processResponseCookies(HttpConnection conn) {
+		if (cookieFile != null && http.getSaveCookies()) {
+			List<HttpCookie> foundCookies = new LinkedList<>();
+
+			List<String> cookieHeaderValues = conn
+					.getHeaderFields(HDR_SET_COOKIE);
+			if (!cookieHeaderValues.isEmpty()) {
+				foundCookies.addAll(
+						extractCookies(HDR_SET_COOKIE, cookieHeaderValues));
+			}
+			cookieHeaderValues = conn.getHeaderFields(HDR_SET_COOKIE2);
+			if (!cookieHeaderValues.isEmpty()) {
+				foundCookies.addAll(
+						extractCookies(HDR_SET_COOKIE2, cookieHeaderValues));
+			}
+			if (!foundCookies.isEmpty()) {
+				try {
+					// update cookie lists with the newly received cookies!
+					Set<HttpCookie> cookies = cookieFile.getCookies(false);
+					cookies.addAll(foundCookies);
+					cookieFile.write(baseUrl);
+					relevantCookies.addAll(foundCookies);
+				} catch (IOException | IllegalArgumentException
+						| InterruptedException e) {
+					LOG.warn(MessageFormat.format(
+							JGitText.get().couldNotPersistCookies,
+							cookieFile.getPath()), e);
+				}
+			}
+		}
+	}
+

@@ -2,15 +2,15 @@
 			long depth, ObjectId... wants) throws Exception {
 		server.getConfig().setBoolean("uploadpack", null, "allowfilter", true);
 
-		List<String> input = new ArrayList();
+		List<String> input = new ArrayList<>();
 		input.add("command=fetch\n");
-		input.add(PacketLineIn.DELIM);
+		input.add(PacketLineIn.delimiter());
 		for (ObjectId want : wants) {
 			input.add("want " + want.getName() + "\n");
 		}
 		input.add("filter tree:" + depth + "\n");
 		input.add("done\n");
-		input.add(PacketLineIn.END);
+		input.add(PacketLineIn.end());
 		ByteArrayInputStream recvStream =
 				uploadPackV2(RequestPolicy.ANY, /*refFilter=*/null,
 							 /*hook=*/null, input.toArray(new String[0]));

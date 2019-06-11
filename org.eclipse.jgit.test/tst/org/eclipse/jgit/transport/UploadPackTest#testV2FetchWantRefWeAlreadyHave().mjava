@@ -7,11 +7,11 @@
 
 		ByteArrayInputStream recvStream = uploadPackV2(
 			"command=fetch\n",
-			PacketLineIn.DELIM,
+			PacketLineIn.delimiter(),
 			"want-ref refs/heads/one\n",
 			"have " + one.toObjectId().getName(),
 			"done\n",
-			PacketLineIn.END);
+				PacketLineIn.end());
 		PacketLineIn pckIn = new PacketLineIn(recvStream);
 
 		// The client still needs to know the hash of the object that
@@ -21,7 +21,7 @@
 		assertThat(
 				pckIn.readString(),
 				is(one.toObjectId().getName() + " refs/heads/one"));
-		assertThat(pckIn.readString(), theInstance(PacketLineIn.DELIM));
+		assertTrue(PacketLineIn.isDelimiter(pckIn.readString()));
 
 		// ... but the client does not need the object itself.
 		assertThat(pckIn.readString(), is("packfile"));

@@ -9,12 +9,12 @@
 
 		ByteArrayInputStream recvStream = uploadPackV2(
 			"command=fetch\n",
-			PacketLineIn.DELIM,
+			PacketLineIn.delimiter(),
 			"want " + fooChild.toObjectId().getName() + "\n",
 			"want " + barChild.toObjectId().getName() + "\n",
 			"have " + fooParent.toObjectId().getName() + "\n",
 			"have " + barParent.toObjectId().getName() + "\n",
-			PacketLineIn.END);
+				PacketLineIn.end());
 		PacketLineIn pckIn = new PacketLineIn(recvStream);
 
 		assertThat(pckIn.readString(), is("acknowledgments"));
@@ -24,7 +24,7 @@
 				"ACK " + fooParent.toObjectId().getName(),
 				"ACK " + barParent.toObjectId().getName()));
 		assertThat(pckIn.readString(), is("ready"));
-		assertThat(pckIn.readString(), theInstance(PacketLineIn.DELIM));
+		assertTrue(PacketLineIn.isDelimiter(pckIn.readString()));
 		assertThat(pckIn.readString(), is("packfile"));
 		parsePack(recvStream);
 		assertFalse(client.getObjectDatabase().has(fooParent.toObjectId()));

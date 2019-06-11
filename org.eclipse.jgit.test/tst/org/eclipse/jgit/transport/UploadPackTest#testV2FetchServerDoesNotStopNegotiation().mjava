@@ -9,15 +9,15 @@
 
 		ByteArrayInputStream recvStream = uploadPackV2(
 			"command=fetch\n",
-			PacketLineIn.DELIM,
+			PacketLineIn.delimiter(),
 			"want " + fooChild.toObjectId().getName() + "\n",
 			"want " + barChild.toObjectId().getName() + "\n",
 			"have " + fooParent.toObjectId().getName() + "\n",
-			PacketLineIn.END);
+				PacketLineIn.end());
 		PacketLineIn pckIn = new PacketLineIn(recvStream);
 
 		assertThat(pckIn.readString(), is("acknowledgments"));
 		assertThat(pckIn.readString(), is("ACK " + fooParent.toObjectId().getName()));
-		assertThat(pckIn.readString(), theInstance(PacketLineIn.END));
+		assertTrue(PacketLineIn.isEnd(pckIn.readString()));
 	}
 

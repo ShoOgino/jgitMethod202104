@@ -6,10 +6,10 @@
 
 		ByteArrayInputStream recvStream = uploadPackV2(
 			"command=fetch\n",
-			PacketLineIn.DELIM,
+			PacketLineIn.delimiter(),
 			"want " + child.toObjectId().getName() + "\n",
 			"deepen 1\n",
-			PacketLineIn.END);
+				PacketLineIn.end());
 		PacketLineIn pckIn = new PacketLineIn(recvStream);
 
 		// Verify that only the correct section is sent. "shallow-info"
@@ -17,6 +17,6 @@
 		// sent only if a packfile is sent.
 		assertThat(pckIn.readString(), is("acknowledgments"));
 		assertThat(pckIn.readString(), is("NAK"));
-		assertThat(pckIn.readString(), theInstance(PacketLineIn.END));
+		assertTrue(PacketLineIn.isEnd(pckIn.readString()));
 	}
 

@@ -1,17 +1,17 @@
 	/*
-	 * Succesful fetch with the basic core commands of the protocol.
+	 * Successful fetch with the basic core commands of the protocol.
 	 */
 	@Test
 	public void testFetchBasicArguments()
 			throws PackProtocolException, IOException {
 		PacketLineIn pckIn = formatAsPacketLine(
-				PacketLineIn.DELIM,
+				PacketLineIn.delimiter(),
 				"thin-pack", "no-progress", "include-tag", "ofs-delta",
 				"want 4624442d68ee402a94364191085b77137618633e",
 				"want f900c8326a43303685c46b279b9f70411bff1a4b",
 				"have 554f6e41067b9e3e565b6988a8294fac1cb78f4b",
 				"have abc760ab9ad72f08209943251b36cb886a578f87", "done",
-				PacketLineIn.END);
+				PacketLineIn.end());
 		ProtocolV2Parser parser = new ProtocolV2Parser(
 				ConfigBuilder.getDefault());
 		FetchV2Request request = parser.parseFetchRequest(pckIn);

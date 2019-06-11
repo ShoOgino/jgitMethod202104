@@ -14,13 +14,13 @@
 		// wants "merge" while excluding "side".
 		ByteArrayInputStream recvStream = uploadPackV2(
 			"command=fetch\n",
-			PacketLineIn.DELIM,
+			PacketLineIn.delimiter(),
 			"shallow " + three.toObjectId().getName() + "\n",
 			"deepen-not side\n",
 			"want " + merge.toObjectId().getName() + "\n",
 			"have " + three.toObjectId().getName() + "\n",
 			"done\n",
-			PacketLineIn.END);
+				PacketLineIn.end());
 		PacketLineIn pckIn = new PacketLineIn(recvStream);
 		assertThat(pckIn.readString(), is("shallow-info"));
 
@@ -35,7 +35,7 @@
 		// "three" is unshallow because its parent "two" is now available.
 		assertThat(pckIn.readString(), is("unshallow " + three.toObjectId().getName()));
 
-		assertThat(pckIn.readString(), theInstance(PacketLineIn.DELIM));
+		assertTrue(PacketLineIn.isDelimiter(pckIn.readString()));
 		assertThat(pckIn.readString(), is("packfile"));
 		parsePack(recvStream);
 

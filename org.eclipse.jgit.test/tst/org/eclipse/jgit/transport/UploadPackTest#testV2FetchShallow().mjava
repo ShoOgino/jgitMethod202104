@@ -9,11 +9,11 @@
 		// commonParent, so it doesn't send it.
 		ByteArrayInputStream recvStream = uploadPackV2(
 			"command=fetch\n",
-			PacketLineIn.DELIM,
+			PacketLineIn.delimiter(),
 			"want " + barChild.toObjectId().getName() + "\n",
 			"have " + fooChild.toObjectId().getName() + "\n",
 			"done\n",
-			PacketLineIn.END);
+				PacketLineIn.end());
 		PacketLineIn pckIn = new PacketLineIn(recvStream);
 		assertThat(pckIn.readString(), is("packfile"));
 		parsePack(recvStream);
@@ -24,12 +24,12 @@
 		// commonParent, so it sends it.
 		recvStream = uploadPackV2(
 			"command=fetch\n",
-			PacketLineIn.DELIM,
+			PacketLineIn.delimiter(),
 			"want " + barChild.toObjectId().getName() + "\n",
 			"have " + fooChild.toObjectId().getName() + "\n",
 			"shallow " + fooChild.toObjectId().getName() + "\n",
 			"done\n",
-			PacketLineIn.END);
+				PacketLineIn.end());
 		pckIn = new PacketLineIn(recvStream);
 		assertThat(pckIn.readString(), is("packfile"));
 		parsePack(recvStream);

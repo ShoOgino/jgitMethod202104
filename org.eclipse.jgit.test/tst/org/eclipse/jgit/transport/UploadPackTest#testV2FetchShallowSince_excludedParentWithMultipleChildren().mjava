@@ -14,12 +14,12 @@
 
 		ByteArrayInputStream recvStream = uploadPackV2(
 			"command=fetch\n",
-			PacketLineIn.DELIM,
+			PacketLineIn.delimiter(),
 			"deepen-since 1510000\n",
 			"want " + child1.toObjectId().getName() + "\n",
 			"want " + child2.toObjectId().getName() + "\n",
 			"done\n",
-			PacketLineIn.END);
+				PacketLineIn.end());
 		PacketLineIn pckIn = new PacketLineIn(recvStream);
 		assertThat(pckIn.readString(), is("shallow-info"));
 
@@ -30,7 +30,7 @@
 				"shallow " + child1.toObjectId().getName(),
 				"shallow " + child2.toObjectId().getName()));
 
-		assertThat(pckIn.readString(), theInstance(PacketLineIn.DELIM));
+		assertTrue(PacketLineIn.isDelimiter(pckIn.readString()));
 		assertThat(pckIn.readString(), is("packfile"));
 		parsePack(recvStream);
 

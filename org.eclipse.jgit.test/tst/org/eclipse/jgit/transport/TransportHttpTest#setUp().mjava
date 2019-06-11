@@ -1,0 +1,13 @@
+	@Override
+	@Before
+	public void setUp() throws Exception {
+		super.setUp();
+		uri = new URIish("https://everyones.loves.git/u/2");
+
+		final Config config = db.getConfig();
+		config.setBoolean("http", null, "saveCookies", true);
+		cookieFile = createTempFile();
+		config.setString("http", null, "cookieFile",
+				cookieFile.getAbsolutePath());
+	}
+

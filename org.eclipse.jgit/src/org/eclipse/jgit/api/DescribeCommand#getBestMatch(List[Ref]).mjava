@@ -8,9 +8,15 @@
 			// Find the first tag that matches in the stream of all tags
 			// filtered by matchers ordered by tie break order
 			Stream<Ref> matchingTags = Stream.empty();
-			for (IMatcher matcher : matchers) {
+			for (FileNameMatcher matcher : matchers) {
 				Stream<Ref> m = tags.stream().filter(
-						tag -> matcher.matches(tag.getName(), false, false));
+						tag -> {
+							matcher.append(
+									tag.getName().substring(R_TAGS.length()));
+							boolean result = matcher.isMatch();
+							matcher.reset();
+							return result;
+						});
 				matchingTags = Stream.of(matchingTags, m).flatMap(i -> i);
 			}
 			return matchingTags.sorted(TAG_TIE_BREAKER).findFirst();

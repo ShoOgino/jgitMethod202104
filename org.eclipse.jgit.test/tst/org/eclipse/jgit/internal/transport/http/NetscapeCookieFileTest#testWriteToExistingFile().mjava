@@ -1,0 +1,26 @@
+	@Test
+	public void testWriteToExistingFile() throws IOException {
+		try (InputStream input = this.getClass()
+				.getResourceAsStream("cookies-simple1.txt")) {
+			Files.copy(input, tmpFile, StandardCopyOption.REPLACE_EXISTING);
+		}
+
+		Set<HttpCookie> cookies = new LinkedHashSet<>();
+		HttpCookie cookie = new HttpCookie("key2", "value2");
+		cookie.setMaxAge(1000);
+		cookies.add(cookie);
+		Date creationDate = new Date();
+		try (Writer writer = Files.newBufferedWriter(tmpFile,
+				StandardCharsets.US_ASCII)) {
+			NetscapeCookieFile.write(writer, cookies, baseUrl, creationDate);
+		}
+		String expectedExpiration = String
+				.valueOf(creationDate.getTime() + (cookie.getMaxAge() * 1000));
+
+		Assert.assertThat(
+				Files.readAllLines(tmpFile, StandardCharsets.US_ASCII),
+				CoreMatchers.equalTo(
+						Arrays.asList("domain.com\tTRUE\t/my/path\tFALSE\t"
+								+ expectedExpiration + "\tkey2\tvalue2")));
+	}
+

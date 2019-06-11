@@ -8,10 +8,10 @@
 		// Without include-tag.
 		ByteArrayInputStream recvStream = uploadPackV2(
 			"command=fetch\n",
-			PacketLineIn.DELIM,
+			PacketLineIn.delimiter(),
 			"want " + commit.toObjectId().getName() + "\n",
 			"done\n",
-			PacketLineIn.END);
+				PacketLineIn.end());
 		PacketLineIn pckIn = new PacketLineIn(recvStream);
 		assertThat(pckIn.readString(), is("packfile"));
 		parsePack(recvStream);
@@ -20,11 +20,11 @@
 		// With tag.
 		recvStream = uploadPackV2(
 			"command=fetch\n",
-			PacketLineIn.DELIM,
+			PacketLineIn.delimiter(),
 			"want " + commit.toObjectId().getName() + "\n",
 			"include-tag\n",
 			"done\n",
-			PacketLineIn.END);
+				PacketLineIn.end());
 		pckIn = new PacketLineIn(recvStream);
 		assertThat(pckIn.readString(), is("packfile"));
 		parsePack(recvStream);
