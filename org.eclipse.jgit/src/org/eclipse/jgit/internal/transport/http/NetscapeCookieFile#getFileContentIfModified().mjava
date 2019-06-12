@@ -1,13 +1,16 @@
 	/**
 	 * Read the underying file and return its content but only in case it has
-	 * been modified since the last access. Internally calculates the hash and
-	 * maintains {@link FileSnapshot}s to prevent issues described as <a href=
+	 * been modified since the last access.
+	 * <p>
+	 * Internally calculates the hash and maintains {@link FileSnapshot}s to
+	 * prevent issues described as <a href=
 	 * "https://github.com/git/git/blob/master/Documentation/technical/racy-git.txt">"Racy
 	 * Git problem"</a>. Inspired by {@link FileBasedConfig#load()}.
 	 *
 	 * @return the file contents in case the file has been modified since the
 	 *         last access, otherwise {@code null}
 	 * @throws IOException
+	 *             if the file is not found or cannot be read
 	 */
 	private byte[] getFileContentIfModified() throws IOException {
 		final int maxStaleRetries = 5;
