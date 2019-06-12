@@ -1,0 +1,8 @@
+	@SuppressWarnings("ReferenceEquality")
+	private static boolean sameCommit(RevCommit a, RevCommit b) {
+		// Reference comparison is intentional; BlameGenerator uses a single
+		// RevWalk which caches the RevCommit objects, and if a given commit
+		// is cached the RevWalk returns the same instance.
+		return a == b;
+	}
+
