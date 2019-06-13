@@ -1,0 +1,20 @@
+	private Collection<PackFile> gc(int compressionLevel)
+			throws IOException, ParseException {
+		GC gc = new GC(db);
+		PackConfig pc = new PackConfig(db.getConfig());
+		pc.setCompressionLevel(compressionLevel);
+
+		pc.setSinglePack(true);
+
+		// --aggressive
+		pc.setDeltaSearchWindowSize(
+				GarbageCollectCommand.DEFAULT_GC_AGGRESSIVE_WINDOW);
+		pc.setMaxDeltaDepth(GarbageCollectCommand.DEFAULT_GC_AGGRESSIVE_DEPTH);
+		pc.setReuseObjects(false);
+
+		gc.setPackConfig(pc);
+		gc.setExpireAgeMillis(0);
+		gc.setPackExpireAgeMillis(0);
+		return gc.gc();
+	}
+

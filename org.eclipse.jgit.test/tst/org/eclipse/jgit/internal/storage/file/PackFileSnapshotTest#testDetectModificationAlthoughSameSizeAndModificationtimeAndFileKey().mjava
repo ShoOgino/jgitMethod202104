@@ -1,0 +1,65 @@
+	// Try repacking so fast that we get two new packs which differ only in
+	// content and checksum but have same name, size and lastmodified.
+	// To avoid that JGit detects modification by checking the filekey create
+	// two new packfiles upfront and create copies of them. Then modify the
+	// packfiles in-place by opening them for write and then copying the
+	// content.
+	@Test
+	public void testDetectModificationAlthoughSameSizeAndModificationtimeAndFileKey()
+			throws Exception {
+		int testDataSeed = 1;
+		int testDataLength = 100;
+		FileBasedConfig config = db.getConfig();
+		config.setBoolean(ConfigConstants.CONFIG_CORE_SECTION, null,
+				ConfigConstants.CONFIG_KEY_TRUSTFOLDERSTAT, false);
+		config.save();
+
+		createTestRepo(testDataSeed, testDataLength);
+
+		// Repack to create initial packfile. Make a copy of it
+		PackFile pf = repackAndCheck(5, null, null, null);
+		Path packFilePath = pf.getPackFile().toPath();
+		Path packFileBasePath = packFilePath.resolveSibling(
+				packFilePath.getFileName().toString().replaceAll(".pack", ""));
+		AnyObjectId chk1 = pf.getPackChecksum();
+		String name = pf.getPackName();
+		Long length = Long.valueOf(pf.getPackFile().length());
+		copyPack(packFileBasePath, "", ".copy1");
+
+		// Repack to create second packfile. Make a copy of it
+		AnyObjectId chk2 = repackAndCheck(6, name, length, chk1)
+				.getPackChecksum();
+		copyPack(packFileBasePath, "", ".copy2");
+
+		// Repack to create third packfile
+		AnyObjectId chk3 = repackAndCheck(7, name, length, chk2)
+				.getPackChecksum();
+		long m3 = packFilePath.toFile().lastModified();
+		db.getObjectDatabase().has(unknownID);
+		assertEquals(chk3, getSinglePack(db.getObjectDatabase().getPacks())
+				.getPackChecksum());
+
+		// Wait for a filesystem timer tick to enhance probability the rest of
+		// this test is done before the filesystem timer ticks.
+		fsTick(packFilePath.toFile());
+
+		// Copy copy2 to packfile data to force modification of packfile without
+		// changing the packfile's filekey.
+		copyPack(packFileBasePath, ".copy2", "");
+		long m2 = packFilePath.toFile().lastModified();
+		assumeFalse(m3 == m2);
+
+		db.getObjectDatabase().has(unknownID);
+		assertEquals(chk2, getSinglePack(db.getObjectDatabase().getPacks())
+				.getPackChecksum());
+
+		// Copy copy2 to packfile data to force modification of packfile without
+		// changing the packfile's filekey.
+		copyPack(packFileBasePath, ".copy1", "");
+		long m1 = packFilePath.toFile().lastModified();
+		assumeTrue(m2 == m1);
+		db.getObjectDatabase().has(unknownID);
+		assertEquals(chk1, getSinglePack(db.getObjectDatabase().getPacks())
+				.getPackChecksum());
+	}
+

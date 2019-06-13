@@ -1,0 +1,13 @@
+	/**
+	 * Wait until this snapshot's file can't be racy anymore
+	 *
+	 * @throws InterruptedException
+	 *             if sleep was interrupted
+	 */
+	public void waitUntilNotRacy() throws InterruptedException {
+		while (isRacyClean(System.currentTimeMillis())) {
+			TimeUnit.NANOSECONDS
+					.sleep((fsTimestampResolution.toNanos() + 1) * 11 / 10);
+		}
+	}
+

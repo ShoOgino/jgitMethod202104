@@ -1,0 +1,14 @@
+	// Copy file from src to dst but avoid creating a new File (with new
+	// FileKey) if dst already exists
+	private Path copyFile(Path src, Path dst) throws IOException {
+		if (Files.exists(dst)) {
+			dst.toFile().setWritable(true);
+			try (OutputStream dstOut = Files.newOutputStream(dst)) {
+				Files.copy(src, dstOut);
+				return dst;
+			}
+		} else {
+			return Files.copy(src, dst, StandardCopyOption.REPLACE_EXISTING);
+		}
+	}
+

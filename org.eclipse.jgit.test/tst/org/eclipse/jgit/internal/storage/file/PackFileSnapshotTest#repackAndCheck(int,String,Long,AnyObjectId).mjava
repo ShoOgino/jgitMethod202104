@@ -1,0 +1,18 @@
+	private PackFile repackAndCheck(int compressionLevel, String oldName,
+			Long oldLength, AnyObjectId oldChkSum)
+			throws IOException, ParseException {
+		PackFile p = getSinglePack(gc(compressionLevel));
+		File pf = p.getPackFile();
+		// The following two assumptions should not cause the test to fail. If
+		// on a certain platform we get packfiles (containing the same git
+		// objects) where the lengths differ or the checksums don't differ we
+		// just skip this test. A reason for that could be that compression
+		// works differently or random number generator works differently. Then
+		// we have to search for more consistent test data or checkin these
+		// packfiles as test resources
+		assumeTrue(oldLength == null || pf.length() == oldLength.longValue());
+		assumeTrue(oldChkSum == null || !p.getPackChecksum().equals(oldChkSum));
+		assertTrue(oldName == null || p.getPackName().equals(oldName));
+		return p;
+	}
+
