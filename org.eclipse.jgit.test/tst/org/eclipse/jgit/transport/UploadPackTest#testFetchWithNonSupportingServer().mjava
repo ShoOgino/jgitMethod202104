@@ -20,12 +20,11 @@
 			try (Transport tn = testProtocol.open(uri, client, "server2")) {
 				tn.setFilterSpec(FilterSpec.withBlobLimit(0));
 
-				thrown.expect(TransportException.class);
-				thrown.expectMessage(
-						"filter requires server to advertise that capability");
-
-				tn.fetch(NullProgressMonitor.INSTANCE,
-						Collections.singletonList(new RefSpec(commit.name())));
+				TransportException e = assertThrows(TransportException.class,
+						() -> tn.fetch(NullProgressMonitor.INSTANCE, Collections
+								.singletonList(new RefSpec(commit.name()))));
+				assertThat(e.getMessage(), containsString(
+						"filter requires server to advertise that capability"));
 			}
 		}
 	}

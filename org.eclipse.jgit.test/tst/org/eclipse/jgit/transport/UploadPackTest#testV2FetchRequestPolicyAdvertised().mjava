@@ -5,26 +5,17 @@
 		remote.update("branch1", advertized);
 
 		// This works
-		uploadPackV2(
-			RequestPolicy.ADVERTISED,
-			null,
-			null,
-			"command=fetch\n",
-			PacketLineIn.delimiter(),
-			"want " + advertized.name() + "\n",
+		uploadPackV2(RequestPolicy.ADVERTISED, null, null, "command=fetch\n",
+				PacketLineIn.delimiter(), "want " + advertized.name() + "\n",
 				PacketLineIn.end());
 
 		// This doesn't
-		thrown.expect(TransportException.class);
-		thrown.expectMessage(Matchers.containsString(
-					"want " + unadvertized.name() + " not valid"));
-		uploadPackV2(
-			RequestPolicy.ADVERTISED,
-			null,
-			null,
-			"command=fetch\n",
-			PacketLineIn.delimiter(),
-			"want " + unadvertized.name() + "\n",
-				PacketLineIn.end());
+		TransportException e = assertThrows(TransportException.class,
+				() -> uploadPackV2(RequestPolicy.ADVERTISED, null, null,
+						"command=fetch\n", PacketLineIn.delimiter(),
+						"want " + unadvertized.name() + "\n",
+						PacketLineIn.end()));
+		assertThat(e.getMessage(),
+				containsString("want " + unadvertized.name() + " not valid"));
 	}
 

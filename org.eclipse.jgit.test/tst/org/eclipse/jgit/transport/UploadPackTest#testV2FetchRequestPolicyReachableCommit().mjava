@@ -1,31 +1,23 @@
 	@Test
 	public void testV2FetchRequestPolicyReachableCommit() throws Exception {
 		RevCommit reachable = remote.commit().message("x").create();
-		RevCommit advertized = remote.commit().message("x").parent(reachable).create();
+		RevCommit advertized = remote.commit().message("x").parent(reachable)
+				.create();
 		RevCommit unreachable = remote.commit().message("y").create();
 		remote.update("branch1", advertized);
 
 		// This works
-		uploadPackV2(
-			RequestPolicy.REACHABLE_COMMIT,
-			null,
-			null,
-			"command=fetch\n",
-			PacketLineIn.delimiter(),
-			"want " + reachable.name() + "\n",
-				PacketLineIn.end());
+		uploadPackV2(RequestPolicy.REACHABLE_COMMIT, null, null,
+				"command=fetch\n", PacketLineIn.delimiter(),
+				"want " + reachable.name() + "\n", PacketLineIn.end());
 
 		// This doesn't
-		thrown.expect(TransportException.class);
-		thrown.expectMessage(Matchers.containsString(
-					"want " + unreachable.name() + " not valid"));
-		uploadPackV2(
-			RequestPolicy.REACHABLE_COMMIT,
-			null,
-			null,
-			"command=fetch\n",
-			PacketLineIn.delimiter(),
-			"want " + unreachable.name() + "\n",
-				PacketLineIn.end());
+		TransportException e = assertThrows(TransportException.class,
+				() -> uploadPackV2(RequestPolicy.REACHABLE_COMMIT, null, null,
+						"command=fetch\n", PacketLineIn.delimiter(),
+						"want " + unreachable.name() + "\n",
+						PacketLineIn.end()));
+		assertThat(e.getMessage(),
+				containsString("want " + unreachable.name() + " not valid"));
 	}
 

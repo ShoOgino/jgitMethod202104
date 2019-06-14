@@ -1,11 +1,9 @@
 	@Test
 	public void testV2FetchUnrecognizedArgument() throws Exception {
-		thrown.expect(PackProtocolException.class);
-		thrown.expectMessage("unexpected invalid-argument");
-		uploadPackV2(
-			"command=fetch\n",
-			PacketLineIn.delimiter(),
-			"invalid-argument\n",
-				PacketLineIn.end());
+		PackProtocolException e = assertThrows(PackProtocolException.class,
+				() -> uploadPackV2("command=fetch\n", PacketLineIn.delimiter(),
+						"invalid-argument\n", PacketLineIn.end()));
+		assertThat(e.getMessage(),
+				containsString("unexpected invalid-argument"));
 	}
 

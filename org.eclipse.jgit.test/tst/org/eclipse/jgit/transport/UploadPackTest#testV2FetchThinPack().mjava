@@ -3,28 +3,28 @@
 		String commonInBlob = "abcdefghijklmnopqrstuvwxyz";
 
 		RevBlob parentBlob = remote.blob(commonInBlob + "a");
-		RevCommit parent = remote.commit(remote.tree(remote.file("foo", parentBlob)));
+		RevCommit parent = remote
+				.commit(remote.tree(remote.file("foo", parentBlob)));
 		RevBlob childBlob = remote.blob(commonInBlob + "b");
-		RevCommit child = remote.commit(remote.tree(remote.file("foo", childBlob)), parent);
+		RevCommit child = remote
+				.commit(remote.tree(remote.file("foo", childBlob)), parent);
 		remote.update("branch1", child);
 
 		// Pretend that we have parent to get a thin pack based on it.
-		ByteArrayInputStream recvStream = uploadPackV2(
-			"command=fetch\n",
-			PacketLineIn.delimiter(),
-			"want " + child.toObjectId().getName() + "\n",
-			"have " + parent.toObjectId().getName() + "\n",
-			"thin-pack\n",
-			"done\n",
-				PacketLineIn.end());
+		ByteArrayInputStream recvStream = uploadPackV2("command=fetch\n",
+				PacketLineIn.delimiter(),
+				"want " + child.toObjectId().getName() + "\n",
+				"have " + parent.toObjectId().getName() + "\n", "thin-pack\n",
+				"done\n", PacketLineIn.end());
 		PacketLineIn pckIn = new PacketLineIn(recvStream);
 
 		assertThat(pckIn.readString(), is("packfile"));
 
 		// Verify that we received a thin pack by trying to apply it
 		// against the client repo, which does not have parent.
-		thrown.expect(IOException.class);
-		thrown.expectMessage("pack has unresolved deltas");
-		parsePack(recvStream);
+		IOException e = assertThrows(IOException.class,
+				() -> parsePack(recvStream));
+		assertThat(e.getMessage(),
+				containsString("pack has unresolved deltas"));
 	}
 
