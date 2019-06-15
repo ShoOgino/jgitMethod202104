@@ -12,7 +12,9 @@
 			DfsStreamKey revKey = new DfsStreamKey.ForReverseIndex(
 					desc.getStreamKey(INDEX));
 			DfsBlockCache.Ref<PackReverseIndex> revref = cache.getOrLoadRef(
-					revKey, () -> loadReverseIdx(ctx, revKey, idx));
+					revKey,
+					REF_POSITION,
+					() -> loadReverseIdx(ctx, revKey, idx));
 			PackReverseIndex revidx = revref.get();
 			if (reverseIndex == null && revidx != null) {
 				reverseIndex = revidx;

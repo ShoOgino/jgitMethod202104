@@ -17,6 +17,7 @@
 			DfsStreamKey bitmapKey = desc.getStreamKey(BITMAP_INDEX);
 			DfsBlockCache.Ref<PackBitmapIndex> idxref = cache.getOrLoadRef(
 					bitmapKey,
+					REF_POSITION,
 					() -> loadBitmapIndex(ctx, bitmapKey, idx, revidx));
 			PackBitmapIndex bmidx = idxref.get();
 			if (bitmapIndex == null && bmidx != null) {

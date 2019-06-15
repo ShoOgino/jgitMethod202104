@@ -17,7 +17,9 @@
 
 			try {
 				DfsStreamKey idxKey = desc.getStreamKey(INDEX);
-				DfsBlockCache.Ref<PackIndex> idxref = cache.getOrLoadRef(idxKey,
+				DfsBlockCache.Ref<PackIndex> idxref = cache.getOrLoadRef(
+						idxKey,
+						REF_POSITION,
 						() -> loadPackIndex(ctx, idxKey));
 				PackIndex idx = idxref.get();
 				if (index == null && idx != null) {
