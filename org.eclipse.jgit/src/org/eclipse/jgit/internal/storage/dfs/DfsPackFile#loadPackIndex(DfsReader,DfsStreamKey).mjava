@@ -13,12 +13,13 @@
 					bs = wantSize;
 				}
 				PackIndex idx = PackIndex.read(new BufferedInputStream(in, bs));
-				int sz = (int) Math.min(
-						idx.getObjectCount() * REC_SIZE,
-						Integer.MAX_VALUE);
 				ctx.stats.readIdxBytes += rc.position();
 				index = idx;
-				return new DfsBlockCache.Ref<>(idxKey, REF_POSITION, sz, idx);
+				return new DfsBlockCache.Ref<>(
+						idxKey,
+						REF_POSITION,
+						idx.getObjectCount() * REC_SIZE,
+						idx);
 			} finally {
 				ctx.stats.readIdxMicros += elapsedMicros(start);
 			}

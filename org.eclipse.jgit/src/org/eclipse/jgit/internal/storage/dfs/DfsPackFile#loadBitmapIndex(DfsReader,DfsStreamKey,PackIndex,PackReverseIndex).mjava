@@ -24,9 +24,9 @@
 				ctx.stats.readIdxBytes += size;
 				ctx.stats.readIdxMicros += elapsedMicros(start);
 			}
-			int sz = (int) Math.min(size, Integer.MAX_VALUE);
 			bitmapIndex = bmidx;
-			return new DfsBlockCache.Ref<>(bitmapKey, REF_POSITION, sz, bmidx);
+			return new DfsBlockCache.Ref<>(
+					bitmapKey, REF_POSITION, size, bmidx);
 		} catch (EOFException e) {
 			throw new IOException(MessageFormat.format(
 					DfsText.get().shortReadOfIndex,
