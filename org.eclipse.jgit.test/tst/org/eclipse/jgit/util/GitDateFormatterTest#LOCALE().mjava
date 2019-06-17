@@ -1,6 +1,7 @@
 	@Test
 	public void LOCALE() {
-		assertEquals("Sep 20, 2011 7:09:25 PM -0400", new GitDateFormatter(
-				Format.LOCALE).formatDate(ident));
+		String date = new GitDateFormatter(Format.LOCALE).formatDate(ident);
+		assertTrue("Sep 20, 2011 7:09:25 PM -0400".equals(date)
+				|| "Sep 20, 2011, 7:09:25 PM -0400".equals(date)); // JDK-8206961
 	}
 
