@@ -1,0 +1,10 @@
+		private List<String> get(String key) {
+			HostConfigEntry entry = session.getHostConfigEntry();
+			if (entry instanceof JGitHostConfigEntry) {
+				// Always true!
+				return ((JGitHostConfigEntry) entry).getMultiValuedOptions()
+						.get(key);
+			}
+			return Collections.emptyList();
+		}
+

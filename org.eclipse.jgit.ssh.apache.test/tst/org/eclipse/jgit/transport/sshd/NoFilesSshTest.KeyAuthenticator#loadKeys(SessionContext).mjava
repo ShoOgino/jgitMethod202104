@@ -1,0 +1,17 @@
+		@Override
+		public Iterable<KeyPair> loadKeys(SessionContext session)
+				throws IOException, GeneralSecurityException {
+			if (!TEST_USER.equals(session.getUsername())) {
+				return Collections.emptyList();
+			}
+			SshdSocketAddress remoteAddress = SshdSocketAddress
+					.toSshdSocketAddress(session.getRemoteAddress());
+			switch (remoteAddress.getHostName()) {
+			case "localhost":
+			case "127.0.0.1":
+				return Collections.singletonList(testUserKey);
+			default:
+				return Collections.emptyList();
+			}
+		}
+

@@ -1,0 +1,19 @@
+		@Override
+		public StrictHostKeyChecking getStrictHostKeyChecking() {
+			HostConfigEntry entry = session.getHostConfigEntry();
+			String value = entry
+					.getProperty(SshConstants.STRICT_HOST_KEY_CHECKING, "ask"); //$NON-NLS-1$
+			switch (value.toLowerCase(Locale.ROOT)) {
+			case SshConstants.YES:
+			case SshConstants.ON:
+				return StrictHostKeyChecking.REQUIRE_MATCH;
+			case SshConstants.NO:
+			case SshConstants.OFF:
+				return StrictHostKeyChecking.ACCEPT_ANY;
+			case "accept-new": //$NON-NLS-1$
+				return StrictHostKeyChecking.ACCEPT_NEW;
+			default:
+				return StrictHostKeyChecking.ASK;
+			}
+		}
+

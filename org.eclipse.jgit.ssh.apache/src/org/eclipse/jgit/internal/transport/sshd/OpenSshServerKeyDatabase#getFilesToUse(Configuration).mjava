@@ -1,0 +1,10 @@
+	private List<HostKeyFile> getFilesToUse(@NonNull Configuration config) {
+		List<HostKeyFile> filesToUse = defaultFiles;
+		List<HostKeyFile> userFiles = addUserHostKeyFiles(
+				config.getUserKnownHostsFiles());
+		if (!userFiles.isEmpty()) {
+			filesToUse = userFiles;
+		}
+		return filesToUse;
+	}
+

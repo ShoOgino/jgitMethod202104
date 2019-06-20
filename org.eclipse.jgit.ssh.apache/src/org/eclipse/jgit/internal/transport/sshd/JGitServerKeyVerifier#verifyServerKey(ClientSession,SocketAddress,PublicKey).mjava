@@ -1,0 +1,22 @@
+	@Override
+	public boolean verifyServerKey(ClientSession session,
+			SocketAddress remoteAddress, PublicKey serverKey) {
+		if (!(session instanceof JGitClientSession)) {
+			LOG.warn("Internal error: wrong session kind: " //$NON-NLS-1$
+					+ session.getClass().getName());
+			return false;
+		}
+		if (!(remoteAddress instanceof InetSocketAddress)) {
+			return false;
+		}
+		SessionConfig config = new SessionConfig((JGitClientSession) session);
+		SshdSocketAddress connectAddress = SshdSocketAddress
+				.toSshdSocketAddress(session.getConnectAddress());
+		String connect = KnownHostHashValue.createHostPattern(
+				connectAddress.getHostName(), connectAddress.getPort());
+		CredentialsProvider provider = ((JGitClientSession) session)
+				.getCredentialsProvider();
+		return database.accept(connect, (InetSocketAddress) remoteAddress,
+				serverKey, config, provider);
+	}
+

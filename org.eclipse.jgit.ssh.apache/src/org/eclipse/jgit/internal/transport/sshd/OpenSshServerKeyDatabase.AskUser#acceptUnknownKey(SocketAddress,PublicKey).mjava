@@ -4,7 +4,6 @@
 			if (check != Check.ASK) {
 				return check == Check.ALLOW;
 			}
-			CredentialsProvider provider = getCredentialsProvider();
 			InetSocketAddress remote = (InetSocketAddress) remoteAddress;
 			// Ask the user
 			String sha256 = KeyUtils.getFingerPrint(BuiltinDigests.sha256,
@@ -12,7 +11,7 @@
 			String md5 = KeyUtils.getFingerPrint(BuiltinDigests.md5, serverKey);
 			String keyAlgorithm = serverKey.getAlgorithm();
 			String remoteHost = remote.getHostString();
-			URIish uri = JGitUserInteraction.toURI(session.getUsername(),
+			URIish uri = JGitUserInteraction.toURI(config.getUsername(),
 					remote);
 			String prompt = SshdText.get().knownHostsUnknownKeyPrompt;
 			return askUser(provider, uri, prompt, //

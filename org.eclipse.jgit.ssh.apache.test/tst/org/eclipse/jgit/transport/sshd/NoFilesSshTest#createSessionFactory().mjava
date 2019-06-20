@@ -1,0 +1,54 @@
+	@Override
+	protected SshSessionFactory createSessionFactory() {
+		SshdSessionFactory result = new SshdSessionFactory(new JGitKeyCache(),
+				null) {
+
+			@Override
+			protected File getSshConfig(File dir) {
+				return null;
+			}
+
+			@Override
+			protected ServerKeyDatabase getServerKeyDatabase(File homeDir,
+					File dir) {
+				return new ServerKeyDatabase() {
+
+					@Override
+					public List<PublicKey> lookup(String connectAddress,
+							InetSocketAddress remoteAddress,
+							Configuration config) {
+						return Collections.singletonList(testServerKey);
+					}
+
+					@Override
+					public boolean accept(String connectAddress,
+							InetSocketAddress remoteAddress,
+							PublicKey serverKey, Configuration config,
+							CredentialsProvider provider) {
+						return KeyUtils.compareKeys(serverKey, testServerKey);
+					}
+
+				};
+			}
+
+			@Override
+			protected Iterable<KeyPair> getDefaultKeys(File dir) {
+				// This would work for this simple test case:
+				// return Collections.singletonList(testUserKey);
+				// But let's see if we can check the host and username that's used.
+				// For that, we need access to the sshd SessionContext:
+				return new KeyAuthenticator();
+			}
+
+			@Override
+			protected String getDefaultPreferredAuthentications() {
+				return "publickey";
+			}
+		};
+
+		// The home directory is mocked at this point!
+		result.setHomeDirectory(FS.DETECTED.userHome());
+		result.setSshDirectory(sshDir);
+		return result;
+	}
+

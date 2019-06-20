@@ -1,0 +1,20 @@
+	@Override
+	public List<PublicKey> lookup(ClientSession session,
+			SocketAddress remoteAddress) {
+		if (!(session instanceof JGitClientSession)) {
+			LOG.warn("Internal error: wrong session kind: " //$NON-NLS-1$
+					+ session.getClass().getName());
+			return Collections.emptyList();
+		}
+		if (!(remoteAddress instanceof InetSocketAddress)) {
+			return Collections.emptyList();
+		}
+		SessionConfig config = new SessionConfig((JGitClientSession) session);
+		SshdSocketAddress connectAddress = SshdSocketAddress
+				.toSshdSocketAddress(session.getConnectAddress());
+		String connect = KnownHostHashValue.createHostPattern(
+				connectAddress.getHostName(), connectAddress.getPort());
+		return database.lookup(connect, (InetSocketAddress) remoteAddress,
+				config);
+	}
+
