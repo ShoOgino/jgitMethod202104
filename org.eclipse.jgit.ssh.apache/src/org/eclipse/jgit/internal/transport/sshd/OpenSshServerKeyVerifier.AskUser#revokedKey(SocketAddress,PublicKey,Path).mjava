@@ -1,12 +1,11 @@
-		public void revokedKey(ClientSession clientSession,
-				SocketAddress remoteAddress, PublicKey serverKey, Path path) {
-			CredentialsProvider provider = getCredentialsProvider(
-					clientSession);
+		public void revokedKey(SocketAddress remoteAddress, PublicKey serverKey,
+				Path path) {
+			CredentialsProvider provider = getCredentialsProvider();
 			if (provider == null) {
 				return;
 			}
 			InetSocketAddress remote = (InetSocketAddress) remoteAddress;
-			URIish uri = JGitUserInteraction.toURI(clientSession.getUsername(),
+			URIish uri = JGitUserInteraction.toURI(session.getUsername(),
 					remote);
 			String sha256 = KeyUtils.getFingerPrint(BuiltinDigests.sha256,
 					serverKey);

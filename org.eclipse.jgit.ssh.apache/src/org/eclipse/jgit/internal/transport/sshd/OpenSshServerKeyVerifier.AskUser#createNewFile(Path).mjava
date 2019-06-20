@@ -1,0 +1,13 @@
+		public boolean createNewFile(Path path) {
+			CredentialsProvider provider = getCredentialsProvider();
+			if (provider == null) {
+				// We can't ask, so don't create the file
+				return false;
+			}
+			URIish uri = new URIish().setPath(path.toString());
+			return askUser(provider, uri, //
+					format(SshdText.get().knownHostsUserAskCreationPrompt,
+							path), //
+					format(SshdText.get().knownHostsUserAskCreationMsg, path));
+		}
+

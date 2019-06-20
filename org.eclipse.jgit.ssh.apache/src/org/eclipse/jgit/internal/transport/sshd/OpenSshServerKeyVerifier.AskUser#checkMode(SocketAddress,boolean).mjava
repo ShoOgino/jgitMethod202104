@@ -1,0 +1,28 @@
+		private Check checkMode(SocketAddress remoteAddress, boolean changed) {
+			if (!(remoteAddress instanceof InetSocketAddress)) {
+				return Check.DENY;
+			}
+			HostConfigEntry entry = session.getHostConfigEntry();
+			String value = entry
+					.getProperty(SshConstants.STRICT_HOST_KEY_CHECKING, "ask"); //$NON-NLS-1$
+			switch (value.toLowerCase(Locale.ROOT)) {
+			case SshConstants.YES:
+			case SshConstants.ON:
+				return Check.DENY;
+			case SshConstants.NO:
+			case SshConstants.OFF:
+				return Check.ALLOW;
+			case "accept-new": //$NON-NLS-1$
+				return changed ? Check.DENY : Check.ALLOW;
+			default:
+				break;
+			}
+			if (getCredentialsProvider() == null) {
+				// This is called only for new, unknown hosts. If we have no way
+				// to interact with the user, the fallback mode is to deny the
+				// key.
+				return Check.DENY;
+			}
+			return Check.ASK;
+		}
+

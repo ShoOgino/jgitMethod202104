@@ -1,0 +1,17 @@
+	private String updateHostKeyLine(String line, PublicKey newKey)
+			throws IOException {
+		// Replaces an existing public key by the new key
+		int pos = line.indexOf(' ');
+		if (pos > 0 && line.charAt(0) == KnownHostEntry.MARKER_INDICATOR) {
+			// We're at the end of the marker. Skip ahead to the next blank.
+			pos = line.indexOf(' ', pos + 1);
+		}
+		if (pos < 0) {
+			// Don't update if bogus format
+			return null;
+		}
+		StringBuilder result = new StringBuilder(line.substring(0, pos + 1));
+		PublicKeyEntry.appendPublicKeyEntry(result, newKey);
+		return result.toString();
+	}
+

@@ -2,10 +2,9 @@
 	public List<PublicKey> lookup(ClientSession session,
 			SocketAddress remote) {
 		List<HostKeyFile> filesToUse = getFilesToUse(session);
-		HostKeyHelper helper = new HostKeyHelper();
 		List<PublicKey> result = new ArrayList<>();
-		Collection<SshdSocketAddress> candidates = helper
-				.resolveHostNetworkIdentities(session, remote);
+		Collection<SshdSocketAddress> candidates = getCandidates(
+				session.getConnectAddress(), remote);
 		for (HostKeyFile file : filesToUse) {
 			for (HostEntryPair current : file.get()) {
 				KnownHostEntry entry = current.getHostEntry();
