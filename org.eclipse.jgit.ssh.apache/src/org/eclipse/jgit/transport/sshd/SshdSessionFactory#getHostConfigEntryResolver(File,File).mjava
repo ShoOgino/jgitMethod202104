@@ -13,8 +13,7 @@
 			@NonNull File homeDir, @NonNull File sshDir) {
 		return defaultHostConfigEntryResolver.computeIfAbsent(
 				new Tuple(new Object[] { homeDir, sshDir }),
-				t -> new JGitSshConfig(homeDir,
-						new File(sshDir, SshConstants.CONFIG),
+				t -> new JGitSshConfig(homeDir, getSshConfig(sshDir),
 						getLocalUserName()));
 	}
 

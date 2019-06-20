@@ -5,12 +5,14 @@
 	 * @param home
 	 *            user's home directory for the purpose of ~ replacement
 	 * @param config
-	 *            file to load.
+	 *            file to load; may be {@code null} if no ssh config file
+	 *            handling is desired
 	 * @param localUserName
 	 *            user name of the current user on the local host OS
 	 */
-	public JGitSshConfig(@NonNull File home, @NonNull File config,
+	public JGitSshConfig(@NonNull File home, File config,
 			@NonNull String localUserName) {
-		configFile = new OpenSshConfigFile(home, config, localUserName);
+		this.localUserName = localUserName;
+		configFile = config == null ?  null : new OpenSshConfigFile(home, config, localUserName);
 	}
 
