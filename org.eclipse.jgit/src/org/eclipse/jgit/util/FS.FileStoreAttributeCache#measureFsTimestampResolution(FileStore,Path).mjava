@@ -1,5 +1,9 @@
 		private static Optional<Duration> measureFsTimestampResolution(
 			FileStore s, Path dir) {
+			Duration configured = readFileTimeResolution(s);
+			if (!UNDEFINED_RESOLUTION.equals(configured)) {
+				return Optional.of(configured);
+			}
 			Path probe = dir.resolve(".probe-" + UUID.randomUUID()); //$NON-NLS-1$
 			try {
 				Files.createFile(probe);
@@ -16,8 +20,9 @@
 						wait = wait * 2;
 					}
 				}
-				return Optional
-						.of(Duration.between(t1.toInstant(), t2.toInstant()));
+				Duration resolution = Duration.between(t1.toInstant(), t2.toInstant());
+				saveFileTimeResolution(s, resolution);
+				return Optional.of(resolution);
 			} catch (IOException | TimeoutException e) {
 				LOG.error(e.getLocalizedMessage(), e);
 			} catch (InterruptedException e) {

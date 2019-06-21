@@ -1,0 +1,16 @@
+	/**
+	 * Record a snapshot for a specific file path without using config file to
+	 * get filesystem timestamp resolution.
+	 * <p>
+	 * This method should be invoked before the file is accessed. It is used by
+	 * FileBasedConfig to avoid endless recursion.
+	 *
+	 * @param path
+	 *            the path to later remember. The path's current status
+	 *            information is saved.
+	 * @return the snapshot.
+	 */
+	public static FileSnapshot saveNoConfig(File path) {
+		return new FileSnapshot(path);
+	}
+
