@@ -1,25 +1,69 @@
-		static Duration getFsTimestampResolution(Path file) {
+		private static Duration getFsTimestampResolution(Path file) {
+			Path dir = Files.isDirectory(file) ? file : file.getParent();
+			FileStore s;
 			try {
-				Path dir = Files.isDirectory(file) ? file : file.getParent();
-				if (!dir.toFile().canWrite()) {
-					// can not determine FileStore of an unborn directory or in
-					// a read-only directory
+				if (Files.exists(dir)) {
+					s = Files.getFileStore(dir);
+					FileStoreAttributeCache c = attributeCache.get(s);
+					if (c != null) {
+						return c.getFsTimestampResolution();
+					}
+					if (!Files.isWritable(dir)) {
+						// cannot measure resolution in a read-only directory
+						return FALLBACK_TIMESTAMP_RESOLUTION;
+					}
+				} else {
+					// cannot determine FileStore of an unborn directory
 					return FALLBACK_TIMESTAMP_RESOLUTION;
 				}
-				FileStore s = Files.getFileStore(dir);
-				FileStoreAttributeCache c = attributeCache.get(s);
-				if (c == null) {
-					c = new FileStoreAttributeCache(s, dir);
-					attributeCache.put(s, c);
-					if (LOG.isDebugEnabled()) {
-						LOG.debug(c.toString());
-					}
+				CompletableFuture<Optional<Duration>> f = CompletableFuture
+						.supplyAsync(() -> {
+							Lock lock = locks.computeIfAbsent(s,
+									l -> new ReentrantLock());
+							if (!lock.tryLock()) {
+								return Optional.empty();
+							}
+							Optional<Duration> resolution;
+							try {
+								// Some earlier future might have set the value
+								// and removed itself since we checked for the
+								// value above. Hence check cache again.
+								FileStoreAttributeCache c = attributeCache
+										.get(s);
+								if (c != null) {
+									return Optional
+											.of(c.getFsTimestampResolution());
+								}
+								resolution = measureFsTimestampResolution(s,
+										dir);
+								if (resolution.isPresent()) {
+									FileStoreAttributeCache cache = new FileStoreAttributeCache(
+											resolution.get());
+									attributeCache.put(s, cache);
+									if (LOG.isDebugEnabled()) {
+										LOG.debug(cache.toString());
+									}
+								}
+							} finally {
+								lock.unlock();
+								locks.remove(s);
+							}
+							return resolution;
+						});
+				// even if measuring in background wait a little - if the result
+				// arrives, it's better than returning the large fallback
+				Optional<Duration> d = f.get(background.get() ? 50 : 2000,
+						TimeUnit.MILLISECONDS);
+				if (d.isPresent()) {
+					return d.get();
 				}
-				return c.getFsTimestampResolution();
-
-			} catch (IOException | InterruptedException e) {
-				LOG.warn(e.getMessage(), e);
-				return FALLBACK_TIMESTAMP_RESOLUTION;
+				// return fallback until measurement is finished
+			} catch (IOException | InterruptedException
+					| ExecutionException e) {
+				LOG.error(e.getMessage(), e);
+			} catch (TimeoutException e) {
+				// use fallback
 			}
+			return FALLBACK_TIMESTAMP_RESOLUTION;
 		}
 
