@@ -1,7 +1,7 @@
 	private void updateKnownHostsFile(Collection<SshdSocketAddress> candidates,
-			PublicKey serverKey, Path path)
-			throws IOException {
-		String newEntry = createHostKeyLine(candidates, serverKey);
+			PublicKey serverKey, Path path, Configuration config)
+			throws Exception {
+		String newEntry = createHostKeyLine(candidates, serverKey, config);
 		if (newEntry == null) {
 			return;
 		}
