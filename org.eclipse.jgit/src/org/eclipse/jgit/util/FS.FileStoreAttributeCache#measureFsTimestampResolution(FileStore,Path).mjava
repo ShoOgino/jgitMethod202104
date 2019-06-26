@@ -25,6 +25,8 @@
 				Duration resolution = Duration.between(t1.toInstant(), t2.toInstant());
 				saveFileTimeResolution(s, resolution);
 				return Optional.of(resolution);
+			} catch (AccessDeniedException e) {
+				LOG.warn(e.getLocalizedMessage(), e); // see bug 548648
 			} catch (IOException | TimeoutException e) {
 				LOG.error(e.getLocalizedMessage(), e);
 			} catch (InterruptedException e) {
