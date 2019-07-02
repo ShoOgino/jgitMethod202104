@@ -5,7 +5,7 @@
 	 *             if sleep was interrupted
 	 */
 	public void waitUntilNotRacy() throws InterruptedException {
-		while (isRacyClean(System.currentTimeMillis())) {
+		while (isRacyClean(Instant.now())) {
 			TimeUnit.NANOSECONDS
 					.sleep((fsTimestampResolution.toNanos() + 1) * 11 / 10);
 		}

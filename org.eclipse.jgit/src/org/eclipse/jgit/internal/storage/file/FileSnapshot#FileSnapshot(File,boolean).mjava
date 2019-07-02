@@ -12,7 +12,7 @@
 	 */
 	protected FileSnapshot(File file, boolean useConfig) {
 		this.file = file;
-		this.lastRead = System.currentTimeMillis();
+		this.lastRead = Instant.now();
 		this.fsTimestampResolution = useConfig
 				? FS.getFsTimerResolution(file.toPath().getParent())
 				: FALLBACK_TIMESTAMP_RESOLUTION;
@@ -20,17 +20,19 @@
 		try {
 			fileAttributes = FS.DETECTED.fileAttributes(file);
 		} catch (IOException e) {
-			this.lastModified = file.lastModified();
+			this.lastModified = Instant.ofEpochMilli(file.lastModified());
 			this.size = file.length();
 			this.fileKey = MISSING_FILEKEY;
 			return;
 		}
-		this.lastModified = fileAttributes.lastModifiedTime().toMillis();
+		this.lastModified = fileAttributes.lastModifiedTime().toInstant();
 		this.size = fileAttributes.size();
 		this.fileKey = getFileKey(fileAttributes);
-		LOG.debug("file={}, create new FileSnapshot: lastRead={} ms" //$NON-NLS-1$
-				+ ", lastModified={} ms, size={}, fileKey={}", //$NON-NLS-1$
-				file, Long.valueOf(lastRead), Long.valueOf(lastModified),
-				Long.valueOf(size), fileKey);
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("file={}, create new FileSnapshot: lastRead={}, lastModified={}, size={}, fileKey={}", //$NON-NLS-1$
+					file, dateFmt.format(lastRead),
+					dateFmt.format(lastModified), Long.valueOf(size),
+					fileKey.toString());
+		}
 	}
 

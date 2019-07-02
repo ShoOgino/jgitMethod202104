@@ -1,11 +1,14 @@
-	private boolean isModified(long currLastModified) {
+	private boolean isModified(Instant currLastModified) {
 		// Any difference indicates the path was modified.
 
-		lastModifiedChanged = lastModified != currLastModified;
+		lastModifiedChanged = !lastModified.equals(currLastModified);
 		if (lastModifiedChanged) {
-			LOG.debug("file={}, lastModified changed from {} to {}", //$NON-NLS-1$
-					file, Long.valueOf(lastModified),
-					Long.valueOf(currLastModified));
+			if (LOG.isDebugEnabled()) {
+				LOG.debug(
+						"file={}, lastModified changed from {} to {}", //$NON-NLS-1$
+						file, dateFmt.format(lastModified),
+						dateFmt.format(currLastModified));
+			}
 			return true;
 		}
 

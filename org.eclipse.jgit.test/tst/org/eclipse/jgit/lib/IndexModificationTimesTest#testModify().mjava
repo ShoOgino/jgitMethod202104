@@ -10,7 +10,7 @@
 			DirCache dc = db.readDirCache();
 			DirCacheEntry entry = dc.getEntry(path);
 
-			long masterLastMod = entry.getLastModified();
+			Instant masterLastMod = entry.getLastModifiedInstant();
 
 			git.checkout().setCreateBranch(true).setName("side").call();
 
@@ -23,7 +23,7 @@
 			dc = db.readDirCache();
 			entry = dc.getEntry(path);
 
-			long sideLastMode = entry.getLastModified();
+			Instant sideLastMod = entry.getLastModifiedInstant();
 
 			Thread.sleep(2000);
 
@@ -33,9 +33,10 @@
 			dc = db.readDirCache();
 			entry = dc.getEntry(path);
 
-			assertTrue("shall have equal mod time!", masterLastMod == sideLastMode);
-			assertTrue("shall not equal master timestamp!",
-					entry.getLastModified() == masterLastMod);
+			assertTrue("shall have equal mod time!",
+					masterLastMod.equals(sideLastMod));
+			assertTrue("shall have equal master timestamp!",
+					entry.getLastModifiedInstant().equals(masterLastMod));
 		}
 	}
 

@@ -1,0 +1,11 @@
+	private static void touch(Instant begin, File dir) throws IOException {
+		while (begin.compareTo(FS.DETECTED.lastModifiedInstant(dir)) >= 0) {
+			try {
+				Thread.sleep(25);
+			} catch (InterruptedException ie) {
+				//
+			}
+			FS.DETECTED.setLastModified(dir.toPath(), Instant.now());
+		}
+	}
+

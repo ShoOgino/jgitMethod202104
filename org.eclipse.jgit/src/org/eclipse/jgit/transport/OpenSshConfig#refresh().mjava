@@ -1,6 +1,6 @@
 	private synchronized State refresh() {
-		final long mtime = configFile.lastModified();
-		if (mtime != lastModified) {
+		final Instant mtime = FS.DETECTED.lastModifiedInstant(configFile);
+		if (!mtime.equals(lastModified)) {
 			State newState = new State();
 			try (FileInputStream in = new FileInputStream(configFile)) {
 				newState.entries = parse(in);

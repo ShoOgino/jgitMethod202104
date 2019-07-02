@@ -1,20 +1,21 @@
 	@Test
 	public void testIsModifiedFileSmudged() throws Exception {
 		File f = writeTrashFile("file", "content");
+		FS fs = db.getFS();
 		try (Git git = new Git(db)) {
 			// The idea of this test is to check the smudged handling
 			// Hopefully fsTick will make sure our entry gets smudged
 			fsTick(f);
 			writeTrashFile("file", "content");
-			long lastModified = f.lastModified();
+			Instant lastModified = fs.lastModifiedInstant(f);
 			git.add().addFilepattern("file").call();
 			writeTrashFile("file", "conten2");
-			f.setLastModified(lastModified);
+			fs.setLastModified(f.toPath(), lastModified);
 			// We cannot trust this to go fast enough on
 			// a system with less than one-second lastModified
 			// resolution, so we force the index to have the
 			// same timestamp as the file we look at.
-			db.getIndexFile().setLastModified(lastModified);
+			fs.setLastModified(db.getIndexFile().toPath(), lastModified);
 		}
 		DirCacheEntry dce = db.readDirCache().getEntry("file");
 		FileTreeIterator fti = new FileTreeIterator(trash, db.getFS(), db

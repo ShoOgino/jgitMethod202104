@@ -4,21 +4,22 @@
 	// then this file must be younger then file i. A path "*<modtime>"
 	// represents a file with a modification time of <modtime>
 	// E.g. ("a", "b", "<c", "f/a.txt") means: a<=b<c<=f/a.txt
-	private void checkModificationTimeStampOrder(String... pathes)
-			throws IOException {
-		long lastMod = Long.MIN_VALUE;
+	private void checkModificationTimeStampOrder(String... pathes) {
+		Instant lastMod = EPOCH;
 		for (String p : pathes) {
 			boolean strong = p.startsWith("<");
 			boolean fixed = p.charAt(strong ? 1 : 0) == '*';
 			p = p.substring((strong ? 1 : 0) + (fixed ? 1 : 0));
-			long curMod = fixed ? Long.valueOf(p).longValue()
-					: FS.DETECTED.lastModified(new File(db.getWorkTree(), p));
-			if (strong)
+			Instant curMod = fixed ? Instant.parse(p)
+					: FS.DETECTED
+							.lastModifiedInstant(new File(db.getWorkTree(), p));
+			if (strong) {
 				assertTrue("path " + p + " is not younger than predecesssor",
-						curMod > lastMod);
-			else
+						curMod.compareTo(lastMod) > 0);
+			} else {
 				assertTrue("path " + p + " is older than predecesssor",
-						curMod >= lastMod);
+						curMod.compareTo(lastMod) >= 0);
+			}
 		}
 	}
 

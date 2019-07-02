@@ -22,8 +22,9 @@
 			throw new CorruptObjectException(JGitText.get().DIRCHasTooManyEntries);
 
 		snapshot = FileSnapshot.save(liveFile);
-		int smudge_s = (int) (snapshot.lastModified() / 1000);
-		int smudge_ns = ((int) (snapshot.lastModified() % 1000)) * 1000000;
+		// TODO (ms) combine smudge_s and smudge_ns into Duration
+		int smudge_s = (int) (snapshot.lastModifiedInstant().getEpochSecond());
+		int smudge_ns = snapshot.lastModifiedInstant().getNano();
 
 		// Load the individual file entries.
 		//

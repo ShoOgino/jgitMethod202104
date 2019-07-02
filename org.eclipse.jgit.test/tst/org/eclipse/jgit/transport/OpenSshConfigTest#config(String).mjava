@@ -1,10 +1,11 @@
 	private void config(String data) throws IOException {
-		long lastMtime = configFile.lastModified();
+		FS fs = db.getFS();
+		Instant lastMtime = fs.lastModifiedInstant(configFile);
 		do {
 			try (final OutputStreamWriter fw = new OutputStreamWriter(
 					new FileOutputStream(configFile), UTF_8)) {
 				fw.write(data);
 			}
-		} while (lastMtime == configFile.lastModified());
+		} while (lastMtime.equals(fs.lastModifiedInstant(configFile)));
 	}
 

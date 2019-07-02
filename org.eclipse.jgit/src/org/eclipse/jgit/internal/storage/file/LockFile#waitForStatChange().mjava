@@ -15,7 +15,12 @@
 		FileSnapshot n = FileSnapshot.save(lck);
 		while (o.equals(n)) {
 			Thread.sleep(25 /* milliseconds */);
-			lck.setLastModified(System.currentTimeMillis());
+			try {
+				Files.setLastModifiedTime(lck.toPath(),
+						FileTime.from(Instant.now()));
+			} catch (IOException e) {
+				n.waitUntilNotRacy();
+			}
 			n = FileSnapshot.save(lck);
 		}
 	}
