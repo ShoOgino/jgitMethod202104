@@ -29,7 +29,12 @@
 		}
 		Path lockPath = lock.toPath();
 		Path link = null;
-		FileStore store = Files.getFileStore(lockPath);
+		FileStore store = null;
+		try {
+			store = Files.getFileStore(lockPath);
+		} catch (SecurityException e) {
+			return true;
+		}
 		try {
 			Boolean canLink = CAN_HARD_LINK.computeIfAbsent(store,
 					s -> Boolean.TRUE);
