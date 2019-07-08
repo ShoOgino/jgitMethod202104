@@ -1,0 +1,13 @@
+	@Test
+	public void testMultipleHooks() {
+		FakePostUploadHook hook1 = new FakePostUploadHook();
+		FakePostUploadHook hook2 = new FakePostUploadHook();
+
+		PostUploadHook chained = PostUploadHookChain
+				.newChain(Arrays.asList(hook1, hook2));
+		chained.onPostUpload(null);
+
+		assertTrue(hook1.wasInvoked());
+		assertTrue(hook2.wasInvoked());
+	}
+

@@ -1,0 +1,8 @@
+	@Test
+	public void testFlattenChainIfOnlyOne() {
+		FakePostUploadHook hook1 = new FakePostUploadHook();
+		PostUploadHook newChain = PostUploadHookChain
+				.newChain(Arrays.asList(PostUploadHook.NULL, hook1));
+		assertEquals(newChain, hook1);
+	}
+

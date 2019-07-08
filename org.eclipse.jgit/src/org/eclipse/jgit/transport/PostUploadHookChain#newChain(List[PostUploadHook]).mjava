@@ -1,0 +1,21 @@
+	/**
+	 * Create a new hook chaining the given hooks together.
+	 *
+	 * @param hooks
+	 *            hooks to execute, in order.
+	 * @return a new chain of the given hooks.
+	 */
+	public static PostUploadHook newChain(List<PostUploadHook> hooks) {
+		List<PostUploadHook> newHooks = hooks.stream()
+				.filter(hook -> !hook.equals(PostUploadHook.NULL))
+				.collect(Collectors.toList());
+
+		if (newHooks.isEmpty()) {
+			return PostUploadHook.NULL;
+		} else if (newHooks.size() == 1) {
+			return newHooks.get(0);
+		} else {
+			return new PostUploadHookChain(newHooks);
+		}
+	}
+
