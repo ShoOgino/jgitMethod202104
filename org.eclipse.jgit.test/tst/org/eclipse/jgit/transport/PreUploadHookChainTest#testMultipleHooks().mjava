@@ -1,0 +1,13 @@
+	@Test
+	public void testMultipleHooks() throws ServiceMayNotContinueException {
+		FakePreUploadHook hook1 = new FakePreUploadHook();
+		FakePreUploadHook hook2 = new FakePreUploadHook();
+
+		PreUploadHook chained = PreUploadHookChain
+				.newChain(Arrays.asList(hook1, hook2));
+		chained.onBeginNegotiateRound(null, null, 0);
+
+		assertTrue(hook1.wasInvoked());
+		assertTrue(hook2.wasInvoked());
+	}
+

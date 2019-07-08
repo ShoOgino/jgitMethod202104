@@ -1,0 +1,21 @@
+	/**
+	 * Create a new hook chaining the given hooks together.
+	 *
+	 * @param hooks
+	 *            hooks to execute, in order.
+	 * @return a new hook chain of the given hooks.
+	 */
+	public static PreUploadHook newChain(List<PreUploadHook> hooks) {
+		List<PreUploadHook> newHooks = hooks.stream()
+				.filter(hook -> !hook.equals(PreUploadHook.NULL))
+				.collect(Collectors.toList());
+
+		if (newHooks.isEmpty()) {
+			return PreUploadHook.NULL;
+		} else if (newHooks.size() == 1) {
+			return newHooks.get(0);
+		} else {
+			return new PreUploadHookChain(newHooks);
+		}
+	}
+
