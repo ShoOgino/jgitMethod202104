@@ -4,8 +4,9 @@
 		bos1.write(" \n\t".getBytes());
 		bos1.write(CONTENT1.getBytes());
 
-		final File file = createFile(bos1.toByteArray());
-		final FileBasedConfig config = new FileBasedConfig(file, FS.DETECTED);
+		final Path file = createFile(bos1.toByteArray());
+		final FileBasedConfig config = new FileBasedConfig(file.toFile(),
+				FS.DETECTED);
 		config.load();
 		assertEquals(ALICE, config.getString(USER, null, NAME));
 
@@ -15,6 +16,6 @@
 		final ByteArrayOutputStream bos2 = new ByteArrayOutputStream();
 		bos2.write(" \n\t".getBytes());
 		bos2.write(CONTENT2.getBytes());
-		assertArrayEquals(bos2.toByteArray(), IO.readFully(file));
+		assertArrayEquals(bos2.toByteArray(), IO.readFully(file.toFile()));
 	}
 

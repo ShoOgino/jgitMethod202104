@@ -1,14 +1,15 @@
 	@Test
 	public void testIncludeRelativeDotDot()
 			throws IOException, ConfigInvalidException {
-		final File includedFile = createFile(CONTENT1.getBytes(), "dir1");
+		final Path includedFile = createFile(CONTENT1.getBytes(), "dir1");
 		final ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		bos.write("[include]\npath=".getBytes());
-		bos.write(("../" + includedFile.getParentFile().getName() + "/"
-				+ includedFile.getName()).getBytes());
+		bos.write(("../" + includedFile.getParent().getFileName() + "/"
+				+ includedFile.getFileName()).getBytes());
 
-		final File file = createFile(bos.toByteArray(), "dir2");
-		final FileBasedConfig config = new FileBasedConfig(file, FS.DETECTED);
+		final Path file = createFile(bos.toByteArray(), "dir2");
+		final FileBasedConfig config = new FileBasedConfig(file.toFile(),
+				FS.DETECTED);
 		config.load();
 		assertEquals(ALICE, config.getString(USER, null, NAME));
 	}

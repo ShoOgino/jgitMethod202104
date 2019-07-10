@@ -1,9 +1,10 @@
-	private File createFile(byte[] content, String subdir) throws IOException {
-		File dir = subdir != null ? new File(trash, subdir) : trash;
-		dir.mkdirs();
+	private Path createFile(byte[] content, String subdir) throws IOException {
+		Path dir = subdir != null ? trash.resolve(subdir) : trash;
+		Files.createDirectories(dir);
 
-		File f = File.createTempFile(getClass().getName(), null, dir);
-		try (FileOutputStream os = new FileOutputStream(f, true)) {
+		Path f = Files.createTempFile(dir, getClass().getName(), null);
+		try (OutputStream os = Files.newOutputStream(f,
+				StandardOpenOption.APPEND)) {
 			os.write(content);
 		}
 		return f;
