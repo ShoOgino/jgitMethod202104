@@ -3,29 +3,34 @@
 	 * <p>
 	 * This method should be invoked before the file is accessed.
 	 *
-	 * @param path
+	 * @param file
 	 *            the path to remember meta data for. The path's current status
 	 *            information is saved.
 	 * @param useConfig
 	 *            if {@code true} read filesystem time resolution from
 	 *            configuration file otherwise use fallback resolution
 	 */
-	protected FileSnapshot(File path, boolean useConfig) {
+	protected FileSnapshot(File file, boolean useConfig) {
+		this.file = file;
 		this.lastRead = System.currentTimeMillis();
 		this.fsTimestampResolution = useConfig
-				? FS.getFsTimerResolution(path.toPath().getParent())
+				? FS.getFsTimerResolution(file.toPath().getParent())
 				: FALLBACK_TIMESTAMP_RESOLUTION;
 		BasicFileAttributes fileAttributes = null;
 		try {
-			fileAttributes = FS.DETECTED.fileAttributes(path);
+			fileAttributes = FS.DETECTED.fileAttributes(file);
 		} catch (IOException e) {
-			this.lastModified = path.lastModified();
-			this.size = path.length();
+			this.lastModified = file.lastModified();
+			this.size = file.length();
 			this.fileKey = MISSING_FILEKEY;
 			return;
 		}
 		this.lastModified = fileAttributes.lastModifiedTime().toMillis();
 		this.size = fileAttributes.size();
 		this.fileKey = getFileKey(fileAttributes);
+		LOG.debug("file={}, create new FileSnapshot: lastRead={} ms" //$NON-NLS-1$
+				+ ", lastModified={} ms, size={}, fileKey={}", //$NON-NLS-1$
+				file, Long.valueOf(lastRead), Long.valueOf(lastModified),
+				Long.valueOf(size), fileKey);
 	}
 

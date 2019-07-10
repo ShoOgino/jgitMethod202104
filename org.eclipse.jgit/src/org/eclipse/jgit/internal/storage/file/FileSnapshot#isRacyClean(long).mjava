@@ -1,6 +1,13 @@
 	private boolean isRacyClean(long read) {
 		// add a 10% safety margin
 		long racyNanos = (fsTimestampResolution.toNanos() + 1) * 11 / 10;
-		return wasRacyClean = (read - lastModified) * 1_000_000 <= racyNanos;
+		long delta = (read - lastModified) * 1_000_000;
+		wasRacyClean = delta <= racyNanos;
+		LOG.debug("file={}, isRacyClean={}, read={} ms, lastModified={} ms," //$NON-NLS-1$
+				+ " delta={} ns, racy<={} ns", //$NON-NLS-1$
+				file, Boolean.valueOf(wasRacyClean), Long.valueOf(read),
+				Long.valueOf(lastModified), Long.valueOf(delta),
+				Long.valueOf(racyNanos));
+		return wasRacyClean;
 	}
 
