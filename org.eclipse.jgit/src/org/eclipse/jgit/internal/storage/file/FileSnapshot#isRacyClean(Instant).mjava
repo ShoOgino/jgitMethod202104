@@ -1,7 +1,7 @@
 	private boolean isRacyClean(Instant read) {
 		// add a 10% safety margin
-		long racyNanos = (fsTimestampResolution.toNanos() + 1) * 11 / 10;
-		long delta = Duration.between(lastModified, read).toNanos();
+		racyNanos = (fsTimestampResolution.toNanos() + 1) * 11 / 10;
+		delta = Duration.between(lastModified, read).toNanos();
 		wasRacyClean = delta <= racyNanos;
 		if (LOG.isDebugEnabled()) {
 			LOG.debug(
