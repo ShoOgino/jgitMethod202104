@@ -5,7 +5,8 @@
 		Repeat repeat = description.getAnnotation(Repeat.class);
 		if (repeat != null) {
 			int n = repeat.n();
-			result = new RepeatStatement(n, statement);
+			boolean abortOnFailure = repeat.abortOnFailure();
+			result = new RepeatStatement(n, abortOnFailure, statement);
 		}
 		return result;
 	}
