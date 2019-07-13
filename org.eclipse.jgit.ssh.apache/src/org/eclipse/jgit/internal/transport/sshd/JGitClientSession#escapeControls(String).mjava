@@ -1,0 +1,15 @@
+	private static String escapeControls(String s) {
+		StringBuilder b = new StringBuilder();
+		int l = s.length();
+		for (int i = 0; i < l; i++) {
+			char ch = s.charAt(i);
+			if (Character.isISOControl(ch)) {
+				b.append(ch <= 0xF ? "\\u000" : "\\u00") //$NON-NLS-1$ //$NON-NLS-2$
+						.append(Integer.toHexString(ch));
+			} else {
+				b.append(ch);
+			}
+		}
+		return b.toString();
+	}
+

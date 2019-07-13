@@ -1,0 +1,16 @@
+	/**
+	 * Sets the lines the server sends before its server identification in the
+	 * initial protocol version exchange.
+	 *
+	 * @param lines
+	 *            to send
+	 * @since 5.5
+	 */
+	public void setPreamble(String... lines) {
+		if (lines != null && lines.length > 0) {
+			PropertyResolverUtils.updateProperty(this.server,
+					ServerFactoryManager.SERVER_EXTRA_IDENTIFICATION_LINES,
+					String.join("|", lines));
+		}
+	}
+

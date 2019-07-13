@@ -1,0 +1,17 @@
+	@Test
+	public void testPreamble() throws Exception {
+		// Test that the client can deal with strange lines being sent before
+		// the server identification string.
+		StringBuilder b = new StringBuilder();
+		for (int i = 0; i < 257; i++) {
+			b.append('a');
+		}
+		server.setPreamble("A line with a \000 NUL",
+				"A long line: " + b.toString());
+		cloneWith(
+				"ssh://" + TEST_USER + "@localhost:" + testPort
+						+ "/doesntmatter",
+				defaultCloneDir, null,
+				"IdentityFile " + privateKey1.getAbsolutePath());
+	}
+
