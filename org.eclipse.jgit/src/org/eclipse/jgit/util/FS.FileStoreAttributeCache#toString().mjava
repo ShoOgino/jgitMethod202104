@@ -1,7 +1,10 @@
-		@SuppressWarnings("nls")
+		@SuppressWarnings({ "nls", "boxing" })
 		@Override
 		public String toString() {
-			return "FileStoreAttributeCache [fsTimestampResolution="
-					+ fsTimestampResolution + "]";
+			return String.format(
+					"FileStoreAttributeCache[fsTimestampResolution=%,d µs, "
+							+ "minimalRacyInterval=%,d µs]",
+					fsTimestampResolution.toNanos() / 1000,
+					minimalRacyInterval.toNanos() / 1000);
 		}
 

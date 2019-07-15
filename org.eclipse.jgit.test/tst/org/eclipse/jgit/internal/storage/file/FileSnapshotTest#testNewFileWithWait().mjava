@@ -11,11 +11,13 @@
 		// if filesystem timestamp resolution is high the snapshot won't be
 		// racily clean
 		Assume.assumeTrue(
-				fsTimerResolution.compareTo(Duration.ofMillis(10)) > 0);
+				fsAttrCache.getFsTimestampResolution()
+						.compareTo(Duration.ofMillis(10)) > 0);
 		Path f1 = createFile("newfile");
 		waitNextTick(f1);
 		FileSnapshot save = FileSnapshot.save(f1.toFile());
-		TimeUnit.NANOSECONDS.sleep(fsTimerResolution.dividedBy(2).toNanos());
+		TimeUnit.NANOSECONDS.sleep(
+				fsAttrCache.getFsTimestampResolution().dividedBy(2).toNanos());
 		assertTrue(save.isModified(f1.toFile()));
 	}
 

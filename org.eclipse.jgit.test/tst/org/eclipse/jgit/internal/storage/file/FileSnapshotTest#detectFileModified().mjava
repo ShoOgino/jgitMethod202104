@@ -13,7 +13,7 @@
 			write(f, "b");
 			if (!snapshot.isModified(f)) {
 				deltas.add(snapshot.lastDelta());
-				racyNanos = snapshot.lastRacyNanos();
+				racyNanos = snapshot.lastRacyThreshold();
 				failures++;
 			}
 			assertEquals("file should contain 'b'", "b", read(f));
@@ -27,7 +27,7 @@
 				LOG.debug(String.format("%,d", d));
 			}
 			LOG.error(
-					"count, failures, racy limit [ns], delta min [ns],"
+					"count, failures, eff. racy threshold [ns], delta min [ns],"
 							+ " delta max [ns], delta avg [ns],"
 							+ " delta stddev [ns]");
 			LOG.error(String.format(
@@ -36,7 +36,14 @@
 					stats.avg(), stats.stddev()));
 		}
 		assertTrue(
-				"FileSnapshot: number of failures to detect file modifications should be 0",
+				String.format(
+						"FileSnapshot: failures to detect file modifications"
+								+ " %d out of %d\n"
+								+ "timestamp resolution %d µs"
+								+ " min racy threshold %d µs"
+						, failures, COUNT,
+						fsAttrCache.getFsTimestampResolution().toNanos() / 1000,
+						fsAttrCache.getMinimalRacyInterval().toNanos() / 1000),
 				failures == 0);
 	}
 

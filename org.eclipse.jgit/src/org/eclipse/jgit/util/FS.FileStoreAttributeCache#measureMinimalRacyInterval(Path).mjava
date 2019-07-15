@@ -1,0 +1,51 @@
+		@SuppressWarnings("boxing")
+		private static Duration measureMinimalRacyInterval(Path dir) {
+			LOG.debug("{}: start measure minimal racy interval in {}", //$NON-NLS-1$
+					Thread.currentThread(), dir);
+			int failures = 0;
+			long racyNanos = 0;
+			final int COUNT = 1000;
+			ArrayList<Long> deltas = new ArrayList<>();
+			Path probe = dir.resolve(".probe-" + UUID.randomUUID()); //$NON-NLS-1$
+			try {
+				Files.createFile(probe);
+				for (int i = 0; i < COUNT; i++) {
+					write(probe, "a"); //$NON-NLS-1$
+					FileSnapshot snapshot = FileSnapshot.save(probe.toFile());
+					read(probe);
+					write(probe, "b"); //$NON-NLS-1$
+					if (!snapshot.isModified(probe.toFile())) {
+						deltas.add(Long.valueOf(snapshot.lastDelta()));
+						racyNanos = snapshot.lastRacyThreshold();
+						failures++;
+					}
+				}
+			} catch (IOException e) {
+				LOG.error(e.getMessage(), e);
+				return FALLBACK_MIN_RACY_INTERVAL;
+			} finally {
+				deleteProbe(probe);
+			}
+			if (failures > 0) {
+				Stats stats = new Stats();
+				for (Long d : deltas) {
+					stats.add(d);
+				}
+				LOG.debug(
+						"delta [ns] since modification FileSnapshot failed to detect\n" //$NON-NLS-1$
+								+ "count, failures, racy limit [ns], delta min [ns]," //$NON-NLS-1$
+								+ " delta max [ns], delta avg [ns]," //$NON-NLS-1$
+								+ " delta stddev [ns]\n" //$NON-NLS-1$
+								+ "{}, {}, {}, {}, {}, {}, {}", //$NON-NLS-1$
+						COUNT, failures, racyNanos, stats.min(), stats.max(),
+						stats.avg(), stats.stddev());
+				return Duration
+						.ofNanos(Double.valueOf(stats.max()).longValue());
+			}
+			// since no failures occurred using the measured filesystem
+			// timestamp resolution there is no need for minimal racy interval
+			LOG.debug("{}: no failures when measuring minimal racy interval", //$NON-NLS-1$
+					Thread.currentThread());
+			return Duration.ZERO;
+		}
+

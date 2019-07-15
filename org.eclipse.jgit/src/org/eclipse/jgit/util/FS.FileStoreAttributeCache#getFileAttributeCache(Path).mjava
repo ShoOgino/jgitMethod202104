@@ -1,0 +1,88 @@
+		private static FileStoreAttributeCache getFileAttributeCache(Path dir) {
+			FileStore s;
+			try {
+				if (Files.exists(dir)) {
+					s = Files.getFileStore(dir);
+					FileStoreAttributeCache c = attributeCache.get(s);
+					if (c != null) {
+						return c;
+					}
+					if (!Files.isWritable(dir)) {
+						// cannot measure resolution in a read-only directory
+						LOG.debug(
+								"{}: cannot measure timestamp resolution in read-only directory {}", //$NON-NLS-1$
+								Thread.currentThread(), dir);
+						return FALLBACK_FILESTORE_ATTRIBUTES;
+					}
+				} else {
+					// cannot determine FileStore of an unborn directory
+					LOG.debug(
+							"{}: cannot measure timestamp resolution of unborn directory {}", //$NON-NLS-1$
+							Thread.currentThread(), dir);
+					return FALLBACK_FILESTORE_ATTRIBUTES;
+				}
+				CompletableFuture<Optional<FileStoreAttributeCache>> f = CompletableFuture
+						.supplyAsync(() -> {
+							Lock lock = locks.computeIfAbsent(s,
+									l -> new ReentrantLock());
+							if (!lock.tryLock()) {
+								LOG.debug(
+										"{}: couldn't get lock to measure timestamp resolution in {}", //$NON-NLS-1$
+										Thread.currentThread(), dir);
+								return Optional.empty();
+							}
+							Optional<FileStoreAttributeCache> cache = Optional
+									.empty();
+							try {
+								// Some earlier future might have set the value
+								// and removed itself since we checked for the
+								// value above. Hence check cache again.
+								FileStoreAttributeCache c = attributeCache
+										.get(s);
+								if (c != null) {
+									return Optional.of(c);
+								}
+								Optional<Duration> resolution = measureFsTimestampResolution(
+										s, dir);
+								if (resolution.isPresent()) {
+									c = new FileStoreAttributeCache(
+											resolution.get());
+									attributeCache.put(s, c);
+									// for high timestamp resolution measure
+									// minimal racy interval
+									if (c.fsTimestampResolution
+											.toNanos() < 100_000_000L) {
+										c.minimalRacyInterval = measureMinimalRacyInterval(
+											dir);
+									}
+									if (LOG.isDebugEnabled()) {
+										LOG.debug(c.toString());
+									}
+									cache = Optional.of(c);
+								}
+							} finally {
+								lock.unlock();
+								locks.remove(s);
+							}
+							return cache;
+						});
+				// even if measuring in background wait a little - if the result
+				// arrives, it's better than returning the large fallback
+				Optional<FileStoreAttributeCache> d = f.get(
+						background.get() ? 100 : 5000,
+						TimeUnit.MILLISECONDS);
+				if (d.isPresent()) {
+					return d.get();
+				}
+				// return fallback until measurement is finished
+			} catch (IOException | InterruptedException
+					| ExecutionException | CancellationException e) {
+				LOG.error(e.getMessage(), e);
+			} catch (TimeoutException | SecurityException e) {
+				// use fallback
+			}
+			LOG.debug("{}: use fallback timestamp resolution for directory {}", //$NON-NLS-1$
+					Thread.currentThread(), dir);
+			return FALLBACK_FILESTORE_ATTRIBUTES;
+		}
+

@@ -13,9 +13,9 @@
 	protected FileSnapshot(File file, boolean useConfig) {
 		this.file = file;
 		this.lastRead = Instant.now();
-		this.fsTimestampResolution = useConfig
-				? FS.getFsTimerResolution(file.toPath().getParent())
-				: FALLBACK_TIMESTAMP_RESOLUTION;
+		this.fileStoreAttributeCache = useConfig
+				? FS.getFileStoreAttributeCache(file.toPath().getParent())
+				: FALLBACK_FILESTORE_ATTRIBUTES;
 		BasicFileAttributes fileAttributes = null;
 		try {
 			fileAttributes = FS.DETECTED.fileAttributes(file);

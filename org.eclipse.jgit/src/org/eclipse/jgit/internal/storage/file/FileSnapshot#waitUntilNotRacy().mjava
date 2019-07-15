@@ -5,9 +5,10 @@
 	 *             if sleep was interrupted
 	 */
 	public void waitUntilNotRacy() throws InterruptedException {
+		long timestampResolution = fileStoreAttributeCache
+				.getFsTimestampResolution().toNanos();
 		while (isRacyClean(Instant.now())) {
-			TimeUnit.NANOSECONDS
-					.sleep((fsTimestampResolution.toNanos() + 1) * 11 / 10);
+			TimeUnit.NANOSECONDS.sleep(timestampResolution);
 		}
 	}
 
