@@ -2,14 +2,16 @@
 		private static Duration measureMinimalRacyInterval(Path dir) {
 			LOG.debug("{}: start measure minimal racy interval in {}", //$NON-NLS-1$
 					Thread.currentThread(), dir);
+			int n = 0;
 			int failures = 0;
 			long racyNanos = 0;
-			final int COUNT = 1000;
 			ArrayList<Long> deltas = new ArrayList<>();
 			Path probe = dir.resolve(".probe-" + UUID.randomUUID()); //$NON-NLS-1$
+			Instant end = Instant.now().plusSeconds(3);
 			try {
 				Files.createFile(probe);
-				for (int i = 0; i < COUNT; i++) {
+				do {
+					n++;
 					write(probe, "a"); //$NON-NLS-1$
 					FileSnapshot snapshot = FileSnapshot.save(probe.toFile());
 					read(probe);
@@ -19,7 +21,7 @@
 						racyNanos = snapshot.lastRacyThreshold();
 						failures++;
 					}
-				}
+				} while (Instant.now().compareTo(end) < 0);
 			} catch (IOException e) {
 				LOG.error(e.getMessage(), e);
 				return FALLBACK_MIN_RACY_INTERVAL;
@@ -37,7 +39,7 @@
 								+ " delta max [ns], delta avg [ns]," //$NON-NLS-1$
 								+ " delta stddev [ns]\n" //$NON-NLS-1$
 								+ "{}, {}, {}, {}, {}, {}, {}", //$NON-NLS-1$
-						COUNT, failures, racyNanos, stats.min(), stats.max(),
+						n, failures, racyNanos, stats.min(), stats.max(),
 						stats.avg(), stats.stddev());
 				return Duration
 						.ofNanos(Double.valueOf(stats.max()).longValue());

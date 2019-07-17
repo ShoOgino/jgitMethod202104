@@ -1,9 +1,9 @@
-		private static FileStoreAttributeCache getFileAttributeCache(Path dir) {
+		private static FileStoreAttributes getFileStoreAttributes(Path dir) {
 			FileStore s;
 			try {
 				if (Files.exists(dir)) {
 					s = Files.getFileStore(dir);
-					FileStoreAttributeCache c = attributeCache.get(s);
+					FileStoreAttributes c = attributeCache.get(s);
 					if (c != null) {
 						return c;
 					}
@@ -21,7 +21,8 @@
 							Thread.currentThread(), dir);
 					return FALLBACK_FILESTORE_ATTRIBUTES;
 				}
-				CompletableFuture<Optional<FileStoreAttributeCache>> f = CompletableFuture
+
+				CompletableFuture<Optional<FileStoreAttributes>> f = CompletableFuture
 						.supplyAsync(() -> {
 							Lock lock = locks.computeIfAbsent(s,
 									l -> new ReentrantLock());
@@ -31,21 +32,27 @@
 										Thread.currentThread(), dir);
 								return Optional.empty();
 							}
-							Optional<FileStoreAttributeCache> cache = Optional
+							Optional<FileStoreAttributes> attributes = Optional
 									.empty();
 							try {
 								// Some earlier future might have set the value
 								// and removed itself since we checked for the
 								// value above. Hence check cache again.
-								FileStoreAttributeCache c = attributeCache
+								FileStoreAttributes c = attributeCache
 										.get(s);
 								if (c != null) {
 									return Optional.of(c);
 								}
+								attributes = readFromConfig(s);
+								if (attributes.isPresent()) {
+									attributeCache.put(s, attributes.get());
+									return attributes;
+								}
+
 								Optional<Duration> resolution = measureFsTimestampResolution(
 										s, dir);
 								if (resolution.isPresent()) {
-									c = new FileStoreAttributeCache(
+									c = new FileStoreAttributes(
 											resolution.get());
 									attributeCache.put(s, c);
 									// for high timestamp resolution measure
@@ -53,24 +60,28 @@
 									if (c.fsTimestampResolution
 											.toNanos() < 100_000_000L) {
 										c.minimalRacyInterval = measureMinimalRacyInterval(
-											dir);
+												dir);
 									}
 									if (LOG.isDebugEnabled()) {
 										LOG.debug(c.toString());
 									}
-									cache = Optional.of(c);
+									saveToConfig(s, c);
 								}
+								attributes = Optional.of(c);
 							} finally {
 								lock.unlock();
 								locks.remove(s);
 							}
-							return cache;
+							return attributes;
 						});
+				f.exceptionally(e -> {
+					LOG.error(e.getLocalizedMessage(), e);
+					return Optional.empty();
+				});
 				// even if measuring in background wait a little - if the result
 				// arrives, it's better than returning the large fallback
-				Optional<FileStoreAttributeCache> d = f.get(
-						background.get() ? 100 : 5000,
-						TimeUnit.MILLISECONDS);
+				Optional<FileStoreAttributes> d = background.get() ? f.get(
+						100, TimeUnit.MILLISECONDS) : f.get();
 				if (d.isPresent()) {
 					return d.get();
 				}

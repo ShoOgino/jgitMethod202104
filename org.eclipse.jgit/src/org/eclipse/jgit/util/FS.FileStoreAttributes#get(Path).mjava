@@ -1,0 +1,13 @@
+		/**
+		 * Get the FileStoreAttributes for the given FileStore
+		 *
+		 * @param path
+		 *            file residing in the FileStore to get attributes for
+		 * @return FileStoreAttributes for the given path.
+		 */
+		public static FileStoreAttributes get(Path path) {
+			path = path.toAbsolutePath();
+			Path dir = Files.isDirectory(path) ? path : path.getParent();
+			return getFileStoreAttributes(dir);
+		}
+

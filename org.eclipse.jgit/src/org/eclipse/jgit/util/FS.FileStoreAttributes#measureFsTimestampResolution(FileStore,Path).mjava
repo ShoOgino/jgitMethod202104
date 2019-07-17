@@ -2,10 +2,6 @@
 			FileStore s, Path dir) {
 			LOG.debug("{}: start measure timestamp resolution {} in {}", //$NON-NLS-1$
 					Thread.currentThread(), s, dir);
-			Duration configured = readFileTimeResolution(s);
-			if (!UNDEFINED_RESOLUTION.equals(configured)) {
-				return Optional.of(configured);
-			}
 			Path probe = dir.resolve(".probe-" + UUID.randomUUID()); //$NON-NLS-1$
 			try {
 				Files.createFile(probe);
@@ -20,7 +16,6 @@
 				Duration fsResolution = Duration.between(t1.toInstant(), t2.toInstant());
 				Duration clockResolution = measureClockResolution();
 				fsResolution = fsResolution.plus(clockResolution);
-				saveFileTimeResolution(s, fsResolution);
 				LOG.debug("{}: end measure timestamp resolution {} in {}", //$NON-NLS-1$
 						Thread.currentThread(), s, dir);
 				return Optional.of(fsResolution);
