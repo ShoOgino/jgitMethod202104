@@ -6,7 +6,7 @@
 				PacketLineIn.end() };
 
 		TestV2Hook testHook = new TestV2Hook();
-		uploadPackV2Setup(null, null, testHook, lines);
+		uploadPackV2Setup((UploadPack up) -> {up.setProtocolV2Hook(testHook);}, lines);
 
 		LsRefsV2Request req = testHook.lsRefsRequest;
 		assertEquals(2, req.getServerOptions().size());

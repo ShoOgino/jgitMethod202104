@@ -3,11 +3,12 @@
 	 * Returns UploadPack's output stream, not including the capability
 	 * advertisement by the server.
 	 */
-	private ByteArrayInputStream uploadPackV2(RequestPolicy requestPolicy,
-			RefFilter refFilter, ProtocolV2Hook hook, String... inputLines)
+	private ByteArrayInputStream uploadPackV2(
+			Consumer<UploadPack> postConstructionSetup,
+			String... inputLines)
 			throws Exception {
 		ByteArrayInputStream recvStream =
-				uploadPackV2Setup(requestPolicy, refFilter, hook, inputLines);
+				uploadPackV2Setup(postConstructionSetup, inputLines);
 		PacketLineIn pckIn = new PacketLineIn(recvStream);
 
 		// drain capabilities

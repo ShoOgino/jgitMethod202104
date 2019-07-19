@@ -7,7 +7,8 @@
 		remote.update("refs/tags/tag", tag);
 
 		TestV2Hook hook = new TestV2Hook();
-		ByteArrayInputStream recvStream = uploadPackV2(null, null, hook,
+		ByteArrayInputStream recvStream = uploadPackV2(
+				(UploadPack up) -> {up.setProtocolV2Hook(hook);},
 				"command=ls-refs\n", PacketLineIn.end());
 		PacketLineIn pckIn = new PacketLineIn(recvStream);
 

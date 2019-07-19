@@ -4,9 +4,7 @@
 
 		// Exercise to make sure that even unreachable commits can be fetched
 		uploadPackV2(
-			RequestPolicy.ANY,
-			null,
-			null,
+			(UploadPack up) -> {up.setRequestPolicy(RequestPolicy.ANY);},
 			"command=fetch\n",
 			PacketLineIn.delimiter(),
 			"want " + unreachable.name() + "\n",

@@ -7,14 +7,18 @@
 		remote.update("branch1", advertized);
 
 		// This works
-		uploadPackV2(RequestPolicy.REACHABLE_COMMIT, null, null,
-				"command=fetch\n", PacketLineIn.delimiter(),
-				"want " + reachable.name() + "\n", PacketLineIn.end());
+		uploadPackV2(
+			(UploadPack up) -> {up.setRequestPolicy(RequestPolicy.REACHABLE_COMMIT);},
+			"command=fetch\n",
+			PacketLineIn.delimiter(),
+			"want " + reachable.name() + "\n",
+				PacketLineIn.end());
 
 		// This doesn't
 		UploadPackInternalServerErrorException e = assertThrows(
 				UploadPackInternalServerErrorException.class,
-				() -> uploadPackV2(RequestPolicy.REACHABLE_COMMIT, null, null,
+				() -> uploadPackV2(
+						(UploadPack up) -> {up.setRequestPolicy(RequestPolicy.REACHABLE_COMMIT);},
 						"command=fetch\n", PacketLineIn.delimiter(),
 						"want " + unreachable.name() + "\n",
 						PacketLineIn.end()));
