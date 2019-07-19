@@ -8,6 +8,12 @@
 		public static FileStoreAttributes get(Path path) {
 			path = path.toAbsolutePath();
 			Path dir = Files.isDirectory(path) ? path : path.getParent();
-			return getFileStoreAttributes(dir);
+			FileStoreAttributes cached = attrCacheByPath.get(dir);
+			if (cached != null) {
+				return cached;
+			}
+			FileStoreAttributes attrs = getFileStoreAttributes(dir);
+			attrCacheByPath.put(dir, attrs);
+			return attrs;
 		}
 
