@@ -8,13 +8,17 @@
 	 *             in case of problems reading the file
 	 * @throws NoSuchAlgorithmException
 	 * @throws NoSuchProviderException
+	 * @throws NoOpenPgpKeyException
+	 *             if the file does not contain any OpenPGP key
 	 */
 	private PGPPublicKey findPublicKeyInKeyBox(Path keyboxFile)
 			throws IOException, NoSuchAlgorithmException,
-			NoSuchProviderException {
+			NoSuchProviderException, NoOpenPgpKeyException {
 		KeyBox keyBox = readKeyBoxFile(keyboxFile);
+		boolean hasOpenPgpKey = false;
 		for (KeyBlob keyBlob : keyBox.getKeyBlobs()) {
 			if (keyBlob.getType() == BlobType.OPEN_PGP_BLOB) {
+				hasOpenPgpKey = true;
 				PGPPublicKey key = findPublicKeyByKeyId(keyBlob);
 				if (key != null) {
 					return key;
@@ -24,6 +28,9 @@
 					return key;
 				}
 			}
+		}
+		if (!hasOpenPgpKey) {
+			throw new NoOpenPgpKeyException();
 		}
 		return null;
 	}

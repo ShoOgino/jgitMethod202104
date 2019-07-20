@@ -1,5 +1,9 @@
 	private KeyBox readKeyBoxFile(Path keyboxFile) throws IOException,
-			NoSuchAlgorithmException, NoSuchProviderException {
+			NoSuchAlgorithmException, NoSuchProviderException,
+			NoOpenPgpKeyException {
+		if (keyboxFile.toFile().length() == 0) {
+			throw new NoOpenPgpKeyException();
+		}
 		KeyBox keyBox;
 		try (InputStream in = new BufferedInputStream(
 				newInputStream(keyboxFile))) {
