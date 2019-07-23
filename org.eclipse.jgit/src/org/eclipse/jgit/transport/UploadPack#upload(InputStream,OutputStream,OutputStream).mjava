@@ -57,9 +57,9 @@
 			// nothing.
 			throw err;
 		} catch (ServiceMayNotContinueException err) {
-			if (!err.isOutput() && err.getMessage() != null && pckOut != null) {
+			if (!err.isOutput() && err.getMessage() != null) {
 				try {
-					pckOut.writeString("ERR " + err.getMessage() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+					errOut.writeError(err.getMessage());
 				} catch (IOException e) {
 					err.addSuppressed(e);
 					throw err;
@@ -68,12 +68,12 @@
 			}
 			throw err;
 		} catch (IOException | RuntimeException | Error err) {
-			if (pckOut != null) {
+			if (rawOut != null) {
 				String msg = err instanceof PackProtocolException
 						? err.getMessage()
 						: JGitText.get().internalServerError;
 				try {
-					pckOut.writeString("ERR " + msg + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+					errOut.writeError(msg);
 				} catch (IOException e) {
 					err.addSuppressed(e);
 					throw err;
