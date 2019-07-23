@@ -51,11 +51,6 @@
 			} else {
 				service(pckOut);
 			}
-		} catch (UploadPackInternalServerErrorException err) {
-			// UploadPackInternalServerErrorException is a special exception
-			// that indicates an error is already written to the client. Do
-			// nothing.
-			throw err;
 		} catch (ServiceMayNotContinueException err) {
 			if (!err.isOutput() && err.getMessage() != null) {
 				try {
