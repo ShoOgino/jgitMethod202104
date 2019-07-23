@@ -7,24 +7,6 @@
 			if (cmd.getResult() != Result.NOT_ATTEMPTED)
 				continue;
 
-			RevObject newObj = null;
-			if (cmd.getType() == ReceiveCommand.Type.CREATE
-					|| cmd.getType() == ReceiveCommand.Type.UPDATE) {
-				try {
-					newObj = walk.parseAny(cmd.getNewId());
-				} catch (IOException e) {
-					cmd.setResult(Result.REJECTED_MISSING_OBJECT,
-							cmd.getNewId().name());
-					continue;
-				}
-				if (cmd.getRefName().startsWith(Constants.R_HEADS)
-						&& !(newObj instanceof RevCommit)) {
-					cmd.setResult(Result.REJECTED_OTHER_REASON,
-							JGitText.get().nonCommitToHeads);
-					continue;
-				}
-			}
-
 			if (cmd.getType() == ReceiveCommand.Type.DELETE) {
 				if (!isAllowDeletes()) {
 					// Deletes are not supported on this repository.
@@ -84,7 +66,8 @@
 				if (ref == null) {
 					// The ref must have been advertised in order to be updated.
 					//
-					cmd.setResult(Result.REJECTED_OTHER_REASON, JGitText.get().noSuchRef);
+					cmd.setResult(Result.REJECTED_OTHER_REASON,
+							JGitText.get().noSuchRef);
 					continue;
 				}
 				ObjectId id = ref.getObjectId();
@@ -106,25 +89,35 @@
 
 				// Is this possibly a non-fast-forward style update?
 				//
-				RevObject oldObj;
+				RevObject oldObj, newObj;
 				try {
 					oldObj = walk.parseAny(cmd.getOldId());
 				} catch (IOException e) {
-					cmd.setResult(Result.REJECTED_MISSING_OBJECT, cmd
-							.getOldId().name());
+					cmd.setResult(Result.REJECTED_MISSING_OBJECT,
+							cmd.getOldId().name());
 					continue;
 				}
 
-				if (oldObj instanceof RevCommit && newObj instanceof RevCommit) {
+				try {
+					newObj = walk.parseAny(cmd.getNewId());
+				} catch (IOException e) {
+					cmd.setResult(Result.REJECTED_MISSING_OBJECT,
+							cmd.getNewId().name());
+					continue;
+				}
+
+				if (oldObj instanceof RevCommit
+						&& newObj instanceof RevCommit) {
 					try {
 						if (walk.isMergedInto((RevCommit) oldObj,
 								(RevCommit) newObj))
 							cmd.setTypeFastForwardUpdate();
 						else
-							cmd.setType(ReceiveCommand.Type.UPDATE_NONFASTFORWARD);
+							cmd.setType(
+									ReceiveCommand.Type.UPDATE_NONFASTFORWARD);
 					} catch (MissingObjectException e) {
-						cmd.setResult(Result.REJECTED_MISSING_OBJECT, e
-								.getMessage());
+						cmd.setResult(Result.REJECTED_MISSING_OBJECT,
+								e.getMessage());
 					} catch (IOException e) {
 						cmd.setResult(Result.REJECTED_OTHER_REASON);
 					}
@@ -141,7 +134,8 @@
 
 			if (!cmd.getRefName().startsWith(Constants.R_REFS)
 					|| !Repository.isValidRefName(cmd.getRefName())) {
-				cmd.setResult(Result.REJECTED_OTHER_REASON, JGitText.get().funnyRefname);
+				cmd.setResult(Result.REJECTED_OTHER_REASON,
+						JGitText.get().funnyRefname);
 			}
 		}
 	}

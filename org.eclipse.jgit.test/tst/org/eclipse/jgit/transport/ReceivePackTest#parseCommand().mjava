@@ -3,7 +3,7 @@
 		String o = "0000000000000000000000000000000000000000";
 		String n = "deadbeefdeadbeefdeadbeefdeadbeefdeadbeef";
 		String r = "refs/heads/master";
-		ReceiveCommand cmd = BaseReceivePack.parseCommand(o + " " + n + " " + r);
+		ReceiveCommand cmd = ReceivePack.parseCommand(o + " " + n + " " + r);
 		assertEquals(ObjectId.zeroId(), cmd.getOldId());
 		assertEquals("deadbeefdeadbeefdeadbeefdeadbeefdeadbeef",
 				cmd.getNewId().name());

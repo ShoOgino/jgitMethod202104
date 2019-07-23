@@ -5,7 +5,27 @@
 	 *            the destination repository.
 	 */
 	public ReceivePack(Repository into) {
-		super(into);
+		db = into;
+		walk = new RevWalk(db);
+		walk.setRetainBody(false);
+
+		TransferConfig tc = db.getConfig().get(TransferConfig.KEY);
+		objectChecker = tc.newReceiveObjectChecker();
+
+		ReceiveConfig rc = db.getConfig().get(ReceiveConfig::new);
+		allowCreates = rc.allowCreates;
+		allowAnyDeletes = true;
+		allowBranchDeletes = rc.allowDeletes;
+		allowNonFastForwards = rc.allowNonFastForwards;
+		allowOfsDelta = rc.allowOfsDelta;
+		allowPushOptions = rc.allowPushOptions;
+		maxCommandBytes = rc.maxCommandBytes;
+		maxDiscardBytes = rc.maxDiscardBytes;
+		advertiseRefsHook = AdvertiseRefsHook.DEFAULT;
+		refFilter = RefFilter.DEFAULT;
+		advertisedHaves = new HashSet<>();
+		clientShallowCommits = new HashSet<>();
+		signedPushConfig = rc.signedPush;
 		preReceive = PreReceiveHook.NULL;
 		postReceive = PostReceiveHook.NULL;
 	}

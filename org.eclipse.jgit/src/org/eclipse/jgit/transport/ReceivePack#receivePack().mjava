@@ -6,7 +6,7 @@
 	 */
 	private void receivePack() throws IOException {
 		// It might take the client a while to pack the objects it needs
-		// to send to us.  We should increase our timeout so we don't
+		// to send to us. We should increase our timeout so we don't
 		// abort while the client is computing.
 		//
 		if (timeoutIn != null)
@@ -26,8 +26,8 @@
 			parser.setAllowThin(true);
 			parser.setNeedNewObjectIds(checkReferencedIsReachable);
 			parser.setNeedBaseObjectIds(checkReferencedIsReachable);
-			parser.setCheckEofAfterPackFooter(!biDirectionalPipe
-					&& !isExpectDataAfterPackFooter());
+			parser.setCheckEofAfterPackFooter(
+					!biDirectionalPipe && !isExpectDataAfterPackFooter());
 			parser.setExpectDataAfterPackFooter(isExpectDataAfterPackFooter());
 			parser.setObjectChecker(objectChecker);
 			parser.setLockMessage(lockMsg);
