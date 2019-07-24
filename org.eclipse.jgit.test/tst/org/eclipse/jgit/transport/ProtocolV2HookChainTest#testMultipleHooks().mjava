@@ -1,0 +1,13 @@
+	@Test
+	public void testMultipleHooks() throws ServiceMayNotContinueException {
+		FakeProtocolV2Hook hook1 = new FakeProtocolV2Hook();
+		FakeProtocolV2Hook hook2 = new FakeProtocolV2Hook();
+
+		ProtocolV2Hook chained = ProtocolV2HookChain
+				.newChain(Arrays.asList(hook1, hook2));
+		chained.onLsRefs(LsRefsV2Request.builder().build());
+
+		assertTrue(hook1.wasInvoked());
+		assertTrue(hook2.wasInvoked());
+	}
+
