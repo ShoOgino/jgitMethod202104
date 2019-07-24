@@ -6,10 +6,10 @@
 		String sourcePath = gitDir.getAbsolutePath();
 		String targetPath = (new File(sourcePath)).getParentFile()
 				.getParentFile().getAbsolutePath()
-				+ "/target.git";
-		StringBuilder cmd = new StringBuilder("git clone --bare ")
-				.append(sourcePath + " " + targetPath);
-		String[] result = execute(cmd.toString());
+				+ File.separator + "target.git";
+		String cmd = "git clone --bare " + shellQuote(sourcePath) + " "
+				+ shellQuote(targetPath);
+		String[] result = execute(cmd);
 		assertArrayEquals(new String[] {
 				"Cloning into '" + targetPath + "'...", "", "" }, result);
 		Git git2 = Git.open(new File(targetPath));

@@ -9,8 +9,8 @@
 		File gitDir = db.getDirectory();
 		String sourceURI = gitDir.toURI().toString();
 		String name = new URIish(sourceURI).getHumanishName();
-		StringBuilder cmd = new StringBuilder("git clone ").append(sourceURI);
-		String[] result = execute(cmd.toString());
+		String cmd = "git clone " + sourceURI;
+		String[] result = execute(cmd);
 		assertArrayEquals(new String[] {
 				"Cloning into '" + new File(target, name).getName() + "'...",
 				"", "" }, result);
