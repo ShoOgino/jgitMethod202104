@@ -1,0 +1,16 @@
+	@Test
+	public void invalidRefWriteOrder() throws IOException {
+		Ref master = ref(MASTER, 1);
+		Ref next = ref(NEXT, 2);
+		ReftableWriter writer = new ReftableWriter()
+			.setMinUpdateIndex(1)
+			.setMaxUpdateIndex(1)
+			.begin(new ByteArrayOutputStream());
+
+		writer.writeRef(next);
+		IllegalArgumentException e  = assertThrows(
+			IllegalArgumentException.class,
+			() -> writer.writeRef(master));
+		assertThat(e.getMessage(), containsString("records must be increasing"));
+	}
+

@@ -29,6 +29,11 @@
 					throws IOException {
 		String msg = message != null ? message : ""; //$NON-NLS-1$
 		beginLog();
-		logs.write(new LogEntry(ref, updateIndex, who, oldId, newId, msg));
+		LogEntry entry = new LogEntry(ref, updateIndex, who, oldId, newId, msg);
+		if (lastLog != null && Entry.compare(lastLog, entry) >= 0) {
+			throwIllegalEntry(lastLog, entry);
+		}
+		lastLog = entry;
+		logs.write(entry);
 	}
 

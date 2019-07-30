@@ -1,0 +1,16 @@
+	@Test
+	public void invalidReflogWriteOrderUpdateIndex() throws IOException {
+		ReftableWriter writer = new ReftableWriter()
+			.setMinUpdateIndex(1)
+			.setMaxUpdateIndex(2)
+			.begin(new ByteArrayOutputStream());
+		PersonIdent who = new PersonIdent("Log", "Ger", 1500079709, -8 * 60);
+		String msg = "test";
+
+		writer.writeLog(MASTER, 1, who, ObjectId.zeroId(), id(1), msg);
+		IllegalArgumentException e  = assertThrows(IllegalArgumentException.class,
+			() -> writer.writeLog(
+				MASTER, 2, who, ObjectId.zeroId(), id(2), msg));
+		assertThat(e.getMessage(), containsString("records must be increasing"));
+	}
+

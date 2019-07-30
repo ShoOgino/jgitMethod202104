@@ -16,7 +16,13 @@
 			throw new IllegalArgumentException();
 		}
 		long d = updateIndex - minUpdateIndex;
-		long blockPos = refs.write(new RefEntry(ref, d));
+		RefEntry entry = new RefEntry(ref, d);
+		if (lastRef != null && Entry.compare(lastRef, entry) >= 0) {
+			throwIllegalEntry(lastRef, entry);
+		}
+		lastRef = entry;
+
+		long blockPos = refs.write(entry);
 		indexRef(ref, blockPos);
 	}
 
