@@ -1,0 +1,9 @@
+	@Test
+	public void testCorrectUri() throws Exception {
+		// Backslash escaped as %5C is correct.
+		Proxy proxy = HttpSupport.proxyFor(new TestProxySelector(), new URL(
+				"http://infor%5Cc.jones@somehost/somewhere/someproject.git"));
+		assertNotNull(proxy);
+		assertEquals(Proxy.Type.HTTP, proxy.type());
+	}
+
