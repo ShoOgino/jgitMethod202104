@@ -1,0 +1,11 @@
+	@Test
+	public void testBlameNoHead() throws Exception {
+		try (Git git = new Git(db)) {
+			writeTrashFile("inIndex.txt", "index");
+			git.add().addFilepattern("inIndex.txt").call();
+		}
+		thrown.expect(Die.class);
+		thrown.expectMessage("no such ref: HEAD");
+		execute("git blame inIndex.txt");
+	}
+

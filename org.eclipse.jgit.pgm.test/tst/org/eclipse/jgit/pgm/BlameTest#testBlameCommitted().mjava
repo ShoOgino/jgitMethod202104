@@ -1,0 +1,13 @@
+	@Test
+	public void testBlameCommitted() throws Exception {
+		try (Git git = new Git(db)) {
+			git.commit().setMessage("initial commit").call();
+			writeTrashFile("committed.txt", "committed");
+			git.add().addFilepattern("committed.txt").call();
+			git.commit().setMessage("commit").call();
+		}
+		assertStringArrayEquals(
+				"1ad3399c (GIT_COMMITTER_NAME 2009-08-15 20:12:58 -0330 1) committed",
+				execute("git blame committed.txt"));
+	}
+
