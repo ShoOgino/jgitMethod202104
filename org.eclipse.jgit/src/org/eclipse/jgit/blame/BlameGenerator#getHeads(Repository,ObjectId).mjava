@@ -1,0 +1,14 @@
+	private List<RevCommit> getHeads(Repository repo, ObjectId head)
+			throws NoWorkTreeException, IOException {
+		List<ObjectId> mergeIds = repo.readMergeHeads();
+		if (mergeIds == null || mergeIds.isEmpty()) {
+			return Collections.singletonList(revPool.parseCommit(head));
+		}
+		List<RevCommit> heads = new ArrayList<>(mergeIds.size() + 1);
+		heads.add(revPool.parseCommit(head));
+		for (ObjectId id : mergeIds) {
+			heads.add(revPool.parseCommit(id));
+		}
+		return heads;
+	}
+

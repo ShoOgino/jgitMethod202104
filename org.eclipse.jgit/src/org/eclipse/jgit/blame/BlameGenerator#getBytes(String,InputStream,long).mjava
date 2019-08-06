@@ -1,0 +1,17 @@
+	private static byte[] getBytes(String path, InputStream in, long maxLength)
+			throws IOException {
+		if (maxLength > Integer.MAX_VALUE) {
+			throw new IOException(
+					MessageFormat.format(JGitText.get().fileIsTooLarge, path));
+		}
+		int max = (int) maxLength;
+		byte[] buffer = new byte[max];
+		int read = IO.readFully(in, buffer, 0);
+		if (read == max) {
+			return buffer;
+		}
+		byte[] copy = new byte[read];
+		System.arraycopy(buffer, 0, copy, 0, read);
+		return copy;
+	}
+
