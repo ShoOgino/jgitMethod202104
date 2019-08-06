@@ -1,8 +1,10 @@
 	private String date(int line) {
-		if (blame.getSourceCommit(line) == null)
-			return ""; //$NON-NLS-1$
-
-		PersonIdent author = blame.getSourceAuthor(line);
+		PersonIdent author;
+		if (blame.getSourceCommit(line) == null) {
+			author = dummyDate;
+		} else {
+			author = blame.getSourceAuthor(line);
+		}
 		if (author == null)
 			return ""; //$NON-NLS-1$
 
