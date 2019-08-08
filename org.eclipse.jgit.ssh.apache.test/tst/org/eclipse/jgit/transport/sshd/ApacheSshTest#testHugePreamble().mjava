@@ -1,0 +1,20 @@
+	@Test (expected = TransportException.class)
+	public void testHugePreamble() throws Exception {
+		// Test that the connection fails when the preamble is longer than 64k.
+		StringBuilder b = new StringBuilder();
+		for (int i = 0; i < 1024; i++) {
+			b.append('a');
+		}
+		String line = b.toString();
+		String[] lines = new String[70];
+		for (int i = 0; i < lines.length; i++) {
+			lines[i] = line;
+		}
+		server.setPreamble(lines);
+		cloneWith(
+				"ssh://" + TEST_USER + "@localhost:" + testPort
+						+ "/doesntmatter",
+				defaultCloneDir, null,
+				"IdentityFile " + privateKey1.getAbsolutePath());
+	}
+
