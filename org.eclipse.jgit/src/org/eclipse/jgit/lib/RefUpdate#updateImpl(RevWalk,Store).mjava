@@ -33,7 +33,8 @@
 			}
 
 			oldObj = safeParseOld(walk, oldValue);
-			if (newObj == oldObj && !detachingSymbolicRef) {
+			if (References.isSameObject(newObj, oldObj)
+					&& !detachingSymbolicRef) {
 				return store.execute(Result.NO_CHANGE);
 			}
 
