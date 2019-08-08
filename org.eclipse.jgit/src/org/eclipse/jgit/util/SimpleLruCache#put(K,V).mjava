@@ -15,6 +15,7 @@
 	 * @throws NullPointerException
 	 *             if the specified key or value is null
 	 */
+	@SuppressWarnings("NonAtomicVolatileUpdate")
 	public V put(@NonNull K key, @NonNull V value) {
 		map.put(key, new Entry<>(key, value, ++time));
 		if (map.size() > maximumSize) {
