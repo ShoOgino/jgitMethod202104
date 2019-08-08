@@ -18,7 +18,7 @@
 	public void updateType(RevWalk walk) throws IOException {
 		if (typeIsCorrect)
 			return;
-		if (type == Type.UPDATE && !AnyObjectId.equals(oldId, newId)) {
+		if (type == Type.UPDATE && !AnyObjectId.isEqual(oldId, newId)) {
 			RevObject o = walk.parseAny(oldId);
 			RevObject n = walk.parseAny(newId);
 			if (!(o instanceof RevCommit)
