@@ -1,0 +1,19 @@
+	@Test
+	public void testNoValues() {
+		Stats s = new Stats();
+		assertTrue(Double.isNaN(s.var()));
+		assertTrue(Double.isNaN(s.stddev()));
+		assertTrue(Double.isNaN(s.avg()));
+		assertTrue(Double.isNaN(s.min()));
+		assertTrue(Double.isNaN(s.max()));
+		s.add(42.3);
+		assertTrue(Double.isNaN(s.var()));
+		assertTrue(Double.isNaN(s.stddev()));
+		assertEquals(42.3, s.avg(), 1E-6);
+		assertEquals(42.3, s.max(), 1E-6);
+		assertEquals(42.3, s.min(), 1E-6);
+		s.add(42.3);
+		assertEquals(0, s.var(), 1E-6);
+		assertEquals(0, s.stddev(), 1E-6);
+	}
+

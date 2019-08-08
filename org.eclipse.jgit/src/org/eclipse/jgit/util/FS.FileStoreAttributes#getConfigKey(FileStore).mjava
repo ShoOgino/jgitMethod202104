@@ -1,0 +1,20 @@
+		private static String getConfigKey(FileStore s) {
+			final String storeKey;
+			if (SystemReader.getInstance().isWindows()) {
+				Object attribute = null;
+				try {
+					attribute = s.getAttribute("volume:vsn"); //$NON-NLS-1$
+				} catch (IOException ignored) {
+					// ignore
+				}
+				if (attribute instanceof Integer) {
+					storeKey = attribute.toString();
+				} else {
+					storeKey = s.name();
+				}
+			} else {
+				storeKey = s.name();
+			}
+			return javaVersionPrefix + storeKey;
+		}
+

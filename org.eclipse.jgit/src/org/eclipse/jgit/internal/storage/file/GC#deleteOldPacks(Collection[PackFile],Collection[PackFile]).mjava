@@ -40,8 +40,9 @@
 					continue oldPackLoop;
 
 			if (!oldPack.shouldBeKept()
-					&& repo.getFS().lastModified(
-							oldPack.getPackFile()) < packExpireDate) {
+					&& repo.getFS()
+							.lastModifiedInstant(oldPack.getPackFile())
+							.toEpochMilli() < packExpireDate) {
 				oldPack.close();
 				if (shouldLoosen) {
 					loosen(inserter, reader, oldPack, ids);

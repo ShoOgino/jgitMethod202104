@@ -1,0 +1,12 @@
+	private static void reportDeleteFailure(boolean failOnError, File f,
+			Exception cause) {
+		String severity = failOnError ? "ERROR" : "WARNING";
+		String msg = severity + ": Failed to delete " + f;
+		if (failOnError) {
+			fail(msg);
+		} else {
+			System.err.println(msg);
+		}
+		cause.printStackTrace(new PrintStream(System.err));
+	}
+

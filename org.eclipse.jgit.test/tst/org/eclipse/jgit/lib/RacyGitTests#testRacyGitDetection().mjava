@@ -10,10 +10,10 @@
 		fsTick(db.getIndexFile());
 
 		// create two files
-		File a = addToWorkDir("a", "a");
-		File b = addToWorkDir("b", "b");
-		assertTrue(a.setLastModified(b.lastModified()));
-		assertTrue(b.setLastModified(b.lastModified()));
+		File a = writeToWorkDir("a", "a");
+		File b = writeToWorkDir("b", "b");
+		TimeUtil.setLastModifiedOf(a.toPath(), b.toPath());
+		TimeUtil.setLastModifiedOf(b.toPath(), b.toPath());
 
 		// wait to ensure that file-modTimes and therefore index entry modTime
 		// doesn't match the modtime of index-file after next persistance
@@ -31,19 +31,32 @@
 		fsTick(db.getIndexFile());
 
 		// Create a racy git situation. This is a situation that the index is
-		// updated and then a file is modified within a second. By changing the
-		// index file artificially, we create a fake racy situation.
-		File updatedA = addToWorkDir("a", "a2");
-		assertTrue(updatedA.setLastModified(updatedA.lastModified() + 100));
+		// updated and then a file is modified within the same tick of the
+		// filesystem timestamp resolution. By changing the index file
+		// artificially, we create a fake racy situation.
+		File updatedA = writeToWorkDir("a", "a2");
+		Instant newLastModified = TimeUtil
+				.setLastModifiedWithOffset(updatedA.toPath(), 100L);
 		resetIndex(new FileTreeIterator(db));
-		assertTrue(db.getIndexFile()
-				.setLastModified(updatedA.lastModified() + 90));
+		FS.DETECTED.setLastModified(db.getIndexFile().toPath(),
+				newLastModified);
 
-		db.readDirCache();
-		// although racily clean a should not be reported as being dirty
+		DirCache dc = db.readDirCache();
+		// check index state: although racily clean a should not be reported as
+		// being dirty since we forcefully reset the index to match the working
+		// tree
 		assertEquals(
 				"[a, mode:100644, time:t1, smudged, length:0, content:a2]"
 						+ "[b, mode:100644, time:t0, length:1, content:b]",
 				indexState(SMUDGE | MOD_TIME | LENGTH | CONTENT));
+
+		// compare state of files in working tree with index to check that
+		// FileTreeIterator.isModified() works as expected
+		FileTreeIterator f = new FileTreeIterator(db.getWorkTree(), db.getFS(),
+				db.getConfig().get(WorkingTreeOptions.KEY));
+		assertTrue(f.findFile("a"));
+		try (ObjectReader reader = db.newObjectReader()) {
+			assertFalse(f.isModified(dc.getEntry("a"), false, reader));
+		}
 	}
 

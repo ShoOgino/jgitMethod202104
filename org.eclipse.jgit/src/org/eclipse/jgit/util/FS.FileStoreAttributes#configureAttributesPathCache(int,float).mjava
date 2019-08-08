@@ -1,0 +1,20 @@
+		/**
+		 * Configures size and purge factor of the path-based cache for file
+		 * system attributes. Caching of file system attributes avoids recurring
+		 * lookup of @{code FileStore} of files which may be expensive on some
+		 * platforms.
+		 *
+		 * @param maxSize
+		 *            maximum size of the cache, default is 100
+		 * @param purgeFactor
+		 *            when the size of the map reaches maxSize the oldest
+		 *            entries will be purged to free up some space for new
+		 *            entries, {@code purgeFactor} is the fraction of
+		 *            {@code maxSize} to purge when this happens
+		 * @since 5.1.9
+		 */
+		public static void configureAttributesPathCache(int maxSize,
+				float purgeFactor) {
+			FileStoreAttributes.attrCacheByPath.configure(maxSize, purgeFactor);
+		}
+

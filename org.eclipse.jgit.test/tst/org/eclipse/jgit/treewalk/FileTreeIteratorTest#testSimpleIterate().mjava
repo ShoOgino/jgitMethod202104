@@ -8,7 +8,7 @@
 		assertEquals(FileMode.REGULAR_FILE.getBits(), top.mode);
 		assertEquals(paths[0], nameOf(top));
 		assertEquals(paths[0].length(), top.getEntryLength());
-		assertEquals(mtime[0], top.getEntryLastModified());
+		assertEquals(mtime[0], top.getEntryLastModifiedInstant());
 
 		top.next(1);
 		assertFalse(top.first());
@@ -16,7 +16,7 @@
 		assertEquals(FileMode.REGULAR_FILE.getBits(), top.mode);
 		assertEquals(paths[1], nameOf(top));
 		assertEquals(paths[1].length(), top.getEntryLength());
-		assertEquals(mtime[1], top.getEntryLastModified());
+		assertEquals(mtime[1], top.getEntryLastModifiedInstant());
 
 		top.next(1);
 		assertFalse(top.first());
@@ -31,7 +31,7 @@
 		assertFalse(sub.eof());
 		assertEquals(paths[2], nameOf(sub));
 		assertEquals(paths[2].length(), subfti.getEntryLength());
-		assertEquals(mtime[2], subfti.getEntryLastModified());
+		assertEquals(mtime[2], subfti.getEntryLastModifiedInstant());
 
 		sub.next(1);
 		assertTrue(sub.eof());
@@ -42,7 +42,7 @@
 		assertEquals(FileMode.REGULAR_FILE.getBits(), top.mode);
 		assertEquals(paths[3], nameOf(top));
 		assertEquals(paths[3].length(), top.getEntryLength());
-		assertEquals(mtime[3], top.getEntryLastModified());
+		assertEquals(mtime[3], top.getEntryLastModifiedInstant());
 
 		top.next(1);
 		assertTrue(top.eof());

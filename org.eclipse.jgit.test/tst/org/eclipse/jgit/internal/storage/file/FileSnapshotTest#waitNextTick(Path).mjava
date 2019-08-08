@@ -1,0 +1,8 @@
+	private static void waitNextTick(Path f) throws IOException {
+		Instant initialLastModified = FS.DETECTED.lastModifiedInstant(f);
+		do {
+			FS.DETECTED.setLastModified(f, Instant.now());
+		} while (FS.DETECTED.lastModifiedInstant(f)
+				.equals(initialLastModified));
+	}
+

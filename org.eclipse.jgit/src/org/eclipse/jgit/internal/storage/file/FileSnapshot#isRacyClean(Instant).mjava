@@ -1,0 +1,14 @@
+	private boolean isRacyClean(Instant read) {
+		racyThreshold = getEffectiveRacyThreshold();
+		delta = Duration.between(lastModified, read).toNanos();
+		wasRacyClean = delta <= racyThreshold;
+		if (LOG.isDebugEnabled()) {
+			LOG.debug(
+					"file={}, isRacyClean={}, read={}, lastModified={}, delta={} ns, racy<={} ns", //$NON-NLS-1$
+					file, Boolean.valueOf(wasRacyClean), dateFmt.format(read),
+					dateFmt.format(lastModified), Long.valueOf(delta),
+					Long.valueOf(racyThreshold));
+		}
+		return wasRacyClean;
+	}
+

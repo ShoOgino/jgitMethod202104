@@ -6,12 +6,12 @@
 	 */
 	@Test
 	public void testFileSizeChanged() throws Exception {
-		File f = createFile("file");
-		FileTime timestamp = Files.getLastModifiedTime(f.toPath());
-		FileSnapshot save = FileSnapshot.save(f);
+		Path f = createFile("file");
+		FileTime timestamp = Files.getLastModifiedTime(f);
+		FileSnapshot save = FileSnapshot.save(f.toFile());
 		append(f, (byte) 'x');
-		Files.setLastModifiedTime(f.toPath(), timestamp);
-		assertTrue(save.isModified(f));
+		Files.setLastModifiedTime(f, timestamp);
+		assertTrue(save.isModified(f.toFile()));
 		assertTrue(save.wasSizeChanged());
 	}
 

@@ -9,7 +9,7 @@
 	public PackFile(File packFile, int extensions) {
 		this.packFile = packFile;
 		this.fileSnapshot = PackFileSnapshot.save(packFile);
-		this.packLastModified = (int) (fileSnapshot.lastModified() >> 10);
+		this.packLastModified = fileSnapshot.lastModifiedInstant();
 		this.extensions = extensions;
 
 		// Multiply by 31 here so we can more directly combine with another

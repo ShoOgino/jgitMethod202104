@@ -1,0 +1,27 @@
+	/**
+	 * Reconfigures the cache. If {@code maxSize} is reduced some entries will
+	 * be purged.
+	 *
+	 * @param maxSize
+	 *            maximum size of the cache
+	 *
+	 * @param purgeFactor
+	 *            when the size of the map reaches maxSize the oldest entries
+	 *            will be purged to free up some space for new entries,
+	 *            {@code purgeFactor} is the fraction of {@code maxSize} to
+	 *            purge when this happens
+	 */
+	public void configure(int maxSize, float purgeFactor) {
+		lock.lock();
+		try {
+			checkPurgeFactor(purgeFactor);
+			this.maximumSize = maxSize;
+			this.purgeSize = purgeSize(maxSize, purgeFactor);
+			if (map.size() >= maximumSize) {
+				purge();
+			}
+		} finally {
+			lock.unlock();
+		}
+	}
+

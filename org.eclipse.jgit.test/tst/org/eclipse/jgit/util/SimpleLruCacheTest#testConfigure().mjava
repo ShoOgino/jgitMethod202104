@@ -1,0 +1,14 @@
+	@Test
+	public void testConfigure() {
+		for (int i = 0; i < 100; i++) {
+			cache.put("a" + i, "a" + i);
+		}
+		assertEquals(100, cache.size());
+		cache.configure(10, 0.3f);
+		assertEquals(7, cache.size());
+		assertNull(cache.get("a0"));
+		assertNull(cache.get("a92"));
+		assertNotNull(cache.get("a93"));
+		assertNotNull(cache.get("a99"));
+	}
+

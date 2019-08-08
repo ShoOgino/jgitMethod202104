@@ -15,7 +15,8 @@
 	 * @throws InterruptedException
 	 * @throws IOException
 	 */
-	public static long fsTick(File lastFile) throws InterruptedException,
+	public static Instant fsTick(File lastFile)
+			throws InterruptedException,
 			IOException {
 		File tmp;
 		FS fs = FS.DETECTED;
@@ -29,15 +30,16 @@
 			tmp = File.createTempFile("fsTickTmpFile", null,
 					lastFile.getParentFile());
 		}
-		long res = FS.getFsTimerResolution(tmp.toPath()).toMillis();
+		long res = FS.getFileStoreAttributes(tmp.toPath())
+				.getFsTimestampResolution().toNanos();
 		long sleepTime = res / 10;
 		try {
-			long startTime = fs.lastModified(lastFile);
-			long actTime = fs.lastModified(tmp);
-			while (actTime <= startTime) {
-				Thread.sleep(sleepTime);
+			Instant startTime = fs.lastModifiedInstant(lastFile);
+			Instant actTime = fs.lastModifiedInstant(tmp);
+			while (actTime.compareTo(startTime) <= 0) {
+				TimeUnit.NANOSECONDS.sleep(sleepTime);
 				FileUtils.touch(tmp.toPath());
-				actTime = fs.lastModified(tmp);
+				actTime = fs.lastModifiedInstant(tmp);
 			}
 			return actTime;
 		} finally {

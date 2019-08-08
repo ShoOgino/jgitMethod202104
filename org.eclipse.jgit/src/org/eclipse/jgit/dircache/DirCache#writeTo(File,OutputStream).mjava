@@ -29,8 +29,8 @@
 			// so we use the current timestamp as a approximation.
 			myLock.createCommitSnapshot();
 			snapshot = myLock.getCommitSnapshot();
-			smudge_s = (int) (snapshot.lastModified() / 1000);
-			smudge_ns = ((int) (snapshot.lastModified() % 1000)) * 1000000;
+			smudge_s = (int) (snapshot.lastModifiedInstant().getEpochSecond());
+			smudge_ns = snapshot.lastModifiedInstant().getNano();
 		} else {
 			// Used in unit tests only
 			smudge_ns = 0;

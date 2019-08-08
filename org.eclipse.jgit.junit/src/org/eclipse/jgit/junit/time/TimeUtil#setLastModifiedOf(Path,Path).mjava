@@ -1,0 +1,17 @@
+	/**
+	 * Set the lastModified time of file a to the one from file b
+	 *
+	 * @param a
+	 *            file to set lastModified time
+	 * @param b
+	 *            file to read lastModified time from
+	 */
+	public static void setLastModifiedOf(Path a, Path b) {
+		Instant mTime = FS.DETECTED.lastModifiedInstant(b);
+		try {
+			Files.setLastModifiedTime(a, FileTime.from(mTime));
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
