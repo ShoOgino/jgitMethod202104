@@ -1,0 +1,11 @@
+	@Test
+	public void fileSnapshotEquals() throws Exception {
+		// 0 sized FileSnapshot.
+		FileSnapshot fs1 = FileSnapshot.MISSING_FILE;
+		// UNKNOWN_SIZE FileSnapshot.
+		FileSnapshot fs2 = FileSnapshot.save(fs1.lastModifiedInstant());
+
+		assertTrue(fs1.equals(fs2));
+		assertTrue(fs2.equals(fs1));
+	}
+

@@ -1,6 +1,7 @@
 	private static void write(File[] files, PackWriter pw)
 			throws IOException {
-		final long begin = files[0].getParentFile().lastModified();
+		final Instant begin = FS.DETECTED
+				.lastModifiedInstant(files[0].getParentFile());
 		NullProgressMonitor m = NullProgressMonitor.INSTANCE;
 
 		try (OutputStream out = new BufferedOutputStream(

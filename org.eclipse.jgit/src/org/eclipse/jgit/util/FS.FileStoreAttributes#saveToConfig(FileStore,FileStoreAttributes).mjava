@@ -1,0 +1,58 @@
+		private static void saveToConfig(FileStore s,
+				FileStoreAttributes c) {
+			FileBasedConfig userConfig = SystemReader.getInstance()
+					.openUserConfig(null, FS.DETECTED);
+			long resolution = c.getFsTimestampResolution().toNanos();
+			TimeUnit resolutionUnit = getUnit(resolution);
+			long resolutionValue = resolutionUnit.convert(resolution,
+					TimeUnit.NANOSECONDS);
+
+			long minRacyThreshold = c.getMinimalRacyInterval().toNanos();
+			TimeUnit minRacyThresholdUnit = getUnit(minRacyThreshold);
+			long minRacyThresholdValue = minRacyThresholdUnit
+					.convert(minRacyThreshold, TimeUnit.NANOSECONDS);
+
+			final int max_retries = 5;
+			int retries = 0;
+			boolean succeeded = false;
+			String key = getConfigKey(s);
+			while (!succeeded && retries < max_retries) {
+				try {
+					userConfig.load(false);
+					userConfig.setString(
+							ConfigConstants.CONFIG_FILESYSTEM_SECTION, key,
+							ConfigConstants.CONFIG_KEY_TIMESTAMP_RESOLUTION,
+							String.format("%d %s", //$NON-NLS-1$
+									Long.valueOf(resolutionValue),
+									resolutionUnit.name().toLowerCase()));
+					userConfig.setString(
+							ConfigConstants.CONFIG_FILESYSTEM_SECTION, key,
+							ConfigConstants.CONFIG_KEY_MIN_RACY_THRESHOLD,
+							String.format("%d %s", //$NON-NLS-1$
+									Long.valueOf(minRacyThresholdValue),
+									minRacyThresholdUnit.name().toLowerCase()));
+					userConfig.save();
+					succeeded = true;
+				} catch (LockFailedException e) {
+					// race with another thread, wait a bit and try again
+					try {
+						LOG.warn(MessageFormat.format(JGitText.get().cannotLock,
+								userConfig.getFile().getAbsolutePath()));
+						retries++;
+						Thread.sleep(20);
+					} catch (InterruptedException e1) {
+						Thread.interrupted();
+					}
+				} catch (IOException e) {
+					LOG.error(MessageFormat.format(
+							JGitText.get().cannotSaveConfig,
+							userConfig.getFile().getAbsolutePath()), e);
+				} catch (ConfigInvalidException e) {
+					LOG.error(MessageFormat.format(
+							JGitText.get().repositoryConfigFileInvalid,
+							userConfig.getFile().getAbsolutePath(),
+							e.getMessage()));
+				}
+			}
+		}
+

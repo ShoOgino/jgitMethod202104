@@ -1,7 +1,7 @@
 	@Test
 	public void testNoOutputStreamSet() throws Exception {
 		File file = writeTrashFile("test.txt", "a");
-		assertTrue(file.setLastModified(file.lastModified() - 5000));
+		TimeUtil.setLastModifiedWithOffset(file.toPath(), -5000L);
 		try (Git git = new Git(db)) {
 			git.add().addFilepattern(".").call();
 			write(file, "b");

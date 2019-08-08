@@ -9,11 +9,11 @@
 		// This should stress the sorting code better than doing it in
 		// the correct order.
 		//
-		mtime = new long[paths.length];
+		mtime = new Instant[paths.length];
 		for (int i = paths.length - 1; i >= 0; i--) {
 			final String s = paths[i];
 			writeTrashFile(s, s);
-			mtime[i] = FS.DETECTED.lastModified(new File(trash, s));
+			mtime[i] = db.getFS().lastModifiedInstant(new File(trash, s));
 		}
 	}
 

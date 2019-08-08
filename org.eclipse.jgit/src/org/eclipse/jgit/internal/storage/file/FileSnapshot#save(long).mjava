@@ -12,10 +12,12 @@
 	 * @param modified
 	 *            the last modification time of the file
 	 * @return the snapshot.
+	 * @deprecated use {@link #save(Instant)} instead.
 	 */
+	@Deprecated
 	public static FileSnapshot save(long modified) {
-		final long read = System.currentTimeMillis();
-		return new FileSnapshot(read, modified, -1, Duration.ZERO,
-				MISSING_FILEKEY);
+		final Instant read = Instant.now();
+		return new FileSnapshot(read, Instant.ofEpochMilli(modified),
+				UNKNOWN_SIZE, FALLBACK_TIMESTAMP_RESOLUTION, MISSING_FILEKEY);
 	}
 

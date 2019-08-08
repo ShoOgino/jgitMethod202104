@@ -1,0 +1,22 @@
+	private void purge() {
+		// don't try to compete if another thread already has the lock
+		if (lock.tryLock()) {
+			try {
+				List<Entry> entriesToPurge = new ArrayList<>(map.values());
+				// copy access times to avoid other threads interfere with
+				// sorting
+				for (Entry e : entriesToPurge) {
+					e.copyAccessTime();
+				}
+				Collections.sort(entriesToPurge,
+						Comparator.comparingLong(o -> -o.lastAccessedSorting));
+				for (int index = purgeSize; index < entriesToPurge
+						.size(); index++) {
+					map.remove(entriesToPurge.get(index).key);
+				}
+			} finally {
+				lock.unlock();
+			}
+		}
+	}
+

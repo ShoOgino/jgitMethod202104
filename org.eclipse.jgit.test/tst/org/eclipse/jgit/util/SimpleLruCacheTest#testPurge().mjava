@@ -1,0 +1,12 @@
+	@Test
+	public void testPurge() {
+		for (int i = 0; i < 101; i++) {
+			cache.put("a" + i, "a" + i);
+		}
+		assertEquals(80, cache.size());
+		assertNull(cache.get("a0"));
+		assertNull(cache.get("a20"));
+		assertNotNull(cache.get("a21"));
+		assertNotNull(cache.get("a99"));
+	}
+

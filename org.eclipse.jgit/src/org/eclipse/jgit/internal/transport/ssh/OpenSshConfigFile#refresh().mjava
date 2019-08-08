@@ -1,6 +1,6 @@
 	private synchronized State refresh() {
-		final long mtime = configFile.lastModified();
-		if (mtime != lastModified) {
+		final Instant mtime = FS.DETECTED.lastModifiedInstant(configFile);
+		if (!mtime.equals(lastModified)) {
 			State newState = new State();
 			try (BufferedReader br = Files
 					.newBufferedReader(configFile.toPath(), UTF_8)) {

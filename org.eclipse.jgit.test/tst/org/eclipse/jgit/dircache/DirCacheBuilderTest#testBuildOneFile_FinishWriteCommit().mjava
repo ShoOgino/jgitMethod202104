@@ -2,7 +2,7 @@
 	public void testBuildOneFile_FinishWriteCommit() throws Exception {
 		final String path = "a-file-path";
 		final FileMode mode = FileMode.REGULAR_FILE;
-		final long lastModified = 1218123387057L;
+		final Instant lastModified = Instant.ofEpochMilli(1218123387057L);
 		final int length = 1342;
 		final DirCacheEntry entOrig;
 		{
@@ -20,7 +20,7 @@
 			assertEquals(ObjectId.zeroId(), entOrig.getObjectId());
 			assertEquals(mode.getBits(), entOrig.getRawMode());
 			assertEquals(0, entOrig.getStage());
-			assertEquals(lastModified, entOrig.getLastModified());
+			assertEquals(lastModified, entOrig.getLastModifiedInstant());
 			assertEquals(length, entOrig.getLength());
 			assertFalse(entOrig.isAssumeValid());
 			b.add(entOrig);
@@ -42,7 +42,7 @@
 			assertEquals(ObjectId.zeroId(), entOrig.getObjectId());
 			assertEquals(mode.getBits(), entOrig.getRawMode());
 			assertEquals(0, entOrig.getStage());
-			assertEquals(lastModified, entOrig.getLastModified());
+			assertEquals(lastModified, entOrig.getLastModifiedInstant());
 			assertEquals(length, entOrig.getLength());
 			assertFalse(entOrig.isAssumeValid());
 		}

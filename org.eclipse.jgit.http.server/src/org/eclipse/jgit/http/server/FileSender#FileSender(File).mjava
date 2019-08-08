@@ -3,7 +3,7 @@
 		this.source = new RandomAccessFile(path, "r");
 
 		try {
-			this.lastModified = path.lastModified();
+			this.lastModified = FS.DETECTED.lastModifiedInstant(path);
 			this.fileLen = source.getChannel().size();
 			this.end = fileLen;
 		} catch (IOException e) {
