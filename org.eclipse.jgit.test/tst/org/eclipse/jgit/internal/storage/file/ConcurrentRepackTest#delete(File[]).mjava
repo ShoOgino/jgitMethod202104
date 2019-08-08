@@ -1,5 +1,6 @@
 	private static void delete(File[] list) throws IOException {
-		final long begin = list[0].getParentFile().lastModified();
+		final Instant begin = FS.DETECTED
+				.lastModifiedInstant(list[0].getParentFile());
 		for (File f : list) {
 			FileUtils.delete(f);
 			assertFalse(f + " was removed", f.exists());

@@ -14,11 +14,11 @@
 			DirCacheEntry entry = dc.getEntry(path);
 			DirCacheEntry entry2 = dc.getEntry(path);
 
-			assertTrue("last modified shall not be zero!",
-					entry.getLastModified() != 0);
+			assertFalse("last modified shall not be the epoch!",
+					entry.getLastModifiedInstant().equals(EPOCH));
 
-			assertTrue("last modified shall not be zero!",
-					entry2.getLastModified() != 0);
+			assertFalse("last modified shall not be the epoch!",
+					entry2.getLastModifiedInstant().equals(EPOCH));
 
 			writeTrashFile(path, "new content");
 			git.add().addFilepattern(path).call();
@@ -28,11 +28,11 @@
 			entry = dc.getEntry(path);
 			entry2 = dc.getEntry(path);
 
-			assertTrue("last modified shall not be zero!",
-					entry.getLastModified() != 0);
+			assertFalse("last modified shall not be the epoch!",
+					entry.getLastModifiedInstant().equals(EPOCH));
 
-			assertTrue("last modified shall not be zero!",
-					entry2.getLastModified() != 0);
+			assertFalse("last modified shall not be the epoch!",
+					entry2.getLastModifiedInstant().equals(EPOCH));
 		}
 	}
 

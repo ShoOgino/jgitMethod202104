@@ -6,8 +6,9 @@
 		bos1.write(0xBF);
 		bos1.write(CONTENT1.getBytes(UTF_8));
 
-		final File file = createFile(bos1.toByteArray());
-		final FileBasedConfig config = new FileBasedConfig(file, FS.DETECTED);
+		final Path file = createFile(bos1.toByteArray());
+		final FileBasedConfig config = new FileBasedConfig(file.toFile(),
+				FS.DETECTED);
 		config.load();
 		assertEquals(ALICE, config.getString(USER, null, NAME));
 
@@ -19,6 +20,6 @@
 		bos2.write(0xBB);
 		bos2.write(0xBF);
 		bos2.write(CONTENT2.getBytes(UTF_8));
-		assertArrayEquals(bos2.toByteArray(), IO.readFully(file));
+		assertArrayEquals(bos2.toByteArray(), IO.readFully(file.toFile()));
 	}
 

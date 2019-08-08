@@ -6,16 +6,16 @@
 	 * @return true if the path needs to be read again.
 	 */
 	public boolean isModified(File path) {
-		long currLastModified;
+		Instant currLastModified;
 		long currSize;
 		Object currFileKey;
 		try {
 			BasicFileAttributes fileAttributes = FS.DETECTED.fileAttributes(path);
-			currLastModified = fileAttributes.lastModifiedTime().toMillis();
+			currLastModified = fileAttributes.lastModifiedTime().toInstant();
 			currSize = fileAttributes.size();
 			currFileKey = getFileKey(fileAttributes);
 		} catch (IOException e) {
-			currLastModified = path.lastModified();
+			currLastModified = Instant.ofEpochMilli(path.lastModified());
 			currSize = path.length();
 			currFileKey = MISSING_FILEKEY;
 		}

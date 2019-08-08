@@ -8,12 +8,14 @@
 	 *
 	 * @param name
 	 *            the file in the repository to force a time change on.
+	 * @throws IOException
 	 */
-	private void BUG_WorkAroundRacyGitIssues(String name) {
+	private void BUG_WorkAroundRacyGitIssues(String name) throws IOException {
 		File path = new File(db.getDirectory(), name);
-		long old = path.lastModified();
+		FS fs = db.getFS();
+		Instant old = fs.lastModifiedInstant(path);
 		long set = 1250379778668L; // Sat Aug 15 20:12:58 GMT-03:30 2009
-		path.setLastModified(set);
-		assertTrue("time changed", old != path.lastModified());
+		fs.setLastModified(path.toPath(), Instant.ofEpochMilli(set));
+		assertFalse("time changed", old.equals(fs.lastModifiedInstant(path)));
 	}
 

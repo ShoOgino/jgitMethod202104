@@ -23,7 +23,8 @@
 		AnyObjectId chk1 = pf.getPackChecksum();
 		String name = pf.getPackName();
 		Long length = Long.valueOf(pf.getPackFile().length());
-		long m1 = packFilePath.toFile().lastModified();
+		FS fs = db.getFS();
+		Instant m1 = fs.lastModifiedInstant(packFilePath);
 
 		// Wait for a filesystem timer tick to enhance probability the rest of
 		// this test is done before the filesystem timer ticks again.
@@ -33,15 +34,15 @@
 		// content and checksum are different since compression level differs
 		AnyObjectId chk2 = repackAndCheck(6, name, length, chk1)
 				.getPackChecksum();
-		long m2 = packFilePath.toFile().lastModified();
-		assumeFalse(m2 == m1);
+		Instant m2 = fs.lastModifiedInstant(packFilePath);
+		assumeFalse(m2.equals(m1));
 
 		// Repack to create packfile with same name, length. Lastmodified is
 		// equal to the previous one because we are in the same filesystem timer
 		// slot. Content and its checksum are different
 		AnyObjectId chk3 = repackAndCheck(7, name, length, chk2)
 				.getPackChecksum();
-		long m3 = packFilePath.toFile().lastModified();
+		Instant m3 = fs.lastModifiedInstant(packFilePath);
 
 		// ask for an unknown git object to force jgit to rescan the list of
 		// available packs. If we would ask for a known objectid then JGit would
@@ -49,6 +50,6 @@
 		db.getObjectDatabase().has(unknownID);
 		assertEquals(chk3, getSinglePack(db.getObjectDatabase().getPacks())
 				.getPackChecksum());
-		assumeTrue(m3 == m2);
+		assumeTrue(m3.equals(m2));
 	}
 

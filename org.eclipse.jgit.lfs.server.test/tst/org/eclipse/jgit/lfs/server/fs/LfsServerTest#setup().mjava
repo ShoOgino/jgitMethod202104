@@ -1,6 +1,11 @@
 	@Before
 	public void setup() throws Exception {
 		tmp = Files.createTempDirectory("jgit_test_");
+
+		// measure timer resolution before the test to avoid time critical tests
+		// are affected by time needed for measurement
+		FS.getFileStoreAttributes(tmp.getParent());
+
 		server = new AppServer();
 		ServletContextHandler app = server.addContext("/lfs");
 		dir = Paths.get(tmp.toString(), "lfs");

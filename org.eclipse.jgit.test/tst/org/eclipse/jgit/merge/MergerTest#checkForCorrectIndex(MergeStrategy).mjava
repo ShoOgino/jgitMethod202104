@@ -1,13 +1,13 @@
 	@Theory
 	public void checkForCorrectIndex(MergeStrategy strategy) throws Exception {
 		File f;
-		long lastTs4, lastTsIndex;
+		Instant lastTs4, lastTsIndex;
 		Git git = Git.wrap(db);
 		File indexFile = db.getIndexFile();
 
 		// Create initial content and remember when the last file was written.
 		f = writeTrashFiles(false, "orig", "orig", "1\n2\n3", "orig", "orig");
-		lastTs4 = FS.DETECTED.lastModified(f);
+		lastTs4 = FS.DETECTED.lastModifiedInstant(f);
 
 		// add all files, commit and check this doesn't update any working tree
 		// files and that the index is in a new file system timer tick. Make
@@ -20,8 +20,9 @@
 		checkConsistentLastModified("0", "1", "2", "3", "4");
 		checkModificationTimeStampOrder("1", "2", "3", "4", "<.git/index");
 		assertEquals("Commit should not touch working tree file 4", lastTs4,
-				FS.DETECTED.lastModified(new File(db.getWorkTree(), "4")));
-		lastTsIndex = FS.DETECTED.lastModified(indexFile);
+				FS.DETECTED
+						.lastModifiedInstant(new File(db.getWorkTree(), "4")));
+		lastTsIndex = FS.DETECTED.lastModifiedInstant(indexFile);
 
 		// Do modifications on the master branch. Then add and commit. This
 		// should touch only "0", "2 and "3"
@@ -35,7 +36,7 @@
 		checkConsistentLastModified("0", "1", "2", "3", "4");
 		checkModificationTimeStampOrder("1", "4", "*" + lastTs4, "<*"
 				+ lastTsIndex, "<0", "2", "3", "<.git/index");
-		lastTsIndex = FS.DETECTED.lastModified(indexFile);
+		lastTsIndex = FS.DETECTED.lastModifiedInstant(indexFile);
 
 		// Checkout a side branch. This should touch only "0", "2 and "3"
 		fsTick(indexFile);
@@ -44,7 +45,7 @@
 		checkConsistentLastModified("0", "1", "2", "3", "4");
 		checkModificationTimeStampOrder("1", "4", "*" + lastTs4, "<*"
 				+ lastTsIndex, "<0", "2", "3", ".git/index");
-		lastTsIndex = FS.DETECTED.lastModified(indexFile);
+		lastTsIndex = FS.DETECTED.lastModifiedInstant(indexFile);
 
 		// This checkout may have populated worktree and index so fast that we
 		// may have smudged entries now. Check that we have the right content
@@ -57,13 +58,13 @@
 				indexState(CONTENT));
 		fsTick(indexFile);
 		f = writeTrashFiles(false, "orig", "orig", "1\n2\n3", "orig", "orig");
-		lastTs4 = FS.DETECTED.lastModified(f);
+		lastTs4 = FS.DETECTED.lastModifiedInstant(f);
 		fsTick(f);
 		git.add().addFilepattern(".").call();
 		checkConsistentLastModified("0", "1", "2", "3", "4");
 		checkModificationTimeStampOrder("*" + lastTsIndex, "<0", "1", "2", "3",
 				"4", "<.git/index");
-		lastTsIndex = FS.DETECTED.lastModified(indexFile);
+		lastTsIndex = FS.DETECTED.lastModifiedInstant(indexFile);
 
 		// Do modifications on the side branch. Touch only "1", "2 and "3"
 		fsTick(indexFile);
@@ -74,7 +75,7 @@
 		checkConsistentLastModified("0", "1", "2", "3", "4");
 		checkModificationTimeStampOrder("0", "4", "*" + lastTs4, "<*"
 				+ lastTsIndex, "<1", "2", "3", "<.git/index");
-		lastTsIndex = FS.DETECTED.lastModified(indexFile);
+		lastTsIndex = FS.DETECTED.lastModifiedInstant(indexFile);
 
 		// merge master and side. Should only touch "0," "2" and "3"
 		fsTick(indexFile);

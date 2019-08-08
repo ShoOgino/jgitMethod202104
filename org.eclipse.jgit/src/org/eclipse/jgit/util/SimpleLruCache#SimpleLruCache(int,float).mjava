@@ -1,0 +1,20 @@
+	/**
+	 * Create a new cache
+	 *
+	 * @param maxSize
+	 *            maximum size of the cache, to reduce need for synchronization
+	 *            this is not a hard limit. The real size of the cache could be
+	 *            slightly above this maximum if multiple threads put new values
+	 *            concurrently
+	 * @param purgeFactor
+	 *            when the size of the map reaches maxSize the oldest entries
+	 *            will be purged to free up some space for new entries,
+	 *            {@code purgeFactor} is the fraction of {@code maxSize} to
+	 *            purge when this happens
+	 */
+	public SimpleLruCache(int maxSize, float purgeFactor) {
+		checkPurgeFactor(purgeFactor);
+		this.maximumSize = maxSize;
+		this.purgeSize = purgeSize(maxSize, purgeFactor);
+	}
+

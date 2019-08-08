@@ -1,0 +1,38 @@
+	/**
+	 * Record a snapshot for a specific file path.
+	 * <p>
+	 * This method should be invoked before the file is accessed.
+	 *
+	 * @param file
+	 *            the path to remember meta data for. The path's current status
+	 *            information is saved.
+	 * @param useConfig
+	 *            if {@code true} read filesystem time resolution from
+	 *            configuration file otherwise use fallback resolution
+	 */
+	protected FileSnapshot(File file, boolean useConfig) {
+		this.file = file;
+		this.lastRead = Instant.now();
+		this.fileStoreAttributeCache = useConfig
+				? FS.getFileStoreAttributes(file.toPath().getParent())
+				: FALLBACK_FILESTORE_ATTRIBUTES;
+		BasicFileAttributes fileAttributes = null;
+		try {
+			fileAttributes = FS.DETECTED.fileAttributes(file);
+		} catch (IOException e) {
+			this.lastModified = Instant.ofEpochMilli(file.lastModified());
+			this.size = file.length();
+			this.fileKey = MISSING_FILEKEY;
+			return;
+		}
+		this.lastModified = fileAttributes.lastModifiedTime().toInstant();
+		this.size = fileAttributes.size();
+		this.fileKey = getFileKey(fileAttributes);
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("file={}, create new FileSnapshot: lastRead={}, lastModified={}, size={}, fileKey={}", //$NON-NLS-1$
+					file, dateFmt.format(lastRead),
+					dateFmt.format(lastModified), Long.valueOf(size),
+					fileKey.toString());
+		}
+	}
+

@@ -13,19 +13,10 @@
 	 * @param smudge_ns
 	 *            nanoseconds component of the index's last modified time.
 	 * @return true if extra careful checks should be used.
+	 * @deprecated use {@link #mightBeRacilyClean(Instant)} instead
 	 */
+	@Deprecated
 	public final boolean mightBeRacilyClean(int smudge_s, int smudge_ns) {
-		// If the index has a modification time then it came from disk
-		// and was not generated from scratch in memory. In such cases
-		// the entry is 'racily clean' if the entry's cached modification
-		// time is equal to or later than the index modification time. In
-		// such cases the work file is too close to the index to tell if
-		// it is clean or not based on the modification time alone.
-		//
-		final int base = infoOffset + P_MTIME;
-		final int mtime = NB.decodeInt32(info, base);
-		if (smudge_s == mtime)
-			return smudge_ns <= NB.decodeInt32(info, base + 4);
-		return false;
+		return mightBeRacilyClean(Instant.ofEpochSecond(smudge_s, smudge_ns));
 	}
 

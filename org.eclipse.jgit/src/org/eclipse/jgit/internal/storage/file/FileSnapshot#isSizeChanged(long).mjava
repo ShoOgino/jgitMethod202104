@@ -1,4 +1,9 @@
 	private boolean isSizeChanged(long currSize) {
-		return currSize != UNKNOWN_SIZE && currSize != size;
+		boolean changed = (currSize != UNKNOWN_SIZE) && (currSize != size);
+		if (changed) {
+			LOG.debug("file={}, size changed from {} to {} bytes", //$NON-NLS-1$
+					file, Long.valueOf(size), Long.valueOf(currSize));
+		}
+		return changed;
 	}
 

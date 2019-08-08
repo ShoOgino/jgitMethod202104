@@ -12,7 +12,9 @@
 
 		try {
 			final String etag = etag(sender);
-			final long lastModified = (sender.getLastModified() / 1000) * 1000;
+			// HTTP header Last-Modified header has a resolution of 1 sec, see
+			// https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.29
+			final long lastModified = sender.getLastModified().getEpochSecond();
 
 			String ifNoneMatch = req.getHeader(HDR_IF_NONE_MATCH);
 			if (etag != null && etag.equals(ifNoneMatch)) {

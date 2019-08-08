@@ -1,6 +1,6 @@
 	private void parse() {
 		this.hosts.clear();
-		this.lastModified = this.netrc.lastModified();
+		this.lastModified = FS.DETECTED.lastModifiedInstant(this.netrc);
 
 		try (BufferedReader r = new BufferedReader(
 				new InputStreamReader(new FileInputStream(netrc), UTF_8))) {

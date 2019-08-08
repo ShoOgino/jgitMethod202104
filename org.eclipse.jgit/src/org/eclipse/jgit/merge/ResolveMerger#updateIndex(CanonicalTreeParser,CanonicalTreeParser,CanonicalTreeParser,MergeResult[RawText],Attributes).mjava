@@ -26,9 +26,9 @@
 				// A conflict occurred, the file will contain conflict markers
 				// the index will be populated with the three stages and the
 				// workdir (if used) contains the halfway merged content.
-				add(tw.getRawPath(), base, DirCacheEntry.STAGE_1, 0, 0);
-				add(tw.getRawPath(), ours, DirCacheEntry.STAGE_2, 0, 0);
-				add(tw.getRawPath(), theirs, DirCacheEntry.STAGE_3, 0, 0);
+				add(tw.getRawPath(), base, DirCacheEntry.STAGE_1, EPOCH, 0);
+				add(tw.getRawPath(), ours, DirCacheEntry.STAGE_2, EPOCH, 0);
+				add(tw.getRawPath(), theirs, DirCacheEntry.STAGE_3, EPOCH, 0);
 				mergeResults.put(tw.getPathString(), result);
 				return;
 			}
@@ -45,7 +45,7 @@
 					? FileMode.REGULAR_FILE : FileMode.fromBits(newMode));
 			if (mergedFile != null) {
 				dce.setLastModified(
-						nonNullRepo().getFS().lastModified(mergedFile));
+						nonNullRepo().getFS().lastModifiedInstant(mergedFile));
 				dce.setLength((int) mergedFile.length());
 			}
 			dce.setObjectId(insertMergeResult(rawMerged, attributes));

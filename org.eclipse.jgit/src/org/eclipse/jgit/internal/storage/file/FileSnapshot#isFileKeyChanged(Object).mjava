@@ -1,4 +1,10 @@
 	private boolean isFileKeyChanged(Object currFileKey) {
-		return currFileKey != MISSING_FILEKEY && !currFileKey.equals(fileKey);
+		boolean changed = currFileKey != MISSING_FILEKEY
+				&& !currFileKey.equals(fileKey);
+		if (changed) {
+			LOG.debug("file={}, FileKey changed from {} to {}", //$NON-NLS-1$
+					file, fileKey, currFileKey);
+		}
+		return changed;
 	}
 
