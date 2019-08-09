@@ -6,22 +6,13 @@
 	 * @param secondObjectId
 	 *            the second identifier to compare. Must not be null.
 	 * @return true if the two identifiers are the same.
+	 * @deprecated use {@link #isEqual(AnyLongObjectId, AnyLongObjectId)}
+	 *             instead.
 	 */
+	@Deprecated
+	@SuppressWarnings("AmbiguousMethodReference")
 	public static boolean equals(final AnyLongObjectId firstObjectId,
 			final AnyLongObjectId secondObjectId) {
-		if (References.isSameObject(firstObjectId, secondObjectId)) {
-			return true;
-		}
-
-		// We test word 2 first as odds are someone already used our
-		// word 1 as a hash code, and applying that came up with these
-		// two instances we are comparing for equality. Therefore the
-		// first two words are very likely to be identical. We want to
-		// break away from collisions as quickly as possible.
-		//
-		return firstObjectId.w2 == secondObjectId.w2
-				&& firstObjectId.w3 == secondObjectId.w3
-				&& firstObjectId.w4 == secondObjectId.w4
-				&& firstObjectId.w1 == secondObjectId.w1;
+		return isEqual(firstObjectId, secondObjectId);
 	}
 
