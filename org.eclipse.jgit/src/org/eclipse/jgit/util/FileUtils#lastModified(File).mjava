@@ -3,7 +3,10 @@
 	 * @return lastModified attribute for given file, not following symbolic
 	 *         links
 	 * @throws IOException
+	 * @deprecated use {@link #lastModifiedInstant(Path)} instead which returns
+	 *             FileTime
 	 */
+	@Deprecated
 	static long lastModified(File file) throws IOException {
 		return Files.getLastModifiedTime(toPath(file), LinkOption.NOFOLLOW_LINKS)
 				.toMillis();

@@ -1,5 +1,7 @@
 		@Override
 		String etag(FileSender sender) throws IOException {
-			return Long.toHexString(sender.getLastModified());
+			Instant lastModified = sender.getLastModified();
+			return Long.toHexString(lastModified.getEpochSecond())
+					+ Long.toHexString(lastModified.getNano());
 		}
 

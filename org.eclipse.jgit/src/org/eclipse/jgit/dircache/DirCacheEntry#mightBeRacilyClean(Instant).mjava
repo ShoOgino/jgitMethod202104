@@ -1,0 +1,31 @@
+	/**
+	 * Is it possible for this entry to be accidentally assumed clean?
+	 * <p>
+	 * The "racy git" problem happens when a work file can be updated faster
+	 * than the filesystem records file modification timestamps. It is possible
+	 * for an application to edit a work file, update the index, then edit it
+	 * again before the filesystem will give the work file a new modification
+	 * timestamp. This method tests to see if file was written out at the same
+	 * time as the index.
+	 *
+	 * @param smudge
+	 *            index's last modified time.
+	 * @return true if extra careful checks should be used.
+	 * @since 5.1.9
+	 */
+	public final boolean mightBeRacilyClean(Instant smudge) {
+		// If the index has a modification time then it came from disk
+		// and was not generated from scratch in memory. In such cases
+		// the entry is 'racily clean' if the entry's cached modification
+		// time is equal to or later than the index modification time. In
+		// such cases the work file is too close to the index to tell if
+		// it is clean or not based on the modification time alone.
+		//
+		final int base = infoOffset + P_MTIME;
+		final int mtime = NB.decodeInt32(info, base);
+		if (smudge.getEpochSecond() == mtime) {
+			return smudge.getNano() <= NB.decodeInt32(info, base + 4);
+		}
+		return false;
+	}
+

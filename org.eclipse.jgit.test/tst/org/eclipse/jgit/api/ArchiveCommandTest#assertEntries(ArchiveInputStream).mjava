@@ -1,0 +1,12 @@
+	private static void assertEntries(ArchiveInputStream o) throws IOException {
+		ArchiveEntry e;
+		int n = 0;
+		while ((e = o.getNextEntry()) != null) {
+			n++;
+			assertEquals(UNEXPECTED_LAST_MODIFIED,
+					(1250379778668L / 1000L) * 1000L,
+					e.getLastModifiedDate().getTime());
+		}
+		assertEquals(UNEXPECTED_ARCHIVE_SIZE, 2, n);
+	}
+

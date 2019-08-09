@@ -1,0 +1,7 @@
+	private Instant decodeTSInstant(int pIdx) {
+		final int base = infoOffset + pIdx;
+		final int sec = NB.decodeInt32(info, base);
+		final int nano = NB.decodeInt32(info, base + 4);
+		return Instant.ofEpochSecond(sec, nano);
+	}
+

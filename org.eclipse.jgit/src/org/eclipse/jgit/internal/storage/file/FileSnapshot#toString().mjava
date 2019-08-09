@@ -1,5 +1,5 @@
 	/** {@inheritDoc} */
-	@SuppressWarnings("nls")
+	@SuppressWarnings({ "nls", "ReferenceEquality" })
 	@Override
 	public String toString() {
 		if (this == DIRTY) {
@@ -8,10 +8,8 @@
 		if (this == MISSING_FILE) {
 			return "MISSING_FILE";
 		}
-		DateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS",
-				Locale.US);
-		return "FileSnapshot[modified: " + f.format(new Date(lastModified))
-				+ ", read: " + f.format(new Date(lastRead)) + ", size:" + size
+		return "FileSnapshot[modified: " + dateFmt.format(lastModified)
+				+ ", read: " + dateFmt.format(lastRead) + ", size:" + size
 				+ ", fileKey: " + fileKey + "]";
 	}
 

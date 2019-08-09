@@ -1,7 +1,5 @@
-	private File createFile(String string) throws IOException {
-		trash.mkdirs();
-		File f = File.createTempFile(string, "tdat", trash);
-		files.add(f);
-		return f;
+	private Path createFile(String string) throws IOException {
+		Files.createDirectories(trash);
+		return Files.createTempFile(trash, string, "tdat");
 	}
 

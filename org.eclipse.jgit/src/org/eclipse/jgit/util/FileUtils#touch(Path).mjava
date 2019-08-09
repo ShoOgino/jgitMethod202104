@@ -4,11 +4,13 @@
 	 * @param f
 	 *            the file to touch
 	 * @throws IOException
-	 * @since 5.2.3
+	 * @since 5.1.8
 	 */
 	public static void touch(Path f) throws IOException {
-		try (OutputStream fos = Files.newOutputStream(f)) {
-			// touch the file
+		try (FileChannel fc = FileChannel.open(f, StandardOpenOption.CREATE,
+				StandardOpenOption.APPEND, StandardOpenOption.SYNC)) {
+			// touch
 		}
+		Files.setLastModifiedTime(f, FileTime.from(Instant.now()));
 	}
 

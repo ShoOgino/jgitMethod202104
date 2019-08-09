@@ -8,10 +8,16 @@
 	 */
 	@Test
 	public void testNewFileWithWait() throws Exception {
-		File f1 = createFile("newfile");
-		waitNextSec(f1);
-		FileSnapshot save = FileSnapshot.save(f1);
-		Thread.sleep(1500);
-		assertTrue(save.isModified(f1));
+		// if filesystem timestamp resolution is high the snapshot won't be
+		// racily clean
+		Assume.assumeTrue(
+				fsAttrCache.getFsTimestampResolution()
+						.compareTo(Duration.ofMillis(10)) > 0);
+		Path f1 = createFile("newfile");
+		waitNextTick(f1);
+		FileSnapshot save = FileSnapshot.save(f1.toFile());
+		TimeUnit.NANOSECONDS.sleep(
+				fsAttrCache.getFsTimestampResolution().dividedBy(2).toNanos());
+		assertTrue(save.isModified(f1.toFile()));
 	}
 

@@ -9,19 +9,19 @@
 	@Test
 	public void testSimulatePackfileReplacement() throws Exception {
 		Assume.assumeFalse(SystemReader.getInstance().isWindows());
-		File f1 = createFile("file"); // inode y
-		File f2 = createFile("fool"); // Guarantees new inode x
+		Path f1 = createFile("file"); // inode y
+		Path f2 = createFile("fool"); // Guarantees new inode x
 		// wait on f2 since this method resets lastModified of the file
 		// and leaves lastModified of f1 untouched
-		waitNextSec(f2);
-		waitNextSec(f2);
-		FileTime timestamp = Files.getLastModifiedTime(f1.toPath());
-		FileSnapshot save = FileSnapshot.save(f1);
-		Files.move(f2.toPath(), f1.toPath(), // Now "file" is inode x
+		waitNextTick(f2);
+		waitNextTick(f2);
+		FileTime timestamp = Files.getLastModifiedTime(f1);
+		FileSnapshot save = FileSnapshot.save(f1.toFile());
+		Files.move(f2, f1, // Now "file" is inode x
 				StandardCopyOption.REPLACE_EXISTING,
 				StandardCopyOption.ATOMIC_MOVE);
-		Files.setLastModifiedTime(f1.toPath(), timestamp);
-		assertTrue(save.isModified(f1));
+		Files.setLastModifiedTime(f1, timestamp);
+		assertTrue(save.isModified(f1.toFile()));
 		assertTrue("unexpected change of fileKey", save.wasFileKeyChanged());
 		assertFalse("unexpected size change", save.wasSizeChanged());
 		assertFalse("unexpected lastModified change",

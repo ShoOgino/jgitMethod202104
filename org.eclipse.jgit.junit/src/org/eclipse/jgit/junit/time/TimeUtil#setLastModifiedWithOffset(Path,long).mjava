@@ -1,0 +1,24 @@
+	/**
+	 * Set the lastModified time of a given file by adding a given offset to the
+	 * current lastModified time
+	 *
+	 * @param path
+	 *            path of a file to set last modified
+	 * @param offsetMillis
+	 *            offset in milliseconds, if negative the new lastModified time
+	 *            is offset before the original lastModified time, otherwise
+	 *            after the original time
+	 * @return the new lastModified time
+	 */
+	public static Instant setLastModifiedWithOffset(Path path,
+			long offsetMillis) {
+		Instant mTime = FS.DETECTED.lastModifiedInstant(path)
+				.plusMillis(offsetMillis);
+		try {
+			Files.setLastModifiedTime(path, FileTime.from(mTime));
+			return mTime;
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+

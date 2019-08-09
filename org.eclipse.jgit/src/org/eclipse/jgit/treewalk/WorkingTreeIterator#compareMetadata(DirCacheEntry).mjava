@@ -29,29 +29,27 @@
 
 		// Git under windows only stores seconds so we round the timestamp
 		// Java gives us if it looks like the timestamp in index is seconds
-		// only. Otherwise we compare the timestamp at millisecond precision,
+		// only. Otherwise we compare the timestamp at nanosecond precision,
 		// unless core.checkstat is set to "minimal", in which case we only
 		// compare the whole second part.
-		long cacheLastModified = entry.getLastModified();
-		long fileLastModified = getEntryLastModified();
-		long lastModifiedMillis = fileLastModified % 1000;
-		long cacheMillis = cacheLastModified % 1000;
-		if (getOptions().getCheckStat() == CheckStat.MINIMAL) {
-			fileLastModified = fileLastModified - lastModifiedMillis;
-			cacheLastModified = cacheLastModified - cacheMillis;
-		} else if (cacheMillis == 0)
-			fileLastModified = fileLastModified - lastModifiedMillis;
-		// Some Java version on Linux return whole seconds only even when
-		// the file systems supports more precision.
-		else if (lastModifiedMillis == 0)
-			cacheLastModified = cacheLastModified - cacheMillis;
-
-		if (fileLastModified != cacheLastModified)
+		Instant cacheLastModified = entry.getLastModifiedInstant();
+		Instant fileLastModified = getEntryLastModifiedInstant();
+		if ((getOptions().getCheckStat() == CheckStat.MINIMAL)
+				|| (cacheLastModified.getNano() == 0)
+				// Some Java version on Linux return whole seconds only even
+				// when the file systems supports more precision.
+				|| (fileLastModified.getNano() == 0)) {
+			if (fileLastModified.getEpochSecond() != cacheLastModified
+					.getEpochSecond()) {
+				return MetadataDiff.DIFFER_BY_TIMESTAMP;
+			}
+		}
+		if (!fileLastModified.equals(cacheLastModified)) {
 			return MetadataDiff.DIFFER_BY_TIMESTAMP;
-		else if (!entry.isSmudged())
-			// The file is clean when you look at timestamps.
-			return MetadataDiff.EQUAL;
-		else
+		} else if (entry.isSmudged()) {
 			return MetadataDiff.SMUDGED;
+		}
+		// The file is clean when when comparing timestamps
+		return MetadataDiff.EQUAL;
 	}
 

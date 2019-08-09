@@ -41,9 +41,11 @@
 			markStart(tip);
 			markStart(base);
 			RevCommit mergeBase;
-			while ((mergeBase = next()) != null)
-				if (mergeBase == base)
+			while ((mergeBase = next()) != null) {
+				if (References.isSameObject(mergeBase, base)) {
 					return true;
+				}
+			}
 			return false;
 		} finally {
 			filter = oldRF;

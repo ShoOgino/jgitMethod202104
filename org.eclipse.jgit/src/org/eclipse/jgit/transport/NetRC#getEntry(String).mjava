@@ -9,8 +9,10 @@
 		if (netrc == null)
 			return null;
 
-		if (this.lastModified != this.netrc.lastModified())
+		if (!this.lastModified
+				.equals(FS.DETECTED.lastModifiedInstant(this.netrc))) {
 			parse();
+		}
 
 		NetRCEntry entry = this.hosts.get(host);
 

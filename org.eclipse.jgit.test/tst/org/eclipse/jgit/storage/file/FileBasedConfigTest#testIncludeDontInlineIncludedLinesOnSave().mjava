@@ -3,13 +3,14 @@
 			throws IOException, ConfigInvalidException {
 		// use a content with multiple sections and multiple key/value pairs
 		// because code for first line works different than for subsequent lines
-		final File includedFile = createFile(CONTENT3.getBytes(UTF_8), "dir1");
+		final Path includedFile = createFile(CONTENT3.getBytes(UTF_8), "dir1");
 
-		final File file = createFile(new byte[0], "dir2");
-		FileBasedConfig config = new FileBasedConfig(file, FS.DETECTED);
+		final Path file = createFile(new byte[0], "dir2");
+		FileBasedConfig config = new FileBasedConfig(file.toFile(),
+				FS.DETECTED);
 		config.setString("include", null, "path",
-				("../" + includedFile.getParentFile().getName() + "/"
-						+ includedFile.getName()));
+				("../" + includedFile.getParent().getFileName() + "/"
+						+ includedFile.getFileName()));
 
 		// just by setting the include.path, it won't be included
 		assertEquals(null, config.getString(USER, null, NAME));
@@ -24,7 +25,7 @@
 		assertEquals(2,
 				new StringTokenizer(expectedText, "\n", false).countTokens());
 
-		config = new FileBasedConfig(file, FS.DETECTED);
+		config = new FileBasedConfig(file.toFile(), FS.DETECTED);
 		config.load();
 
 		String actualText = config.toText();

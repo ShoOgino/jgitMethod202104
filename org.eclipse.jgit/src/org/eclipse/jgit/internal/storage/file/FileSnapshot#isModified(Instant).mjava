@@ -1,0 +1,36 @@
+	private boolean isModified(Instant currLastModified) {
+		// Any difference indicates the path was modified.
+
+		lastModifiedChanged = !lastModified.equals(currLastModified);
+		if (lastModifiedChanged) {
+			if (LOG.isDebugEnabled()) {
+				LOG.debug(
+						"file={}, lastModified changed from {} to {}", //$NON-NLS-1$
+						file, dateFmt.format(lastModified),
+						dateFmt.format(currLastModified));
+			}
+			return true;
+		}
+
+		// We have already determined the last read was far enough
+		// after the last modification that any new modifications
+		// are certain to change the last modified time.
+		if (cannotBeRacilyClean) {
+			LOG.debug("file={}, cannot be racily clean", file); //$NON-NLS-1$
+			return false;
+		}
+		if (!isRacyClean(lastRead)) {
+			// Our last read should have marked cannotBeRacilyClean,
+			// but this thread may not have seen the change. The read
+			// of the volatile field lastRead should have fixed that.
+			LOG.debug("file={}, is unmodified", file); //$NON-NLS-1$
+			return false;
+		}
+
+		// We last read this path too close to its last observed
+		// modification time. We may have missed a modification.
+		// Scan again, to ensure we still see the same state.
+		LOG.debug("file={}, is racily clean", file); //$NON-NLS-1$
+		return true;
+	}
+
