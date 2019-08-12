@@ -29,7 +29,7 @@
 		try {
 			path = file.toPath();
 			Files.createFile(path);
-		} catch (FileAlreadyExistsException e) {
+		} catch (FileAlreadyExistsException | InvalidPathException e) {
 			return token(false, null);
 		}
 		if (supportsAtomicCreateNewFile() || !supportsUnixNLink) {
