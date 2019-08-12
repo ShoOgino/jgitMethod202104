@@ -1,0 +1,18 @@
+	/** {@inheritDoc} */
+	@Override
+	public List<ReflogEntry> getReverseEntries(int max) throws IOException {
+		lock.lock();
+		try {
+			LogCursor cursor = reftable.seekLog(refname);
+
+			List<ReflogEntry> result = new ArrayList<>();
+			while (cursor.next() && result.size() < max) {
+				result.add(cursor.getReflogEntry());
+			}
+
+			return result;
+		} finally {
+			lock.unlock();
+		}
+	}
+

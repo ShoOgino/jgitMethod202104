@@ -1,0 +1,12 @@
+	/** {@inheritDoc} */
+	@Override
+	public ReflogEntry getLastEntry() throws IOException {
+		lock.lock();
+		try {
+			LogCursor cursor = reftable.seekLog(refname);
+			return cursor.next() ? cursor.getReflogEntry() : null;
+		} finally {
+			lock.unlock();
+		}
+	}
+
