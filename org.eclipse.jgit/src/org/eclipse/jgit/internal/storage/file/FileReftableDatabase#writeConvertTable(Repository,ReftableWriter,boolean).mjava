@@ -1,0 +1,42 @@
+	private static void writeConvertTable(Repository repo, ReftableWriter w,
+			boolean writeLogs) throws IOException {
+		int size = 0;
+		List<Ref> refs = repo.getRefDatabase().getRefs();
+		if (writeLogs) {
+			for (Ref r : refs) {
+				ReflogReader rlr = repo.getReflogReader(r.getName());
+				if (rlr != null) {
+					size = Math.max(rlr.getReverseEntries().size(), size);
+				}
+			}
+		}
+		// We must use 1 here, nextUpdateIndex() on the empty stack is 1.
+		w.setMinUpdateIndex(1).setMaxUpdateIndex(size + 1).begin();
+
+		// The spec says to write the logs in the first table, and put refs in a
+		// separate table, but this complicates the compaction (when we can we drop
+		// deletions? Can we compact the .log table and the .ref table together?)
+		try (RevWalk rw = new RevWalk(repo)) {
+			List<Ref> toWrite = new ArrayList<>(refs.size());
+			for (Ref r : refs) {
+				toWrite.add(refForWrite(rw, r));
+			}
+			w.sortAndWriteRefs(toWrite);
+		}
+
+		if (writeLogs) {
+			for (Ref r : refs) {
+				long idx = size;
+				ReflogReader reader = repo.getReflogReader(r.getName());
+				if (reader == null) {
+					continue;
+				}
+				for (ReflogEntry e : reader.getReverseEntries()) {
+					w.writeLog(r.getName(), idx, e.getWho(), e.getOldId(),
+							e.getNewId(), e.getComment());
+					idx--;
+				}
+			}
+		}
+	}
+

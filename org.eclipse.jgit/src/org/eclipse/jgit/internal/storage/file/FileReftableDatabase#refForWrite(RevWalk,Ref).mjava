@@ -1,0 +1,18 @@
+	private static Ref refForWrite(RevWalk rw, Ref r) throws IOException {
+		if (r.isSymbolic()) {
+			return new SymbolicRef(r.getName(), new ObjectIdRef.Unpeeled(NEW,
+					r.getTarget().getName(), null));
+		}
+		ObjectId newId = r.getObjectId();
+		RevObject obj = rw.parseAny(newId);
+		RevObject peel = null;
+		if (obj instanceof RevTag) {
+			peel = rw.peel(obj);
+		}
+		if (peel != null) {
+			return new ObjectIdRef.PeeledTag(PACKED, r.getName(), newId,
+					peel.copy());
+		}
+		return new ObjectIdRef.PeeledNonTag(PACKED, r.getName(), newId);
+	}
+

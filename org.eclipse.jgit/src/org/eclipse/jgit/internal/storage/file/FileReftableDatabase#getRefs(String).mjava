@@ -1,0 +1,12 @@
+	/** {@inheritDoc} */
+	@Override
+	public Map<String, Ref> getRefs(String prefix) throws IOException {
+		List<Ref> refs = reftableDatabase.getRefsByPrefix(prefix);
+		RefList.Builder<Ref> builder = new RefList.Builder<>(refs.size());
+		for (Ref r : refs) {
+			builder.add(r);
+		}
+		return new RefMap(prefix, builder.toRefList(), RefList.emptyList(),
+				RefList.emptyList());
+	}
+

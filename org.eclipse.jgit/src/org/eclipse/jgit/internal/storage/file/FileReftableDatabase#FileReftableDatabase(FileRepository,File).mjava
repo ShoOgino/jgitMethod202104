@@ -1,0 +1,15 @@
+	FileReftableDatabase(FileRepository repo, File refstackName) throws IOException {
+		this.fileRepository = repo;
+		this.reftableStack = new FileReftableStack(refstackName,
+			new File(fileRepository.getDirectory(), Constants.REFTABLE),
+			() -> fileRepository.fireEvent(new RefsChangedEvent()),
+			() -> fileRepository.getConfig());
+		this.reftableDatabase = new ReftableDatabase() {
+
+			@Override
+			public MergedReftable openMergedReftable() throws IOException {
+				return reftableStack.getMergedReftable();
+			}
+		};
+	}
+

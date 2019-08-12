@@ -1,0 +1,24 @@
+		void writeLink(ReftableWriter w) throws IOException {
+			long idx = reftableDatabase.nextUpdateIndex();
+			w.setMinUpdateIndex(idx).setMaxUpdateIndex(idx).begin()
+					.writeRef(dstRef);
+
+			ObjectId beforeId = ObjectId.zeroId();
+			Ref before = exactRef(dstRef.getName());
+			if (before != null) {
+				before = before.getLeaf();
+				if (before.getObjectId() != null) {
+					beforeId = before.getObjectId();
+				}
+			}
+
+			Ref after = dstRef.getLeaf();
+			ObjectId afterId = ObjectId.zeroId();
+			if (after.getObjectId() != null) {
+				afterId = after.getObjectId();
+			}
+
+			w.writeLog(dstRef.getName(), idx, getRefLogIdent(), beforeId,
+					afterId, getRefLogMessage());
+		}
+

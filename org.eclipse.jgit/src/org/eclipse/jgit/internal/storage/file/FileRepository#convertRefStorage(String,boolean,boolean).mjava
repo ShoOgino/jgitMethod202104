@@ -1,0 +1,29 @@
+	/**
+	 * Converts between ref storage formats.
+	 *
+	 * @param format
+	 *            the format to convert to, either "reftable" or "refdir"
+	 * @param writeLogs
+	 *            whether to write reflogs
+	 * @param backup
+	 *            whether to make a backup of the old data
+	 * @throws IOException
+	 *             on I/O problems.
+	 */
+	@SuppressWarnings("nls")
+	public void convertRefStorage(String format, boolean writeLogs,
+			boolean backup) throws IOException {
+		if (format.equals("reftable")) { //$NON-NLS-1$
+			if (refs instanceof RefDirectory) {
+				convertToReftable(writeLogs, backup);
+			}
+		} else if (format.equals("refdir")) {//$NON-NLS-1$
+			if (refs instanceof FileReftableDatabase) {
+				convertToPackedRefs(backup);
+			}
+		} else {
+			throw new IOException(String.format(
+					"unknown supported ref storage format '%s'", format));
+		}
+	}
+

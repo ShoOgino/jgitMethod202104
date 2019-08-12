@@ -1,0 +1,87 @@
+	/**
+	 * Converts the RefDatabase from reftable to RefDirectory. This operation is
+	 * not atomic.
+	 *
+	 * @param backup
+	 *            whether to rename or delete the old storage files. If set to
+	 *            true, the reftable list is left in "refs.old", and the
+	 *            reftable/ dir is left alone. If set to false, the reftable/
+	 *            dir is removed, and "refs" file is removed.
+	 * @throws IOException
+	 *             on IO problem
+	 */
+	void convertToPackedRefs(boolean backup) throws IOException {
+		List<Ref> all = refs.getRefs();
+		File packedRefs = new File(getDirectory(), Constants.PACKED_REFS);
+		if (packedRefs.exists()) {
+			throw new IOException(MessageFormat.format(JGitText.get().fileAlreadyExists,
+				packedRefs.getName()));
+		}
+
+		File refsFile = new File(getDirectory(), "refs"); //$NON-NLS-1$
+
+		refs.close();
+
+		if (backup) {
+			File refsOld = new File(getDirectory(), "refs.old"); //$NON-NLS-1$
+			if (refsOld.exists()) {
+				throw new IOException(MessageFormat.format(
+					JGitText.get().fileAlreadyExists,
+						"refs.old")); //$NON-NLS-1$
+			}
+			FileUtils.rename(refsFile, refsOld);
+		} else {
+			refsFile.delete();
+		}
+
+		// This is not atomic, but there is no way to instantiate a RefDirectory
+		// that is disconnected from the current repo.
+		refs = new RefDirectory(this);
+		refs.create();
+
+		List<Ref> symrefs = new ArrayList<>();
+		BatchRefUpdate bru = refs.newBatchUpdate();
+		for (Ref r : all) {
+			if (r.isSymbolic()) {
+				symrefs.add(r);
+			} else {
+				bru.addCommand(new ReceiveCommand(ObjectId.zeroId(),
+						r.getObjectId(), r.getName()));
+			}
+		}
+
+		try (RevWalk rw = new RevWalk(this)) {
+			bru.execute(rw, NullProgressMonitor.INSTANCE);
+		}
+
+		List<String> failed = new ArrayList<>();
+		for (ReceiveCommand cmd : bru.getCommands()) {
+			if (cmd.getResult() != ReceiveCommand.Result.OK) {
+				failed.add(cmd.getRefName() + ": " + cmd.getResult()); //$NON-NLS-1$
+			}
+		}
+
+		if (!failed.isEmpty()) {
+			throw new IOException(String.format("%s: %s", //$NON-NLS-1$
+					JGitText.get().failedToConvert,
+					StringUtils.join(failed, ", "))); //$NON-NLS-1$
+		}
+
+		for (Ref s : symrefs) {
+			RefUpdate up = refs.newUpdate(s.getName(), false);
+			up.setForceUpdate(true);
+			RefUpdate.Result res = up.link(s.getTarget().getName());
+			if (res != RefUpdate.Result.NEW
+					&& res != RefUpdate.Result.NO_CHANGE) {
+				throw new IOException(
+						String.format("ref %s: %s", s.getName(), res)); //$NON-NLS-1$
+			}
+		}
+
+		if (!backup) {
+			File reftableDir = new File(getDirectory(), Constants.REFTABLE);
+			FileUtils.delete(reftableDir,
+					FileUtils.RECURSIVE | FileUtils.IGNORE_ERRORS);
+		}
+	}
+

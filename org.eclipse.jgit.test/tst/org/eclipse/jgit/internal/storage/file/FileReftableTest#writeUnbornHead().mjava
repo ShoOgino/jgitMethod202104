@@ -1,0 +1,10 @@
+	@Test
+	public void writeUnbornHead() throws Exception {
+		RefUpdate.Result r = db.updateRef("HEAD").link("refs/heads/unborn");
+		assertEquals(FORCED, r);
+
+		Ref head = db.exactRef("HEAD");
+		assertTrue(head.isSymbolic());
+		assertEquals(head.getTarget().getName(), "refs/heads/unborn");
+	}
+

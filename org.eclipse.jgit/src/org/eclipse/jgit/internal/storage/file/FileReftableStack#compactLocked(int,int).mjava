@@ -1,0 +1,47 @@
+	/**
+	 * Write the reftable for the given range into a temp file.
+	 *
+	 * @param first
+	 *            index of first stack entry to be written
+	 * @param last
+	 *            index of last stack entry to be written
+	 * @return the file holding the replacement table.
+	 * @throws IOException
+	 *             on I/O problem
+	 */
+	private File compactLocked(int first, int last) throws IOException {
+		String fn = filename(first, last);
+
+		File tmpTable = File.createTempFile(fn + "_", ".ref", //$NON-NLS-1$//$NON-NLS-2$
+				stackPath.getParentFile());
+		try (FileOutputStream fos = new FileOutputStream(tmpTable)) {
+			ReftableCompactor c = new ReftableCompactor(fos)
+					.setConfig(reftableConfig())
+					.setMinUpdateIndex(
+							stack.get(first).reftableReader.minUpdateIndex())
+					.setMaxUpdateIndex(
+							stack.get(last).reftableReader.maxUpdateIndex())
+					.setIncludeDeletes(first > 0);
+
+			List<ReftableReader> compactMe = new ArrayList<>();
+			long totalBytes = 0;
+			for (int i = first; i <= last; i++) {
+				compactMe.add(stack.get(i).reftableReader);
+				totalBytes += stack.get(i).reftableReader.size();
+			}
+			c.addAll(compactMe);
+
+			c.compact();
+
+			// Even though the compaction did not definitely succeed, we keep
+			// tally here as we've expended the effort.
+			stats.bytes += totalBytes;
+			stats.tables += first - last + 1;
+			stats.attempted++;
+			stats.refCount += c.getStats().refCount();
+			stats.logCount += c.getStats().logCount();
+		}
+
+		return tmpTable;
+	}
+

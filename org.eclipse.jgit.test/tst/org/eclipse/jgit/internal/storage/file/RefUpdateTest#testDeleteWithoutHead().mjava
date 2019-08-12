@@ -6,6 +6,8 @@
 		refUpdate.setNewObjectId(ObjectId.zeroId());
 		Result updateResult = refUpdate.update();
 		assertEquals(Result.FORCED, updateResult);
+
+		assertEquals(ObjectId.zeroId(), db.exactRef("HEAD").getObjectId());
 		Result deleteHeadResult = db.updateRef(Constants.HEAD).delete();
 		assertEquals(Result.NO_CHANGE, deleteHeadResult);
 

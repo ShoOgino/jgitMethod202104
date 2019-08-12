@@ -14,7 +14,7 @@
 
 		assertResults(cmds, OK, OK);
 		assertRefs("refs/heads/master", B, "refs/heads/branch", B);
-		assertEquals(atomic ? 2 : 3, refsChangedEvents);
+		assertEquals(batchesRefUpdates() ? 2 : 3, refsChangedEvents);
 		assertReflogUnchanged(oldLogs, "refs/heads/master");
 		assertReflogUnchanged(oldLogs, "refs/heads/branch");
 	}

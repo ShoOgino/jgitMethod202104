@@ -1,0 +1,17 @@
+	@Test
+	public void testCompactFully() throws Exception {
+		ObjectId c1 = db.resolve("master^^");
+		ObjectId c2 = db.resolve("master^");
+		for (int i = 0; i < 5; i++) {
+			RefUpdate u = db.updateRef("refs/heads/master");
+			u.setForceUpdate(true);
+			u.setNewObjectId((i%2) == 0 ? c1 : c2);
+			assertEquals(u.update(), FORCED);
+		}
+
+		File tableDir = new File(db.getDirectory(), Constants.REFTABLE);
+		assertTrue(tableDir.listFiles().length > 1);
+		((FileReftableDatabase)db.getRefDatabase()).compactFully();
+		assertEquals(tableDir.listFiles().length,1);
+	}
+

@@ -1,0 +1,11 @@
+	private long[] tableSizes() throws IOException {
+		long[] sizes = new long[stack.size()];
+		for (int i = 0; i < stack.size(); i++) {
+			// If we don't subtract the overhead, the file size isn't
+			// proportional to the number of entries. This will cause us to
+			// compact too often, which is expensive.
+			sizes[i] = stack.get(i).reftableReader.size() - OVERHEAD;
+		}
+		return sizes;
+	}
+

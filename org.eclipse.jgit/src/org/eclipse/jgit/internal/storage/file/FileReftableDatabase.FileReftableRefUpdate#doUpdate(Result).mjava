@@ -1,0 +1,15 @@
+		@Override
+		protected Result doUpdate(Result desiredResult) throws IOException {
+			if (isRefLogIncludingResult()) {
+				setRefLogMessage(
+						getRefLogMessage() + ": " + desiredResult.toString(), //$NON-NLS-1$
+						false);
+			}
+
+			if (!addReftable(this::writeUpdate)) {
+				return Result.LOCK_FAILURE;
+			}
+
+			return desiredResult;
+		}
+

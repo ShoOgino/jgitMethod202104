@@ -1,0 +1,33 @@
+	@SuppressWarnings("boxing")
+	@Test
+	public void testRacyReload() throws Exception {
+		ObjectId id = db.resolve("master");
+		int retry = 0;
+		try (FileRepository repo1 = new FileRepository(db.getDirectory());
+				FileRepository repo2 = new FileRepository(db.getDirectory())) {
+			FileRepository repos[] = { repo1, repo2 };
+			for (int i = 0; i < 10; i++) {
+				for (int j = 0; j < 2; j++) {
+					FileRepository repo = repos[j];
+					RefUpdate u = repo.getRefDatabase().newUpdate(
+							String.format("branch%d", i * 10 + j), false);
+
+					u.setNewObjectId(id);
+					RefUpdate.Result r = u.update();
+					if (!r.equals(Result.NEW)) {
+						retry++;
+						u = repo.getRefDatabase().newUpdate(
+								String.format("branch%d", i * 10 + j), false);
+
+						u.setNewObjectId(id);
+						r = u.update();
+						assertEquals(r, Result.NEW);
+					}
+				}
+			}
+
+			// only the first one succeeds
+			assertEquals(retry, 19);
+		}
+	}
+

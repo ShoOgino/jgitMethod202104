@@ -1,0 +1,9 @@
+	/** {@inheritDoc} */
+	@Override
+	public RefRename newRename(String fromName, String toName)
+			throws IOException {
+		RefUpdate src = newUpdate(fromName, true);
+		RefUpdate dst = newUpdate(toName, true);
+		return new FileRefRename(src, dst);
+	}
+

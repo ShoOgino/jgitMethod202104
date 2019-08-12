@@ -1,0 +1,25 @@
+	@Test
+	public void testUpdateRefDetached() throws Exception {
+		ObjectId pid = db.resolve("refs/heads/master");
+		ObjectId ppid = db.resolve("refs/heads/master^");
+		RefUpdate updateRef = db.updateRef("HEAD", true);
+		updateRef.setForceUpdate(true);
+		updateRef.setNewObjectId(ppid);
+		RefUpdate.Result update = updateRef.update();
+		assertEquals(FORCED, update);
+		assertEquals(ppid, db.resolve("HEAD"));
+		Ref ref = db.exactRef("HEAD");
+		assertEquals("HEAD", ref.getName());
+		assertTrue("is detached", !ref.isSymbolic());
+
+		// the branch HEAD referred to is left untouched
+		assertEquals(pid, db.resolve("refs/heads/master"));
+		ReflogReader reflogReader = db.getReflogReader("HEAD");
+		ReflogEntry e = reflogReader.getReverseEntries().get(0);
+		assertEquals(ppid, e.getNewId());
+		assertEquals("GIT_COMMITTER_EMAIL", e.getWho().getEmailAddress());
+		assertEquals("GIT_COMMITTER_NAME", e.getWho().getName());
+		assertEquals(1250379778000L, e.getWho().getWhen().getTime());
+		assertEquals(pid, e.getOldId());
+	}
+

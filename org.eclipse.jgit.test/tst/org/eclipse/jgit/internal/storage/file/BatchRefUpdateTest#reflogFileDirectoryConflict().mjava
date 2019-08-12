@@ -9,8 +9,11 @@
 
 		assertResults(cmds, OK, OK);
 		assertRefs("refs/heads/master/x", A);
-		assertEquals(atomic ? 2 : 3, refsChangedEvents);
-		assertNull(getLastReflog("refs/heads/master"));
+		assertEquals(batchesRefUpdates() ? 2 : 3, refsChangedEvents);
+		if (!useReftable) {
+			// reftable retains reflog entries for deleted branches.
+			assertNull(getLastReflog("refs/heads/master"));
+		}
 		assertReflogEquals(
 				reflog(zeroId(), A, new PersonIdent(diskRepo), "a reflog"),
 				getLastReflog("refs/heads/master/x"));

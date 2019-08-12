@@ -1,0 +1,21 @@
+		@Override
+		protected Result doLink(String target) throws IOException {
+			if (isRefLogIncludingResult()) {
+				setRefLogMessage(
+						getRefLogMessage() + ": " + Result.FORCED.toString(), //$NON-NLS-1$
+						false);
+			}
+
+			boolean exists = exactRef(getName()) != null;
+			dstRef = new SymbolicRef(getName(),
+					new ObjectIdRef.Unpeeled(Ref.Storage.NEW, target, null),
+					reftableDatabase.nextUpdateIndex());
+
+			if (!addReftable(this::writeLink)) {
+				return Result.LOCK_FAILURE;
+			}
+			// XXX unclear if we should support FORCED here. Baseclass says
+			// NEW is OK ?
+			return exists ? Result.FORCED : Result.NEW;
+		}
+

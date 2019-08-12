@@ -1,0 +1,9 @@
+	@Test
+	public void testDelete() throws Exception {
+		RefUpdate up = db.getRefDatabase().newUpdate("refs/heads/a", false);
+		up.setForceUpdate(true);
+		RefUpdate.Result res = up.delete();
+		assertEquals(res, FORCED);
+		assertNull(db.exactRef("refs/heads/a"));
+	}
+

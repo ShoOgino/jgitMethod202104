@@ -1,7 +1,6 @@
 	@Test
 	public void conflictThanksToDelete() throws IOException {
-		writeLooseRef("refs/heads/master", A);
-		writeLooseRef("refs/heads/masters", B);
+		writeLooseRefs("refs/heads/master", A, "refs/heads/masters", B);
 
 		List<ReceiveCommand> cmds = Arrays.asList(
 				new ReceiveCommand(A, B, "refs/heads/master", UPDATE),
@@ -13,7 +12,7 @@
 		assertRefs("refs/heads/master", B, "refs/heads/masters/x", A);
 		if (atomic) {
 			assertEquals(2, refsChangedEvents);
-		} else {
+		} else if (!useReftable) {
 			// The non-atomic case actually produces 5 events, but that's an
 			// implementation detail. We expect at least 4 events, one for the
 			// initial read due to writeLooseRef(), and then one for each

@@ -1,0 +1,24 @@
+	@Test
+	public void testLooseDelete() throws IOException {
+		final String newRef = "refs/heads/abc";
+		assertNull(db.exactRef(newRef));
+
+		RefUpdate ref = db.updateRef(newRef);
+		ObjectId nonZero = db.resolve(Constants.HEAD);
+		assertNotEquals(nonZero, ObjectId.zeroId());
+		ref.setNewObjectId(nonZero);
+		assertEquals(RefUpdate.Result.NEW, ref.update());
+
+		ref = db.updateRef(newRef);
+		ref.setNewObjectId(db.resolve(Constants.HEAD));
+
+		assertEquals(ref.delete(), RefUpdate.Result.NO_CHANGE);
+
+		// Differs from RefupdateTest. Deleting a loose ref leaves reflog trail.
+		ReflogReader reader = db.getReflogReader("refs/heads/abc");
+		assertEquals(ObjectId.zeroId(), reader.getReverseEntry(1).getOldId());
+		assertEquals(nonZero, reader.getReverseEntry(1).getNewId());
+		assertEquals(nonZero, reader.getReverseEntry(0).getOldId());
+		assertEquals(ObjectId.zeroId(), reader.getReverseEntry(0).getNewId());
+	}
+

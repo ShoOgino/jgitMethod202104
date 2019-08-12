@@ -1,0 +1,8 @@
+	@Test
+	public void testDeleteNotFound() throws IOException {
+		RefUpdate ref = updateRef("refs/heads/doesnotexist");
+		assertNull(db.exactRef(ref.getName()));
+		assertEquals(RefUpdate.Result.NEW, ref.delete());
+		assertNull(db.exactRef(ref.getName()));
+	}
+

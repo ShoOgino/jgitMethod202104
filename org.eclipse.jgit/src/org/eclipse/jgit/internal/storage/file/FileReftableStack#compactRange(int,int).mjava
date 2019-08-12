@@ -1,0 +1,103 @@
+	/**
+	 * Compacts a range of the stack, following the file locking protocol
+	 * documented in the spec.
+	 *
+	 * @param first
+	 *            index of first stack entry to be considered in compaction
+	 * @param last
+	 *            index of last stack entry to be considered in compaction
+	 * @return true if a compaction was successfully applied.
+	 * @throws IOException
+	 *             on I/O problem
+	 */
+	boolean compactRange(int first, int last) throws IOException {
+		if (first >= last) {
+			return true;
+		}
+		LockFile lock = new LockFile(stackPath);
+
+		File tmpTable = null;
+		List<LockFile> subtableLocks = new ArrayList<>();
+
+		try {
+			if (!lock.lock()) {
+				return false;
+			}
+			if (!isUpToDate()) {
+				return false;
+			}
+
+			List<File> deleteOnSuccess = new ArrayList<>();
+			for (int i = first; i <= last; i++) {
+				File f = new File(reftableDir, stack.get(i).name);
+				LockFile lf = new LockFile(f);
+				if (!lf.lock()) {
+					return false;
+				}
+				subtableLocks.add(lf);
+				deleteOnSuccess.add(f);
+			}
+
+			lock.unlock();
+			lock = null;
+
+			tmpTable = compactLocked(first, last);
+
+			lock = new LockFile(stackPath);
+			if (!lock.lock()) {
+				return false;
+			}
+			if (!isUpToDate()) {
+				return false;
+			}
+
+			String fn = filename(
+					stack.get(first).reftableReader.minUpdateIndex(),
+					stack.get(last).reftableReader.maxUpdateIndex());
+
+			// The spec suggests to use .log for log-only tables, and collect
+			// all log entries in a single file at the bottom of the stack. That would
+			// require supporting overlapping ranges for the different tables. For the
+			// sake of simplicity, we simply ignore this and always produce a log +
+			// ref combined table.
+			fn += ".ref"; //$NON-NLS-1$
+			File dest = new File(reftableDir, fn);
+
+			FileUtils.rename(tmpTable, dest, StandardCopyOption.ATOMIC_MOVE);
+			tmpTable = null;
+
+			StringBuilder sb = new StringBuilder();
+
+			for (int i = 0; i < first; i++) {
+				sb.append(stack.get(i).name + "\n"); //$NON-NLS-1$
+			}
+			sb.append(fn + "\n"); //$NON-NLS-1$
+			for (int i = last + 1; i < stack.size(); i++) {
+				sb.append(stack.get(i).name + "\n"); //$NON-NLS-1$
+			}
+
+			lock.write(sb.toString().getBytes(UTF_8));
+			if (!lock.commit()) {
+				dest.delete();
+				return false;
+			}
+
+			for (File f : deleteOnSuccess) {
+				Files.delete(f.toPath());
+			}
+
+			reload();
+			return true;
+		} finally {
+			if (tmpTable != null) {
+				tmpTable.delete();
+			}
+			for (LockFile lf : subtableLocks) {
+				lf.unlock();
+			}
+			if (lock != null) {
+				lock.unlock();
+			}
+		}
+	}
+

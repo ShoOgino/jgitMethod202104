@@ -1,0 +1,20 @@
+	@Test
+	public void testWriteReflog() throws Exception {
+		ObjectId pid = db.resolve("refs/heads/master^");
+		RefUpdate updateRef = db.updateRef("refs/heads/master");
+		updateRef.setNewObjectId(pid);
+		String msg = "REFLOG!";
+		updateRef.setRefLogMessage(msg, true);
+		PersonIdent person = new PersonIdent("name", "mail@example.com");
+		updateRef.setRefLogIdent(person);
+		updateRef.setForceUpdate(true);
+		RefUpdate.Result update = updateRef.update();
+		assertEquals(FORCED, update); // internal
+		ReflogReader r = db.getReflogReader("refs/heads/master");
+
+		ReflogEntry e = r.getLastEntry();
+		assertEquals(e.getNewId(), pid);
+		assertEquals(e.getComment(), "REFLOG!: FORCED");
+		assertEquals(e.getWho(), person);
+	}
+

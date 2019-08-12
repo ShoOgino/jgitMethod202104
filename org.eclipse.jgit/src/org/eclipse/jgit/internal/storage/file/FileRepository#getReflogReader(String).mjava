@@ -1,9 +1,18 @@
 	/** {@inheritDoc} */
 	@Override
 	public ReflogReader getReflogReader(String refName) throws IOException {
+		if (refs instanceof FileReftableDatabase) {
+			// Cannot use findRef: reftable stores log data for deleted or renamed
+			// branches.
+			return ((FileReftableDatabase)refs).getReflogReader(refName);
+		}
+
+		// TODO: use exactRef here, which offers more predictable and therefore preferable
+		// behavior.
 		Ref ref = findRef(refName);
-		if (ref != null)
-			return new ReflogReaderImpl(this, ref.getName());
-		return null;
+		if (ref == null) {
+			return null;
+		}
+		return new ReflogReaderImpl(this, ref.getName());
 	}
 

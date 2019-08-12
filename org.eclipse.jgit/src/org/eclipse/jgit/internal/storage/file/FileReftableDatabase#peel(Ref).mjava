@@ -1,0 +1,11 @@
+	/** {@inheritDoc} */
+	@Override
+	public Ref peel(Ref ref) throws IOException {
+		Ref oldLeaf = ref.getLeaf();
+		if (oldLeaf.isPeeled() || oldLeaf.getObjectId() == null) {
+			return ref;
+		}
+		return recreate(ref, doPeel(oldLeaf), hasVersioning());
+
+	}
+

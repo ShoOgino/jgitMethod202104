@@ -1,4 +1,8 @@
 	private void writeLooseRef(String name, AnyObjectId id) throws IOException {
-		write(new File(diskRepo.getDirectory(), name), id.name() + "\n");
+		if (useReftable) {
+			writeRef(name, id);
+		} else {
+			write(new File(diskRepo.getDirectory(), name), id.name() + "\n");
+		}
 	}
 

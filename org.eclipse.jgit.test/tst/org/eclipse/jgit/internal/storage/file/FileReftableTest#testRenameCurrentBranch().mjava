@@ -1,0 +1,34 @@
+	@Test
+	public void testRenameCurrentBranch() throws IOException {
+		ObjectId rb = db.resolve("refs/heads/b");
+		writeSymref(Constants.HEAD, "refs/heads/b");
+		ObjectId oldHead = db.resolve(Constants.HEAD);
+		assertEquals("internal test condition, b == HEAD", oldHead, rb);
+		RefRename renameRef = db.renameRef("refs/heads/b",
+				"refs/heads/new/name");
+		RefUpdate.Result result = renameRef.rename();
+		assertEquals(RefUpdate.Result.RENAMED, result);
+		assertEquals(rb, db.resolve("refs/heads/new/name"));
+		assertNull(db.resolve("refs/heads/b"));
+		assertEquals(rb, db.resolve(Constants.HEAD));
+
+		List<String> names = new ArrayList<>();
+		names.add("HEAD");
+		names.add("refs/heads/b");
+		names.add("refs/heads/new/name");
+
+		for (String nm : names) {
+			ReflogReader rd = db.getReflogReader(nm);
+			assertNotNull(rd);
+			ReflogEntry last = rd.getLastEntry();
+			ObjectId id = last.getNewId();
+			assertTrue(ObjectId.zeroId().equals(id) || rb.equals(id));
+
+			id = last.getNewId();
+			assertTrue(ObjectId.zeroId().equals(id) || rb.equals(id));
+
+			String want = "Branch: renamed b to new/name";
+			assertEquals(want, last.getComment());
+		}
+	}
+

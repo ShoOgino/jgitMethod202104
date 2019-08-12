@@ -1,0 +1,22 @@
+	@Test
+	public void testDeleteWithoutHead() throws IOException {
+		// Prepare repository without HEAD
+		RefUpdate refUpdate = db.updateRef(Constants.HEAD, true);
+		refUpdate.setForceUpdate(true);
+		refUpdate.setNewObjectId(ObjectId.zeroId());
+
+		RefUpdate.Result updateResult = refUpdate.update();
+		assertEquals(FORCED, updateResult);
+
+		Ref r = db.exactRef("HEAD");
+		assertEquals(ObjectId.zeroId(), r.getObjectId());
+		RefUpdate.Result deleteHeadResult = db.updateRef(Constants.HEAD)
+				.delete();
+
+		// why does doDelete say NEW ?
+		assertEquals(RefUpdate.Result.NO_CHANGE, deleteHeadResult);
+
+		// Any result is ok as long as it's not an NPE
+		db.updateRef(Constants.R_HEADS + "master").delete();
+	}
+

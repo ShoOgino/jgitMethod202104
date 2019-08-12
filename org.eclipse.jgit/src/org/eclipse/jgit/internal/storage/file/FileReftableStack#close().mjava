@@ -1,0 +1,15 @@
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void close() {
+		for (StackEntry entry : stack) {
+			try {
+				entry.reftableReader.close();
+			} catch (Exception e) {
+				// we are reading; this should never fail.
+				throw new AssertionError(e);
+			}
+		}
+	}
+

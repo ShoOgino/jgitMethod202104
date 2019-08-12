@@ -1,0 +1,15 @@
+	/**
+	 * Heuristically tries to compact the stack if the stack has a suitable
+	 * shape.
+	 *
+	 * @throws IOException
+	 */
+	private void autoCompact() throws IOException {
+		Optional<Segment> cand = autoCompactCandidate(tableSizes());
+		if (cand.isPresent()) {
+			if (!compactRange(cand.get().start, cand.get().end - 1)) {
+				stats.failed++;
+			}
+		}
+	}
+

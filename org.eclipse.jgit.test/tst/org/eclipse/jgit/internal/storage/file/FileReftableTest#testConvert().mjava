@@ -1,0 +1,12 @@
+	@Test
+	public void testConvert() throws Exception {
+		Ref h = db.exactRef("HEAD");
+		assertTrue(h.isSymbolic());
+		assertEquals("refs/heads/master", h.getTarget().getName());
+
+		Ref b = db.exactRef("refs/heads/b");
+		assertFalse(b.isSymbolic());
+		assertTrue(b.isPeeled());
+		assertEquals(bCommit, b.getObjectId().name());
+	}
+

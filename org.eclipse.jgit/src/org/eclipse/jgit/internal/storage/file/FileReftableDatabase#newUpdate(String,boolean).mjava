@@ -1,0 +1,20 @@
+	/** {@inheritDoc} */
+	@Override
+	public RefUpdate newUpdate(String refName, boolean detach)
+			throws IOException {
+		boolean detachingSymbolicRef = false;
+		Ref ref = exactRef(refName);
+
+		if (ref == null) {
+			ref = new ObjectIdRef.Unpeeled(NEW, refName, null);
+		} else {
+			detachingSymbolicRef = detach && ref.isSymbolic();
+		}
+
+		RefUpdate update = new FileReftableRefUpdate(ref);
+		if (detachingSymbolicRef) {
+			update.setDetachingSymbolicRef();
+		}
+		return update;
+	}
+

@@ -14,7 +14,7 @@
 		assertResults(cmds, OK, OK, OK);
 		assertRefs("refs/heads/master", B, "refs/heads/branch1", A,
 				"refs/heads/branch2", A);
-		assertEquals(atomic ? 3 : 5, refsChangedEvents);
+		assertEquals(batchesRefUpdates() ? 3 : 5, refsChangedEvents);
 		assertReflogEquals(
 				// Always forced; setAllowNonFastForwards(true) bypasses the
 				// check.

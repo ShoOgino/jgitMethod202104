@@ -1,0 +1,32 @@
+	@SuppressWarnings({ "resource", "unused" })
+	@Test
+	public void missingReftable() throws Exception {
+		try (FileReftableStack stack = new FileReftableStack(
+				new File(reftableDir, "refs"), reftableDir, null,
+				() -> new Config())) {
+			outer: for (int i = 0; i < 10; i++) {
+				final long next = stack.getMergedReftable().maxUpdateIndex()
+						+ 1;
+				String name = String.format("branch%d", Integer.valueOf(i));
+				Ref r = newRef(name, ObjectId.zeroId());
+				boolean ok = stack.addReftable(rw -> {
+					rw.setMinUpdateIndex(next).setMaxUpdateIndex(next).begin()
+							.writeRef(r);
+				});
+				assertTrue(ok);
+
+				List<File> files = Arrays.asList(reftableDir.listFiles());
+				for (int j = 0; j < files.size(); j++) {
+					File f = files.get(j);
+					if (f.getName().endsWith(".ref")) {
+						assertTrue(f.delete());
+						break outer;
+					}
+				}
+			}
+		}
+		thrown.expect(FileNotFoundException.class);
+		new FileReftableStack(new File(reftableDir, "refs"), reftableDir, null,
+				() -> new Config());
+	}
+

@@ -1,0 +1,60 @@
+	/**
+	 * Tries to add a new reftable to the stack. Returns true if it succeeded,
+	 * or false if there was a lock failure, due to races with other processes.
+	 * This is package private so FileReftableDatabase can call into here.
+	 *
+	 * @param w
+	 *            writer to write data to a reftable under construction
+	 * @return true if the transaction.
+	 * @throws IOException
+	 *             on I/O problems
+	 */
+	@SuppressWarnings("nls")
+	public boolean addReftable(Writer w) throws IOException {
+		LockFile lock = new LockFile(stackPath);
+		try {
+			if (!lock.lockForAppend()) {
+				return false;
+			}
+			if (!isUpToDate()) {
+				return false;
+			}
+
+			String fn = filename(nextUpdateIndex(), nextUpdateIndex());
+
+			File tmpTable = File.createTempFile(fn + "_", ".ref",
+					stackPath.getParentFile());
+
+			ReftableWriter.Stats s;
+			try (FileOutputStream fos = new FileOutputStream(tmpTable)) {
+				ReftableWriter rw = new ReftableWriter(reftableConfig(), fos);
+				w.call(rw);
+				rw.finish();
+				s = rw.getStats();
+			}
+
+			if (s.minUpdateIndex() < nextUpdateIndex()) {
+				return false;
+			}
+
+			// The spec says to name log-only files with .log, which is somewhat
+			// pointless given compaction, but we do so anyway.
+			fn += s.refCount() > 0 ? ".ref" : ".log";
+			File dest = new File(reftableDir, fn);
+
+			FileUtils.rename(tmpTable, dest, StandardCopyOption.ATOMIC_MOVE);
+			lock.write((fn + "\n").getBytes(UTF_8));
+			if (!lock.commit()) {
+				FileUtils.delete(dest);
+				return false;
+			}
+
+			reload();
+
+			autoCompact();
+		} finally {
+			lock.unlock();
+		}
+		return true;
+	}
+

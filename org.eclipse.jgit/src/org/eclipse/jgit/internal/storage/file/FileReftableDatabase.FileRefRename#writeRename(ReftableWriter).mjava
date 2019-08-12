@@ -1,0 +1,45 @@
+		void writeRename(ReftableWriter w) throws IOException {
+			long idx = reftableDatabase.nextUpdateIndex();
+			w.setMinUpdateIndex(idx).setMaxUpdateIndex(idx).begin();
+			List<Ref> refs = new ArrayList<>(3);
+
+			Ref dest = destination.getRef();
+			Ref head = exactRef(Constants.HEAD);
+			if (head != null && head.isSymbolic()
+					&& head.getLeaf().getName().equals(source.getName())) {
+				head = new SymbolicRef(Constants.HEAD, dest, idx);
+				refs.add(head);
+			}
+
+			ObjectId objId = source.getRef().getObjectId();
+
+			// XXX should we check if the source is a Tag vs. NonTag?
+			refs.add(new ObjectIdRef.PeeledNonTag(Ref.Storage.NEW,
+					destination.getName(), objId));
+			refs.add(new ObjectIdRef.Unpeeled(Ref.Storage.NEW, source.getName(),
+					null));
+
+			w.sortAndWriteRefs(refs);
+			PersonIdent who = destination.getRefLogIdent();
+			if (who == null) {
+				who = new PersonIdent(fileRepository);
+			}
+
+			if (!destination.getRefLogMessage().isEmpty()) {
+				List<String> refnames = refs.stream().map(r -> r.getName())
+						.collect(Collectors.toList());
+				Collections.sort(refnames);
+				for (String s : refnames) {
+					ObjectId old = (Constants.HEAD.equals(s)
+							|| s.equals(source.getName())) ? objId
+									: ObjectId.zeroId();
+					ObjectId newId = (Constants.HEAD.equals(s)
+							|| s.equals(destination.getName())) ? objId
+									: ObjectId.zeroId();
+
+					w.writeLog(s, idx, who, old, newId,
+							destination.getRefLogMessage());
+				}
+			}
+		}
+

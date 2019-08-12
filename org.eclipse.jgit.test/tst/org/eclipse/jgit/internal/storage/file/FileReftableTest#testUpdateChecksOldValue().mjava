@@ -1,0 +1,19 @@
+	@Test
+	public void testUpdateChecksOldValue() throws Exception {
+		ObjectId cur = db.resolve("master");
+		ObjectId prev = db.resolve("master^");
+		RefUpdate u1 = db.updateRef("refs/heads/master");
+		RefUpdate u2 = db.updateRef("refs/heads/master");
+
+		u1.setExpectedOldObjectId(cur);
+		u1.setNewObjectId(prev);
+		u1.setForceUpdate(true);
+
+		u2.setExpectedOldObjectId(cur);
+		u2.setNewObjectId(prev);
+		u2.setForceUpdate(true);
+
+		assertEquals(FORCED, u1.update());
+		assertEquals(LOCK_FAILURE, u2.update());
+	}
+

@@ -1,0 +1,10 @@
+	private static Ref recreate(Ref old, Ref leaf, boolean hasVersioning) {
+		if (old.isSymbolic()) {
+			Ref dst = recreate(old.getTarget(), leaf, hasVersioning);
+			return new SymbolicRef(old.getName(), dst,
+					hasVersioning ? old.getUpdateIndex()
+							: UNDEFINED_UPDATE_INDEX);
+		}
+		return leaf;
+	}
+

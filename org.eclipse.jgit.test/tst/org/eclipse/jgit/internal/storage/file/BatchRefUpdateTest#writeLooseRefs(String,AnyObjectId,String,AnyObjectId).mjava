@@ -1,0 +1,27 @@
+	private void writeLooseRefs(String name1, AnyObjectId id1, String name2,
+			AnyObjectId id2) throws IOException {
+		if (useReftable) {
+			BatchRefUpdate bru = diskRepo.getRefDatabase().newBatchUpdate();
+
+			Ref r1 = diskRepo.exactRef(name1);
+			ReceiveCommand c1 = new ReceiveCommand(
+					r1 != null ? r1.getObjectId() : ObjectId.zeroId(),
+					id1.toObjectId(), name1, r1 == null ? CREATE : UPDATE);
+
+			Ref r2 = diskRepo.exactRef(name2);
+			ReceiveCommand c2 = new ReceiveCommand(
+					r2 != null ? r2.getObjectId() : ObjectId.zeroId(),
+					id2.toObjectId(), name2, r2 == null ? CREATE : UPDATE);
+
+			bru.addCommand(c1, c2);
+			try (RevWalk rw = new RevWalk(diskRepo)) {
+				bru.execute(rw, NullProgressMonitor.INSTANCE);
+			}
+			assertEquals(c2.getResult(), ReceiveCommand.Result.OK);
+			assertEquals(c1.getResult(), ReceiveCommand.Result.OK);
+		} else {
+			writeLooseRef(name1, id1);
+			writeLooseRef(name2, id2);
+		}
+	}
+

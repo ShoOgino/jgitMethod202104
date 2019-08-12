@@ -1,0 +1,10 @@
+	@Test
+	public void testFastforwardStatus2() throws Exception {
+		writeSymref(Constants.HEAD, "refs/heads/a");
+		ObjectId bId = db.exactRef("refs/heads/b").getObjectId();
+		RefUpdate u = db.updateRef("refs/heads/a");
+		u.setNewObjectId(bId);
+		u.setRefLogMessage("Setup", false);
+		assertEquals(FAST_FORWARD, u.update());
+	}
+

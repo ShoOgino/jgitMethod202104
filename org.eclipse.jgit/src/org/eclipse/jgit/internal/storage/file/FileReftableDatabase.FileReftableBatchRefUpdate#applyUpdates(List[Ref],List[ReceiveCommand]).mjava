@@ -1,0 +1,12 @@
+		@Override
+		protected void applyUpdates(List<Ref> newRefs,
+				List<ReceiveCommand> pending) throws IOException {
+			if (!addReftable(rw -> write(rw, newRefs, pending))) {
+				for (ReceiveCommand c : pending) {
+					if (c.getResult() == ReceiveCommand.Result.NOT_ATTEMPTED) {
+						c.setResult(RefUpdate.Result.LOCK_FAILURE);
+					}
+				}
+			}
+		}
+

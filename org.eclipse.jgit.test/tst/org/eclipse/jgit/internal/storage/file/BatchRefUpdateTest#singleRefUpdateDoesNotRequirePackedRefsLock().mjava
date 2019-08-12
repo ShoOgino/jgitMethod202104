@@ -1,5 +1,6 @@
 	@Test
 	public void singleRefUpdateDoesNotRequirePackedRefsLock() throws Exception {
+		assumeFalse(useReftable);
 		writeLooseRef("refs/heads/master", A);
 
 		List<ReceiveCommand> cmds = Arrays

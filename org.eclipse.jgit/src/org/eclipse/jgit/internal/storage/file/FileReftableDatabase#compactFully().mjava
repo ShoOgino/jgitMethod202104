@@ -1,0 +1,13 @@
+	/**
+	 * Runs a full compaction for GC purposes.
+	 * @throws IOException on I/O errors
+	 */
+	public void compactFully() throws IOException {
+		reftableDatabase.getLock().lock();
+		try {
+			reftableStack.compactFully();
+		} finally {
+			reftableDatabase.getLock().unlock();
+		}
+	}
+

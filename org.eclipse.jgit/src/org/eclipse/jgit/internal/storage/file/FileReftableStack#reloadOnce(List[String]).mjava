@@ -1,0 +1,72 @@
+	/**
+	 * Reloads the stack, potentially reusing opened reftableReaders.
+	 *
+	 * @param names
+	 *            holds the names of the tables to load.
+	 * @throws FileNotFoundException
+	 *             load must be retried.
+	 * @throws IOException
+	 *             on other IO errors.
+	 */
+	private void reloadOnce(List<String> names)
+			throws IOException, FileNotFoundException {
+		Map<String, ReftableReader> current = stack.stream()
+				.collect(Collectors.toMap(e -> e.name, e -> e.reftableReader));
+
+		List<ReftableReader> newTables = new ArrayList<>();
+		List<StackEntry> newStack = new ArrayList<>(stack.size() + 1);
+		try {
+			ReftableReader last = null;
+			for (String name : names) {
+				StackEntry entry = new StackEntry();
+				entry.name = name;
+
+				ReftableReader t = null;
+				if (current.containsKey(name)) {
+					t = current.remove(name);
+				} else {
+					File subtable = new File(reftableDir, name);
+					FileInputStream is;
+
+					is = new FileInputStream(subtable);
+
+					t = new ReftableReader(BlockSource.from(is));
+					newTables.add(t);
+				}
+
+				if (last != null) {
+					// TODO: move this to MergedReftable
+					if (last.maxUpdateIndex() >= t.minUpdateIndex()) {
+						throw new ReftableNumbersNotIncreasingException(name,
+								last.maxUpdateIndex(), t.minUpdateIndex());
+					}
+				}
+				last = t;
+
+				entry.reftableReader = t;
+				newStack.add(entry);
+			}
+			// survived without exceptions: swap in new stack, and close
+			// dangling tables.
+			stack = newStack;
+			newTables.clear();
+
+			current.values().forEach(r -> {
+				try {
+					r.close();
+				} catch (IOException e) {
+					throw new AssertionError(e);
+				}
+			});
+		} finally {
+			newTables.forEach(t -> {
+				try {
+					t.close();
+				} catch (IOException ioe) {
+					// reader close should not generate errors.
+					throw new AssertionError(ioe);
+				}
+			});
+		}
+	}
+

@@ -1,0 +1,14 @@
+	@Test
+	public void testRenameAtomic() throws IOException {
+		ObjectId prevId = db.resolve("refs/heads/master^");
+
+		RefRename rename = db.renameRef("refs/heads/master",
+				"refs/heads/newmaster");
+
+		RefUpdate updateRef = db.updateRef("refs/heads/master");
+		updateRef.setNewObjectId(prevId);
+		updateRef.setForceUpdate(true);
+		assertEquals(FORCED, updateRef.update());
+		assertEquals(RefUpdate.Result.LOCK_FAILURE, rename.rename());
+	}
+

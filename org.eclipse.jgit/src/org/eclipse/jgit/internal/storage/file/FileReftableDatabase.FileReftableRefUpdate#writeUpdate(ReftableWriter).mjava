@@ -1,0 +1,27 @@
+		void writeUpdate(ReftableWriter w) throws IOException {
+			Ref newRef = null;
+			if (rw != null && !ObjectId.zeroId().equals(getNewObjectId())) {
+				RevObject obj = rw.parseAny(getNewObjectId());
+				if (obj instanceof RevTag) {
+					newRef = new ObjectIdRef.PeeledTag(Ref.Storage.PACKED,
+							dstRef.getName(), getNewObjectId(),
+							rw.peel(obj).copy());
+				}
+			}
+			if (newRef == null) {
+				newRef = new ObjectIdRef.PeeledNonTag(Ref.Storage.PACKED,
+						dstRef.getName(), getNewObjectId());
+			}
+
+			long idx = reftableDatabase.nextUpdateIndex();
+			w.setMinUpdateIndex(idx).setMaxUpdateIndex(idx).begin()
+					.writeRef(newRef);
+
+			ObjectId oldId = getOldObjectId();
+			if (oldId == null) {
+				oldId = ObjectId.zeroId();
+			}
+			w.writeLog(dstRef.getName(), idx, getRefLogIdent(), oldId,
+					getNewObjectId(), getRefLogMessage());
+		}
+

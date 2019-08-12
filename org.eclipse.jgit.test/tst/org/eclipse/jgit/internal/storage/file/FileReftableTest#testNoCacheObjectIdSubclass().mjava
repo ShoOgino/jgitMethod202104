@@ -1,0 +1,29 @@
+	@Test
+	public void testNoCacheObjectIdSubclass() throws IOException {
+		final String newRef = "refs/heads/abc";
+		final RefUpdate ru = updateRef(newRef);
+		final SubclassedId newid = new SubclassedId(ru.getNewObjectId());
+		ru.setNewObjectId(newid);
+		RefUpdate.Result update = ru.update();
+		assertEquals(RefUpdate.Result.NEW, update);
+		Ref r = db.exactRef(newRef);
+		assertEquals(newRef, r.getName());
+		assertNotNull(r.getObjectId());
+		assertNotSame(newid, r.getObjectId());
+		assertSame(ObjectId.class, r.getObjectId().getClass());
+		assertEquals(newid, r.getObjectId());
+		List<ReflogEntry> reverseEntries1 = db.getReflogReader("refs/heads/abc")
+				.getReverseEntries();
+		ReflogEntry entry1 = reverseEntries1.get(0);
+		assertEquals(1, reverseEntries1.size());
+		assertEquals(ObjectId.zeroId(), entry1.getOldId());
+		assertEquals(r.getObjectId(), entry1.getNewId());
+
+		assertEquals(new PersonIdent(db).toString(),
+				entry1.getWho().toString());
+		assertEquals("", entry1.getComment());
+		List<ReflogEntry> reverseEntries2 = db.getReflogReader("HEAD")
+				.getReverseEntries();
+		assertEquals(0, reverseEntries2.size());
+	}
+

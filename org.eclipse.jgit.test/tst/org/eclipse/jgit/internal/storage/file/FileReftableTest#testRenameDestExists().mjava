@@ -1,0 +1,11 @@
+	@Test
+	public void testRenameDestExists() throws IOException {
+		ObjectId rb = db.resolve("refs/heads/b");
+		writeSymref(Constants.HEAD, "refs/heads/b");
+		ObjectId oldHead = db.resolve(Constants.HEAD);
+		assertEquals("internal test condition, b == HEAD", oldHead, rb);
+		RefRename renameRef = db.renameRef("refs/heads/b", "refs/heads/a");
+		RefUpdate.Result result = renameRef.rename();
+		assertEquals(RefUpdate.Result.LOCK_FAILURE, result);
+	}
+

@@ -1,0 +1,49 @@
+	void reload() throws IOException {
+		// Try for 2.5 seconds.
+		long deadline = System.currentTimeMillis() + 2500;
+		// A successful reftable transaction is 2 atomic file writes
+		// (open, write, close, rename), which a fast Linux system should be
+		// able to do in about ~200us. So 1 ms should be ample time.
+		long min = 1;
+		long max = 1000;
+		long delay = 0;
+		boolean success = false;
+		while (System.currentTimeMillis() < deadline) {
+			List<String> names = readTableNames();
+			try {
+				reloadOnce(names);
+				success = true;
+				break;
+			} catch (FileNotFoundException e) {
+				List<String> changed = readTableNames();
+				if (changed.equals(names)) {
+					throw e;
+				}
+			}
+
+			delay = FileUtils.delay(delay, min, max);
+			try {
+				Thread.sleep(delay);
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+				throw new RuntimeException(e);
+			}
+		}
+
+		if (!success) {
+			// TODO: should reexamine the 'refs' file to see if it was the same
+			// if it didn't change, then we must have corruption. If it did,
+			// retry.
+			throw new LockFailedException(stackPath);
+		}
+
+		mergedReftable = new MergedReftable(stack.stream()
+				.map(x -> x.reftableReader).collect(Collectors.toList()));
+		long curr = nextUpdateIndex();
+		if (lastNextUpdateIndex > 0 && lastNextUpdateIndex != curr
+				&& onChange != null) {
+			onChange.run();
+		}
+		lastNextUpdateIndex = curr;
+	}
+

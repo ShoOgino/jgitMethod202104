@@ -9,7 +9,8 @@
 			expected.put((String) args[i], (AnyObjectId) args[i + 1]);
 		}
 
-		Map<String, Ref> refs = refdir.getRefs(RefDatabase.ALL);
+		Map<String, Ref> refs = diskRepo.getRefDatabase()
+				.getRefs(RefDatabase.ALL);
 		Ref actualHead = refs.remove(Constants.HEAD);
 		if (actualHead != null) {
 			String actualLeafName = actualHead.getLeaf().getName();

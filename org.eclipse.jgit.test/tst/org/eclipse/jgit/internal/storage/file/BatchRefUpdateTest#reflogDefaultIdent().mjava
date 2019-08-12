@@ -14,7 +14,7 @@
 		assertResults(cmds, OK, OK);
 		assertRefs("refs/heads/master", B, "refs/heads/branch1", B,
 				"refs/heads/branch2", A);
-		assertEquals(atomic ? 3 : 4, refsChangedEvents);
+		assertEquals(batchesRefUpdates() ? 3 : 4, refsChangedEvents);
 		assertReflogEquals(reflog(A, B, new PersonIdent(diskRepo), "a reflog"),
 				getLastReflog("refs/heads/master"));
 		assertReflogEquals(

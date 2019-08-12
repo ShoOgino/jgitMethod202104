@@ -1,0 +1,30 @@
+	/**
+	 * Update the HEAD ref when the referenced branch is unborn
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void testUpdateRefDetachedUnbornHead() throws Exception {
+		ObjectId ppid = db.resolve("refs/heads/master^");
+		writeSymref("HEAD", "refs/heads/unborn");
+		RefUpdate updateRef = db.updateRef("HEAD", true);
+		updateRef.setForceUpdate(true);
+		updateRef.setNewObjectId(ppid);
+		RefUpdate.Result update = updateRef.update();
+		assertEquals(RefUpdate.Result.NEW, update);
+		assertEquals(ppid, db.resolve("HEAD"));
+		Ref ref = db.exactRef("HEAD");
+		assertEquals("HEAD", ref.getName());
+		assertTrue("is detached", !ref.isSymbolic());
+
+		// the branch HEAD referred to is left untouched
+		assertNull(db.resolve("refs/heads/unborn"));
+		ReflogReader reflogReader = db.getReflogReader("HEAD");
+		ReflogEntry e = reflogReader.getReverseEntries().get(0);
+		assertEquals(ObjectId.zeroId(), e.getOldId());
+		assertEquals(ppid, e.getNewId());
+		assertEquals("GIT_COMMITTER_EMAIL", e.getWho().getEmailAddress());
+		assertEquals("GIT_COMMITTER_NAME", e.getWho().getName());
+		assertEquals(1250379778000L, e.getWho().getWhen().getTime());
+	}
+

@@ -1,7 +1,6 @@
 	@Test
 	public void simpleForce() throws IOException {
-		writeLooseRef("refs/heads/master", A);
-		writeLooseRef("refs/heads/masters", B);
+		writeLooseRefs("refs/heads/master", A, "refs/heads/masters", B);
 
 		List<ReceiveCommand> cmds = Arrays.asList(
 				new ReceiveCommand(A, B, "refs/heads/master", UPDATE),
@@ -11,6 +10,6 @@
 
 		assertResults(cmds, OK, OK);
 		assertRefs("refs/heads/master", B, "refs/heads/masters", A);
-		assertEquals(atomic ? 2 : 3, refsChangedEvents);
+		assertEquals(batchesRefUpdates() ? 2 : 3, refsChangedEvents);
 	}
 

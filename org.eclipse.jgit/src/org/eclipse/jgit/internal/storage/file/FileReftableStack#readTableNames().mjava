@@ -1,0 +1,17 @@
+	private List<String> readTableNames() throws IOException {
+		List<String> names = new ArrayList<>(stack.size() + 1);
+
+		try (BufferedReader br = new BufferedReader(
+				new InputStreamReader(new FileInputStream(stackPath), UTF_8))) {
+			String line;
+			while ((line = br.readLine()) != null) {
+				if (!line.isEmpty()) {
+					names.add(line);
+				}
+			}
+		} catch (FileNotFoundException e) {
+			// file isn't there: empty repository.
+		}
+		return names;
+	}
+

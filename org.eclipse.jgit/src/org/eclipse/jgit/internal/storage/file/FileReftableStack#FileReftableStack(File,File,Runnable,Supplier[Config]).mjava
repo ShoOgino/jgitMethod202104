@@ -1,0 +1,30 @@
+	/**
+	 * Creates a stack corresponding to the list of reftables in the argument
+	 *
+	 * @param stackPath
+	 *            the filename for the stack.
+	 * @param reftableDir
+	 *            the dir holding the tables.
+	 * @param onChange
+	 *            hook to call if we notice a new write
+	 * @param configSupplier
+	 *            Config supplier
+	 * @throws IOException
+	 *             on I/O problems
+	 */
+	public FileReftableStack(File stackPath, File reftableDir,
+			@Nullable Runnable onChange, Supplier<Config> configSupplier)
+			throws IOException {
+		this.stackPath = stackPath;
+		this.reftableDir = reftableDir;
+		this.stack = new ArrayList<>();
+		this.configSupplier = configSupplier;
+		this.onChange = onChange;
+
+		// skip event notification
+		lastNextUpdateIndex = 0;
+		reload();
+
+		stats = new CompactionStats();
+	}
+

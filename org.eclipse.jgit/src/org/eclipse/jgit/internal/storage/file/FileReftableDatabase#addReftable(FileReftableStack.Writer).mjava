@@ -1,0 +1,11 @@
+	private boolean addReftable(FileReftableStack.Writer w) throws IOException {
+		if (!reftableStack.addReftable(w)) {
+			reftableStack.reload();
+			reftableDatabase.clearCache();
+			return false;
+		}
+		reftableDatabase.clearCache();
+
+		return true;
+	}
+

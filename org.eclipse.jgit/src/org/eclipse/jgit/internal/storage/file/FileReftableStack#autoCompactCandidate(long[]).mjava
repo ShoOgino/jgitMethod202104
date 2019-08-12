@@ -1,0 +1,35 @@
+	private static Optional<Segment> autoCompactCandidate(long sizes[]) {
+		if (sizes.length == 0) {
+			return Optional.empty();
+		}
+
+		// The cost of compaction is proportional to the size, and we want to
+		// avoid frequent large compactions. We do this by playing the game 2048
+		// here: first compact together the smallest tables if there are more
+		// than one. Then try to see if the result will be big enough to match
+		// up with next up.
+
+		List<Segment> segments = segmentSizes(sizes);
+		segments = segments.stream().filter(s -> s.size() > 1)
+				.collect(Collectors.toList());
+		if (segments.isEmpty()) {
+			return Optional.empty();
+		}
+
+		Optional<Segment> optMinSeg = segments.stream()
+				.min(Comparator.comparing(s -> Integer.valueOf(s.log)));
+		// Input is non-empty, so always present.
+		Segment smallCollected = optMinSeg.get();
+		while (smallCollected.start > 0) {
+			int prev = smallCollected.start - 1;
+			long prevSize = sizes[prev];
+			if (log(smallCollected.bytes) < log(prevSize)) {
+				break;
+			}
+			smallCollected.start = prev;
+			smallCollected.bytes += prevSize;
+		}
+
+		return Optional.of(smallCollected);
+	}
+

@@ -1,0 +1,24 @@
+	/**
+	 * @return true if the on-disk file corresponds to the in-memory data.
+	 * @throws IOException
+	 *             on IO problem
+	 */
+	boolean isUpToDate() throws IOException {
+		// We could use FileSnapshot to avoid reading the file, but the file is
+		// small so it's probably a minor optimization.
+		try {
+			List<String> names = readTableNames();
+			if (names.size() != stack.size()) {
+				return false;
+			}
+			for (int i = 0; i < names.size(); i++) {
+				if (!names.get(i).equals(stack.get(i).name)) {
+					return false;
+				}
+			}
+		} catch (FileNotFoundException e) {
+			return stack.isEmpty();
+		}
+		return true;
+	}
+

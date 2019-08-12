@@ -1,0 +1,21 @@
+	void writeBranches(FileReftableStack stack, String template, int start,
+			int N) throws IOException {
+		for (int i = 0; i < N; i++) {
+			while (true) {
+				final long next = stack.getMergedReftable().maxUpdateIndex()
+						+ 1;
+
+				String name = String.format(template,
+						Integer.valueOf(start + i));
+				Ref r = newRef(name, ObjectId.zeroId());
+				boolean ok = stack.addReftable(rw -> {
+					rw.setMinUpdateIndex(next).setMaxUpdateIndex(next).begin()
+							.writeRef(r);
+				});
+				if (ok) {
+					break;
+				}
+			}
+		}
+	}
+

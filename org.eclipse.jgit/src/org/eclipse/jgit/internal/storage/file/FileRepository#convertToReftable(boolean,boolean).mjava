@@ -1,0 +1,42 @@
+	@SuppressWarnings("nls")
+	void convertToReftable(boolean writeLogs, boolean backup)
+			throws IOException {
+		File newRefs = new File(getDirectory(), "refs.new");
+		File reftableDir = new File(getDirectory(), Constants.REFTABLE);
+
+		if (reftableDir.exists() && reftableDir.listFiles().length > 0) {
+			throw new IOException(JGitText.get().reftableDirExists);
+		}
+
+		// Ignore return value, as it is tied to temporary newRefs file.
+		FileReftableDatabase.convertFrom(this, newRefs, writeLogs);
+
+		File refsFile = new File(getDirectory(), "refs");
+
+		// non-atomic: remove old data.
+		File packedRefs = new File(getDirectory(), Constants.PACKED_REFS);
+		File logsDir = new File(getDirectory(), Constants.LOGS);
+
+		if (backup) {
+			FileUtils.rename(refsFile, new File(getDirectory(), "refs.old"));
+			if (packedRefs.exists()) {
+				FileUtils.rename(packedRefs, new File(getDirectory(),
+						Constants.PACKED_REFS + ".old"));
+			}
+			if (logsDir.exists()) {
+				FileUtils.rename(logsDir,
+						new File(getDirectory(), Constants.LOGS + ".old"));
+			}
+		} else {
+			packedRefs.delete(); // ignore return value.
+			FileUtils.delete(logsDir, FileUtils.RECURSIVE);
+			FileUtils.delete(refsFile, FileUtils.RECURSIVE);
+		}
+
+		// Put new data.
+		FileUtils.rename(newRefs, refsFile);
+
+		refs.close();
+		refs = new FileReftableDatabase(this, refsFile);
+	}
+

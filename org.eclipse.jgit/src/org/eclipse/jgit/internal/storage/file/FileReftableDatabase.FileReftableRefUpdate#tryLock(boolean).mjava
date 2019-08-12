@@ -1,0 +1,15 @@
+		@Override
+		protected boolean tryLock(boolean deref) throws IOException {
+			dstRef = getRef();
+			if (deref) {
+				dstRef = dstRef.getLeaf();
+			}
+
+			Ref derefed = exactRef(dstRef.getName());
+			if (derefed != null) {
+				setOldObjectId(derefed.getObjectId());
+			}
+
+			return true;
+		}
+

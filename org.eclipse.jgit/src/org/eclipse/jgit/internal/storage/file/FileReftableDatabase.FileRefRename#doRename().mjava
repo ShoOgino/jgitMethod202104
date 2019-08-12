@@ -1,0 +1,20 @@
+		@Override
+		protected RefUpdate.Result doRename() throws IOException {
+			Ref src = exactRef(source.getName());
+			if (exactRef(destination.getName()) != null || src == null
+					|| !source.getOldObjectId().equals(src.getObjectId())) {
+				return RefUpdate.Result.LOCK_FAILURE;
+			}
+
+			if (src.isSymbolic()) {
+				// We could support this, but this is easier and compatible.
+				return RefUpdate.Result.IO_FAILURE;
+			}
+
+			if (!addReftable(this::writeRename)) {
+				return RefUpdate.Result.LOCK_FAILURE;
+			}
+
+			return RefUpdate.Result.RENAMED;
+		}
+

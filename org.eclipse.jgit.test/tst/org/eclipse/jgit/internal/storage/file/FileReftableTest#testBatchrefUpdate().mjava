@@ -1,0 +1,35 @@
+	@Test
+	public void testBatchrefUpdate() throws Exception {
+		ObjectId cur = db.resolve("master");
+		ObjectId prev = db.resolve("master^");
+
+		PersonIdent person = new PersonIdent("name", "mail@example.com");
+		ReceiveCommand rc1 = new ReceiveCommand(ObjectId.zeroId(), cur, "refs/heads/batch1");
+		ReceiveCommand rc2 = new ReceiveCommand(ObjectId.zeroId(), prev, "refs/heads/batch2");
+		String msg =  "message";
+		try (RevWalk rw = new RevWalk(db)) {
+			db.getRefDatabase().newBatchUpdate()
+					.addCommand(rc1, rc2)
+					.setAtomic(true)
+					.setRefLogIdent(person)
+					.setRefLogMessage(msg, false)
+					.execute(rw, NullProgressMonitor.INSTANCE);
+		}
+
+		assertEquals(rc1.getResult(), ReceiveCommand.Result.OK);
+		assertEquals(rc2.getResult(), ReceiveCommand.Result.OK);
+
+		ReflogEntry e = db.getReflogReader("refs/heads/batch1").getLastEntry();
+		assertEquals(msg, e.getComment());
+		assertEquals(person, e.getWho());
+		assertEquals(cur, e.getNewId());
+
+		e = db.getReflogReader("refs/heads/batch2").getLastEntry();
+		assertEquals(msg, e.getComment());
+		assertEquals(person, e.getWho());
+		assertEquals(prev, e.getNewId());
+
+		assertEquals(cur, db.exactRef("refs/heads/batch1").getObjectId());
+		assertEquals(prev, db.exactRef("refs/heads/batch2").getObjectId());
+	}
+

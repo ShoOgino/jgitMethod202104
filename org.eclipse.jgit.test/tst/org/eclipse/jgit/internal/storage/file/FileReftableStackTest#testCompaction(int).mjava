@@ -1,0 +1,27 @@
+	public void testCompaction(int N) throws Exception {
+		try (FileReftableStack stack = new FileReftableStack(
+				new File(reftableDir, "refs"), reftableDir, null,
+				() -> new Config())) {
+			writeBranches(stack, "refs/heads/branch%d", 0, N);
+			MergedReftable table = stack.getMergedReftable();
+			for (int i = 1; i < N; i++) {
+				String name = String.format("refs/heads/branch%d",
+						Integer.valueOf(i));
+				RefCursor c = table.seekRef(name);
+				assertTrue(c.next());
+				assertEquals(ObjectId.zeroId(), c.getRef().getObjectId());
+			}
+
+			List<String> files = Arrays.asList(reftableDir.listFiles()).stream()
+					.map(File::getName).collect(Collectors.toList());
+			Collections.sort(files);
+
+			assertTrue(files.size() < 20);
+
+			FileReftableStack.CompactionStats stats = stack.getStats();
+			assertEquals(0, stats.failed);
+			assertTrue(stats.attempted < N);
+			assertTrue(stats.refCount < FileReftableStack.log(N) * N);
+		}
+	}
+

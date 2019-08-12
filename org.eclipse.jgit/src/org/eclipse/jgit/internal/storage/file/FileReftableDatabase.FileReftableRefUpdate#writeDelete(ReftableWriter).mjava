@@ -1,0 +1,20 @@
+		void writeDelete(ReftableWriter w) throws IOException {
+			Ref newRef = new ObjectIdRef.Unpeeled(Ref.Storage.NEW,
+					dstRef.getName(), null);
+			long idx = reftableDatabase.nextUpdateIndex();
+			w.setMinUpdateIndex(idx).setMaxUpdateIndex(idx).begin()
+					.writeRef(newRef);
+
+			ObjectId oldId = ObjectId.zeroId();
+			Ref old = exactRef(dstRef.getName());
+			if (old != null) {
+				old = old.getLeaf();
+				if (old.getObjectId() != null) {
+					oldId = old.getObjectId();
+				}
+			}
+
+			w.writeLog(dstRef.getName(), idx, getRefLogIdent(), oldId,
+					ObjectId.zeroId(), getRefLogMessage());
+		}
+

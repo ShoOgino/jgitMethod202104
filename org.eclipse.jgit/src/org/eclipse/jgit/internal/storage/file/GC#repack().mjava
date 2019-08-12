@@ -100,7 +100,10 @@
 			throw new IOException(e);
 		}
 		prunePacked();
-		deleteEmptyRefsFolders();
+		if (repo.getRefDatabase() instanceof RefDirectory) {
+			// TODO: abstract this more cleanly.
+			deleteEmptyRefsFolders();
+		}
 		deleteOrphans();
 		deleteTempPacksIdx();
 
