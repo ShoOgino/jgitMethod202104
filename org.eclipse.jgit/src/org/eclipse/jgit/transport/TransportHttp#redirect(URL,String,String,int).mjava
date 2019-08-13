@@ -1,4 +1,5 @@
-	private URIish redirect(String location, String checkFor, int redirects)
+	private URIish redirect(URL currentUrl, String location, String checkFor,
+			int redirects)
 			throws TransportException {
 		if (location == null || location.isEmpty()) {
 			throw new TransportException(uri,
@@ -12,13 +13,16 @@
 							location));
 		}
 		try {
-			if (!isValidRedirect(baseUrl, location, checkFor)) {
+			URI redirectTo = new URI(location);
+			redirectTo = currentUrl.toURI().resolve(redirectTo);
+			String redirected = redirectTo.toASCIIString();
+			if (!isValidRedirect(baseUrl, redirected, checkFor)) {
 				throw new TransportException(uri,
 						MessageFormat.format(JGitText.get().redirectBlocked,
-								baseUrl, location));
+								baseUrl, redirected));
 			}
-			location = location.substring(0, location.indexOf(checkFor));
-			URIish result = new URIish(location);
+			redirected = redirected.substring(0, redirected.indexOf(checkFor));
+			URIish result = new URIish(redirected);
 			if (LOG.isInfoEnabled()) {
 				LOG.info(MessageFormat.format(JGitText.get().redirectHttp,
 						uri.setPass(null),

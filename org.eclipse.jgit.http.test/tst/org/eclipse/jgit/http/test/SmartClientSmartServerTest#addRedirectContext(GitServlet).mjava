@@ -19,6 +19,23 @@
 				// empty
 			}
 
+			private String local(String url, boolean toLocal) {
+				if (!toLocal) {
+					return url;
+				}
+				try {
+					URI u = new URI(url);
+					String fragment = u.getRawFragment();
+					if (fragment != null) {
+						return u.getRawPath() + '#' + fragment;
+					} else {
+						return u.getRawPath();
+					}
+				} catch (URISyntaxException e) {
+					return url;
+				}
+			}
+
 			@Override
 			public void doFilter(ServletRequest request,
 					ServletResponse response, FilterChain chain)
@@ -31,6 +48,11 @@
 							.append(httpServletRequest.getQueryString());
 				}
 				String urlString = fullUrl.toString();
+				boolean localRedirect = false;
+				if (urlString.contains("/local")) {
+					urlString = urlString.replace("/local", "");
+					localRedirect = true;
+				}
 				if (urlString.contains("/loop/")) {
 					urlString = urlString.replace("/loop/", "/loop/x/");
 					if (urlString.contains("/loop/x/x/x/x/x/x/x/x/")) {
@@ -41,7 +63,7 @@
 					httpServletResponse.setStatus(
 							HttpServletResponse.SC_MOVED_TEMPORARILY);
 					httpServletResponse.setHeader(HttpSupport.HDR_LOCATION,
-							urlString);
+							local(urlString, localRedirect));
 					return;
 				}
 				int responseCode = HttpServletResponse.SC_MOVED_PERMANENTLY;
@@ -71,9 +93,10 @@
 						targetContext = matcher.group(1);
 					}
 					urlString = urlString.replace("/redirect", targetContext);
+
 				}
 				httpServletResponse.setHeader(HttpSupport.HDR_LOCATION,
-						urlString);
+						local(urlString, localRedirect));
 			}
 
 			@Override
