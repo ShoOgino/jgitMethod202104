@@ -16,21 +16,7 @@
 	 */
 	public RevCommit commit(final int secDelta, final RevTree tree,
 			final RevCommit... parents) throws Exception {
-		tick(secDelta);
-
-		final org.eclipse.jgit.lib.CommitBuilder c;
-
-		c = new org.eclipse.jgit.lib.CommitBuilder();
-		c.setTreeId(tree);
-		c.setParentIds(parents);
-		c.setAuthor(new PersonIdent(defaultAuthor, getDate()));
-		c.setCommitter(new PersonIdent(defaultCommitter, getDate()));
-		c.setMessage("");
-		ObjectId id;
-		try (ObjectInserter ins = inserter) {
-			id = ins.insert(c);
-			ins.flush();
-		}
+		ObjectId id = unparsedCommit(secDelta, tree, parents);
 		return pool.parseCommit(id);
 	}
 

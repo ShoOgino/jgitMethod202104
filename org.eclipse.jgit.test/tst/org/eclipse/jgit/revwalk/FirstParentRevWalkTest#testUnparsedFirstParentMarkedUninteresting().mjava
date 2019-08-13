@@ -1,0 +1,16 @@
+	@Test
+	public void testUnparsedFirstParentMarkedUninteresting() throws Exception {
+		ObjectId a = unparsedCommit();
+		ObjectId b1 = unparsedCommit(a);
+		ObjectId b2 = unparsedCommit(a);
+		ObjectId c = unparsedCommit(b1, b2);
+
+		rw.reset();
+		rw.setFirstParent(true);
+		RevCommit parsedC = rw.parseCommit(c);
+		markStart(parsedC);
+		markUninteresting(rw.parseCommit(b1));
+		assertCommit(parsedC, rw.next());
+		assertNull(rw.next());
+	}
+

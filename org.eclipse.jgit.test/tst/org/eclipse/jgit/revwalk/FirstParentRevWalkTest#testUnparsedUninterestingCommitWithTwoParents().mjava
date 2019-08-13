@@ -1,0 +1,30 @@
+	/**
+	 * This fails if we try to propagate flags before parsing commits.
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void testUnparsedUninterestingCommitWithTwoParents()
+			throws Exception {
+		ObjectId a = unparsedCommit();
+		ObjectId b = unparsedCommit(a);
+		ObjectId c1 = unparsedCommit(b);
+		ObjectId c2 = unparsedCommit(b);
+		ObjectId d = unparsedCommit(c1);
+		ObjectId e = unparsedCommit(c1, c2);
+
+		ObjectId uA = unparsedCommit(a, b);
+		ObjectId uB1 = unparsedCommit(uA, c2);
+		ObjectId uB2 = unparsedCommit(uA, d);
+		ObjectId uninteresting = unparsedCommit(uB1, uB2);
+
+		rw.reset();
+		rw.setFirstParent(true);
+		RevCommit parsedE = rw.parseCommit(e);
+		markStart(parsedE);
+		markUninteresting(rw.parseCommit(uninteresting));
+
+		assertCommit(parsedE, rw.next());
+		assertNull(rw.next());
+	}
+

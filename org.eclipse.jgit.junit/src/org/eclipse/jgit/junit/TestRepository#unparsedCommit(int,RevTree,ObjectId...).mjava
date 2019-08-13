@@ -1,0 +1,36 @@
+	/**
+	 * Create a new, unparsed commit.
+	 * <p>
+	 * The author and committer identities are stored using the current
+	 * timestamp, after being incremented by {@code secDelta}. The message body
+	 * is empty.
+	 *
+	 * @param secDelta
+	 *            number of seconds to advance {@link #tick(int)} by.
+	 * @param tree
+	 *            the root tree for the commit.
+	 * @param parents
+	 *            zero or more IDs of the commit's parents.
+	 * @return the ID of the new commit.
+	 * @throws Exception
+	 */
+	public ObjectId unparsedCommit(final int secDelta, final RevTree tree,
+			final ObjectId... parents) throws Exception {
+		tick(secDelta);
+
+		final org.eclipse.jgit.lib.CommitBuilder c;
+
+		c = new org.eclipse.jgit.lib.CommitBuilder();
+		c.setTreeId(tree);
+		c.setParentIds(parents);
+		c.setAuthor(new PersonIdent(defaultAuthor, getDate()));
+		c.setCommitter(new PersonIdent(defaultCommitter, getDate()));
+		c.setMessage("");
+		ObjectId id;
+		try (ObjectInserter ins = inserter) {
+			id = ins.insert(c);
+			ins.flush();
+		}
+		return id;
+	}
+
