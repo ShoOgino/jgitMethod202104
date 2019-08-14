@@ -1,0 +1,13 @@
+		@Override
+		public StoredConfig getSystemConfig()
+				throws IOException, ConfigInvalidException {
+			if (systemConfig == null) {
+				systemConfig = createSystemConfig(null, FS.DETECTED);
+			}
+			if (systemConfig.isOutdated()) {
+				LOG.debug("loading system config {}", systemConfig); //$NON-NLS-1$
+				systemConfig.load();
+			}
+			return systemConfig;
+		}
+

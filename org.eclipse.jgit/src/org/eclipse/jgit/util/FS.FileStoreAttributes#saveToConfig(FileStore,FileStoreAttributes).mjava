@@ -1,7 +1,12 @@
 		private static void saveToConfig(FileStore s,
 				FileStoreAttributes c) {
-			StoredConfig userConfig = SystemReader.getInstance()
-					.openUserConfig(null, FS.DETECTED);
+			StoredConfig userConfig;
+			try {
+				userConfig = SystemReader.getInstance().getUserConfig();
+			} catch (IOException | ConfigInvalidException e) {
+				LOG.error(JGitText.get().saveFileStoreAttributesFailed, e);
+				return;
+			}
 			long resolution = c.getFsTimestampResolution().toNanos();
 			TimeUnit resolutionUnit = getUnit(resolution);
 			long resolutionValue = resolutionUnit.convert(resolution,

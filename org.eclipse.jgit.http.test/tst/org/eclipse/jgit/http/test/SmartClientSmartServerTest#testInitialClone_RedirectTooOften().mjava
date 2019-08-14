@@ -1,7 +1,7 @@
 	@Test
 	public void testInitialClone_RedirectTooOften() throws Exception {
-		FileBasedConfig userConfig = SystemReader.getInstance()
-				.openUserConfig(null, FS.DETECTED);
+		StoredConfig userConfig = SystemReader.getInstance()
+				.getUserConfig();
 		userConfig.setInt("http", null, "maxRedirects", 3);
 		userConfig.save();
 		Repository dst = createBareRepository();
