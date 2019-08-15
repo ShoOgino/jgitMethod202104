@@ -1,0 +1,45 @@
+	/**
+	 * Return the first public key matching the key id ({@link #signingKey}.
+	 *
+	 * @param pubringFile
+	 *
+	 * @return the PGP public key, or {@code null} if none found
+	 * @throws IOException
+	 *             on I/O related errors
+	 * @throws PGPException
+	 *             on BouncyCastle errors
+	 */
+	private PGPPublicKey findPublicKeyInPubring(Path pubringFile)
+			throws IOException, PGPException {
+		try (InputStream in = newInputStream(pubringFile)) {
+			PGPPublicKeyRingCollection pgpPub = new PGPPublicKeyRingCollection(
+					new BufferedInputStream(in),
+					new JcaKeyFingerprintCalculator());
+
+			String keyId = signingKey.toLowerCase(Locale.ROOT);
+			Iterator<PGPPublicKeyRing> keyrings = pgpPub.getKeyRings();
+			while (keyrings.hasNext()) {
+				PGPPublicKeyRing keyRing = keyrings.next();
+				Iterator<PGPPublicKey> keys = keyRing.getPublicKeys();
+				while (keys.hasNext()) {
+					PGPPublicKey key = keys.next();
+					// try key id
+					String fingerprint = Hex.toHexString(key.getFingerprint())
+							.toLowerCase(Locale.ROOT);
+					if (fingerprint.endsWith(keyId)) {
+						return key;
+					}
+					// try user id
+					Iterator<String> userIDs = key.getUserIDs();
+					while (userIDs.hasNext()) {
+						String userId = userIDs.next();
+						if (containsSigningKey(userId)) {
+							return key;
+						}
+					}
+				}
+			}
+		}
+		return null;
+	}
+

@@ -1,0 +1,10 @@
+	private boolean hasKeyFiles(Path dir) {
+		try (DirectoryStream<Path> contents = Files.newDirectoryStream(dir,
+				"*.key")) { //$NON-NLS-1$
+			return contents.iterator().hasNext();
+		} catch (IOException e) {
+			// Not a directory, or something else
+			return false;
+		}
+	}
+
