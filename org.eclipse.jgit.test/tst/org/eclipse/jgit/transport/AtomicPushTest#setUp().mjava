@@ -14,10 +14,11 @@
 				});
 		uri = testProtocol.register(ctx, server);
 
-		try (ObjectInserter ins = client.newObjectInserter()) {
-			obj1 = ins.insert(Constants.OBJ_BLOB, Constants.encode("test"));
-			obj2 = ins.insert(Constants.OBJ_BLOB, Constants.encode("file"));
-			ins.flush();
+		try (TestRepository<?> clientRepo = new TestRepository<>(client)) {
+			commit1 = clientRepo.commit().noFiles().message("test commit 1")
+					.create();
+			commit2 = clientRepo.commit().noFiles().message("test commit 2")
+					.create();
 		}
 	}
 

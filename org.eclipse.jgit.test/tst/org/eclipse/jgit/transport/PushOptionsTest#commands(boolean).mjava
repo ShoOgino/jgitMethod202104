@@ -1,12 +1,12 @@
 	private List<RemoteRefUpdate> commands(boolean atomicSafe)
 			throws IOException {
 		List<RemoteRefUpdate> cmds = new ArrayList<>();
-		cmds.add(new RemoteRefUpdate(null, null, obj1, "refs/heads/one",
+		cmds.add(new RemoteRefUpdate(null, null, commit1, "refs/heads/one",
 				true /* force update */, null /* no local tracking ref */,
 				ObjectId.zeroId()));
-		cmds.add(new RemoteRefUpdate(null, null, obj2, "refs/heads/two",
+		cmds.add(new RemoteRefUpdate(null, null, commit2, "refs/heads/two",
 				true /* force update */, null /* no local tracking ref */,
-				atomicSafe ? ObjectId.zeroId() : obj1));
+				atomicSafe ? ObjectId.zeroId() : commit1));
 		return cmds;
 	}
 
