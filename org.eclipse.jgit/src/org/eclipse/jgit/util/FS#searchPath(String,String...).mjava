@@ -15,9 +15,16 @@
 
 		for (String p : path.split(File.pathSeparator)) {
 			for (String command : lookFor) {
-				final File e = new File(p, command);
-				if (e.isFile())
-					return e.getAbsoluteFile();
+				final File file = new File(p, command);
+				try {
+					if (file.isFile()) {
+						return file.getAbsoluteFile();
+					}
+				} catch (SecurityException e) {
+					LOG.warn(MessageFormat.format(
+							JGitText.get().skipNotAccessiblePath,
+							file.getPath()));
+				}
 			}
 		}
 		return null;

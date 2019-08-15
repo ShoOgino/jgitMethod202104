@@ -1,0 +1,10 @@
+	@After
+	public void tearDown() throws Exception {
+		System.setSecurityManager(originalSecurityManager);
+
+		// Note: don't use this method before security manager is replaced in
+		// setUp() method. The method uses FS.DETECTED internally and can affect
+		// the test.
+		FileUtils.delete(root, FileUtils.RECURSIVE | FileUtils.RETRY);
+	}
+

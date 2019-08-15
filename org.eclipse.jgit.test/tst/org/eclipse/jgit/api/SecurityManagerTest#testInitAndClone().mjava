@@ -1,0 +1,26 @@
+	@Test
+	public void testInitAndClone() throws IOException, GitAPIException {
+		File remote = new File(root, "remote");
+		File local = new File(root, "local");
+
+		try (Git git = Git.init().setDirectory(remote).call()) {
+			JGitTestUtil.write(new File(remote, "hello.txt"), "Hello world!");
+			git.add().addFilepattern(".").call();
+			git.commit().setMessage("Initial commit").call();
+		}
+
+		try (Git git = Git.cloneRepository().setURI(remote.toURI().toString())
+				.setDirectory(local).call()) {
+			assertTrue(new File(local, ".git").exists());
+
+			JGitTestUtil.write(new File(local, "hi.txt"), "Hi!");
+			git.add().addFilepattern(".").call();
+			RevCommit commit1 = git.commit().setMessage("Commit on local repo")
+					.call();
+			assertEquals("Commit on local repo", commit1.getFullMessage());
+			assertNotNull(TreeWalk.forPath(git.getRepository(), "hello.txt",
+					commit1.getTree()));
+		}
+
+	}
+

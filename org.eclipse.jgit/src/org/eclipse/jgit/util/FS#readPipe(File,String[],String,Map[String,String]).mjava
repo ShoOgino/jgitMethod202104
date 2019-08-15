@@ -75,6 +75,13 @@
 			}
 		} catch (IOException e) {
 			LOG.error("Caught exception in FS.readPipe()", e); //$NON-NLS-1$
+		} catch (AccessControlException e) {
+			LOG.warn(MessageFormat.format(
+					JGitText.get().readPipeIsNotAllowedRequiredPermission,
+					command, dir, e.getPermission()));
+		} catch (SecurityException e) {
+			LOG.warn(MessageFormat.format(JGitText.get().readPipeIsNotAllowed,
+					command, dir));
 		}
 		if (debug) {
 			LOG.debug("readpipe returns null"); //$NON-NLS-1$
