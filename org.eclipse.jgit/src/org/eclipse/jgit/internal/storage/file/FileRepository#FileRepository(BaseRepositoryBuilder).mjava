@@ -9,32 +9,16 @@
 	 */
 	public FileRepository(BaseRepositoryBuilder options) throws IOException {
 		super(options);
-
-		if (StringUtils.isEmptyOrNull(SystemReader.getInstance().getenv(
-				Constants.GIT_CONFIG_NOSYSTEM_KEY)))
-			systemConfig = SystemReader.getInstance().openSystemConfig(null,
-					getFS());
-		else
-			systemConfig = new FileBasedConfig(null, FS.DETECTED) {
-				@Override
-				public void load() {
-					// empty, do not load
-				}
-
-				@Override
-				public boolean isOutdated() {
-					// regular class would bomb here
-					return false;
-				}
-			};
-		userConfig = SystemReader.getInstance().openUserConfig(systemConfig,
-				getFS());
+		StoredConfig userConfig = null;
+		try {
+			userConfig = SystemReader.getInstance().getUserConfig();
+		} catch (ConfigInvalidException e) {
+			LOG.error(e.getMessage(), e);
+			throw new IOException(e.getMessage(), e);
+		}
 		repoConfig = new FileBasedConfig(userConfig, getFS().resolve(
 				getDirectory(), Constants.CONFIG),
 				getFS());
-
-		loadSystemConfig();
-		loadUserConfig();
 		loadRepoConfig();
 
 		repoConfig.addChangeListener(this::fireEvent);
