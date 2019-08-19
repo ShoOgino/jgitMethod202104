@@ -1,3 +1,4 @@
+	@SuppressWarnings("boxing")
 	@Test
 	public void testListConfig() throws Exception {
 		boolean isWindows = SystemReader.getInstance().getProperty("os.name")
@@ -6,18 +7,16 @@
 				.equals("Mac OS X");
 
 		String[] output = execute("git config --list");
-		List<String> expect = new ArrayList<>();
-		expect.add("gc.autoDetach=false");
-		expect.add("core.filemode=" + !isWindows);
-		expect.add("core.logallrefupdates=true");
-		if (isMac)
-			expect.add("core.precomposeunicode=true");
-		expect.add("core.repositoryformatversion=0");
-		if (!FS.DETECTED.supportsSymlinks())
-			expect.add("core.symlinks=false");
-		expect.add(""); // ends with LF (last line empty)
-		assertEquals("expected default configuration",
-				Arrays.asList(expect.toArray()).toString(),
-				Arrays.asList(output).toString());
+
+		Map<String, String> options = parseOptions(output);
+
+		assertEquals(!isWindows, Boolean.valueOf(options.get("core.filemode")));
+		assertTrue((Boolean.valueOf(options.get("core.logallrefupdates"))));
+		if (isMac) {
+			assertTrue(
+					(Boolean.valueOf(options.get("core.precomposeunicode"))));
+		}
+		assertEquals(Integer.valueOf(0),
+				Integer.valueOf(options.get("core.repositoryformatversion")));
 	}
 

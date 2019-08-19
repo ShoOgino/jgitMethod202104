@@ -4,7 +4,7 @@
 	 * An implementation of the File#createNewFile() semantics which can create
 	 * a unique file atomically also on NFS. If the config option
 	 * {@code core.supportsAtomicCreateNewFile = true} (which is the default)
-	 * then simply File#createNewFile() is called.
+	 * then simply Files#createFile() is called.
 	 *
 	 * But if {@code core.supportsAtomicCreateNewFile = false} then after
 	 * successful creation of the lock file a hard link to that lock file is
@@ -25,14 +25,17 @@
 	 */
 	@Override
 	public LockToken createNewFileAtomic(File file) throws IOException {
-		if (!file.createNewFile()) {
+		Path path;
+		try {
+			path = file.toPath();
+			Files.createFile(path);
+		} catch (FileAlreadyExistsException | InvalidPathException e) {
 			return token(false, null);
 		}
 		if (supportsAtomicCreateNewFile() || !supportsUnixNLink) {
 			return token(true, null);
 		}
 		Path link = null;
-		Path path = file.toPath();
 		try {
 			link = Files.createLink(Paths.get(uniqueLinkPath(file)), path);
 			Integer nlink = (Integer) (Files.getAttribute(path,
