@@ -1,8 +1,11 @@
 		@Override
 		public FileBasedConfig openSystemConfig(Config parent, FS fs) {
-			if (systemConfig == null) {
-				systemConfig = createSystemConfig(parent, fs);
+			FileBasedConfig c = systemConfig.get();
+			if (c == null) {
+				systemConfig.compareAndSet(null,
+						createSystemConfig(parent, fs));
+				c = systemConfig.get();
 			}
-			return systemConfig;
+			return c;
 		}
 
