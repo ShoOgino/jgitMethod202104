@@ -1,15 +1,11 @@
 		@Override
 		public StoredConfig getUserConfig()
 				throws IOException, ConfigInvalidException {
-			if (userConfig == null) {
-				userConfig = openUserConfig(getSystemConfig(), FS.DETECTED);
-			} else {
-				getSystemConfig();
-			}
-			if (userConfig.isOutdated()) {
+			FileBasedConfig c = openUserConfig(getSystemConfig(), FS.DETECTED);
+			if (c.isOutdated()) {
 				LOG.debug("loading user config {}", userConfig); //$NON-NLS-1$
-				userConfig.load();
+				c.load();
 			}
-			return userConfig;
+			return c;
 		}
 
