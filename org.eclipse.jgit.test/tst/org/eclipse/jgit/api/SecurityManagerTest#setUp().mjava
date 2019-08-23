@@ -1,0 +1,56 @@
+	@Before
+	public void setUp() throws Exception {
+		// Create working directory
+		SystemReader.setInstance(new MockSystemReader());
+		root = Files.createTempDirectory("jgit-security").toFile();
+
+		// Add system permissions
+		permissions.add(new RuntimePermission("*"));
+		permissions.add(new SecurityPermission("*"));
+		permissions.add(new AuthPermission("*"));
+		permissions.add(new ReflectPermission("*"));
+		permissions.add(new PropertyPermission("*", "read,write"));
+		permissions.add(new LoggingPermission("control", null));
+
+		permissions.add(new FilePermission(
+				System.getProperty("java.home") + "/-", "read"));
+
+		String tempDir = System.getProperty("java.io.tmpdir");
+		permissions.add(new FilePermission(tempDir, "read,write,delete"));
+		permissions
+				.add(new FilePermission(tempDir + "/-", "read,write,delete"));
+
+		// Add permissions to dependent jar files.
+		String classPath = System.getProperty("java.class.path");
+		if (classPath != null) {
+			for (String path : classPath.split(File.pathSeparator)) {
+				permissions.add(new FilePermission(path, "read"));
+			}
+		}
+		// Add permissions to jgit class files.
+		String jgitSourcesRoot = new File(System.getProperty("user.dir"))
+				.getParent();
+		permissions.add(new FilePermission(jgitSourcesRoot + "/-", "read"));
+
+		// Add permissions to working dir for jgit. Our git repositories will be
+		// initialized and cloned here.
+		permissions.add(new FilePermission(root.getPath() + "/-",
+				"read,write,delete,execute"));
+
+		// Replace Security Manager
+		originalSecurityManager = System.getSecurityManager();
+		System.setSecurityManager(new SecurityManager() {
+
+			@Override
+			public void checkPermission(Permission requested) {
+				for (Permission permission : permissions) {
+					if (permission.implies(requested)) {
+						return;
+					}
+				}
+
+				super.checkPermission(requested);
+			}
+		});
+	}
+
