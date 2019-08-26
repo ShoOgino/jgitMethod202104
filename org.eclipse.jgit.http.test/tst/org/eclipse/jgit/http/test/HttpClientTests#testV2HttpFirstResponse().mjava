@@ -3,12 +3,11 @@
 		remoteRepository.getRepository().getConfig().setInt(
 				"protocol", null, "version", 2);
 
-		JDKHttpConnectionFactory f = new JDKHttpConnectionFactory();
 		String url = smartAuthNoneURI.toString() + "/info/refs?service=git-upload-pack";
-		HttpConnection c = f.create(new URL(url));
+		HttpConnection c = HttpTransport.getConnectionFactory()
+				.create(new URL(url));
 		c.setRequestMethod("GET");
 		c.setRequestProperty("Git-Protocol", "version=2");
-		c.connect();
 		assertEquals(200, c.getResponseCode());
 
 		PacketLineIn pckIn = new PacketLineIn(c.getInputStream());
