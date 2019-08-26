@@ -1,0 +1,23 @@
+	@Test
+	public void testUninterestingCommitWithTwoParents() throws Exception {
+		RevCommit a = commit();
+		RevCommit b = commit(a);
+		RevCommit c1 = commit(b);
+		RevCommit c2 = commit(b);
+		RevCommit d = commit(c1);
+		RevCommit e = commit(c1, c2);
+
+		RevCommit uA = commit(a, b);
+		RevCommit uB1 = commit(uA, c2);
+		RevCommit uB2 = commit(uA, d);
+		RevCommit uninteresting = commit(uB1, uB2);
+
+		rw.reset();
+		rw.setFirstParent(true);
+		markStart(e);
+		markUninteresting(uninteresting);
+
+		assertCommit(e, rw.next());
+		assertNull(rw.next());
+	}
+
