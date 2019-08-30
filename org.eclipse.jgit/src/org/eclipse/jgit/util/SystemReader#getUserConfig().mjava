@@ -11,6 +11,21 @@
 	 *             if something went wrong when reading files
 	 * @since 5.1.9
 	 */
-	public abstract StoredConfig getUserConfig()
-			throws IOException, ConfigInvalidException;
+	public StoredConfig getUserConfig()
+			throws IOException, ConfigInvalidException {
+		FileBasedConfig c = userConfig.get();
+		if (c == null) {
+			userConfig.compareAndSet(null,
+					openUserConfig(getSystemConfig(), FS.DETECTED));
+			c = userConfig.get();
+		} else {
+			// Ensure the parent is up to date
+			getSystemConfig();
+		}
+		if (c.isOutdated()) {
+			LOG.debug("loading user config {}", userConfig); //$NON-NLS-1$
+			c.load();
+		}
+		return c;
+	}
 
