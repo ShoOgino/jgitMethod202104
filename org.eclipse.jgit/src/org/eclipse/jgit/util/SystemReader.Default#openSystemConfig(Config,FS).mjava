@@ -1,11 +1,23 @@
 		@Override
 		public FileBasedConfig openSystemConfig(Config parent, FS fs) {
-			FileBasedConfig c = systemConfig.get();
-			if (c == null) {
-				systemConfig.compareAndSet(null,
-						createSystemConfig(parent, fs));
-				c = systemConfig.get();
+			if (StringUtils
+					.isEmptyOrNull(getenv(Constants.GIT_CONFIG_NOSYSTEM_KEY))) {
+				File configFile = fs.getGitSystemConfig();
+				if (configFile != null) {
+					return new FileBasedConfig(parent, configFile, fs);
+				}
 			}
-			return c;
+			return new FileBasedConfig(parent, null, fs) {
+				@Override
+				public void load() {
+					// empty, do not load
+				}
+
+				@Override
+				public boolean isOutdated() {
+					// regular class would bomb here
+					return false;
+				}
+			};
 		}
 

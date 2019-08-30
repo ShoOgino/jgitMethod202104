@@ -1,0 +1,21 @@
+	@Test
+	public void openSystemConfigReturnsDifferentInstances() throws Exception {
+		FileBasedConfig system1 = SystemReader.getInstance()
+				.openSystemConfig(null, fs);
+		system1.load();
+		assertEquals("false",
+				system1.getString("core", null, "trustFolderStat"));
+
+		FileBasedConfig system2 = SystemReader.getInstance()
+				.openSystemConfig(null, fs);
+		system2.load();
+		assertEquals("false",
+				system2.getString("core", null, "trustFolderStat"));
+
+		system1.setString("core", null, "trustFolderStat", "true");
+		assertEquals("true",
+				system1.getString("core", null, "trustFolderStat"));
+		assertEquals("false",
+				system2.getString("core", null, "trustFolderStat"));
+	}
+
