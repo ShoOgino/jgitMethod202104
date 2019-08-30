@@ -1,0 +1,17 @@
+	@Test
+	public void openUserConfigReturnsDifferentInstances() throws Exception {
+		FileBasedConfig user1 = SystemReader.getInstance().openUserConfig(null,
+				fs);
+		user1.load();
+		assertEquals("false", user1.getString("core", null, "bare"));
+
+		FileBasedConfig user2 = SystemReader.getInstance().openUserConfig(null,
+				fs);
+		user2.load();
+		assertEquals("false", user2.getString("core", null, "bare"));
+
+		user1.setString("core", null, "bare", "true");
+		assertEquals("true", user1.getString("core", null, "bare"));
+		assertEquals("false", user2.getString("core", null, "bare"));
+	}
+
