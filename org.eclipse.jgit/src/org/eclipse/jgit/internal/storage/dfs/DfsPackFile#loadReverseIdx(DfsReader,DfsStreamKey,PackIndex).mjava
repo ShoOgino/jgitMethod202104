@@ -1,0 +1,11 @@
+	private DfsBlockCache.Ref<PackReverseIndex> loadReverseIdx(
+			DfsReader ctx, DfsStreamKey revKey, PackIndex idx) {
+		PackReverseIndex revidx = new PackReverseIndex(idx);
+		reverseIndex = revidx;
+		return new DfsBlockCache.Ref<>(
+				revKey,
+				REF_POSITION,
+				idx.getObjectCount() * 8,
+				revidx);
+	}
+
