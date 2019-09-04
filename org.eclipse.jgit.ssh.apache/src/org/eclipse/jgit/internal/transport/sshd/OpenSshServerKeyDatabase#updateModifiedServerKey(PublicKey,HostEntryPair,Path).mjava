@@ -1,12 +1,9 @@
-	private void updateModifiedServerKey(ClientSession clientSession,
-			SocketAddress remoteAddress, PublicKey serverKey,
-			HostEntryPair entry, Path path, HostKeyHelper helper)
+	private void updateModifiedServerKey(PublicKey serverKey,
+			HostEntryPair entry, Path path)
 			throws IOException {
 		KnownHostEntry hostEntry = entry.getHostEntry();
 		String oldLine = hostEntry.getConfigLine();
-		String newLine = helper.prepareModifiedServerKeyLine(clientSession,
-				remoteAddress, hostEntry, oldLine, entry.getServerKey(),
-				serverKey);
+		String newLine = updateHostKeyLine(oldLine, serverKey);
 		if (newLine == null || newLine.isEmpty()) {
 			return;
 		}

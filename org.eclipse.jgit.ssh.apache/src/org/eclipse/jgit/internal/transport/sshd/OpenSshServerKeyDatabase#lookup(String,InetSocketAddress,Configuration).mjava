@@ -1,0 +1,22 @@
+	@Override
+	public List<PublicKey> lookup(@NonNull String connectAddress,
+			@NonNull InetSocketAddress remoteAddress,
+			@NonNull Configuration config) {
+		List<HostKeyFile> filesToUse = getFilesToUse(config);
+		List<PublicKey> result = new ArrayList<>();
+		Collection<SshdSocketAddress> candidates = getCandidates(
+				connectAddress, remoteAddress);
+		for (HostKeyFile file : filesToUse) {
+			for (HostEntryPair current : file.get()) {
+				KnownHostEntry entry = current.getHostEntry();
+				for (SshdSocketAddress host : candidates) {
+					if (entry.isHostMatch(host.getHostName(), host.getPort())) {
+						result.add(current.getServerKey());
+						break;
+					}
+				}
+			}
+		}
+		return result;
+	}
+

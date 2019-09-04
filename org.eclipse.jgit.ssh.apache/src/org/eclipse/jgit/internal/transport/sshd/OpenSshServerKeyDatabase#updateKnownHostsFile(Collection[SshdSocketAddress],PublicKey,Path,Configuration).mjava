@@ -1,0 +1,28 @@
+	private void updateKnownHostsFile(Collection<SshdSocketAddress> candidates,
+			PublicKey serverKey, Path path, Configuration config)
+			throws Exception {
+		String newEntry = createHostKeyLine(candidates, serverKey, config);
+		if (newEntry == null) {
+			return;
+		}
+		LockFile lock = new LockFile(path.toFile());
+		if (lock.lockForAppend()) {
+			try {
+				try (BufferedWriter writer = new BufferedWriter(
+						new OutputStreamWriter(lock.getOutputStream(),
+								UTF_8))) {
+					writer.newLine();
+					writer.write(newEntry);
+					writer.newLine();
+				}
+				lock.commit();
+			} catch (IOException e) {
+				lock.unlock();
+				throw e;
+			}
+		} else {
+			LOG.warn(format(SshdText.get().knownHostsFileLockedUpdate,
+					path));
+		}
+	}
+

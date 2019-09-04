@@ -1,17 +1,15 @@
 		public ModifiedKeyHandling acceptModifiedServerKey(
-				ClientSession clientSession,
-				SocketAddress remoteAddress, PublicKey expected,
+				InetSocketAddress remoteAddress, PublicKey expected,
 				PublicKey actual, Path path) {
-			Check check = checkMode(clientSession, remoteAddress, true);
+			Check check = checkMode(remoteAddress, true);
 			if (check == Check.ALLOW) {
 				// Never auto-store on CHECK.ALLOW
 				return ModifiedKeyHandling.ALLOW;
 			}
-			InetSocketAddress remote = (InetSocketAddress) remoteAddress;
 			String keyAlgorithm = actual.getAlgorithm();
-			String remoteHost = remote.getHostString();
-			URIish uri = JGitUserInteraction.toURI(clientSession.getUsername(),
-					remote);
+			String remoteHost = remoteAddress.getHostString();
+			URIish uri = JGitUserInteraction.toURI(config.getUsername(),
+					remoteAddress);
 			List<String> messages = new ArrayList<>();
 			String warning = format(
 					SshdText.get().knownHostsModifiedKeyWarning,
@@ -22,8 +20,6 @@
 					KeyUtils.getFingerPrint(BuiltinDigests.sha256, actual));
 			messages.addAll(Arrays.asList(warning.split("\n"))); //$NON-NLS-1$
 
-			CredentialsProvider provider = getCredentialsProvider(
-					clientSession);
 			if (check == Check.DENY) {
 				if (provider != null) {
 					messages.add(format(

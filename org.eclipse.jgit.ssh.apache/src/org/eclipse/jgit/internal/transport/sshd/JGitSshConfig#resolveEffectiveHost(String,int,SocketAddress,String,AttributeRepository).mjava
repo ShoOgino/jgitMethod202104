@@ -2,7 +2,7 @@
 	public HostConfigEntry resolveEffectiveHost(String host, int port,
 			SocketAddress localAddress, String username,
 			AttributeRepository attributes) throws IOException {
-		HostEntry entry = configFile.lookup(host, port, username);
+		HostEntry entry = configFile == null ? new HostEntry() : configFile.lookup(host, port, username);
 		JGitHostConfigEntry config = new JGitHostConfigEntry();
 		// Apache MINA conflates all keys, even multi-valued ones, in one map
 		// and puts multiple values separated by commas in one string. See
@@ -28,7 +28,7 @@
 		String user = username != null && !username.isEmpty() ? username
 				: entry.getValue(SshConstants.USER);
 		if (user == null || user.isEmpty()) {
-			user = configFile.getLocalUserName();
+			user = localUserName;
 		}
 		config.setUsername(user);
 		config.setProperty(SshConstants.USER, user);

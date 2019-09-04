@@ -1,0 +1,34 @@
+	private String createHostKeyLine(Collection<SshdSocketAddress> patterns,
+			PublicKey key, Configuration config) throws Exception {
+		StringBuilder result = new StringBuilder();
+		if (config.getHashKnownHosts()) {
+			// SHA1 is the only algorithm for host name hashing known to OpenSSH
+			// or to Apache MINA sshd.
+			NamedFactory<Mac> digester = KnownHostDigest.SHA1;
+			Mac mac = digester.create();
+			SecureRandom prng = new SecureRandom();
+			byte[] salt = new byte[mac.getDefaultBlockSize()];
+			for (SshdSocketAddress address : patterns) {
+				if (result.length() > 0) {
+					result.append(',');
+				}
+				prng.nextBytes(salt);
+				KnownHostHashValue.append(result, digester, salt,
+						KnownHostHashValue.calculateHashValue(
+								address.getHostName(), address.getPort(), mac,
+								salt));
+			}
+		} else {
+			for (SshdSocketAddress address : patterns) {
+				if (result.length() > 0) {
+					result.append(',');
+				}
+				KnownHostHashValue.appendHostPattern(result,
+						address.getHostName(), address.getPort());
+			}
+		}
+		result.append(' ');
+		PublicKeyEntry.appendPublicKeyEntry(result, key);
+		return result.toString();
+	}
+
