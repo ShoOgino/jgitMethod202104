@@ -16,7 +16,7 @@
 	 *             if the specified key or value is null
 	 */
 	public V put(@NonNull K key, @NonNull V value) {
-		map.put(key, new Entry<>(key, value, ++time));
+		map.put(key, new Entry<>(key, value, tick()));
 		if (map.size() > maximumSize) {
 			purge();
 		}
