@@ -3,9 +3,7 @@
 	 */
 	@Override
 	public long maxUpdateIndex() throws IOException {
-		if (blockSize == -1) {
-			readFileHeader();
-		}
-		return maxUpdateIndex;
+		return tables.length > 0 ? tables[tables.length - 1].maxUpdateIndex()
+				: 0;
 	}
 
