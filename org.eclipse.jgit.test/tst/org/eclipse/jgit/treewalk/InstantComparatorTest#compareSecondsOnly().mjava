@@ -1,0 +1,10 @@
+	@Test
+	public void compareSecondsOnly() {
+		Instant now = Instant.now();
+		Instant t = Instant.ofEpochSecond(now.getEpochSecond(), 987654321);
+		Instant s = Instant.ofEpochSecond(now.getEpochSecond(), 123456789);
+		assertEquals(0, cmp.compare(t, s, true));
+		assertEquals(0, cmp.compare(t, t, true));
+		assertEquals(0, cmp.compare(s, t, true));
+	}
+
