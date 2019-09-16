@@ -1,0 +1,18 @@
+	@Test
+	public void compareMicrosUnequal() {
+		Instant now = Instant.now();
+		Instant t = Instant.ofEpochSecond(now.getEpochSecond(), 123456000);
+		Instant s = Instant.ofEpochSecond(now.getEpochSecond(), 123455000);
+		assertTrue(cmp.compare(s, t) < 0);
+		assertTrue(cmp.compare(t, s) > 0);
+		t = Instant.ofEpochSecond(now.getEpochSecond(), 123460000);
+		assertTrue(cmp.compare(s, t) < 0);
+		assertTrue(cmp.compare(t, s) > 0);
+		t = Instant.ofEpochSecond(now.getEpochSecond(), 123500000);
+		assertTrue(cmp.compare(s, t) < 0);
+		assertTrue(cmp.compare(t, s) > 0);
+		s = Instant.ofEpochSecond(now.getEpochSecond() - 1L, 123456000);
+		assertTrue(cmp.compare(s, t) < 0);
+		assertTrue(cmp.compare(t, s) > 0);
+	}
+
