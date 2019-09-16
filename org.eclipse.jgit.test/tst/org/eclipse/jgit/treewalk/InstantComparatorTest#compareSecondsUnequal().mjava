@@ -1,0 +1,9 @@
+	@Test
+	public void compareSecondsUnequal() {
+		Instant now = Instant.now();
+		Instant t = Instant.ofEpochSecond(now.getEpochSecond());
+		Instant s = Instant.ofEpochSecond(now.getEpochSecond() - 1L);
+		assertTrue(cmp.compare(s, t) < 0);
+		assertTrue(cmp.compare(t, s) > 0);
+	}
+
