@@ -1,0 +1,18 @@
+	@Test
+	public void compareNanosUnequal() {
+		Instant now = Instant.now();
+		Instant t = Instant.ofEpochSecond(now.getEpochSecond(), 123456789);
+		Instant s = Instant.ofEpochSecond(now.getEpochSecond(), 123456700);
+		assertTrue(cmp.compare(s, t) < 0);
+		assertTrue(cmp.compare(t, s) > 0);
+		t = Instant.ofEpochSecond(now.getEpochSecond(), 123456800);
+		assertTrue(cmp.compare(s, t) < 0);
+		assertTrue(cmp.compare(t, s) > 0);
+		s = Instant.ofEpochSecond(now.getEpochSecond() - 1L, 123456789);
+		assertTrue(cmp.compare(s, t) < 0);
+		assertTrue(cmp.compare(t, s) > 0);
+		s = Instant.ofEpochSecond(now.getEpochSecond(), 123456788);
+		assertTrue(cmp.compare(s, t) < 0);
+		assertTrue(cmp.compare(t, s) > 0);
+	}
+

@@ -1,0 +1,18 @@
+	@Test
+	public void compareMillisUnequal() {
+		Instant now = Instant.now();
+		Instant t = Instant.ofEpochSecond(now.getEpochSecond(), 123000000);
+		Instant s = Instant.ofEpochSecond(now.getEpochSecond(), 122000000);
+		assertTrue(cmp.compare(s, t) < 0);
+		assertTrue(cmp.compare(t, s) > 0);
+		t = Instant.ofEpochSecond(now.getEpochSecond(), 130000000);
+		assertTrue(cmp.compare(s, t) < 0);
+		assertTrue(cmp.compare(t, s) > 0);
+		t = Instant.ofEpochSecond(now.getEpochSecond(), 200000000);
+		assertTrue(cmp.compare(s, t) < 0);
+		assertTrue(cmp.compare(t, s) > 0);
+		s = Instant.ofEpochSecond(now.getEpochSecond() - 1L, 123000000);
+		assertTrue(cmp.compare(s, t) < 0);
+		assertTrue(cmp.compare(t, s) > 0);
+	}
+
