@@ -9,11 +9,11 @@
 		assertFalse(client.getObjectDatabase().has(blob.toObjectId()));
 
 		try (Transport tn = testProtocol.open(uri, client, "server")) {
-			thrown.expect(TransportException.class);
-			thrown.expectMessage(Matchers
-					.containsString("want " + blob.name() + " not valid"));
+			TransportException e = assertThrows(TransportException.class, () ->
 			tn.fetch(NullProgressMonitor.INSTANCE,
-					Collections.singletonList(new RefSpec(blob.name())));
+					Collections.singletonList(new RefSpec(blob.name()))));
+			assertThat(e.getMessage(),
+					containsString("want " + blob.name() + " not valid"));
 		}
 	}
 
