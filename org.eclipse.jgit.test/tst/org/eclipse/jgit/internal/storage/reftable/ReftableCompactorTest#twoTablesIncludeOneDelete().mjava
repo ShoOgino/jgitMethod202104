@@ -2,10 +2,10 @@
 	public void twoTablesIncludeOneDelete() throws IOException {
 		byte[] inTab1;
 		try (ByteArrayOutputStream inBuf = new ByteArrayOutputStream()) {
-			ReftableWriter writer = new ReftableWriter()
+			ReftableWriter writer = new ReftableWriter(inBuf)
 				.setMinUpdateIndex(0)
 				.setMaxUpdateIndex(0)
-				.begin(inBuf);
+				.begin();
 
 			writer.writeRef(ref(MASTER, 1));
 			writer.finish();
@@ -14,10 +14,10 @@
 
 		byte[] inTab2;
 		try (ByteArrayOutputStream inBuf = new ByteArrayOutputStream()) {
-			ReftableWriter writer = new ReftableWriter()
+			ReftableWriter writer = new ReftableWriter(inBuf)
 				.setMinUpdateIndex(1)
 				.setMaxUpdateIndex(1)
-				.begin(inBuf);
+				.begin();
 
 			writer.writeRef(tombstone(MASTER));
 			writer.finish();
@@ -25,11 +25,12 @@
 		}
 
 		byte[] outTab;
-		ReftableCompactor compactor = new ReftableCompactor();
+		ReftableCompactor compactor;
 		try (ByteArrayOutputStream outBuf = new ByteArrayOutputStream()) {
+			compactor = new ReftableCompactor(outBuf);
 			compactor.setIncludeDeletes(true);
 			compactor.addAll(Arrays.asList(read(inTab1), read(inTab2)));
-			compactor.compact(outBuf);
+			compactor.compact();
 			outTab = outBuf.toByteArray();
 		}
 		Stats stats = compactor.getStats();

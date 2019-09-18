@@ -4,11 +4,15 @@
 			return;
 		}
 
-		try (DfsReftableStack stack = DfsReftableStack.open(ctx, reftablesBefore)) {
-			ReftableCompactor compact = new ReftableCompactor();
+		try (DfsReftableStack stack = DfsReftableStack.open(ctx, reftablesBefore);
+		     DfsOutputStream out = objdb.writeFile(pack, REFTABLE)) {
+			ReftableCompactor compact = new ReftableCompactor(out);
 			compact.addAll(stack.readers());
 			compact.setIncludeDeletes(includeDeletes);
-			compactReftable(pack, compact);
+			compact.setConfig(configureReftable(reftableConfig, out));
+			compact.compact();
+			pack.addFileExt(REFTABLE);
+			pack.setReftableStats(compact.getStats());
 		}
 	}
 

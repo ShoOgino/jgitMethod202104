@@ -7,7 +7,7 @@
 
 		DfsPackDescription t1 = odb.newPack(INSERT);
 		try (DfsOutputStream out = odb.writeFile(t1, REFTABLE)) {
-			new ReftableWriter().begin(out).finish();
+			new ReftableWriter(out).begin().finish();
 			t1.addFileExt(REFTABLE);
 		}
 		odb.commitPack(Collections.singleton(t1), null);

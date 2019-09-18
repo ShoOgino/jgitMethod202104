@@ -12,9 +12,9 @@
 
 		int expBytes = 147860;
 		byte[] table;
-		ReftableWriter writer = new ReftableWriter().setConfig(cfg);
 		try (ByteArrayOutputStream buf = new ByteArrayOutputStream()) {
-			writer.begin(buf);
+			ReftableWriter writer = new ReftableWriter(buf).setConfig(cfg);
+			writer.begin();
 			writer.sortAndWriteRefs(refs);
 			assertEquals(expBytes, writer.estimateTotalBytes());
 			writer.finish();

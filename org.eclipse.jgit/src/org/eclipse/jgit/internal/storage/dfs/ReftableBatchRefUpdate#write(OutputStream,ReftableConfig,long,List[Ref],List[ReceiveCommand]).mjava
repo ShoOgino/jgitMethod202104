@@ -1,9 +1,9 @@
 	private ReftableWriter.Stats write(OutputStream os, ReftableConfig cfg,
 			long updateIndex, List<Ref> newRefs, List<ReceiveCommand> pending)
 			throws IOException {
-		ReftableWriter writer = new ReftableWriter(cfg)
+		ReftableWriter writer = new ReftableWriter(cfg, os)
 				.setMinUpdateIndex(updateIndex).setMaxUpdateIndex(updateIndex)
-				.begin(os).sortAndWriteRefs(newRefs);
+				.begin().sortAndWriteRefs(newRefs);
 		if (!isRefLogDisabled()) {
 			writeLog(writer, updateIndex, pending);
 		}

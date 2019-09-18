@@ -6,9 +6,9 @@
 		byte[] table;
 		ReftableConfig cfg = new ReftableConfig();
 		cfg.setIndexObjects(false);
-		ReftableWriter writer = new ReftableWriter().setConfig(cfg);
 		try (ByteArrayOutputStream buf = new ByteArrayOutputStream()) {
-			writer.begin(buf);
+			ReftableWriter writer = new ReftableWriter(buf).setConfig(cfg);
+			writer.begin();
 			assertEquals(92, writer.estimateTotalBytes());
 			writer.writeRef(exp);
 			assertEquals(expBytes, writer.estimateTotalBytes());
