@@ -6,6 +6,10 @@
 	 * @since 4.11
 	 */
 	public boolean isNativeHookPresent() {
-		return FS.DETECTED.findHook(getRepository(), getHookName()) != null;
+		FS fs = getRepository().getFS();
+		if (fs == null) {
+			fs = FS.DETECTED;
+		}
+		return fs.findHook(getRepository(), getHookName()) != null;
 	}
 

@@ -1,0 +1,17 @@
+	private File getRunDirectory(Repository repository,
+			@NonNull String hookName) {
+		if (repository.isBare()) {
+			return repository.getDirectory();
+		}
+		switch (hookName) {
+		case "pre-receive": //$NON-NLS-1$
+		case "update": //$NON-NLS-1$
+		case "post-receive": //$NON-NLS-1$
+		case "post-update": //$NON-NLS-1$
+		case "push-to-checkout": //$NON-NLS-1$
+			return repository.getDirectory();
+		default:
+			return repository.getWorkTree();
+		}
+	}
+

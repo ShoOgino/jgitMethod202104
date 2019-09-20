@@ -1,0 +1,11 @@
+	private File getHooksDirectory(Repository repository) {
+		Config config = repository.getConfig();
+		String hooksDir = config.getString(ConfigConstants.CONFIG_CORE_SECTION,
+				null, ConfigConstants.CONFIG_KEY_HOOKS_PATH);
+		if (hooksDir != null) {
+			return new File(hooksDir);
+		}
+		File dir = repository.getDirectory();
+		return dir == null ? null : new File(dir, Constants.HOOKS);
+	}
+

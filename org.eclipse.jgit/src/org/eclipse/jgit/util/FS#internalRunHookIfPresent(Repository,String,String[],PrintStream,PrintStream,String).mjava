@@ -31,20 +31,18 @@
 			final String hookName, String[] args, PrintStream outRedirect,
 			PrintStream errRedirect, String stdinArgs)
 			throws JGitInternalException {
-		final File hookFile = findHook(repository, hookName);
-		if (hookFile == null)
+		File hookFile = findHook(repository, hookName);
+		if (hookFile == null || hookName == null) {
 			return new ProcessResult(Status.NOT_PRESENT);
+		}
 
-		final String hookPath = hookFile.getAbsolutePath();
-		final File runDirectory;
-		if (repository.isBare())
-			runDirectory = repository.getDirectory();
-		else
-			runDirectory = repository.getWorkTree();
-		final String cmd = relativize(runDirectory.getAbsolutePath(),
-				hookPath);
+		File runDirectory = getRunDirectory(repository, hookName);
+		if (runDirectory == null) {
+			return new ProcessResult(Status.NOT_PRESENT);
+		}
+		String cmd = hookFile.getAbsolutePath();
 		ProcessBuilder hookProcess = runInShell(cmd, args);
-		hookProcess.directory(runDirectory);
+		hookProcess.directory(runDirectory.getAbsoluteFile());
 		Map<String, String> environment = hookProcess.environment();
 		environment.put(Constants.GIT_DIR_KEY,
 				repository.getDirectory().getAbsolutePath());
