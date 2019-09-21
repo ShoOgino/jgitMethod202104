@@ -12,20 +12,16 @@
 	 * @since 5.1.9
 	 */
 	public StoredConfig getUserConfig()
-			throws IOException, ConfigInvalidException {
+			throws ConfigInvalidException, IOException {
 		FileBasedConfig c = userConfig.get();
 		if (c == null) {
 			userConfig.compareAndSet(null,
 					openUserConfig(getSystemConfig(), FS.DETECTED));
 			c = userConfig.get();
-		} else {
-			// Ensure the parent is up to date
-			getSystemConfig();
 		}
-		if (c.isOutdated()) {
-			LOG.debug("loading user config {}", userConfig); //$NON-NLS-1$
-			c.load();
-		}
+		// on the very first call this will check a second time if the system
+		// config is outdated
+		updateAll(c);
 		return c;
 	}
 

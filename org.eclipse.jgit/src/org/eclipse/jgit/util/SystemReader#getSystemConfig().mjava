@@ -12,17 +12,14 @@
 	 * @since 5.1.9
 	 */
 	public StoredConfig getSystemConfig()
-			throws IOException, ConfigInvalidException {
+			throws ConfigInvalidException, IOException {
 		FileBasedConfig c = systemConfig.get();
 		if (c == null) {
 			systemConfig.compareAndSet(null,
 					openSystemConfig(null, FS.DETECTED));
 			c = systemConfig.get();
 		}
-		if (c.isOutdated()) {
-			LOG.debug("loading system config {}", systemConfig); //$NON-NLS-1$
-			c.load();
-		}
+		updateAll(c);
 		return c;
 	}
 
