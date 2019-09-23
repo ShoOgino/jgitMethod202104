@@ -11,10 +11,11 @@
 								Integer.valueOf(srcCommit.getParentCount())));
 			srcParent = srcCommit.getParent(0);
 		} else {
-			if (mainlineParentNumber.intValue() > srcCommit.getParentCount())
+			if (mainlineParentNumber.intValue() > srcCommit.getParentCount()) {
 				throw new JGitInternalException(MessageFormat.format(
 						JGitText.get().commitDoesNotHaveGivenParent, srcCommit,
 						mainlineParentNumber));
+			}
 			srcParent = srcCommit
 					.getParent(mainlineParentNumber.intValue() - 1);
 		}
