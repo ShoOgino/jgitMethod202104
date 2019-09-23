@@ -77,6 +77,9 @@
 						repo.writeCherryPickHead(srcCommit.getId());
 					repo.writeMergeCommitMsg(message);
 
+					repo.fireEvent(new WorkingTreeModifiedEvent(
+							merger.getModifiedFiles(), null));
+
 					return CherryPickResult.CONFLICT;
 				}
 			}
