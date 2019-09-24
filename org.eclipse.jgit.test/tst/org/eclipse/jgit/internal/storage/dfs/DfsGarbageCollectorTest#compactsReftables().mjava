@@ -13,10 +13,10 @@
 		Ref next = new ObjectIdRef.PeeledNonTag(Ref.Storage.LOOSE,
 				"refs/heads/next", commit0.copy());
 		try (DfsOutputStream out = odb.writeFile(t1, REFTABLE)) {
-			ReftableWriter w = new ReftableWriter();
+			ReftableWriter w = new ReftableWriter(out);
 			w.setMinUpdateIndex(42);
 			w.setMaxUpdateIndex(42);
-			w.begin(out);
+			w.begin();
 			w.sortAndWriteRefs(Collections.singleton(next));
 			w.finish();
 			t1.addFileExt(REFTABLE);

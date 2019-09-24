@@ -2,10 +2,10 @@
 	public void invalidRefWriteOrder() throws IOException {
 		Ref master = ref(MASTER, 1);
 		Ref next = ref(NEXT, 2);
-		ReftableWriter writer = new ReftableWriter()
+		ReftableWriter writer = new ReftableWriter(new ByteArrayOutputStream())
 			.setMinUpdateIndex(1)
 			.setMaxUpdateIndex(1)
-			.begin(new ByteArrayOutputStream());
+			.begin();
 
 		writer.writeRef(next);
 		IllegalArgumentException e  = assertThrows(

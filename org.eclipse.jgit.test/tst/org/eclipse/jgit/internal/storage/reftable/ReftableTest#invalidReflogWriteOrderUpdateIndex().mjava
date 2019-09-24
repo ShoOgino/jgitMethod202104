@@ -1,9 +1,9 @@
 	@Test
 	public void invalidReflogWriteOrderUpdateIndex() throws IOException {
-		ReftableWriter writer = new ReftableWriter()
+		ReftableWriter writer = new ReftableWriter(new ByteArrayOutputStream())
 			.setMinUpdateIndex(1)
 			.setMaxUpdateIndex(2)
-			.begin(new ByteArrayOutputStream());
+			.begin();
 		PersonIdent who = new PersonIdent("Log", "Ger", 1500079709, -8 * 60);
 		String msg = "test";
 

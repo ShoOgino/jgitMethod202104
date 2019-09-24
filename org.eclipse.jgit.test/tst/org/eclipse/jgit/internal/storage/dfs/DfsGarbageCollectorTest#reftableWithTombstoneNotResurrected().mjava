@@ -33,10 +33,10 @@
 		Ref newNext = new ObjectIdRef.PeeledNonTag(Ref.Storage.LOOSE, NEXT,
 				commit1);
 		try (DfsOutputStream out = odb.writeFile(t1, REFTABLE)) {
-			ReftableWriter w = new ReftableWriter();
-			w.setMinUpdateIndex(1);
-			w.setMaxUpdateIndex(1);
-			w.begin(out);
+			ReftableWriter w = new ReftableWriter(out)
+			.setMinUpdateIndex(1)
+			.setMaxUpdateIndex(1)
+			.begin();
 			w.writeRef(newNext, 1);
 			w.finish();
 			t1.addFileExt(REFTABLE);

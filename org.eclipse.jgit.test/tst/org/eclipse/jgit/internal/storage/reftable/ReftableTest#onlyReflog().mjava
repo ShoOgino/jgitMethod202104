@@ -4,10 +4,10 @@
 		String msg = "test";
 
 		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-		ReftableWriter writer = new ReftableWriter()
+		ReftableWriter writer = new ReftableWriter(buffer)
 				.setMinUpdateIndex(1)
 				.setMaxUpdateIndex(1)
-				.begin(buffer);
+				.begin();
 		writer.writeLog(MASTER, 1, who, ObjectId.zeroId(), id(1), msg);
 		writer.writeLog(NEXT, 1, who, ObjectId.zeroId(), id(2), msg);
 		writer.finish();

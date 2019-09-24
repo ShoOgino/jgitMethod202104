@@ -5,7 +5,7 @@
 			cfg.setRefBlockSize(64);
 
 			ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-			ReftableWriter writer = new ReftableWriter(cfg).begin(buffer);
+			ReftableWriter writer = new ReftableWriter(cfg, buffer).begin();
 			writer.writeRef(ref("refs/heads/i-am-not-a-teapot", 1));
 			writer.finish();
 			fail("expected BlockSizeTooSmallException");
