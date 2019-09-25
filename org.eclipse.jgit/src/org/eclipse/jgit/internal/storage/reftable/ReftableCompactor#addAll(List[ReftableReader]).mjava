@@ -11,12 +11,10 @@
 	 * @throws java.io.IOException
 	 *             update indexes of a reader cannot be accessed.
 	 */
-	public void addAll(List<? extends Reftable> readers) throws IOException {
-		tables.addAll(readers);
-		for (Reftable r : readers) {
-			if (r instanceof ReftableReader) {
-				adjustUpdateIndexes((ReftableReader) r);
-			}
+	public void addAll(List<ReftableReader> readers) throws IOException {
+		for (ReftableReader r : readers) {
+			tables.add(r);
+			adjustUpdateIndexes(r);
 		}
 	}
 
