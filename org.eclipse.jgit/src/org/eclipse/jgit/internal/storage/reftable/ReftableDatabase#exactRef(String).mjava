@@ -1,0 +1,27 @@
+	/**
+	 * Read a single reference.
+	 * <p>
+	 * This method expects an unshortened reference name and does not search
+	 * using the standard search path.
+	 *
+	 * @param name
+	 *            the unabbreviated name of the reference.
+	 * @return the reference (if it exists); else {@code null}.
+	 * @throws java.io.IOException
+	 *             the reference space cannot be accessed.
+	 */
+	@Nullable
+	public Ref exactRef(String name) throws IOException {
+		lock.lock();
+		try {
+			Reftable table = reader();
+			Ref ref = table.exactRef(name);
+			if (ref != null && ref.isSymbolic()) {
+				return table.resolve(ref);
+			}
+			return ref;
+		} finally {
+			lock.unlock();
+		}
+	}
+

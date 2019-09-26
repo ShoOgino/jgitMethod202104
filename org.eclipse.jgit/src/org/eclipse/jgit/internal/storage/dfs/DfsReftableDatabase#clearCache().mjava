@@ -1,18 +1,18 @@
 	@Override
 	void clearCache() {
-		lock.lock();
+		getLock().lock();
 		try {
-			if (tableStack != null) {
-				tableStack.close();
-				tableStack = null;
-			}
 			if (ctx != null) {
 				ctx.close();
 				ctx = null;
 			}
-			mergedTables = null;
+			reftableDatabase.clearCache();
+			if (stack != null) {
+				stack.close();
+				stack = null;
+			}
 		} finally {
-			lock.unlock();
+			getLock().unlock();
 		}
 	}
 

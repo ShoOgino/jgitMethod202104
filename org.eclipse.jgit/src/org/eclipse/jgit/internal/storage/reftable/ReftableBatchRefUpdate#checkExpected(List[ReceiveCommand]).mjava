@@ -1,7 +1,7 @@
 	private boolean checkExpected(List<ReceiveCommand> pending)
 			throws IOException {
 		for (ReceiveCommand cmd : pending) {
-			if (!matchOld(cmd, refdb.exactRef(cmd.getRefName()))) {
+			if (!matchOld(cmd, refDb.exactRef(cmd.getRefName()))) {
 				cmd.setResult(LOCK_FAILURE);
 				if (isAtomic()) {
 					ReceiveCommand.abort(pending);

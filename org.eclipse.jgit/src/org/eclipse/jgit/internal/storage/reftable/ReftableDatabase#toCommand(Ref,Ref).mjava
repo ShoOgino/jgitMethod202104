@@ -1,7 +1,14 @@
-	private static ReceiveCommand toCommand(Ref oldRef, Ref newRef) {
+	/**
+	 * @return a ReceiveCommand for the change from oldRef to newRef
+	 * @param oldRef
+	 *            a ref
+	 * @param newRef
+	 *            a ref
+	 */
+	public static ReceiveCommand toCommand(Ref oldRef, Ref newRef) {
 		ObjectId oldId = toId(oldRef);
 		ObjectId newId = toId(newRef);
-		String name = toName(oldRef, newRef);
+		String name = oldRef != null ? oldRef.getName() : newRef.getName();
 
 		if (oldRef != null && oldRef.isSymbolic()) {
 			if (newRef != null) {
@@ -9,6 +16,8 @@
 					return ReceiveCommand.link(oldRef.getTarget().getName(),
 							newRef.getTarget().getName(), name);
 				} else {
+					// This should pass in oldId for compat with
+					// RefDirectoryUpdate
 					return ReceiveCommand.unlink(oldRef.getTarget().getName(),
 							newId, name);
 				}

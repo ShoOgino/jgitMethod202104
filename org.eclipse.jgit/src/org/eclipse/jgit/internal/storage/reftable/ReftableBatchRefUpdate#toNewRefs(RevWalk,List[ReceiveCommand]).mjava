@@ -1,17 +1,22 @@
+	// Extracts and peels the refs out of the ReceiveCommands
 	private static List<Ref> toNewRefs(RevWalk rw, List<ReceiveCommand> pending)
-			throws IOException {
+		throws IOException {
 		List<Ref> refs = new ArrayList<>(pending.size());
 		for (ReceiveCommand cmd : pending) {
+			if (cmd.getResult() != NOT_ATTEMPTED) {
+				continue;
+			}
+
 			String name = cmd.getRefName();
 			ObjectId newId = cmd.getNewId();
 			String newSymref = cmd.getNewSymref();
 			if (AnyObjectId.isEqual(ObjectId.zeroId(), newId)
-					&& newSymref == null) {
+				&& newSymref == null) {
 				refs.add(new ObjectIdRef.Unpeeled(NEW, name, null));
 				continue;
 			} else if (newSymref != null) {
 				refs.add(new SymbolicRef(name,
-						new ObjectIdRef.Unpeeled(NEW, newSymref, null)));
+					new ObjectIdRef.Unpeeled(NEW, newSymref, null)));
 				continue;
 			}
 
@@ -22,7 +27,7 @@
 			}
 			if (peel != null) {
 				refs.add(new ObjectIdRef.PeeledTag(PACKED, name, newId,
-						peel.copy()));
+					peel.copy()));
 			} else {
 				refs.add(new ObjectIdRef.PeeledNonTag(PACKED, name, newId));
 			}

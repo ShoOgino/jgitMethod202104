@@ -1,25 +1,12 @@
 	/** {@inheritDoc} */
 	@Override
 	public Map<String, Ref> getRefs(String prefix) throws IOException {
-		RefList.Builder<Ref> all = new RefList.Builder<>();
-		lock.lock();
-		try {
-			Reftable table = reader();
-			try (RefCursor rc = ALL.equals(prefix) ? table.allRefs()
-					: (prefix.endsWith("/") ? table.seekRefsWithPrefix(prefix) //$NON-NLS-1$
-							: table.seekRef(prefix))) {
-				while (rc.next()) {
-					Ref ref = table.resolve(rc.getRef());
-					if (ref != null && ref.getObjectId() != null) {
-						all.add(ref);
-					}
-				}
-			}
-		} finally {
-			lock.unlock();
+		List<Ref> refs = reftableDatabase.getRefsByPrefix(prefix);
+		RefList.Builder<Ref> builder = new RefList.Builder<>(refs.size());
+		for (Ref r : refs) {
+			builder.add(r);
 		}
-
-		RefList<Ref> none = RefList.emptyList();
-		return new RefMap(prefix, all.toRefList(), none, none);
+		return new RefMap(prefix, builder.toRefList(), RefList.emptyList(),
+			RefList.emptyList());
 	}
 

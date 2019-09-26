@@ -11,8 +11,10 @@
 				// used for a missing object. Eagerly handle this case so we
 				// can set the right result.
 				cmd.setResult(REJECTED_MISSING_OBJECT);
-				ReceiveCommand.abort(pending);
-				return false;
+				if (isAtomic()) {
+					ReceiveCommand.abort(pending);
+					return false;
+				}
 			}
 		}
 		return true;

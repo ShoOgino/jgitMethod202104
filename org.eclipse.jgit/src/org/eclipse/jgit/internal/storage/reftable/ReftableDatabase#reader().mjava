@@ -1,0 +1,14 @@
+	/**
+	 * @return the merged reftable that is implemented by the stack of
+	 *         reftables. Return value must be accessed under lock.
+	 * @throws IOException
+	 *             on I/O problems
+	 */
+	private Reftable reader() throws IOException {
+		assert lock.isLocked();
+		if (mergedTables == null) {
+			mergedTables = openMergedReftable();
+		}
+		return mergedTables;
+	}
+

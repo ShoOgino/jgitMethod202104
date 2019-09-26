@@ -1,0 +1,49 @@
+	/**
+	 * @return whether the given refName would be illegal in a repository that
+	 *         uses loose refs.
+	 * @param refName
+	 *            the name to check
+	 * @param added
+	 *            a sorted set of refs we pretend have been added to the
+	 *            database.
+	 * @param deleted
+	 *            a set of refs we pretend have been removed from the database.
+	 * @throws IOException
+	 *             on I/O problems
+	 */
+	public boolean isNameConflicting(String refName, TreeSet<String> added,
+			Set<String> deleted) throws IOException {
+		lock.lock();
+		try {
+			Reftable table = reader();
+
+			// Cannot be nested within an existing reference.
+			int lastSlash = refName.lastIndexOf('/');
+			while (0 < lastSlash) {
+				String prefix = refName.substring(0, lastSlash);
+				if (!deleted.contains(prefix)
+						&& (table.hasRef(prefix) || added.contains(prefix))) {
+					return true;
+				}
+				lastSlash = refName.lastIndexOf('/', lastSlash - 1);
+			}
+
+			// Cannot be the container of an existing reference.
+			String prefix = refName + '/';
+			RefCursor c = table.seekRefsWithPrefix(prefix);
+			while (c.next()) {
+				if (!deleted.contains(c.getRef().getName())) {
+					return true;
+				}
+			}
+
+			String it = added.ceiling(refName + '/');
+			if (it != null && it.startsWith(prefix)) {
+				return true;
+			}
+			return false;
+		} finally {
+			lock.unlock();
+		}
+	}
+
