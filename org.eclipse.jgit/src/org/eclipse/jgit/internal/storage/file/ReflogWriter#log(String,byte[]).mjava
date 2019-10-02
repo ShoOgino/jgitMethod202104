@@ -1,7 +1,7 @@
 	private ReflogWriter log(String refName, byte[] rec) throws IOException {
 		File log = refdb.logFor(refName);
 		boolean write = forceWrite
-				|| (isLogAllRefUpdates() && shouldAutoCreateLog(refName))
+				|| shouldAutoCreateLog(refName)
 				|| log.isFile();
 		if (!write)
 			return this;

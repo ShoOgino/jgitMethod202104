@@ -2,8 +2,13 @@
 	 * Whether to log all refUpdates
 	 *
 	 * @return whether to log all refUpdates
+	 * @deprecated since 5.6; default value depends on whether the repository is
+	 *             bare. Use
+	 *             {@link Config#getEnum(String, String, String, Enum)}
+	 *             directly.
 	 */
+	@Deprecated
 	public boolean isLogAllRefUpdates() {
-		return logAllRefUpdates;
+		return !LogRefUpdates.FALSE.equals(logAllRefUpdates);
 	}
 
