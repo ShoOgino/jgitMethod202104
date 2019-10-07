@@ -1,0 +1,25 @@
+	/**
+	 * Get the jgit configuration located at $XDG_CONFIG_HOME/jgit/config. The
+	 * configuration will be reloaded automatically if the configuration file
+	 * was modified. If the configuration file wasn't modified returns the
+	 * cached configuration.
+	 *
+	 * @return the jgit configuration located at $XDG_CONFIG_HOME/jgit/config
+	 * @throws ConfigInvalidException
+	 *             if configuration is invalid
+	 * @throws IOException
+	 *             if something went wrong when reading files
+	 * @since 5.5.2
+	 */
+	public StoredConfig getJGitConfig()
+			throws ConfigInvalidException, IOException {
+		FileBasedConfig c = jgitConfig.get();
+		if (c == null) {
+			jgitConfig.compareAndSet(null,
+					openJGitConfig(null, FS.DETECTED));
+			c = jgitConfig.get();
+		}
+		updateAll(c);
+		return c;
+	}
+
