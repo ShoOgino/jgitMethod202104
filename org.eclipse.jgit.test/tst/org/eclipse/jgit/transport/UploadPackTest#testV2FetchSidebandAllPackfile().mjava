@@ -6,11 +6,11 @@
 		server.getConfig().setBoolean("uploadpack", null, "allowsidebandall", true);
 
 		ByteArrayInputStream recvStream = uploadPackV2("command=fetch\n",
-				PacketLineIn.DELIM,
+				PacketLineIn.delimiter(),
 				"want " + commit.getName() + "\n",
 				"sideband-all\n",
 				"done\n",
-				PacketLineIn.END);
+				PacketLineIn.end());
 		PacketLineIn pckIn = new PacketLineIn(recvStream);
 
 		String s;
