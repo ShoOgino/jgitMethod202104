@@ -1,0 +1,51 @@
+	/**
+	 * @param connectivityCheckInfo
+	 *            Source for connectivity check.
+	 * @param ow
+	 *            Walk which can also check blobs.
+	 * @param pm
+	 *            Monitor to publish progress to.
+	 * @throws IOException
+	 *             an error occurred during connectivity checking.
+	 *
+	 */
+	private void checkObjects(ConnectivityCheckInfo connectivityCheckInfo,
+			ObjectWalk ow,
+			ProgressMonitor pm) throws IOException {
+		RevObject o;
+		ObjectIdSubclassMap<ObjectId> newObjectIds = connectivityCheckInfo
+				.getParser()
+				.getNewObjectIds();
+
+		while ((o = ow.nextObject()) != null) {
+			pm.update(1);
+			if (o.has(RevFlag.UNINTERESTING)) {
+				continue;
+			}
+
+			if (connectivityCheckInfo.isCheckObjects()) {
+				if (newObjectIds.contains(o)) {
+					continue;
+				}
+				throw new MissingObjectException(o, o.getType());
+
+			}
+
+			if (o instanceof RevBlob
+					&& !connectivityCheckInfo.getRepository().getObjectDatabase()
+							.has(o)) {
+				throw new MissingObjectException(o, Constants.TYPE_BLOB);
+			}
+		}
+
+		if (connectivityCheckInfo.isCheckObjects()) {
+			for (ObjectId id : connectivityCheckInfo.getParser()
+					.getBaseObjectIds()) {
+				o = ow.parseAny(id);
+				if (!o.has(RevFlag.UNINTERESTING)) {
+					throw new MissingObjectException(o, o.getType());
+				}
+			}
+		}
+	}
+

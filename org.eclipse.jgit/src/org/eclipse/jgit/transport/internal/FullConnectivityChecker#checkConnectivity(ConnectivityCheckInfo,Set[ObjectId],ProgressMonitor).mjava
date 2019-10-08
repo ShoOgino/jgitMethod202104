@@ -1,0 +1,18 @@
+	@Override
+	public void checkConnectivity(ConnectivityCheckInfo connectivityCheckInfo,
+			Set<ObjectId> haves, ProgressMonitor pm)
+			throws MissingObjectException, IOException {
+		pm.beginTask(JGitText.get().countingObjects,
+				ProgressMonitor.UNKNOWN);
+		try (ObjectWalk ow = new ObjectWalk(connectivityCheckInfo.getRepository())) {
+			if (!markStartAndKnownNodes(connectivityCheckInfo, ow, haves,
+					pm)) {
+				return;
+			}
+			checkCommitTree(connectivityCheckInfo, ow, pm);
+			checkObjects(connectivityCheckInfo, ow, pm);
+		} finally {
+			pm.endTask();
+		}
+	}
+

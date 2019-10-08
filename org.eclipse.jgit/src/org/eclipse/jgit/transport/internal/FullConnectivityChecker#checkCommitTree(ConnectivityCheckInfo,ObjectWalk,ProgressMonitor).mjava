@@ -1,0 +1,27 @@
+	/**
+	 * @param connectivityCheckInfo
+	 *            Source for connectivity check.
+	 * @param ow
+	 *            Walk which can also check blobs.
+	 * @param pm
+	 *            Monitor to publish progress to.
+	 * @throws IOException
+	 *             an error occurred during connectivity checking.
+	 */
+	private void checkCommitTree(ConnectivityCheckInfo connectivityCheckInfo,
+			ObjectWalk ow,
+			ProgressMonitor pm) throws IOException {
+		RevCommit c;
+		ObjectIdSubclassMap<ObjectId> newObjectIds = connectivityCheckInfo
+				.getParser()
+				.getNewObjectIds();
+		while ((c = ow.next()) != null) {
+			pm.update(1);
+			if (connectivityCheckInfo.isCheckObjects()
+					&& !c.has(RevFlag.UNINTERESTING)
+					&& !newObjectIds.contains(c)) {
+				throw new MissingObjectException(c, Constants.TYPE_COMMIT);
+			}
+		}
+	}
+
