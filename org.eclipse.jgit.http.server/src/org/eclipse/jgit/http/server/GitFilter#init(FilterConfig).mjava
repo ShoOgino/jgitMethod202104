@@ -16,7 +16,7 @@
 			b = b.through(new UploadPackServlet.Factory(uploadPackFactory));
 			for (Filter f : uploadPackFilters)
 				b = b.through(f);
-			b.with(new UploadPackServlet());
+			b.with(new UploadPackServlet(uploadPackErrorHandler));
 		}
 
 		if (receivePackFactory != ReceivePackFactory.DISABLED) {
