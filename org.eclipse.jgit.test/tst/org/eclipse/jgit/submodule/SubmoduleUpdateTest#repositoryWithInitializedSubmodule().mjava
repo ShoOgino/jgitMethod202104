@@ -16,10 +16,11 @@
 		});
 		editor.commit();
 
-		Repository subRepo = Git.init().setBare(false)
+		try (Repository subRepo = Git.init().setBare(false)
 				.setDirectory(new File(db.getWorkTree(), path)).call()
-				.getRepository();
-		assertNotNull(subRepo);
+				.getRepository()) {
+			assertNotNull(subRepo);
+		}
 
 		SubmoduleUpdateCommand command = new SubmoduleUpdateCommand(db);
 		Collection<String> updated = command.call();

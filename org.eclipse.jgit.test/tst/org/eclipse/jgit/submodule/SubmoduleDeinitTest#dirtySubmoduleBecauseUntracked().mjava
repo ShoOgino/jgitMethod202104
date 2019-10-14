@@ -9,7 +9,6 @@
 		assertEquals(1, updated.size());
 
 		File submoduleDir = assertSubmoduleIsInitialized();
-		SubmoduleWalk generator;
 
 		write(new File(submoduleDir, "untracked"), "untracked");
 
@@ -17,8 +16,9 @@
 		assertEquals(path, result.getPath());
 		assertEquals(SubmoduleDeinitCommand.SubmoduleDeinitStatus.DIRTY, result.getStatus());
 
-		generator = SubmoduleWalk.forIndex(db);
-		assertTrue(generator.next());
+		try (SubmoduleWalk generator = SubmoduleWalk.forIndex(db)) {
+			assertTrue(generator.next());
+		}
 		assertTrue(submoduleDir.isDirectory());
 		assertNotEquals(0, submoduleDir.list().length);
 	}

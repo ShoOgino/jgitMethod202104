@@ -36,11 +36,12 @@
 		assertEquals(1, updated.size());
 		assertEquals(path, updated.iterator().next());
 
-		SubmoduleWalk generator = SubmoduleWalk.forIndex(db);
-		assertTrue(generator.next());
-		try (Repository subRepo = generator.getRepository()) {
-			assertNotNull(subRepo);
-			assertEquals(commit, subRepo.resolve(Constants.HEAD));
+		try (SubmoduleWalk generator = SubmoduleWalk.forIndex(db)) {
+			assertTrue(generator.next());
+			try (Repository subRepo = generator.getRepository()) {
+				assertNotNull(subRepo);
+				assertEquals(commit, subRepo.resolve(Constants.HEAD));
+			}
 		}
 	}
 
