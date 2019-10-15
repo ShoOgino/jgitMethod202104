@@ -2,7 +2,8 @@
 	public void testFileInFolderUntracked() throws Exception {
 		RevCommit commit = writeFileInFolderAndCommit();
 		writeFileInFolderUntracked();
-		TreeWalk treeWalk = createTreeWalk(commit);
-		assertPaths(treeWalk, UNTRACKED_FILE_IN_FOLDER);
+		try (TreeWalk treeWalk = createTreeWalk(commit)) {
+			assertPaths(treeWalk, UNTRACKED_FILE_IN_FOLDER);
+		}
 	}
 

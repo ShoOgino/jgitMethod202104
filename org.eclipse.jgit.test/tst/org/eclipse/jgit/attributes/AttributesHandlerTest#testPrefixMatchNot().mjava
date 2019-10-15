@@ -2,12 +2,13 @@
 	public void testPrefixMatchNot() throws Exception {
 		setupRepo(null, null, "sub/new bar", null);
 		writeTrashFile("sub/new/foo.txt", "1");
-		walk = beginWalk();
-		assertIteration(F, ".gitattributes");
-		assertIteration(D, "sub");
-		assertIteration(F, "sub/a.txt");
-		assertIteration(D, "sub/new", attrs("bar"));
-		assertIteration(F, "sub/new/foo.txt");
-		endWalk();
+		try (TreeWalk walk = beginWalk()) {
+			assertIteration(walk, F, ".gitattributes");
+			assertIteration(walk, D, "sub");
+			assertIteration(walk, F, "sub/a.txt");
+			assertIteration(walk, D, "sub/new", attrs("bar"));
+			assertIteration(walk, F, "sub/new/foo.txt");
+			assertFalse("Not all files tested", walk.next());
+		}
 	}
 

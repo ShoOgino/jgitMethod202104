@@ -21,23 +21,25 @@
 		writeTrashFile("src/config/windows.file", "");
 		writeTrashFile("src/config/windows.txt", "");
 
-		walk = beginWalk();
+		try (TreeWalk walk = beginWalk()) {
+			assertIteration(walk, F, ".gitattributes");
+			assertIteration(walk, F, "global.txt", asList(EOL_LF));
+			assertIteration(walk, F, "readme.txt", asList(EOL_LF));
 
-		assertIteration(F, ".gitattributes");
-		assertIteration(F, "global.txt", asList(EOL_LF));
-		assertIteration(F, "readme.txt", asList(EOL_LF));
+			assertIteration(walk, D, "src");
 
-		assertIteration(D, "src");
+			assertIteration(walk, D, "src/config");
+			assertIteration(walk, F, "src/config/.gitattributes");
+			assertIteration(walk, F, "src/config/readme.txt",
+					asList(DELTA_UNSET));
+			assertIteration(walk, F, "src/config/windows.file", null);
+			assertIteration(walk, F, "src/config/windows.txt",
+					asList(DELTA_UNSET));
 
-		assertIteration(D, "src/config");
-		assertIteration(F, "src/config/.gitattributes");
-		assertIteration(F, "src/config/readme.txt", asList(DELTA_UNSET));
-		assertIteration(F, "src/config/windows.file", null);
-		assertIteration(F, "src/config/windows.txt", asList(DELTA_UNSET));
+			assertIteration(walk, F, "windows.file", null);
+			assertIteration(walk, F, "windows.txt", asList(EOL_LF));
 
-		assertIteration(F, "windows.file", null);
-		assertIteration(F, "windows.txt", asList(EOL_LF));
-
-		endWalk();
+			assertFalse("Not all files tested", walk.next());
+		}
 	}
 

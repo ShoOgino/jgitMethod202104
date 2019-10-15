@@ -2,7 +2,8 @@
 	public void testFileInFolderCommittedModified() throws Exception {
 		RevCommit commit = writeFileInFolderAndCommit();
 		writeFileInFolderModified();
-		TreeWalk treeWalk = createTreeWalk(commit);
-		assertPaths(treeWalk, FILE_IN_FOLDER);
+		try (TreeWalk treeWalk = createTreeWalk(commit)) {
+			assertPaths(treeWalk, FILE_IN_FOLDER);
+		}
 	}
 

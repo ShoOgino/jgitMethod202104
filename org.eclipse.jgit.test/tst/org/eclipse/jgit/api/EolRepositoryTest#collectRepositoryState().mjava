@@ -1,11 +1,19 @@
 	private void collectRepositoryState() throws Exception {
 		dirCache = db.readDirCache();
-		walk = beginWalk();
-		if (dotGitattributes != null)
-			collectEntryContentAndAttributes(F, ".gitattributes", null);
-		collectEntryContentAndAttributes(F, fileCRLF.getName(), entryCRLF);
-		collectEntryContentAndAttributes(F, fileLF.getName(), entryLF);
-		collectEntryContentAndAttributes(F, fileMixed.getName(), entryMixed);
-		endWalk();
+		try (TreeWalk walk = new TreeWalk(db)) {
+			walk.addTree(new FileTreeIterator(db));
+			walk.addTree(new DirCacheIterator(db.readDirCache()));
+			if (dotGitattributes != null) {
+				collectEntryContentAndAttributes(walk, F, ".gitattributes",
+						null);
+			}
+			collectEntryContentAndAttributes(walk, F, fileCRLF.getName(),
+					entryCRLF);
+			collectEntryContentAndAttributes(walk, F, fileLF.getName(),
+					entryLF);
+			collectEntryContentAndAttributes(walk, F, fileMixed.getName(),
+					entryMixed);
+			assertFalse("Not all files tested", walk.next());
+		}
 	}
 

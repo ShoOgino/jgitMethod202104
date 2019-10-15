@@ -9,17 +9,18 @@
 
 		// Adds file to index
 		git.add().addFilepattern(".").call();
-		walk = beginWalk();
 
-		assertIteration(F, ".gitattributes");
+		try (TreeWalk walk = beginWalk()) {
+			assertIteration(walk, F, ".gitattributes");
 
-		assertIteration(D, "levelA");
-		assertIteration(F, "levelA/.gitattributes");
-		assertIteration(F, "levelA/lA.txt");
+			assertIteration(walk, D, "levelA");
+			assertIteration(walk, F, "levelA/.gitattributes");
+			assertIteration(walk, F, "levelA/lA.txt");
 
-		assertIteration(D, "levelB");
-		assertIteration(F, "levelB/.gitattributes");
+			assertIteration(walk, D, "levelB");
+			assertIteration(walk, F, "levelB/.gitattributes");
 
-		endWalk();
+			assertFalse("Not all files tested", walk.next());
+		}
 	}
 

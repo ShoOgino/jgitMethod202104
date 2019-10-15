@@ -4,7 +4,8 @@
 		RevCommit commit = writeFileAndCommit();
 		deleteFileAndCommit();
 		rewriteFileIgnored();
-		TreeWalk treeWalk = createTreeWalk(commit);
-		assertPaths(treeWalk, FILE);
+		try (TreeWalk treeWalk = createTreeWalk(commit)) {
+			assertPaths(treeWalk, FILE);
+		}
 	}
 

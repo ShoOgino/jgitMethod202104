@@ -2,7 +2,8 @@
 	public void testFileIgnored() throws Exception {
 		RevCommit commit = writeFileAndCommit();
 		writeFileIgnored();
-		TreeWalk treeWalk = createTreeWalk(commit);
-		assertFalse(treeWalk.next());
+		try (TreeWalk treeWalk = createTreeWalk(commit)) {
+			assertFalse(treeWalk.next());
+		}
 	}
 

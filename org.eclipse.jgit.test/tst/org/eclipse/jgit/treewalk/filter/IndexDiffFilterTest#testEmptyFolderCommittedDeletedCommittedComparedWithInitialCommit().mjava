@@ -3,7 +3,8 @@
 			throws Exception {
 		RevCommit commit = createEmptyFolderAndCommit();
 		deleteFolderAndCommit();
-		TreeWalk treeWalk = createTreeWalk(commit);
-		assertFalse(treeWalk.next());
+		try (TreeWalk treeWalk = createTreeWalk(commit)) {
+			assertFalse(treeWalk.next());
+		}
 	}
 

@@ -12,16 +12,17 @@
 
 		// Adds file to index
 		git.add().addFilepattern(".").call();
-		walk = beginWalk();
 
-		assertIteration(F, "l0.txt");
+		try (TreeWalk walk = beginWalk()) {
+			assertIteration(walk, F, "l0.txt");
 
-		assertIteration(D, "level1");
-		assertIteration(F, "level1/l1.txt");
+			assertIteration(walk, D, "level1");
+			assertIteration(walk, F, "level1/l1.txt");
 
-		assertIteration(D, "level1/level2");
-		assertIteration(F, "level1/level2/l2.txt");
+			assertIteration(walk, D, "level1/level2");
+			assertIteration(walk, F, "level1/level2/l2.txt");
 
-		endWalk();
+			assertFalse("Not all files tested", walk.next());
+		}
 	}
 

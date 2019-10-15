@@ -2,7 +2,8 @@
 	public void testFileIgnoredNotHonored() throws Exception {
 		RevCommit commit = writeFileAndCommit();
 		writeFileIgnored();
-		TreeWalk treeWalk = createTreeWalkDishonorIgnores(commit);
-		assertPaths(treeWalk, IGNORED_FILE, GITIGNORE);
+		try (TreeWalk treeWalk = createTreeWalkDishonorIgnores(commit)) {
+			assertPaths(treeWalk, IGNORED_FILE, GITIGNORE);
+		}
 	}
 

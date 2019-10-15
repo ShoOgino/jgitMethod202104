@@ -2,7 +2,8 @@
 	public void testFileCommittedModifiedIgnored() throws Exception {
 		RevCommit commit = writeFileAndCommit();
 		writeFileModifiedIgnored();
-		TreeWalk treeWalk = createTreeWalk(commit);
-		assertPaths(treeWalk, FILE);
+		try (TreeWalk treeWalk = createTreeWalk(commit)) {
+			assertPaths(treeWalk, FILE);
+		}
 	}
 
