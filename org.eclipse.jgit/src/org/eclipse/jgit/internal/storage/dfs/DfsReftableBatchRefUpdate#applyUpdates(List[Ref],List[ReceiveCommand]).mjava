@@ -1,23 +1,27 @@
-	private void applyUpdates(RevWalk rw, List<ReceiveCommand> pending)
+	@Override
+	protected void applyUpdates(List<Ref> newRefs, List<ReceiveCommand> pending)
 			throws IOException {
-		List<Ref> newRefs = toNewRefs(rw, pending);
-		long updateIndex = nextUpdateIndex();
 		Set<DfsPackDescription> prune = Collections.emptySet();
 		DfsPackDescription pack = odb.newPack(PackSource.INSERT);
 		try (DfsOutputStream out = odb.writeFile(pack, REFTABLE)) {
 			ReftableConfig cfg = DfsPackCompactor
-					.configureReftable(reftableConfig, out);
+					.configureReftable(refdb.getReftableConfig(), out);
 
 			ReftableWriter.Stats stats;
 			if (refdb.compactDuringCommit()
 					&& newRefs.size() * AVG_BYTES <= cfg.getRefBlockSize()
 					&& canCompactTopOfStack(cfg)) {
 				ByteArrayOutputStream tmp = new ByteArrayOutputStream();
-				write(tmp, cfg, updateIndex, newRefs, pending);
+				ReftableWriter rw = new ReftableWriter(cfg, tmp);
+				write(rw, newRefs, pending);
+				rw.finish();
 				stats = compactTopOfStack(out, cfg, tmp.toByteArray());
 				prune = toPruneTopOfStack();
 			} else {
-				stats = write(out, cfg, updateIndex, newRefs, pending);
+				ReftableWriter rw = new ReftableWriter(cfg, out);
+				write(rw, newRefs, pending);
+				rw.finish();
+				stats = rw.getStats();
 			}
 			pack.addFileExt(REFTABLE);
 			pack.setReftableStats(stats);

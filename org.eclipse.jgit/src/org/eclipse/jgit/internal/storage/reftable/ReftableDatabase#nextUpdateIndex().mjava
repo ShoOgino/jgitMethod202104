@@ -1,0 +1,15 @@
+	/**
+	 * @return the next available logical timestamp for an additional reftable
+	 *         in the stack.
+	 * @throws java.io.IOException
+	 *             on I/O problems.
+	 */
+	public long nextUpdateIndex() throws IOException {
+		lock.lock();
+		try {
+			return reader().maxUpdateIndex() + 1;
+		} finally {
+			lock.unlock();
+		}
+	}
+

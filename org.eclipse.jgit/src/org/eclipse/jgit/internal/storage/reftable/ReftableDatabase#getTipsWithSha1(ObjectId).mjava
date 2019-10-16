@@ -1,0 +1,25 @@
+	/**
+	 * Returns all refs that resolve directly to the given {@link ObjectId}.
+	 * Includes peeled {@linkObjectId}s.
+	 *
+	 * @param id
+	 *            {@link ObjectId} to resolve
+	 * @return a {@link Set} of {@link Ref}s whose tips point to the provided
+	 *         id.
+	 * @throws java.io.IOException
+	 *             on I/O errors.
+	 */
+	public Set<Ref> getTipsWithSha1(ObjectId id) throws IOException {
+		lock.lock();
+		try {
+			RefCursor cursor = reader().byObjectId(id);
+			Set<Ref> refs = new HashSet<>();
+			while (cursor.next()) {
+				refs.add(cursor.getRef());
+			}
+			return refs;
+		} finally {
+			lock.unlock();
+		}
+	}
+

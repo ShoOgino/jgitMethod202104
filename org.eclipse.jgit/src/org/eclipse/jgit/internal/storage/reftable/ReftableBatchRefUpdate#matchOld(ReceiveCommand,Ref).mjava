@@ -1,7 +1,7 @@
 	private static boolean matchOld(ReceiveCommand cmd, @Nullable Ref ref) {
 		if (ref == null) {
 			return AnyObjectId.isEqual(ObjectId.zeroId(), cmd.getOldId())
-					&& cmd.getOldSymref() == null;
+				&& cmd.getOldSymref() == null;
 		} else if (ref.isSymbolic()) {
 			return ref.getTarget().getName().equals(cmd.getOldSymref());
 		}

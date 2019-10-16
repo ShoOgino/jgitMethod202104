@@ -2,7 +2,7 @@
 	@Override
 	protected boolean compareAndPut(Ref oldRef, @Nullable Ref newRef)
 			throws IOException {
-		ReceiveCommand cmd = toCommand(oldRef, newRef);
+		ReceiveCommand cmd = ReftableDatabase.toCommand(oldRef, newRef);
 		try (RevWalk rw = new RevWalk(getRepository())) {
 			rw.setRetainBody(false);
 			newBatchUpdate().setAllowNonFastForwards(true).addCommand(cmd)

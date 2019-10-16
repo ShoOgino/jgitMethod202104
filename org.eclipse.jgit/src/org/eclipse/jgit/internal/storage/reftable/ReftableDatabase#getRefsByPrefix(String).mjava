@@ -1,0 +1,31 @@
+	/**
+	 * Returns refs whose names start with a given prefix.
+	 *
+	 * @param prefix
+	 *            string that names of refs should start with; may be empty (to
+	 *            return all refs).
+	 * @return immutable list of refs whose names start with {@code prefix}.
+	 * @throws java.io.IOException
+	 *             the reference space cannot be accessed.
+	 */
+	public List<Ref> getRefsByPrefix(String prefix) throws IOException {
+		List<Ref> all = new ArrayList<>();
+		lock.lock();
+		try {
+			Reftable table = reader();
+			try (RefCursor rc = RefDatabase.ALL.equals(prefix) ? table.allRefs()
+					: table.seekRefsWithPrefix(prefix)) {
+				while (rc.next()) {
+					Ref ref = table.resolve(rc.getRef());
+					if (ref != null && ref.getObjectId() != null) {
+						all.add(ref);
+					}
+				}
+			}
+		} finally {
+			lock.unlock();
+		}
+
+		return Collections.unmodifiableList(all);
+	}
+

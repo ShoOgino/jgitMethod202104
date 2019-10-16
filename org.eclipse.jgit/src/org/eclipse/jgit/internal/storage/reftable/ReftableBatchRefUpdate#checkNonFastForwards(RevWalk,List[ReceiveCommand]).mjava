@@ -7,8 +7,10 @@
 			cmd.updateType(rw);
 			if (cmd.getType() == UPDATE_NONFASTFORWARD) {
 				cmd.setResult(REJECTED_NONFASTFORWARD);
-				ReceiveCommand.abort(pending);
-				return false;
+				if (isAtomic()) {
+					ReceiveCommand.abort(pending);
+					return false;
+				}
 			}
 		}
 		return true;

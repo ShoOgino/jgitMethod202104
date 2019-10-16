@@ -6,12 +6,10 @@
 	 * @param odb
 	 *            object database to store the reftable.
 	 */
-	protected ReftableBatchRefUpdate(DfsReftableDatabase refdb,
+	protected DfsReftableBatchRefUpdate(DfsReftableDatabase refdb,
 			DfsObjDatabase odb) {
-		super(refdb);
+		super(refdb, refdb.reftableDatabase, refdb.getLock(), refdb.getRepository());
 		this.refdb = refdb;
 		this.odb = odb;
-		lock = refdb.getLock();
-		reftableConfig = refdb.getReftableConfig();
 	}
 

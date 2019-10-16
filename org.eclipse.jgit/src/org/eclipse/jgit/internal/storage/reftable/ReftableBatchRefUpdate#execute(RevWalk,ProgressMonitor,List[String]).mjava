@@ -12,24 +12,36 @@
 			if (!checkObjectExistence(rw, pending)) {
 				return;
 			}
+			// if we are here, checkObjectExistence might have flagged some problems
+			// but the transaction is not atomic, so we should proceed with the other
+			// pending commands.
+			pending = getPending();
 			if (!checkNonFastForwards(rw, pending)) {
 				return;
 			}
+			pending = getPending();
 
 			lock.lock();
 			try {
 				if (!checkExpected(pending)) {
 					return;
 				}
+				pending = getPending();
 				if (!checkConflicting(pending)) {
 					return;
 				}
+				pending = getPending();
 				if (!blockUntilTimestamps(MAX_WAIT)) {
 					return;
 				}
-				applyUpdates(rw, pending);
+
+				List<Ref> newRefs = toNewRefs(rw, pending);
+				applyUpdates(newRefs, pending);
 				for (ReceiveCommand cmd : pending) {
-					cmd.setResult(OK);
+					if (cmd.getResult() == NOT_ATTEMPTED) {
+						// XXX this is a bug in DFS ?
+						cmd.setResult(OK);
+					}
 				}
 			} finally {
 				lock.unlock();
