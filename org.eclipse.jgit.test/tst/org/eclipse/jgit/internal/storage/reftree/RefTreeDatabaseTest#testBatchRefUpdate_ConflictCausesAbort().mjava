@@ -11,7 +11,9 @@
 		BatchRefUpdate batchUpdate = refdb.newBatchUpdate();
 		batchUpdate.setAllowNonFastForwards(true);
 		batchUpdate.addCommand(commands);
-		batchUpdate.execute(new RevWalk(repo), NullProgressMonitor.INSTANCE);
+		try (RevWalk rw = new RevWalk(repo)) {
+			batchUpdate.execute(rw, NullProgressMonitor.INSTANCE);
+		}
 		assertEquals(txnId, getTxnCommitted());
 
 		assertEquals(LOCK_FAILURE, commands.get(0).getResult());

@@ -12,7 +12,9 @@
 
 		RevCommit c = new RevCommit(
 				id("9473095c4cb2f12aefe1db8a355fe3fafba42f67"));
-		c.parseCanonical(new RevWalk(db), b.toByteArray());
+		try (RevWalk rw = new RevWalk(db)) {
+			c.parseCanonical(rw, b.toByteArray());
+		}
 		assertEquals("'utf8'", c.getEncodingName());
 		assertEquals("Sm\u00f6rg\u00e5sbord\n", c.getFullMessage());
 

@@ -9,12 +9,17 @@
 		git.commit().setMessage("commit on master").call();
 		MergeResult mergeCall = merge(db.resolve("topic"));
 		ObjectId start = mergeCall.getNewHead();
-		PlotCommitList<PlotLane> commitList = createCommitList(start);
+		try (PlotWalk walk = new PlotWalk(db)) {
+			walk.markStart(walk.parseCommit(start));
+			PlotCommitList<PlotLane> commitList = new PlotCommitList<>();
+			commitList.source(walk);
+			commitList.fillTo(1000);
 
-		for (int i = 0; i < commitList.size(); i++)
-			plotRenderer.paintCommit(commitList.get(i), 30);
+			for (int i = 0; i < commitList.size(); i++)
+				plotRenderer.paintCommit(commitList.get(i), 30);
 
-		List<Integer> indentations = plotRenderer.indentations;
-		assertEquals(indentations.get(2), indentations.get(3));
+			List<Integer> indentations = plotRenderer.indentations;
+			assertEquals(indentations.get(2), indentations.get(3));
+		}
 	}
 

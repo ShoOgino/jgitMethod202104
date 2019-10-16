@@ -20,7 +20,9 @@
 		b.write("Hi\n".getBytes(UTF_8));
 		final RevCommit c;
 		c = new RevCommit(id("9473095c4cb2f12aefe1db8a355fe3fafba42f67")); // bogus id
-		c.parseCanonical(new RevWalk(db), b.toByteArray());
+		try (RevWalk rw = new RevWalk(db)) {
+			c.parseCanonical(rw, b.toByteArray());
+		}
 
 		assertEquals("EUC-JP", c.getEncoding().name());
 		assertEquals("F\u00f6r fattare", c.getAuthorIdent().getName());

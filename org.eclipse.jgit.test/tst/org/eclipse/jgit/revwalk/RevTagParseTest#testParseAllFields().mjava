@@ -28,18 +28,18 @@
 
 		body.append("\n");
 
-		final RevWalk rw = new RevWalk(db);
 		final RevTag c;
 
 		c = new RevTag(id("9473095c4cb2f12aefe1db8a355fe3fafba42f67"));
 		assertNull(c.getObject());
 		assertNull(c.getTagName());
 
-		c.parseCanonical(rw, body.toString().getBytes(UTF_8));
-		assertNotNull(c.getObject());
-		assertEquals(treeId, c.getObject().getId());
-		assertSame(rw.lookupTree(treeId), c.getObject());
-
+		try (RevWalk rw = new RevWalk(db)) {
+			c.parseCanonical(rw, body.toString().getBytes(UTF_8));
+			assertNotNull(c.getObject());
+			assertEquals(treeId, c.getObject().getId());
+			assertSame(rw.lookupTree(treeId), c.getObject());
+		}
 		assertNotNull(c.getTagName());
 		assertEquals(name, c.getTagName());
 		assertEquals("", c.getFullMessage());

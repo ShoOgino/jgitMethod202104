@@ -10,7 +10,9 @@
 		b.write("message\n".getBytes(UTF_8));
 
 		RevTag t = new RevTag(id("9473095c4cb2f12aefe1db8a355fe3fafba42f67"));
-		t.parseCanonical(new RevWalk(db), b.toByteArray());
+		try (RevWalk rw = new RevWalk(db)) {
+			t.parseCanonical(rw, b.toByteArray());
+		}
 
 		assertEquals("t", t.getTaggerIdent().getName());
 		assertEquals("message", t.getShortMessage());

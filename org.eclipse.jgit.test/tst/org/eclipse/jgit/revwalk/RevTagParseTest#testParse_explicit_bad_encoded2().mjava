@@ -26,7 +26,9 @@
 		b.write("Hi\n".getBytes(UTF_8));
 		final RevTag c;
 		c = new RevTag(id("9473095c4cb2f12aefe1db8a355fe3fafba42f67"));
-		c.parseCanonical(new RevWalk(db), b.toByteArray());
+		try (RevWalk rw = new RevWalk(db)) {
+			c.parseCanonical(rw, b.toByteArray());
+		}
 
 		assertEquals("F\u00f6r fattare", c.getTaggerIdent().getName());
 		assertEquals("\u304d\u308c\u3044", c.getShortMessage());

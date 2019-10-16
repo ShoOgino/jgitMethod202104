@@ -11,7 +11,9 @@
 		ReceiveCommand cmd = command(null, B, ORIG_HEAD);
 		BatchRefUpdate batch = refdb.newBatchUpdate();
 		batch.addCommand(cmd);
-		batch.execute(new RevWalk(repo), NullProgressMonitor.INSTANCE);
+		try (RevWalk rw = new RevWalk(repo)) {
+			batch.execute(rw, NullProgressMonitor.INSTANCE);
+		}
 		assertEquals(REJECTED_OTHER_REASON, cmd.getResult());
 		assertEquals(
 				MessageFormat.format(JGitText.get().invalidRefName, ORIG_HEAD),

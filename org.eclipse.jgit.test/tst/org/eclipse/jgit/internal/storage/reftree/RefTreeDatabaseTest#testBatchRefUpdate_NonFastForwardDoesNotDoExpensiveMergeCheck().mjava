@@ -9,13 +9,15 @@
 		BatchRefUpdate batchUpdate = refdb.newBatchUpdate();
 		batchUpdate.setAllowNonFastForwards(true);
 		batchUpdate.addCommand(commands);
-		batchUpdate.execute(new RevWalk(repo) {
+		try (RevWalk rw = new RevWalk(repo) {
 			@Override
 			public boolean isMergedInto(RevCommit base, RevCommit tip) {
 				fail("isMergedInto() should not be called");
 				return false;
 			}
-		}, NullProgressMonitor.INSTANCE);
+		}) {
+			batchUpdate.execute(rw, NullProgressMonitor.INSTANCE);
+		}
 		assertNotEquals(txnId, getTxnCommitted());
 
 		Map<String, Ref> refs = refdb.getRefs(ALL);

@@ -9,7 +9,9 @@
 				command(B, A, "refs/heads/masters"));
 		BatchRefUpdate batchUpdate = refdb.newBatchUpdate();
 		batchUpdate.addCommand(commands);
-		batchUpdate.execute(new RevWalk(repo), NullProgressMonitor.INSTANCE);
+		try (RevWalk rw = new RevWalk(repo)) {
+			batchUpdate.execute(rw, NullProgressMonitor.INSTANCE);
+		}
 		assertEquals(txnId, getTxnCommitted());
 
 		assertEquals(REJECTED_NONFASTFORWARD,

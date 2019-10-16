@@ -1,7 +1,8 @@
 	private static PackIndex writePack(FileRepository repo,
 			Set<? extends ObjectId> want, Set<ObjectIdSet> excludeObjects)
 					throws IOException {
-		RevWalk walk = new RevWalk(repo);
-		return writePack(repo, walk, 0, want, NONE, excludeObjects);
+		try (RevWalk walk = new RevWalk(repo)) {
+			return writePack(repo, walk, 0, want, NONE, excludeObjects);
+		}
 	}
 

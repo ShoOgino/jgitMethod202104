@@ -7,8 +7,9 @@
 
 		final RevCommit c;
 		c = new RevCommit(id("9473095c4cb2f12aefe1db8a355fe3fafba42f67"));
-		c.parseCanonical(new RevWalk(db), b.toString().getBytes(UTF_8));
-
+		try (RevWalk rw = new RevWalk(db)) {
+			c.parseCanonical(rw, b.toString().getBytes(UTF_8));
+		}
 		assertEquals("", c.getFullMessage());
 		assertEquals("", c.getShortMessage());
 	}
