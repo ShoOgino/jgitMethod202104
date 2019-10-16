@@ -3,7 +3,8 @@
 			throws Exception {
 		RevCommit commit = writeFileAndCommit();
 		writeFileModifiedAndCommit();
-		TreeWalk treeWalk = createTreeWalk(commit);
-		assertPaths(treeWalk, FILE);
+		try (TreeWalk treeWalk = createTreeWalk(commit)) {
+			assertPaths(treeWalk, FILE);
+		}
 	}
 

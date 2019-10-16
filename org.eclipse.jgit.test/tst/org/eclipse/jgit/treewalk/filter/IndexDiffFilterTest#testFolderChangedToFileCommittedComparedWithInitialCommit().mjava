@@ -4,7 +4,8 @@
 		RevCommit commit = writeFileInFolderAndCommit();
 		deleteAll();
 		writeFileWithFolderNameAndCommit();
-		TreeWalk treeWalk = createTreeWalk(commit);
-		assertPaths(treeWalk, FOLDER, FILE_IN_FOLDER);
+		try (TreeWalk treeWalk = createTreeWalk(commit)) {
+			assertPaths(treeWalk, FOLDER, FILE_IN_FOLDER);
+		}
 	}
 

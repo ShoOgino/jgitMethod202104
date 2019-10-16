@@ -7,17 +7,18 @@
 		writeTrashFile("sub/b.jar", "bj");
 		writeTrashFile("sub/b.xml", "bx");
 		writeTrashFile("sub/foo/b.jar", "bf");
-		walk = beginWalk();
-		assertIteration(F, ".gitattributes");
-		assertIteration(D, "foo", attrs("xml"));
-		assertIteration(F, "foo/bar.jar", attrs("jar"));
-		assertIteration(F, "foo/bar.xml");
-		assertIteration(D, "sub");
-		assertIteration(F, "sub/a.txt");
-		assertIteration(F, "sub/b.jar", attrs("jar"));
-		assertIteration(F, "sub/b.xml");
-		assertIteration(D, "sub/foo", attrs("sub xml"));
-		assertIteration(F, "sub/foo/b.jar", attrs("jar"));
-		endWalk();
+		try (TreeWalk walk = beginWalk()) {
+			assertIteration(walk, F, ".gitattributes");
+			assertIteration(walk, D, "foo", attrs("xml"));
+			assertIteration(walk, F, "foo/bar.jar", attrs("jar"));
+			assertIteration(walk, F, "foo/bar.xml");
+			assertIteration(walk, D, "sub");
+			assertIteration(walk, F, "sub/a.txt");
+			assertIteration(walk, F, "sub/b.jar", attrs("jar"));
+			assertIteration(walk, F, "sub/b.xml");
+			assertIteration(walk, D, "sub/foo", attrs("sub xml"));
+			assertIteration(walk, F, "sub/foo/b.jar", attrs("jar"));
+			assertFalse("Not all files tested", walk.next());
+		}
 	}
 

@@ -23,16 +23,18 @@
 						})
 				.create());
 
-		SubmoduleWalk gen = SubmoduleWalk.forPath(db, commit.getTree(), "sub");
-		assertEquals(path, gen.getPath());
-		assertEquals(subId, gen.getObjectId());
-		assertEquals(new File(db.getWorkTree(), path), gen.getDirectory());
-		assertNull(gen.getConfigUpdate());
-		assertNull(gen.getConfigUrl());
-		assertEquals("sub", gen.getModulesPath());
-		assertNull(gen.getModulesUpdate());
-		assertEquals("git://example.com/sub", gen.getModulesUrl());
-		assertNull(gen.getRepository());
-		assertFalse(gen.next());
+		try (SubmoduleWalk gen = SubmoduleWalk.forPath(db, commit.getTree(),
+				"sub")) {
+			assertEquals(path, gen.getPath());
+			assertEquals(subId, gen.getObjectId());
+			assertEquals(new File(db.getWorkTree(), path), gen.getDirectory());
+			assertNull(gen.getConfigUpdate());
+			assertNull(gen.getConfigUrl());
+			assertEquals("sub", gen.getModulesPath());
+			assertNull(gen.getModulesUpdate());
+			assertEquals("git://example.com/sub", gen.getModulesUrl());
+			assertNull(gen.getRepository());
+			assertFalse(gen.next());
+		}
 	}
 

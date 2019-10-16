@@ -2,7 +2,8 @@
 	public void testFileCommittedChangedNotModified() throws Exception {
 		RevCommit commit = writeFileAndCommit();
 		writeFile();
-		TreeWalk treeWalk = createTreeWalk(commit);
-		assertFalse(treeWalk.next());
+		try (TreeWalk treeWalk = createTreeWalk(commit)) {
+			assertFalse(treeWalk.next());
+		}
 	}
 

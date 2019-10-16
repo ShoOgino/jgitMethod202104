@@ -7,17 +7,17 @@
 
 		writeTrashFile("levelA/lA.txt", "");
 
-		walk = beginWalk();
+		try (TreeWalk walk = beginWalk()) {
+			assertIteration(walk, F, ".gitattributes");
 
-		assertIteration(F, ".gitattributes");
+			assertIteration(walk, D, "levelA");
+			assertIteration(walk, F, "levelA/.gitattributes");
+			assertIteration(walk, F, "levelA/lA.txt");
 
-		assertIteration(D, "levelA");
-		assertIteration(F, "levelA/.gitattributes");
-		assertIteration(F, "levelA/lA.txt");
+			assertIteration(walk, D, "levelB");
+			assertIteration(walk, F, "levelB/.gitattributes");
 
-		assertIteration(D, "levelB");
-		assertIteration(F, "levelB/.gitattributes");
-
-		endWalk();
+			assertFalse("Not all files tested", walk.next());
+		}
 	}
 

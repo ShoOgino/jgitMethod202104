@@ -7,22 +7,29 @@
 		// apply to any of the files here. It would match for a
 		// further subdirectory sub/sub. The sub/ rules must match
 		// only for directories.
-		walk = beginWalk();
-		assertIteration(F, ".gitattributes");
-		assertIteration(D, "sub", attrs("global"));
-		assertIteration(F, "sub/.gitattributes", attrs("init top_sub"));
-		assertIteration(F, "sub/a.txt", attrs("init foo top top_sub"));
-		endWalk();
+		try (TreeWalk walk = beginWalk()) {
+			assertIteration(walk, F, ".gitattributes");
+			assertIteration(walk, D, "sub", attrs("global"));
+			assertIteration(walk, F, "sub/.gitattributes",
+					attrs("init top_sub"));
+			assertIteration(walk, F, "sub/a.txt",
+					attrs("init foo top top_sub"));
+			assertFalse("Not all files tested", walk.next());
+		}
 		// All right, let's see that they *do* apply in sub/sub:
 		writeTrashFile("sub/sub/b.txt", "b");
-		walk = beginWalk();
-		assertIteration(F, ".gitattributes");
-		assertIteration(D, "sub", attrs("global"));
-		assertIteration(F, "sub/.gitattributes", attrs("init top_sub"));
-		assertIteration(F, "sub/a.txt", attrs("init foo top top_sub"));
-		assertIteration(D, "sub/sub", attrs("init subsub2 top_sub global"));
-		assertIteration(F, "sub/sub/b.txt",
-				attrs("init foo subsub top top_sub"));
-		endWalk();
+		try (TreeWalk walk = beginWalk()) {
+			assertIteration(walk, F, ".gitattributes");
+			assertIteration(walk, D, "sub", attrs("global"));
+			assertIteration(walk, F, "sub/.gitattributes",
+					attrs("init top_sub"));
+			assertIteration(walk, F, "sub/a.txt",
+					attrs("init foo top top_sub"));
+			assertIteration(walk, D, "sub/sub",
+					attrs("init subsub2 top_sub global"));
+			assertIteration(walk, F, "sub/sub/b.txt",
+					attrs("init foo subsub top top_sub"));
+			assertFalse("Not all files tested", walk.next());
+		}
 	}
 

@@ -4,13 +4,14 @@
 		writeTrashFile("sub/a.txt", "1");
 		writeTrashFile("foo/sext", "2");
 		writeTrashFile("foo/s.txt", "3");
-		walk = beginWalk();
-		assertIteration(F, ".gitattributes");
-		assertIteration(D, "foo");
-		assertIteration(F, "foo/s.txt", attrs("bar"));
-		assertIteration(F, "foo/sext", attrs("bar"));
-		assertIteration(D, "sub");
-		assertIteration(F, "sub/a.txt");
-		endWalk();
+		try (TreeWalk walk = beginWalk()) {
+			assertIteration(walk, F, ".gitattributes");
+			assertIteration(walk, D, "foo");
+			assertIteration(walk, F, "foo/s.txt", attrs("bar"));
+			assertIteration(walk, F, "foo/sext", attrs("bar"));
+			assertIteration(walk, D, "sub");
+			assertIteration(walk, F, "sub/a.txt");
+			assertFalse("Not all files tested", walk.next());
+		}
 	}
 

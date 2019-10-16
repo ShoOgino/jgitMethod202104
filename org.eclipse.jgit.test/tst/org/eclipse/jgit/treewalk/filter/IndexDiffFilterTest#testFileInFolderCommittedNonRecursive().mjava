@@ -1,7 +1,8 @@
 	@Test
 	public void testFileInFolderCommittedNonRecursive() throws Exception {
 		RevCommit commit = writeFileInFolderAndCommit();
-		TreeWalk treeWalk = createNonRecursiveTreeWalk(commit);
-		assertPaths(treeWalk, FOLDER);
+		try (TreeWalk treeWalk = createNonRecursiveTreeWalk(commit)) {
+			assertPaths(treeWalk, FOLDER);
+		}
 	}
 

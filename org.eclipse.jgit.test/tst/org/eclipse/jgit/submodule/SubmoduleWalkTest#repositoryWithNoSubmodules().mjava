@@ -1,8 +1,9 @@
 	@Test
 	public void repositoryWithNoSubmodules() throws IOException {
-		SubmoduleWalk gen = SubmoduleWalk.forIndex(db);
-		assertFalse(gen.next());
-		assertNull(gen.getPath());
-		assertEquals(ObjectId.zeroId(), gen.getObjectId());
+		try (SubmoduleWalk gen = SubmoduleWalk.forIndex(db)) {
+			assertFalse(gen.next());
+			assertNull(gen.getPath());
+			assertEquals(ObjectId.zeroId(), gen.getObjectId());
+		}
 	}
 

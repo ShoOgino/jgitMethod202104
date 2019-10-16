@@ -1,4 +1,4 @@
-	private void assertIteration(FileMode type, String pathName,
+	private void assertIteration(TreeWalk walk, FileMode type, String pathName,
 			List<Attribute> nodeAttrs) throws IOException {
 		assertTrue("walk has entry", walk.next());
 		assertEquals(pathName, walk.getPathString());
@@ -8,7 +8,7 @@
 
 		AttributesNode attributesNode = itr.getEntryAttributesNode(db
 				.newObjectReader());
-		assertAttributesNode(pathName, attributesNode, nodeAttrs);
+		assertAttributesNode(walk, pathName, attributesNode, nodeAttrs);
 
 		if (D.equals(type))
 			walk.enterSubtree();

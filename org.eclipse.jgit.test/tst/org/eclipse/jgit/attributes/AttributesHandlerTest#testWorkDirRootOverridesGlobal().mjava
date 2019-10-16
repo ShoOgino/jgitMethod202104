@@ -4,11 +4,12 @@
 				null,
 				"[attr]foo bar3", "*.txt foo");
 
-		walk = beginWalk();
-		assertIteration(F, ".gitattributes");
-		assertIteration(D, "sub");
-		assertIteration(F, "sub/.gitattributes");
-		assertIteration(F, "sub/a.txt", attrs("foo bar3"));
-		endWalk();
+		try (TreeWalk walk = beginWalk()) {
+			assertIteration(walk, F, ".gitattributes");
+			assertIteration(walk, D, "sub");
+			assertIteration(walk, F, "sub/.gitattributes");
+			assertIteration(walk, F, "sub/a.txt", attrs("foo bar3"));
+			assertFalse("Not all files tested", walk.next());
+		}
 	}
 

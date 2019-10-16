@@ -2,10 +2,12 @@
 	public void testExpandBuiltInMacro2() throws Exception {
 		setupRepo(null, null, null, "*.txt -binary");
 
-		walk = beginWalk();
-		assertIteration(D, "sub");
-		assertIteration(F, "sub/.gitattributes");
-		assertIteration(F, "sub/a.txt", attrs("-binary diff merge text"));
-		endWalk();
+		try (TreeWalk walk = beginWalk()) {
+			assertIteration(walk, D, "sub");
+			assertIteration(walk, F, "sub/.gitattributes");
+			assertIteration(walk, F, "sub/a.txt",
+					attrs("-binary diff merge text"));
+			assertFalse("Not all files tested", walk.next());
+		}
 	}
 

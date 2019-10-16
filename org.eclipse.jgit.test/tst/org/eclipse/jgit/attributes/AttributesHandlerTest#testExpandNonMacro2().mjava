@@ -2,10 +2,11 @@
 	public void testExpandNonMacro2() throws Exception {
 		setupRepo(null, null, null, "*.txt -text");
 
-		walk = beginWalk();
-		assertIteration(D, "sub");
-		assertIteration(F, "sub/.gitattributes");
-		assertIteration(F, "sub/a.txt", attrs("-text"));
-		endWalk();
+		try (TreeWalk walk = beginWalk()) {
+			assertIteration(walk, D, "sub");
+			assertIteration(walk, F, "sub/.gitattributes");
+			assertIteration(walk, F, "sub/a.txt", attrs("-text"));
+			assertFalse("Not all files tested", walk.next());
+		}
 	}
 

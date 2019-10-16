@@ -3,10 +3,11 @@
 		setupRepo(
 				"[attr]foo x -bar\n[attr]bar y -foo", null, null, "*.txt foo");
 
-		walk = beginWalk();
-		assertIteration(D, "sub");
-		assertIteration(F, "sub/.gitattributes");
-		assertIteration(F, "sub/a.txt", attrs("foo x -bar -y"));
-		endWalk();
+		try (TreeWalk walk = beginWalk()) {
+			assertIteration(walk, D, "sub");
+			assertIteration(walk, F, "sub/.gitattributes");
+			assertIteration(walk, F, "sub/a.txt", attrs("foo x -bar -y"));
+			assertFalse("Not all files tested", walk.next());
+		}
 	}
 

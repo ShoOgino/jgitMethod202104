@@ -17,8 +17,9 @@
 		assertEquals(path, result.getPath());
 		assertEquals(SubmoduleDeinitCommand.SubmoduleDeinitStatus.FORCED, result.getStatus());
 
-		SubmoduleWalk generator = SubmoduleWalk.forIndex(db);
-		assertTrue(generator.next());
+		try (SubmoduleWalk generator = SubmoduleWalk.forIndex(db)) {
+			assertTrue(generator.next());
+		}
 		assertTrue(submoduleDir.isDirectory());
 		assertEquals(0, submoduleDir.list().length);
 	}
