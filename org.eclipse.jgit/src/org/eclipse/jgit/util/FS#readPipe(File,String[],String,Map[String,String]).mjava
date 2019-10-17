@@ -61,14 +61,13 @@
 					gobbler.join();
 					if (rc == 0 && !gobbler.fail.get()) {
 						return r;
-					} else {
-						if (debug) {
-							LOG.debug("readpipe rc=" + rc); //$NON-NLS-1$
-						}
-						throw new CommandFailedException(rc,
-								gobbler.errorMessage.get(),
-								gobbler.exception.get());
 					}
+					if (debug) {
+						LOG.debug("readpipe rc=" + rc); //$NON-NLS-1$
+					}
+					throw new CommandFailedException(rc,
+							gobbler.errorMessage.get(),
+							gobbler.exception.get());
 				} catch (InterruptedException ie) {
 					// Stop bothering me, I have a zombie to reap.
 				}

@@ -17,9 +17,8 @@
 		ObjectId id = idFor(type, data, off, len);
 		if (!createDuplicate && db.has(id)) {
 			return id;
-		} else {
-			File tmp = toTemp(type, data, off, len);
-			return insertOneObject(tmp, id, createDuplicate);
 		}
+		File tmp = toTemp(type, data, off, len);
+		return insertOneObject(tmp, id, createDuplicate);
 	}
 

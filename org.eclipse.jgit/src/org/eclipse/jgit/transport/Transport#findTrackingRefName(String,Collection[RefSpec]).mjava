@@ -3,11 +3,11 @@
 		// try to find matching tracking refs
 		for (RefSpec fetchSpec : fetchSpecs) {
 			if (fetchSpec.matchSource(remoteName)) {
-				if (fetchSpec.isWildcard())
+				if (fetchSpec.isWildcard()) {
 					return fetchSpec.expandFromSource(remoteName)
 							.getDestination();
-				else
-					return fetchSpec.getDestination();
+				}
+				return fetchSpec.getDestination();
 			}
 		}
 		return null;

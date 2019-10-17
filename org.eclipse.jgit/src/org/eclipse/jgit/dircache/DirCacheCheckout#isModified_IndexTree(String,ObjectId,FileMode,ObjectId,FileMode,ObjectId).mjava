@@ -1,12 +1,13 @@
 	private boolean isModified_IndexTree(String path, ObjectId iId,
 			FileMode iMode, ObjectId tId, FileMode tMode, ObjectId rootTree)
 			throws CorruptObjectException, IOException {
-		if (iMode != tMode)
+		if (iMode != tMode) {
 			return true;
+		}
 		if (FileMode.TREE.equals(iMode)
-				&& (iId == null || ObjectId.zeroId().equals(iId)))
+				&& (iId == null || ObjectId.zeroId().equals(iId))) {
 			return isModifiedSubtree_IndexTree(path, rootTree);
-		else
-			return !equalIdAndMode(iId, iMode, tId, tMode);
+		}
+		return !equalIdAndMode(iId, iMode, tId, tMode);
 	}
 

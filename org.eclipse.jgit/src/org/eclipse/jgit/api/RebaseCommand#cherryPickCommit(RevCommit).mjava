@@ -6,10 +6,10 @@
 			monitor.beginTask(MessageFormat.format(
 					JGitText.get().applyingCommit,
 					commitToPick.getShortMessage()), ProgressMonitor.UNKNOWN);
-			if (preserveMerges)
+			if (preserveMerges) {
 				return cherryPickCommitPreservingMerges(commitToPick);
-			else
-				return cherryPickCommitFlattening(commitToPick);
+			}
+			return cherryPickCommitFlattening(commitToPick);
 		} finally {
 			monitor.endTask();
 		}

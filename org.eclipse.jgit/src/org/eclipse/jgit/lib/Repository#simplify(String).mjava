@@ -16,11 +16,12 @@
 		try (RevWalk rw = new RevWalk(this)) {
 			rw.setRetainBody(true);
 			Object resolved = resolve(rw, revstr);
-			if (resolved != null)
-				if (resolved instanceof String)
+			if (resolved != null) {
+				if (resolved instanceof String) {
 					return (String) resolved;
-				else
-					return ((AnyObjectId) resolved).getName();
+				}
+				return ((AnyObjectId) resolved).getName();
+			}
 			return null;
 		}
 	}

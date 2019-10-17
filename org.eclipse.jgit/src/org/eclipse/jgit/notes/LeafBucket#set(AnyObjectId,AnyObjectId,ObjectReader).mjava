@@ -7,25 +7,23 @@
 				notes[p].setData(noteData.copy());
 				return this;
 
-			} else {
-				System.arraycopy(notes, p + 1, notes, p, cnt - p - 1);
-				cnt--;
-				return 0 < cnt ? this : null;
 			}
+			System.arraycopy(notes, p + 1, notes, p, cnt - p - 1);
+			cnt--;
+			return 0 < cnt ? this : null;
 
 		} else if (noteData != null) {
 			if (shouldSplit()) {
 				return split().set(noteOn, noteData, or);
-
-			} else {
-				growIfFull();
-				p = -(p + 1);
-				if (p < cnt)
-					System.arraycopy(notes, p, notes, p + 1, cnt - p);
-				notes[p] = new Note(noteOn, noteData.copy());
-				cnt++;
-				return this;
 			}
+			growIfFull();
+			p = -(p + 1);
+			if (p < cnt) {
+				System.arraycopy(notes, p, notes, p + 1, cnt - p);
+			}
+			notes[p] = new Note(noteOn, noteData.copy());
+			cnt++;
+			return this;
 
 		} else {
 			return this;

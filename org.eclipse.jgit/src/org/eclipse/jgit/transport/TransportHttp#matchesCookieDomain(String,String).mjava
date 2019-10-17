@@ -45,12 +45,10 @@
 		host = host.toLowerCase(Locale.ROOT);
 		if (host.equals(cookieDomain)) {
 			return true;
-		} else {
-			if (!host.endsWith(cookieDomain)) {
-				return false;
-			}
-			return host
-					.charAt(host.length() - cookieDomain.length() - 1) == '.';
 		}
+		if (!host.endsWith(cookieDomain)) {
+			return false;
+		}
+		return host.charAt(host.length() - cookieDomain.length() - 1) == '.';
 	}
 

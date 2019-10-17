@@ -26,13 +26,12 @@
 			entry.setLength((int) getEntryLength());
 
 			return false;
-		} else {
-			if (mode == FileMode.SYMLINK.getBits()) {
-				return !new File(readSymlinkTarget(current())).equals(
-						new File(readContentAsNormalizedString(entry, reader)));
-			}
-			// Content differs: that's a real change
-			return true;
 		}
+		if (mode == FileMode.SYMLINK.getBits()) {
+			return !new File(readSymlinkTarget(current())).equals(
+					new File(readContentAsNormalizedString(entry, reader)));
+		}
+		// Content differs: that's a real change
+		return true;
 	}
 

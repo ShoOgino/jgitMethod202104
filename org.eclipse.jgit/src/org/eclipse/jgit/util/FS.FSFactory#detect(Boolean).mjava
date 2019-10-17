@@ -6,14 +6,14 @@
 		 */
 		public FS detect(Boolean cygwinUsed) {
 			if (SystemReader.getInstance().isWindows()) {
-				if (cygwinUsed == null)
+				if (cygwinUsed == null) {
 					cygwinUsed = Boolean.valueOf(FS_Win32_Cygwin.isCygwin());
-				if (cygwinUsed.booleanValue())
+				}
+				if (cygwinUsed.booleanValue()) {
 					return new FS_Win32_Cygwin();
-				else
-					return new FS_Win32();
-			} else {
-				return new FS_POSIX();
+				}
+				return new FS_Win32();
 			}
+			return new FS_POSIX();
 		}
 
