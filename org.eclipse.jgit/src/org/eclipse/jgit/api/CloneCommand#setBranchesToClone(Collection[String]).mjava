@@ -13,7 +13,13 @@
 	 * @return {@code this}
 	 */
 	public CloneCommand setBranchesToClone(Collection<String> branchesToClone) {
-		this.branchesToClone = branchesToClone;
+		if (branchesToClone == null || branchesToClone.isEmpty()) {
+			// fallback to default
+			fetchType = FETCH_TYPE.ALL_BRANCHES;
+		} else {
+			this.fetchType = FETCH_TYPE.MULTIPLE_BRANCHES;
+			this.branchesToClone = branchesToClone;
+		}
 		return this;
 	}
 

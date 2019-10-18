@@ -1,0 +1,23 @@
+	/**
+	 * Set up a mirror of the source repository. This implies that a bare
+	 * repository will be created. Compared to {@link #setBare},
+	 * {@code #setMirror} not only maps local branches of the source to local
+	 * branches of the target, it maps all refs (including remote-tracking
+	 * branches, notes etc.) and sets up a refspec configuration such that all
+	 * these refs are overwritten by a git remote update in the target
+	 * repository.
+	 *
+	 * @param mirror
+	 *            whether to mirror all refs from the source repository
+	 *
+	 * @return {@code this}
+	 * @since 5.6
+	 */
+	public CloneCommand setMirror(boolean mirror) {
+		if (mirror) {
+			this.fetchType = FETCH_TYPE.MIRROR;
+			setBare(true);
+		}
+		return this;
+	}
+

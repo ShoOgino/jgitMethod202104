@@ -8,10 +8,15 @@
 		writeTrashFile("Test.txt", "Hello world");
 		git.add().addFilepattern("Test.txt").call();
 		git.commit().setMessage("Initial commit").call();
-		git.tag().setName("tag-initial").setMessage("Tag initial").call();
+		Ref head = git.tag().setName("tag-initial").setMessage("Tag initial")
+				.call();
 
 		// create a test branch and switch to it
 		git.checkout().setCreateBranch(true).setName("test").call();
+		// create a non-standard ref
+		RefUpdate ru = db.updateRef("refs/meta/foo/bar");
+		ru.setNewObjectId(head.getObjectId());
+		ru.update();
 
 		// commit something on the test branch
 		writeTrashFile("Test.txt", "Some change");

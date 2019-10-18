@@ -6,12 +6,11 @@
 		RemoteConfig config = new RemoteConfig(clonedRepo.getConfig(), remote);
 		config.addURI(u);
 
-		final String dst = (bare ? Constants.R_HEADS : Constants.R_REMOTES
-				+ config.getName() + '/') + '*';
-		boolean fetchAll = cloneAllBranches || branchesToClone == null
-				|| branchesToClone.isEmpty();
+		boolean fetchAll = fetchType == FETCH_TYPE.ALL_BRANCHES
+				|| fetchType == FETCH_TYPE.MIRROR;
 
-		config.setFetchRefSpecs(calculateRefSpecs(fetchAll, dst));
+		config.setFetchRefSpecs(calculateRefSpecs(fetchType, config.getName()));
+		config.setMirror(fetchType == FETCH_TYPE.MIRROR);
 		config.update(clonedRepo.getConfig());
 
 		clonedRepo.getConfig().save();
