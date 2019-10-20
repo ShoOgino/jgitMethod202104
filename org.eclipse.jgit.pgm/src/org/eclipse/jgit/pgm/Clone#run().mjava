@@ -9,7 +9,7 @@
 		if (localName == null) {
 			try {
 				localName = uri.getHumanishName();
-				if (isBare) {
+				if (isBare || isMirror) {
 					localName = localName + Constants.DOT_GIT_EXT;
 				}
 				localNameF = new File(SystemReader.getInstance().getProperty(
@@ -26,6 +26,7 @@
 
 		CloneCommand command = Git.cloneRepository();
 		command.setURI(sourceUri).setRemote(remoteName).setBare(isBare)
+				.setMirror(isMirror)
 				.setNoCheckout(noCheckout).setBranch(branch)
 				.setCloneSubmodules(cloneSubmodules);
 
