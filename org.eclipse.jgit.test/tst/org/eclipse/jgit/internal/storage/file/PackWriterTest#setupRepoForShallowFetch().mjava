@@ -1,5 +1,8 @@
 	private FileRepository setupRepoForShallowFetch() throws Exception {
 		FileRepository repo = createBareRepository();
+		// TestRepository will close the repo, but we need to return an open
+		// one!
+		repo.incrementOpen();
 		try (TestRepository<Repository> r = new TestRepository<>(repo)) {
 			BranchBuilder bb = r.branch("refs/heads/master");
 			contentA = r.blob("A");

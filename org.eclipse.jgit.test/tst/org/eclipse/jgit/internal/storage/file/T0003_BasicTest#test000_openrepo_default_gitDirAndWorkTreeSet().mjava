@@ -14,13 +14,14 @@
 		}
 
 		File theDir = new File(repo1Parent, Constants.DOT_GIT);
-		FileRepository r = (FileRepository) new FileRepositoryBuilder()
+		try (FileRepository r = (FileRepository) new FileRepositoryBuilder()
 				.setGitDir(theDir).setWorkTree(repo1Parent.getParentFile())
-				.build();
-		assertEqualsPath(theDir, r.getDirectory());
-		assertEqualsPath(repo1Parent.getParentFile(), r.getWorkTree());
-		assertEqualsPath(new File(theDir, "index"), r.getIndexFile());
-		assertEqualsPath(new File(theDir, Constants.OBJECTS), r.getObjectDatabase()
-				.getDirectory());
+				.build()) {
+			assertEqualsPath(theDir, r.getDirectory());
+			assertEqualsPath(repo1Parent.getParentFile(), r.getWorkTree());
+			assertEqualsPath(new File(theDir, "index"), r.getIndexFile());
+			assertEqualsPath(new File(theDir, Constants.OBJECTS),
+					r.getObjectDatabase().getDirectory());
+		}
 	}
 

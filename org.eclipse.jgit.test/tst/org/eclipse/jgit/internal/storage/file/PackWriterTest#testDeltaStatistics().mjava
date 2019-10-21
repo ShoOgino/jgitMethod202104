@@ -1,22 +1,22 @@
 	@Test
 	public void testDeltaStatistics() throws Exception {
 		config.setDeltaCompress(true);
+		// TestRepository will close repo
 		FileRepository repo = createBareRepository();
 		ArrayList<RevObject> blobs = new ArrayList<>();
 		try (TestRepository<FileRepository> testRepo = new TestRepository<>(
 				repo)) {
 			blobs.add(testRepo.blob(genDeltableData(1000)));
 			blobs.add(testRepo.blob(genDeltableData(1005)));
-		}
-
-		try (PackWriter pw = new PackWriter(repo)) {
-			NullProgressMonitor m = NullProgressMonitor.INSTANCE;
-			pw.preparePack(blobs.iterator());
-			pw.writePack(m, m, os);
-			PackStatistics stats = pw.getStatistics();
-			assertEquals(1, stats.getTotalDeltas());
-			assertTrue("Delta bytes not set.",
-					stats.byObjectType(OBJ_BLOB).getDeltaBytes() > 0);
+			try (PackWriter pw = new PackWriter(repo)) {
+				NullProgressMonitor m = NullProgressMonitor.INSTANCE;
+				pw.preparePack(blobs.iterator());
+				pw.writePack(m, m, os);
+				PackStatistics stats = pw.getStatistics();
+				assertEquals(1, stats.getTotalDeltas());
+				assertTrue("Delta bytes not set.",
+						stats.byObjectType(OBJ_BLOB).getDeltaBytes() > 0);
+			}
 		}
 	}
 
