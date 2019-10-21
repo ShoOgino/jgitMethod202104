@@ -1,8 +1,10 @@
 	@Test
 	public void testGarbageSelectivelyVisible() throws IOException {
-		ObjectInserter ins = db.newObjectInserter();
-		ObjectId fooId = ins.insert(Constants.OBJ_BLOB, Constants.encode("foo"));
-		ins.flush();
+		ObjectId fooId;
+		try (ObjectInserter ins = db.newObjectInserter()) {
+			fooId = ins.insert(Constants.OBJ_BLOB, Constants.encode("foo"));
+			ins.flush();
+		}
 		assertEquals(1, db.getObjectDatabase().listPacks().size());
 
 		// Make pack 0 garbage.

@@ -9,8 +9,9 @@
 				called[0] = true;
 			}
 		};
-		final ObjectReader reader = db.newObjectReader();
-		parent.createSubtreeIterator(reader).stopWalk();
+		try (ObjectReader reader = db.newObjectReader()) {
+			parent.createSubtreeIterator(reader).stopWalk();
+		}
 		assertTrue(called[0]);
 	}
 

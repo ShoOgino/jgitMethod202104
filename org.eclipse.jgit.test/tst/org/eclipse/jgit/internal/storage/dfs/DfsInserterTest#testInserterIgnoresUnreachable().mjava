@@ -1,34 +1,38 @@
 	@Test
 	public void testInserterIgnoresUnreachable() throws IOException {
-		ObjectInserter ins = db.newObjectInserter();
-		ObjectId fooId = ins.insert(Constants.OBJ_BLOB, Constants.encode("foo"));
-		ins.flush();
-		assertEquals(1, db.getObjectDatabase().listPacks().size());
+		ObjectId fooId;
+		try (ObjectInserter ins = db.newObjectInserter()) {
+			fooId = ins.insert(Constants.OBJ_BLOB, Constants.encode("foo"));
+			ins.flush();
+			assertEquals(1, db.getObjectDatabase().listPacks().size());
 
-		// Make pack 0 garbage.
-		db.getObjectDatabase().listPacks().get(0).setPackSource(PackSource.UNREACHABLE_GARBAGE);
+			// Make pack 0 garbage.
+			db.getObjectDatabase().listPacks().get(0)
+					.setPackSource(PackSource.UNREACHABLE_GARBAGE);
 
-		// We shouldn't be able to see foo because it's garbage.
-		assertFalse(db.getObjectDatabase().has(fooId, true));
+			// We shouldn't be able to see foo because it's garbage.
+			assertFalse(db.getObjectDatabase().has(fooId, true));
 
-		// But if we re-insert foo, it should become visible again.
-		ins.insert(Constants.OBJ_BLOB, Constants.encode("foo"));
-		ins.flush();
+			// But if we re-insert foo, it should become visible again.
+			ins.insert(Constants.OBJ_BLOB, Constants.encode("foo"));
+			ins.flush();
+		}
 		assertTrue(db.getObjectDatabase().has(fooId, true));
 
 		// Verify that we have a foo in both packs, and 1 of them is garbage.
-		DfsReader reader = new DfsReader(db.getObjectDatabase());
-		DfsPackFile packs[] = db.getObjectDatabase().getPacks();
-		Set<PackSource> pack_sources = new HashSet<>();
+		try (DfsReader reader = new DfsReader(db.getObjectDatabase())) {
+			DfsPackFile packs[] = db.getObjectDatabase().getPacks();
+			Set<PackSource> pack_sources = new HashSet<>();
 
-		assertEquals(2, packs.length);
+			assertEquals(2, packs.length);
 
-		pack_sources.add(packs[0].getPackDescription().getPackSource());
-		pack_sources.add(packs[1].getPackDescription().getPackSource());
+			pack_sources.add(packs[0].getPackDescription().getPackSource());
+			pack_sources.add(packs[1].getPackDescription().getPackSource());
 
-		assertTrue(packs[0].hasObject(reader, fooId));
-		assertTrue(packs[1].hasObject(reader, fooId));
-		assertTrue(pack_sources.contains(PackSource.UNREACHABLE_GARBAGE));
-		assertTrue(pack_sources.contains(PackSource.INSERT));
+			assertTrue(packs[0].hasObject(reader, fooId));
+			assertTrue(packs[1].hasObject(reader, fooId));
+			assertTrue(pack_sources.contains(PackSource.UNREACHABLE_GARBAGE));
+			assertTrue(pack_sources.contains(PackSource.INSERT));
+		}
 	}
 
