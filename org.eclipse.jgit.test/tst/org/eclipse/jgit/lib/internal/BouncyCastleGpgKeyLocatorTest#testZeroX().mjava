@@ -1,0 +1,11 @@
+	@Test
+	public void testZeroX() throws Exception {
+		assertTrue(match("John Fade <0xfade@example.com>", "0x"));
+		assertTrue(match("John Fade <0xfade@example.com>", "*0x"));
+		assertTrue(match("John Fade <0xfade@example.com>", "*0xfade"));
+		assertTrue(match("John Fade <0xfade@example.com>", "*0xFADE"));
+		assertTrue(match("John Fade <0xfade@example.com>", "@0xfade"));
+		assertFalse(match("John Fade <0xfade@example.com>", "@0xFADE"));
+		assertFalse(match("", "0x"));
+	}
+

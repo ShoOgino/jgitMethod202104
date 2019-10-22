@@ -1,0 +1,18 @@
+	private void substringTests(String prefix) throws Exception {
+		assertTrue(match(USER_ID, prefix + "heinrichh@uni-duesseldorf.de"));
+		assertTrue(match(USER_ID, prefix + "heinrich"));
+		assertTrue(match(USER_ID, prefix + "HEIN"));
+		assertTrue(match(USER_ID, prefix + "Heine <"));
+		assertTrue(match(USER_ID, prefix + "UNI"));
+		assertTrue(match(USER_ID, prefix + "uni"));
+		assertTrue(match(USER_ID, prefix + "rich He"));
+		assertTrue(match(USER_ID, prefix + "h@u"));
+		assertTrue(match(USER_ID, prefix + USER_ID));
+		assertTrue(match(USER_ID, prefix + USER_ID.toUpperCase(Locale.ROOT)));
+		assertFalse(match(USER_ID, prefix + ""));
+		assertFalse(match(USER_ID, prefix + " "));
+		assertFalse(match(USER_ID, prefix + "yy"));
+		assertFalse(match("", prefix + ""));
+		assertFalse(match("", prefix + "uni"));
+	}
+

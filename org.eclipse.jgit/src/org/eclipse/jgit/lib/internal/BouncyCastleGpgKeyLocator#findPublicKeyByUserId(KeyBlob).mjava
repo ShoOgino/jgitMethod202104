@@ -1,7 +1,7 @@
 	private PGPPublicKey findPublicKeyByUserId(KeyBlob keyBlob)
 			throws IOException {
 		for (UserID userID : keyBlob.getUserIds()) {
-			if (containsSigningKey(userID.getUserIDAsString())) {
+			if (containsSigningKey(userID.getUserIDAsString(), signingKey)) {
 				return getSigningPublicKey(keyBlob);
 			}
 		}

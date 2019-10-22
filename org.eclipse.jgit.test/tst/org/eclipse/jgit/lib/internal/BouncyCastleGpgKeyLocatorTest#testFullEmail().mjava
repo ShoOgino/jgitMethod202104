@@ -1,0 +1,16 @@
+	@Test
+	public void testFullEmail() throws Exception {
+		assertTrue(match(USER_ID, "<heinrichh@uni-duesseldorf.de>"));
+		assertTrue(match(USER_ID + " ", "<heinrichh@uni-duesseldorf.de>"));
+		assertFalse(match(USER_ID, "<>"));
+		assertFalse(match(USER_ID, "<h>"));
+		assertFalse(match(USER_ID, "<heinrichh>"));
+		assertFalse(match(USER_ID, "<uni-duesseldorf>"));
+		assertFalse(match(USER_ID, "<h@u>"));
+		assertFalse(match(USER_ID, "<HeinrichH@uni-duesseldorf.de>"));
+		assertFalse(match(USER_ID.substring(0, USER_ID.length() - 1),
+				"<heinrichh@uni-duesseldorf.de>"));
+		assertFalse(match("", "<>"));
+		assertFalse(match("", "<heinrichh@uni-duesseldorf.de>"));
+	}
+

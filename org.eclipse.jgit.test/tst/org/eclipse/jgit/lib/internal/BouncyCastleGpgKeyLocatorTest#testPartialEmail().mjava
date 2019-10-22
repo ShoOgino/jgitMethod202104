@@ -1,0 +1,18 @@
+	@Test
+	public void testPartialEmail() throws Exception {
+		assertTrue(match(USER_ID, "@heinrichh@uni-duesseldorf.de"));
+		assertTrue(match(USER_ID, "@heinrichh"));
+		assertTrue(match(USER_ID, "@duesseldorf"));
+		assertTrue(match(USER_ID, "@uni-d"));
+		assertTrue(match(USER_ID, "@h"));
+		assertTrue(match(USER_ID, "@."));
+		assertTrue(match(USER_ID, "@h@u"));
+		assertFalse(match(USER_ID, "@ "));
+		assertFalse(match(USER_ID, "@"));
+		assertFalse(match(USER_ID, "@Heine"));
+		assertFalse(match(USER_ID, "@HeinrichH"));
+		assertFalse(match(USER_ID, "@Heinrich"));
+		assertFalse(match("", "@"));
+		assertFalse(match("", "@h"));
+	}
+

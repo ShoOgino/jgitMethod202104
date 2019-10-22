@@ -16,7 +16,7 @@
 					new BufferedInputStream(in),
 					new JcaKeyFingerprintCalculator());
 
-			String keyId = signingKey.toLowerCase(Locale.ROOT);
+			String keyId = toFingerprint(signingKey).toLowerCase(Locale.ROOT);
 			Iterator<PGPPublicKeyRing> keyrings = pgpPub.getKeyRings();
 			while (keyrings.hasNext()) {
 				PGPPublicKeyRing keyRing = keyrings.next();
@@ -33,7 +33,7 @@
 					Iterator<String> userIDs = key.getUserIDs();
 					while (userIDs.hasNext()) {
 						String userId = userIDs.next();
-						if (containsSigningKey(userId)) {
+						if (containsSigningKey(userId, signingKey)) {
 							return key;
 						}
 					}
