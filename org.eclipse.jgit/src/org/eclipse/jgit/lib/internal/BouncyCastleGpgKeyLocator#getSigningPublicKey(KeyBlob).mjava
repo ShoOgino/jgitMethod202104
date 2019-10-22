@@ -1,0 +1,20 @@
+	private PGPPublicKey getSigningPublicKey(KeyBlob blob) throws IOException {
+		PGPPublicKey masterKey = null;
+		Iterator<PGPPublicKey> keys = ((PublicKeyRingBlob) blob)
+				.getPGPPublicKeyRing().getPublicKeys();
+		while (keys.hasNext()) {
+			PGPPublicKey key = keys.next();
+			// only consider keys that have the [S] usage flag set
+			if (isSigningKey(key)) {
+				if (key.isMasterKey()) {
+					masterKey = key;
+				} else {
+					return key;
+				}
+			}
+		}
+		// return the master key if no other signing key was found or null if
+		// the master key did not have the signing flag set
+		return masterKey;
+	}
+
