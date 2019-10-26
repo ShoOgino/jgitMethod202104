@@ -22,11 +22,11 @@
 			if (c == null) {
 				break;
 			}
-			for (int i = 0; i < c.parents.length; i++) {
-				if (firstParent && i > 0) {
+			for (RevCommit p : c.parents) {
+				p.inDegree++;
+				if (firstParent) {
 					break;
 				}
-				c.parents[i].inDegree++;
 			}
 			pending.add(c);
 		}
