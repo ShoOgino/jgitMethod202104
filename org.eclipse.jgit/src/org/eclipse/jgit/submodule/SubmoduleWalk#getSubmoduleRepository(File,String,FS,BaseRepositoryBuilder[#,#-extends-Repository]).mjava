@@ -1,0 +1,37 @@
+	/**
+	 * Get submodule repository at path, using the specified file system
+	 * abstraction and the specified builder
+	 *
+	 * @param parent
+	 *            {@link Repository} that contains the submodule
+	 * @param path
+	 *            of the working tree of the submodule
+	 * @param fs
+	 *            {@link FS} to use
+	 * @param builder
+	 *            {@link BaseRepositoryBuilder} to use to build the submodule
+	 *            repository
+	 * @return the {@link Repository} of the submodule, or {@code null} if it
+	 *         doesn't exist
+	 * @throws IOException
+	 *             on errors
+	 * @since 5.6
+	 */
+	public static Repository getSubmoduleRepository(File parent, String path,
+			FS fs, BaseRepositoryBuilder<?, ? extends Repository> builder)
+			throws IOException {
+		File subWorkTree = new File(parent, path);
+		if (!subWorkTree.isDirectory()) {
+			return null;
+		}
+		try {
+			return builder //
+					.setMustExist(true) //
+					.setFS(fs) //
+					.setWorkTree(subWorkTree) //
+					.build();
+		} catch (RepositoryNotFoundException e) {
+			return null;
+		}
+	}
+

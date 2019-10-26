@@ -1,0 +1,25 @@
+	/**
+	 * Run the diff operation. Until this is called, all lists will be empty.
+	 * Use
+	 * {@link #diff(ProgressMonitor, int, int, String, RepositoryBuilderFactory)}
+	 * if a progress monitor is required.
+	 * <p>
+	 * The operation may create repositories for submodules using builders
+	 * provided by the given {@code factory}, if any, and will also close these
+	 * submodule repositories again.
+	 * </p>
+	 *
+	 * @param factory
+	 *            the {@link RepositoryBuilderFactory} to use to create builders
+	 *            to create submodule repositories, if needed; if {@code null},
+	 *            submodule repositories will be built using a plain
+	 *            {@link RepositoryBuilder}.
+	 * @return if anything is different between index, tree, and workdir
+	 * @throws java.io.IOException
+	 * @since 5.6
+	 */
+	public boolean diff(RepositoryBuilderFactory factory)
+			throws IOException {
+		return diff(null, 0, 0, "", factory); //$NON-NLS-1$
+	}
+
