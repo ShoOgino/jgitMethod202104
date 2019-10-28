@@ -3,6 +3,11 @@
 		this.closeReader = closeReader;
 		this.reader = reader;
 		this.diffCfg = cfg.get(DiffConfig.KEY);
+		if (quotePaths == null) {
+			quotePaths = Boolean
+					.valueOf(cfg.getBoolean(ConfigConstants.CONFIG_CORE_SECTION,
+							ConfigConstants.CONFIG_KEY_QUOTE_PATH, true));
+		}
 
 		ContentSource cs = ContentSource.create(reader);
 		source = new ContentSource.Pair(cs, cs);

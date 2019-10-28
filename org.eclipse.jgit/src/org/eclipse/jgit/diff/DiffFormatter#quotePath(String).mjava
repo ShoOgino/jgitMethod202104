@@ -1,4 +1,7 @@
-	private static String quotePath(String name) {
-		return QuotedString.GIT_PATH.quote(name);
+	private String quotePath(String path) {
+		if (quotePaths == null || quotePaths.booleanValue()) {
+			return QuotedString.GIT_PATH.quote(path);
+		}
+		return QuotedString.GIT_PATH_MINIMAL.quote(path);
 	}
 
