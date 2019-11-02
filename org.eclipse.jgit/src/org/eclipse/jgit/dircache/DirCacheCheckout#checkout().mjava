@@ -24,8 +24,11 @@
 				dc.unlock();
 			} finally {
 				if (performingCheckout) {
+					Set<String> touched = new HashSet<>(conflicts);
+					touched.addAll(getUpdated().keySet());
+					touched.addAll(kept);
 					WorkingTreeModifiedEvent event = new WorkingTreeModifiedEvent(
-							getUpdated().keySet(), getRemoved());
+							touched, getRemoved());
 					if (!event.isEmpty()) {
 						repo.fireEvent(event);
 					}

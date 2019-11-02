@@ -52,11 +52,11 @@
 					if (mtime == null || mtime.equals(Instant.EPOCH)) {
 						entry.setLastModified(f.getEntryLastModifiedInstant());
 					}
-					keep(entry, f);
+					keep(i.getEntryPathString(), entry, f);
 				}
 			} else
 				// The index contains a folder
-				keep(i.getDirCacheEntry(), f);
+				keep(i.getEntryPathString(), i.getDirCacheEntry(), f);
 		} else {
 			// There is no entry in the merge commit. Means: we want to delete
 			// what's currently in the index and working tree

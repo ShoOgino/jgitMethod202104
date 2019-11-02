@@ -60,6 +60,10 @@
 						+ "This reverts commit " + srcCommit.getId().getName() //$NON-NLS-1$
 						+ ".\n"; //$NON-NLS-1$
 				if (merger.merge(headCommit, srcParent)) {
+					if (!merger.getModifiedFiles().isEmpty()) {
+						repo.fireEvent(new WorkingTreeModifiedEvent(
+								merger.getModifiedFiles(), null));
+					}
 					if (AnyObjectId.isEqual(headCommit.getTree().getId(),
 							merger.getResultTreeId()))
 						continue;

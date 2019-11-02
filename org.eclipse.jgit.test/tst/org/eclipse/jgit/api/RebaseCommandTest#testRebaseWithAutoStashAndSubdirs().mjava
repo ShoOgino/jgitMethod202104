@@ -28,10 +28,9 @@
 		checkoutBranch("refs/heads/topic");
 		writeTrashFile("sub/file0", "unstaged modified file0");
 
-		Set<String> modifiedFiles = new HashSet<>();
+		ChangeRecorder recorder = new ChangeRecorder();
 		ListenerHandle handle = db.getListenerList()
-				.addWorkingTreeModifiedListener(
-						event -> modifiedFiles.addAll(event.getModified()));
+				.addWorkingTreeModifiedListener(recorder);
 		try {
 			// rebase
 			assertEquals(Status.OK, git.rebase()
@@ -49,8 +48,7 @@
 						+ "[sub/file0, mode:100644, content:file0]",
 				indexState(CONTENT));
 		assertEquals(RepositoryState.SAFE, db.getRepositoryState());
-		List<String> modified = new ArrayList<>(modifiedFiles);
-		Collections.sort(modified);
-		assertEquals("[file1, sub/file0]", modified.toString());
+		recorder.assertEvent(new String[] { "file1", "file2", "sub/file0" },
+				new String[0]);
 	}
 
