@@ -93,16 +93,16 @@
 				try {
 					oldObj = walk.parseAny(cmd.getOldId());
 				} catch (IOException e) {
-					cmd.setResult(Result.REJECTED_MISSING_OBJECT,
-							cmd.getOldId().name());
+					receiveCommandErrorHandler
+							.handleOldIdValidationException(cmd, e);
 					continue;
 				}
 
 				try {
 					newObj = walk.parseAny(cmd.getNewId());
 				} catch (IOException e) {
-					cmd.setResult(Result.REJECTED_MISSING_OBJECT,
-							cmd.getNewId().name());
+					receiveCommandErrorHandler
+							.handleNewIdValidationException(cmd, e);
 					continue;
 				}
 
@@ -110,16 +110,14 @@
 						&& newObj instanceof RevCommit) {
 					try {
 						if (walk.isMergedInto((RevCommit) oldObj,
-								(RevCommit) newObj))
+								(RevCommit) newObj)) {
 							cmd.setTypeFastForwardUpdate();
-						else
-							cmd.setType(
-									ReceiveCommand.Type.UPDATE_NONFASTFORWARD);
-					} catch (MissingObjectException e) {
-						cmd.setResult(Result.REJECTED_MISSING_OBJECT,
-								e.getMessage());
+						} else {
+							cmd.setType(ReceiveCommand.Type.UPDATE_NONFASTFORWARD);
+						}
 					} catch (IOException e) {
-						cmd.setResult(Result.REJECTED_OTHER_REASON);
+						receiveCommandErrorHandler
+								.handleFastForwardCheckException(cmd, e);
 					}
 				} else {
 					cmd.setType(ReceiveCommand.Type.UPDATE_NONFASTFORWARD);

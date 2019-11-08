@@ -22,11 +22,9 @@
 		try {
 			batch.setPushCertificate(getPushCertificate());
 			batch.execute(walk, updating);
-		} catch (IOException err) {
-			for (ReceiveCommand cmd : toApply) {
-				if (cmd.getResult() == Result.NOT_ATTEMPTED)
-					cmd.reject(err);
-			}
+		} catch (IOException e) {
+			receiveCommandErrorHandler.handleBatchRefUpdateException(toApply,
+					e);
 		}
 	}
 

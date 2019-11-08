@@ -1,0 +1,17 @@
+	/**
+	 * Handle an exception thrown while checking if the update is fast-forward.
+	 *
+	 * @param cmd
+	 *            offending command
+	 * @param e
+	 *            exception thrown
+	 */
+	default void handleFastForwardCheckException(ReceiveCommand cmd,
+			IOException e) {
+		if (e instanceof MissingObjectException) {
+			cmd.setResult(Result.REJECTED_MISSING_OBJECT, e.getMessage());
+		} else {
+			cmd.setResult(Result.REJECTED_OTHER_REASON);
+		}
+	}
+

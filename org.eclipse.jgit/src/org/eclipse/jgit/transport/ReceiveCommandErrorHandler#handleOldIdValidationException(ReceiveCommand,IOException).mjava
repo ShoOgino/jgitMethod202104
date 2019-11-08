@@ -1,0 +1,13 @@
+	/**
+	 * Handle an exception thrown while validating the old commit ID.
+	 *
+	 * @param cmd
+	 *            offending command
+	 * @param e
+	 *            exception thrown
+	 */
+	default void handleOldIdValidationException(ReceiveCommand cmd,
+			IOException e) {
+		cmd.setResult(Result.REJECTED_MISSING_OBJECT, cmd.getOldId().name());
+	}
+
