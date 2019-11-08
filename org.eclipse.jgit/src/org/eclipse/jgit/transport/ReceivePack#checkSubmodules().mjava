@@ -1,4 +1,5 @@
-	private void checkSubmodules() throws IOException {
+	private void checkSubmodules() throws IOException, LargeObjectException,
+			SubmoduleValidationException {
 		ObjectDatabase odb = db.getObjectDatabase();
 		if (objectChecker == null) {
 			return;
@@ -7,12 +8,8 @@
 			AnyObjectId blobId = entry.getBlobId();
 			ObjectLoader blob = odb.open(blobId, Constants.OBJ_BLOB);
 
-			try {
-				SubmoduleValidator.assertValidGitModulesFile(
-						new String(blob.getBytes(), UTF_8));
-			} catch (LargeObjectException | SubmoduleValidationException e) {
-				throw new IOException(e);
-			}
+			SubmoduleValidator.assertValidGitModulesFile(
+					new String(blob.getBytes(), UTF_8));
 		}
 	}
 
