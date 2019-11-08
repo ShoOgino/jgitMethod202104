@@ -12,7 +12,9 @@
 			log(up.getRepository(), e);
 			if (!rsp.isCommitted()) {
 				rsp.reset();
-				sendError(req, rsp, SC_INTERNAL_SERVER_ERROR);
+				String msg = e instanceof PackProtocolException ? e.getMessage()
+						: null;
+				sendError(req, rsp, SC_INTERNAL_SERVER_ERROR, msg);
 			}
 		}
 	}
