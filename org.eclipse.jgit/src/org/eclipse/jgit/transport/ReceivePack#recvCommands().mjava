@@ -61,15 +61,9 @@
 			if (hasCommands()) {
 				readPostCommands(pck);
 			}
-		} catch (PackProtocolException e) {
+		} catch (Throwable t) {
 			discardCommands();
-			fatalError(e.getMessage());
-			throw e;
-		} catch (InputOverLimitIOException e) {
-			String msg = JGitText.get().tooManyCommands;
-			discardCommands();
-			fatalError(msg);
-			throw new PackProtocolException(msg);
+			throw t;
 		}
 	}
 
