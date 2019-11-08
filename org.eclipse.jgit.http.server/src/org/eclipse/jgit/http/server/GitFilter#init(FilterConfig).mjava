@@ -24,7 +24,7 @@
 			b = b.through(new ReceivePackServlet.Factory(receivePackFactory));
 			for (Filter f : receivePackFilters)
 				b = b.through(f);
-			b.with(new ReceivePackServlet());
+			b.with(new ReceivePackServlet(receivePackErrorHandler));
 		}
 
 		ServletBinder refs = serve("*/" + Constants.INFO_REFS);
