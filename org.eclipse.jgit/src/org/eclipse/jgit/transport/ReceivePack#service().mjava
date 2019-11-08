@@ -26,7 +26,7 @@
 					} catch (IOException | RuntimeException
 							| SubmoduleValidationException | Error err) {
 						unlockPack();
-						sendStatusReport(err);
+						unpackErrorHandler.handleUnpackException(err);
 						throw new UnpackException(err);
 					}
 				}
