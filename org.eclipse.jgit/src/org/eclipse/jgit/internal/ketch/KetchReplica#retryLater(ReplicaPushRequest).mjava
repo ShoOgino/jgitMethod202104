@@ -9,9 +9,8 @@
 		queued.add(0, new ReplicaPushRequest(this, cmds));
 
 		if (!waitingForRetry()) {
-			long delay = KetchSystem.delay(
-					lastRetryMillis,
-					minRetryMillis, maxRetryMillis);
+			long delay = FileUtils
+				.delay(lastRetryMillis, minRetryMillis, maxRetryMillis);
 			if (log.isDebugEnabled()) {
 				log.debug("Retrying {} after {} ms", //$NON-NLS-1$
 						describeForLog(), Long.valueOf(delay));
