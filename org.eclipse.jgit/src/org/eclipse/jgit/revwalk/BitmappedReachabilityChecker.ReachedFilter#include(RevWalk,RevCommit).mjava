@@ -1,0 +1,24 @@
+		/** {@inheritDoc} */
+		@Override
+		public final boolean include(RevWalk walker, RevCommit cmit) {
+			Bitmap commitBitmap;
+
+			if (reached.contains(cmit)) {
+				// already seen or included
+				dontFollow(cmit);
+				return false;
+			}
+
+			if ((commitBitmap = repoBitmaps.getBitmap(cmit)) != null) {
+				reached.or(commitBitmap);
+				// Emit the commit because there are new contents in the bitmap
+				// but don't follow parents (they are already in the bitmap)
+				dontFollow(cmit);
+				return true;
+			}
+
+			// No bitmaps, keep going
+			reached.addObject(cmit, Constants.OBJ_COMMIT);
+			return true;
+		}
+

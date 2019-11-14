@@ -2,35 +2,36 @@
 	 * Check all targets are reachable from the starters.
 	 * <p>
 	 * In this implementation, it is recommended to put the most popular
-	 * starters (e.g. refs/heads tips) at the beginning of the collection
+	 * starters (e.g. refs/heads tips) at the beginning.
 	 */
 	@Override
 	public Optional<RevCommit> areAllReachable(Collection<RevCommit> targets,
 			Stream<RevCommit> starters) throws MissingObjectException,
 			IncorrectObjectTypeException, IOException {
-		BitmapCalculator calculator = new BitmapCalculator(walk);
 
-		/**
-		 * Iterate over starters bitmaps and remove targets as they become
-		 * reachable.
-		 *
-		 * Building the total starters bitmap has the same cost (iterating over
-		 * all starters adding the bitmaps) and this gives us the chance to
-		 * shorcut the loop.
-		 *
-		 * This is based on the assuption that most of the starters will have
-		 * the reachability bitmap precalculated. If many require a walk, the
-		 * walk.reset() could start to take too much time.
-		 */
 		List<RevCommit> remainingTargets = new ArrayList<>(targets);
-		Iterator<RevCommit> it = starters.iterator();
-		while (it.hasNext()) {
-			BitmapBuilder starterBitmap = calculator.getBitmap(it.next(),
-					NullProgressMonitor.INSTANCE);
-			remainingTargets.removeIf(starterBitmap::contains);
-			if (remainingTargets.isEmpty()) {
-				return Optional.empty();
+
+		walk.reset();
+		walk.sort(RevSort.TOPO);
+
+		// Filter emits only commits that are unreachable from previously
+		// visited commits. Internally it keeps a bitmap of everything
+		// reachable so far, which we use to discard reachable targets.
+		BitmapIndex repoBitmaps = walk.getObjectReader().getBitmapIndex();
+		ReachedFilter reachedFilter = new ReachedFilter(repoBitmaps);
+		walk.setRevFilter(reachedFilter);
+
+		Iterator<RevCommit> startersIter = starters.iterator();
+		while (startersIter.hasNext()) {
+			walk.markStart(startersIter.next());
+			while (walk.next() != null) {
+				remainingTargets.removeIf(reachedFilter::isReachable);
+
+				if (remainingTargets.isEmpty()) {
+					return Optional.empty();
+				}
 			}
+			walk.reset();
 		}
 
 		return Optional.of(remainingTargets.get(0));
