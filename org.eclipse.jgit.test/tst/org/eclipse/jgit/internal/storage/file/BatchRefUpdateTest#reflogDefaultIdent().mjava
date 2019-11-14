@@ -3,24 +3,19 @@
 		writeRef("refs/heads/master", A);
 		writeRef("refs/heads/branch2", A);
 
-		Map<String, ReflogEntry> oldLogs = getLastReflogs(
-				"refs/heads/master", "refs/heads/branch1", "refs/heads/branch2");
+		Map<String, ReflogEntry> oldLogs = getLastReflogs("refs/heads/master",
+				"refs/heads/branch1", "refs/heads/branch2");
 		List<ReceiveCommand> cmds = Arrays.asList(
 				new ReceiveCommand(A, B, "refs/heads/master", UPDATE),
 				new ReceiveCommand(zeroId(), B, "refs/heads/branch1", CREATE));
-		execute(
-				newBatchUpdate(cmds)
-						.setAllowNonFastForwards(true)
-						.setRefLogMessage("a reflog", false));
+		execute(newBatchUpdate(cmds).setAllowNonFastForwards(true)
+				.setRefLogMessage("a reflog", false));
 
 		assertResults(cmds, OK, OK);
-		assertRefs(
-				"refs/heads/master", B,
-				"refs/heads/branch1", B,
+		assertRefs("refs/heads/master", B, "refs/heads/branch1", B,
 				"refs/heads/branch2", A);
 		assertEquals(atomic ? 3 : 4, refsChangedEvents);
-		assertReflogEquals(
-				reflog(A, B, new PersonIdent(diskRepo), "a reflog"),
+		assertReflogEquals(reflog(A, B, new PersonIdent(diskRepo), "a reflog"),
 				getLastReflog("refs/heads/master"));
 		assertReflogEquals(
 				reflog(zeroId(), B, new PersonIdent(diskRepo), "a reflog"),

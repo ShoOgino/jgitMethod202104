@@ -1,18 +1,18 @@
 	@Test
-	public void nonFastForwardDoesNotDoExpensiveMergeCheck() throws IOException {
+	public void nonFastForwardDoesNotDoExpensiveMergeCheck()
+			throws IOException {
 		writeLooseRef("refs/heads/master", B);
 
-		List<ReceiveCommand> cmds = Arrays.asList(
-				new ReceiveCommand(B, A, "refs/heads/master", UPDATE_NONFASTFORWARD));
+		List<ReceiveCommand> cmds = Arrays.asList(new ReceiveCommand(B, A,
+				"refs/heads/master", UPDATE_NONFASTFORWARD));
 		try (RevWalk rw = new RevWalk(diskRepo) {
-					@Override
-					public boolean isMergedInto(RevCommit base, RevCommit tip) {
-						throw new AssertionError("isMergedInto() should not be called");
-					}
-				}) {
-			newBatchUpdate(cmds)
-					.setAllowNonFastForwards(true)
-					.execute(rw, new StrictWorkMonitor());
+			@Override
+			public boolean isMergedInto(RevCommit base, RevCommit tip) {
+				throw new AssertionError("isMergedInto() should not be called");
+			}
+		}) {
+			newBatchUpdate(cmds).setAllowNonFastForwards(true).execute(rw,
+					new StrictWorkMonitor());
 		}
 
 		assertResults(cmds, OK);

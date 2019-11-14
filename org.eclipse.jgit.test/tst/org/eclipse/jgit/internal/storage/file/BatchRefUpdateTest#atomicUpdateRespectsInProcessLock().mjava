@@ -23,7 +23,8 @@
 			long timeoutSecs = 10;
 			long startNanos = System.nanoTime();
 
-			// Hold onto the lock until we observe the worker thread has attempted to
+			// Hold onto the lock until we observe the worker thread has
+			// attempted to
 			// acquire it.
 			while (l.getQueueLength() == 0) {
 				long elapsedNanos = System.nanoTime() - startNanos;
@@ -33,7 +34,8 @@
 				Thread.sleep(3);
 			}
 
-			// Once we unlock, the worker thread should finish the update promptly.
+			// Once we unlock, the worker thread should finish the update
+			// promptly.
 			l.unlock();
 			t.join(SECONDS.toMillis(timeoutSecs));
 			assertFalse(t.isAlive());
@@ -45,8 +47,6 @@
 
 		assertResults(cmds, OK, OK);
 		assertEquals(2, refsChangedEvents);
-		assertRefs(
-				"refs/heads/master", B,
-				"refs/heads/branch", B);
+		assertRefs("refs/heads/master", B, "refs/heads/branch", B);
 	}
 

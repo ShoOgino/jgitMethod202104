@@ -4,8 +4,8 @@
 
 		for (int i = 0; i < 2; i++) {
 			BatchRefUpdate bu = diskRepo.getRefDatabase().newBatchUpdate();
-			String b1  = String.format("refs/heads/a%d",i);
-			String b2  = String.format("refs/heads/b%d",i);
+			String b1 = String.format("refs/heads/a%d", i);
+			String b2 = String.format("refs/heads/b%d", i);
 			bu.setAtomic(atomic);
 			ReceiveCommand c1 = new ReceiveCommand(ObjectId.zeroId(), A, b1);
 			ReceiveCommand c2 = new ReceiveCommand(ObjectId.zeroId(), B, b2);
@@ -18,10 +18,11 @@
 		}
 
 		File packed = new File(diskRepo.getDirectory(), "packed-refs");
-		String packedStr = new String(Files.readAllBytes(packed.toPath()), UTF_8);
+		String packedStr = new String(Files.readAllBytes(packed.toPath()),
+				UTF_8);
 
 		int a2 = packedStr.indexOf("refs/heads/a1");
 		int b1 = packedStr.indexOf("refs/heads/b0");
-		assertTrue(a2 <  b1);
+		assertTrue(a2 < b1);
 	}
 

@@ -2,9 +2,10 @@
 	public void noRefLog() throws IOException {
 		writeRef("refs/heads/master", A);
 
-		Map<String, ReflogEntry> oldLogs =
-				getLastReflogs("refs/heads/master", "refs/heads/branch");
-		assertEquals(Collections.singleton("refs/heads/master"), oldLogs.keySet());
+		Map<String, ReflogEntry> oldLogs = getLastReflogs("refs/heads/master",
+				"refs/heads/branch");
+		assertEquals(Collections.singleton("refs/heads/master"),
+				oldLogs.keySet());
 
 		List<ReceiveCommand> cmds = Arrays.asList(
 				new ReceiveCommand(A, B, "refs/heads/master", UPDATE),
@@ -12,9 +13,7 @@
 		execute(newBatchUpdate(cmds).setAllowNonFastForwards(true));
 
 		assertResults(cmds, OK, OK);
-		assertRefs(
-				"refs/heads/master", B,
-				"refs/heads/branch", B);
+		assertRefs("refs/heads/master", B, "refs/heads/branch", B);
 		assertEquals(atomic ? 2 : 3, refsChangedEvents);
 		assertReflogUnchanged(oldLogs, "refs/heads/master");
 		assertReflogUnchanged(oldLogs, "refs/heads/branch");

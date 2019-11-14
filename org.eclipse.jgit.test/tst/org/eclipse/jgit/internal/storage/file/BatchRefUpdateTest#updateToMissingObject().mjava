@@ -2,8 +2,8 @@
 	public void updateToMissingObject() throws IOException {
 		writeLooseRef("refs/heads/master", A);
 
-		ObjectId bad =
-				ObjectId.fromString("deadbeefdeadbeefdeadbeefdeadbeefdeadbeef");
+		ObjectId bad = ObjectId
+				.fromString("deadbeefdeadbeefdeadbeefdeadbeefdeadbeef");
 		List<ReceiveCommand> cmds = Arrays.asList(
 				new ReceiveCommand(A, bad, "refs/heads/master", UPDATE),
 				new ReceiveCommand(zeroId(), B, "refs/heads/foo2", CREATE));
@@ -15,9 +15,7 @@
 			assertEquals(1, refsChangedEvents);
 		} else {
 			assertResults(cmds, REJECTED_MISSING_OBJECT, OK);
-			assertRefs(
-					"refs/heads/master", A,
-					"refs/heads/foo2", B);
+			assertRefs("refs/heads/master", A, "refs/heads/foo2", B);
 			assertEquals(2, refsChangedEvents);
 		}
 	}

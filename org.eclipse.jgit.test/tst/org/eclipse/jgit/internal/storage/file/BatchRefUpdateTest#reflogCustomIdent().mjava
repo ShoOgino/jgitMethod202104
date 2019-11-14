@@ -5,24 +5,17 @@
 		List<ReceiveCommand> cmds = Arrays.asList(
 				new ReceiveCommand(A, B, "refs/heads/master", UPDATE),
 				new ReceiveCommand(zeroId(), B, "refs/heads/branch", CREATE));
-		PersonIdent ident = new PersonIdent("A Reflog User", "reflog@example.com");
-		execute(
-				newBatchUpdate(cmds)
-						.setRefLogMessage("a reflog", false)
-						.setRefLogIdent(ident));
+		PersonIdent ident = new PersonIdent("A Reflog User",
+				"reflog@example.com");
+		execute(newBatchUpdate(cmds).setRefLogMessage("a reflog", false)
+				.setRefLogIdent(ident));
 
 		assertResults(cmds, OK, OK);
 		assertEquals(atomic ? 2 : 3, refsChangedEvents);
-		assertRefs(
-				"refs/heads/master", B,
-				"refs/heads/branch", B);
-		assertReflogEquals(
-				reflog(A, B, ident, "a reflog"),
-				getLastReflog("refs/heads/master"),
-				true);
-		assertReflogEquals(
-				reflog(zeroId(), B, ident, "a reflog"),
-				getLastReflog("refs/heads/branch"),
-				true);
+		assertRefs("refs/heads/master", B, "refs/heads/branch", B);
+		assertReflogEquals(reflog(A, B, ident, "a reflog"),
+				getLastReflog("refs/heads/master"), true);
+		assertReflogEquals(reflog(zeroId(), B, ident, "a reflog"),
+				getLastReflog("refs/heads/branch"), true);
 	}
 
