@@ -10,21 +10,19 @@
 		execute(newBatchUpdate(cmds).setAllowNonFastForwards(true), false);
 
 		if (atomic) {
-			// Atomic update sees that master and master/x are conflicting, then marks
+			// Atomic update sees that master and master/x are conflicting, then
+			// marks
 			// the first one in the list as LOCK_FAILURE and aborts the rest.
-			assertResults(cmds,
-					LOCK_FAILURE, TRANSACTION_ABORTED, TRANSACTION_ABORTED);
-			assertRefs(
-					"refs/heads/master", A,
-					"refs/heads/masters", B);
+			assertResults(cmds, LOCK_FAILURE, TRANSACTION_ABORTED,
+					TRANSACTION_ABORTED);
+			assertRefs("refs/heads/master", A, "refs/heads/masters", B);
 			assertEquals(1, refsChangedEvents);
 		} else {
-			// Non-atomic updates are applied in order: master succeeds, then master/x
+			// Non-atomic updates are applied in order: master succeeds, then
+			// master/x
 			// fails due to conflict.
 			assertResults(cmds, OK, LOCK_FAILURE, LOCK_FAILURE);
-			assertRefs(
-					"refs/heads/master", B,
-					"refs/heads/masters", B);
+			assertRefs("refs/heads/master", B, "refs/heads/masters", B);
 			assertEquals(2, refsChangedEvents);
 		}
 	}

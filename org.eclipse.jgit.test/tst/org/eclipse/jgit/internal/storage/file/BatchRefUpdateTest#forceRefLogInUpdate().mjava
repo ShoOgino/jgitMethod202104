@@ -2,20 +2,17 @@
 	public void forceRefLogInUpdate() throws Exception {
 		setLogAllRefUpdates(false);
 		writeRef("refs/heads/master", A);
-		assertTrue(
-				getLastReflogs("refs/heads/master", "refs/heads/branch").isEmpty());
+		assertTrue(getLastReflogs("refs/heads/master", "refs/heads/branch")
+				.isEmpty());
 
 		List<ReceiveCommand> cmds = Arrays.asList(
 				new ReceiveCommand(A, B, "refs/heads/master", UPDATE),
 				new ReceiveCommand(zeroId(), B, "refs/heads/branch", CREATE));
-		execute(
-				newBatchUpdate(cmds)
-						.setRefLogMessage("a reflog", false)
-						.setForceRefLog(true));
+		execute(newBatchUpdate(cmds).setRefLogMessage("a reflog", false)
+				.setForceRefLog(true));
 
 		assertResults(cmds, OK, OK);
-		assertReflogEquals(
-				reflog(A, B, new PersonIdent(diskRepo), "a reflog"),
+		assertReflogEquals(reflog(A, B, new PersonIdent(diskRepo), "a reflog"),
 				getLastReflog("refs/heads/master"));
 		assertReflogEquals(
 				reflog(zeroId(), B, new PersonIdent(diskRepo), "a reflog"),

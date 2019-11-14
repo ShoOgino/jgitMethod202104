@@ -5,21 +5,19 @@
 
 		List<ReceiveCommand> cmds = Arrays.asList(
 				new ReceiveCommand(A, B, "refs/heads/master", UPDATE),
-				new ReceiveCommand(B, A, "refs/heads/branch1", UPDATE_NONFASTFORWARD),
+				new ReceiveCommand(B, A, "refs/heads/branch1",
+						UPDATE_NONFASTFORWARD),
 				new ReceiveCommand(zeroId(), A, "refs/heads/branch2", CREATE));
-		execute(
-				newBatchUpdate(cmds)
-						.setAllowNonFastForwards(true)
-						.setRefLogMessage(null, true));
+		execute(newBatchUpdate(cmds).setAllowNonFastForwards(true)
+				.setRefLogMessage(null, true));
 
 		assertResults(cmds, OK, OK, OK);
-		assertRefs(
-				"refs/heads/master", B,
-				"refs/heads/branch1", A,
+		assertRefs("refs/heads/master", B, "refs/heads/branch1", A,
 				"refs/heads/branch2", A);
 		assertEquals(atomic ? 3 : 5, refsChangedEvents);
 		assertReflogEquals(
-				// Always forced; setAllowNonFastForwards(true) bypasses the check.
+				// Always forced; setAllowNonFastForwards(true) bypasses the
+				// check.
 				reflog(A, B, new PersonIdent(diskRepo), "forced-update"),
 				getLastReflog("refs/heads/master"));
 		assertReflogEquals(

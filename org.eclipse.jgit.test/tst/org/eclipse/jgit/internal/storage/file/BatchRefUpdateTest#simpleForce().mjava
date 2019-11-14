@@ -5,13 +5,12 @@
 
 		List<ReceiveCommand> cmds = Arrays.asList(
 				new ReceiveCommand(A, B, "refs/heads/master", UPDATE),
-				new ReceiveCommand(B, A, "refs/heads/masters", UPDATE_NONFASTFORWARD));
+				new ReceiveCommand(B, A, "refs/heads/masters",
+						UPDATE_NONFASTFORWARD));
 		execute(newBatchUpdate(cmds).setAllowNonFastForwards(true));
 
 		assertResults(cmds, OK, OK);
-		assertRefs(
-				"refs/heads/master", B,
-				"refs/heads/masters", A);
+		assertRefs("refs/heads/master", B, "refs/heads/masters", A);
 		assertEquals(atomic ? 2 : 3, refsChangedEvents);
 	}
 

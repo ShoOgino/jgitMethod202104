@@ -2,8 +2,8 @@
 	public void reflogDelete() throws IOException {
 		writeRef("refs/heads/master", A);
 		writeRef("refs/heads/branch", A);
-		assertEquals(
-				2, getLastReflogs("refs/heads/master", "refs/heads/branch").size());
+		assertEquals(2, getLastReflogs("refs/heads/master", "refs/heads/branch")
+				.size());
 
 		List<ReceiveCommand> cmds = Arrays.asList(
 				new ReceiveCommand(A, zeroId(), "refs/heads/master", DELETE),
@@ -14,8 +14,7 @@
 		assertRefs("refs/heads/branch", B);
 		assertEquals(atomic ? 3 : 4, refsChangedEvents);
 		assertNull(getLastReflog("refs/heads/master"));
-		assertReflogEquals(
-				reflog(A, B, new PersonIdent(diskRepo), "a reflog"),
+		assertReflogEquals(reflog(A, B, new PersonIdent(diskRepo), "a reflog"),
 				getLastReflog("refs/heads/branch"));
 	}
 

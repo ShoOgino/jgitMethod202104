@@ -10,9 +10,7 @@
 		execute(newBatchUpdate(cmds).setAllowNonFastForwards(true));
 
 		assertResults(cmds, OK, OK, OK);
-		assertRefs(
-				"refs/heads/master", B,
-				"refs/heads/masters/x", A);
+		assertRefs("refs/heads/master", B, "refs/heads/masters/x", A);
 		if (atomic) {
 			assertEquals(2, refsChangedEvents);
 		} else {
