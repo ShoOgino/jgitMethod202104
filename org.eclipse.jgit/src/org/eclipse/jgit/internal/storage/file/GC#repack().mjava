@@ -25,7 +25,6 @@
 		Set<ObjectId> txnHeads = new HashSet<>();
 		Set<ObjectId> tagTargets = new HashSet<>();
 		Set<ObjectId> indexObjects = listNonHEADIndexObjects();
-		RefDatabase refdb = repo.getRefDatabase();
 
 		for (Ref ref : refsBefore) {
 			checkCancelled();
@@ -37,8 +36,6 @@
 				allHeads.add(ref.getObjectId());
 			} else if (isTag(ref)) {
 				allTags.add(ref.getObjectId());
-			} else if (RefTreeNames.isRefTree(refdb, ref.getName())) {
-				txnHeads.add(ref.getObjectId());
 			} else {
 				nonHeads.add(ref.getObjectId());
 			}

@@ -35,7 +35,6 @@
 			allHeadsAndTags = new HashSet<>();
 			allTags = new HashSet<>();
 			nonHeads = new HashSet<>();
-			txnHeads = new HashSet<>();
 			tagTargets = new HashSet<>();
 			for (Ref ref : refsBefore) {
 				if (ref.isSymbolic() || ref.getObjectId() == null) {
@@ -45,8 +44,6 @@
 					allHeads.add(ref.getObjectId());
 				} else if (isTag(ref)) {
 					allTags.add(ref.getObjectId());
-				} else if (RefTreeNames.isRefTree(refdb, ref.getName())) {
-					txnHeads.add(ref.getObjectId());
 				} else {
 					nonHeads.add(ref.getObjectId());
 				}
@@ -72,7 +69,6 @@
 			try {
 				packHeads(pm);
 				packRest(pm);
-				packRefTreeGraph(pm);
 				packGarbage(pm);
 				objdb.commitPack(newPackDesc, toPrune());
 				rollback = false;

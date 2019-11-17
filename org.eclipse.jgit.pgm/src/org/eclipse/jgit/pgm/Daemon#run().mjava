@@ -13,9 +13,9 @@
 			}
 			cfg = new FileBasedConfig(configFile, FS.DETECTED);
 		}
-		cfg.load();
-		new WindowCacheConfig().fromConfig(cfg).install();
-		packConfig.fromConfig(cfg);
+			cfg.load();
+			new WindowCacheConfig().fromConfig(cfg).install();
+			packConfig.fromConfig(cfg);
 
 		int threads = packConfig.getThreads();
 		if (threads <= 0)
@@ -48,9 +48,6 @@
 			service(d, n).setOverridable(true);
 		for (String n : forbidOverride)
 			service(d, n).setOverridable(false);
-		if (ketchServerType == KetchServerType.LEADER) {
-			startKetchLeader(d);
-		}
 		d.start();
 		outw.println(MessageFormat.format(CLIText.get().listeningOn, d.getAddress()));
 	}
