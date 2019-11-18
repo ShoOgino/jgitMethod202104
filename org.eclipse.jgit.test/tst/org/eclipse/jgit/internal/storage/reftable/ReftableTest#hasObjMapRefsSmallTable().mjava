@@ -1,0 +1,11 @@
+	@Test
+	public void hasObjMapRefsSmallTable() throws IOException {
+		ArrayList<Ref> refs = new ArrayList<>();
+		ReftableConfig cfg = new ReftableConfig();
+		cfg.setIndexObjects(false);
+		refs.add(ref(MASTER, 1));
+		byte[] table = write(refs);
+		ReftableReader t = read(table);
+		assertTrue(t.hasObjectMap());
+	}
+
