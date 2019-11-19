@@ -1,6 +1,6 @@
 	@Override
 	public Optional<RevCommit> areAllReachable(Collection<RevCommit> targets,
-			Collection<RevCommit> starters)
+			Stream<RevCommit> starters)
 					throws MissingObjectException, IncorrectObjectTypeException,
 					IOException {
 		walk.reset();
@@ -12,8 +12,9 @@
 			walk.markStart(target);
 		}
 
-		for (RevCommit starter : starters) {
-			walk.markUninteresting(starter);
+		Iterator<RevCommit> iterator = starters.iterator();
+		while (iterator.hasNext()) {
+			walk.markUninteresting(iterator.next());
 		}
 
 		return Optional.ofNullable(walk.next());

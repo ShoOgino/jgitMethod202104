@@ -21,13 +21,10 @@
 	 * @throws IOException
 	 *             if any of the underlying indexes or readers can not be
 	 *             opened.
-	 *
-	 * @deprecated see {{@link #areAllReachable(Collection, Stream)}
+	 * @since 5.6
 	 */
-	@Deprecated
-	default Optional<RevCommit> areAllReachable(Collection<RevCommit> targets,
-                       Collection<RevCommit> starters) throws MissingObjectException,
-			IncorrectObjectTypeException, IOException {
-		return areAllReachable(targets, starters.stream());
-	}
+	Optional<RevCommit> areAllReachable(Collection<RevCommit> targets,
+			Stream<RevCommit> starters)
+			throws MissingObjectException, IncorrectObjectTypeException,
+			IOException;
 
