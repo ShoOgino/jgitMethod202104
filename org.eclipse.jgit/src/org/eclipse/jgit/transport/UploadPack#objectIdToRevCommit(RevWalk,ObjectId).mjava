@@ -1,0 +1,23 @@
+	/**
+	 * Translate an object id to a RevCommit.
+	 *
+	 * @param walk
+	 *            walk on the relevant object storae
+	 * @param objectId
+	 *            Object Id
+	 * @return RevCommit instance or null if the object is missing
+	 */
+	@Nullable
+	private static RevCommit objectIdToRevCommit(RevWalk walk,
+			ObjectId objectId) {
+		if (objectId == null) {
+			return null;
+		}
+
+		try {
+			return walk.parseCommit(objectId);
+		} catch (IOException e) {
+			return null;
+		}
+	}
+

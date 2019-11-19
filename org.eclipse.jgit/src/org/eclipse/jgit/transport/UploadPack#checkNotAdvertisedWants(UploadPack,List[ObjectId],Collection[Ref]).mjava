@@ -53,11 +53,13 @@
 			ReachabilityChecker reachabilityChecker = walk
 					.createReachabilityChecker();
 
-			List<Ref> sortedVisibleRefs = moreImportantRefsFirst(visibleRefs);
-			List<RevCommit> reachableCommits = refsToRevCommits(walk,
-					sortedVisibleRefs);
+			Stream<RevCommit> reachableCommits = importantRefsFirst(visibleRefs)
+					.map(UploadPack::refToObjectId)
+					.map(objId -> objectIdToRevCommit(walk, objId))
+					.filter(Objects::nonNull); // Ignore missing tips
+
 			Optional<RevCommit> unreachable = reachabilityChecker
-					.areAllReachable(wantsAsCommits, reachableCommits.stream());
+					.areAllReachable(wantsAsCommits, reachableCommits);
 			if (unreachable.isPresent()) {
 				throw new WantNotValidException(unreachable.get());
 			}

@@ -1,4 +1,4 @@
-	private static List<Ref> moreImportantRefsFirst(
+	static Stream<Ref> importantRefsFirst(
 			Collection<Ref> visibleRefs) {
 		Predicate<Ref> startsWithRefsHeads = ref -> ref.getName()
 				.startsWith(Constants.R_HEADS);
@@ -7,11 +7,10 @@
 		Predicate<Ref> allOther = ref -> !startsWithRefsHeads.test(ref)
 				&& !startsWithRefsTags.test(ref);
 
-		List<Ref> sorted = new ArrayList<>(visibleRefs.size());
-		sorted.addAll(filterRefByPredicate(visibleRefs, startsWithRefsHeads));
-		sorted.addAll(filterRefByPredicate(visibleRefs, startsWithRefsTags));
-		sorted.addAll(filterRefByPredicate(visibleRefs, allOther));
-
-		return sorted;
+		return Stream.concat(
+				visibleRefs.stream().filter(startsWithRefsHeads),
+				Stream.concat(
+						visibleRefs.stream().filter(startsWithRefsTags),
+						visibleRefs.stream().filter(allOther)));
 	}
 
