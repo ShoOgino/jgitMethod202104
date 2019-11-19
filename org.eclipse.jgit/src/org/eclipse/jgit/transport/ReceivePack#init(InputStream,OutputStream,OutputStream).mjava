@@ -1,6 +1,9 @@
 	/**
 	 * Initialize the instance with the given streams.
 	 *
+	 * Visible for out-of-tree subclasses (e.g. tests that need to set the
+	 * streams without going through the {@link #service()} method).
+	 *
 	 * @param input
 	 *            raw input to read client commands and pack data from. Caller
 	 *            must ensure the input is buffered, otherwise read performance
@@ -15,7 +18,7 @@
 	 *            standard error channel of the command execution. For most
 	 *            other network connections this should be null.
 	 */
-	private void init(final InputStream input, final OutputStream output,
+	protected void init(final InputStream input, final OutputStream output,
 			final OutputStream messages) {
 		origOut = output;
 		rawIn = input;
