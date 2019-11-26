@@ -1,4 +1,6 @@
-	private void checkUnadvertisedIfUnallowed(String fetchCapability) throws Exception {
+	private void checkUnadvertisedIfUnallowed(String configSection,
+			String configName, String fetchCapability) throws Exception {
+		server.getConfig().setBoolean(configSection, null, configName, false);
 		ByteArrayInputStream recvStream =
 				uploadPackV2Setup(null, PacketLineIn.end());
 		PacketLineIn pckIn = new PacketLineIn(recvStream);
@@ -9,9 +11,9 @@
 		String line;
 		while (!PacketLineIn.isEnd((line = pckIn.readString()))) {
 			if (line.startsWith("fetch=")) {
-				assertThat(
-					Arrays.asList(line.substring(6).split(" ")),
-					hasItems("shallow"));
+				List<String> fetchItems = Arrays.asList(line.substring(6).split(" "));
+				assertThat(fetchItems, hasItems("shallow"));
+				assertFalse(fetchItems.contains(fetchCapability));
 				lines.add("fetch");
 			} else {
 				lines.add(line);
