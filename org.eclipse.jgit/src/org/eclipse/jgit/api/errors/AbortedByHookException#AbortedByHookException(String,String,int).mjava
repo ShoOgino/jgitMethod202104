@@ -1,17 +1,19 @@
 	/**
 	 * Constructor for AbortedByHookException
 	 *
-	 * @param message
-	 *            The error details.
+	 * @param hookStdErr
+	 *            The error details from the stderr output of the hook
 	 * @param hookName
 	 *            The name of the hook that interrupted the command, must not be
 	 *            null.
 	 * @param returnCode
 	 *            The return code of the hook process that has been run.
 	 */
-	public AbortedByHookException(String message, String hookName,
+	public AbortedByHookException(String hookStdErr, String hookName,
 			int returnCode) {
-		super(message);
+		super(MessageFormat.format(JGitText.get().commandRejectedByHook,
+				hookName, hookStdErr));
+		this.hookStdErr = hookStdErr;
 		this.hookName = hookName;
 		this.returnCode = returnCode;
 	}
