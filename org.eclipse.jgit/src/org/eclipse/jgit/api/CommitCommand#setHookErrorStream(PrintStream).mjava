@@ -1,0 +1,17 @@
+	/**
+	 * Set the error stream for all hook scripts executed by this command
+	 * (pre-commit, commit-msg, post-commit). If not set it defaults to
+	 * {@code System.err}.
+	 *
+	 * @param hookStdErr
+	 *            the error stream for hook scripts executed by this command
+	 * @return {@code this}
+	 * @since 5.6
+	 */
+	public CommitCommand setHookErrorStream(PrintStream hookStdErr) {
+		setHookErrorStream(PreCommitHook.NAME, hookStdErr);
+		setHookErrorStream(CommitMsgHook.NAME, hookStdErr);
+		setHookErrorStream(PostCommitHook.NAME, hookStdErr);
+		return this;
+	}
+

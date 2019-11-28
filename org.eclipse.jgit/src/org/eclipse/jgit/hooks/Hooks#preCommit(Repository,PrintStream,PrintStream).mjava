@@ -1,15 +1,17 @@
 	/**
-	 * Create pre-commit hook for the given repository with the default error
-	 * stream
+	 * Create pre-commit hook for the given repository
 	 *
 	 * @param repo
 	 *            a {@link org.eclipse.jgit.lib.Repository} object.
 	 * @param outputStream
 	 *            The output stream, or {@code null} to use {@code System.out}
+	 * @param errorStream
+	 *            The error stream, or {@code null} to use {@code System.err}
 	 * @return The pre-commit hook for the given repository.
+	 * @since 5.6
 	 */
 	public static PreCommitHook preCommit(Repository repo,
-			PrintStream outputStream) {
-		return new PreCommitHook(repo, outputStream);
+			PrintStream outputStream, PrintStream errorStream) {
+		return new PreCommitHook(repo, outputStream, errorStream);
 	}
 

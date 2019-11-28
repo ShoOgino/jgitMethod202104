@@ -6,9 +6,11 @@
 	 */
 	protected void doRun() throws AbortedByHookException {
 		final ByteArrayOutputStream errorByteArray = new ByteArrayOutputStream();
+		final TeeOutputStream stderrStream = new TeeOutputStream(errorByteArray,
+				getErrorStream());
 		PrintStream hookErrRedirect = null;
 		try {
-			hookErrRedirect = new PrintStream(errorByteArray, false,
+			hookErrRedirect = new PrintStream(stderrStream, false,
 					UTF_8.name());
 		} catch (UnsupportedEncodingException e) {
 			// UTF-8 is guaranteed to be available
