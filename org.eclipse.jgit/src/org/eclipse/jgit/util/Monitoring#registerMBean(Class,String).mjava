@@ -1,0 +1,39 @@
+	/**
+	 * Register a MBean with the platform MBean server
+	 *
+	 * @param mbean
+	 *            the mbean interface to register
+	 * @param metricName
+	 *            name of the JGit metric, will be prefixed with
+	 *            "org.eclipse.jgit/"
+	 * @return the registered mbean's object instance
+	 */
+	public static @Nullable ObjectInstance registerMBean(Class mbean,
+			String metricName) {
+		boolean register;
+		try {
+			register = SystemReader.getInstance().getUserConfig().getBoolean(
+					ConfigConstants.CONFIG_JMX_SECTION,
+					mbean.getSimpleName(), false);
+		} catch (IOException | ConfigInvalidException e) {
+			LOG.error(e.getMessage(), e);
+			return null;
+		}
+		if (!register) {
+			return null;
+		}
+		MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+		try {
+			ObjectName mbeanName = objectName(mbean, metricName);
+			if (server.isRegistered(mbeanName)) {
+				server.unregisterMBean(mbeanName);
+			}
+			return server.registerMBean(mbean, mbeanName);
+		} catch (MalformedObjectNameException | InstanceAlreadyExistsException
+				| MBeanRegistrationException | NotCompliantMBeanException
+				| InstanceNotFoundException e) {
+			LOG.error(e.getMessage(), e);
+			return null;
+		}
+	}
+

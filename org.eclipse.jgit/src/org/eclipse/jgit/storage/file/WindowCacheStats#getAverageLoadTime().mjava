@@ -1,0 +1,12 @@
+	/**
+	 * Average time in nanoseconds for loading new values. This is
+	 * {@code totalLoadTime / (loadSuccessCount + loadFailureCount)}.
+	 *
+	 * @return the average time spent loading new values
+	 */
+	default double getAverageLoadTime() {
+		long totalLoadCount = getLoadSuccessCount() + getLoadFailureCount();
+		return (totalLoadCount == 0) ? 0.0
+				: (double) getTotalLoadTime() / totalLoadCount;
+	}
+
