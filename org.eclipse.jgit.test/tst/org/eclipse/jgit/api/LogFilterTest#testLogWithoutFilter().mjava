@@ -1,0 +1,10 @@
+	@Test
+	public void testLogWithoutFilter() throws Exception {
+		int count = 0;
+		for (RevCommit c : git.log().call()) {
+			assertEquals(committer, c.getCommitterIdent());
+			count++;
+		}
+		assertEquals(4, count);
+	}
+

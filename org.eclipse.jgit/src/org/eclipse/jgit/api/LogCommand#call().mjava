@@ -10,9 +10,22 @@
 	@Override
 	public Iterable<RevCommit> call() throws GitAPIException, NoHeadException {
 		checkCallable();
-		if (!pathFilters.isEmpty())
-			walk.setTreeFilter(AndTreeFilter.create(
-					PathFilterGroup.create(pathFilters), TreeFilter.ANY_DIFF));
+		List<TreeFilter> filters = new ArrayList<>();
+		if (!pathFilters.isEmpty()) {
+			filters.add(AndTreeFilter.create(PathFilterGroup.create(pathFilters), TreeFilter.ANY_DIFF));
+		}
+		if (!excludeTreeFilters.isEmpty()) {
+			for (TreeFilter f : excludeTreeFilters) {
+				filters.add(AndTreeFilter.create(f, TreeFilter.ANY_DIFF));
+			}
+		}
+		if (!filters.isEmpty()) {
+			if (filters.size() == 1) {
+				filters.add(TreeFilter.ANY_DIFF);
+			}
+			walk.setTreeFilter(AndTreeFilter.create(filters));
+
+		}
 		if (skip > -1 && maxCount > -1)
 			walk.setRevFilter(AndRevFilter.create(SkipRevFilter.create(skip),
 					MaxCountRevFilter.create(maxCount)));

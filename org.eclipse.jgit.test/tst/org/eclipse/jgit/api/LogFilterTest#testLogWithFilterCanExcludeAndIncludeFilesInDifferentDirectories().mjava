@@ -1,0 +1,14 @@
+	@Test
+	public void testLogWithFilterCanExcludeAndIncludeFilesInDifferentDirectories()
+			throws Exception {
+		int count = 0;
+		Iterator it = git.log().addPath("subdir-include")
+				.excludePath("subdir-exclude").call().iterator();
+		while (it.hasNext()) {
+			it.next();
+			count++;
+		}
+		// we expect to include c.txt
+		assertEquals(1, count);
+	}
+

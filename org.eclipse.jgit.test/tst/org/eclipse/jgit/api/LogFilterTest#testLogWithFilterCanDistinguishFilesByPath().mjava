@@ -1,0 +1,17 @@
+	@Test
+	public void testLogWithFilterCanDistinguishFilesByPath() throws Exception {
+		int count = 0;
+		for (RevCommit c : git.log().addPath("a.txt").call()) {
+			assertEquals("commit1", c.getFullMessage());
+			count++;
+		}
+		assertEquals(1, count);
+
+		count = 0;
+		for (RevCommit c : git.log().addPath("b.txt").call()) {
+			assertEquals("commit2", c.getFullMessage());
+			count++;
+		}
+		assertEquals(1, count);
+	}
+

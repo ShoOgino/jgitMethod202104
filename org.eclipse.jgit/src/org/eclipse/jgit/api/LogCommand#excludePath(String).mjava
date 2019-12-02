@@ -1,0 +1,18 @@
+	/**
+	 * Show all commits that are not within any of the specified paths. The path
+	 * must either name a file or a directory exactly and use <code>/</code>
+	 * (slash) as separator. Note that regular expressions or wildcards are not
+	 * yet supported. If a path is both added and excluded from the search, then
+	 * the exclusion wins.
+	 *
+	 * @param path
+	 *            a repository-relative path (with <code>/</code> as separator)
+	 * @return {@code this}
+	 * @since 5.6
+	 */
+	public LogCommand excludePath(String path) {
+		checkCallable();
+		excludeTreeFilters.add(PathFilter.create(path).negate());
+		return this;
+	}
+

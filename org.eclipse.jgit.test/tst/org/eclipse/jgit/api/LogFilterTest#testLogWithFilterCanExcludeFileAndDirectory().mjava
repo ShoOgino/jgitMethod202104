@@ -1,0 +1,14 @@
+	@Test
+	public void testLogWithFilterCanExcludeFileAndDirectory() throws Exception {
+		int count = 0;
+		Iterator it = git.log().excludePath("b.txt")
+				.excludePath("subdir-exclude").call().iterator();
+
+		while (it.hasNext()) {
+			it.next();
+			count++;
+		}
+		// we expect a.txt and c.txt
+		assertEquals(2, count);
+	}
+
