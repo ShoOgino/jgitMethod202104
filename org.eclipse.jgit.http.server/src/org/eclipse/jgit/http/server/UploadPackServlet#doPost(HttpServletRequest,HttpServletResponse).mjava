@@ -21,7 +21,8 @@
 			rsp.setContentType(UPLOAD_PACK_RESULT_TYPE);
 
 			try {
-				up.upload(getInputStream(req), out, null);
+				up.uploadWithExceptionPropagation(getInputStream(req), out,
+						null);
 				out.close();
 			} catch (ServiceMayNotContinueException e) {
 				if (e.isOutput()) {

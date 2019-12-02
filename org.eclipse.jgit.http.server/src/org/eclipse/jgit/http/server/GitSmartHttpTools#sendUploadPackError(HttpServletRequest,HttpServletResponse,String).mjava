@@ -1,23 +1,11 @@
 	private static void sendUploadPackError(HttpServletRequest req,
 			HttpServletResponse res, String textForGit) throws IOException {
+		// Do not use sideband. Sideband is acceptable only while packfile is
+		// being sent. Other places, like acknowledgement section, do not
+		// support sideband. Use an error packet.
 		ByteArrayOutputStream buf = new ByteArrayOutputStream(128);
 		PacketLineOut pckOut = new PacketLineOut(buf);
-
-		boolean sideband;
-		UploadPack up = (UploadPack) req.getAttribute(ATTRIBUTE_HANDLER);
-		if (up != null) {
-			try {
-				sideband = up.isSideBand();
-			} catch (RequestNotYetReadException e) {
-				sideband = isUploadPackSideBand(req);
-			}
-		} else
-			sideband = isUploadPackSideBand(req);
-
-		if (sideband)
-			writeSideBand(buf, textForGit);
-		else
-			writePacket(pckOut, textForGit);
+		writePacket(pckOut, textForGit);
 		send(req, res, UPLOAD_PACK_RESULT_TYPE, buf.toByteArray());
 	}
 
