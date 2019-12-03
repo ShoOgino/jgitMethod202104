@@ -38,8 +38,7 @@
 								// Some earlier future might have set the value
 								// and removed itself since we checked for the
 								// value above. Hence check cache again.
-								FileStoreAttributes c = attributeCache
-										.get(s);
+								FileStoreAttributes c = attributeCache.get(s);
 								if (c != null) {
 									return Optional.of(c);
 								}
@@ -73,7 +72,7 @@
 								locks.remove(s);
 							}
 							return attributes;
-						});
+						}, FUTURE_RUNNER);
 				f = f.exceptionally(e -> {
 					LOG.error(e.getLocalizedMessage(), e);
 					return Optional.empty();

@@ -19,6 +19,11 @@
 				LOG.debug("{}: end measure timestamp resolution {} in {}", //$NON-NLS-1$
 						Thread.currentThread(), s, dir);
 				return Optional.of(fsResolution);
+			} catch (SecurityException e) {
+				// Log it here; most likely deleteProbe() below will also run
+				// into a SecurityException, and then this one will be lost
+				// without trace.
+				LOG.warn(e.getLocalizedMessage(), e);
 			} catch (AccessDeniedException e) {
 				LOG.warn(e.getLocalizedMessage(), e); // see bug 548648
 			} catch (IOException e) {

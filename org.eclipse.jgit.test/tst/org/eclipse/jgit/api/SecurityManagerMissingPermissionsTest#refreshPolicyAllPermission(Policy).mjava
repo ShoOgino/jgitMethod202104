@@ -1,0 +1,33 @@
+	/**
+	 * Refresh the Java Security Policy.
+	 *
+	 * @param policy
+	 *            the policy object
+	 *
+	 * @throws IOException
+	 *             if the temporary file that contains the policy could not be
+	 *             created
+	 */
+	private static void refreshPolicyAllPermission(Policy policy)
+			throws IOException {
+		// Starting with an all permissions policy.
+		String policyString = "grant { permission java.security.AllPermission; };";
+
+		// Do not use TemporaryFilesFactory, it will create a dependency cycle
+		Path policyFile = Files.createTempFile("testpolicy", ".txt");
+
+		try {
+			Files.write(policyFile, Collections.singletonList(policyString));
+			System.setProperty("java.security.policy",
+					policyFile.toUri().toURL().toString());
+			policy.refresh();
+		} finally {
+			try {
+				Files.delete(policyFile);
+			} catch (IOException e) {
+				// Do not log; the test tests for no logging having occurred
+				e.printStackTrace();
+			}
+		}
+	}
+

@@ -1,0 +1,25 @@
+	/**
+	 * If a SecurityManager is active a lot of {@link java.io.FilePermission}
+	 * errors are thrown and logged while initializing a repository.
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void testCreateNewRepos_MissingPermissions() throws Exception {
+		File wcTree = new File(getTemporaryDirectory(),
+				"CreateNewRepositoryTest_testCreateNewRepos");
+
+		File marker = new File(getTemporaryDirectory(), "marker");
+		Files.write(marker.toPath(), Collections.singletonList("Can write"));
+		assertTrue("Can write in test directory", marker.isFile());
+		FileUtils.delete(marker);
+		assertFalse("Can delete in test direcory", marker.exists());
+
+		Git git = Git.init().setBare(false)
+				.setDirectory(new File(wcTree.getAbsolutePath())).call();
+
+		addRepoToClose(git.getRepository());
+
+		assertEquals("", errorOutputWriter.toString());
+	}
+
