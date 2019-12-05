@@ -1,0 +1,19 @@
+	@Test
+	public void hasObjMapRefsNoIndexObjects() throws IOException {
+		ArrayList<Ref> refs = new ArrayList<>();
+		ReftableConfig cfg = new ReftableConfig();
+		cfg.setIndexObjects(false);
+		cfg.setRefBlockSize(256);
+		cfg.setAlignBlocks(true);
+
+		// Fill up 5 blocks.
+		int N = 256 * 5 / 25;
+		for (int i= 0; i < N; i++) {
+			refs.add(ref(String.format("%02d/xxxxxxxxxx", i), i));
+		}
+		byte[] table = write(refs, cfg);
+
+		ReftableReader t = read(table);
+		assertFalse(t.hasObjectMap());
+	}
+

@@ -1,10 +1,4 @@
 	private byte[] write(Collection<Ref> refs) throws IOException {
-		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-		stats = new ReftableWriter(buffer)
-				.begin()
-				.sortAndWriteRefs(refs)
-				.finish()
-				.getStats();
-		return buffer.toByteArray();
+		return write(refs, new ReftableConfig());
 	}
 

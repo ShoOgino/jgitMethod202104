@@ -1,0 +1,22 @@
+	@Test
+	public void hasObjLogs() throws IOException {
+		PersonIdent who = new PersonIdent("Log", "Ger", 1500079709, -8 * 60);
+		String msg = "test";
+		ReftableConfig cfg = new ReftableConfig();
+		cfg.setIndexObjects(false);
+
+		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+		ReftableWriter writer = new ReftableWriter(buffer)
+			.setMinUpdateIndex(1)
+			.setConfig(cfg)
+			.setMaxUpdateIndex(1)
+			.begin();
+
+		writer.writeLog("master", 1, who, ObjectId.zeroId(), id(1), msg);
+		writer.finish();
+		byte[] table = buffer.toByteArray();
+
+		ReftableReader t = read(table);
+		assertTrue(t.hasObjectMap());
+	}
+
