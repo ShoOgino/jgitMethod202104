@@ -1,9 +1,10 @@
-	@SuppressWarnings("boxing")
 	@Test
 	public void noIndexScan() throws IOException {
 		List<Ref> refs = new ArrayList<>();
 		for (int i = 1; i <= 567; i++) {
-			refs.add(ref(String.format("refs/heads/%03d", i), i));
+			@SuppressWarnings("boxing")
+			Ref ref = ref(String.format("refs/heads/%03d", i), i);
+			refs.add(ref);
 		}
 
 		byte[] table = write(refs);

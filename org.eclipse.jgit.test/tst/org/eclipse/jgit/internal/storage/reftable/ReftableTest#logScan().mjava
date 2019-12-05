@@ -1,4 +1,3 @@
-	@SuppressWarnings("boxing")
 	@Test
 	public void logScan() throws IOException {
 		ReftableConfig cfg = new ReftableConfig();
@@ -11,6 +10,7 @@
 
 		List<Ref> refs = new ArrayList<>();
 		for (int i = 1; i <= 5670; i++) {
+			@SuppressWarnings("boxing")
 			Ref ref = ref(String.format("refs/heads/%04d", i), i);
 			refs.add(ref);
 			writer.writeRef(ref);
