@@ -1,13 +1,12 @@
 	@Test
-	public void testInsertChangeId() throws JGitInternalException,
-			GitAPIException {
+	public void testInsertChangeId() throws Exception {
 		try (Git git = new Git(db)) {
 			String messageHeader = "Some header line\n\nSome detail explanation\n";
 			String changeIdTemplate = "\nChange-Id: I"
 					+ ObjectId.zeroId().getName() + "\n";
 			String messageFooter = "Some foooter lines\nAnother footer line\n";
-			RevCommit commit = git.commit().setMessage(
-					messageHeader + messageFooter)
+			RevCommit commit = git.commit()
+					.setMessage(messageHeader + messageFooter)
 					.setInsertChangeId(true).call();
 			// we should find a real change id (at the end of the file)
 			byte[] chars = commit.getFullMessage().getBytes(UTF_8);
@@ -15,11 +14,12 @@
 			String lastLine = RawParseUtils.decode(chars, lastLineBegin + 1,
 					chars.length);
 			assertTrue(lastLine.contains("Change-Id:"));
-			assertFalse(lastLine.contains(
-					"Change-Id: I" + ObjectId.zeroId().getName()));
+			assertFalse(lastLine
+					.contains("Change-Id: I" + ObjectId.zeroId().getName()));
 
-			commit = git.commit().setMessage(
-					messageHeader + changeIdTemplate + messageFooter)
+			commit = git.commit()
+					.setMessage(
+							messageHeader + changeIdTemplate + messageFooter)
 					.setInsertChangeId(true).call();
 			// we should find a real change id (in the line as dictated by the
 			// template)
@@ -34,11 +34,12 @@
 			String line = RawParseUtils.decode(chars, lineStart, lineEnd);
 
 			assertTrue(line.contains("Change-Id:"));
-			assertFalse(line.contains(
-					"Change-Id: I" + ObjectId.zeroId().getName()));
+			assertFalse(line
+					.contains("Change-Id: I" + ObjectId.zeroId().getName()));
 
-			commit = git.commit().setMessage(
-					messageHeader + changeIdTemplate + messageFooter)
+			commit = git.commit()
+					.setMessage(
+							messageHeader + changeIdTemplate + messageFooter)
 					.setInsertChangeId(false).call();
 			// we should find the untouched template
 			chars = commit.getFullMessage().getBytes(UTF_8);
@@ -51,8 +52,8 @@
 
 			line = RawParseUtils.decode(chars, lineStart, lineEnd);
 
-			assertTrue(commit.getFullMessage().contains(
-					"Change-Id: I" + ObjectId.zeroId().getName()));
+			assertTrue(commit.getFullMessage()
+					.contains("Change-Id: I" + ObjectId.zeroId().getName()));
 		}
 	}
 

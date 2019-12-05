@@ -1,5 +1,5 @@
 	@Test
-	public void testModeChange() throws IOException, GitAPIException {
+	public void testModeChange() throws Exception {
 		assumeFalse(System.getProperty("os.name").startsWith("Windows"));// SKIP
 		try (Git git = new Git(db)) {
 			// create file
@@ -17,7 +17,8 @@
 			FS fs = db.getFS();
 			fs.setExecute(file, true);
 			git.add().addFilepattern("a.txt").call();
-			git.commit().setMessage("mode change").setCommitter(committer).call();
+			git.commit().setMessage("mode change").setCommitter(committer)
+					.call();
 
 			// pure mode change should be committable with -o option
 			fs.setExecute(file, false);
