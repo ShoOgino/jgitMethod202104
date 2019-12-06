@@ -1,0 +1,12 @@
+	@Test
+	public void testLogWithFilterCanExcludeFilesInDirectory() throws Exception {
+		int count = 0;
+		Iterator it = git.log().excludePath("subdir-exclude").call().iterator();
+		while (it.hasNext()) {
+			it.next();
+			count++;
+		}
+		// of all the commits, we expect to filter out only d.txt
+		assertEquals(3, count);
+	}
+

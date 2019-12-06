@@ -1,0 +1,56 @@
+	@Before
+	public void setup() throws Exception {
+		super.setUp();
+		git = new Git(db);
+
+		// create first file
+		File file = new File(db.getWorkTree(), "a.txt");
+		FileUtils.createNewFile(file);
+		try (PrintWriter writer = new PrintWriter(file, UTF_8.name())) {
+			writer.print("content1");
+		}
+
+		// First commit - a.txt file
+		git.add().addFilepattern("a.txt").call();
+		git.commit().setMessage("commit1").setCommitter(committer).call();
+
+		// create second file
+		file = new File(db.getWorkTree(), "b.txt");
+		FileUtils.createNewFile(file);
+		try (PrintWriter writer = new PrintWriter(file, UTF_8.name())) {
+			writer.print("content2");
+		}
+
+		// Second commit - b.txt file
+		git.add().addFilepattern("b.txt").call();
+		git.commit().setMessage("commit2").setCommitter(committer).call();
+
+		// create third file
+		Path includeSubdir = Paths.get(db.getWorkTree().toString(),
+				"subdir-include");
+		includeSubdir.toFile().mkdirs();
+		file = Paths.get(includeSubdir.toString(), "c.txt").toFile();
+		FileUtils.createNewFile(file);
+		try (PrintWriter writer = new PrintWriter(file, UTF_8.name())) {
+			writer.print("content3");
+		}
+
+		// Third commit - c.txt file
+		git.add().addFilepattern("subdir-include").call();
+		git.commit().setMessage("commit3").setCommitter(committer).call();
+
+		// create fourth file
+		Path excludeSubdir = Paths.get(db.getWorkTree().toString(),
+				"subdir-exclude");
+		excludeSubdir.toFile().mkdirs();
+		file = Paths.get(excludeSubdir.toString(), "d.txt").toFile();
+		FileUtils.createNewFile(file);
+		try (PrintWriter writer = new PrintWriter(file, UTF_8.name())) {
+			writer.print("content4");
+		}
+
+		// Fourth commit - d.txt file
+		git.add().addFilepattern("subdir-exclude").call();
+		git.commit().setMessage("commit4").setCommitter(committer).call();
+	}
+

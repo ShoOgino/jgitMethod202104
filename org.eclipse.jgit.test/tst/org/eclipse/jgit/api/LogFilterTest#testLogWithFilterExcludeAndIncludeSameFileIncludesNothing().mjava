@@ -1,0 +1,15 @@
+	@Test
+	public void testLogWithFilterExcludeAndIncludeSameFileIncludesNothing()
+			throws Exception {
+		int count = 0;
+		Iterator it = git.log().addPath("subdir-exclude")
+				.excludePath("subdir-exclude").call().iterator();
+
+		while (it.hasNext()) {
+			it.next();
+			count++;
+		}
+		// we expect the exclude to trump everything
+		assertEquals(0, count);
+	}
+

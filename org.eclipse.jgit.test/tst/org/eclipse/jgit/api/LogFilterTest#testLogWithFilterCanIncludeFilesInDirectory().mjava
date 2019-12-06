@@ -1,0 +1,10 @@
+	@Test
+	public void testLogWithFilterCanIncludeFilesInDirectory() throws Exception {
+		int count = 0;
+		for (RevCommit c : git.log().addPath("subdir-include").call()) {
+			assertEquals("commit3", c.getFullMessage());
+			count++;
+		}
+		assertEquals(1, count);
+	}
+
