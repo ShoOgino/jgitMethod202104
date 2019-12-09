@@ -22,7 +22,8 @@
 						state.name()));
 
 			if (!noVerify) {
-				Hooks.preCommit(repo, hookOutRedirect.get(PreCommitHook.NAME))
+				Hooks.preCommit(repo, hookOutRedirect.get(PreCommitHook.NAME),
+						hookErrRedirect.get(PreCommitHook.NAME))
 						.call();
 			}
 
@@ -64,7 +65,8 @@
 			if (!noVerify) {
 				message = Hooks
 						.commitMsg(repo,
-								hookOutRedirect.get(CommitMsgHook.NAME))
+								hookOutRedirect.get(CommitMsgHook.NAME),
+								hookErrRedirect.get(CommitMsgHook.NAME))
 						.setCommitMessage(message).call();
 			}
 
@@ -145,7 +147,8 @@
 						repo.writeRevertHead(null);
 					}
 					Hooks.postCommit(repo,
-							hookOutRedirect.get(PostCommitHook.NAME)).call();
+							hookOutRedirect.get(PostCommitHook.NAME),
+							hookErrRedirect.get(PostCommitHook.NAME)).call();
 
 					return revCommit;
 				}

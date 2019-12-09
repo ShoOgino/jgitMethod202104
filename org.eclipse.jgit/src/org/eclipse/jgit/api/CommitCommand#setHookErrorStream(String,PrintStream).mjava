@@ -1,0 +1,24 @@
+	/**
+	 * Set the error stream for a selected hook script executed by this command
+	 * (pre-commit, commit-msg, post-commit). If not set it defaults to
+	 * {@code System.err}.
+	 *
+	 * @param hookName
+	 *            name of the hook to set the output stream for
+	 * @param hookStdErr
+	 *            the output stream to use for the selected hook
+	 * @return {@code this}
+	 * @since 5.6
+	 */
+	public CommitCommand setHookErrorStream(String hookName,
+			PrintStream hookStdErr) {
+		if (!(PreCommitHook.NAME.equals(hookName)
+				|| CommitMsgHook.NAME.equals(hookName)
+				|| PostCommitHook.NAME.equals(hookName))) {
+			throw new IllegalArgumentException(MessageFormat
+					.format(JGitText.get().illegalHookName, hookName));
+		}
+		hookErrRedirect.put(hookName, hookStdErr);
+		return this;
+	}
+
