@@ -19,10 +19,8 @@
 				getParameters(), getOutputStream(), stderrStream,
 				getStdinArgs());
 		if (result.isExecutedWithError()) {
-			throw new AbortedByHookException(
-					new String(errorByteArray.toByteArray(),
-							Charset.defaultCharset().name()),
-					getHookName(), result.getExitCode());
+			handleError(new String(errorByteArray.toByteArray(),
+					Charset.defaultCharset().name()), result);
 		}
 	}
 
