@@ -58,8 +58,11 @@
 
 			if (enable && !(db.getRefDatabase() instanceof RefTreeDatabase)) {
 				StoredConfig cfg = db.getConfig();
-				cfg.setInt("core", null, "repositoryformatversion", 1); //$NON-NLS-1$ //$NON-NLS-2$
-				cfg.setString("extensions", null, "refStorage", "reftree"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				cfg.setInt(ConfigConstants.CONFIG_CORE_SECTION, null,
+						ConfigConstants.CONFIG_KEY_REPO_FORMAT_VERSION, 1);
+				cfg.setString(ConfigConstants.CONFIG_EXTENSIONS_SECTION, null,
+						ConfigConstants.CONFIG_KEY_REFSTORAGE,
+						ConfigConstants.CONFIG_REFSTORAGE_REFTREE);
 				cfg.save();
 				errw.println("Enabled reftree."); //$NON-NLS-1$
 				errw.flush();
