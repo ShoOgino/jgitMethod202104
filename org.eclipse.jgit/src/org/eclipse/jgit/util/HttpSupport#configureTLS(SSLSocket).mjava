@@ -1,0 +1,62 @@
+	/**
+	 * Enables all supported TLS protocol versions on the socket given. If
+	 * system property "https.protocols" is set, only protocols specified there
+	 * are enabled.
+	 * <p>
+	 * This is primarily a mechanism to deal with using TLS on IBM JDK. IBM JDK
+	 * returns sockets that support all TLS protocol versions but have only the
+	 * one specified in the context enabled. Oracle or OpenJDK return sockets
+	 * that have all available protocols enabled already, up to the one
+	 * specified.
+	 * <p>
+	 * <table>
+	 * <tr>
+	 * <td>SSLContext.getInstance()</td>
+	 * <td>OpenJDK</td>
+	 * <td>IDM JDK</td>
+	 * </tr>
+	 * <tr>
+	 * <td>"TLS"</td>
+	 * <td>Supported: TLSv1, TLSV1.1, TLSv1.2 (+ TLSv1.3)<br />
+	 * Enabled: TLSv1, TLSV1.1, TLSv1.2 (+ TLSv1.3)</td>
+	 * <td>Supported: TLSv1, TLSV1.1, TLSv1.2<br />
+	 * Enabled: TLSv1</td>
+	 * </tr>
+	 * <tr>
+	 * <td>"TLSv1.2"</td>
+	 * <td>Supported: TLSv1, TLSV1.1, TLSv1.2<br />
+	 * Enabled: TLSv1, TLSV1.1, TLSv1.2</td>
+	 * <td>Supported: TLSv1, TLSV1.1, TLSv1.2<br />
+	 * Enabled: TLSv1.2</td>
+	 * </tr>
+	 * </table>
+	 *
+	 * @param socket
+	 *            to configure
+	 * @see <a href=
+	 *      "https://www.ibm.com/support/knowledgecenter/en/SSYKE2_8.0.0/com.ibm.java.security.component.80.doc/security-component/jsse2Docs/matchsslcontext_tls.html">Behavior
+	 *      of SSLContext.getInstance("TLS") on IBM JDK</a>
+	 * @see <a href=
+	 *      "https://docs.oracle.com/javase/8/docs/technotes/guides/security/jsse/JSSERefGuide.html#InstallationAndCustomization">Customizing
+	 *      JSSE about https.protocols</a>
+	 * @since 5.7
+	 */
+	public static void configureTLS(SSLSocket socket) {
+		// 1. Enable all available TLS protocol versions
+		Set<String> enabled = new LinkedHashSet<>(
+				Arrays.asList(socket.getEnabledProtocols()));
+		for (String s : socket.getSupportedProtocols()) {
+			if (s.startsWith("TLS")) { //$NON-NLS-1$
+				enabled.add(s);
+			}
+		}
+		// 2. Respect the https.protocols system property
+		Set<String> configured = getConfiguredProtocols();
+		if (!configured.isEmpty()) {
+			enabled.retainAll(configured);
+		}
+		if (!enabled.isEmpty()) {
+			socket.setEnabledProtocols(enabled.toArray(new String[0]));
+		}
+	}
+

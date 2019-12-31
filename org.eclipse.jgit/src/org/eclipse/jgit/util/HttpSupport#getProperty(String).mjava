@@ -1,0 +1,9 @@
+	private static String getProperty(String property) {
+		try {
+			return SystemReader.getInstance().getProperty(property);
+		} catch (SecurityException e) {
+			LOG.warn(JGitText.get().failedReadHttpsProtocols, e);
+			return null;
+		}
+	}
+

@@ -18,10 +18,11 @@
 				configBuilder
 						.setRedirectsEnabled(followRedirects.booleanValue());
 			}
+			SSLConnectionSocketFactory sslConnectionFactory = getSSLSocketFactory();
+			clientBuilder.setSSLSocketFactory(sslConnectionFactory);
 			if (hostnameverifier != null) {
-				SSLConnectionSocketFactory sslConnectionFactory = new SSLConnectionSocketFactory(
-						getSSLContext(), hostnameverifier);
-				clientBuilder.setSSLSocketFactory(sslConnectionFactory);
+				// Using a custom verifier: we don't want pooled connections
+				// with this.
 				Registry<ConnectionSocketFactory> registry = RegistryBuilder
 						.<ConnectionSocketFactory> create()
 						.register("https", sslConnectionFactory)

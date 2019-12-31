@@ -1,0 +1,15 @@
+	private static Set<String> getConfiguredProtocols() {
+		Set<String> result = configuredHttpsProtocols;
+		if (result == null) {
+			String configured = getProperty("https.protocols"); //$NON-NLS-1$
+			if (StringUtils.isEmptyOrNull(configured)) {
+				result = Collections.emptySet();
+			} else {
+				result = new LinkedHashSet<>(
+						Arrays.asList(configured.split("\\s*,\\s*"))); //$NON-NLS-1$
+			}
+			configuredHttpsProtocols = result;
+		}
+		return result;
+	}
+

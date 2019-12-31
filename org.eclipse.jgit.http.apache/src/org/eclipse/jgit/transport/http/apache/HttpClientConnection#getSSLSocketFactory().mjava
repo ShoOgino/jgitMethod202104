@@ -1,0 +1,26 @@
+	private SSLConnectionSocketFactory getSSLSocketFactory() {
+		HostnameVerifier verifier = hostnameverifier;
+		SSLContext context;
+		if (verifier == null) {
+			// Use defaults
+			context = SSLContexts.createDefault();
+			verifier = new DefaultHostnameVerifier(
+					PublicSuffixMatcherLoader.getDefault());
+		} else {
+			// Using a custom verifier. Attention: configure() must have been
+			// called already, otherwise one gets a "context not initialized"
+			// exception. In JGit this branch is reached only when hostname
+			// verification is switched off, and JGit _does_ call configure()
+			// before we get here.
+			context = getSSLContext();
+		}
+		return new SSLConnectionSocketFactory(context, verifier) {
+
+			@Override
+			protected void prepareSocket(SSLSocket socket) throws IOException {
+				super.prepareSocket(socket);
+				HttpSupport.configureTLS(socket);
+			}
+		};
+	}
+
