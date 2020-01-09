@@ -15,15 +15,19 @@
 		final int slot = slot(pack, position);
 		final Entry e1 = table.get(slot);
 		ByteWindow v = scan(e1, pack, position);
-		if (v != null)
+		if (v != null) {
+			statsRecorder.recordHits(1);
 			return v;
+		}
 
 		synchronized (lock(pack, position)) {
 			Entry e2 = table.get(slot);
 			if (e2 != e1) {
 				v = scan(e2, pack, position);
-				if (v != null)
+				if (v != null) {
+					statsRecorder.recordHits(1);
 					return v;
+				}
 			}
 
 			v = load(pack, position);
