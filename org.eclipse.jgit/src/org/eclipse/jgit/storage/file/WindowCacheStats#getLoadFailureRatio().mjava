@@ -1,0 +1,14 @@
+	/**
+	 * Ratio of cache load attempts which threw exceptions. This is defined as
+	 * {@code loadFailureCount / (loadSuccessCount + loadFailureCount)}, or
+	 * {@code 0.0} when {@code loadSuccessCount + loadFailureCount == 0}.
+	 *
+	 * @return the ratio of cache loading attempts which threw exceptions
+	 */
+	default double getLoadFailureRatio() {
+		long loadFailureCount = getLoadFailureCount();
+		long totalLoadCount = getLoadSuccessCount() + loadFailureCount;
+		return (totalLoadCount == 0) ? 0.0
+				: (double) loadFailureCount / totalLoadCount;
+	}
+
