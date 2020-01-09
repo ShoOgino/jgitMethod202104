@@ -1,5 +1,6 @@
 	private void clear(Ref ref) {
-		openBytes.addAndGet(-ref.size);
+		statsRecorder.recordOpenBytes(-ref.size);
+		statsRecorder.recordEvictions(1);
 		close(ref.pack);
 	}
 

@@ -29,8 +29,9 @@
 		windowSizeShift = bits(cfg.getPackedGitWindowSize());
 		windowSize = 1 << windowSizeShift;
 
-		openFiles = new AtomicInteger();
-		openBytes = new AtomicLong();
+		mbean = new StatsRecorderImpl();
+		statsRecorder = mbean;
+		Monitoring.registerMBean(mbean, "block_cache"); //$NON-NLS-1$
 
 		if (maxFiles < 1)
 			throw new IllegalArgumentException(JGitText.get().openFilesMustBeAtLeast1);
