@@ -1,0 +1,11 @@
+	private void writeResponse(TemporaryBuffer out) throws IOException {
+		// The Content-Length cannot overflow when cast to an int, our
+		// hardcoded LIMIT constant above assures us we wouldn't store
+		// more than 2 GiB of content in memory.
+		rsp.setContentLength((int) out.length());
+		try (OutputStream os = rsp.getOutputStream()) {
+			out.writeTo(os, null);
+			os.flush();
+		}
+	}
+
