@@ -1,5 +1,6 @@
 	private void close(PackFile pack) {
-		if (pack.endWindowCache())
-			openFiles.decrementAndGet();
+		if (pack.endWindowCache()) {
+			statsRecorder.recordOpenFiles(-1);
+		}
 	}
 
