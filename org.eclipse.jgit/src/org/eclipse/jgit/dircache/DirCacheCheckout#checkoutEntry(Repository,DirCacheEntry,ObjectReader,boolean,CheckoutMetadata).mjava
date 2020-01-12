@@ -69,29 +69,9 @@
 		File tmpFile = File.createTempFile(
 				"._" + name, null, parentDir); //$NON-NLS-1$
 
-		EolStreamType nonNullEolStreamType;
-		if (checkoutMetadata.eolStreamType != null) {
-			nonNullEolStreamType = checkoutMetadata.eolStreamType;
-		} else if (opt.getAutoCRLF() == AutoCRLF.TRUE) {
-			nonNullEolStreamType = EolStreamType.AUTO_CRLF;
-		} else {
-			nonNullEolStreamType = EolStreamType.DIRECT;
-		}
-		try (OutputStream channel = EolStreamTypeUtil.wrapOutputStream(
-				new FileOutputStream(tmpFile), nonNullEolStreamType)) {
-			if (checkoutMetadata.smudgeFilterCommand != null) {
-				if (FilterCommandRegistry
-						.isRegistered(checkoutMetadata.smudgeFilterCommand)) {
-					runBuiltinFilterCommand(repo, checkoutMetadata, ol,
-							channel);
-				} else {
-					runExternalFilterCommand(repo, entry, checkoutMetadata, ol,
-							fs, channel);
-				}
-			} else {
-				ol.copyTo(channel);
-			}
-		}
+		getContent(repo, entry.getPathString(), checkoutMetadata, ol, opt,
+				new FileOutputStream(tmpFile));
+
 		// The entry needs to correspond to the on-disk filesize. If the content
 		// was filtered (either by autocrlf handling or smudge filters) ask the
 		// filesystem again for the length. Otherwise the objectloader knows the
