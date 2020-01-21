@@ -19,8 +19,7 @@
 		String expectedExpiration = String
 				.valueOf(creationDate.getTime() + (cookie.getMaxAge() * 1000));
 
-		Assert.assertThat(
-				Files.readAllLines(tmpFile, StandardCharsets.US_ASCII),
+		assertThat(Files.readAllLines(tmpFile, StandardCharsets.US_ASCII),
 				CoreMatchers
 						.equalTo(Arrays.asList("mydomain.com\tTRUE\t/\tTRUE\t"
 								+ expectedExpiration + "\tkey2\tvalue")));

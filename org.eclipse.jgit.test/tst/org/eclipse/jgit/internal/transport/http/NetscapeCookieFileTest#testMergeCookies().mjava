@@ -20,11 +20,10 @@
 		cookie = new HttpCookie("key3", "valueFromSet2");
 		cookiesExpectedMergedSet.add(cookie);
 
-		Assert.assertThat(
-				NetscapeCookieFile.mergeCookies(cookieSet1, cookieSet2),
+		assertThat(NetscapeCookieFile.mergeCookies(cookieSet1, cookieSet2),
 				HttpCookiesMatcher.containsInOrder(cookiesExpectedMergedSet));
 
-		Assert.assertThat(NetscapeCookieFile.mergeCookies(cookieSet1, null),
+		assertThat(NetscapeCookieFile.mergeCookies(cookieSet1, null),
 				HttpCookiesMatcher.containsInOrder(cookieSet1));
 	}
 

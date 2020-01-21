@@ -4,12 +4,12 @@
 			long delta) {
 		java.util.regex.Matcher matcher = Pattern.compile(pattern)
 				.matcher(string);
-		Assert.assertTrue("Given string '" + string + "' does not match '"
-				+ pattern + "'", matcher.matches());
+		assertTrue("Given string '" + string + "' does not match '" + pattern
+				+ "'", matcher.matches());
 		// extract numeric value
 		Long actualNumericValue = Long.decode(matcher.group(1));
 
-		Assert.assertTrue(
+		assertTrue(
 				"Value is supposed to be close to " + expectedNumericValue
 						+ " but is " + actualNumericValue + ".",
 				Math.abs(expectedNumericValue - actualNumericValue) <= delta);
