@@ -1,7 +1,7 @@
 	@Test
-	public void testInvalidGroupHeader() throws ConfigInvalidException {
-		expectedEx.expect(ConfigInvalidException.class);
-		expectedEx.expectMessage(JGitText.get().badGroupHeader);
-		parse("[foo \"bar\" ]\nfoo=bar\n");
+	public void testInvalidGroupHeader() {
+		assertThrows(JGitText.get().badGroupHeader,
+				ConfigInvalidException.class,
+				() -> parse("[foo \"bar\" ]\nfoo=bar\n"));
 	}
 

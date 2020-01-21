@@ -1,12 +1,13 @@
 	@Test
-	public void validateUnreachableBlobWithBitmaps()
-			throws PackProtocolException, IOException {
-		if (!isUnreachableBlobValid()) {
-			thrown.expect(TransportException.class);
-			thrown.expectMessage(Matchers.containsString(
-					"want " + unreachableBlob.name() + " not valid"));
-		}
-		createValidator().checkWants(getUploadPack(getRepoWithBitmaps()),
+	public void validateUnreachableBlobWithBitmaps() throws Throwable {
+		ThrowingCallable c = () -> createValidator().checkWants(
+				getUploadPack(getRepoWithBitmaps()),
 				Arrays.asList(unreachableBlob));
+		if (!isUnreachableBlobValid()) {
+			assertTransportException(c,
+					"want " + unreachableBlob.name() + " not valid");
+			return;
+		}
+		c.call();
 	}
 

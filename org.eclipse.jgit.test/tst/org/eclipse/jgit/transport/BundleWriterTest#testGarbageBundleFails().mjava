@@ -1,9 +1,8 @@
 	@Test
 	public void testGarbageBundleFails() throws Exception {
 		Repository newRepo = createBareRepository();
-		thrown.expect(TransportException.class);
-		fetchFromBundle(newRepo,
+		assertThrows(TransportException.class, () -> fetchFromBundle(newRepo,
 				(TransportBundle.V2_BUNDLE_SIGNATURE + '\n' + "Garbage")
-						.getBytes(UTF_8));
+						.getBytes(UTF_8)));
 	}
 

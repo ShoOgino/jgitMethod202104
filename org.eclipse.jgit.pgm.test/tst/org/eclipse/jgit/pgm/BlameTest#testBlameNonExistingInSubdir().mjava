@@ -3,8 +3,7 @@
 		try (Git git = new Git(db)) {
 			git.commit().setMessage("initial commit").call();
 		}
-		thrown.expect(Die.class);
-		thrown.expectMessage("no such path 'sub/does_not_exist.txt' in HEAD");
-		execute("git blame sub/does_not_exist.txt");
+		assertThrows("no such path 'sub/does_not_exist.txt' in HEAD", Die.class,
+				() -> execute("git blame sub/does_not_exist.txt"));
 	}
 

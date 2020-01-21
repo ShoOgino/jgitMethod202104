@@ -7,7 +7,7 @@
 		ProtocolV2Parser parser = new ProtocolV2Parser(
 				ConfigBuilder.start().allowFilter().done());
 
-		thrown.expect(PackProtocolException.class);
-		parser.parseFetchRequest(pckIn);
+		assertThrows(PackProtocolException.class,
+				() -> parser.parseFetchRequest(pckIn));
 	}
 

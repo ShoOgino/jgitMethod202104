@@ -1,13 +1,13 @@
 	@Test
-	public void validateUnreachableCommitWithoutBitmaps()
-			throws PackProtocolException, IOException {
-		if (!isUnreachableCommitValid()) {
-			thrown.expect(TransportException.class);
-			thrown.expectMessage(Matchers.containsString(
-					"want " + unreachableCommit.name() + " not valid"));
-
-		}
-		createValidator().checkWants(getUploadPack(getRepoWithoutBitmaps()),
+	public void validateUnreachableCommitWithoutBitmaps() throws Throwable {
+		ThrowingCallable c = () -> createValidator().checkWants(
+				getUploadPack(getRepoWithoutBitmaps()),
 				Arrays.asList(unreachableCommit));
+		if (!isUnreachableCommitValid()) {
+			assertTransportException(c,
+					"want " + unreachableCommit.name() + " not valid");
+			return;
+		}
+		c.call();
 	}
 

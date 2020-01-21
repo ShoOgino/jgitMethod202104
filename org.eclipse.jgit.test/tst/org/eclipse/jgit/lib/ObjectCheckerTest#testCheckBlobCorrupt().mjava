@@ -1,6 +1,6 @@
 	@Test
-	public void testCheckBlobCorrupt() throws CorruptObjectException {
-		thrown.expect(CorruptObjectException.class);
-		SECRET_KEY_CHECKER.check(OBJ_BLOB, encodeASCII("key = \"secret_key\""));
+	public void testCheckBlobCorrupt() {
+		assertThrows(CorruptObjectException.class, () -> SECRET_KEY_CHECKER
+				.check(OBJ_BLOB, encodeASCII("key = \"secret_key\"")));
 	}
 

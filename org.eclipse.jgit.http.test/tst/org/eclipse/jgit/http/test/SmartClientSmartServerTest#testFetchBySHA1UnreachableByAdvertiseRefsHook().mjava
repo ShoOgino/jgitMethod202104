@@ -12,11 +12,11 @@
 		try (Repository dst = createBareRepository();
 				Transport t = Transport.open(dst, remoteURI)) {
 			assertFalse(dst.getObjectDatabase().has(A_txt));
-			thrown.expect(TransportException.class);
-			thrown.expectMessage(Matchers.containsString(
-					"want " + A.name() + " not valid"));
-			t.fetch(NullProgressMonitor.INSTANCE, Collections
-					.singletonList(new RefSpec(A.name())));
+			Exception e = assertThrows(TransportException.class,
+					() -> t.fetch(NullProgressMonitor.INSTANCE,
+							Collections.singletonList(new RefSpec(A.name()))));
+			assertTrue(
+					e.getMessage().contains("want " + A.name() + " not valid"));
 		}
 	}
 

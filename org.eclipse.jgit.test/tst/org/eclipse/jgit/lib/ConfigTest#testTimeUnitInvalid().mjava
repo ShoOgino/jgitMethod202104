@@ -1,8 +1,7 @@
 	@Test
-	public void testTimeUnitInvalid() throws ConfigInvalidException {
-		expectedEx.expect(IllegalArgumentException.class);
-		expectedEx
-				.expectMessage("Invalid time unit value: a.a=1 monttthhh");
-		parseTime("1 monttthhh", DAYS);
+	public void testTimeUnitInvalid() {
+		assertThrows("Invalid time unit value: a.a=1 monttthhh",
+				IllegalArgumentException.class,
+				() -> parseTime("1 monttthhh", DAYS));
 	}
 

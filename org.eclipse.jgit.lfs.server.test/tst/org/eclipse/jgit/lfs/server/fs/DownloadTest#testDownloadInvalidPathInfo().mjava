@@ -6,9 +6,7 @@
 		Path f = Paths.get(getTempDirectory().toString(), "download");
 		String error = String.format(
 				"Invalid pathInfo: '/%s' does not match '/{SHA-256}'", id);
-		exception.expect(RuntimeException.class);
-		exception.expectMessage(
-				formatErrorMessage(SC_UNPROCESSABLE_ENTITY, error));
-		getContent(id, f);
+		assertThrows(formatErrorMessage(SC_UNPROCESSABLE_ENTITY, error),
+				RuntimeException.class, () -> getContent(id, f));
 	}
 
