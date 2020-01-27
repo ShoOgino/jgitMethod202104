@@ -81,7 +81,10 @@
 			return wantUnit.convert(Long.parseLong(digits) * inputMul,
 					inputUnit);
 		} catch (NumberFormatException nfe) {
-			throw notTimeUnit(section, subsection, unitName, valueString);
+			IllegalArgumentException iae = notTimeUnit(section, subsection,
+					unitName, valueString);
+			iae.initCause(nfe);
+			throw iae;
 		}
 	}
 

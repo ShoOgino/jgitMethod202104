@@ -12,8 +12,10 @@
 						remaining -= r;
 					return r;
 				} catch (ZipException badStream) {
-					throw new CorruptObjectException(id,
+					CorruptObjectException coe = new CorruptObjectException(id,
 							JGitText.get().corruptObjectBadStream);
+					coe.initCause(badStream);
+					throw coe;
 				}
 			}
 
