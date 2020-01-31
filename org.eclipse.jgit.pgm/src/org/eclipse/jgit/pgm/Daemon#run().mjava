@@ -2,19 +2,20 @@
 	@Override
 	protected void run() throws Exception {
 		PackConfig packConfig = new PackConfig();
-
-		if (configFile != null) {
+		StoredConfig cfg;
+		if (configFile == null) {
+			cfg = getUserConfig();
+		} else {
 			if (!configFile.exists()) {
 				throw die(MessageFormat.format(
 						CLIText.get().configFileNotFound, //
 						configFile.getAbsolutePath()));
 			}
-
-			FileBasedConfig cfg = new FileBasedConfig(configFile, FS.DETECTED);
-			cfg.load();
-			new WindowCacheConfig().fromConfig(cfg).install();
-			packConfig.fromConfig(cfg);
+			cfg = new FileBasedConfig(configFile, FS.DETECTED);
 		}
+		cfg.load();
+		new WindowCacheConfig().fromConfig(cfg).install();
+		packConfig.fromConfig(cfg);
 
 		int threads = packConfig.getThreads();
 		if (threads <= 0)
