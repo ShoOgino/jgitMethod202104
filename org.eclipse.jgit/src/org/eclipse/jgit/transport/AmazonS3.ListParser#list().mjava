@@ -3,7 +3,7 @@
 			if (prefix.length() > 0)
 				args.put("prefix", prefix); //$NON-NLS-1$
 			if (!entries.isEmpty())
-				args.put("marker", prefix + entries.get(entries.size() - 1)); //$NON-NLS-1$
+				args.put("marker", prefix + entries.get(entries.size() - 1).getName()); //$NON-NLS-1$
 
 			for (int curAttempt = 0; curAttempt < maxAttempts; curAttempt++) {
 				final HttpURLConnection c = open("GET", bucket, "", args); //$NON-NLS-1$ //$NON-NLS-2$
@@ -12,6 +12,8 @@
 				case HttpURLConnection.HTTP_OK:
 					truncated = false;
 					data = null;
+					keyName = null;
+					keyLastModified = null;
 
 					final XMLReader xr;
 					try {

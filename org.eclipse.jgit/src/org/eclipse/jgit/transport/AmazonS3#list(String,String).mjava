@@ -3,6 +3,8 @@
 	 * <p>
 	 * This method is primarily meant for obtaining a "recursive directory
 	 * listing" rooted under the specified bucket and prefix location.
+	 * It returns the keys sorted in reverse order of LastModified time
+	 * (freshest keys first).
 	 *
 	 * @param bucket
 	 *            name of the bucket whose objects should be listed.
@@ -26,6 +28,9 @@
 		do {
 			lp.list();
 		} while (lp.truncated);
-		return lp.entries;
+
+		Comparator<KeyInfo> comparator = Comparator.comparingLong(KeyInfo::getLastModifiedSecs);
+		return lp.entries.stream().sorted(comparator.reversed())
+			.map(KeyInfo::getName).collect(Collectors.toList());
 	}
 
