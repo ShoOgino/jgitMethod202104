@@ -6,7 +6,6 @@
 		if (lockCount < 1)
 			throw new IllegalArgumentException(JGitText.get().lockCountMustBeGreaterOrEqual1);
 
-		queue = new ReferenceQueue<>();
 		clock = new AtomicLong(1);
 		table = new AtomicReferenceArray<>(tableSize);
 		locks = new Lock[lockCount];
@@ -28,6 +27,9 @@
 		mmap = cfg.isPackedGitMMAP();
 		windowSizeShift = bits(cfg.getPackedGitWindowSize());
 		windowSize = 1 << windowSizeShift;
+		useStrongRefs = cfg.isPackedGitUseStrongRefs();
+		queue = useStrongRefs ? new StrongCleanupQueue(this)
+				: new SoftCleanupQueue(this);
 
 		mbean = new StatsRecorderImpl();
 		statsRecorder = mbean;
