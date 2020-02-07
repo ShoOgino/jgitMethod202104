@@ -2,8 +2,9 @@
 	 * Set the branches or tags to clone.
 	 * <p>
 	 * This is ignored if {@link #setCloneAllBranches(boolean)
-	 * setCloneAllBranches(true)} is used. If {@code branchesToClone} is
-	 * {@code null} or empty, it's also ignored and all branches will be cloned.
+	 * setCloneAllBranches(true)} or {@link #setMirror(boolean) setMirror(true)}
+	 * is used. If {@code branchesToClone} is {@code null} or empty, it's also
+	 * ignored.
 	 * </p>
 	 *
 	 * @param branchesToClone
@@ -13,13 +14,7 @@
 	 * @return {@code this}
 	 */
 	public CloneCommand setBranchesToClone(Collection<String> branchesToClone) {
-		if (branchesToClone == null || branchesToClone.isEmpty()) {
-			// fallback to default
-			fetchType = FETCH_TYPE.ALL_BRANCHES;
-		} else {
-			this.fetchType = FETCH_TYPE.MULTIPLE_BRANCHES;
-			this.branchesToClone = branchesToClone;
-		}
+		this.branchesToClone = branchesToClone;
 		return this;
 	}
 
