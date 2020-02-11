@@ -26,7 +26,10 @@
 		}
 
 		if (marked) {
-			if (seen == null) {
+			if (prevCommit != null) {
+				walker.setRevFilter(new AddToBitmapWithCacheFilter(prevCommit,
+						prevBitmap, bitmapResult));
+			} else if (seen == null) {
 				walker.setRevFilter(new AddToBitmapFilter(bitmapResult));
 			} else {
 				walker.setRevFilter(
