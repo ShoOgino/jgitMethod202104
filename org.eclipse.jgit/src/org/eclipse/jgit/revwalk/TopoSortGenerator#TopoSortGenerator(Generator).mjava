@@ -22,12 +22,16 @@
 			if (c == null) {
 				break;
 			}
-			for (RevCommit p : c.parents) {
-				p.inDegree++;
-				if (firstParent) {
-					break;
+			if ((c.flags & TOPO_QUEUED) == 0) {
+				for (RevCommit p : c.parents) {
+					p.inDegree++;
+
+					if (firstParent) {
+						break;
+					}
 				}
 			}
+			c.flags |= TOPO_QUEUED;
 			pending.add(c);
 		}
 	}
