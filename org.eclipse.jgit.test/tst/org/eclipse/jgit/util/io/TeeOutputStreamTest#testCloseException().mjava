@@ -1,0 +1,23 @@
+	@Test
+	public void testCloseException() {
+		TestOutput first = new TestOutput() {
+			@Override
+			public void close() throws IOException {
+				throw new IOException();
+			}
+
+		};
+		TestOutput second = new TestOutput();
+
+		@SuppressWarnings("resource")
+		TeeOutputStream tee = new TeeOutputStream(first, second);
+		try {
+			tee.close();
+		} catch (IOException ex) {
+			// Expected from first closed
+		}
+		assertFalse("First stream should not be closed", first.closed);
+		assertTrue("Second stream should still be closed if first close failed",
+				second.closed);
+	}
+
