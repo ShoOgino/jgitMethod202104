@@ -1,12 +1,13 @@
 	@Test
-	public void validateReachableBlobWithoutBitmaps()
-			throws PackProtocolException, IOException {
-		if (!isReachableBlobValid_withoutBitmaps()) {
-			thrown.expect(TransportException.class);
-			thrown.expectMessage(Matchers.containsString(
-					"want " + reachableBlob.name() + " not valid"));
-		}
-		createValidator().checkWants(getUploadPack(getRepoWithoutBitmaps()),
+	public void validateReachableBlobWithoutBitmaps() throws Throwable {
+		ThrowingCallable c = () -> createValidator().checkWants(
+				getUploadPack(getRepoWithoutBitmaps()),
 				Arrays.asList(reachableBlob));
+		if (!isReachableBlobValid_withoutBitmaps()) {
+			assertTransportException(c,
+					"want " + reachableBlob.name() + " not valid");
+			return;
+		}
+		c.call();
 	}
 

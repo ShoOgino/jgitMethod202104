@@ -45,9 +45,11 @@
 						try {
 							pnum = Integer.parseInt(parentnum);
 						} catch (NumberFormatException e) {
-							throw new RevisionSyntaxException(
+							RevisionSyntaxException rse = new RevisionSyntaxException(
 									JGitText.get().invalidCommitParentNumber,
 									revstr);
+							rse.initCause(e);
+							throw rse;
 						}
 						if (pnum != 0) {
 							RevCommit commit = (RevCommit) rev;
@@ -142,8 +144,10 @@
 					try {
 						dist = Integer.parseInt(distnum);
 					} catch (NumberFormatException e) {
-						throw new RevisionSyntaxException(
+						RevisionSyntaxException rse = new RevisionSyntaxException(
 								JGitText.get().invalidAncestryLength, revstr);
+						rse.initCause(e);
+						throw rse;
 					}
 				} else
 					dist = 1;
@@ -202,7 +206,10 @@
 							remoteConfig = new RemoteConfig(getConfig(),
 									"origin"); //$NON-NLS-1$
 						} catch (URISyntaxException e) {
-							throw new RevisionSyntaxException(revstr);
+							RevisionSyntaxException rse = new RevisionSyntaxException(
+									revstr);
+							rse.initCause(e);
+							throw rse;
 						}
 						String remoteBranchName = getConfig()
 								.getString(

@@ -4,8 +4,7 @@
 			git.commit().setMessage("initial commit").call();
 		}
 		writeTrashFile("onlyInWorkingTree.txt", "not in repo");
-		thrown.expect(Die.class);
-		thrown.expectMessage("no such path 'onlyInWorkingTree.txt' in HEAD");
-		execute("git blame onlyInWorkingTree.txt");
+		assertThrows("no such path 'onlyInWorkingTree.txt' in HEAD", Die.class,
+				() -> execute("git blame onlyInWorkingTree.txt"));
 	}
 

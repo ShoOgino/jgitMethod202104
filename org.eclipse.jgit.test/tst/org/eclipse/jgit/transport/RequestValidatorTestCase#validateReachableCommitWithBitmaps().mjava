@@ -1,14 +1,13 @@
 	@Test
-	public void validateReachableCommitWithBitmaps()
-			throws PackProtocolException, IOException {
-		if (!isReachableCommitValid()) {
-			thrown.expect(TransportException.class);
-			thrown.expectMessage(Matchers
-					.containsString(
-							"want " + reachableCommit.name() + " not valid"));
-
-		}
-		createValidator().checkWants(getUploadPack(getRepoWithBitmaps()),
+	public void validateReachableCommitWithBitmaps() throws Throwable {
+		ThrowingCallable c = () -> createValidator().checkWants(
+				getUploadPack(getRepoWithBitmaps()),
 				Arrays.asList(reachableCommit));
+		if (!isReachableCommitValid()) {
+			assertTransportException(c,
+					"want " + reachableCommit.name() + " not valid");
+			return;
+		}
+		c.call();
 	}
 

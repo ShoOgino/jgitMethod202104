@@ -1,10 +1,16 @@
 		@Override
 		public void endElement(final String uri, final String name,
 				final String qName) throws SAXException {
-			if ("Key".equals(name)) //$NON-NLS-1$
-				entries.add(data.toString().substring(prefix.length()));
-			else if ("IsTruncated".equals(name)) //$NON-NLS-1$
+			if ("Key".equals(name))  { //$NON-NLS-1$
+				keyName = data.toString().substring(prefix.length());
+			} else if ("IsTruncated".equals(name)) { //$NON-NLS-1$
 				truncated = StringUtils.equalsIgnoreCase("true", data.toString()); //$NON-NLS-1$
+			} else if ("LastModified".equals(name)) { //$NON-NLS-1$
+				keyLastModified = Instant.parse(data.toString());
+			} else if ("Contents".equals(name)) { //$NON-NLS-1$
+				entries.add(new KeyInfo(keyName, keyLastModified.getEpochSecond()));
+			}
+
 			data = null;
 		}
 

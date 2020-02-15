@@ -21,7 +21,9 @@
 						errw.println(MessageFormat.format(CLIText.get().skippingObject, type, name));
 						continue;
 					}
-					throw new MissingObjectException(id, type);
+					MissingObjectException mue1 = new MissingObjectException(id, type);
+					mue1.initCause(mue);
+					throw mue1;
 				}
 				refs.put(name, new ObjectIdRef.Unpeeled(Ref.Storage.PACKED,
 						name, id));

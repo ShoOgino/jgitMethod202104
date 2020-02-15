@@ -11,7 +11,9 @@
 				try {
 					lck.write(content);
 				} catch (IOException ioe) {
-					throw new ObjectWritingException(MessageFormat.format(CLIText.get().cantWrite, file));
+					throw new ObjectWritingException(
+							MessageFormat.format(CLIText.get().cantWrite, file),
+							ioe);
 				}
 				if (!lck.commit())
 					throw new ObjectWritingException(MessageFormat.format(CLIText.get().cantWrite, file));

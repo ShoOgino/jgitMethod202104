@@ -6,8 +6,10 @@
 			try {
 				r = inf.inflate(buf);
 			} catch (DataFormatException e) {
-				throw new CorruptObjectException(id,
+				CorruptObjectException coe = new CorruptObjectException(id,
 						JGitText.get().corruptObjectBadStream);
+				coe.initCause(e);
+				throw coe;
 			}
 			if (r != 0)
 				throw new CorruptObjectException(id,

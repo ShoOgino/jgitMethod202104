@@ -4,8 +4,7 @@
 			writeTrashFile("inIndex.txt", "index");
 			git.add().addFilepattern("inIndex.txt").call();
 		}
-		thrown.expect(Die.class);
-		thrown.expectMessage("no such ref: HEAD");
-		execute("git blame inIndex.txt");
+		assertThrows("no such ref: HEAD", Die.class,
+				() -> execute("git blame inIndex.txt"));
 	}
 

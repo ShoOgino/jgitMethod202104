@@ -1,6 +1,5 @@
 	@Test
-	public void testShallowFileCorrupt()
-			throws Exception {
+	public void testShallowFileCorrupt() throws Exception {
 		FileRepository repository = createBareRepository();
 		ObjectDirectory dir = repository.getObjectDatabase();
 
@@ -10,10 +9,8 @@
 				UTF_8.name())) {
 			writer.println(commit);
 		}
-
-		expectedEx.expect(IOException.class);
-		expectedEx.expectMessage(MessageFormat
-				.format(JGitText.get().badShallowLine, commit));
-		dir.getShallowCommits();
+		assertThrows(
+				MessageFormat.format(JGitText.get().badShallowLine, commit),
+				IOException.class, () -> dir.getShallowCommits());
 	}
 

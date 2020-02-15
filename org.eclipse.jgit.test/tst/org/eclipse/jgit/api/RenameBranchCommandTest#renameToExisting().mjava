@@ -1,7 +1,7 @@
 	@Test
 	public void renameToExisting() throws Exception {
 		assertNotNull(git.branchCreate().setName("foo").call());
-		thrown.expect(RefAlreadyExistsException.class);
-		git.branchRename().setOldName("master").setNewName("foo").call();
+		assertThrows(RefAlreadyExistsException.class, () -> git.branchRename()
+				.setOldName("master").setNewName("foo").call());
 	}
 

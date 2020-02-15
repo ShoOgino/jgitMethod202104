@@ -1,7 +1,6 @@
 	@Test
-	public void testCrEOFContinuation() throws ConfigInvalidException {
-		expectedEx.expect(ConfigInvalidException.class);
-		expectedEx.expectMessage("Bad escape: \\u000d");
-		parseEscapedValue("tr\\\r");
+	public void testCrEOFContinuation() {
+		assertThrows("Bad escape: \\u000d", ConfigInvalidException.class,
+				() -> parseEscapedValue("tr\\\r"));
 	}
 

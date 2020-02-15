@@ -1,12 +1,10 @@
 	@Test
-	public void testDownloadNotFound()
-			throws ClientProtocolException, IOException {
+	public void testDownloadNotFound() {
 		String TEXT = "test";
 		AnyLongObjectId id = LongObjectIdTestUtils.hash(TEXT);
 		Path f = Paths.get(getTempDirectory().toString(), "download");
 		String error = String.format("Object '%s' not found", id.getName());
-		exception.expect(RuntimeException.class);
-		exception.expectMessage(formatErrorMessage(SC_NOT_FOUND, error));
-		getContent(id, f);
+		assertThrows(formatErrorMessage(SC_NOT_FOUND, error),
+				RuntimeException.class, () -> getContent(id, f));
 	}
 

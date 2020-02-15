@@ -1,8 +1,7 @@
 	@Test
 	public void blockSizeNotPowerOfTwoExpectsException() {
-		thrown.expect(IllegalArgumentException.class);
-		thrown.expectMessage(is(JGitText.get().blockSizeNotPowerOf2));
-
-		new DfsBlockCacheConfig().setBlockSize(1000);
+		assertThrows(JGitText.get().blockSizeNotPowerOf2,
+				IllegalArgumentException.class,
+				() -> new DfsBlockCacheConfig().setBlockSize(1000));
 	}
 

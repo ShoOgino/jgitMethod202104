@@ -1,7 +1,6 @@
 	@Test
-	public void testIncludeInvalidName() throws ConfigInvalidException {
-		expectedEx.expect(ConfigInvalidException.class);
-		expectedEx.expectMessage(JGitText.get().invalidLineInConfigFile);
-		parse("[include]\nbar\n");
+	public void testIncludeInvalidName() {
+		assertThrows(JGitText.get().invalidLineInConfigFile,
+				ConfigInvalidException.class, () -> parse("[include]\nbar\n"));
 	}
 

@@ -1,8 +1,8 @@
 	@Test
 	public void testTimeUnitInvalidWithSection() throws ConfigInvalidException {
 		Config c = parse("[a \"b\"]\na=1 monttthhh\n");
-		expectedEx.expect(IllegalArgumentException.class);
-		expectedEx.expectMessage("Invalid time unit value: a.b.a=1 monttthhh");
-		c.getTimeUnit("a", "b", "a", 0, DAYS);
+		assertThrows("Invalid time unit value: a.b.a=1 monttthhh",
+				IllegalArgumentException.class,
+				() -> c.getTimeUnit("a", "b", "a", 0, DAYS));
 	}
 

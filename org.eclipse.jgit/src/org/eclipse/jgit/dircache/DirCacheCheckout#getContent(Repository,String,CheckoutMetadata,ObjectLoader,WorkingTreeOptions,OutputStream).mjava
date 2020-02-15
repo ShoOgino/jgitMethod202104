@@ -1,0 +1,58 @@
+	/**
+	 * Return filtered content for a specific object (blob). EOL handling and
+	 * smudge-filter handling are applied in the same way as it would be done
+	 * during a checkout.
+	 *
+	 * @param repo
+	 *            the repository
+	 * @param path
+	 *            the path used to determine the correct filters for the object
+	 * @param checkoutMetadata
+	 *            containing
+	 *            <ul>
+	 *            <li>smudgeFilterCommand to be run for smudging the object</li>
+	 *            <li>eolStreamType used for stream conversion (can be
+	 *            null)</li>
+	 *            </ul>
+	 * @param ol
+	 *            the object loader to read raw content of the object
+	 * @param opt
+	 *            the working tree options where only 'core.autocrlf' is used
+	 *            for EOL handling if 'checkoutMetadata.eolStreamType' is not
+	 *            valid
+	 * @param os
+	 *            the output stream the filtered content is written to. The
+	 *            caller is responsible to close the stream.
+	 * @throws IOException
+	 *
+	 * @since 5.7
+	 */
+	public static void getContent(Repository repo, String path,
+			CheckoutMetadata checkoutMetadata, ObjectLoader ol,
+			WorkingTreeOptions opt, OutputStream os)
+			throws IOException {
+		EolStreamType nonNullEolStreamType;
+		if (checkoutMetadata.eolStreamType != null) {
+			nonNullEolStreamType = checkoutMetadata.eolStreamType;
+		} else if (opt.getAutoCRLF() == AutoCRLF.TRUE) {
+			nonNullEolStreamType = EolStreamType.AUTO_CRLF;
+		} else {
+			nonNullEolStreamType = EolStreamType.DIRECT;
+		}
+		try (OutputStream channel = EolStreamTypeUtil.wrapOutputStream(
+				os, nonNullEolStreamType)) {
+			if (checkoutMetadata.smudgeFilterCommand != null) {
+				if (FilterCommandRegistry
+						.isRegistered(checkoutMetadata.smudgeFilterCommand)) {
+					runBuiltinFilterCommand(repo, checkoutMetadata, ol,
+							channel);
+				} else {
+					runExternalFilterCommand(repo, path, checkoutMetadata, ol,
+							channel);
+				}
+			} else {
+				ol.copyTo(channel);
+			}
+		}
+	}
+

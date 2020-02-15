@@ -1,0 +1,16 @@
+	@Override
+	@Before
+	public void setUp() throws Exception {
+		originalSecurityManager = System.getSecurityManager();
+
+		appender = new WriterAppender(
+				new PatternLayout(PatternLayout.TTCC_CONVERSION_PATTERN),
+				errorOutputWriter);
+
+		Logger.getRootLogger().addAppender(appender);
+
+		refreshPolicyAllPermission(Policy.getPolicy());
+		System.setSecurityManager(new SecurityManager());
+		super.setUp();
+	}
+

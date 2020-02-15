@@ -1,13 +1,13 @@
 	@Test
-	public void validateAdvertisedTipWithBitmaps()
-			throws PackProtocolException, IOException {
-		if (!isAdvertisedTipValid()) {
-			thrown.expect(TransportException.class);
-			thrown.expectMessage(Matchers.containsString(
-					"want " + tipAdvertisedCommit.name() + " not valid"));
-
-		}
-		createValidator().checkWants(getUploadPack(getRepoWithBitmaps()),
+	public void validateAdvertisedTipWithBitmaps() throws Throwable {
+		ThrowingCallable c = () -> createValidator().checkWants(
+				getUploadPack(getRepoWithBitmaps()),
 				Arrays.asList(tipAdvertisedCommit));
+		if (!isAdvertisedTipValid()) {
+			assertTransportException(c,
+					"want " + tipAdvertisedCommit.name() + " not valid");
+			return;
+		}
+		c.call();
 	}
 

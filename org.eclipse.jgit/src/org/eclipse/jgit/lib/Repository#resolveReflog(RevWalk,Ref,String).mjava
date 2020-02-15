@@ -4,8 +4,11 @@
 		try {
 			number = Integer.parseInt(time);
 		} catch (NumberFormatException nfe) {
-			throw new RevisionSyntaxException(MessageFormat.format(
-					JGitText.get().invalidReflogRevision, time));
+			RevisionSyntaxException rse = new RevisionSyntaxException(
+					MessageFormat.format(JGitText.get().invalidReflogRevision,
+							time));
+			rse.initCause(nfe);
+			throw rse;
 		}
 		assert number >= 0;
 		ReflogReader reader = getReflogReader(ref.getName());

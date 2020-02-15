@@ -1,7 +1,7 @@
 	@Test
-	public void testIncludeEmptyValue() throws ConfigInvalidException {
-		expectedEx.expect(ConfigInvalidException.class);
-		expectedEx.expectMessage(JGitText.get().invalidLineInConfigFile);
-		parse("[include]\npath=\n");
+	public void testIncludeEmptyValue() {
+		assertThrows(JGitText.get().invalidLineInConfigFile,
+				ConfigInvalidException.class,
+				() -> parse("[include]\npath=\n"));
 	}
 

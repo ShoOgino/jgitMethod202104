@@ -1,7 +1,7 @@
 	@Test
 	public void testNonBundleFails() throws Exception {
 		Repository newRepo = createBareRepository();
-		thrown.expect(TransportException.class);
-		fetchFromBundle(newRepo, "Not a bundle file".getBytes(UTF_8));
+		assertThrows(TransportException.class, () -> fetchFromBundle(newRepo,
+				"Not a bundle file".getBytes(UTF_8)));
 	}
 

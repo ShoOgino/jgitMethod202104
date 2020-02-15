@@ -1,8 +1,8 @@
 	// Run an external filter command
-	private static void runExternalFilterCommand(Repository repo,
-			DirCacheEntry entry,
-			CheckoutMetadata checkoutMetadata, ObjectLoader ol, FS fs,
+	private static void runExternalFilterCommand(Repository repo, String path,
+			CheckoutMetadata checkoutMetadata, ObjectLoader ol,
 			OutputStream channel) throws IOException {
+		FS fs = repo.getFS();
 		ProcessBuilder filterProcessBuilder = fs.runInShell(
 				checkoutMetadata.smudgeFilterCommand, new String[0]);
 		filterProcessBuilder.directory(repo.getWorkTree());
@@ -21,12 +21,12 @@
 		} catch (IOException | InterruptedException e) {
 			throw new IOException(new FilterFailedException(e,
 					checkoutMetadata.smudgeFilterCommand,
-					entry.getPathString()));
+					path));
 		}
 		if (rc != 0) {
 			throw new IOException(new FilterFailedException(rc,
 					checkoutMetadata.smudgeFilterCommand,
-					entry.getPathString(),
+					path,
 					result.getStdout().toByteArray(MAX_EXCEPTION_TEXT_SIZE),
 					RawParseUtils.decode(result.getStderr()
 							.toByteArray(MAX_EXCEPTION_TEXT_SIZE))));
