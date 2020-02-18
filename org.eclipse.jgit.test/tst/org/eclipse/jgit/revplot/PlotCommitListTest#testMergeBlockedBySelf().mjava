@@ -1,13 +1,17 @@
 	/**
 	 * <pre>
 	 * a4
-	 * |   b3
-	 * a3  |
-	 * | \\|
-	 * |   |\\
-	 * |   b2||
-	 * a2  | //
-	 * |   b1
+	 * |
+	 * a3
+	 * | \\
+	 * a2  \\
+	 * |    \\
+	 * |  b3 ||
+	 * |  |  ||
+	 * |  b2 ||
+	 * |  | //
+	 * |  b1
+	 * |  |
 	 * | /
 	 * a1
 	 * </pre>
@@ -34,10 +38,10 @@
 			Set<Integer> positions = asSet(0, 1);
 			CommitListAssert test = new CommitListAssert(pcl);
 			int posA = test.commit(a4).lanePos(positions).getLanePos();
-			int posB = test.commit(b3).lanePos(positions).getLanePos();
 			test.commit(a3).lanePos(posA);
-			test.commit(b2).lanePos(posB);
 			test.commit(a2).lanePos(posA);
+			int posB = test.commit(b3).lanePos(positions).getLanePos();
+			test.commit(b2).lanePos(posB);
 			// b1 is not repositioned, uses "detour lane"
 			// (drawn as a double arc in the ascii graph above)
 			test.commit(b1).lanePos(posB);
