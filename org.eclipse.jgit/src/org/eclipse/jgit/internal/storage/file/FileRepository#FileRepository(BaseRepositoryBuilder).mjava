@@ -28,18 +28,17 @@
 				ConfigConstants.CONFIG_KEY_REPO_FORMAT_VERSION, 0);
 
 		String reftype = repoConfig.getString(
-				"extensions", null, "refStorage"); //$NON-NLS-1$ //$NON-NLS-2$
+				ConfigConstants.CONFIG_EXTENSIONS_SECTION, null,
+				ConfigConstants.CONFIG_KEY_REF_STORAGE);
 		if (repositoryFormatVersion >= 1 && reftype != null) {
-			if (StringUtils.equalsIgnoreCase(reftype, "reftable")) { //$NON-NLS-1$
-				refs = new FileReftableDatabase(this,
-						new File(getDirectory(), "refs")); //$NON-NLS-1$
+			if (StringUtils.equalsIgnoreCase(reftype,
+					ConfigConstants.CONFIG_REF_STORAGE_REFTABLE)) {
+				refs = new FileReftableDatabase(this);
 			} else if (StringUtils.equalsIgnoreCase(reftype, "reftree")) { //$NON-NLS-1$
 				refs = new RefTreeDatabase(this, new RefDirectory(this));
 			} else {
 				throw new IOException(JGitText.get().unknownRepositoryFormat);
 			}
-		} else if (FileReftableDatabase.isReftable(getDirectory())) {
-			refs = new FileReftableDatabase(this, new File(getDirectory(), "refs")); //$NON-NLS-1$
 		} else {
 			refs = new RefDirectory(this);
 		}

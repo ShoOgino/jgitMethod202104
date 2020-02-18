@@ -1,22 +1,37 @@
+	/**
+	 * Converts the RefDatabase from RefDirectory to reftable. This operation is
+	 * not atomic.
+	 *
+	 * @param writeLogs
+	 *            whether to write reflogs
+	 * @param backup
+	 *            whether to rename or delete the old storage files. If set to
+	 *            {@code true}, the loose refs are left in {@code refs.old}, the
+	 *            packed-refs in {@code packed-refs.old} and reflogs in
+	 *            {@code refs.old/}. HEAD is left in {@code HEAD.old} and also
+	 *            {@code .log} is appended to additional refs. If set to
+	 *            {@code false}, the {@code refs/} and {@code logs/} directories
+	 *            and {@code HEAD} and additional symbolic refs are removed.
+	 * @throws IOException
+	 *             on IO problem
+	 */
 	@SuppressWarnings("nls")
 	void convertToReftable(boolean writeLogs, boolean backup)
 			throws IOException {
-		File newRefs = new File(getDirectory(), "refs.new");
 		File reftableDir = new File(getDirectory(), Constants.REFTABLE);
-
+		File headFile = new File(getDirectory(), Constants.HEAD);
 		if (reftableDir.exists() && reftableDir.listFiles().length > 0) {
 			throw new IOException(JGitText.get().reftableDirExists);
 		}
 
 		// Ignore return value, as it is tied to temporary newRefs file.
-		FileReftableDatabase.convertFrom(this, newRefs, writeLogs);
+		FileReftableDatabase.convertFrom(this, writeLogs);
 
 		File refsFile = new File(getDirectory(), "refs");
 
 		// non-atomic: remove old data.
 		File packedRefs = new File(getDirectory(), Constants.PACKED_REFS);
 		File logsDir = new File(getDirectory(), Constants.LOGS);
-
 
 		List<String> additional = getRefDatabase().getAdditionalRefs().stream()
 				.map(Ref::getName).collect(toList());
@@ -36,7 +51,8 @@
 					new File(getDirectory(), r + ".old"));
 			}
 		} else {
-			packedRefs.delete(); // ignore return value.
+			FileUtils.delete(packedRefs, FileUtils.SKIP_MISSING);
+			FileUtils.delete(headFile);
 			FileUtils.delete(logsDir, FileUtils.RECURSIVE);
 			FileUtils.delete(refsFile, FileUtils.RECURSIVE);
 			for (String r : additional) {
@@ -44,10 +60,25 @@
 			}
 		}
 
-		// Put new data.
-		FileUtils.rename(newRefs, refsFile);
+		FileUtils.mkdir(refsFile, true);
 
+		// By putting in a dummy HEAD, old versions of Git still detect a repo
+		// (that they can't read)
+		try (OutputStream os = new FileOutputStream(headFile)) {
+			os.write(Constants.encodeASCII("ref: refs/heads/.invalid"));
+		}
+
+		// Some tools might write directly into .git/refs/heads/BRANCH. By
+		// putting a file here, this fails spectacularly.
+		FileUtils.createNewFile(new File(refsFile, "heads"));
+
+		repoConfig.setString(ConfigConstants.CONFIG_EXTENSIONS_SECTION, null,
+				ConfigConstants.CONFIG_KEY_REF_STORAGE,
+				ConfigConstants.CONFIG_REF_STORAGE_REFTABLE);
+		repoConfig.setLong(ConfigConstants.CONFIG_CORE_SECTION, null,
+				ConfigConstants.CONFIG_KEY_REPO_FORMAT_VERSION, 1);
+		repoConfig.save();
 		refs.close();
-		refs = new FileReftableDatabase(this, refsFile);
+		refs = new FileReftableDatabase(this);
 	}
 

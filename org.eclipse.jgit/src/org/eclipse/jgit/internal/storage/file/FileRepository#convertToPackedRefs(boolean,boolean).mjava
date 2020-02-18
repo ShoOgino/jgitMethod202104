@@ -2,15 +2,18 @@
 	 * Converts the RefDatabase from reftable to RefDirectory. This operation is
 	 * not atomic.
 	 *
+	 * @param writeLogs
+	 *            whether to write reflogs
 	 * @param backup
 	 *            whether to rename or delete the old storage files. If set to
-	 *            true, the reftable list is left in "refs.old", and the
-	 *            reftable/ dir is left alone. If set to false, the reftable/
-	 *            dir is removed, and "refs" file is removed.
+	 *            {@code true}, the reftable list is left in {@code refs.old},
+	 *            and the {@code reftable/} dir is left alone. If set to
+	 *            {@code false}, the {@code reftable/} dir is removed, and
+	 *            {@code refs} file is removed.
 	 * @throws IOException
 	 *             on IO problem
 	 */
-	void convertToPackedRefs(boolean backup) throws IOException {
+	void convertToPackedRefs(boolean writeLogs, boolean backup) throws IOException {
 		List<Ref> all = refs.getRefs();
 		File packedRefs = new File(getDirectory(), Constants.PACKED_REFS);
 		if (packedRefs.exists()) {
@@ -19,26 +22,26 @@
 		}
 
 		File refsFile = new File(getDirectory(), "refs"); //$NON-NLS-1$
+		File refsHeadsFile = new File(refsFile, "heads");//$NON-NLS-1$
+		File headFile = new File(getDirectory(), Constants.HEAD);
+		FileReftableDatabase oldDb = (FileReftableDatabase) refs;
 
-		refs.close();
-
-		if (backup) {
-			File refsOld = new File(getDirectory(), "refs.old"); //$NON-NLS-1$
-			if (refsOld.exists()) {
-				throw new IOException(MessageFormat.format(
-					JGitText.get().fileAlreadyExists,
-						"refs.old")); //$NON-NLS-1$
-			}
-			FileUtils.rename(refsFile, refsOld);
-		} else {
-			refsFile.delete();
-		}
+		// Remove the dummy files that ensure compatibility with older git
+		// versions (see convertToReftable). First make room for refs/heads/
+		refsHeadsFile.delete();
+		// RefDirectory wants to create the refs/ directory from scratch, so
+		// remove that too.
+		refsFile.delete();
+		// remove HEAD so its previous invalid value doesn't cause issues.
+		headFile.delete();
 
 		// This is not atomic, but there is no way to instantiate a RefDirectory
 		// that is disconnected from the current repo.
-		refs = new RefDirectory(this);
+		RefDirectory refDir = new RefDirectory(this);
+		refs = refDir;
 		refs.create();
 
+		ReflogWriter logWriter = refDir.newLogWriter(true);
 		List<Ref> symrefs = new ArrayList<>();
 		BatchRefUpdate bru = refs.newBatchUpdate();
 		for (Ref r : all) {
@@ -47,6 +50,15 @@
 			} else {
 				bru.addCommand(new ReceiveCommand(ObjectId.zeroId(),
 						r.getObjectId(), r.getName()));
+			}
+
+			if (writeLogs) {
+				List<ReflogEntry> logs = oldDb.getReflogReader(r.getName())
+					.getReverseEntries();
+				Collections.reverse(logs);
+				for (ReflogEntry e : logs) {
+					logWriter.log(r.getName(), e);
+				}
 			}
 		}
 
@@ -83,5 +95,7 @@
 			FileUtils.delete(reftableDir,
 					FileUtils.RECURSIVE | FileUtils.IGNORE_ERRORS);
 		}
+		repoConfig.unset(ConfigConstants.CONFIG_EXTENSIONS_SECTION, null,
+				ConfigConstants.CONFIG_KEY_REF_STORAGE);
 	}
 
