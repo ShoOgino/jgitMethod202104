@@ -8,8 +8,9 @@
 		MergedReftable mr = new MergedReftable(new ArrayList<>(tables));
 		mr.setIncludeDeletes(includeDeletes);
 
-		writer.setMinUpdateIndex(Math.max(minUpdateIndex, 0));
-		writer.setMaxUpdateIndex(maxUpdateIndex);
+		writer.setMaxUpdateIndex(mr.maxUpdateIndex());
+		writer.setMinUpdateIndex(mr.minUpdateIndex());
+
 		writer.begin();
 		mergeRefs(mr);
 		mergeLogs(mr);
