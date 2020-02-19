@@ -1,8 +1,5 @@
 	/**
 	 * Add all of the tables, in the specified order.
-	 * <p>
-	 * Unconditionally adds all tables, ignoring the
-	 * {@link #setCompactBytesLimit(long)}.
 	 *
 	 * @param readers
 	 *            tables to compact. Tables should be ordered oldest first/most
@@ -14,7 +11,6 @@
 	public void addAll(List<ReftableReader> readers) throws IOException {
 		for (ReftableReader r : readers) {
 			tables.add(r);
-			adjustUpdateIndexes(r);
 		}
 	}
 

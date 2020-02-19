@@ -16,7 +16,9 @@
 		ReftableCompactor compactor;
 		try (ByteArrayOutputStream outBuf = new ByteArrayOutputStream()) {
 			compactor = new ReftableCompactor(outBuf);
-			compactor.tryAddFirst(read(inTab));
+			List<ReftableReader> readers = new ArrayList<>();
+			readers.add(read(inTab));
+			compactor.addAll(readers);
 			compactor.compact();
 			outTab = outBuf.toByteArray();
 		}
