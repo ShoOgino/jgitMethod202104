@@ -1,0 +1,23 @@
+	@Test
+	public void test() throws IOException {
+		byte[] data = Constants.encode("Hello World");
+
+		TestOutput first = new TestOutput();
+		TestOutput second = new TestOutput();
+		try (TeeOutputStream tee = new TeeOutputStream(first, second)) {
+			tee.write(data);
+			assertArrayEquals("Stream output must match", first.toByteArray(),
+					second.toByteArray());
+
+			tee.write(1);
+			assertArrayEquals("Stream output must match", first.toByteArray(),
+					second.toByteArray());
+
+			tee.write(data, 1, 4); // Test partial write methods
+			assertArrayEquals("Stream output must match", first.toByteArray(),
+					second.toByteArray());
+		}
+		assertTrue("First stream should be closed", first.closed);
+		assertTrue("Second stream should be closed", second.closed);
+	}
+

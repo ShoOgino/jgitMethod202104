@@ -1,0 +1,9 @@
+	@Test
+	public void testEncodeMatchesDecode() {
+		String[] testStrings = { "", "cow", "a", "a secret string",
+				"\0\1\2\r\n\t" };
+		for (String e : testStrings) {
+			JGitTestUtil.assertEquals(b(e), decode(toHexString(b(e))));
+		}
+	}
+

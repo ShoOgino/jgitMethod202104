@@ -1,0 +1,19 @@
+	/**
+	 * Encode a byte array to a hexadecimal string.
+	 *
+	 * @param b byte array
+	 * @return hexadecimal string
+	 */
+	public static String toHexString(byte[] b) {
+		char[] c = new char[b.length * 2];
+
+		for (int i = 0; i < b.length; i++) {
+			int v = b[i] & 0xFF;
+
+			c[i * 2] = HEX[v >>> 4];
+			c[i * 2 + 1] = HEX[v & 0x0F];
+		}
+
+		return new String(c);
+	}
+
