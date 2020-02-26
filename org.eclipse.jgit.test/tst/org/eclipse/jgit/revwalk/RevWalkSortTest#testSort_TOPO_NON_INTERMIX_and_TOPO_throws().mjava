@@ -1,0 +1,17 @@
+	@Test
+	public void testSort_TOPO_NON_INTERMIX_and_TOPO_throws() throws Exception {
+		final RevCommit a = commit();
+
+		rw.sort(RevSort.TOPO_KEEP_BRANCH_TOGETHER);
+		rw.sort(RevSort.TOPO, true);
+		markStart(a);
+		try {
+			rw.next();
+			fail("did not throw IllegalStateException");
+		} catch (IllegalStateException e) {
+			assertEquals(
+					JGitText.get().cannotCombineTopoSortWithTopoNonIntermixSort,
+					e.getMessage());
+		}
+	}
+
