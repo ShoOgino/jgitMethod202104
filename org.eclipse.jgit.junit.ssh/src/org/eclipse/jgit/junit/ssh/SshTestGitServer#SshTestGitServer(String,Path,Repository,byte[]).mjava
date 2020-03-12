@@ -32,14 +32,14 @@
 
 		configureAuthentication();
 
-		List<NamedFactory<Command>> subsystems = configureSubsystems();
+		List<SubsystemFactory> subsystems = configureSubsystems();
 		if (!subsystems.isEmpty()) {
 			server.setSubsystemFactories(subsystems);
 		}
 
 		configureShell();
 
-		server.setCommandFactory(command -> {
+		server.setCommandFactory((channel, command) -> {
 			if (command.startsWith(RemoteConfig.DEFAULT_UPLOAD_PACK)) {
 				return new GitUploadPackCommand(command, executorService);
 			} else if (command.startsWith(RemoteConfig.DEFAULT_RECEIVE_PACK)) {

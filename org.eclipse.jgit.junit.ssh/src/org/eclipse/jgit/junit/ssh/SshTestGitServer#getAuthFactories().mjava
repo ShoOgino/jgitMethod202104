@@ -1,8 +1,9 @@
-	private List<NamedFactory<UserAuth>> getAuthFactories() {
-		List<NamedFactory<UserAuth>> authentications = new ArrayList<>();
+	private List<UserAuthFactory> getAuthFactories() {
+		List<UserAuthFactory> authentications = new ArrayList<>();
 		authentications.add(new UserAuthGSSFactory() {
 			@Override
-			public UserAuth create() {
+			public UserAuth createUserAuth(ServerSession session)
+					throws IOException {
 				return new FakeUserAuthGSS();
 			}
 		});
