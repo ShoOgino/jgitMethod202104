@@ -1,0 +1,38 @@
+	/**
+	 * Create a new sorter and completely spin the generator.
+	 * <p>
+	 * When the constructor completes the supplied generator will have no
+	 * commits remaining, as all of the commits will be held inside of this
+	 * generator's internal buffer.
+	 *
+	 * @param s
+	 *            generator to pull all commits out of, and into this buffer.
+	 * @throws MissingObjectException
+	 * @throws IncorrectObjectTypeException
+	 * @throws IOException
+	 */
+	TopoNonIntermixSortGenerator(Generator s) throws MissingObjectException,
+			IncorrectObjectTypeException, IOException {
+		super(s.firstParent);
+		pending = new FIFORevQueue(firstParent);
+		outputType = s.outputType() | SORT_TOPO;
+		s.shareFreeList(pending);
+		for (;;) {
+			final RevCommit c = s.next();
+			if (c == null) {
+				break;
+			}
+			if ((c.flags & TOPO_QUEUED) == 0) {
+				for (RevCommit p : c.parents) {
+					p.inDegree++;
+
+					if (firstParent) {
+						break;
+					}
+				}
+			}
+			c.flags |= TOPO_QUEUED;
+			pending.add(c);
+		}
+	}
+

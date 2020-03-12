@@ -1,0 +1,21 @@
+	@Test
+	public void testSort_TOPO_NON_INTERMIX_REVERSE() throws Exception {
+		// c1 is back dated before its parent.
+		//
+		final RevCommit a = commit();
+		final RevCommit b = commit(a);
+		final RevCommit c1 = commit(-5, b);
+		final RevCommit c2 = commit(10, b);
+		final RevCommit d = commit(c1, c2);
+
+		rw.sort(RevSort.TOPO_KEEP_BRANCH_TOGETHER);
+		rw.sort(RevSort.REVERSE, true);
+		markStart(d);
+		assertCommit(a, rw.next());
+		assertCommit(b, rw.next());
+		assertCommit(c1, rw.next());
+		assertCommit(c2, rw.next());
+		assertCommit(d, rw.next());
+		assertNull(rw.next());
+	}
+

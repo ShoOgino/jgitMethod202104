@@ -1,0 +1,44 @@
+	@Override
+	RevCommit next() throws MissingObjectException,
+			IncorrectObjectTypeException, IOException {
+		for (;;) {
+			final RevCommit c = pending.next();
+			if (c == null) {
+				return null;
+			}
+
+			if (c.inDegree > 0) {
+				// At least one of our children is missing. We delay
+				// production until all of our children are output.
+				//
+				continue;
+			}
+
+			if ((c.flags & TOPO_QUEUED) == 0) {
+				// c is a parent that already produced or a parent that
+				// was never in the priority queue and should never produce.
+				//
+				continue;
+			}
+
+			for (RevCommit p : c.parents) {
+				if (--p.inDegree == 0 && (p.flags & TOPO_QUEUED) != 0) {
+					// The parent has no unproduced interesting children. unpop
+					// the parent so it goes right behind this child. This means
+					// that this parent commit may appear in "pending" more than
+					// once, but this is safe since upon the second and
+					// subsequent iterations with this commit, it will no longer
+					// have TOPO_QUEUED set, and thus will be skipped.
+					//
+					pending.unpop(p);
+				}
+				if (firstParent) {
+					break;
+				}
+			}
+
+			c.flags &= ~TOPO_QUEUED;
+			return c;
+		}
+	}
+
