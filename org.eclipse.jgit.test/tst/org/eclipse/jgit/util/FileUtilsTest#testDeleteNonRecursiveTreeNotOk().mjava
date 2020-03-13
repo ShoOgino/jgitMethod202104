@@ -1,0 +1,16 @@
+	@Test
+	public void testDeleteNonRecursiveTreeNotOk() throws IOException {
+		File t = new File(trash, "t");
+		FileUtils.mkdir(t);
+		File f = new File(t, "f");
+		FileUtils.createNewFile(f);
+		try {
+			FileUtils.delete(t, FileUtils.EMPTY_DIRECTORIES_ONLY);
+			fail("expected failure to delete f");
+		} catch (IOException e) {
+			assertTrue(e.getMessage().endsWith(t.getAbsolutePath()));
+		}
+		assertTrue(f.exists());
+		assertTrue(t.exists());
+	}
+

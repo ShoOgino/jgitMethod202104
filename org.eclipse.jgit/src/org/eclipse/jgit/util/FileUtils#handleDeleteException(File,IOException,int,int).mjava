@@ -1,0 +1,8 @@
+	private static void handleDeleteException(File f, IOException e,
+			int allOptions, int checkOptions) throws IOException {
+		if (e != null && (allOptions & checkOptions) == 0) {
+			throw new IOException(MessageFormat.format(
+					JGitText.get().deleteFileFailed, f.getAbsolutePath()), e);
+		}
+	}
+
