@@ -11,6 +11,9 @@
 
 		config.setFetchRefSpecs(calculateRefSpecs(fetchType, config.getName()));
 		config.setMirror(fetchType == FETCH_TYPE.MIRROR);
+		if (tagOption != null) {
+			config.setTagOpt(tagOption);
+		}
 		config.update(clonedRepo.getConfig());
 
 		clonedRepo.getConfig().save();
@@ -19,7 +22,12 @@
 		FetchCommand command = new FetchCommand(clonedRepo);
 		command.setRemote(remote);
 		command.setProgressMonitor(monitor);
-		command.setTagOpt(fetchAll ? TagOpt.FETCH_TAGS : TagOpt.AUTO_FOLLOW);
+		if (tagOption != null) {
+			command.setTagOpt(tagOption);
+		} else {
+			command.setTagOpt(
+					fetchAll ? TagOpt.FETCH_TAGS : TagOpt.AUTO_FOLLOW);
+		}
 		configure(command);
 
 		return command.call();

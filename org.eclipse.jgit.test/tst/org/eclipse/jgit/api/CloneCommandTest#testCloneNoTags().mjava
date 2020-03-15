@@ -1,0 +1,17 @@
+	@Test
+	public void testCloneNoTags() throws IOException, JGitInternalException,
+			GitAPIException, URISyntaxException {
+		File directory = createTempDirectory("testCloneRepository");
+		CloneCommand command = Git.cloneRepository();
+		command.setDirectory(directory);
+		command.setURI(fileUri());
+		command.setNoTags();
+		Git git2 = command.call();
+		addRepoToClose(git2.getRepository());
+		assertNotNull(git2);
+		assertNotNull(git2.getRepository().resolve("refs/heads/test"));
+		assertNull(git2.getRepository().resolve("tag-initial"));
+		assertNull(git2.getRepository().resolve("tag-for-blob"));
+		assertTagOption(git2.getRepository(), TagOpt.NO_TAGS);
+	}
+
