@@ -1,0 +1,16 @@
+	private void verifyIndexContent(String path, byte[] expectedContent)
+			throws Exception {
+		DirCache dc = db.readDirCache();
+		for (int i = 0; i < dc.getEntryCount(); ++i) {
+			DirCacheEntry entry = dc.getEntry(i);
+			if (path.equals(entry.getPathString())) {
+				byte[] data = db.open(entry.getObjectId(), Constants.OBJ_BLOB)
+						.getCachedBytes();
+				assertArrayEquals("Unexpected index content for " + path,
+						expectedContent, data);
+				return;
+			}
+		}
+		fail("Path not found in index: " + path);
+	}
+

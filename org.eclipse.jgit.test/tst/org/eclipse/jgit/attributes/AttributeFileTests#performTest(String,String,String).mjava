@@ -1,0 +1,27 @@
+	private void performTest(String initial, String index, String finalText)
+			throws Exception {
+		File dummy = writeTrashFile("dummy.foo", initial);
+		byte[] data = readTestResource("add.png");
+		assertTrue("Expected some binary data", data.length > 100);
+		File binary = writeTrashFile("add.png", "");
+		Files.write(binary.toPath(), data);
+		try (Git git = Git.wrap(db)) {
+			git.add().addFilepattern(".").call();
+			git.commit().setMessage("test commit").call();
+			// binary should be unchanged, dummy should match "index"
+			verifyIndexContent("dummy.foo",
+					index.getBytes(StandardCharsets.UTF_8));
+			verifyIndexContent("add.png", data);
+			assertTrue("Should be able to delete " + dummy, dummy.delete());
+			assertTrue("Should be able to delete " + binary, binary.delete());
+			git.reset().setMode(ResetType.HARD).call();
+			assertTrue("File " + dummy + " should exist", dummy.isFile());
+			assertTrue("File " + binary + " should exist", binary.isFile());
+			// binary should be unchanged, dummy should match "finalText"
+			String textFile = RawParseUtils.decode(IO.readFully(dummy, 512));
+			assertEquals("Unexpected text content", finalText, textFile);
+			byte[] binaryFile = IO.readFully(binary, 512);
+			assertArrayEquals("Unexpected binary content", data, binaryFile);
+		}
+	}
+
