@@ -1,12 +1,14 @@
-	private void checkObjectCollision(AnyObjectId obj, int type, byte[] data)
-			throws IOException {
+	private void checkObjectCollision(AnyObjectId obj, int type, byte[] data,
+			long sizeBeforeInflating) throws IOException {
 		try {
 			final ObjectLoader ldr = readCurs.open(obj, type);
 			final byte[] existingData = ldr.getCachedBytes(data.length);
 			if (!Arrays.equals(data, existingData)) {
-				throw new IOException(MessageFormat.format(
-						JGitText.get().collisionOn, obj.name()));
+				throw new IOException(MessageFormat
+						.format(JGitText.get().collisionOn, obj.name()));
 			}
+			stats.incrementObjectsDuplicated();
+			stats.incrementNumBytesDuplicated(sizeBeforeInflating);
 		} catch (MissingObjectException notLocal) {
 			// This is OK, we don't have a copy of the object locally
 			// but the API throws when we try to read it as usually its

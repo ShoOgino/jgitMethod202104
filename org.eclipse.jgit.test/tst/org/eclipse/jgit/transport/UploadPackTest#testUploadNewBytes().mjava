@@ -1,0 +1,24 @@
+	@Test
+	public void testUploadNewBytes() throws Exception {
+		String commonInBlob = "abcdefghijklmnopqrstuvwx";
+
+		RevBlob parentBlob = remote.blob(commonInBlob + "a");
+		RevCommit parent = remote.commit(remote.tree(remote.file("foo", parentBlob)));
+		RevBlob childBlob = remote.blob(commonInBlob + "b");
+		RevCommit child = remote.commit(remote.tree(remote.file("foo", childBlob)), parent);
+		remote.update("branch1", child);
+
+		ByteArrayInputStream recvStream = uploadPackV2(
+			"command=fetch\n",
+			PacketLineIn.delimiter(),
+			"want " + child.toObjectId().getName() + "\n",
+			"ofs-delta\n",
+			"done\n",
+				PacketLineIn.end());
+		PacketLineIn pckIn = new PacketLineIn(recvStream);
+		assertThat(pckIn.readString(), is("packfile"));
+		ReceivedPackStatistics receivedStats = parsePack(recvStream);
+		assertTrue(receivedStats.getNumBytesDuplicated() == 0);
+		assertTrue(receivedStats.getNumObjectsDuplicated() == 0);
+	}
+
