@@ -1,0 +1,10 @@
+	@Test
+	public void blob_reachable_from_owning_commit() throws Exception {
+		PedestrianObjectReachabilityChecker checker = getChecker(repo);
+
+		RevObject branchABlob = branchACommit.blob;
+		assertReachable("reachable from itself",
+				checker.areAllReachable(Arrays.asList(branchABlob),
+						Stream.of(branchACommit.commit)));
+	}
+

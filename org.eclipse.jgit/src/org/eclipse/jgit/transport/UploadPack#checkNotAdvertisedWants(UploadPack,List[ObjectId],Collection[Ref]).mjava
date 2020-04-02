@@ -25,8 +25,17 @@
 						// operator is willing to pay the cost of these
 						// reachability checks.
 						try (ObjectWalk objWalk = walk.toObjectWalkWithSameObjects()) {
-							checkReachabilityByWalkingObjects(objWalk,
-									wantsAsObjs, reachableFrom);
+							List<RevObject> havesAsObjs = objectIdsToRevObjects(
+									objWalk, reachableFrom);
+							PedestrianObjectReachabilityChecker reachabilityChecker = new PedestrianObjectReachabilityChecker(
+									objWalk);
+							Optional<RevObject> unreachable = reachabilityChecker
+									.areAllReachable(wantsAsObjs,
+											havesAsObjs.stream());
+							if (unreachable.isPresent()) {
+								throw new WantNotValidException(
+										unreachable.get());
+							}
 						}
 						return;
 					}

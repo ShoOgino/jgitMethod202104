@@ -1,0 +1,9 @@
+	@Test
+	public void blob_in_branch_reachable_from_merge() throws Exception {
+		PedestrianObjectReachabilityChecker checker = getChecker(repo);
+
+		RevObject branchABlob = branchACommit.blob;
+		assertReachable("reachable from merge", checker.areAllReachable(
+				Arrays.asList(branchABlob), Stream.of(mergeCommit.commit)));
+	}
+
