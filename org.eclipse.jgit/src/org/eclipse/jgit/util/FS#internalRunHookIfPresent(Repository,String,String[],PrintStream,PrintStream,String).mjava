@@ -41,7 +41,7 @@
 			return new ProcessResult(Status.NOT_PRESENT);
 		}
 		String cmd = hookFile.getAbsolutePath();
-		ProcessBuilder hookProcess = runInShell(cmd, args);
+		ProcessBuilder hookProcess = runInShell(shellQuote(cmd), args);
 		hookProcess.directory(runDirectory.getAbsoluteFile());
 		Map<String, String> environment = hookProcess.environment();
 		environment.put(Constants.GIT_DIR_KEY,
