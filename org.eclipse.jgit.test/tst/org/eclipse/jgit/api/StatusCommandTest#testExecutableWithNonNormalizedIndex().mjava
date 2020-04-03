@@ -1,0 +1,22 @@
+	@Test
+	public void testExecutableWithNonNormalizedIndex() throws Exception {
+		assumeTrue(FS.DETECTED.supportsExecute());
+		try (Git git = new Git(db)) {
+			// Commit a file with CR/LF into the index
+			FileBasedConfig config = db.getConfig();
+			config.setString("core", null, "autocrlf", "false");
+			config.save();
+			File testFile = writeTrashFile("file.txt", "line 1\r\nline 2\r\n");
+			FS.DETECTED.setExecute(testFile, true);
+			git.add().addFilepattern("file.txt").call();
+			git.commit().setMessage("Initial").call();
+			assertEquals(
+					"[file.txt, mode:100755, content:line 1\r\nline 2\r\n]",
+					indexState(CONTENT));
+			config.setString("core", null, "autocrlf", "true");
+			config.save();
+			Status status = git.status().call();
+			assertTrue("Expected no differences", status.isClean());
+		}
+	}
+
