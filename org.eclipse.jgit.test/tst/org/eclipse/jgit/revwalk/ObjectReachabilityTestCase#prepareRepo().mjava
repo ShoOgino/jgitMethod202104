@@ -1,13 +1,10 @@
-	private void prepareRepo()
-			throws Exception {
+	private void prepareRepo() throws Exception {
 		baseCommit = createCommit("base");
 		branchACommit = createCommit("branchA", baseCommit);
 		branchBCommit = createCommit("branchB", baseCommit);
 		mergeCommit = createCommit("merge", branchACommit, branchBCommit);
 
 		// Bitmaps are generated from references
-		// TODO(ifrade): These are not needed now, but will be when we use these
-		// tests with the bitmap implementation.
 		repo.update("refs/heads/a", branchACommit.commit);
 		repo.update("refs/heads/b", branchBCommit.commit);
 		repo.update("refs/heads/merge", mergeCommit.commit);

@@ -1,12 +1,13 @@
 	@Test
 	public void blob_in_base_reachable_from_branches() throws Exception {
-		PedestrianObjectReachabilityChecker checker = getChecker(repo);
+		ObjectReachabilityChecker checker = getChecker(repo);
 
 		RevObject baseBlob = baseCommit.blob;
 		assertReachable("reachable from one branch", checker.areAllReachable(
 				Arrays.asList(baseBlob), Stream.of(branchACommit.commit)));
 		assertReachable("reachable from another branch",
 				checker.areAllReachable(
-				Arrays.asList(baseBlob), Stream.of(branchBCommit.commit)));
+						Arrays.asList(baseBlob),
+						Stream.of(branchBCommit.commit)));
 	}
 
