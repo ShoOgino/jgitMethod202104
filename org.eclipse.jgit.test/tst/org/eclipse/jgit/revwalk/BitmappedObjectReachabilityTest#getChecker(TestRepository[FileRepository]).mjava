@@ -1,0 +1,12 @@
+	@Override
+	ObjectReachabilityChecker getChecker(
+			TestRepository<FileRepository> repository) throws Exception {
+		// GC generates the bitmaps
+		GC gc = new GC(repository.getRepository());
+		gc.setAuto(false);
+		gc.gc();
+
+		return new BitmappedObjectReachabilityChecker(
+				repository.getRevWalk().toObjectWalkWithSameObjects());
+	}
+
