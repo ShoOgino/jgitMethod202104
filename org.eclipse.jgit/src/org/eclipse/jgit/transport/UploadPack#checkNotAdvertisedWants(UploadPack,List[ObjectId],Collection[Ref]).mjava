@@ -6,7 +6,6 @@
 
 		try (RevWalk walk = new RevWalk(reader)) {
 			walk.setRetainBody(false);
-			Set<ObjectId> reachableFrom = refIdSet(visibleRefs);
 			// Missing "wants" throw exception here
 			List<RevObject> wantsAsObjs = objectIdsToRevObjects(walk,
 					notAdvertisedWants);
@@ -33,12 +32,15 @@
 				}
 
 				try (ObjectWalk objWalk = walk.toObjectWalkWithSameObjects()) {
-					List<RevObject> havesAsObjs = objectIdsToRevObjects(objWalk,
-							reachableFrom);
+					Stream<RevObject> startersAsObjs = importantRefsFirst(visibleRefs)
+							.map(UploadPack::refToObjectId)
+							.map(objId -> objectIdToRevObject(objWalk, objId))
+							.filter(Objects::nonNull); // Ignore missing tips
+
 					ObjectReachabilityChecker reachabilityChecker = objWalk
 							.createObjectReachabilityChecker();
 					Optional<RevObject> unreachable = reachabilityChecker
-							.areAllReachable(wantsAsObjs, havesAsObjs.stream());
+							.areAllReachable(wantsAsObjs, startersAsObjs);
 					if (unreachable.isPresent()) {
 						throw new WantNotValidException(unreachable.get());
 					}

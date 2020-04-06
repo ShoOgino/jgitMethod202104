@@ -1,0 +1,23 @@
+	/**
+	 * Translate an object id to a RevObject.
+	 *
+	 * @param walk
+	 *            walk on the relevant object storage
+	 * @param objectId
+	 *            Object Id
+	 * @return RevObject instance or null if the object is missing
+	 */
+	@Nullable
+	private static RevObject objectIdToRevObject(RevWalk walk,
+			ObjectId objectId) {
+		if (objectId == null) {
+			return null;
+		}
+
+		try {
+			return walk.parseAny(objectId);
+		} catch (IOException e) {
+			return null;
+		}
+	}
+
