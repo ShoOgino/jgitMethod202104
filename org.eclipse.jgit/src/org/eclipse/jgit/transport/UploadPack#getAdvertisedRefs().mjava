@@ -1,8 +1,10 @@
 	/**
 	 * Get refs which were advertised to the client.
 	 *
-	 * @return all refs which were advertised to the client, or null if
-	 *         {@link #setAdvertisedRefs(Map)} has not been called yet.
+	 * @return all refs which were advertised to the client. Only valid during
+	 *         the negotiation phase. Will return {@code null} if
+	 *         {@link #setAdvertisedRefs(Map)} has not been called yet or if
+	 *         {@code #sendPack()} has been called.
 	 */
 	public final Map<String, Ref> getAdvertisedRefs() {
 		return refs;

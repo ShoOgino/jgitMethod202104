@@ -1,0 +1,11 @@
+		public RefCallsCountingRepository(DfsRepositoryDescription repoDesc) {
+			super(repoDesc);
+			refdb = new InMemoryRepository.MemRefDatabase() {
+				@Override
+				public List<Ref> getRefs() throws IOException {
+					numRefCalls++;
+					return super.getRefs();
+				}
+			};
+		}
+

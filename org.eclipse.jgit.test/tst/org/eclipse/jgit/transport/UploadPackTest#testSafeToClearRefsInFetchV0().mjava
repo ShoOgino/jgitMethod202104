@@ -1,0 +1,21 @@
+	@Test
+	public void testSafeToClearRefsInFetchV0() throws Exception {
+		server =
+			new RefCallsCountingRepository(
+				new DfsRepositoryDescription("server"));
+		remote = new TestRepository<>(server);
+		RevCommit one = remote.commit().message("1").create();
+		remote.update("one", one);
+		testProtocol = new TestProtocol<>((Object req, Repository db) -> {
+			UploadPack up = new UploadPack(db);
+			return up;
+		}, null);
+		uri = testProtocol.register(ctx, server);
+		try (Transport tn = testProtocol.open(uri, client, "server")) {
+			tn.fetch(NullProgressMonitor.INSTANCE,
+				Collections.singletonList(new RefSpec(one.name())));
+		}
+		assertTrue(client.getObjectDatabase().has(one.toObjectId()));
+		assertEquals(1, ((RefCallsCountingRepository)server).numRefCalls());
+	}
+
