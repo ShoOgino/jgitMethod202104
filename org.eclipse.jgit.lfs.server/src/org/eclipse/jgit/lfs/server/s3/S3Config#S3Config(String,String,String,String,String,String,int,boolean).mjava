@@ -1,6 +1,10 @@
 	/**
-	 * <p>Constructor for S3Config.</p>
+	 * <p>
+	 * Constructor for S3Config.
+	 * </p>
 	 *
+	 * @param hostname
+	 *            S3 API host
 	 * @param region
 	 *            AWS region
 	 * @param bucket
@@ -17,12 +21,18 @@
 	 * @param disableSslVerify
 	 *            if {@code true} disable Amazon server certificate and hostname
 	 *            verification
+	 * @since 5.8
 	 */
-	public S3Config(String region, String bucket, String storageClass,
+	public S3Config(String hostname, String region, String bucket, String storageClass,
 			String accessKey, String secretKey, int expirationSeconds,
 			boolean disableSslVerify) {
-		this(String.format("s3-%s.amazonaws.com", region), region, bucket, //$NON-NLS-1$
-				storageClass, accessKey, secretKey, expirationSeconds,
-				disableSslVerify);
+		this.hostname = hostname;
+		this.region = region;
+		this.bucket = bucket;
+		this.storageClass = storageClass;
+		this.accessKey = accessKey;
+		this.secretKey = secretKey;
+		this.expirationSeconds = expirationSeconds;
+		this.disableSslVerify = disableSslVerify;
 	}
 
