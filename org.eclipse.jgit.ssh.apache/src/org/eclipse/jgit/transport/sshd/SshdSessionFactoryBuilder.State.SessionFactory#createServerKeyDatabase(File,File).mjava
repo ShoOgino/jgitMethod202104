@@ -1,0 +1,13 @@
+			@Override
+			protected ServerKeyDatabase createServerKeyDatabase(File homeDir,
+					File sshDir) {
+				if (serverKeyDatabaseCreator != null) {
+					ServerKeyDatabase result = serverKeyDatabaseCreator
+							.apply(homeDir, sshDir);
+					if (result != null) {
+						return result;
+					}
+				}
+				return super.createServerKeyDatabase(homeDir, sshDir);
+			}
+

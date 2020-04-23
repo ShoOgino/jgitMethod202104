@@ -1,0 +1,21 @@
+	@Test
+	public void testCloneWithBuiltInKeys() throws Exception {
+		// This test should fail unless our in-memory setup is taken: no
+		// known_hosts file, and a config that specifies a non-existing key.
+		File newHostKey = new File(getTemporaryDirectory(), "newhostkey");
+		copyTestResource("id_ed25519", newHostKey);
+		server.addHostKey(newHostKey.toPath(), true);
+		testServerKey = load(newHostKey.toPath()).getPublic();
+		assertTrue(newHostKey.delete());
+		testUserKey = load(privateKey1.getAbsoluteFile().toPath());
+		assertNotNull(testServerKey);
+		assertNotNull(testUserKey);
+		cloneWith(
+				"ssh://" + TEST_USER + "@localhost:" + testPort
+						+ "/doesntmatter",
+				new File(getTemporaryDirectory(), "cloned"), null, //
+				"Host localhost", //
+				"IdentityFile "
+						+ new File(sshDir, "does_not_exist").getAbsolutePath());
+	}
+

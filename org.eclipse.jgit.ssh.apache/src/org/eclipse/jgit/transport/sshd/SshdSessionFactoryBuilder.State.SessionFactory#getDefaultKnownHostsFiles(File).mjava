@@ -1,0 +1,9 @@
+			@Override
+			protected List<Path> getDefaultKnownHostsFiles(File sshDir) {
+				if (knownHostsFileFinder != null) {
+					List<Path> result = knownHostsFileFinder.apply(sshDir);
+					return result == null ? Collections.emptyList() : result;
+				}
+				return super.getDefaultKnownHostsFiles(sshDir);
+			}
+

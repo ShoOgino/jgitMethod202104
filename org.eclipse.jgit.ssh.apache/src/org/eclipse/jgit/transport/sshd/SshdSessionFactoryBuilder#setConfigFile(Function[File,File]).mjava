@@ -1,0 +1,21 @@
+	/**
+	 * Sets a function that returns the SSH config file, given the SSH
+	 * directory. The function may return {@code null}, in which case no SSH
+	 * config file will be used. If a non-null file is returned, it will be used
+	 * when it exists. If no supplier has been set, or the supplier has been set
+	 * explicitly to {@code null}, by default a file named
+	 * {@link org.eclipse.jgit.transport.SshConstants#CONFIG
+	 * SshConstants.CONFIG} in the {@link #setSshDirectory(File) SSH directory}
+	 * is used.
+	 *
+	 * @param supplier
+	 *            returning a {@link File} for the SSH config file to use, or
+	 *            returning {@code null} if no config file is to be used
+	 * @return this {@link SshdSessionFactoryBuilder}
+	 */
+	public SshdSessionFactoryBuilder setConfigFile(
+			Function<File, File> supplier) {
+		this.state.configFileFinder = supplier;
+		return this;
+	}
+

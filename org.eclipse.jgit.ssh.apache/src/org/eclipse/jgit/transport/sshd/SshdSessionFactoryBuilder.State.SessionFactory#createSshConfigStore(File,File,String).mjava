@@ -1,0 +1,11 @@
+			@Override
+			protected SshConfigStore createSshConfigStore(File homeDir,
+					File configFile, String localUserName) {
+				if (configFactory != null) {
+					return configFactory.create(homeDir, configFile,
+							localUserName);
+				}
+				return super.createSshConfigStore(homeDir, configFile,
+						localUserName);
+			}
+

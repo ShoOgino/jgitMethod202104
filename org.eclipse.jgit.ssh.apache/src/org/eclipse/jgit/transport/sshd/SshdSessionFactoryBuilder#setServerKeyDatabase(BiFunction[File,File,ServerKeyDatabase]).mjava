@@ -1,0 +1,16 @@
+	/**
+	 * Sets a function that creates a new {@link ServerKeyDatabase}, given the
+	 * SSH and home directory. If not set or explicitly set to {@code null}, or
+	 * if the {@code factory} returns {@code null}, the default as specified by
+	 * {@link SshdSessionFactory#createServerKeyDatabase(File, File)} is used.
+	 *
+	 * @param factory
+	 *            to create a {@link ServerKeyDatabase}
+	 * @return this {@link SshdSessionFactoryBuilder}
+	 */
+	public SshdSessionFactoryBuilder setServerKeyDatabase(
+			BiFunction<File, File, ServerKeyDatabase> factory) {
+		this.state.serverKeyDatabaseCreator = factory;
+		return this;
+	}
+

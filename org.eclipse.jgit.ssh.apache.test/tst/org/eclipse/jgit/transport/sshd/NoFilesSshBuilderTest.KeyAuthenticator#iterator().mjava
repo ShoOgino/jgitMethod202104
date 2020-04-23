@@ -1,0 +1,11 @@
+		@Override
+		public Iterator<KeyPair> iterator() {
+			// Should not be called. The use of the Iterable interface in
+			// SshdSessionFactory.getDefaultKeys() made sense in sshd 2.0.0,
+			// but sshd 2.2.0 added the SessionContext, which although good
+			// (without it we couldn't check here) breaks the Iterable analogy.
+			// But we're stuck now with that interface for getDefaultKeys, and
+			// so this override throwing an exception is unfortunately needed.
+			throw new UnsupportedOperationException();
+		}
+

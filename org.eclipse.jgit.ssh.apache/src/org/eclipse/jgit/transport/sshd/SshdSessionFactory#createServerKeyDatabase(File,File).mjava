@@ -1,5 +1,5 @@
 	/**
-	 * Obtains a {@link ServerKeyDatabase} to verify server host keys. The
+	 * Creates a {@link ServerKeyDatabase} to verify server host keys. The
 	 * default implementation returns a {@link ServerKeyDatabase} that
 	 * recognizes the two openssh standard files {@code ~/.ssh/known_hosts} and
 	 * {@code ~/.ssh/known_hosts2} as well as any files configured via the
@@ -10,14 +10,12 @@
 	 * @param sshDir
 	 *            representing ~/.ssh/
 	 * @return the {@link ServerKeyDatabase}
-	 * @since 5.5
+	 * @since 5.8
 	 */
 	@NonNull
-	protected ServerKeyDatabase getServerKeyDatabase(@NonNull File homeDir,
+	protected ServerKeyDatabase createServerKeyDatabase(@NonNull File homeDir,
 			@NonNull File sshDir) {
-		return defaultServerKeyDatabase.computeIfAbsent(
-				new Tuple(new Object[] { homeDir, sshDir }),
-				t -> createServerKeyDatabase(homeDir, sshDir));
-
+		return new OpenSshServerKeyDatabase(true,
+				getDefaultKnownHostsFiles(sshDir));
 	}
 
