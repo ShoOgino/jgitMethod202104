@@ -1,26 +1,30 @@
 	@Test
-	public void testSshWithoutKnownHostsWithProviderAcceptNew()
+	public void testSshWithoutKnownHostsWithProviderAsk()
 			throws Exception {
 		File copiedHosts = new File(knownHosts.getParentFile(),
 				"copiedKnownHosts");
 		assertTrue("Failed to rename known_hosts",
 				knownHosts.renameTo(copiedHosts));
+		// The provider will answer "yes" to all questions, so we should be able
+		// to connect and end up with a new known_hosts file with the host key.
 		TestCredentialsProvider provider = new TestCredentialsProvider();
 		cloneWith("ssh://localhost/doesntmatter", defaultCloneDir, provider, //
 				"Host localhost", //
 				"HostName localhost", //
 				"Port " + testPort, //
 				"User " + TEST_USER, //
-				"StrictHostKeyChecking accept-new", //
 				"IdentityFile " + privateKey1.getAbsolutePath());
-		if (getSessionFactory() instanceof JschConfigSessionFactory) {
-			// JSch doesn't create new files.
-			assertTrue("CredentialsProvider not called",
-					provider.getLog().isEmpty());
+		List<LogEntry> messages = provider.getLog();
+		assertFalse("Expected user interaction", messages.isEmpty());
+		if (isJsch()) {
+			// JSch doesn't create a non-existing file.
+			assertEquals("Expected to be asked about the key", 1,
+					messages.size());
 			return;
 		}
-		assertEquals("Expected to be asked about the file creation", 1,
-				provider.getLog().size());
+		assertEquals(
+				"Expected to be asked about the key, and the file creation",
+				2, messages.size());
 		assertTrue("~/.ssh/known_hosts should exist now", knownHosts.exists());
 		// Instead of checking the file contents, let's just clone again
 		// without provider. If it works, the server host key was written

@@ -2,10 +2,9 @@
 	public void testSshKeys(String keyName) throws Exception {
 		// JSch fails on ECDSA 384/521 keys. Compare
 		// https://sourceforge.net/p/jsch/patches/10/
-		assumeTrue(!(getSessionFactory() instanceof JschConfigSessionFactory
-				&& (keyName.contains("ed25519")
-						|| keyName.startsWith("id_ecdsa_384")
-						|| keyName.startsWith("id_ecdsa_521"))));
+		assumeTrue(!(isJsch() && (keyName.contains("ed25519")
+				|| keyName.startsWith("id_ecdsa_384")
+				|| keyName.startsWith("id_ecdsa_521"))));
 		File cloned = new File(getTemporaryDirectory(), "cloned");
 		String keyFileName = keyName + "_key";
 		File privateKey = new File(sshDir, keyFileName);
