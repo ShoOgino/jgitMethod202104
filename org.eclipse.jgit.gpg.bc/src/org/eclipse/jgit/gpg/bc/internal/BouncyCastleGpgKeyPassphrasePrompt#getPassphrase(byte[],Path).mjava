@@ -17,21 +17,21 @@
 			throws PGPException, CanceledException, UnsupportedCredentialItem,
 			URISyntaxException {
 		if (passphrase == null) {
-			passphrase = new CharArrayType(JGitText.get().credentialPassphrase,
+			passphrase = new CharArrayType(BCText.get().credentialPassphrase,
 					true);
 		}
 
 		if (credentialsProvider == null) {
-			throw new PGPException(JGitText.get().gpgNoCredentialsProvider);
+			throw new PGPException(BCText.get().gpgNoCredentialsProvider);
 		}
 
 		if (passphrase.getValue() == null
 				&& !credentialsProvider.get(createURI(keyLocation),
 						new InformationalMessage(
-								MessageFormat.format(JGitText.get().gpgKeyInfo,
+								MessageFormat.format(BCText.get().gpgKeyInfo,
 										Hex.toHexString(keyFingerprint))),
 						passphrase)) {
-			throw new CanceledException(JGitText.get().gpgSigningCancelled);
+			throw new CanceledException(BCText.get().gpgSigningCancelled);
 		}
 		return passphrase.getValue();
 	}
