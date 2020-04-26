@@ -1,15 +1,17 @@
 	@Test
 	public void testCloneWithBuiltInKeys() throws Exception {
 		// This test should fail unless our in-memory setup is taken: no
-		// known_hosts file, and a config that specifies a non-existing key.
-		File newHostKey = new File(getTemporaryDirectory(), "newhostkey");
-		copyTestResource("id_ed25519", newHostKey);
-		server.addHostKey(newHostKey.toPath(), true);
-		testServerKey = load(newHostKey.toPath()).getPublic();
-		assertTrue(newHostKey.delete());
-		testUserKey = load(privateKey1.getAbsoluteFile().toPath());
+		// known_hosts file, a config that specifies a non-existing key,
+		// and the test is using a newly generated KeyPairs anyway.
+		KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
+		generator.initialize(2048);
+		testUserKey = generator.generateKeyPair();
+		KeyPair hostKey = generator.generateKeyPair();
+		server.addHostKey(hostKey, true);
+		testServerKey = hostKey.getPublic();
 		assertNotNull(testServerKey);
 		assertNotNull(testUserKey);
+		server.setTestUserPublicKey(testUserKey.getPublic());
 		cloneWith(
 				"ssh://" + TEST_USER + "@localhost:" + testPort
 						+ "/doesntmatter",
