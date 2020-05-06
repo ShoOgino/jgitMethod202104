@@ -54,14 +54,9 @@
 					break;
 				case COPY:
 					f = getFile(fh.getOldPath(), false);
-					byte[] bs = IO.readFully(f);
-					File target = getFile(fh.getNewPath(), true);
-					FileOutputStream fos = new FileOutputStream(target);
-					try {
-						fos.write(bs);
-					} finally {
-						fos.close();
-					}
+					File target = getFile(fh.getNewPath(), false);
+					FileUtils.mkdirs(target.getParentFile(), true);
+					Files.copy(f.toPath(), target.toPath());
 					apply(target, fh);
 				}
 				r.addUpdatedFile(f);
