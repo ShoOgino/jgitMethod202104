@@ -1,0 +1,15 @@
+	@Test
+	public void testSuccessfulNewBranchBasedOnNewWithTip() throws Exception {
+		createNewCommit();
+		connectivityCheckInfo.setCommands(
+				Collections.singletonList(createNewBrachCommand()));
+
+		connectivityChecker.setForcedHaves(wrap(openRewiewObjectId));
+
+		connectivityChecker.checkConnectivity(connectivityCheckInfo,
+				advertisedHaves, pm);
+
+		verify(connectivityCheckerDelegate).checkConnectivity(
+				connectivityCheckInfo, wrap(openRewiewObjectId), pm);
+	}
+

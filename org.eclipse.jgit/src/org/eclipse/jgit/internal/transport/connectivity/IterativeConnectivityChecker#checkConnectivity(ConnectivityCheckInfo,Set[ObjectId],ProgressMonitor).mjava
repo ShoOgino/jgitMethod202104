@@ -1,0 +1,34 @@
+	@Override
+	public void checkConnectivity(ConnectivityCheckInfo connectivityCheckInfo,
+			Set<ObjectId> advertisedHaves, ProgressMonitor pm)
+			throws MissingObjectException, IOException {
+		try {
+			Set<ObjectId> newRefs = new HashSet<>();
+			Set<ObjectId> expectedParents = new HashSet<>();
+
+			getAllObjectIds(connectivityCheckInfo.getCommands())
+					.forEach(oid -> {
+						if (advertisedHaves.contains(oid)) {
+							expectedParents.add(oid);
+						} else {
+							newRefs.add(oid);
+						}
+					});
+			if (!newRefs.isEmpty()) {
+				expectedParents.addAll(extractAdvertisedParentCommits(newRefs,
+						advertisedHaves, connectivityCheckInfo.getWalk()));
+			}
+
+			expectedParents.addAll(forcedHaves);
+
+			if (!expectedParents.isEmpty()) {
+				delegate.checkConnectivity(connectivityCheckInfo,
+						expectedParents, pm);
+				return;
+			}
+		} catch (MissingObjectException e) {
+			// This is fine, retry with all haves.
+		}
+		delegate.checkConnectivity(connectivityCheckInfo, advertisedHaves, pm);
+	}
+

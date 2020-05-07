@@ -1,0 +1,15 @@
+	@Test
+	public void testSuccessfulNewBranchBasedOnOld() throws Exception {
+		createNewCommit(branchHeadCommitObject);
+		connectivityCheckInfo.setCommands(
+				Collections.singletonList(createNewBrachCommand()));
+
+		connectivityChecker.checkConnectivity(connectivityCheckInfo,
+				advertisedHaves, pm);
+
+		verify(connectivityCheckerDelegate).checkConnectivity(
+				connectivityCheckInfo,
+				wrap(branchHeadObjectId /* as direct parent */),
+				pm);
+	}
+

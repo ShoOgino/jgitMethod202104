@@ -1,0 +1,20 @@
+	@Test
+	public void testDependOnGrandparent() throws Exception {
+		RevCommit grandparent = tr.commit(new RevCommit[] {});
+		RevCommit parent = tr.commit(grandparent);
+		createNewCommit(parent);
+
+		branchHeadCommitObject = tr.commit(grandparent);
+		branchHeadObjectId = branchHeadCommitObject.getId();
+		tr.getRevWalk().dispose();
+
+		connectivityCheckInfo.setCommands(
+				Collections.singletonList(createNewBrachCommand()));
+
+		connectivityChecker.checkConnectivity(connectivityCheckInfo,
+				advertisedHaves, pm);
+
+		verify(connectivityCheckerDelegate)
+				.checkConnectivity(connectivityCheckInfo, advertisedHaves, pm);
+	}
+

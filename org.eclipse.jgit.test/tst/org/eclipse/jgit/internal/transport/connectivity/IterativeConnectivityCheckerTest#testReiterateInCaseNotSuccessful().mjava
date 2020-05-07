@@ -1,0 +1,18 @@
+	@Test
+	public void testReiterateInCaseNotSuccessful() throws Exception {
+		createNewCommit(branchHeadCommitObject);
+		connectivityCheckInfo.setCommands(
+				Collections.singletonList(createNewBrachCommand()));
+
+		doThrow(new MissingObjectException(branchHeadCommitObject,
+				Constants.OBJ_COMMIT)).when(connectivityCheckerDelegate)
+						.checkConnectivity(connectivityCheckInfo,
+								wrap(branchHeadObjectId /* as direct parent */), pm);
+
+		connectivityChecker.checkConnectivity(connectivityCheckInfo,
+				advertisedHaves, pm);
+
+		verify(connectivityCheckerDelegate)
+				.checkConnectivity(connectivityCheckInfo, advertisedHaves, pm);
+	}
+
