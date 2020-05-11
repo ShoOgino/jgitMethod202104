@@ -1,0 +1,29 @@
+	private static Set<ObjectId> extractAdvertisedParentCommits(
+			Set<ObjectId> newRefs, Set<ObjectId> advertisedHaves, RevWalk rw)
+			throws MissingObjectException, IOException {
+		Set<ObjectId> advertisedParents = new HashSet<>();
+		for (ObjectId newRef : newRefs) {
+			RevObject object = rw.parseAny(newRef);
+			if (object instanceof RevCommit) {
+				int numberOfParentsToCheck = 0;
+				Queue<RevCommit> parents = new ArrayDeque<>(
+						MAXIMUM_PARENTS_TO_CHECK);
+				parents.addAll(
+						parseParents(((RevCommit) object).getParents(), rw));
+				// Looking through a chain of ancestors handles the case where a
+				// series of commits is sent in a single push for a new branch.
+				while (!parents.isEmpty()) {
+					RevCommit parentCommit = parents.poll();
+					if (advertisedHaves.contains(parentCommit.getId())) {
+						advertisedParents.add(parentCommit.getId());
+					} else if (numberOfParentsToCheck < MAXIMUM_PARENTS_TO_CHECK) {
+						RevCommit[] grandParents = parentCommit.getParents();
+						numberOfParentsToCheck += grandParents.length;
+						parents.addAll(parseParents(grandParents, rw));
+					}
+				}
+			}
+		}
+		return advertisedParents;
+	}
+

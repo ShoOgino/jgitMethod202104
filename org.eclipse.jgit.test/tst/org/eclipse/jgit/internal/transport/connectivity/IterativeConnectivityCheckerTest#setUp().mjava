@@ -1,0 +1,21 @@
+	@Before
+	public void setUp() throws Exception {
+		tr = new TestRepository<>(
+				new InMemoryRepository(new DfsRepositoryDescription("test")));
+		connectivityChecker = new IterativeConnectivityChecker(
+				connectivityCheckerDelegate);
+		connectivityCheckInfo = new ConnectivityCheckInfo();
+		connectivityCheckInfo.setParser(parser);
+		connectivityCheckInfo.setRepository(tr.getRepository());
+		connectivityCheckInfo.setWalk(tr.getRevWalk());
+
+		branchHeadCommitObject = tr.commit().create();
+		branchHeadObjectId = branchHeadCommitObject.getId();
+
+		openReviewCommitObject = tr.commit().create();
+		openRewiewObjectId = openReviewCommitObject.getId();
+
+		advertisedHaves = wrap(branchHeadObjectId, openRewiewObjectId,
+				otherHaveObjectId);
+	}
+

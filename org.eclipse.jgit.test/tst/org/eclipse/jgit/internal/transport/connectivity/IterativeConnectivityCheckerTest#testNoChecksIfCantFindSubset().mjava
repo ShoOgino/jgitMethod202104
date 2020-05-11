@@ -1,0 +1,13 @@
+	@Test
+	public void testNoChecksIfCantFindSubset() throws Exception {
+		createNewCommit();
+		connectivityCheckInfo.setCommands(
+				Collections.singletonList(createNewBrachCommand()));
+
+		connectivityChecker.checkConnectivity(connectivityCheckInfo,
+				advertisedHaves, pm);
+
+		verify(connectivityCheckerDelegate)
+				.checkConnectivity(connectivityCheckInfo, advertisedHaves, pm);
+	}
+
