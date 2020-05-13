@@ -1,0 +1,31 @@
+	/**
+	 * Processes a commit and prepares its bitmap to write to the bitmap index
+	 * file.
+	 *
+	 * @param c
+	 *            the commit corresponds to the bitmap.
+	 * @param bitmap
+	 *            the bitmap to be written.
+	 * @param flags
+	 *            the flags of the commit.
+	 */
+	public void processBitmapForWrite(BitmapCommit c, Bitmap bitmap,
+			int flags) {
+		EWAHCompressedBitmap compressed = bitmap.retrieveCompressed();
+		compressed.trim();
+		StoredBitmap newest = new StoredBitmap(c, compressed, null, flags);
+
+		bitmapsToWriteXorBuffer.add(newest);
+		if (bitmapsToWriteXorBuffer.size() > MAX_XOR_OFFSET_SEARCH) {
+			bitmapsToWrite.add(
+					generateStoredEntry(bitmapsToWriteXorBuffer.pollFirst()));
+		}
+
+		if (c.isAddToIndex()) {
+			// The Bitmap map in the base class is used to make revwalks
+			// efficient, so only add bitmaps that keep it efficient without
+			// bloating memory.
+			addBitmap(c, bitmap, flags);
+		}
+	}
+

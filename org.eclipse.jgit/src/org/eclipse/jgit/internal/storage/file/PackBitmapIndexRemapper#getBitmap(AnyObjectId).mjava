@@ -5,10 +5,6 @@
 		if (bitmap != null || oldPackIndex == null)
 			return bitmap;
 
-		StoredBitmap stored = convertedBitmaps.get(objectId);
-		if (stored != null)
-			return stored.getBitmap();
-
 		StoredBitmap oldBitmap = oldPackIndex.getBitmaps().get(objectId);
 		if (oldBitmap == null)
 			return null;
@@ -21,8 +17,6 @@
 			inflated.set(prevToNewMapping[i.next()]);
 		bitmap = inflated.toEWAHCompressedBitmap();
 		bitmap.trim();
-		convertedBitmaps.add(
-				new StoredBitmap(objectId, bitmap, null, oldBitmap.getFlags()));
 		return bitmap;
 	}
 
