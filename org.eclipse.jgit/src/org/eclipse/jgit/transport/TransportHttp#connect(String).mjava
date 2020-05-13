@@ -82,6 +82,14 @@
 				}
 			} catch (NotSupportedException | TransportException e) {
 				throw e;
+			} catch (InterruptedIOException e) {
+				// Timeout!? Don't try other authentication methods.
+				throw new TransportException(uri, MessageFormat.format(
+						JGitText.get().connectionTimeOut, u.getHost()), e);
+			} catch (SocketException e) {
+				// Nothing on other end, timeout, connection reset, ...
+				throw new TransportException(uri,
+						JGitText.get().connectionFailed, e);
 			} catch (SSLHandshakeException e) {
 				handleSslFailure(e);
 				continue; // Re-try
