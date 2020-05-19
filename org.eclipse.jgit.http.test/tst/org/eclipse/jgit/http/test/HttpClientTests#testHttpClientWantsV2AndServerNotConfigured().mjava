@@ -1,5 +1,5 @@
 	@Test
-	public void testHttpClientWantsV2ButServerNotConfigured() throws Exception {
+	public void testHttpClientWantsV2AndServerNotConfigured() throws Exception {
 		String url = smartAuthNoneURI.toString() + "/info/refs?service=git-upload-pack";
 		HttpConnection c = HttpTransport.getConnectionFactory()
 				.create(new URL(url));
@@ -8,10 +8,6 @@
 		assertEquals(200, c.getResponseCode());
 
 		PacketLineIn pckIn = new PacketLineIn(c.getInputStream());
-
-		// Check that we get a v0 response.
-		assertThat(pckIn.readString(), is("# service=git-upload-pack"));
-		assertTrue(PacketLineIn.isEnd(pckIn.readString()));
-		assertTrue(pckIn.readString().matches("[0-9a-f]{40} HEAD.*"));
+		assertThat(pckIn.readString(), is("version 2"));
 	}
 
