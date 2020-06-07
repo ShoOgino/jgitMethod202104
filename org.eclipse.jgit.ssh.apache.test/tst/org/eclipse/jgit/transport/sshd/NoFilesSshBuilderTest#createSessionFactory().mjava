@@ -1,0 +1,29 @@
+	@Override
+	protected SshSessionFactory createSessionFactory() {
+		return new SshdSessionFactoryBuilder() //
+				.setConfigStoreFactory((h, f, u) -> null)
+				.setDefaultKeysProvider(f -> new KeyAuthenticator())
+				.setServerKeyDatabase((h, s) -> new ServerKeyDatabase() {
+
+					@Override
+					public List<PublicKey> lookup(String connectAddress,
+							InetSocketAddress remoteAddress,
+							Configuration config) {
+						return Collections.singletonList(testServerKey);
+					}
+
+					@Override
+					public boolean accept(String connectAddress,
+							InetSocketAddress remoteAddress,
+							PublicKey serverKey, Configuration config,
+							CredentialsProvider provider) {
+						return KeyUtils.compareKeys(serverKey, testServerKey);
+					}
+
+				}) //
+				.setPreferredAuthentications("publickey")
+				.setHomeDirectory(FS.DETECTED.userHome())
+				.setSshDirectory(sshDir) //
+				.build(new JGitKeyCache());
+	}
+

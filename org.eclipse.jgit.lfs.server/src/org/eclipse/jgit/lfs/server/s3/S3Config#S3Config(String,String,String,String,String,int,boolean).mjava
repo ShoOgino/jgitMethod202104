@@ -21,12 +21,8 @@
 	public S3Config(String region, String bucket, String storageClass,
 			String accessKey, String secretKey, int expirationSeconds,
 			boolean disableSslVerify) {
-		this.region = region;
-		this.bucket = bucket;
-		this.storageClass = storageClass;
-		this.accessKey = accessKey;
-		this.secretKey = secretKey;
-		this.expirationSeconds = expirationSeconds;
-		this.disableSslVerify = disableSslVerify;
+		this(String.format("s3-%s.amazonaws.com", region), region, bucket, //$NON-NLS-1$
+				storageClass, accessKey, secretKey, expirationSeconds,
+				disableSslVerify);
 	}
 

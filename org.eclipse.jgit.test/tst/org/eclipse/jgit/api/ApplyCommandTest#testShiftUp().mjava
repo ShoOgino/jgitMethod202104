@@ -1,0 +1,10 @@
+	@Test
+	public void testShiftUp() throws Exception {
+		ApplyResult result = init("ShiftUp");
+		assertEquals(1, result.getUpdatedFiles().size());
+		assertEquals(new File(db.getWorkTree(), "ShiftUp"),
+				result.getUpdatedFiles().get(0));
+		checkFile(new File(db.getWorkTree(), "ShiftUp"),
+				b.getString(0, b.size(), false));
+	}
+

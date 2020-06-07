@@ -1,0 +1,38 @@
+	/**
+	 * Prompts use for a passphrase unless one was cached from a previous
+	 * prompt.
+	 *
+	 * @param keyFingerprint
+	 *            the fingerprint to show to the user during prompting
+	 * @param keyLocation
+	 *            the location the key was loaded from
+	 * @return the passphrase (maybe <code>null</code>)
+	 * @throws PGPException
+	 * @throws CanceledException
+	 *             in case passphrase was not entered by user
+	 * @throws URISyntaxException
+	 * @throws UnsupportedCredentialItem
+	 */
+	public char[] getPassphrase(byte[] keyFingerprint, Path keyLocation)
+			throws PGPException, CanceledException, UnsupportedCredentialItem,
+			URISyntaxException {
+		if (passphrase == null) {
+			passphrase = new CharArrayType(BCText.get().credentialPassphrase,
+					true);
+		}
+
+		if (credentialsProvider == null) {
+			throw new PGPException(BCText.get().gpgNoCredentialsProvider);
+		}
+
+		if (passphrase.getValue() == null
+				&& !credentialsProvider.get(createURI(keyLocation),
+						new InformationalMessage(
+								MessageFormat.format(BCText.get().gpgKeyInfo,
+										Hex.toHexString(keyFingerprint))),
+						passphrase)) {
+			throw new CanceledException(BCText.get().gpgSigningCancelled);
+		}
+		return passphrase.getValue();
+	}
+

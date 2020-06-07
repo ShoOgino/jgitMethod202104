@@ -1,0 +1,19 @@
+	@Benchmark
+	@BenchmarkMode({ Mode.AverageTime })
+	@OutputTimeUnit(TimeUnit.MICROSECONDS)
+	@Warmup(iterations = 5, time = 1000, timeUnit = TimeUnit.MILLISECONDS)
+	@Measurement(iterations = 5, time = 5000, timeUnit = TimeUnit.MILLISECONDS)
+	public Path moveFileToExistingDir() throws IOException {
+		i++;
+		Path tmp = testDir.resolve("tmp" + i++);
+		Files.createFile(tmp);
+		Path targetDirectory = targetDir;
+		Path targetFile = targetDirectory.resolve("tmp" + i);
+		try {
+			return Files.move(tmp, targetFile, StandardCopyOption.ATOMIC_MOVE);
+		} catch (NoSuchFileException e) {
+			Files.createDirectory(targetDirectory);
+			return Files.move(tmp, targetFile, StandardCopyOption.ATOMIC_MOVE);
+		}
+	}
+

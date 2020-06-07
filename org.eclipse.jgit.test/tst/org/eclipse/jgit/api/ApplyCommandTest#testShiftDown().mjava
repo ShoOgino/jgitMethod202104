@@ -1,0 +1,10 @@
+	@Test
+	public void testShiftDown() throws Exception {
+		ApplyResult result = init("ShiftDown");
+		assertEquals(1, result.getUpdatedFiles().size());
+		assertEquals(new File(db.getWorkTree(), "ShiftDown"),
+				result.getUpdatedFiles().get(0));
+		checkFile(new File(db.getWorkTree(), "ShiftDown"),
+				b.getString(0, b.size(), false));
+	}
+

@@ -1,0 +1,10 @@
+			@Override
+			protected Iterable<KeyPair> getDefaultKeys(File sshDir) {
+				if (defaultKeysProvider != null) {
+					Iterable<KeyPair> result = defaultKeysProvider
+							.apply(sshDir);
+					return result == null ? Collections.emptyList() : result;
+				}
+				return super.getDefaultKeys(sshDir);
+			}
+

@@ -1,0 +1,37 @@
+	private ServletContextHandler addSlowContext(GitServlet gs, String path,
+			boolean auth) {
+		ServletContextHandler slow = server.addContext('/' + path);
+		slow.addFilter(new FilterHolder(new Filter() {
+
+			@Override
+			public void init(FilterConfig filterConfig)
+					throws ServletException {
+				// empty
+			}
+
+			// Simply delays the servlet for two seconds. Used for timeout
+			// tests, which use a one-second timeout.
+			@Override
+			public void doFilter(ServletRequest request,
+					ServletResponse response, FilterChain chain)
+					throws IOException, ServletException {
+				try {
+					Thread.sleep(2000);
+				} catch (InterruptedException e) {
+					throw new IOException(e);
+				}
+				chain.doFilter(request, response);
+			}
+
+			@Override
+			public void destroy() {
+				// empty
+			}
+		}), "/*", EnumSet.of(DispatcherType.REQUEST));
+		slow.addServlet(new ServletHolder(gs), "/*");
+		if (auth) {
+			return server.authBasic(slow);
+		}
+		return slow;
+	}
+

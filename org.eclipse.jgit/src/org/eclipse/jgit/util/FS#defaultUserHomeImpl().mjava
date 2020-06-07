@@ -1,0 +1,9 @@
+	private File defaultUserHomeImpl() {
+		final String home = AccessController.doPrivileged(
+				(PrivilegedAction<String>) () -> System.getProperty("user.home") //$NON-NLS-1$
+		);
+		if (home == null || home.length() == 0)
+			return null;
+		return new File(home).getAbsoluteFile();
+	}
+

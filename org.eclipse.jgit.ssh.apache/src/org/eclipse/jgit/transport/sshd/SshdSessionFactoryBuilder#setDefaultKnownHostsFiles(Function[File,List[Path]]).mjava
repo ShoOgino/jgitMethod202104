@@ -1,0 +1,16 @@
+	/**
+	 * Sets a function that returns the default known hosts files, given the SSH
+	 * directory. If not set or explicitly set to {@code null}, the defaults as
+	 * specified by {@link SshdSessionFactory#getDefaultKnownHostsFiles(File)}
+	 * are used.
+	 *
+	 * @param supplier
+	 *            to get the default known hosts files
+	 * @return this {@link SshdSessionFactoryBuilder}
+	 */
+	public SshdSessionFactoryBuilder setDefaultKnownHostsFiles(
+			Function<File, List<Path>> supplier) {
+		this.state.knownHostsFileFinder = supplier;
+		return this;
+	}
+

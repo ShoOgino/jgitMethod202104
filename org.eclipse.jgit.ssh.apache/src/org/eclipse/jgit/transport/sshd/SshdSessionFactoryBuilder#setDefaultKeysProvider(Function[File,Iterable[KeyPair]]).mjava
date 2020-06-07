@@ -1,0 +1,15 @@
+	/**
+	 * Sets a function that returns the default private keys, given the SSH
+	 * directory. If not set or explicitly set to {@code null}, the defaults as
+	 * specified by {@link SshdSessionFactory#getDefaultKeys(File)} are used.
+	 *
+	 * @param provider
+	 *            to get the default private key files
+	 * @return this {@link SshdSessionFactoryBuilder}
+	 */
+	public SshdSessionFactoryBuilder setDefaultKeysProvider(
+			Function<File, Iterable<KeyPair>> provider) {
+		this.state.defaultKeysProvider = provider;
+		return this;
+	}
+

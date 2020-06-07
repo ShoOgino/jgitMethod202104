@@ -1,0 +1,9 @@
+			@Override
+			protected List<Path> getDefaultIdentities(File sshDir) {
+				if (defaultKeyFileFinder != null) {
+					List<Path> result = defaultKeyFileFinder.apply(sshDir);
+					return result == null ? Collections.emptyList() : result;
+				}
+				return super.getDefaultIdentities(sshDir);
+			}
+

@@ -17,7 +17,10 @@
 		// new git system
 		String eol = attrs.getValue("eol"); //$NON-NLS-1$
 		if (eol != null) {
-			if ("crlf".equals(eol)) {//$NON-NLS-1$
+			if ("crlf".equals(eol)) { //$NON-NLS-1$
+				if ("auto".equals(attrs.getValue("text"))) { //$NON-NLS-1$ //$NON-NLS-2$
+					return EolStreamType.AUTO_CRLF;
+				}
 				return EolStreamType.TEXT_CRLF;
 			} else if ("lf".equals(eol)) { //$NON-NLS-1$
 				return EolStreamType.DIRECT;

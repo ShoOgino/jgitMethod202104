@@ -5,12 +5,16 @@
 	 * collected by the setter methods of this class. Each instance of this
 	 * class should only be used for one invocation of the command (means: one
 	 * call to {@link #call()})
+	 *
+	 * @throws ServiceUnavailableException
+	 *             if signing service is not available e.g. since it isn't
+	 *             installed
 	 */
 	@Override
-	public RevCommit call() throws GitAPIException, NoHeadException,
-			NoMessageException, UnmergedPathsException,
-			ConcurrentRefUpdateException, WrongRepositoryStateException,
-			AbortedByHookException {
+	public RevCommit call() throws GitAPIException, AbortedByHookException,
+			ConcurrentRefUpdateException, NoHeadException, NoMessageException,
+			ServiceUnavailableException, UnmergedPathsException,
+			WrongRepositoryStateException {
 		checkCallable();
 		Collections.sort(only);
 
@@ -104,6 +108,10 @@
 				commit.setTreeId(indexTreeId);
 
 				if (signCommit.booleanValue()) {
+					if (gpgSigner == null) {
+						throw new ServiceUnavailableException(
+								JGitText.get().signingServiceUnavailable);
+					}
 					gpgSigner.sign(commit, signingKey, committer,
 							credentialsProvider);
 				}

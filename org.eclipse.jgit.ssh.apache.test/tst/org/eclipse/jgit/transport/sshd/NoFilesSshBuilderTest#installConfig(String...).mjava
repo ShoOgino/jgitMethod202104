@@ -1,0 +1,12 @@
+	@Override
+	protected void installConfig(String... config) {
+		File configFile = new File(sshDir, Constants.CONFIG);
+		if (config != null) {
+			try {
+				Files.write(configFile.toPath(), Arrays.asList(config));
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+		}
+	}
+

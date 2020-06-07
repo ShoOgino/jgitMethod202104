@@ -9,7 +9,8 @@
 	 *
 	 * @throws NoMessageException
 	 *             if the commit message has not been specified
-	 * @throws UnsupportedSigningFormatException if the configured gpg.format is not supported
+	 * @throws UnsupportedSigningFormatException
+	 *             if the configured gpg.format is not supported
 	 */
 	private void processOptions(RepositoryState state, RevWalk rw)
 			throws NoMessageException, UnsupportedSigningFormatException {
@@ -80,9 +81,6 @@
 						JGitText.get().onlyOpenPgpSupportedForSigning);
 			}
 			gpgSigner = GpgSigner.getDefault();
-			if (gpgSigner == null) {
-				gpgSigner = new BouncyCastleGpgSigner();
-			}
 		}
 	}
 

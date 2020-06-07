@@ -1,0 +1,21 @@
+	/**
+	 * Builds a {@link SshdSessionFactory} as configured, using the given
+	 * {@link KeyCache} for caching keys.
+	 * <p>
+	 * Different {@link SshdSessionFactory SshdSessionFactories} should
+	 * <em>not</em> share the same {@link KeyCache} since the cache is
+	 * invalidated when the factory itself or when the last {@link SshdSession}
+	 * created from the factory is closed.
+	 * </p>
+	 *
+	 * @param cache
+	 *            to use for caching ssh keys; may be {@code null} if no caching
+	 *            is desired.
+	 * @return the {@link SshdSessionFactory}
+	 */
+	public SshdSessionFactory build(KeyCache cache) {
+		// Use a copy to avoid that subsequent calls to setters affect an
+		// already created SshdSessionFactory.
+		return state.copy().build(cache);
+	}
+

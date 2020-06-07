@@ -141,6 +141,10 @@
 				} catch (SSLHandshakeException e) {
 					handleSslFailure(e);
 					continue; // Re-try
+				} catch (SocketException | InterruptedIOException e) {
+					// Timeout!? Must propagate; don't try other authentication
+					// methods.
+					throw e;
 				} catch (IOException e) {
 					if (authenticator == null || authMethod
 							.getType() != HttpAuthMethod.Type.NONE) {
