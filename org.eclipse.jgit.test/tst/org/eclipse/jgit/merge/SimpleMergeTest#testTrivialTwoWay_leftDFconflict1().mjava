@@ -1,30 +1,29 @@
 	@Test
 	public void testTrivialTwoWay_leftDFconflict1() throws Exception {
-		final DirCache treeB = db.readDirCache();
-		final DirCache treeO = db.readDirCache();
-		final DirCache treeT = db.readDirCache();
-		{
-			final DirCacheBuilder b = treeB.builder();
-			final DirCacheBuilder o = treeO.builder();
-			final DirCacheBuilder t = treeT.builder();
+		DirCache treeB = db.readDirCache();
+		DirCache treeO = db.readDirCache();
+		DirCache treeT = db.readDirCache();
 
-			b.add(createEntry("d/o", FileMode.REGULAR_FILE));
-			b.add(createEntry("d/t", FileMode.REGULAR_FILE));
+		DirCacheBuilder bTreeBuilder = treeB.builder();
+		DirCacheBuilder oTreeBuilder = treeO.builder();
+		DirCacheBuilder tTreeBuilder = treeT.builder();
 
-			o.add(createEntry("d", FileMode.REGULAR_FILE));
+		bTreeBuilder.add(createEntry("d/o", FileMode.REGULAR_FILE));
+		bTreeBuilder.add(createEntry("d/t", FileMode.REGULAR_FILE));
 
-			t.add(createEntry("d/o", FileMode.REGULAR_FILE));
-			t.add(createEntry("d/t", FileMode.REGULAR_FILE, "t !"));
+		oTreeBuilder.add(createEntry("d", FileMode.REGULAR_FILE));
 
-			b.finish();
-			o.finish();
-			t.finish();
-		}
+		tTreeBuilder.add(createEntry("d/o", FileMode.REGULAR_FILE));
+		tTreeBuilder.add(createEntry("d/t", FileMode.REGULAR_FILE, "t !"));
 
-		final ObjectInserter ow = db.newObjectInserter();
-		final ObjectId b = commit(ow, treeB, new ObjectId[] {});
-		final ObjectId o = commit(ow, treeO, new ObjectId[] { b });
-		final ObjectId t = commit(ow, treeT, new ObjectId[] { b });
+		bTreeBuilder.finish();
+		oTreeBuilder.finish();
+		tTreeBuilder.finish();
+
+		ObjectInserter ow = db.newObjectInserter();
+		ObjectId b = commit(ow, treeB, new ObjectId[] {});
+		ObjectId o = commit(ow, treeO, new ObjectId[] { b });
+		ObjectId t = commit(ow, treeT, new ObjectId[] { b });
 
 		Merger ourMerger = MergeStrategy.SIMPLE_TWO_WAY_IN_CORE.newMerger(db);
 		boolean merge = ourMerger.merge(new ObjectId[] { o, t });
