@@ -17,20 +17,26 @@
 		File serverDir = new File(getTemporaryDirectory(), "srv");
 		assertTrue(serverDir.mkdir());
 		// Create two key pairs. Let's not call them "id_rsa".
+		KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
+		generator.initialize(2048);
 		privateKey1 = new File(sshDir, "first_key");
 		privateKey2 = new File(sshDir, "second_key");
-		publicKey1 = createKeyPair(privateKey1);
-		createKeyPair(privateKey2);
-		ByteArrayOutputStream publicHostKey = new ByteArrayOutputStream();
+		publicKey1 = createKeyPair(generator.generateKeyPair(), privateKey1);
+		createKeyPair(generator.generateKeyPair(), privateKey2);
+		// Create a host key
+		KeyPair hostKey = generator.generateKeyPair();
 		// Start a server with our test user and the first key.
 		server = new SshTestGitServer(TEST_USER, publicKey1.toPath(), db,
-				createHostKey(publicHostKey));
+				hostKey);
 		testPort = server.start();
 		assertTrue(testPort > 0);
 		knownHosts = new File(sshDir, "known_hosts");
-		Files.write(knownHosts.toPath(), Collections.singleton("[localhost]:"
-				+ testPort + ' '
-				+ publicHostKey.toString(US_ASCII.name())));
+		StringBuilder knownHostsLine = new StringBuilder();
+		knownHostsLine.append("[localhost]:").append(testPort).append(' ');
+		PublicKeyEntry.appendPublicKeyEntry(knownHostsLine,
+				hostKey.getPublic());
+		Files.write(knownHosts.toPath(),
+				Collections.singleton(knownHostsLine.toString()));
 		factory = createSessionFactory();
 		SshSessionFactory.setInstance(factory);
 	}

@@ -12,11 +12,11 @@
 	 *            the unencrypted private key to use as host key
 	 * @throws IOException
 	 * @throws GeneralSecurityException
+	 * @since 5.9
 	 */
 	public SshTestGitServer(@NonNull String testUser, @NonNull Path testKey,
-			@NonNull Repository repository, @NonNull byte[] hostKey)
+			@NonNull Repository repository, @NonNull KeyPair hostKey)
 			throws IOException, GeneralSecurityException {
-		this(testUser, readPublicKey(testKey), repository,
-				readKeyPair(hostKey));
+		this(testUser, readPublicKey(testKey), repository, hostKey);
 	}
 
