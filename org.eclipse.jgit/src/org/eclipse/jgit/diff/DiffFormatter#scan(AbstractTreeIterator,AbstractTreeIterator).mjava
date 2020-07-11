@@ -18,9 +18,18 @@
 			throws IOException {
 		assertHaveReader();
 
-		TreeWalk walk = new TreeWalk(reader);
-		walk.addTree(a);
-		walk.addTree(b);
+		TreeWalk walk = new TreeWalk(repository, reader);
+		int aIndex = walk.addTree(a);
+		int bIndex = walk.addTree(b);
+		if (repository != null) {
+			if (a instanceof WorkingTreeIterator
+					&& b instanceof DirCacheIterator) {
+				((WorkingTreeIterator) a).setDirCacheIterator(walk, bIndex);
+			} else if (b instanceof WorkingTreeIterator
+					&& a instanceof DirCacheIterator) {
+				((WorkingTreeIterator) b).setDirCacheIterator(walk, aIndex);
+			}
+		}
 		walk.setRecursive(true);
 
 		TreeFilter filter = getDiffTreeFilterFor(a, b);

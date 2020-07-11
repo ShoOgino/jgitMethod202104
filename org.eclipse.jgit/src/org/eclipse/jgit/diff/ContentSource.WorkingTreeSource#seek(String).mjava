@@ -1,6 +1,15 @@
 		private void seek(String path) throws IOException {
 			if (!path.equals(current)) {
 				iterator.reset();
+				// Possibly this iterator had an associated DirCacheIterator,
+				// but we have no access to it and thus don't know about it.
+				// We have to reset this iterator here to work without
+				// DirCacheIterator and to descend always into ignored
+				// directories. Otherwise we might not find tracked files below
+				// ignored folders. Since we're looking only for a single
+				// specific path this is not a performance problem.
+				iterator.setWalkIgnoredDirectories(true);
+				iterator.setDirCacheIterator(null, -1);
 				tw.reset();
 				tw.addTree(iterator);
 				tw.setFilter(PathFilter.create(path));
