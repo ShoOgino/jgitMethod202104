@@ -13,9 +13,14 @@
 		}
 		if (detectBinary) {
 			isBinary = RawText.isBinary(buf, cnt);
+			passAsIs = isBinary;
 			detectBinary = false;
-			if (isBinary && abortIfBinary)
+			if (isBinary && abortIfBinary) {
 				throw new IsBinaryException();
+			}
+			if (!passAsIs && forCheckout) {
+				passAsIs = RawText.isCrLfText(buf, cnt);
+			}
 		}
 		ptr = 0;
 		return true;

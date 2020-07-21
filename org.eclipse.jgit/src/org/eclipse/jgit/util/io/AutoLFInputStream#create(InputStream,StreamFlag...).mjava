@@ -1,0 +1,21 @@
+	/**
+	 * Factory method for creating an {@link AutoLFInputStream} with the
+	 * specified {@link StreamFlag flags}.
+	 *
+	 * @param in
+	 *            raw input stream
+	 * @param flags
+	 *            {@link StreamFlag}s controlling the stream behavior
+	 * @return a new {@link AutoLFInputStream}
+	 * @since 5.9
+	 */
+	public static AutoLFInputStream create(InputStream in,
+			StreamFlag... flags) {
+		if (flags == null) {
+			return new AutoLFInputStream(in, null);
+		}
+		EnumSet<StreamFlag> set = EnumSet.noneOf(StreamFlag.class);
+		set.addAll(Arrays.asList(flags));
+		return new AutoLFInputStream(in, set);
+	}
+

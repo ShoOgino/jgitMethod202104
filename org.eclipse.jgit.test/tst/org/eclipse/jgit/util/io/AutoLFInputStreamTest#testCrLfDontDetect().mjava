@@ -1,0 +1,6 @@
+	@Test
+	public void testCrLfDontDetect() throws IOException {
+		test(asBytes("1\r\n2\r\n"), asBytes("1\n2\n"),
+				in -> AutoLFInputStream.create(in, StreamFlag.DETECT_BINARY));
+	}
+

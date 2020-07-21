@@ -1,0 +1,34 @@
+	/**
+	 * Wrap the input stream depending on
+	 * {@link org.eclipse.jgit.lib.CoreConfig.EolStreamType}.
+	 *
+	 * @param in
+	 *            original stream
+	 * @param conversion
+	 *            to be performed
+	 * @param forCheckout
+	 *            whether the stream is for checking out from the repository
+	 * @return the converted stream depending on
+	 *         {@link org.eclipse.jgit.lib.CoreConfig.EolStreamType}
+	 * @since 5.9
+	 */
+	public static InputStream wrapInputStream(InputStream in,
+			EolStreamType conversion, boolean forCheckout) {
+		switch (conversion) {
+		case TEXT_CRLF:
+			return new AutoCRLFInputStream(in, false);
+		case TEXT_LF:
+			return AutoLFInputStream.create(in);
+		case AUTO_CRLF:
+			return new AutoCRLFInputStream(in, true);
+		case AUTO_LF:
+			EnumSet<StreamFlag> flags = forCheckout
+					? EnumSet.of(StreamFlag.DETECT_BINARY,
+							StreamFlag.FOR_CHECKOUT)
+					: EnumSet.of(StreamFlag.DETECT_BINARY);
+			return new AutoLFInputStream(in, flags);
+		default:
+			return in;
+		}
+	}
+

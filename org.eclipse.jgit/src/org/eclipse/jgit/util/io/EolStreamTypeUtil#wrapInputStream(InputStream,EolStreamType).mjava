@@ -1,6 +1,6 @@
 	/**
 	 * Wrap the input stream depending on
-	 * {@link org.eclipse.jgit.lib.CoreConfig.EolStreamType}
+	 * {@link org.eclipse.jgit.lib.CoreConfig.EolStreamType}.
 	 *
 	 * @param in
 	 *            original stream
@@ -11,17 +11,6 @@
 	 */
 	public static InputStream wrapInputStream(InputStream in,
 			EolStreamType conversion) {
-		switch (conversion) {
-		case TEXT_CRLF:
-			return new AutoCRLFInputStream(in, false);
-		case TEXT_LF:
-			return new AutoLFInputStream(in, false);
-		case AUTO_CRLF:
-			return new AutoCRLFInputStream(in, true);
-		case AUTO_LF:
-			return new AutoLFInputStream(in, true);
-		default:
-			return in;
-		}
+		return wrapInputStream(in, conversion, false);
 	}
 

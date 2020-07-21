@@ -1,0 +1,7 @@
+	@Test
+	public void testCrLf() throws IOException {
+		byte[] bytes = asBytes("1\r\n2\n3\r\n\r");
+		test(bytes, bytes, in -> AutoLFInputStream.create(in,
+				StreamFlag.DETECT_BINARY, StreamFlag.FOR_CHECKOUT));
+	}
+

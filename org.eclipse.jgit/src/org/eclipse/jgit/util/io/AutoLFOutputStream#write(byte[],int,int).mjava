@@ -3,14 +3,11 @@
 	public void write(byte[] b, int startOff, int startLen)
 			throws IOException {
 		final int overflow = buffer(b, startOff, startLen);
-		if (overflow < 0) {
+		if (overflow <= 0) {
 			return;
 		}
 		final int off = startOff + startLen - overflow;
 		final int len = overflow;
-		if (len == 0) {
-			return;
-		}
 		int lastw = off;
 		if (isBinary) {
 			out.write(b, off, len);
