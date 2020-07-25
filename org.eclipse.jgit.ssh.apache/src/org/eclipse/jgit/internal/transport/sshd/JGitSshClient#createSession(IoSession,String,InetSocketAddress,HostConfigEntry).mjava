@@ -16,11 +16,6 @@
 		int numberOfPasswordPrompts = getNumberOfPasswordPrompts(hostConfig);
 		session.getProperties().put(PASSWORD_PROMPTS,
 				Integer.valueOf(numberOfPasswordPrompts));
-		FilePasswordProvider passwordProvider = getFilePasswordProvider();
-		if (passwordProvider instanceof RepeatingFilePasswordProvider) {
-			((RepeatingFilePasswordProvider) passwordProvider)
-					.setAttempts(numberOfPasswordPrompts);
-		}
 		List<Path> identities = hostConfig.getIdentities().stream()
 				.map(s -> {
 					try {
@@ -34,6 +29,7 @@
 				.collect(Collectors.toList());
 		CachingKeyPairProvider ourConfiguredKeysProvider = new CachingKeyPairProvider(
 				identities, keyCache);
+		FilePasswordProvider passwordProvider = getFilePasswordProvider();
 		ourConfiguredKeysProvider.setPasswordFinder(passwordProvider);
 		if (hostConfig.isIdentitiesOnly()) {
 			session.setKeyIdentityProvider(ourConfiguredKeysProvider);

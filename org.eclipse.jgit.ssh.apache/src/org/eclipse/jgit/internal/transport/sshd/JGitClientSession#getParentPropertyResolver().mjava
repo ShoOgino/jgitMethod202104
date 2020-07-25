@@ -1,0 +1,12 @@
+	@Override
+	public PropertyResolver getParentPropertyResolver() {
+		IoSession ioSession = getIoSession();
+		if (ioSession != null) {
+			Object obj = ioSession.getAttribute(AttributeRepository.class);
+			if (obj instanceof PropertyResolver) {
+				return (PropertyResolver) obj;
+			}
+		}
+		return super.getParentPropertyResolver();
+	}
+

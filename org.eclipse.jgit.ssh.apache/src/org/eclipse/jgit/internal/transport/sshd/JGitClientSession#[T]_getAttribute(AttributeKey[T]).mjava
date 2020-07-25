@@ -1,0 +1,16 @@
+	@Override
+	public <T> T getAttribute(AttributeKey<T> key) {
+		T value = super.getAttribute(key);
+		if (value == null) {
+			IoSession ioSession = getIoSession();
+			if (ioSession != null) {
+				Object obj = ioSession.getAttribute(AttributeRepository.class);
+				if (obj instanceof AttributeRepository) {
+					AttributeRepository sessionAttributes = (AttributeRepository) obj;
+					value = sessionAttributes.resolveAttribute(key);
+				}
+			}
+		}
+		return value;
+	}
+

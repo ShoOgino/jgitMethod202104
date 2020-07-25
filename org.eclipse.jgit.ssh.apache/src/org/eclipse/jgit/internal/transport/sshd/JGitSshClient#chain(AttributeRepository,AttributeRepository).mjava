@@ -1,0 +1,11 @@
+	private AttributeRepository chain(AttributeRepository self,
+			AttributeRepository parent) {
+		if (self == null) {
+			return Objects.requireNonNull(parent);
+		}
+		if (parent == null || parent == self) {
+			return self;
+		}
+		return new ChainingAttributes(self, parent);
+	}
+

@@ -1,0 +1,9 @@
+		@Override
+		public <T> T resolveAttribute(AttributeKey<T> key) {
+			T value = getAttribute(Objects.requireNonNull(key));
+			if (value == null) {
+				return parent.getAttribute(key);
+			}
+			return value;
+		}
+

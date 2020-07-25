@@ -1,0 +1,22 @@
+	private AttributeRepository sessionAttributes(AttributeRepository parent,
+			HostConfigEntry hostConfig, InetSocketAddress originalAddress) {
+		// sshd needs some entries from the host config already in the
+		// constructor of the session. Put those into a dedicated
+		// AttributeRepository for the new session where it will find them.
+		// We can set the host config only once the session object has been
+		// created.
+		Map<AttributeKey<?>, Object> data = new HashMap<>();
+		data.put(HOST_CONFIG_ENTRY, hostConfig);
+		data.put(ORIGINAL_REMOTE_ADDRESS, originalAddress);
+		String preferredAuths = hostConfig.getProperty(
+				SshConstants.PREFERRED_AUTHENTICATIONS,
+				resolveAttribute(PREFERRED_AUTHENTICATIONS));
+		if (!StringUtils.isEmptyOrNull(preferredAuths)) {
+			data.put(SessionAttributes.PROPERTIES,
+					Collections.singletonMap(PREFERRED_AUTHS, preferredAuths));
+		}
+		return new SessionAttributes(
+				AttributeRepository.ofAttributesMap(data),
+				parent, this);
+	}
+
