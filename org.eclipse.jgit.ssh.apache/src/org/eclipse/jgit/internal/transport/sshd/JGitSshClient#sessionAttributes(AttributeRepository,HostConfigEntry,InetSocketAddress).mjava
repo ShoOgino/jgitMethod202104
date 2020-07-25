@@ -8,12 +8,15 @@
 		Map<AttributeKey<?>, Object> data = new HashMap<>();
 		data.put(HOST_CONFIG_ENTRY, hostConfig);
 		data.put(ORIGINAL_REMOTE_ADDRESS, originalAddress);
+		data.put(TARGET_SERVER, new SshdSocketAddress(originalAddress));
 		String preferredAuths = hostConfig.getProperty(
 				SshConstants.PREFERRED_AUTHENTICATIONS,
 				resolveAttribute(PREFERRED_AUTHENTICATIONS));
 		if (!StringUtils.isEmptyOrNull(preferredAuths)) {
 			data.put(SessionAttributes.PROPERTIES,
-					Collections.singletonMap(PREFERRED_AUTHS, preferredAuths));
+					Collections.singletonMap(
+							PREFERRED_AUTHS.getName(),
+							preferredAuths));
 		}
 		return new SessionAttributes(
 				AttributeRepository.ofAttributesMap(data),
