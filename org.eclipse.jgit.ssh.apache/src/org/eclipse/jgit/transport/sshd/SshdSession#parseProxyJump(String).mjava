@@ -1,0 +1,25 @@
+	private List<URIish> parseProxyJump(String proxyJump)
+			throws URISyntaxException {
+		String[] hops = proxyJump.split(","); //$NON-NLS-1$
+		List<URIish> result = new LinkedList<>();
+		for (String hop : hops) {
+			// There shouldn't be any whitespace, but let's be lenient
+			hop = hop.trim();
+			if (SHORT_SSH_FORMAT.matcher(hop).matches()) {
+				// URIish doesn't understand the short SSH format
+				// user@host:port, only user@host:path
+				hop = SshConstants.SSH_SCHEME + "://" + hop; //$NON-NLS-1$
+			}
+			URIish to = new URIish(hop);
+			if (!SshConstants.SSH_SCHEME.equalsIgnoreCase(to.getScheme())) {
+				throw new URISyntaxException(hop,
+						SshdText.get().configProxyJumpNotSsh);
+			} else if (!StringUtils.isEmptyOrNull(to.getPath())) {
+				throw new URISyntaxException(hop,
+						SshdText.get().configProxyJumpWithPath);
+			}
+			result.add(to);
+		}
+		return result;
+	}
+

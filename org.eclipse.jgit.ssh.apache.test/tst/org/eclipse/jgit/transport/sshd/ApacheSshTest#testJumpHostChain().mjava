@@ -1,0 +1,38 @@
+	@Test
+	public void testJumpHostChain() throws Exception {
+		SshdSocketAddress[] forwarded1 = { null };
+		SshdSocketAddress[] forwarded2 = { null };
+		try (SshServer proxy1 = createProxy(TEST_USER + 'X', publicKey2,
+				forwarded1);
+				SshServer proxy2 = createProxy("foo", publicKey1, forwarded2)) {
+			try {
+				// Clone proxy1 -> proxy2 -> server
+				cloneWith("ssh://server/doesntmatter", defaultCloneDir, null, //
+						"Host server", //
+						"HostName localhost", //
+						"Port " + testPort, //
+						"User " + TEST_USER, //
+						"IdentityFile " + privateKey1.getAbsolutePath(), //
+						"ProxyJump proxy2," + TEST_USER + "X@proxy:"
+								+ proxy1.getPort(), //
+						"", //
+						"Host proxy", //
+						"Hostname localhost", //
+						"IdentityFile " + privateKey2.getAbsolutePath(), //
+						"", //
+						"Host proxy2", //
+						"Hostname localhost", //
+						"User foo", //
+						"Port " + proxy2.getPort(), //
+						"IdentityFile " + privateKey1.getAbsolutePath());
+				assertNotNull(forwarded1[0]);
+				assertEquals(proxy2.getPort(), forwarded1[0].getPort());
+				assertNotNull(forwarded2[0]);
+				assertEquals(testPort, forwarded2[0].getPort());
+			} finally {
+				proxy1.stop();
+				proxy2.stop();
+			}
+		}
+	}
+

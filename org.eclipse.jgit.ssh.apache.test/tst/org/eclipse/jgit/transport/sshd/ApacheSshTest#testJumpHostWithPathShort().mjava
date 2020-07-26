@@ -1,0 +1,37 @@
+	@Test
+	public void testJumpHostWithPathShort() throws Exception {
+		SshdSocketAddress[] forwarded = { null };
+		try (SshServer proxy = createProxy(TEST_USER + 'X', publicKey2,
+				forwarded)) {
+			try {
+				TransportException e = assertThrows(TransportException.class,
+						() -> cloneWith("ssh://server/doesntmatter",
+								defaultCloneDir, null, //
+								"Host server", //
+								"HostName localhost", //
+								"Port " + testPort, //
+								"User " + TEST_USER, //
+								"IdentityFile " + privateKey1.getAbsolutePath(), //
+								"ProxyJump " + TEST_USER + "X@proxy:wrongPath", //
+								"", //
+								"Host proxy", //
+								"Hostname localhost", //
+								"Port " + proxy.getPort(), //
+								"IdentityFile "
+										+ privateKey2.getAbsolutePath()));
+				// Find the expected message
+				Throwable t = e;
+				while (t != null) {
+					if (t instanceof URISyntaxException) {
+						break;
+					}
+					t = t.getCause();
+				}
+				assertNotNull(t);
+				assertTrue(t.getMessage().contains("wrongPath"));
+			} finally {
+				proxy.stop();
+			}
+		}
+	}
+

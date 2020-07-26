@@ -1,0 +1,10 @@
+	private void close(Closeable toClose, Throwable error) {
+		if (toClose != null) {
+			try {
+				toClose.close();
+			} catch (IOException e) {
+				error.addSuppressed(e);
+			}
+		}
+	}
+

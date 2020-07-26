@@ -1,0 +1,62 @@
+	/**
+	 * Creates a simple proxy server. Accepts only publickey authentication from
+	 * the given user with the given key, allows all forwardings. Adds the
+	 * proxy's host key to {@link #knownHosts}.
+	 *
+	 * @param user
+	 *            to accept
+	 * @param userKey
+	 *            public key of that user at this server
+	 * @param report
+	 *            single-element array to report back the forwarded address.
+	 * @return the started server
+	 * @throws Exception
+	 */
+	private SshServer createProxy(String user, File userKey,
+			SshdSocketAddress[] report) throws Exception {
+		SshServer proxy = SshServer.setUpDefaultServer();
+		// Give the server its own host key
+		KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
+		generator.initialize(2048);
+		KeyPair proxyHostKey = generator.generateKeyPair();
+		proxy.setKeyPairProvider(
+				session -> Collections.singletonList(proxyHostKey));
+		// Allow (only) publickey authentication
+		proxy.setUserAuthFactories(Collections.singletonList(
+				ServerAuthenticationManager.DEFAULT_USER_AUTH_PUBLIC_KEY_FACTORY));
+		// Install the user's public key
+		PublicKey userProxyKey = AuthorizedKeyEntry
+				.readAuthorizedKeys(userKey.toPath()).get(0)
+				.resolvePublicKey(null, PublicKeyEntryResolver.IGNORING);
+		proxy.setPublickeyAuthenticator(
+				(userName, publicKey, session) -> user.equals(userName)
+						&& KeyUtils.compareKeys(userProxyKey, publicKey));
+		// Allow forwarding
+		proxy.setForwardingFilter(new StaticDecisionForwardingFilter(true) {
+
+			@Override
+			protected boolean checkAcceptance(String request, Session session,
+					SshdSocketAddress target) {
+				report[0] = target;
+				return super.checkAcceptance(request, session, target);
+			}
+		});
+		proxy.start();
+		// Add the proxy's host key to knownhosts
+		try (BufferedWriter writer = Files.newBufferedWriter(
+				knownHosts.toPath(), StandardCharsets.US_ASCII,
+				StandardOpenOption.WRITE, StandardOpenOption.APPEND)) {
+			writer.append('\n');
+			KnownHostHashValue.appendHostPattern(writer, "localhost",
+					proxy.getPort());
+			writer.append(',');
+			KnownHostHashValue.appendHostPattern(writer, "127.0.0.1",
+					proxy.getPort());
+			writer.append(' ');
+			PublicKeyEntry.appendPublicKeyEntry(writer,
+					proxyHostKey.getPublic());
+			writer.append('\n');
+		}
+		return proxy;
+	}
+

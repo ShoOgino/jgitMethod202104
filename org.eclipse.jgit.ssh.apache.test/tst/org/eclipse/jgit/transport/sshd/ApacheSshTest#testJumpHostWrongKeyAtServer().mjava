@@ -1,0 +1,32 @@
+	@Test
+	public void testJumpHostWrongKeyAtServer() throws Exception {
+		// Test that we find the target server's URI in the exception message
+		SshdSocketAddress[] forwarded = { null };
+		try (SshServer proxy = createProxy(TEST_USER + 'X', publicKey2,
+				forwarded)) {
+			try {
+				// Now try to clone via the proxy
+				TransportException e = assertThrows(TransportException.class,
+						() -> cloneWith("ssh://server/doesntmatter",
+								defaultCloneDir, null, //
+								"Host server", //
+								"HostName localhost", //
+								"Port " + testPort, //
+								"User " + TEST_USER, //
+								"IdentityFile " + privateKey2.getAbsolutePath(),
+								"ProxyJump " + TEST_USER + "X@proxy:"
+										+ proxy.getPort(), //
+								"", //
+								"Host proxy", //
+								"Hostname localhost", //
+								"IdentityFile "
+										+ privateKey2.getAbsolutePath()));
+				String message = e.getMessage();
+				assertTrue(message.contains("localhost:" + testPort));
+				assertTrue(message.contains("ssh://server"));
+			} finally {
+				proxy.stop();
+			}
+		}
+	}
+

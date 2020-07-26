@@ -1,0 +1,76 @@
+	private ClientSession connect(URIish target, List<URIish> jumps,
+			SshFutureListener<CloseFuture> listener, Duration timeout,
+			int depth) throws IOException {
+		if (--depth < 0) {
+			throw new IOException(
+					format(SshdText.get().proxyJumpAbort, target));
+		}
+		HostConfigEntry hostConfig = getHostConfig(target.getUser(),
+				target.getHost(), target.getPort());
+		String host = hostConfig.getHostName();
+		int port = hostConfig.getPort();
+		List<URIish> hops = determineHops(jumps, hostConfig, target.getHost());
+		ClientSession resultSession = null;
+		ClientSession proxySession = null;
+		PortForwardingTracker portForward = null;
+		try {
+			if (!hops.isEmpty()) {
+				URIish hop = hops.remove(0);
+				if (LOG.isDebugEnabled()) {
+					LOG.debug("Connecting to jump host {}", hop); //$NON-NLS-1$
+				}
+				proxySession = connect(hop, hops, null, timeout, depth);
+			}
+			AttributeRepository context = null;
+			if (proxySession != null) {
+				SshdSocketAddress remoteAddress = new SshdSocketAddress(host,
+						port);
+				portForward = proxySession.createLocalPortForwardingTracker(
+						SshdSocketAddress.LOCALHOST_ADDRESS, remoteAddress);
+				// We must connect to the locally bound address, not the one
+				// from the host config.
+				context = AttributeRepository.ofKeyValuePair(
+						JGitSshClient.LOCAL_FORWARD_ADDRESS,
+						portForward.getBoundAddress());
+			}
+			resultSession = connect(hostConfig, context, timeout);
+			if (proxySession != null) {
+				final PortForwardingTracker tracker = portForward;
+				final ClientSession pSession = proxySession;
+				resultSession.addCloseFutureListener(future -> {
+					IoUtils.closeQuietly(tracker);
+					String sessionName = pSession.toString();
+					try {
+						pSession.close();
+					} catch (IOException e) {
+						LOG.error(format(
+								SshdText.get().sshProxySessionCloseFailed,
+								sessionName), e);
+					}
+				});
+				portForward = null;
+				proxySession = null;
+			}
+			if (listener != null) {
+				resultSession.addCloseFutureListener(listener);
+			}
+			// Authentication timeout is by default 2 minutes.
+			resultSession.auth().verify(resultSession.getAuthTimeout());
+			return resultSession;
+		} catch (IOException e) {
+			close(portForward, e);
+			close(proxySession, e);
+			close(resultSession, e);
+			if (e instanceof SshException && ((SshException) e)
+					.getDisconnectCode() == SSH2_DISCONNECT_NO_MORE_AUTH_METHODS_AVAILABLE) {
+				// Ensure the user gets to know on which URI the authentication
+				// was denied.
+				throw new TransportException(target,
+						format(SshdText.get().loginDenied, host,
+								Integer.toString(port)),
+						e);
+			}
+			throw e;
+		}
+	}
+

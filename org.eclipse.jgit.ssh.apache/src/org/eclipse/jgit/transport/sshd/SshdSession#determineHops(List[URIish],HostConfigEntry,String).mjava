@@ -1,0 +1,18 @@
+	private List<URIish> determineHops(List<URIish> currentHops,
+			HostConfigEntry hostConfig, String host) throws IOException {
+		if (currentHops.isEmpty()) {
+			String jumpHosts = hostConfig.getProperty(SshConstants.PROXY_JUMP);
+			if (!StringUtils.isEmptyOrNull(jumpHosts)) {
+				try {
+					return parseProxyJump(jumpHosts);
+				} catch (URISyntaxException e) {
+					throw new IOException(
+							format(SshdText.get().configInvalidProxyJump, host,
+									jumpHosts),
+							e);
+				}
+			}
+		}
+		return currentHops;
+	}
+

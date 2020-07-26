@@ -1,0 +1,37 @@
+	@Test
+	public void testJumpHostRecursion() throws Exception {
+		SshdSocketAddress[] forwarded1 = { null };
+		SshdSocketAddress[] forwarded2 = { null };
+		try (SshServer proxy1 = createProxy(TEST_USER + 'X', publicKey2,
+				forwarded1);
+				SshServer proxy2 = createProxy("foo", publicKey1, forwarded2)) {
+			try {
+				TransportException e = assertThrows(TransportException.class,
+						() -> cloneWith(
+						"ssh://server/doesntmatter", defaultCloneDir, null, //
+						"Host server", //
+						"HostName localhost", //
+						"Port " + testPort, //
+						"User " + TEST_USER, //
+						"IdentityFile " + privateKey1.getAbsolutePath(), //
+						"ProxyJump " + TEST_USER + "X@proxy", //
+						"", //
+						"Host proxy", //
+						"Hostname localhost", //
+						"Port " + proxy1.getPort(), //
+						"ProxyJump ssh://proxy2:" + proxy2.getPort(), //
+						"IdentityFile " + privateKey2.getAbsolutePath(), //
+						"", //
+						"Host proxy2", //
+						"Hostname localhost", //
+						"User foo", //
+						"ProxyJump " + TEST_USER + "X@proxy", //
+						"IdentityFile " + privateKey1.getAbsolutePath()));
+				assertTrue(e.getMessage().contains("proxy"));
+			} finally {
+				proxy1.stop();
+				proxy2.stop();
+			}
+		}
+	}
+

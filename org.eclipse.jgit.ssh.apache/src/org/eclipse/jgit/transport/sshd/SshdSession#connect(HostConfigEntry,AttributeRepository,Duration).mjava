@@ -1,0 +1,13 @@
+	private ClientSession connect(HostConfigEntry config,
+			AttributeRepository context, Duration timeout)
+			throws IOException {
+		ConnectFuture connected = client.connect(config, context, null);
+		long timeoutMillis = timeout.toMillis();
+		if (timeoutMillis <= 0) {
+			connected = connected.verify();
+		} else {
+			connected = connected.verify(timeoutMillis);
+		}
+		return connected.getSession();
+	}
+
