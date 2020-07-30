@@ -6,6 +6,10 @@
 		ProtocolV2Parser parser = new ProtocolV2Parser(
 				ConfigBuilder.start().allowFilter().done());
 		FetchV2Request request = parser.parseFetchRequest(pckIn);
+		assertTrue(request.getFilterSpec().allowsType(OBJ_BLOB));
+		assertTrue(request.getFilterSpec().allowsType(OBJ_TREE));
+		assertTrue(request.getFilterSpec().allowsType(OBJ_COMMIT));
+		assertTrue(request.getFilterSpec().allowsType(OBJ_TAG));
 		assertEquals(15, request.getFilterSpec().getBlobLimit());
 		assertEquals(-1, request.getFilterSpec().getTreeDepthLimit());
 	}

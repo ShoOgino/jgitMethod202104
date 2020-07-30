@@ -18,7 +18,8 @@
 	public static FilterSpec fromFilterLine(String filterLine)
 			throws PackProtocolException {
 		if (filterLine.equals("blob:none")) { //$NON-NLS-1$
-			return FilterSpec.withBlobLimit(0);
+			return FilterSpec.withObjectTypes(
+					ObjectTypes.allow(OBJ_TREE, OBJ_COMMIT, OBJ_TAG));
 		} else if (filterLine.startsWith("blob:limit=")) { //$NON-NLS-1$
 			long blobLimit = -1;
 			try {
