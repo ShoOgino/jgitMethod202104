@@ -1,23 +1,5 @@
 	@Override
 	public Process exec(String commandName, int timeout) throws IOException {
-		@SuppressWarnings("resource")
-		ChannelExec exec = session.createExecChannel(commandName);
-		if (timeout <= 0) {
-			try {
-				exec.open().verify();
-			} catch (IOException | RuntimeException e) {
-				exec.close(true);
-				throw e;
-			}
-		} else {
-			try {
-				exec.open().verify(TimeUnit.SECONDS.toMillis(timeout));
-			} catch (IOException | RuntimeException e) {
-				exec.close(true);
-				throw new IOException(format(SshdText.get().sshCommandTimeout,
-						commandName, Integer.valueOf(timeout)), e);
-			}
-		}
-		return new SshdExecProcess(exec, commandName);
+		return exec(commandName, Collections.emptyMap(), timeout);
 	}
 

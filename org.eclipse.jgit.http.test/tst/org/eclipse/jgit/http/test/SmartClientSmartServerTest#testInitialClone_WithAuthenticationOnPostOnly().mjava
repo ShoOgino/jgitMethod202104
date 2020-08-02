@@ -12,7 +12,7 @@
 		}
 
 		List<AccessEvent> requests = getRequests();
-		assertEquals(3, requests.size());
+		assertEquals(enableProtocolV2 ? 4 : 3, requests.size());
 
 		AccessEvent info = requests.get(0);
 		assertEquals("GET", info.getMethod());
@@ -22,24 +22,29 @@
 		assertEquals(200, info.getStatus());
 		assertEquals("application/x-git-upload-pack-advertisement",
 				info.getResponseHeader(HDR_CONTENT_TYPE));
-		assertEquals("gzip", info.getResponseHeader(HDR_CONTENT_ENCODING));
+		if (!enableProtocolV2) {
+			assertEquals("gzip", info.getResponseHeader(HDR_CONTENT_ENCODING));
+		}
 
 		AccessEvent service = requests.get(1);
 		assertEquals("POST", service.getMethod());
 		assertEquals(join(authOnPostURI, "git-upload-pack"), service.getPath());
 		assertEquals(401, service.getStatus());
 
-		service = requests.get(2);
-		assertEquals("POST", service.getMethod());
-		assertEquals(join(authOnPostURI, "git-upload-pack"), service.getPath());
-		assertEquals(0, service.getParameters().size());
-		assertNotNull("has content-length",
-				service.getRequestHeader(HDR_CONTENT_LENGTH));
-		assertNull("not chunked",
-				service.getRequestHeader(HDR_TRANSFER_ENCODING));
+		for (int i = 2; i < requests.size(); i++) {
+			service = requests.get(i);
+			assertEquals("POST", service.getMethod());
+			assertEquals(join(authOnPostURI, "git-upload-pack"),
+					service.getPath());
+			assertEquals(0, service.getParameters().size());
+			assertNotNull("has content-length",
+					service.getRequestHeader(HDR_CONTENT_LENGTH));
+			assertNull("not chunked",
+					service.getRequestHeader(HDR_TRANSFER_ENCODING));
 
-		assertEquals(200, service.getStatus());
-		assertEquals("application/x-git-upload-pack-result",
-				service.getResponseHeader(HDR_CONTENT_TYPE));
+			assertEquals(200, service.getStatus());
+			assertEquals("application/x-git-upload-pack-result",
+					service.getResponseHeader(HDR_CONTENT_TYPE));
+		}
 	}
 

@@ -7,6 +7,7 @@
 		boolean receivedContinue = false;
 		boolean receivedAck = false;
 		boolean receivedReady = false;
+		boolean needsAcknowledgementV2 = true;
 
 		if (statelessRPC) {
 			state.writeTo(out, null);
@@ -20,7 +21,7 @@
 			}
 
 			ObjectId o = c.getId();
-			pckOut.writeString("have " + o.name() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			pckOut.writeString("have " + o.name() + '\n'); //$NON-NLS-1$
 			havesSent++;
 			havesSinceLastContinue++;
 
@@ -37,6 +38,7 @@
 			}
 
 			pckOut.end();
+			outNeedsEnd = false;
 			resultsPending++; // Each end will cause a result to come back.
 
 			if (havesSent == 32 && !statelessRPC) {
@@ -48,9 +50,32 @@
 				continue;
 			}
 
+			// Read the section header
+			if (needsAcknowledgementV2 && TransferConfig.ProtocolVersion.V2
+					.equals(getProtocolVersion())) {
+				String header = pckIn.readString();
+				if (!GitProtocolConstants.SECTION_ACKNOWLEDGMENTS
+						.equals(header)) {
+					throw new PackProtocolException(MessageFormat.format(
+							JGitText.get().expectedGot,
+							GitProtocolConstants.SECTION_ACKNOWLEDGMENTS,
+							header));
+				}
+				needsAcknowledgementV2 = false;
+			}
 			READ_RESULT: for (;;) {
-				final AckNackResult anr = pckIn.readACK(ackId);
+				AckNackResult anr = pckIn.readACKorEOF(ackId);
 				switch (anr) {
+				case ACK_EOF:
+					if (TransferConfig.ProtocolVersion.V0
+							.equals(getProtocolVersion())) {
+						throw new PackProtocolException(
+								JGitText.get().expectedACKNAKFoundEOF);
+					}
+					// More lines needed
+					resultsPending--;
+					break READ_RESULT;
+
 				case NAK:
 					// More have lines are necessary to compute the
 					// pack on the remote side. Keep doing that.
@@ -59,17 +84,24 @@
 					break READ_RESULT;
 
 				case ACK:
-					// The remote side is happy and knows exactly what
-					// to send us. There is no further negotiation and
-					// we can break out immediately.
-					//
-					multiAck = MultiAck.OFF;
-					resultsPending = 0;
-					receivedAck = true;
-					if (statelessRPC) {
-						state.writeTo(out, null);
+					if (TransferConfig.ProtocolVersion.V0
+							.equals(getProtocolVersion())) {
+						// The remote side is happy and knows exactly what
+						// to send us. There is no further negotiation and
+						// we can break out immediately.
+						//
+						multiAck = MultiAck.OFF;
+						resultsPending = 0;
+						receivedAck = true;
+						if (statelessRPC) {
+							state.writeTo(out, null);
+						}
+						break SEND_HAVES;
 					}
-					break SEND_HAVES;
+					// Keep on reading ACKs until we get the ACK_READY
+					markCommon(walk.parseAny(ackId), AckNackResult.ACK_COMMON);
+					receivedAck = true;
+					break;
 
 				case ACK_CONTINUE:
 				case ACK_COMMON:
@@ -85,6 +117,12 @@
 					havesSinceLastContinue = 0;
 					if (anr == AckNackResult.ACK_READY) {
 						receivedReady = true;
+						if (TransferConfig.ProtocolVersion.V2
+								.equals(getProtocolVersion())) {
+							multiAck = MultiAck.OFF;
+							resultsPending = 0;
+							break SEND_HAVES;
+						}
 					}
 					break;
 				}
@@ -118,14 +156,35 @@
 			throw new CancelledException();
 		}
 
+		if (receivedReady && TransferConfig.ProtocolVersion.V2
+				.equals(getProtocolVersion())) {
+			// We'll get the packfile right away. Skip the delimiter.
+			String delim = pckIn.readString();
+			if (!PacketLineIn.isDelimiter(delim)) {
+				throw new PackProtocolException(MessageFormat
+						.format(JGitText.get().expectedGot, "0001", delim)); //$NON-NLS-1$
+			}
+			return;
+		}
 		if (!receivedReady || !noDone) {
 			// When statelessRPC is true we should always leave SEND_HAVES
 			// loop above while in the middle of a request. This allows us
 			// to just write done immediately.
 			//
 			pckOut.writeString("done\n"); //$NON-NLS-1$
+			if (TransferConfig.ProtocolVersion.V2
+					.equals(getProtocolVersion())) {
+				pckOut.end();
+				outNeedsEnd = false;
+				pckOut.flush();
+				// Protocol V2 will skip acknowledgments completely if we send
+				// a done.
+				return;
+			}
 			pckOut.flush();
 		}
+
+		// Below is protocol V0 only.
 
 		if (!receivedAck) {
 			// Apparently if we have never received an ACK earlier
@@ -146,6 +205,14 @@
 				//
 				break;
 
+			case ACK_EOF:
+				if (TransferConfig.ProtocolVersion.V0
+						.equals(getProtocolVersion())) {
+					throw new PackProtocolException(
+							JGitText.get().expectedACKNAKFoundEOF);
+				}
+				break READ_RESULT;
+
 			case ACK:
 				// A solitary ACK at this point means the remote won't
 				// speak anymore, but is going to send us a pack now.
@@ -154,7 +221,16 @@
 
 			case ACK_CONTINUE:
 			case ACK_COMMON:
+				// We will expect a normal ACK to break out of the loop.
+				//
+				multiAck = MultiAck.CONTINUE;
+				break;
+
 			case ACK_READY:
+				if (TransferConfig.ProtocolVersion.V2
+						.equals(getProtocolVersion())) {
+					break READ_RESULT;
+				}
 				// We will expect a normal ACK to break out of the loop.
 				//
 				multiAck = MultiAck.CONTINUE;

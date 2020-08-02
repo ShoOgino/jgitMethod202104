@@ -15,6 +15,9 @@
 
 		remoteRepository = src.getRepository();
 		remoteURI = toURIish(app, srcName);
+		if (enableProtocolV2) {
+			remoteRepository.getConfig().setInt("protocol", null, "version", 2);
+		}
 
 		A_txt = src.blob("A");
 		A = src.commit().add("A_txt", A_txt).create();

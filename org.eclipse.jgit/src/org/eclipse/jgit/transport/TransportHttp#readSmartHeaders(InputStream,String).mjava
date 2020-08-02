@@ -1,19 +1,36 @@
 	private void readSmartHeaders(InputStream in, String service)
 			throws IOException {
-		// A smart reply will have a '#' after the first 4 bytes, but
-		// a dumb reply cannot contain a '#' until after byte 41. Do a
+		// A smart protocol V0 reply will have a '#' after the first 4 bytes,
+		// but a dumb reply cannot contain a '#' until after byte 41. Do a
 		// quick check to make sure its a smart reply before we parse
 		// as a pkt-line stream.
 		//
-		final byte[] magic = new byte[5];
+		// There appears to be a confusion about this in protocol V2. Github
+		// sends the # service line as a git (not http) header also when
+		// protocol V2 is used. Gitlab also does so. JGit's UploadPack doesn't,
+		// and thus Gerrit also does not.
+		final byte[] magic = new byte[14];
+		if (!in.markSupported()) {
+			throw new TransportException(uri,
+					JGitText.get().inputStreamMustSupportMark);
+		}
+		in.mark(14);
 		IO.readFully(in, magic, 0, magic.length);
+		// Did we get 000dversion 2 or similar? (Canonical is 000eversion 2\n,
+		// but JGit and thus Gerrit omits the \n.)
+		if (Arrays.equals(Arrays.copyOfRange(magic, 4, 11),
+				"version".getBytes()) && magic[12] >= '1' && magic[12] <= '9') { //$NON-NLS-1$
+			// It's a smart server doing version 1 or greater, but not sending
+			// the # service line header. Don't consume the version line.
+			in.reset();
+			return;
+		}
 		if (magic[4] != '#') {
 			throw new TransportException(uri, MessageFormat.format(
 					JGitText.get().expectedPktLineWithService, RawParseUtils.decode(magic)));
 		}
-
-		final PacketLineIn pckIn = new PacketLineIn(new UnionInputStream(
-				new ByteArrayInputStream(magic), in));
+		in.reset();
+		final PacketLineIn pckIn = new PacketLineIn(in);
 		final String exp = "# service=" + service; //$NON-NLS-1$
 		final String act = pckIn.readString();
 		if (!exp.equals(act)) {

@@ -1,4 +1,5 @@
-	void service(String name, PacketLineOut pckOut)
+	void service(String name, PacketLineOut pckOut,
+			TransferConfig.ProtocolVersion gitProtocol)
 			throws IOException {
 		final StringBuilder cmd = new StringBuilder();
 		cmd.append(name);
@@ -12,6 +13,11 @@
 			cmd.append(uri.getPort());
 		}
 		cmd.append('\0');
+		if (TransferConfig.ProtocolVersion.V2.equals(gitProtocol)) {
+			cmd.append('\0');
+			cmd.append(GitProtocolConstants.VERSION_2_REQUEST);
+			cmd.append('\0');
+		}
 		pckOut.writeString(cmd.toString());
 		pckOut.flush();
 	}

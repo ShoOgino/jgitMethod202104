@@ -1,6 +1,10 @@
-		private ProcessBuilder createProcess(List<String> args) {
+		private ProcessBuilder createProcess(List<String> args,
+				Map<String, String> environment) {
 			ProcessBuilder pb = new ProcessBuilder();
 			pb.command(args);
+			if (environment != null) {
+				pb.environment().putAll(environment);
+			}
 			File directory = local != null ? local.getDirectory() : null;
 			if (directory != null) {
 				pb.environment().put(Constants.GIT_DIR_KEY,

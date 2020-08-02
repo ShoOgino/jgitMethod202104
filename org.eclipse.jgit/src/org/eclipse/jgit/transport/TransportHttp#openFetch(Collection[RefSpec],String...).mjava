@@ -1,0 +1,22 @@
+	@Override
+	public FetchConnection openFetch(Collection<RefSpec> refSpecs,
+			String... additionalPatterns)
+			throws NotSupportedException, TransportException {
+		final String service = SVC_UPLOAD_PACK;
+		try {
+			TransferConfig.ProtocolVersion gitProtocol = protocol;
+			if (gitProtocol == null) {
+				gitProtocol = TransferConfig.ProtocolVersion.V2;
+			}
+			HttpConnection c = connect(service, gitProtocol);
+			try (InputStream in = openInputStream(c)) {
+				return getConnection(c, in, service, refSpecs,
+						additionalPatterns);
+			}
+		} catch (NotSupportedException | TransportException err) {
+			throw err;
+		} catch (IOException err) {
+			throw new TransportException(uri, JGitText.get().errorReadingInfoRefs, err);
+		}
+	}
+

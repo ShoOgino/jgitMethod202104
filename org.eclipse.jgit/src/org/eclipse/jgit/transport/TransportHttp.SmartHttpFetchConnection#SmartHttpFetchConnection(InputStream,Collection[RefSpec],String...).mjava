@@ -1,0 +1,17 @@
+		SmartHttpFetchConnection(InputStream advertisement,
+				Collection<RefSpec> refSpecs, String... additionalPatterns)
+				throws TransportException {
+			super(TransportHttp.this);
+			statelessRPC = true;
+
+			init(advertisement, DisabledOutputStream.INSTANCE);
+			outNeedsEnd = false;
+			if (!readAdvertisedRefs()) {
+				// Must be protocol V2
+				LongPollService service = new LongPollService(SVC_UPLOAD_PACK,
+						getProtocolVersion());
+				init(service.getInputStream(), service.getOutputStream());
+				lsRefs(refSpecs, additionalPatterns);
+			}
+		}
+

@@ -21,10 +21,11 @@
 			final StringBuilder line = new StringBuilder(46);
 			line.append("want "); //$NON-NLS-1$
 			line.append(objectId.name());
-			if (first) {
+			if (first && TransferConfig.ProtocolVersion.V0
+					.equals(getProtocolVersion())) {
 				line.append(enableCapabilities());
-				first = false;
 			}
+			first = false;
 			line.append('\n');
 			p.writeString(line.toString());
 		}
@@ -34,8 +35,10 @@
 		if (!filterSpec.isNoOp()) {
 			p.writeString(filterSpec.filterLine());
 		}
-		p.end();
-		outNeedsEnd = false;
+		if (TransferConfig.ProtocolVersion.V0.equals(getProtocolVersion())) {
+			p.end();
+			outNeedsEnd = false;
+		}
 		return true;
 	}
 
