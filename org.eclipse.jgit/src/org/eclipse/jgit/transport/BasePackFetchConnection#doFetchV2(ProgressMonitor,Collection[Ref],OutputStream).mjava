@@ -1,0 +1,66 @@
+	private void doFetchV2(ProgressMonitor monitor, Collection<Ref> want,
+			OutputStream outputStream) throws IOException, CancelledException {
+		sideband = true;
+		negotiateBegin();
+
+		pckState.writeString("command=" + GitProtocolConstants.COMMAND_FETCH); //$NON-NLS-1$
+		// Capabilities are sent as command arguments in protocol V2
+		String agent = UserAgent.get();
+		if (agent != null && isCapableOf(GitProtocolConstants.OPTION_AGENT)) {
+			pckState.writeString(
+					GitProtocolConstants.OPTION_AGENT + '=' + agent);
+		}
+		Set<String> capabilities = new HashSet<>();
+		String advertised = getCapability(GitProtocolConstants.COMMAND_FETCH);
+		if (!StringUtils.isEmptyOrNull(advertised)) {
+			capabilities.addAll(Arrays.asList(advertised.split("\\s+"))); //$NON-NLS-1$
+		}
+		// Arguments
+		pckState.writeDelim();
+		for (String capability : getCapabilitiesV2(capabilities)) {
+			pckState.writeString(capability);
+		}
+		if (!sendWants(want, pckState)) {
+			// We already have everything we wanted.
+			return;
+		}
+		// If we send something, we always close it properly ourselves.
+		outNeedsEnd = false;
+
+		FetchStateV2 fetchState = new FetchStateV2();
+		boolean sentDone = false;
+		for (;;) {
+			// The "state" buffer contains the full fetch request with all
+			// common objects found so far.
+			state.writeTo(out, monitor);
+			sentDone = sendNextHaveBatch(fetchState, pckOut, monitor);
+			if (sentDone) {
+				break;
+			}
+			if (readAcknowledgments(fetchState, pckIn, monitor)) {
+				// We got a "ready": next should be a patch file.
+				break;
+			}
+			// Note: C git reads and requires here (and after a packfile) a
+			// "0002" packet in stateless RPC transports (https). This "response
+			// end" packet is even mentioned in the protocol V2 technical
+			// documentation. However, it is not actually part of the public
+			// protocol; it occurs only in an internal protocol wrapper in the C
+			// git implementation.
+		}
+		clearState();
+		String line = pckIn.readString();
+		// If we sent a done, we may have an error reply here.
+		if (sentDone && line.startsWith("ERR ")) { //$NON-NLS-1$
+			throw new RemoteRepositoryException(uri, line.substring(4));
+		}
+		// "shallow-info", "wanted-refs", and "packfile-uris" would have to be
+		// handled here in that order.
+		if (!GitProtocolConstants.SECTION_PACKFILE.equals(line)) {
+			throw new PackProtocolException(
+					MessageFormat.format(JGitText.get().expectedGot,
+							GitProtocolConstants.SECTION_PACKFILE, line));
+		}
+		receivePack(monitor, outputStream);
+	}
+

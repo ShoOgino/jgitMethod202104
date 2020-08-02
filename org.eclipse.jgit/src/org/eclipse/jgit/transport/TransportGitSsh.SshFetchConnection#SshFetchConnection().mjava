@@ -1,33 +1,4 @@
 		SshFetchConnection() throws TransportException {
-			super(TransportGitSsh.this);
-			try {
-				process = getSession().exec(commandFor(getOptionUploadPack()),
-						getTimeout());
-				final MessageWriter msg = new MessageWriter();
-				setMessageWriter(msg);
-
-				final InputStream upErr = process.getErrorStream();
-				errorThread = new StreamCopyThread(upErr, msg.getRawStream());
-				errorThread.start();
-
-				init(process.getInputStream(), process.getOutputStream());
-
-			} catch (TransportException err) {
-				close();
-				throw err;
-			} catch (Throwable err) {
-				close();
-				throw new TransportException(uri,
-						JGitText.get().remoteHungUpUnexpectedly, err);
-			}
-
-			try {
-				readAdvertisedRefs();
-			} catch (NoRemoteRepositoryException notFound) {
-				final String msgs = getMessages();
-				checkExecFailure(process.exitValue(), getOptionUploadPack(),
-						msgs);
-				throw cleanNotFound(notFound, msgs);
-			}
+			this(Collections.emptyList());
 		}
 

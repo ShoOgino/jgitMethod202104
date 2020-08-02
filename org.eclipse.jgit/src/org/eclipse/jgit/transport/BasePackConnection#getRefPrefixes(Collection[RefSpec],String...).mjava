@@ -1,0 +1,31 @@
+	private Collection<String> getRefPrefixes(Collection<RefSpec> refSpecs,
+			String... additionalPatterns) {
+		if (refSpecs.isEmpty() && (additionalPatterns == null
+				|| additionalPatterns.length == 0)) {
+			return Collections.emptyList();
+		}
+		Set<String> patterns = new HashSet<>();
+		if (additionalPatterns != null) {
+			Arrays.stream(additionalPatterns).filter(Objects::nonNull)
+					.forEach(patterns::add);
+		}
+		for (RefSpec spec : refSpecs) {
+			// TODO: for now we only do protocol V2 for fetch. For push
+			// RefSpecs, the logic would need to be different. (At the
+			// minimum, take spec.getDestination().)
+			String src = spec.getSource();
+			if (ObjectId.isId(src)) {
+				continue;
+			}
+			if (spec.isWildcard()) {
+				patterns.add(src.substring(0, src.indexOf('*')));
+			} else {
+				patterns.add(src);
+				patterns.add(Constants.R_REFS + src);
+				patterns.add(Constants.R_HEADS + src);
+				patterns.add(Constants.R_TAGS + src);
+			}
+		}
+		return patterns;
+	}
+

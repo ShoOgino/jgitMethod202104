@@ -1,0 +1,121 @@
+	private HttpConnection connect(String service,
+			TransferConfig.ProtocolVersion protocolVersion)
+			throws TransportException, NotSupportedException {
+		URL u = getServiceURL(service);
+		int authAttempts = 1;
+		int redirects = 0;
+		Collection<Type> ignoreTypes = null;
+		for (;;) {
+			try {
+				final HttpConnection conn = httpOpen(METHOD_GET, u, AcceptEncoding.GZIP);
+				if (useSmartHttp) {
+					String exp = "application/x-" + service + "-advertisement"; //$NON-NLS-1$ //$NON-NLS-2$
+					conn.setRequestProperty(HDR_ACCEPT, exp + ", */*"); //$NON-NLS-1$
+				} else {
+					conn.setRequestProperty(HDR_ACCEPT, "*/*"); //$NON-NLS-1$
+				}
+				if (TransferConfig.ProtocolVersion.V2.equals(protocolVersion)) {
+					conn.setRequestProperty(
+							GitProtocolConstants.PROTOCOL_HEADER,
+							GitProtocolConstants.VERSION_2_REQUEST);
+				}
+				final int status = HttpSupport.response(conn);
+				processResponseCookies(conn);
+				switch (status) {
+				case HttpConnection.HTTP_OK:
+					// Check if HttpConnection did some authentication in the
+					// background (e.g Kerberos/SPNEGO).
+					// That may not work for streaming requests and jgit
+					// explicit authentication would be required
+					if (authMethod.getType() == HttpAuthMethod.Type.NONE
+							&& conn.getHeaderField(HDR_WWW_AUTHENTICATE) != null)
+						authMethod = HttpAuthMethod.scanResponse(conn, ignoreTypes);
+					return conn;
+
+				case HttpConnection.HTTP_NOT_FOUND:
+					throw createNotFoundException(uri, u,
+							conn.getResponseMessage());
+
+				case HttpConnection.HTTP_UNAUTHORIZED:
+					authMethod = HttpAuthMethod.scanResponse(conn, ignoreTypes);
+					if (authMethod.getType() == HttpAuthMethod.Type.NONE)
+						throw new TransportException(uri, MessageFormat.format(
+								JGitText.get().authenticationNotSupported, uri));
+					CredentialsProvider credentialsProvider = getCredentialsProvider();
+					if (credentialsProvider == null)
+						throw new TransportException(uri,
+								JGitText.get().noCredentialsProvider);
+					if (authAttempts > 1)
+						credentialsProvider.reset(currentUri);
+					if (3 < authAttempts
+							|| !authMethod.authorize(currentUri,
+									credentialsProvider)) {
+						throw new TransportException(uri,
+								JGitText.get().notAuthorized);
+					}
+					authAttempts++;
+					continue;
+
+				case HttpConnection.HTTP_FORBIDDEN:
+					throw new TransportException(uri, MessageFormat.format(
+							JGitText.get().serviceNotPermitted, baseUrl,
+							service));
+
+				case HttpConnection.HTTP_MOVED_PERM:
+				case HttpConnection.HTTP_MOVED_TEMP:
+				case HttpConnection.HTTP_SEE_OTHER:
+				case HttpConnection.HTTP_11_MOVED_PERM:
+				case HttpConnection.HTTP_11_MOVED_TEMP:
+					// SEE_OTHER should actually never be sent by a git server,
+					// and in general should occur only on POST requests. But it
+					// doesn't hurt to accept it here as a redirect.
+					if (http.getFollowRedirects() == HttpRedirectMode.FALSE) {
+						throw new TransportException(uri,
+								MessageFormat.format(
+										JGitText.get().redirectsOff,
+										Integer.valueOf(status)));
+					}
+					URIish newUri = redirect(u,
+							conn.getHeaderField(HDR_LOCATION),
+							Constants.INFO_REFS, redirects++);
+					setURI(newUri);
+					u = getServiceURL(service);
+					authAttempts = 1;
+					break;
+				default:
+					String err = status + " " + conn.getResponseMessage(); //$NON-NLS-1$
+					throw new TransportException(uri, err);
+				}
+			} catch (NotSupportedException | TransportException e) {
+				throw e;
+			} catch (InterruptedIOException e) {
+				// Timeout!? Don't try other authentication methods.
+				throw new TransportException(uri, MessageFormat.format(
+						JGitText.get().connectionTimeOut, u.getHost()), e);
+			} catch (SocketException e) {
+				// Nothing on other end, timeout, connection reset, ...
+				throw new TransportException(uri,
+						JGitText.get().connectionFailed, e);
+			} catch (SSLHandshakeException e) {
+				handleSslFailure(e);
+				continue; // Re-try
+			} catch (IOException e) {
+				if (authMethod.getType() != HttpAuthMethod.Type.NONE) {
+					if (ignoreTypes == null) {
+						ignoreTypes = new HashSet<>();
+					}
+
+					ignoreTypes.add(authMethod.getType());
+
+					// reset auth method & attempts for next authentication type
+					authMethod = HttpAuthMethod.Type.NONE.method(null);
+					authAttempts = 1;
+
+					continue;
+				}
+
+				throw new TransportException(uri, MessageFormat.format(JGitText.get().cannotOpenService, service), e);
+			}
+		}
+	}
+

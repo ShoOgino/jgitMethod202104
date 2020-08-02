@@ -1,0 +1,7 @@
+	@Test
+	public void testParseAckV2_Invalid() {
+		IOException e = assertThrows(IOException.class,
+				() -> PacketLineIn.parseACKv2("HELO", new MutableObjectId()));
+		assertTrue(e.getMessage().contains("xpected ACK/NAK"));
+	}
+

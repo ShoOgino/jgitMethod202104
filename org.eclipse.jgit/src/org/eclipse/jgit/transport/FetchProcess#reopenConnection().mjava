@@ -3,7 +3,17 @@
 		if (conn != null)
 			return;
 
-		conn = transport.openFetch();
+		// Build prefixes
+		Set<String> prefixes = new HashSet<>();
+		for (Ref toGet : askFor.values()) {
+			String src = toGet.getName();
+			prefixes.add(src);
+			prefixes.add(Constants.R_REFS + src);
+			prefixes.add(Constants.R_HEADS + src);
+			prefixes.add(Constants.R_TAGS + src);
+		}
+		conn = transport.openFetch(Collections.emptyList(),
+				prefixes.toArray(new String[0]));
 
 		// Since we opened a new connection we cannot be certain
 		// that the system we connected to has the same exact set

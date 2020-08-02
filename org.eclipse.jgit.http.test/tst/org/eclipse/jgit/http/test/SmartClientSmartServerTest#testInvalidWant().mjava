@@ -15,7 +15,8 @@
 					Collections.<ObjectId> emptySet());
 			fail("Server accepted want " + id.name());
 		} catch (TransportException err) {
-			assertEquals("want " + id.name() + " not valid", err.getMessage());
+			assertTrue(err.getMessage()
+					.contains("want " + id.name() + " not valid"));
 		}
 	}
 

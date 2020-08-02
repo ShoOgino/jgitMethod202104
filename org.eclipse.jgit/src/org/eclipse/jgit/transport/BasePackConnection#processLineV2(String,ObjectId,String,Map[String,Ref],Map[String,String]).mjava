@@ -1,0 +1,43 @@
+	private void processLineV2(String line, ObjectId id, String rest,
+			Map<String, Ref> avail, Map<String, String> symRefs)
+			throws IOException {
+		String[] parts = rest.split(" "); //$NON-NLS-1$
+		String name = parts[0];
+		// Two attributes possible, symref-target or peeled
+		String symRefTarget = null;
+		String peeled = null;
+		for (int i = 1; i < parts.length; i++) {
+			if (parts[i].startsWith(REF_ATTR_SYMREF_TARGET)) {
+				if (symRefTarget != null) {
+					throw new PackProtocolException(uri, MessageFormat.format(
+							JGitText.get().duplicateRefAttribute, line));
+				}
+				symRefTarget = parts[i]
+						.substring(REF_ATTR_SYMREF_TARGET.length());
+			} else if (parts[i].startsWith(REF_ATTR_PEELED)) {
+				if (peeled != null) {
+					throw new PackProtocolException(uri, MessageFormat.format(
+							JGitText.get().duplicateRefAttribute, line));
+				}
+				peeled = parts[i].substring(REF_ATTR_PEELED.length());
+			}
+			if (peeled != null && symRefTarget != null) {
+				break;
+			}
+		}
+		Ref idRef;
+		if (peeled != null) {
+			idRef = new ObjectIdRef.PeeledTag(Ref.Storage.NETWORK, name, id,
+					toId(line, peeled));
+		} else {
+			idRef = new ObjectIdRef.PeeledNonTag(Ref.Storage.NETWORK, name, id);
+		}
+		Ref prior = avail.put(name, idRef);
+		if (prior != null) {
+			throw duplicateAdvertisement(name);
+		}
+		if (!StringUtils.isEmptyOrNull(symRefTarget)) {
+			symRefs.put(name, symRefTarget);
+		}
+	}
+

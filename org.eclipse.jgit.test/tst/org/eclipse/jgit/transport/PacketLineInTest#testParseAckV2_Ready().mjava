@@ -1,0 +1,12 @@
+	@Test
+	public void testParseAckV2_Ready() throws IOException {
+		final ObjectId expid = ObjectId
+				.fromString("fcfcfb1fd94829c1a1704f894fc111d14770d34e");
+		final MutableObjectId actid = new MutableObjectId();
+		actid.fromString(expid.name());
+
+		assertSame(PacketLineIn.AckNackResult.ACK_READY,
+				PacketLineIn.parseACKv2("ready", actid));
+		assertEquals(expid, actid);
+	}
+

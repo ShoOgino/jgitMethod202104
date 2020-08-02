@@ -23,8 +23,14 @@
 		}
 		out.write(buf, pos, len);
 		if (log.isDebugEnabled()) {
-			String s = RawParseUtils.decode(UTF_8, buf, pos, len);
-			log.debug("git> " + s); //$NON-NLS-1$
+			// Escape a trailing \n to avoid empty lines in the log.
+			if (len > 0 && buf[pos + len - 1] == '\n') {
+				log.debug(
+						"git> " + RawParseUtils.decode(UTF_8, buf, pos, len - 1) //$NON-NLS-1$
+								+ "\\n"); //$NON-NLS-1$
+			} else {
+				log.debug("git> " + RawParseUtils.decode(UTF_8, buf, pos, len)); //$NON-NLS-1$
+			}
 		}
 	}
 

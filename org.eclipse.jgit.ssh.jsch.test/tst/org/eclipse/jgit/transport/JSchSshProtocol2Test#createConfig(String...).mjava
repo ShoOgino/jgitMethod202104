@@ -1,0 +1,8 @@
+	private OpenSshConfig createConfig(String... content) throws IOException {
+		File configFile = new File(sshDir, Constants.CONFIG);
+		if (content != null) {
+			Files.write(configFile.toPath(), Arrays.asList(content));
+		}
+		return new OpenSshConfig(getTemporaryDirectory(), configFile);
+	}
+

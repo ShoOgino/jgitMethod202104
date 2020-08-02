@@ -64,5 +64,21 @@
 				}
 			}
 		}
+		// If HEAD is still in the symRefs map here, the real ref was not
+		// reported, but we know it must point to the object reported for HEAD.
+		// So fill it in in the refMap.
+		String headRefName = symRefs.get(Constants.HEAD);
+		if (headRefName != null && !refMap.containsKey(headRefName)) {
+			Ref headRef = refMap.get(Constants.HEAD);
+			if (headRef != null) {
+				ObjectId headObj = headRef.getObjectId();
+				headRef = new ObjectIdRef.PeeledNonTag(Ref.Storage.NETWORK,
+						headRefName, headObj);
+				refMap.put(headRefName, headRef);
+				headRef = new SymbolicRef(Constants.HEAD, headRef);
+				refMap.put(Constants.HEAD, headRef);
+				symRefs.remove(Constants.HEAD);
+			}
+		}
 	}
 

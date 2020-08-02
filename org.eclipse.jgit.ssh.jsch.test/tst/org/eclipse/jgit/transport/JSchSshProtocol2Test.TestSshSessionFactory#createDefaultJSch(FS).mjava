@@ -1,0 +1,9 @@
+		@Override
+		protected JSch createDefaultJSch(FS fs) throws JSchException {
+			JSch defaultJSch = super.createDefaultJSch(fs);
+			if (knownHosts.exists()) {
+				defaultJSch.setKnownHosts(knownHosts.getAbsolutePath());
+			}
+			return defaultJSch;
+		}
+

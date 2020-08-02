@@ -1,0 +1,26 @@
+	@Test
+	public void testUpdateWithSymRefsFillInHead() {
+		final String oidName = "0000000000000000000000000000000000000001";
+		final Ref advertised = new ObjectIdRef.PeeledNonTag(Ref.Storage.NETWORK,
+				Constants.HEAD, ObjectId.fromString(oidName));
+
+		final Map<String, Ref> refMap = new HashMap<>();
+		refMap.put(advertised.getName(), advertised);
+
+		final Map<String, String> symRefs = new HashMap<>();
+		symRefs.put("HEAD", "refs/heads/main");
+
+		BasePackConnection.updateWithSymRefs(refMap, symRefs);
+
+		assertThat(refMap, hasKey("HEAD"));
+		assertThat(refMap, hasKey("refs/heads/main"));
+		final Ref headRef = refMap.get("HEAD");
+		final Ref mainRef = refMap.get("refs/heads/main");
+		assertThat(headRef, instanceOf(SymbolicRef.class));
+		final SymbolicRef headSymRef = (SymbolicRef) headRef;
+		assertEquals(Constants.HEAD, headSymRef.getName());
+		assertSame(mainRef, headSymRef.getTarget());
+		assertEquals(oidName, headRef.getObjectId().name());
+		assertEquals(oidName, mainRef.getObjectId().name());
+	}
+

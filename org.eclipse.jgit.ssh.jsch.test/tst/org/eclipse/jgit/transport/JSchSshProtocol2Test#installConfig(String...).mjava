@@ -1,0 +1,12 @@
+	@Override
+	protected void installConfig(String... config) {
+		SshSessionFactory factory = getSessionFactory();
+		assertTrue(factory instanceof JschConfigSessionFactory);
+		JschConfigSessionFactory j = (JschConfigSessionFactory) factory;
+		try {
+			j.setConfig(createConfig(config));
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+

@@ -1,0 +1,11 @@
+	private void markCommon(RevObject obj, AckNackResult anr, boolean useState)
+			throws IOException {
+		if (useState && anr == AckNackResult.ACK_COMMON && !obj.has(STATE)) {
+			pckState.writeString("have " + obj.name() + '\n'); //$NON-NLS-1$
+			obj.add(STATE);
+		}
+		obj.add(COMMON);
+		if (obj instanceof RevCommit)
+			((RevCommit) obj).carry(COMMON);
+	}
+

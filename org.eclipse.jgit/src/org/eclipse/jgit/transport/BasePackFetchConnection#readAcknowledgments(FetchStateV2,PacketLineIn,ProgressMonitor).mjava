@@ -1,0 +1,62 @@
+	/**
+	 * Reads and processes acknowledgments, adding ACKed objects as "have"s to
+	 * the global state {@link TemporaryBuffer}.
+	 *
+	 * @param fetchState
+	 *            to update
+	 * @param input
+	 *            to read from
+	 * @param monitor
+	 *            for progress reporting and cancellation
+	 * @return {@code true} if a "ready" was received and a packfile is expected
+	 *         next
+	 * @throws IOException
+	 *             on errors
+	 * @throws CancelledException
+	 *             on cancellation
+	 */
+	private boolean readAcknowledgments(FetchStateV2 fetchState,
+			PacketLineIn input, ProgressMonitor monitor)
+			throws IOException, CancelledException {
+		String line = input.readString();
+		if (!GitProtocolConstants.SECTION_ACKNOWLEDGMENTS.equals(line)) {
+			throw new PackProtocolException(MessageFormat.format(
+					JGitText.get().expectedGot,
+					GitProtocolConstants.SECTION_ACKNOWLEDGMENTS, line));
+		}
+		MutableObjectId returnedId = new MutableObjectId();
+		line = input.readString();
+		boolean gotReady = false;
+		long n = 0;
+		while (!PacketLineIn.isEnd(line) && !PacketLineIn.isDelimiter(line)) {
+			AckNackResult ack = PacketLineIn.parseACKv2(line, returnedId);
+			// If we got a "ready", we just skip the remaining lines after
+			// having checked them for being valid. (Normally, the "ready"
+			// should be the last line anyway.)
+			if (!gotReady) {
+				if (ack == AckNackResult.ACK_COMMON) {
+					// markCommon appends the object to the "state"
+					markCommon(walk.parseAny(returnedId), ack, true);
+					fetchState.havesWithoutAck = 0;
+				} else if (ack == AckNackResult.ACK_READY) {
+					gotReady = true;
+				}
+			}
+			n++;
+			if (n % 10 == 0 && monitor.isCancelled()) {
+				throw new CancelledException();
+			}
+			line = input.readString();
+		}
+		if (gotReady) {
+			if (!PacketLineIn.isDelimiter(line)) {
+				throw new PackProtocolException(MessageFormat
+						.format(JGitText.get().expectedGot, "0001", line)); //$NON-NLS-1$
+			}
+		} else if (!PacketLineIn.isEnd(line)) {
+			throw new PackProtocolException(MessageFormat
+					.format(JGitText.get().expectedGot, "0000", line)); //$NON-NLS-1$
+		}
+		return gotReady;
+	}
+

@@ -29,19 +29,20 @@
 		}
 
 		List<AccessEvent> requests = getRequests();
-		assertEquals(4, requests.size());
+		assertEquals(enableProtocolV2 ? 5 : 4, requests.size());
 
-		AccessEvent redirect = requests.get(0);
+		int requestNumber = 0;
+		AccessEvent redirect = requests.get(requestNumber++);
 		assertEquals("GET", redirect.getMethod());
 		assertEquals(join(cloneFrom, "info/refs"), redirect.getPath());
 		assertEquals(301, redirect.getStatus());
 
-		AccessEvent info = requests.get(1);
+		AccessEvent info = requests.get(requestNumber++);
 		assertEquals("GET", info.getMethod());
 		assertEquals(join(authURI, "info/refs"), info.getPath());
 		assertEquals(401, info.getStatus());
 
-		info = requests.get(2);
+		info = requests.get(requestNumber++);
 		assertEquals("GET", info.getMethod());
 		assertEquals(join(authURI, "info/refs"), info.getPath());
 		assertEquals(1, info.getParameters().size());
@@ -49,9 +50,24 @@
 		assertEquals(200, info.getStatus());
 		assertEquals("application/x-git-upload-pack-advertisement",
 				info.getResponseHeader(HDR_CONTENT_TYPE));
-		assertEquals("gzip", info.getResponseHeader(HDR_CONTENT_ENCODING));
+		if (!enableProtocolV2) {
+			assertEquals("gzip", info.getResponseHeader(HDR_CONTENT_ENCODING));
+		} else {
+			AccessEvent lsRefs = requests.get(requestNumber++);
+			assertEquals("POST", lsRefs.getMethod());
+			assertEquals(join(authURI, "git-upload-pack"), lsRefs.getPath());
+			assertEquals(0, lsRefs.getParameters().size());
+			assertNotNull("has content-length",
+					lsRefs.getRequestHeader(HDR_CONTENT_LENGTH));
+			assertNull("not chunked",
+					lsRefs.getRequestHeader(HDR_TRANSFER_ENCODING));
+			assertEquals("version=2", lsRefs.getRequestHeader("Git-Protocol"));
+			assertEquals(200, lsRefs.getStatus());
+			assertEquals("application/x-git-upload-pack-result",
+					lsRefs.getResponseHeader(HDR_CONTENT_TYPE));
+		}
 
-		AccessEvent service = requests.get(3);
+		AccessEvent service = requests.get(requestNumber);
 		assertEquals("POST", service.getMethod());
 		assertEquals(join(authURI, "git-upload-pack"), service.getPath());
 		assertEquals(0, service.getParameters().size());

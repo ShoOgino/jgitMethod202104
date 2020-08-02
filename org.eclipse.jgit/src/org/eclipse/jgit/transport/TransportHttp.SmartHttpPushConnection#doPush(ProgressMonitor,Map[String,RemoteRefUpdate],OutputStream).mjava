@@ -2,7 +2,8 @@
 		protected void doPush(final ProgressMonitor monitor,
 				final Map<String, RemoteRefUpdate> refUpdates,
 				OutputStream outputStream) throws TransportException {
-			final Service svc = new MultiRequestService(SVC_RECEIVE_PACK);
+			final Service svc = new MultiRequestService(SVC_RECEIVE_PACK,
+					getProtocolVersion());
 			init(svc.getInputStream(), svc.getOutputStream());
 			super.doPush(monitor, refUpdates, outputStream);
 		}

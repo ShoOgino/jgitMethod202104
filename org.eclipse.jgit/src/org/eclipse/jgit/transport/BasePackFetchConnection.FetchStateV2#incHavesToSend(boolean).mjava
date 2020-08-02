@@ -1,0 +1,13 @@
+		void incHavesToSend(boolean statelessRPC) {
+			if (statelessRPC) {
+				// Increase this quicker since connection setup costs accumulate
+				if (havesToSend < 16384) {
+					havesToSend *= 2;
+				} else {
+					havesToSend = havesToSend * 11 / 10;
+				}
+			} else {
+				havesToSend += 32;
+			}
+		}
+

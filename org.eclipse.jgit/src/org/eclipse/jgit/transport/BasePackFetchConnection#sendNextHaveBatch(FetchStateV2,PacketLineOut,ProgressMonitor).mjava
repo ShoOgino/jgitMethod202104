@@ -1,0 +1,46 @@
+	/**
+	 * Sends the next batch of "have"s and terminates the {@code output}.
+	 *
+	 * @param fetchState
+	 *            is updated with information about the number of items written,
+	 *            and whether to expect a packfile next
+	 * @param output
+	 *            to write to
+	 * @param monitor
+	 *            for progress reporting and cancellation
+	 * @return {@code true} if a "done" was written and we should thus expect a
+	 *         packfile next
+	 * @throws IOException
+	 *             on errors
+	 * @throws CancelledException
+	 *             on cancellation
+	 */
+	private boolean sendNextHaveBatch(FetchStateV2 fetchState,
+			PacketLineOut output, ProgressMonitor monitor)
+			throws IOException, CancelledException {
+		long n = 0;
+		while (n < fetchState.havesToSend) {
+			final RevCommit c = walk.next();
+			if (c == null) {
+				break;
+			}
+			output.writeString("have " + c.getId().name() + '\n'); //$NON-NLS-1$
+			n++;
+			if (n % 10 == 0 && monitor.isCancelled()) {
+				throw new CancelledException();
+			}
+		}
+		fetchState.havesTotal += n;
+		if (n == 0
+				|| fetchState.havesWithoutAck > MAX_HAVES
+				|| fetchState.havesTotal > maxHaves) {
+			output.writeString("done\n"); //$NON-NLS-1$
+			output.end();
+			return true;
+		}
+		fetchState.havesWithoutAck += n;
+		output.end();
+		fetchState.incHavesToSend(statelessRPC);
+		return false;
+	}
+

@@ -1,0 +1,24 @@
+	void service(String name, PacketLineOut pckOut,
+			TransferConfig.ProtocolVersion gitProtocol)
+			throws IOException {
+		final StringBuilder cmd = new StringBuilder();
+		cmd.append(name);
+		cmd.append(' ');
+		cmd.append(uri.getPath());
+		cmd.append('\0');
+		cmd.append("host="); //$NON-NLS-1$
+		cmd.append(uri.getHost());
+		if (uri.getPort() > 0 && uri.getPort() != GIT_PORT) {
+			cmd.append(":"); //$NON-NLS-1$
+			cmd.append(uri.getPort());
+		}
+		cmd.append('\0');
+		if (TransferConfig.ProtocolVersion.V2.equals(gitProtocol)) {
+			cmd.append('\0');
+			cmd.append(GitProtocolConstants.VERSION_2_REQUEST);
+			cmd.append('\0');
+		}
+		pckOut.writeString(cmd.toString());
+		pckOut.flush();
+	}
+

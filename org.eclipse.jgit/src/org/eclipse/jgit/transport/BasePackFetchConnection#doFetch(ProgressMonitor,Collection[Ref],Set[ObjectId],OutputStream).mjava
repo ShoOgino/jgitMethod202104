@@ -26,18 +26,34 @@
 			markRefsAdvertised();
 			markReachable(have, maxTimeWanted(want));
 
+			if (TransferConfig.ProtocolVersion.V2
+					.equals(getProtocolVersion())) {
+				// Protocol V2 always is a "stateless" protocol, even over a
+				// bidirectional pipe: the server serves one "fetch" request and
+				// then forgets anything it has learned, so the next fetch
+				// request has to re-send all wants and previously determined
+				// common objects as "have"s again.
+				state = new TemporaryBuffer.Heap(Integer.MAX_VALUE);
+				pckState = new PacketLineOut(state);
+				try {
+					doFetchV2(monitor, want, outputStream);
+				} finally {
+					clearState();
+				}
+				return;
+			}
+			// Protocol V0/1
 			if (statelessRPC) {
 				state = new TemporaryBuffer.Heap(Integer.MAX_VALUE);
 				pckState = new PacketLineOut(state);
 			}
-
-			if (sendWants(want)) {
+			PacketLineOut output = statelessRPC ? pckState : pckOut;
+			if (sendWants(want, output)) {
+				output.end();
+				outNeedsEnd = false;
 				negotiate(monitor);
 
-				walk.dispose();
-				reachableCommits = null;
-				state = null;
-				pckState = null;
+				clearState();
 
 				receivePack(monitor, outputStream);
 			}

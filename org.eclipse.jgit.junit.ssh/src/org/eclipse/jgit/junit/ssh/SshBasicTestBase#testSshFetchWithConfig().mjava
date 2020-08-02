@@ -1,0 +1,26 @@
+	@Test
+	public void testSshFetchWithConfig() throws Exception {
+		File localClone = cloneWith("ssh://localhost/doesntmatter",
+				defaultCloneDir, null, //
+				"Host localhost", //
+				"HostName localhost", //
+				"Port " + testPort, //
+				"User " + TEST_USER, //
+				"IdentityFile " + privateKey1.getAbsolutePath());
+		// Do a commit in the upstream repo
+		try (Git git = new Git(db)) {
+			writeTrashFile("SomeOtherFile.txt", "Other commit");
+			git.add().addFilepattern("SomeOtherFile.txt").call();
+			git.commit().setMessage("New commit").call();
+		}
+		// Pull in the clone
+		try (Git git = Git.open(localClone)) {
+			File f = new File(git.getRepository().getWorkTree(),
+					"SomeOtherFile.txt");
+			assertFalse(f.exists());
+			git.pull().setRemote("origin").call();
+			assertTrue(f.exists());
+			assertEquals("Other commit", read(f));
+		}
+	}
+

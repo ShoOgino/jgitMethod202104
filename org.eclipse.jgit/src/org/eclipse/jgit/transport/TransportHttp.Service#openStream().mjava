@@ -5,5 +5,9 @@
 			conn.setDoOutput(true);
 			conn.setRequestProperty(HDR_CONTENT_TYPE, requestType);
 			conn.setRequestProperty(HDR_ACCEPT, responseType);
+			if (TransferConfig.ProtocolVersion.V2.equals(protocolVersion)) {
+				conn.setRequestProperty(GitProtocolConstants.PROTOCOL_HEADER,
+						GitProtocolConstants.VERSION_2_REQUEST);
+			}
 		}
 

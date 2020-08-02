@@ -1,0 +1,12 @@
+	@Test
+	public void testParseAckV2_ACK() throws IOException {
+		final ObjectId expid = ObjectId
+				.fromString("fcfcfb1fd94829c1a1704f894fc111d14770d34e");
+		final MutableObjectId actid = new MutableObjectId();
+
+		assertSame(PacketLineIn.AckNackResult.ACK_COMMON,
+				PacketLineIn.parseACKv2(
+						"ACK fcfcfb1fd94829c1a1704f894fc111d14770d34e", actid));
+		assertEquals(expid, actid);
+	}
+

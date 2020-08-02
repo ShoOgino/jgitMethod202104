@@ -22,7 +22,8 @@
 
 			if (useProtocolV2) {
 				String symrefPart = symrefs.containsKey(ref.getName())
-						? (" symref-target:" + symrefs.get(ref.getName())) //$NON-NLS-1$
+						? (' ' + REF_ATTR_SYMREF_TARGET
+								+ symrefs.get(ref.getName()))
 						: ""; //$NON-NLS-1$
 				String peelPart = ""; //$NON-NLS-1$
 				if (derefTags) {
@@ -31,7 +32,8 @@
 					}
 					ObjectId peeledObjectId = ref.getPeeledObjectId();
 					if (peeledObjectId != null) {
-						peelPart = " peeled:" + peeledObjectId.getName(); //$NON-NLS-1$
+						peelPart = ' ' + REF_ATTR_PEELED
+								+ peeledObjectId.getName();
 					}
 				}
 				writeOne(objectId.getName() + " " + ref.getName() + symrefPart //$NON-NLS-1$

@@ -5,10 +5,11 @@
 
 		final TestRepository<Repository> src = createTestRepository();
 		final String srcName = src.getRepository().getDirectory().getName();
-		src.getRepository()
-				.getConfig()
-				.setBoolean(ConfigConstants.CONFIG_CORE_SECTION, null,
-						ConfigConstants.CONFIG_KEY_LOGALLREFUPDATES, true);
+		StoredConfig cfg = src.getRepository().getConfig();
+		cfg.setBoolean(ConfigConstants.CONFIG_CORE_SECTION, null,
+				ConfigConstants.CONFIG_KEY_LOGALLREFUPDATES, true);
+		cfg.setInt("protocol", null, "version", enableProtocolV2 ? 2 : 0);
+		cfg.save();
 
 		GitServlet gs = new GitServlet();
 		gs.setUploadPackFactory((HttpServletRequest req, Repository db) -> {
