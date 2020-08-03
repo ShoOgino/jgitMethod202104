@@ -1,0 +1,18 @@
+	@Override
+	protected <C extends Collection<ClientSessionEvent>> C updateCurrentSessionState(
+			C newState) {
+		if (closeFuture.isClosed()) {
+			newState.add(ClientSessionEvent.CLOSED);
+		}
+		if (isAuthenticated()) { // authFuture.isSuccess()
+			newState.add(ClientSessionEvent.AUTHED);
+		}
+		if (KexState.DONE.equals(getKexState())) {
+			AuthFuture future = authFuture;
+			if (future == null || future.isFailure()) {
+				newState.add(ClientSessionEvent.WAIT_AUTH);
+			}
+		}
+		return newState;
+	}
+
