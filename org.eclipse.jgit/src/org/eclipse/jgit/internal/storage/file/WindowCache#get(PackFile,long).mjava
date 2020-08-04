@@ -2,7 +2,7 @@
 			throws IOException {
 		final WindowCache c = cache;
 		final ByteWindow r = c.getOrLoad(pack, c.toStart(offset));
-		if (c != cache) {
+		if (c != cache.publishMBeanIfNeeded()) {
 			// The cache was reconfigured while we were using the old one
 			// to load this window. The window is still valid, but our
 			// cache may think its still live. Ensure the window is removed

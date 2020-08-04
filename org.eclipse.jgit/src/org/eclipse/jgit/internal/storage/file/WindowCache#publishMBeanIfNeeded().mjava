@@ -1,0 +1,7 @@
+	private WindowCache publishMBeanIfNeeded() {
+		if (publishMBean.getAndSet(false)) {
+			Monitoring.registerMBean(mbean, "block_cache"); //$NON-NLS-1$
+		}
+		return this;
+	}
+

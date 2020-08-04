@@ -33,9 +33,7 @@
 
 		mbean = new StatsRecorderImpl();
 		statsRecorder = mbean;
-		if (cfg.getExposeStatsViaJmx()) {
-			Monitoring.registerMBean(mbean, "block_cache"); //$NON-NLS-1$
-		}
+		publishMBean.set(cfg.getExposeStatsViaJmx());
 
 		if (maxFiles < 1)
 			throw new IllegalArgumentException(JGitText.get().openFilesMustBeAtLeast1);
