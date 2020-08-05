@@ -1,0 +1,28 @@
+	private static File createKeyPair(KeyPair newKey, File privateKeyFile)
+			throws Exception {
+		// Write PKCS#8 PEM unencrypted. Both JSch and sshd can read that.
+		PrivateKey privateKey = newKey.getPrivate();
+		String format = privateKey.getFormat();
+		if (!"PKCS#8".equalsIgnoreCase(format)) {
+			throw new IOException("Cannot write " + privateKey.getAlgorithm()
+					+ " key in " + format + " format");
+		}
+		try (BufferedWriter writer = Files.newBufferedWriter(
+				privateKeyFile.toPath(), StandardCharsets.US_ASCII)) {
+			writer.write("-----BEGIN PRIVATE KEY-----");
+			writer.newLine();
+			write(writer, privateKey.getEncoded(), 64);
+			writer.write("-----END PRIVATE KEY-----");
+			writer.newLine();
+		}
+		File publicKeyFile = new File(privateKeyFile.getParentFile(),
+				privateKeyFile.getName() + ".pub");
+		StringBuilder builder = new StringBuilder();
+		PublicKeyEntry.appendPublicKeyEntry(builder, newKey.getPublic());
+		builder.append(' ').append(TEST_USER);
+		try (OutputStream out = new FileOutputStream(publicKeyFile)) {
+			out.write(builder.toString().getBytes(StandardCharsets.US_ASCII));
+		}
+		return publicKeyFile;
+	}
+
