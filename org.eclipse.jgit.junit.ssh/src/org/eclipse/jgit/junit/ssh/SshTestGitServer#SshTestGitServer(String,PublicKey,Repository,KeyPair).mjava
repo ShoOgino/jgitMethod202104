@@ -36,6 +36,8 @@
 				return new GitUploadPackCommand(command, executorService);
 			} else if (command.startsWith(RemoteConfig.DEFAULT_RECEIVE_PACK)) {
 				return new GitReceivePackCommand(command, executorService);
+			} else if (command.startsWith(ECHO_COMMAND)) {
+				return new EchoCommand(command, executorService);
 			}
 			return new UnknownCommand(command);
 		});

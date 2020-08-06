@@ -1,6 +1,7 @@
-	@Test(expected = TransportException.class)
+	@Test
 	public void testSshWithoutConfig() throws Exception {
-		cloneWith("ssh://" + TEST_USER + "@localhost:" + testPort
-				+ "/doesntmatter", defaultCloneDir, null);
+		assertThrows(TransportException.class,
+				() -> cloneWith("ssh://" + TEST_USER + "@localhost:" + testPort
+						+ "/doesntmatter", defaultCloneDir, null));
 	}
 

@@ -1,0 +1,21 @@
+	@Test
+	public void testSingleCommand() throws Exception {
+		installConfig("IdentityFile " + privateKey1.getAbsolutePath());
+		String command = SshTestGitServer.ECHO_COMMAND + " 1 without timeout";
+		long start = System.nanoTime();
+		String reply = SshSupport.runSshCommand(
+				new URIish("ssh://" + TEST_USER + "@localhost:" + testPort),
+				null, FS.DETECTED, command, 0); // 0 == no timeout
+		long elapsed = System.nanoTime() - start;
+		assertEquals(command, reply);
+		// Now that we have an idea how long this takes on the test
+		// infrastructure, try again with a timeout.
+		command = SshTestGitServer.ECHO_COMMAND + " 1 expecting no timeout";
+		// Still use a generous timeout.
+		int timeout = 10 * ((int) TimeUnit.NANOSECONDS.toSeconds(elapsed) + 1);
+		reply = SshSupport.runSshCommand(
+				new URIish("ssh://" + TEST_USER + "@localhost:" + testPort),
+				null, FS.DETECTED, command, timeout);
+		assertEquals(command, reply);
+	}
+

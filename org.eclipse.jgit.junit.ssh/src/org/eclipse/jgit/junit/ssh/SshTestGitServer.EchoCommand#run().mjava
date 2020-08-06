@@ -1,0 +1,29 @@
+		@Override
+		public void run() {
+			String[] parts = getCommand().split(" ");
+			int timeout = 0;
+			if (parts.length >= 2) {
+				try {
+					timeout = Integer.parseInt(parts[1]);
+				} catch (NumberFormatException e) {
+					// No timeout.
+				}
+				if (timeout > 0) {
+					try {
+						Thread.sleep(TimeUnit.SECONDS.toMillis(timeout));
+					} catch (InterruptedException e) {
+						// Ignore.
+					}
+				}
+			}
+			try {
+				doEcho(getCommand(), getOutputStream());
+				onExit(0);
+			} catch (IOException e) {
+				log.warn(
+						MessageFormat.format("Could not run {0}", getCommand()),
+						e);
+				onExit(-1, e.toString());
+			}
+		}
+

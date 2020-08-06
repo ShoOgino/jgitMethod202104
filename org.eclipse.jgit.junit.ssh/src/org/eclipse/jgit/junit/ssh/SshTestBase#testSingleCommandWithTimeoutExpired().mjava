@@ -1,0 +1,13 @@
+	@Test
+	public void testSingleCommandWithTimeoutExpired() throws Exception {
+		installConfig("IdentityFile " + privateKey1.getAbsolutePath());
+		String command = SshTestGitServer.ECHO_COMMAND + " 2 EXPECTING TIMEOUT";
+
+		CommandFailedException e = assertThrows(CommandFailedException.class,
+				() -> SshSupport.runSshCommand(new URIish(
+						"ssh://" + TEST_USER + "@localhost:" + testPort), null,
+						FS.DETECTED, command, 1));
+		assertTrue(e.getMessage().contains(command));
+		assertTrue(e.getMessage().contains("time"));
+	}
+

@@ -1,0 +1,14 @@
+	private static int checkTimeout(String command, int timeout, long since)
+			throws CommandFailedException {
+		long elapsed = System.nanoTime() - since;
+		int newTimeout = timeout
+				- (int) TimeUnit.NANOSECONDS.toSeconds(elapsed);
+		if (newTimeout <= 0) {
+			// All time used up for connecting the session
+			throw new CommandFailedException(0,
+					MessageFormat.format(JGitText.get().sshCommandTimeout,
+							command, Integer.valueOf(timeout)));
+		}
+		return newTimeout;
+	}
+
