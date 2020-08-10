@@ -1,0 +1,9 @@
+	@Test
+	public void testCloneV4() throws Exception {
+		StoredConfig cfg = SystemReader.getInstance().getUserConfig();
+		cfg.load();
+		cfg.setInt("index", null, "version", 4);
+		cfg.save();
+		cloneAndCheck(EnumSet.of(DirCacheVersion.DIRC_VERSION_PATHCOMPRESS));
+	}
+

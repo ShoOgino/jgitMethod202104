@@ -1,0 +1,121 @@
+	DirCacheEntry(byte[] sharedInfo, MutableInteger infoAt, InputStream in,
+			MessageDigest md, Instant smudge, DirCacheVersion version,
+			DirCacheEntry previous)
+			throws IOException {
+		info = sharedInfo;
+		infoOffset = infoAt.value;
+
+		IO.readFully(in, info, infoOffset, INFO_LEN);
+
+		int len;
+		if (isExtended()) {
+			len = INFO_LEN_EXTENDED;
+			IO.readFully(in, info, infoOffset + INFO_LEN, INFO_LEN_EXTENDED - INFO_LEN);
+
+			if ((getExtendedFlags() & ~EXTENDED_FLAGS) != 0)
+				throw new IOException(MessageFormat.format(JGitText.get()
+						.DIRCUnrecognizedExtendedFlags, String.valueOf(getExtendedFlags())));
+		} else
+			len = INFO_LEN;
+
+		infoAt.value += len;
+		md.update(info, infoOffset, len);
+
+		int toRemove = 0;
+		if (version == DirCacheVersion.DIRC_VERSION_PATHCOMPRESS) {
+			// Read variable int and update digest
+			int b = in.read();
+			md.update((byte) b);
+			toRemove = b & 0x7F;
+			while ((b & 0x80) != 0) {
+				toRemove++;
+				b = in.read();
+				md.update((byte) b);
+				toRemove = (toRemove << 7) | (b & 0x7F);
+			}
+			if (toRemove < 0
+					|| previous != null && toRemove > previous.path.length) {
+				if (previous == null) {
+					throw new IOException(MessageFormat.format(
+							JGitText.get().DIRCCorruptLengthFirst,
+							Integer.valueOf(toRemove)));
+				}
+				throw new IOException(MessageFormat.format(
+						JGitText.get().DIRCCorruptLength,
+						Integer.valueOf(toRemove), previous.getPathString()));
+			}
+		}
+		int pathLen = NB.decodeUInt16(info, infoOffset + P_FLAGS) & NAME_MASK;
+		int skipped = 0;
+		if (pathLen < NAME_MASK) {
+			path = new byte[pathLen];
+			if (version == DirCacheVersion.DIRC_VERSION_PATHCOMPRESS
+					&& previous != null) {
+				System.arraycopy(previous.path, 0, path, 0,
+						previous.path.length - toRemove);
+				IO.readFully(in, path, previous.path.length - toRemove,
+						pathLen - (previous.path.length - toRemove));
+				md.update(path, previous.path.length - toRemove,
+						pathLen - (previous.path.length - toRemove));
+				pathLen = pathLen - (previous.path.length - toRemove);
+			} else {
+				IO.readFully(in, path, 0, pathLen);
+				md.update(path, 0, pathLen);
+			}
+		} else if (version != DirCacheVersion.DIRC_VERSION_PATHCOMPRESS
+				|| previous == null || toRemove == previous.path.length) {
+			ByteArrayOutputStream tmp = new ByteArrayOutputStream();
+			byte[] buf = new byte[NAME_MASK];
+			IO.readFully(in, buf, 0, NAME_MASK);
+			tmp.write(buf);
+			readNulTerminatedString(in, tmp);
+			path = tmp.toByteArray();
+			pathLen = path.length;
+			md.update(path, 0, pathLen);
+			skipped = 1; // we already skipped 1 '\0' in readNulTerminatedString
+			md.update((byte) 0);
+		} else {
+			ByteArrayOutputStream tmp = new ByteArrayOutputStream();
+			tmp.write(previous.path, 0, previous.path.length - toRemove);
+			pathLen = readNulTerminatedString(in, tmp);
+			path = tmp.toByteArray();
+			md.update(path, previous.path.length - toRemove, pathLen);
+			skipped = 1; // we already skipped 1 '\0' in readNulTerminatedString
+			md.update((byte) 0);
+		}
+
+		try {
+			checkPath(path);
+		} catch (InvalidPathException e) {
+			CorruptObjectException p =
+				new CorruptObjectException(e.getMessage());
+			if (e.getCause() != null)
+				p.initCause(e.getCause());
+			throw p;
+		}
+
+		if (version == DirCacheVersion.DIRC_VERSION_PATHCOMPRESS) {
+			if (skipped == 0) {
+				int b = in.read();
+				if (b < 0) {
+					throw new EOFException(JGitText.get().shortReadOfBlock);
+				}
+				md.update((byte) b);
+			}
+		} else {
+			// Index records are padded out to the next 8 byte alignment
+			// for historical reasons related to how C Git read the files.
+			//
+			final int actLen = len + pathLen;
+			final int expLen = (actLen + 8) & ~7;
+			final int padLen = expLen - actLen - skipped;
+			if (padLen > 0) {
+				IO.skipFully(in, padLen);
+				md.update(nullpad, 0, padLen);
+			}
+		}
+		if (mightBeRacilyClean(smudge)) {
+			smudgeRacilyClean();
+		}
+	}
+

@@ -1,0 +1,16 @@
+	@Test
+	public void testCloneV3ResetHardVersionChange() throws Exception {
+		cloneAndCheck(EnumSet.of(DirCacheVersion.DIRC_VERSION_MINIMUM,
+						DirCacheVersion.DIRC_VERSION_EXTENDED));
+		StoredConfig cfg = db.getConfig();
+		cfg.setInt("index", null, "version", 4);
+		cfg.save();
+		FileUtils.delete(new File(db.getDirectory(), "index"));
+		try (Git git = new Git(db)) {
+			git.reset().setMode(ResetType.HARD).call();
+		}
+		assertEquals("DirCache version should have changed",
+				DirCacheVersion.DIRC_VERSION_PATHCOMPRESS,
+				DirCache.read(db).getVersion());
+	}
+

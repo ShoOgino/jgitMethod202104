@@ -2,11 +2,20 @@
 		final MessageDigest foot = Constants.newMessageDigest();
 		final DigestOutputStream dos = new DigestOutputStream(os, foot);
 
-		boolean extended = false;
-		for (int i = 0; i < entryCnt; i++) {
-			if (sortedEntries[i].isExtended()) {
-				extended = true;
-				break;
+		if (version == null && this.repository != null) {
+			// A new DirCache is being written.
+			DirCacheConfig config = repository.getConfig()
+					.get(DirCacheConfig::new);
+			version = config.getIndexVersion();
+		}
+		if (version == null
+				|| version == DirCacheVersion.DIRC_VERSION_MINIMUM) {
+			version = DirCacheVersion.DIRC_VERSION_MINIMUM;
+			for (int i = 0; i < entryCnt; i++) {
+				if (sortedEntries[i].isExtended()) {
+					version = DirCacheVersion.DIRC_VERSION_EXTENDED;
+					break;
+				}
 			}
 		}
 
@@ -14,7 +23,7 @@
 		//
 		final byte[] tmp = new byte[128];
 		System.arraycopy(SIG_DIRC, 0, tmp, 0, SIG_DIRC.length);
-		NB.encodeInt32(tmp, 4, extended ? 3 : 2);
+		NB.encodeInt32(tmp, 4, version.getVersionCode());
 		NB.encodeInt32(tmp, 8, entryCnt);
 		dos.write(tmp, 0, 12);
 
@@ -46,7 +55,7 @@
 			if (e.mightBeRacilyClean(smudge)) {
 				e.smudgeRacilyClean();
 			}
-			e.write(dos);
+			e.write(dos, version, i == 0 ? null : sortedEntries[i - 1]);
 		}
 
 		if (writeTree) {

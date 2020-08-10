@@ -1,0 +1,22 @@
+	@Test
+	public void testReadWriteV4() throws Exception {
+		final File file = pathOf("gitgit.index.v4");
+		final DirCache dc = new DirCache(file, FS.DETECTED);
+		dc.read();
+		assertEquals(DirCacheVersion.DIRC_VERSION_PATHCOMPRESS,
+				dc.getVersion());
+		assertEquals(5, dc.getEntryCount());
+		assertV4TreeEntry(0, "src/org/eclipse/jgit/atest/foo.txt", false, dc);
+		assertV4TreeEntry(1, "src/org/eclipse/jgit/atest/foobar.txt", false,
+				dc);
+		assertV4TreeEntry(2, "src/org/eclipse/jgit/other/bar.txt", true, dc);
+		assertV4TreeEntry(3, "test.txt", false, dc);
+		assertV4TreeEntry(4, "test.txt2", false, dc);
+
+		final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		dc.writeTo(null, bos);
+		final byte[] indexBytes = bos.toByteArray();
+		final byte[] expectedBytes = IO.readFully(file);
+		assertArrayEquals(expectedBytes, indexBytes);
+	}
+

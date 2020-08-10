@@ -1,0 +1,15 @@
+	private DirCacheVersion cloneAndCheck(Set<DirCacheVersion> expected)
+			throws Exception {
+		File directory = createTempDirectory("testCloneRepository");
+		CloneCommand command = Git.cloneRepository();
+		command.setDirectory(directory);
+		command.setURI("file://" + db.getWorkTree().getAbsolutePath());
+		Git git2 = command.call();
+		addRepoToClose(git2.getRepository());
+		assertNotNull(git2);
+		DirCache dc = DirCache.read(git2.getRepository());
+		DirCacheVersion version = dc.getVersion();
+		assertTrue(expected.contains(version));
+		return version;
+	}
+

@@ -1,0 +1,11 @@
+		public DirCacheConfig(Config cfg) {
+			boolean manyFiles = cfg.getBoolean(
+					ConfigConstants.CONFIG_FEATURE_SECTION,
+					ConfigConstants.CONFIG_KEY_MANYFILES, false);
+			indexVersion = cfg.getEnum(DirCacheVersion.values(),
+					ConfigConstants.CONFIG_INDEX_SECTION, null,
+					ConfigConstants.CONFIG_KEY_VERSION,
+					manyFiles ? DirCacheVersion.DIRC_VERSION_PATHCOMPRESS
+							: DirCacheVersion.DIRC_VERSION_EXTENDED);
+		}
+

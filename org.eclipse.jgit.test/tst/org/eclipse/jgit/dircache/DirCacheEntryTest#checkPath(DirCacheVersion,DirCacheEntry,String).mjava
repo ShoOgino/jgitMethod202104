@@ -1,0 +1,24 @@
+	private static void checkPath(DirCacheVersion indexVersion,
+			DirCacheEntry previous, String name) throws IOException {
+		DirCacheEntry dce = new DirCacheEntry(name);
+		long now = System.currentTimeMillis();
+		long anHourAgo = now - TimeUnit.HOURS.toMillis(1);
+		dce.setLastModified(Instant.ofEpochMilli(anHourAgo));
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		dce.write(out, indexVersion, previous);
+		byte[] raw = out.toByteArray();
+		MessageDigest md0 = Constants.newMessageDigest();
+		md0.update(raw);
+		ByteArrayInputStream in = new ByteArrayInputStream(raw);
+		MutableInteger infoAt = new MutableInteger();
+		byte[] sharedInfo = new byte[raw.length];
+		MessageDigest md = Constants.newMessageDigest();
+		DirCacheEntry read = new DirCacheEntry(sharedInfo, infoAt, in, md,
+				Instant.ofEpochMilli(now), indexVersion, previous);
+		assertEquals("Paths of length " + name.length() + " should match", name,
+				read.getPathString());
+		assertEquals("Should have been fully read", -1, in.read());
+		assertArrayEquals("Digests should match", md0.digest(),
+				md.digest());
+	}
+

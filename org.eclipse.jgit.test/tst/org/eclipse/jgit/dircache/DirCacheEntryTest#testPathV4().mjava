@@ -1,0 +1,15 @@
+	@Test
+	public void testPathV4() throws Exception {
+		StringBuilder name = new StringBuilder();
+		for (int i = 0; i < 20; i++) {
+			name.append('a');
+		}
+		DirCacheEntry previous = new DirCacheEntry(name.toString());
+		for (int j = 0; j < 20; j++) {
+			name.setLength(name.length() - 1);
+			String newName = name.toString() + "bbb";
+			checkPath(DirCacheVersion.DIRC_VERSION_PATHCOMPRESS, previous,
+					newName);
+		}
+	}
+

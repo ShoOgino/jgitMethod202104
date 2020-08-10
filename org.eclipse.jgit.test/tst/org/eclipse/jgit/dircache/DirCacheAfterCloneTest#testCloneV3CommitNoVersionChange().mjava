@@ -1,0 +1,17 @@
+	@Test
+	public void testCloneV3CommitNoVersionChange() throws Exception {
+		DirCacheVersion initial = cloneAndCheck(
+				EnumSet.of(DirCacheVersion.DIRC_VERSION_MINIMUM,
+						DirCacheVersion.DIRC_VERSION_EXTENDED));
+		StoredConfig cfg = db.getConfig();
+		cfg.setInt("index", null, "version", 4);
+		cfg.save();
+		try (Git git = new Git(db)) {
+			writeTrashFile("Test.txt2", "Hello again");
+			git.add().addFilepattern("Test.txt2").call();
+			git.commit().setMessage("Second commit").call();
+		}
+		assertEquals("DirCache version should be unchanged", initial,
+				DirCache.read(db).getVersion());
+	}
+

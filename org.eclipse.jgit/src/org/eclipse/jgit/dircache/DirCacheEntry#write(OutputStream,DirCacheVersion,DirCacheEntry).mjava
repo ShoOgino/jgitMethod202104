@@ -1,0 +1,40 @@
+	void write(OutputStream os, DirCacheVersion version, DirCacheEntry previous)
+			throws IOException {
+		final int len = isExtended() ? INFO_LEN_EXTENDED : INFO_LEN;
+		if (version != DirCacheVersion.DIRC_VERSION_PATHCOMPRESS) {
+			os.write(info, infoOffset, len);
+			os.write(path, 0, path.length);
+			// Index records are padded out to the next 8 byte alignment
+			// for historical reasons related to how C Git read the files.
+			//
+			int entryLen = len + path.length;
+			int expLen = (entryLen + 8) & ~7;
+			if (entryLen != expLen)
+				os.write(nullpad, 0, expLen - entryLen);
+		} else {
+			int pathCommon = 0;
+			int toRemove;
+			if (previous != null) {
+				// Figure out common prefix
+				int pathLen = Math.min(path.length, previous.path.length);
+				while (pathCommon < pathLen
+						&& path[pathCommon] == previous.path[pathCommon]) {
+					pathCommon++;
+				}
+				toRemove = previous.path.length - pathCommon;
+			} else {
+				toRemove = 0;
+			}
+			byte[] tmp = new byte[16];
+			int n = tmp.length;
+			tmp[--n] = (byte) (toRemove & 0x7F);
+			while ((toRemove >>>= 7) != 0) {
+				tmp[--n] = (byte) (0x80 | (--toRemove & 0x7F));
+			}
+			os.write(info, infoOffset, len);
+			os.write(tmp, n, tmp.length - n);
+			os.write(path, pathCommon, path.length - pathCommon);
+			os.write(0);
+		}
+	}
+

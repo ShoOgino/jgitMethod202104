@@ -1,0 +1,12 @@
+	@Test
+	public void testShortPathV4() throws Exception {
+		StringBuilder name = new StringBuilder(1 + 16);
+		name.append('a');
+		DirCacheEntry previous = new DirCacheEntry(name.toString());
+		for (int j = 0; j < 16; j++) {
+			checkPath(DirCacheVersion.DIRC_VERSION_PATHCOMPRESS, previous,
+					name.toString());
+			name.append('b');
+		}
+	}
+
