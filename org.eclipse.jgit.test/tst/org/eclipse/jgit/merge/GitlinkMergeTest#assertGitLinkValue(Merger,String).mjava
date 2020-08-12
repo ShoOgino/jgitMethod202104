@@ -1,0 +1,14 @@
+	private void assertGitLinkValue(Merger resolveMerger, String expectedValue)
+			throws Exception {
+		try (TreeWalk tw = new TreeWalk(db)) {
+			tw.setRecursive(true);
+			tw.reset(resolveMerger.getResultTreeId());
+
+			assertTrue(tw.next());
+			assertEquals(SUBMODULE_PATH, tw.getPathString());
+			assertEquals(ObjectId.fromString(expectedValue), tw.getObjectId(0));
+
+			assertFalse(tw.next());
+		}
+	}
+
