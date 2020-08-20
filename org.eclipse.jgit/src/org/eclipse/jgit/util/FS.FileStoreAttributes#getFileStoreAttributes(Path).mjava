@@ -64,7 +64,9 @@
 									if (LOG.isDebugEnabled()) {
 										LOG.debug(c.toString());
 									}
-									saveToConfig(s, c);
+									FileStoreAttributes newAttrs = c;
+									SAVE_RUNNER.execute(
+											() -> saveToConfig(s, newAttrs));
 								}
 								attributes = Optional.of(c);
 							} finally {
