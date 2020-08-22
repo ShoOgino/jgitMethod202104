@@ -5,11 +5,9 @@
 						.getAbsolutePath();
 			}
 			try {
-				Path xdgHomePath = Paths.get(configHomePath);
-				Files.createDirectories(xdgHomePath);
-				return xdgHomePath;
-			} catch (IOException | InvalidPathException e) {
-				LOG.error(JGitText.get().createXDGConfigHomeFailed,
+				return Paths.get(configHomePath);
+			} catch (InvalidPathException e) {
+				LOG.error(JGitText.get().logXDGConfigHomeInvalid,
 						configHomePath, e);
 			}
 			return null;

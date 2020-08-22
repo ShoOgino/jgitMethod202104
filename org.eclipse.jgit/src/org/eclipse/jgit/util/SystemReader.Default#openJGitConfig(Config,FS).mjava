@@ -2,16 +2,9 @@
 		public FileBasedConfig openJGitConfig(Config parent, FS fs) {
 			Path xdgPath = getXDGConfigHome(fs);
 			if (xdgPath != null) {
-				Path configPath = null;
-				try {
-					configPath = xdgPath.resolve("jgit"); //$NON-NLS-1$
-					Files.createDirectories(configPath);
-					configPath = configPath.resolve(Constants.CONFIG);
-					return new FileBasedConfig(parent, configPath.toFile(), fs);
-				} catch (IOException e) {
-					LOG.error(JGitText.get().createJGitConfigFailed, configPath,
-							e);
-				}
+				Path configPath = xdgPath.resolve("jgit") //$NON-NLS-1$
+						.resolve(Constants.CONFIG);
+				return new FileBasedConfig(parent, configPath.toFile(), fs);
 			}
 			return new FileBasedConfig(parent,
 					new File(fs.userHome(), ".jgitconfig"), fs); //$NON-NLS-1$
