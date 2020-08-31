@@ -1,0 +1,13 @@
+	@Test
+	public void testExtraHeadersResetAndMore() throws Exception {
+		config.fromText(DEFAULT + "[http \"http://example.com\"]\n"
+				+ "\textraHeader=foo: bar\n" //
+				+ "\textraHeader=bar: foo\n" //
+				+ "\textraHeader=\n" //
+				+ "\textraHeader=baz: something\n");
+		HttpConfig http = new HttpConfig(config,
+				new URIish("http://example.com/"));
+		assertEquals(1, http.getExtraHeaders().size());
+		assertEquals("baz: something", http.getExtraHeaders().get(0));
+	}
+

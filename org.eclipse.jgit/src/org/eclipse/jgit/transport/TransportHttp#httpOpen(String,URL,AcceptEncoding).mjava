@@ -31,7 +31,9 @@
 			conn.setRequestProperty(HDR_ACCEPT_ENCODING, ENCODING_GZIP);
 		}
 		conn.setRequestProperty(HDR_PRAGMA, "no-cache"); //$NON-NLS-1$
-		if (UserAgent.get() != null) {
+		if (http.getUserAgent() != null) {
+			conn.setRequestProperty(HDR_USER_AGENT, http.getUserAgent());
+		} else if (UserAgent.get() != null) {
 			conn.setRequestProperty(HDR_USER_AGENT, UserAgent.get());
 		}
 		int timeOut = getTimeout();
@@ -40,6 +42,7 @@
 			conn.setConnectTimeout(effTimeOut);
 			conn.setReadTimeout(effTimeOut);
 		}
+		addHeaders(conn, http.getExtraHeaders());
 		// set cookie header if necessary
 		if (!relevantCookies.isEmpty()) {
 			setCookieHeader(conn);

@@ -1,0 +1,10 @@
+	@Test
+	public void testExtraHeaders() throws Exception {
+		config.fromText(DEFAULT + "[http \"http://example.com\"]\n"
+				+ "\textraHeader=foo: bar\n");
+		HttpConfig http = new HttpConfig(config,
+				new URIish("http://example.com/"));
+		assertEquals(1, http.getExtraHeaders().size());
+		assertEquals("foo: bar", http.getExtraHeaders().get(0));
+	}
+

@@ -1,0 +1,13 @@
+	private void assertHeaders(String expected, String... headersToAdd) {
+		HttpConnection fake = Mockito.mock(HttpConnection.class);
+		Map<String, String> headers = new LinkedHashMap<>();
+		Mockito.doAnswer(invocation -> {
+			Object[] args = invocation.getArguments();
+			headers.put(args[0].toString(), args[1].toString());
+			return null;
+		}).when(fake).setRequestProperty(ArgumentMatchers.anyString(),
+				ArgumentMatchers.anyString());
+		TransportHttp.addHeaders(fake, Arrays.asList(headersToAdd));
+		Assert.assertEquals(expected, headers.toString());
+	}
+

@@ -1,0 +1,38 @@
+	/**
+	 * Adds a list of header strings to the connection. Headers are expected to
+	 * separate keys from values, i.e. "Key: Value". Headers without colon or
+	 * key are ignored (and logged), as are headers with keys that are not RFC
+	 * 7230 tokens or with non-ASCII values.
+	 *
+	 * @param conn
+	 *            The target HttpConnection
+	 * @param headersToAdd
+	 *            A list of header strings
+	 */
+	static void addHeaders(HttpConnection conn, List<String> headersToAdd) {
+		for (String header : headersToAdd) {
+			// Empty values are allowed according to
+			// https://tools.ietf.org/html/rfc7230
+			int colon = header.indexOf(':');
+			String key = null;
+			if (colon > 0) {
+				key = header.substring(0, colon).trim();
+			}
+			if (key == null || key.isEmpty()) {
+				LOG.warn(MessageFormat.format(
+						JGitText.get().invalidHeaderFormat, header));
+			} else if (HttpSupport.scanToken(key, 0) != key.length()) {
+				LOG.warn(MessageFormat.format(JGitText.get().invalidHeaderKey,
+						header));
+			} else {
+				String value = header.substring(colon + 1).trim();
+				if (!StandardCharsets.US_ASCII.newEncoder().canEncode(value)) {
+					LOG.warn(MessageFormat
+							.format(JGitText.get().invalidHeaderValue, header));
+				} else {
+					conn.setRequestProperty(key, value);
+				}
+			}
+		}
+	}
+

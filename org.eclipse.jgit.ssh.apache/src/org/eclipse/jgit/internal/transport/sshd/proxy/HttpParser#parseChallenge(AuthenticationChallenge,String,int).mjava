@@ -8,7 +8,7 @@
 			// optional legacy whitespace around the equals sign), where the
 			// value can be either a token or a quoted string.
 			start = skipWhiteSpace(header, start);
-			int end = scanToken(header, start);
+			int end = HttpSupport.scanToken(header, start);
 			if (end == start) {
 				// Nothing found. Either at end or on a comma.
 				if (start < header.length() && header.charAt(start) == ',') {
@@ -74,7 +74,7 @@
 					challenge.addArgument(header.substring(start, end), value);
 					start = nextEnd[0];
 				} else {
-					int nextEnd = scanToken(header, nextStart);
+					int nextEnd = HttpSupport.scanToken(header, nextStart);
 					challenge.addArgument(header.substring(start, end),
 							header.substring(nextStart, nextEnd));
 					start = nextEnd;

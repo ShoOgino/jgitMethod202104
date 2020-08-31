@@ -1,0 +1,9 @@
+	@Test
+	public void testUserAgentNonAscii() throws Exception {
+		config.fromText(DEFAULT + "[http \"http://example.com\"]\n"
+				+ "\tuserAgent= d ümmy Agent -5.10\n");
+		HttpConfig http = new HttpConfig(config,
+				new URIish("http://example.com/"));
+		assertEquals("d.mmy.Agent.-5.10", http.getUserAgent());
+	}
+
