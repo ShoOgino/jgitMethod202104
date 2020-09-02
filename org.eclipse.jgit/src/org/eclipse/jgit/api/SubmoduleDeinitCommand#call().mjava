@@ -52,6 +52,8 @@
 				}
 			}
 			return results;
+		} catch (ConfigInvalidException e) {
+			throw new InvalidConfigurationException(e.getMessage(), e);
 		} catch (IOException e) {
 			throw new JGitInternalException(e.getMessage(), e);
 		}
