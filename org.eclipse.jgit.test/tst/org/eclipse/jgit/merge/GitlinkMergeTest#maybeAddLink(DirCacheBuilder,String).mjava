@@ -1,0 +1,10 @@
+	private void maybeAddLink(DirCacheBuilder builder,
+			@Nullable String linkId) {
+		if (linkId == null) {
+			return;
+		}
+		DirCacheEntry newLink = createGitLink(SUBMODULE_PATH,
+				ObjectId.fromString(linkId));
+		builder.add(newLink);
+	}
+
