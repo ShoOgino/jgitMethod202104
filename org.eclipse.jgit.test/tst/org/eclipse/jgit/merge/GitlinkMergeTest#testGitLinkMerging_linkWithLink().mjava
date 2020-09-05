@@ -1,0 +1,29 @@
+	@Test
+	public void testGitLinkMerging_linkWithLink() throws Exception {
+		DirCache treeB = db.readDirCache();
+		DirCache treeO = db.readDirCache();
+		DirCache treeT = db.readDirCache();
+
+		DirCacheBuilder bTreeBuilder = treeB.builder();
+		DirCacheBuilder oTreeBuilder = treeO.builder();
+		DirCacheBuilder tTreeBuilder = treeT.builder();
+
+		bTreeBuilder.add(
+				createEntry(SUBMODULE_PATH, FileMode.REGULAR_FILE, "blob"));
+		maybeAddLink(oTreeBuilder, LINK_ID2);
+		maybeAddLink(tTreeBuilder, LINK_ID3);
+
+		bTreeBuilder.finish();
+		oTreeBuilder.finish();
+		tTreeBuilder.finish();
+
+		ObjectInserter ow = db.newObjectInserter();
+		ObjectId b = commit(ow, treeB, new ObjectId[] {});
+		ObjectId o = commit(ow, treeO, new ObjectId[] { b });
+		ObjectId t = commit(ow, treeT, new ObjectId[] { b });
+
+		Merger resolveMerger = MergeStrategy.RESOLVE.newMerger(db);
+		boolean merge = resolveMerger.merge(new ObjectId[] { o, t });
+		assertFalse(merge);
+	}
+

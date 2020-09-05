@@ -19,19 +19,24 @@
 		try (PackWriter packWriter = newPackWriter()) {
 			packWriter.setObjectCountCallback(callback);
 
-			final HashSet<ObjectId> inc = new HashSet<>();
-			final HashSet<ObjectId> exc = new HashSet<>();
-			inc.addAll(include.values());
-			for (RevCommit r : assume)
-				exc.add(r.getId());
 			packWriter.setIndexDisabled(true);
 			packWriter.setDeltaBaseAsOffset(true);
-			packWriter.setThin(!exc.isEmpty());
 			packWriter.setReuseValidatingObjects(false);
-			if (exc.isEmpty()) {
-				packWriter.setTagTargets(tagTargets);
+			if (cachedPacks.isEmpty()) {
+				HashSet<ObjectId> inc = new HashSet<>();
+				HashSet<ObjectId> exc = new HashSet<>();
+				inc.addAll(include.values());
+				for (RevCommit r : assume) {
+					exc.add(r.getId());
+				}
+				if (exc.isEmpty()) {
+					packWriter.setTagTargets(tagTargets);
+				}
+				packWriter.setThin(!exc.isEmpty());
+				packWriter.preparePack(monitor, inc, exc);
+			} else {
+				packWriter.preparePack(cachedPacks);
 			}
-			packWriter.preparePack(monitor, inc, exc);
 
 			final Writer w = new OutputStreamWriter(os, UTF_8);
 			w.write(TransportBundle.V2_BUNDLE_SIGNATURE);

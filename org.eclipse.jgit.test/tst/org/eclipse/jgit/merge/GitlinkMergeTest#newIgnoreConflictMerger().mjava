@@ -1,0 +1,11 @@
+	private Merger newIgnoreConflictMerger() {
+		return new ResolveMerger(db, true) {
+			@Override
+			protected boolean mergeImpl() throws IOException {
+				// emulate call with ignore conflicts.
+				return mergeTrees(mergeBase(), sourceTrees[0], sourceTrees[1],
+						true);
+			}
+		};
+	}
+

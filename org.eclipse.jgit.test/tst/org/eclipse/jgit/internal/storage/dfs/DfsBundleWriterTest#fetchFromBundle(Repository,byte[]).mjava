@@ -1,0 +1,12 @@
+	private static FetchResult fetchFromBundle(Repository newRepo,
+			byte[] bundle) throws Exception {
+		URIish uri = new URIish("in-memory://");
+		ByteArrayInputStream in = new ByteArrayInputStream(bundle);
+		RefSpec rs = new RefSpec("refs/heads/*:refs/heads/*");
+		Set<RefSpec> refs = Collections.singleton(rs);
+		try (TransportBundleStream transport = new TransportBundleStream(
+				newRepo, uri, in)) {
+			return transport.fetch(NullProgressMonitor.INSTANCE, refs);
+		}
+	}
+
