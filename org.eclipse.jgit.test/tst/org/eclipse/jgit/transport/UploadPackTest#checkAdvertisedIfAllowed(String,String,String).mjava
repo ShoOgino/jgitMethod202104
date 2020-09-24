@@ -2,7 +2,7 @@
 			String fetchCapability) throws Exception {
 		server.getConfig().setBoolean(configSection, null, configName, true);
 		ByteArrayInputStream recvStream =
-				uploadPackV2Setup(null, PacketLineIn.end());
+				uploadPackSetup("2", null, PacketLineIn.end());
 		PacketLineIn pckIn = new PacketLineIn(recvStream);
 
 		assertThat(pckIn.readString(), is("version 2"));

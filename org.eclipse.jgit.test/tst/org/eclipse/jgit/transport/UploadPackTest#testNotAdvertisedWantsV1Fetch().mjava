@@ -1,0 +1,20 @@
+	@Test
+	public void testNotAdvertisedWantsV1Fetch() throws Exception {
+		String commonInBlob = "abcdefghijklmnopqrstuvwxyz";
+
+		RevBlob parentBlob = remote.blob(commonInBlob + "a");
+		RevCommit parent = remote
+				.commit(remote.tree(remote.file("foo", parentBlob)));
+		RevBlob childBlob = remote.blob(commonInBlob + "b");
+		RevCommit child = remote
+				.commit(remote.tree(remote.file("foo", childBlob)), parent);
+		remote.update("branch1", child);
+
+		uploadPackV1("want " + child.toObjectId().getName() + "\n",
+				PacketLineIn.end(),
+				"have " + parent.toObjectId().getName() + "\n",
+				"done\n", PacketLineIn.end());
+
+		assertEquals(0, stats.getNotAdvertisedWants());
+	}
+

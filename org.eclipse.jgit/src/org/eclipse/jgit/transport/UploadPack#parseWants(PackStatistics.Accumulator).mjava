@@ -1,4 +1,4 @@
-	private void parseWants() throws IOException {
+	private void parseWants(PackStatistics.Accumulator accumulator) throws IOException {
 		List<ObjectId> notAdvertisedWants = null;
 		for (ObjectId obj : wantIds) {
 			if (!advertised.contains(obj)) {
@@ -7,8 +7,16 @@
 				notAdvertisedWants.add(obj);
 			}
 		}
-		if (notAdvertisedWants != null)
+		if (notAdvertisedWants != null) {
+			accumulator.notAdvertisedWants = notAdvertisedWants.size();
+
+			long startReachabilityChecking = System.currentTimeMillis();
+
 			requestValidator.checkWants(this, notAdvertisedWants);
+
+			accumulator.reachabilityCheckDuration = System.currentTimeMillis() -
+					startReachabilityChecking;
+		}
 
 		AsyncRevObjectQueue q = walk.parseAny(wantIds, true);
 		try {

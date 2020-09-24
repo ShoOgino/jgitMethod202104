@@ -1,14 +1,14 @@
 	/*
-	 * Invokes UploadPack with protocol v2 and sends it the given lines.
+	 * Invokes UploadPack with protocol v1 and sends it the given lines.
 	 * Returns UploadPack's output stream, not including the capability
 	 * advertisement by the server.
 	 */
-	private ByteArrayInputStream uploadPackV2(
+	private ByteArrayInputStream uploadPackV1(
 			Consumer<UploadPack> postConstructionSetup,
 			String... inputLines)
 			throws Exception {
 		ByteArrayInputStream recvStream =
-				uploadPackSetup("2", postConstructionSetup, inputLines);
+				uploadPackSetup("1", postConstructionSetup, inputLines);
 		PacketLineIn pckIn = new PacketLineIn(recvStream);
 
 		// drain capabilities

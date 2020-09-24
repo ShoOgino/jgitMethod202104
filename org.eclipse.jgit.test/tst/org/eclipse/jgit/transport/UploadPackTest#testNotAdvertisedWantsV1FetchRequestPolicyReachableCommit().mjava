@@ -1,0 +1,21 @@
+	@Test
+	public void testNotAdvertisedWantsV1FetchRequestPolicyReachableCommit() throws Exception {
+		String commonInBlob = "abcdefghijklmnopqrstuvwxyz";
+
+		RevBlob parentBlob = remote.blob(commonInBlob + "a");
+		RevCommit parent = remote
+				.commit(remote.tree(remote.file("foo", parentBlob)));
+		RevBlob childBlob = remote.blob(commonInBlob + "b");
+		RevCommit child = remote
+				.commit(remote.tree(remote.file("foo", childBlob)), parent);
+
+		remote.update("branch1", child);
+
+		uploadPackV1((UploadPack up) -> {up.setRequestPolicy(RequestPolicy.REACHABLE_COMMIT);},
+				"want " + parent.toObjectId().getName() + "\n",
+				PacketLineIn.end(),
+				"done\n", PacketLineIn.end());
+
+		assertEquals(1, stats.getNotAdvertisedWants());
+	}
+
