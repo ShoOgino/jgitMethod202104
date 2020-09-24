@@ -1,0 +1,42 @@
+	/**
+	 * Parse a string value from a git {@link Config} and treat it as a file
+	 * path, replacing a ~/ prefix by the user's home directory.
+	 * <p>
+	 * <b>Note:</b> this may throw {@link InvalidPathException} if the string is
+	 * not a valid path.
+	 * </p>
+	 *
+	 * @param config
+	 *            to get the path from.
+	 * @param section
+	 *            section the key is in.
+	 * @param subsection
+	 *            subsection the key is in, or null if not in a subsection.
+	 * @param name
+	 *            the key name.
+	 * @param fs
+	 *            to use to convert the string into a path.
+	 * @param resolveAgainst
+	 *            directory to resolve the path against if it is a relative
+	 *            path.
+	 * @param defaultValue
+	 *            to return if no value was present
+	 * @return the {@link Path}, or {@code defaultValue} if not set
+	 * @since 5.10
+	 */
+	default Path getPath(Config config, String section, String subsection,
+			String name, @NonNull FS fs, File resolveAgainst,
+			Path defaultValue) {
+		String value = config.getString(section, subsection, name);
+		if (value == null) {
+			return defaultValue;
+		}
+		File file;
+		if (value.startsWith("~/")) { //$NON-NLS-1$
+			file = fs.resolve(fs.userHome(), value.substring(2));
+		} else {
+			file = fs.resolve(resolveAgainst, value);
+		}
+		return file.toPath();
+	}
+

@@ -1,0 +1,31 @@
+	/**
+	 * Parse a string value and treat it as a file path, replacing a ~/ prefix
+	 * by the user's home directory.
+	 * <p>
+	 * <b>Note:</b> this may throw {@link InvalidPathException} if the string is
+	 * not a valid path.
+	 * </p>
+	 *
+	 * @param section
+	 *            section the key is in.
+	 * @param subsection
+	 *            subsection the key is in, or null if not in a subsection.
+	 * @param name
+	 *            the key name.
+	 * @param fs
+	 *            to use to convert the string into a path.
+	 * @param resolveAgainst
+	 *            directory to resolve the path against if it is a relative
+	 *            path; {@code null} to use the Java process's current
+	 *            directory.
+	 * @param defaultValue
+	 *            to return if no value was present
+	 * @return the {@link Path}, or {@code defaultValue} if not set
+	 * @since 5.10
+	 */
+	public Path getPath(String section, String subsection, String name,
+			@NonNull FS fs, File resolveAgainst, Path defaultValue) {
+		return typedGetter.getPath(this, section, subsection, name, fs,
+				resolveAgainst, defaultValue);
+	}
+
