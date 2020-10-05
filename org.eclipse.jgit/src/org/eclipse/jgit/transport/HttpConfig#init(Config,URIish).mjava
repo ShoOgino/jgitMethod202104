@@ -67,6 +67,11 @@
 			saveCookies = config.getBoolean(HTTP, match, SAVE_COOKIES_KEY,
 					saveCookies);
 		}
+		// Environment overrides config
+		agent = SystemReader.getInstance().getenv(ENV_HTTP_USER_AGENT);
+		if (!StringUtils.isEmptyOrNull(agent)) {
+			userAgent = UserAgent.clean(agent);
+		}
 		postBuffer = postBufferSize;
 		sslVerify = sslVerifyFlag;
 		followRedirects = followRedirectsMode;
