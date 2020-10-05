@@ -1,0 +1,27 @@
+	/**
+	 * Branch off from master and then tag
+	 *
+	 * <pre>
+	 * c1 -+ -> c2
+	 *     |
+	 *     +-> t1
+	 * </pre>
+	 * @throws Exception
+	 * */
+	@Test
+	public void testDescribeUseAllRefsBranch() throws Exception {
+		final ObjectId c1 = modify("aaa");
+		modify("bbb");
+
+		branch("b", c1);
+		final ObjectId c3 = modify("ccc");
+		tag("t1");
+
+		if (!useAnnotatedTags && !describeUseAllTags) {
+			assertEquals(null, describe(c3));
+		} else {
+			assertEquals("t1", describe(c3));
+		}
+		assertEquals("heads/b", describeAll(c3));
+	}
+

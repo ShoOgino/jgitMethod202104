@@ -1,0 +1,13 @@
+	@Test
+	public void testDescribeUseAllRefsMaster() throws Exception {
+		final ObjectId c1 = modify("aaa");
+		tag("t1");
+
+		if (useAnnotatedTags || describeUseAllTags) {
+			assertEquals("t1", describe(c1));
+		} else {
+			assertEquals(null, describe(c1));
+		}
+		assertEquals("heads/master", describeAll(c1));
+	}
+

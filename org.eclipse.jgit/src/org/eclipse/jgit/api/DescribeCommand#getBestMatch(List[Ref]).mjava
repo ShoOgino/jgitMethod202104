@@ -11,8 +11,7 @@
 			for (FileNameMatcher matcher : matchers) {
 				Stream<Ref> m = tags.stream().filter(
 						tag -> {
-							matcher.append(
-									tag.getName().substring(R_TAGS.length()));
+							matcher.append(formatRefName(tag.getName()));
 							boolean result = matcher.isMatch();
 							matcher.reset();
 							return result;
