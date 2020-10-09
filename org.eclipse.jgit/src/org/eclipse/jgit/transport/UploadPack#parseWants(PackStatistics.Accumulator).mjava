@@ -10,12 +10,13 @@
 		if (notAdvertisedWants != null) {
 			accumulator.notAdvertisedWants = notAdvertisedWants.size();
 
-			long startReachabilityChecking = System.currentTimeMillis();
+			Instant startReachabilityChecking = Instant.now();
 
 			requestValidator.checkWants(this, notAdvertisedWants);
 
-			accumulator.reachabilityCheckDuration = System.currentTimeMillis() -
-					startReachabilityChecking;
+			accumulator.reachabilityCheckDuration = Duration
+					.between(startReachabilityChecking, Instant.now())
+					.toMillis();
 		}
 
 		AsyncRevObjectQueue q = walk.parseAny(wantIds, true);
