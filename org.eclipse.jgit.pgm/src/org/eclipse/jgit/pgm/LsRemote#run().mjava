@@ -8,6 +8,9 @@
 		try {
 			refs.addAll(command.call());
 			for (Ref r : refs) {
+				if (symref && r.isSymbolic()) {
+					show(r.getTarget(), r.getName());
+				}
 				show(r.getObjectId(), r.getName());
 				if (r.getPeeledObjectId() != null) {
 					show(r.getPeeledObjectId(), r.getName() + "^{}"); //$NON-NLS-1$

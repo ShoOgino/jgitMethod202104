@@ -9,11 +9,10 @@
 		command.setURI(fileUri());
 		Git git2 = command.call();
 		addRepoToClose(git2.getRepository());
-		assertNotNull(git2);
 		assertTrue(git2.getRepository().isBare());
 		assertNotNull(git2.getRepository().resolve("tag-for-blob"));
 		assertNotNull(git2.getRepository().resolve("tag-initial"));
-		assertEquals(git2.getRepository().getFullBranch(), "refs/heads/master");
+		assertEquals("refs/heads/master", git2.getRepository().getFullBranch());
 		assertEquals("refs/heads/master, refs/heads/test", allRefNames(
 				git2.branchList().setListMode(ListMode.ALL).call()));
 		assertNotNull(git2.getRepository().exactRef("refs/meta/foo/bar"));
