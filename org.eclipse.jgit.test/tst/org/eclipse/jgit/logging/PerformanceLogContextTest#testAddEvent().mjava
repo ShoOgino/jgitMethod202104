@@ -1,0 +1,11 @@
+	@Test
+	public void testAddEvent() {
+		PerformanceLogRecord record = new PerformanceLogRecord("record", 0);
+		PerformanceLogContext.getInstance().addEvent(record);
+
+		List<PerformanceLogRecord> eventRecords = PerformanceLogContext
+				.getInstance().getEventRecords();
+		assertTrue(eventRecords.contains(record));
+		assertEquals(1, eventRecords.size());
+	}
+

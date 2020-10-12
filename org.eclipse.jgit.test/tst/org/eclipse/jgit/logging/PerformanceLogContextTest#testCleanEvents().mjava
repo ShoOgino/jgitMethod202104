@@ -1,0 +1,14 @@
+	@Test
+	public void testCleanEvents() {
+		PerformanceLogRecord record1 = new PerformanceLogRecord("record1", 0);
+		PerformanceLogContext.getInstance().addEvent(record1);
+
+		PerformanceLogRecord record2 = new PerformanceLogRecord("record2", 0);
+		PerformanceLogContext.getInstance().addEvent(record2);
+
+		PerformanceLogContext.getInstance().cleanEvents();
+		List<PerformanceLogRecord> eventRecords = PerformanceLogContext
+				.getInstance().getEventRecords();
+		assertEquals(0, eventRecords.size());
+	}
+
