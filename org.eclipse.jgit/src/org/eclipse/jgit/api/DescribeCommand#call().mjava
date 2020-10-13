@@ -13,7 +13,7 @@
 			}
 
 			Collection<Ref> tagList = repo.getRefDatabase()
-					.getRefsByPrefix(R_TAGS);
+					.getRefsByPrefix(useAll ? R_REFS : R_TAGS);
 			Map<ObjectId, List<Ref>> tags = tagList.stream()
 					.filter(this::filterLightweightTags)
 					.collect(Collectors.groupingBy(this::getObjectIdFromRef));
@@ -66,7 +66,7 @@
 			Optional<Ref> bestMatch = getBestMatch(tags.get(target));
 			if (bestMatch.isPresent()) {
 				return longDesc ? longDescription(bestMatch.get(), 0, target) :
-						bestMatch.get().getName().substring(R_TAGS.length());
+						formatRefName(bestMatch.get().getName());
 			}
 
 			w.markStart(target);
