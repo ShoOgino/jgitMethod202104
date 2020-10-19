@@ -12,7 +12,7 @@
 		}
 
 		PackStatistics.Accumulator accumulator = new PackStatistics.Accumulator();
-		long negotiateStart = System.currentTimeMillis();
+		Instant negotiateStart = Instant.now();
 
 		ProtocolV2Parser parser = new ProtocolV2Parser(transferConfig);
 		FetchV2Request req = parser.parseFetchRequest(pckIn);
@@ -118,8 +118,8 @@
 				pckOut.writeString("packfile\n"); //$NON-NLS-1$
 			}
 
-			accumulator.timeNegotiating = System.currentTimeMillis()
-					- negotiateStart;
+			accumulator.timeNegotiating = Duration
+					.between(negotiateStart, Instant.now()).toMillis();
 
 			sendPack(accumulator,
 					req,

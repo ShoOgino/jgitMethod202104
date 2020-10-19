@@ -13,7 +13,7 @@
 			else
 				advertised = refIdSet(getAdvertisedOrDefaultRefs().values());
 
-			long negotiateStart = System.currentTimeMillis();
+			Instant negotiateStart = Instant.now();
 			accumulator.advertised = advertised.size();
 
 			ProtocolV0Parser parser = new ProtocolV0Parser(transferConfig);
@@ -55,8 +55,8 @@
 			if (!req.getClientShallowCommits().isEmpty())
 				walk.assumeShallow(req.getClientShallowCommits());
 			sendPack = negotiate(req, accumulator, pckOut);
-			accumulator.timeNegotiating += System.currentTimeMillis()
-					- negotiateStart;
+			accumulator.timeNegotiating = Duration
+					.between(negotiateStart, Instant.now()).toMillis();
 
 			if (sendPack && !biDirectionalPipe) {
 				// Ensure the request was fully consumed. Any remaining input must
