@@ -4,8 +4,6 @@
 		 *
 		 * @param commandName
 		 *            the command to execute
-		 * @param environment
-		 *            environment variables to pass on
 		 * @param tms
 		 *            the timeout value, in seconds, for the command.
 		 * @throws TransportException
@@ -14,17 +12,11 @@
 		 * @throws IOException
 		 *             on problems opening streams
 		 */
-		JschProcess(String commandName, Map<String, String> environment,
-				int tms) throws TransportException, IOException {
+		JschProcess(String commandName, int tms)
+				throws TransportException, IOException {
 			timeout = tms;
 			try {
 				channel = (ChannelExec) sock.openChannel("exec"); //$NON-NLS-1$
-				if (environment != null) {
-					for (Map.Entry<String, String> envVar : environment
-							.entrySet()) {
-						channel.setEnv(envVar.getKey(), envVar.getValue());
-					}
-				}
 				channel.setCommand(commandName);
 				setupStreams();
 				channel.connect(timeout > 0 ? timeout * 1000 : 0);

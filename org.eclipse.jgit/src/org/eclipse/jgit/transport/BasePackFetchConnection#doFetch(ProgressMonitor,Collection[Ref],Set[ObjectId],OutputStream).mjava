@@ -31,28 +31,6 @@
 				pckState = new PacketLineOut(state);
 			}
 
-			if (TransferConfig.ProtocolVersion.V2
-					.equals(getProtocolVersion())) {
-				sideband = true;
-				noDone = true;
-				multiAck = MultiAck.DETAILED;
-				setFetchOptions();
-				PacketLineOut output = statelessRPC ? pckState : pckOut;
-				output.writeString(
-						"command=" + GitProtocolConstants.COMMAND_FETCH); //$NON-NLS-1$
-				// Capabilities are sent as command arguments in protocol V2
-				String agent = UserAgent.get();
-				if (agent != null
-						&& isCapableOf(GitProtocolConstants.OPTION_AGENT)) {
-					output.writeString(
-							GitProtocolConstants.OPTION_AGENT + '=' + agent);
-				}
-				output.writeDelim();
-				// Arguments
-				for (String capability : getCapabilitiesV2()) {
-					output.writeString(capability);
-				}
-			}
 			if (sendWants(want)) {
 				negotiate(monitor);
 
@@ -61,25 +39,6 @@
 				state = null;
 				pckState = null;
 
-				if (TransferConfig.ProtocolVersion.V2
-						.equals(getProtocolVersion())) {
-					String header = pckIn.readString();
-					if (PacketLineIn.isEnd(header)) {
-						// No packfile following.
-						return;
-					}
-
-					if (header.startsWith("ERR ")) { //$NON-NLS-1$
-						// Protocol V2 may give us an error here (for instance,
-						// invalid want)
-						throw new PackProtocolException(header.substring(4));
-					}
-					if (!GitProtocolConstants.SECTION_PACKFILE.equals(header)) {
-						throw new PackProtocolException(MessageFormat.format(
-								JGitText.get().expectedGot,
-								GitProtocolConstants.SECTION_PACKFILE, header));
-					}
-				}
 				receivePack(monitor, outputStream);
 			}
 		} catch (CancelledException ce) {

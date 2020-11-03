@@ -1,14 +1,10 @@
 	@SuppressWarnings("resource") // Closed by caller
 	private FetchConnection getConnection(HttpConnection c, InputStream in,
-			String service, Collection<RefSpec> refSpecs,
-			String... additionalPatterns) throws IOException {
+			String service) throws IOException {
 		BaseConnection f;
 		if (isSmartHttp(c, service)) {
-			InputStream withMark = in.markSupported() ? in
-					: new BufferedInputStream(in);
-			readSmartHeaders(withMark, service);
-			f = new SmartHttpFetchConnection(withMark, refSpecs,
-					additionalPatterns);
+			readSmartHeaders(in, service);
+			f = new SmartHttpFetchConnection(in);
 		} else {
 			// Assume this server doesn't support smart HTTP fetch
 			// and fall back on dumb object walking.

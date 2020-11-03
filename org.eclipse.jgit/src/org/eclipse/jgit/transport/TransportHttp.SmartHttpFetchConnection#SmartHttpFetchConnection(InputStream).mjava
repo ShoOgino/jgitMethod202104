@@ -1,5 +1,10 @@
 		SmartHttpFetchConnection(InputStream advertisement)
 				throws TransportException {
-			this(advertisement, Collections.emptyList());
+			super(TransportHttp.this);
+			statelessRPC = true;
+
+			init(advertisement, DisabledOutputStream.INSTANCE);
+			outNeedsEnd = false;
+			readAdvertisedRefs();
 		}
 

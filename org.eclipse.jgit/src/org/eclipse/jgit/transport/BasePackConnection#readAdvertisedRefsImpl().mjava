@@ -1,50 +1,32 @@
-	private boolean readAdvertisedRefsImpl() throws IOException {
+	private void readAdvertisedRefsImpl() throws IOException {
 		final LinkedHashMap<String, Ref> avail = new LinkedHashMap<>();
-		for (boolean first = true;; first = false) {
+		for (;;) {
 			String line;
 
-			if (first) {
-				boolean isV1 = false;
-				try {
-					line = readLine();
-				} catch (EOFException e) {
+			try {
+				line = pckIn.readString();
+			} catch (EOFException eof) {
+				if (avail.isEmpty())
 					throw noRepository();
-				}
-				if (line != null && VERSION_1.equals(line)) {
-					// Same as V0, except for this extra line. We shouldn't get
-					// it since we never request V1.
-					setProtocolVersion(TransferConfig.ProtocolVersion.V0);
-					isV1 = true;
-					line = readLine();
-				}
-				if (line == null) {
-					break;
-				}
+				throw eof;
+			}
+			if (PacketLineIn.isEnd(line))
+				break;
+
+			if (line.startsWith("ERR ")) { //$NON-NLS-1$
+				// This is a customized remote service error.
+				// Users should be informed about it.
+				throw new RemoteRepositoryException(uri, line.substring(4));
+			}
+
+			if (avail.isEmpty()) {
 				final int nul = line.indexOf('\0');
 				if (nul >= 0) {
-					// Protocol V0: The first line (if any) may contain
-					// "hidden" capability values after a NUL byte.
-					for (String capability : line.substring(nul + 1)
-							.split(" ")) { //$NON-NLS-1$
-						addCapability(capability);
-					}
+					// The first line (if any) may contain "hidden"
+					// capability values after a NUL byte.
+					remoteCapablities.addAll(
+							Arrays.asList(line.substring(nul + 1).split(" "))); //$NON-NLS-1$
 					line = line.substring(0, nul);
-					setProtocolVersion(TransferConfig.ProtocolVersion.V0);
-				} else if (!isV1 && VERSION_2.equals(line)) {
-					// Protocol V2: remaining lines are capabilities as
-					// key=value pairs
-					setProtocolVersion(TransferConfig.ProtocolVersion.V2);
-					readCapabilitiesV2();
-					// Break out here so that stateless RPC transports get a
-					// chance to set up the output stream.
-					return false;
-				} else {
-					setProtocolVersion(TransferConfig.ProtocolVersion.V0);
-				}
-			} else {
-				line = readLine();
-				if (line == null) {
-					break;
 				}
 			}
 
@@ -53,21 +35,41 @@
 				throw invalidRefAdvertisementLine(line);
 			}
 			String name = line.substring(41, line.length());
-			if (first && name.equals("capabilities^{}")) { //$NON-NLS-1$
-				// special line from git-receive-pack (protocol V0) to show
+			if (avail.isEmpty() && name.equals("capabilities^{}")) { //$NON-NLS-1$
+				// special line from git-receive-pack to show
 				// capabilities when there are no refs to advertise
-				// TODO: throw error if protocol version is >= V2?
 				continue;
 			}
 
-			final ObjectId id = toId(line, line.substring(0, 40));
+			final ObjectId id;
+			try {
+				id  = ObjectId.fromString(line.substring(0, 40));
+			} catch (InvalidObjectIdException e) {
+				PackProtocolException ppe = invalidRefAdvertisementLine(line);
+				ppe.initCause(e);
+				throw ppe;
+			}
 			if (name.equals(".have")) { //$NON-NLS-1$
 				additionalHaves.add(id);
+			} else if (name.endsWith("^{}")) { //$NON-NLS-1$
+				name = name.substring(0, name.length() - 3);
+				final Ref prior = avail.get(name);
+				if (prior == null)
+					throw new PackProtocolException(uri, MessageFormat.format(
+							JGitText.get().advertisementCameBefore, name, name));
+
+				if (prior.getPeeledObjectId() != null)
+					throw duplicateAdvertisement(name + "^{}"); //$NON-NLS-1$
+
+				avail.put(name, new ObjectIdRef.PeeledTag(
+						Ref.Storage.NETWORK, name, prior.getObjectId(), id));
 			} else {
-				processLineV1(name, id, avail);
+				final Ref prior = avail.put(name, new ObjectIdRef.PeeledNonTag(
+						Ref.Storage.NETWORK, name, id));
+				if (prior != null)
+					throw duplicateAdvertisement(name);
 			}
 		}
 		available(avail);
-		return true;
 	}
 

@@ -32,11 +32,9 @@
 
 		List<AccessEvent> requests = getRequests();
 		requests.removeAll(cloneRequests);
+		assertEquals(2, requests.size());
 
-		assertEquals(enableProtocolV2 ? 3 : 2, requests.size());
-
-		int requestNumber = 0;
-		AccessEvent info = requests.get(requestNumber++);
+		AccessEvent info = requests.get(0);
 		assertEquals("GET", info.getMethod());
 		assertEquals(join(remoteURI, "info/refs"), info.getPath());
 		assertEquals(1, info.getParameters().size());
@@ -45,24 +43,9 @@
 		assertEquals("application/x-git-upload-pack-advertisement",
 				info.getResponseHeader(HDR_CONTENT_TYPE));
 
-		if (enableProtocolV2) {
-			AccessEvent lsRefs = requests.get(requestNumber++);
-			assertEquals("POST", lsRefs.getMethod());
-			assertEquals(join(remoteURI, "git-upload-pack"), lsRefs.getPath());
-			assertEquals(0, lsRefs.getParameters().size());
-			assertNotNull("has content-length",
-					lsRefs.getRequestHeader(HDR_CONTENT_LENGTH));
-			assertNull("not chunked",
-					lsRefs.getRequestHeader(HDR_TRANSFER_ENCODING));
-			assertEquals("version=2", lsRefs.getRequestHeader("Git-Protocol"));
-			assertEquals(200, lsRefs.getStatus());
-			assertEquals("application/x-git-upload-pack-result",
-					lsRefs.getResponseHeader(HDR_CONTENT_TYPE));
-		}
-
 		// We should have needed one request to perform the fetch.
 		//
-		AccessEvent service = requests.get(requestNumber);
+		AccessEvent service = requests.get(1);
 		assertEquals("POST", service.getMethod());
 		assertEquals(join(remoteURI, "git-upload-pack"), service.getPath());
 		assertEquals(0, service.getParameters().size());

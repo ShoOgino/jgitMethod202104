@@ -66,8 +66,7 @@
 					new PacketLineOut(NullOutputStream.INSTANCE),
 					accumulator);
 		} else {
-			pckOut.writeString(
-					GitProtocolConstants.SECTION_ACKNOWLEDGMENTS + '\n');
+			pckOut.writeString("acknowledgments\n"); //$NON-NLS-1$
 			for (ObjectId id : req.getPeerHas()) {
 				if (walk.getObjectReader().has(id)) {
 					pckOut.writeString("ACK " + id.getName() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -116,8 +115,7 @@
 			if (!pckOut.isUsingSideband()) {
 				// sendPack will write "packfile\n" for us if sideband-all is used.
 				// But sideband-all is not used, so we have to write it ourselves.
-				pckOut.writeString(
-						GitProtocolConstants.SECTION_PACKFILE + '\n');
+				pckOut.writeString("packfile\n"); //$NON-NLS-1$
 			}
 
 			accumulator.timeNegotiating = Duration
