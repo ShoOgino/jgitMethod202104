@@ -36,10 +36,28 @@
 					: eIdx;
 				fastAdd(ent);
 			} else {
-				// Apply to all entries of the current path (different stages)
 				lastIdx = cache.nextEntry(eIdx);
-				for (int i = eIdx; i < lastIdx; i++) {
-					final DirCacheEntry ent = cache.getEntry(i);
+				if (lastIdx > eIdx + 1) {
+					// Apply to all entries of the current path (different
+					// stages). If any apply() resets the stage to STAGE_0, take
+					// only that entry and omit all others.
+					DirCacheEntry[] tmp = new DirCacheEntry[lastIdx - eIdx];
+					int n = 0;
+					for (int i = eIdx; i < lastIdx; i++) {
+						DirCacheEntry ent = cache.getEntry(i);
+						e.apply(ent);
+						if (ent.getStage() == DirCacheEntry.STAGE_0) {
+							fastAdd(ent);
+							n = 0;
+							break;
+						}
+						tmp[n++] = ent;
+					}
+					for (int i = 0; i < n; i++) {
+						fastAdd(tmp[i]);
+					}
+				} else {
+					DirCacheEntry ent = cache.getEntry(eIdx);
 					e.apply(ent);
 					fastAdd(ent);
 				}
