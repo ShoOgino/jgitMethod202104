@@ -1,0 +1,15 @@
+		@Override
+		public void seekPastPrefix(String prefixName) throws IOException {
+			initRefIndex();
+			byte[] key = prefixName.getBytes(UTF_8);
+			ByteBuffer byteBuffer = ByteBuffer.allocate(key.length + 1);
+			byteBuffer.put(key);
+			// Add the representation of the last byte lexicographically. Based on how UTF_8
+			// representation works, this byte will be bigger lexicographically than any
+			// UTF_8 character when translated into bytes, since 0xFF can never be a part of
+			// a UTF_8 string.
+			byteBuffer.put((byte) 0xFF);
+
+			block = seek(REF_BLOCK_TYPE, byteBuffer.array(), refIndex, 0, refEnd);
+		}
+

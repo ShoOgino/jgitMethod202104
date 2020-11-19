@@ -1,0 +1,13 @@
+	@Test
+	public void seekPastToNonExistentPrefixToTheEnd() throws IOException {
+		Ref exp = ref(MASTER, 1);
+		Ref next = ref(NEXT, 2);
+		Ref afterNext = ref(AFTER_NEXT, 3);
+		Ref afterNextNext = ref(LAST, 4);
+		ReftableReader t = read(write(exp, next, afterNext, afterNextNext));
+		try (RefCursor rc = t.seekRefsWithPrefix("")) {
+			rc.seekPastPrefix("refs/heads/nextnon_existent_end");
+			assertFalse(rc.next());
+		}
+	}
+

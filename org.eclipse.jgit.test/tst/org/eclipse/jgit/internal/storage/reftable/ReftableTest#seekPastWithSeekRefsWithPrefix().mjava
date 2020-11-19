@@ -1,0 +1,21 @@
+	@Test
+	public void seekPastWithSeekRefsWithPrefix() throws IOException {
+		Ref exp = ref(MASTER, 1);
+		Ref next = ref(NEXT, 2);
+		Ref afterNext = ref(AFTER_NEXT, 3);
+		Ref afterNextNext = ref(LAST, 4);
+		Ref notRefsHeads = ref(NOT_REF_HEADS, 5);
+		ReftableReader t = read(write(exp, next, afterNext, afterNextNext, notRefsHeads));
+		try (RefCursor rc = t.seekRefsWithPrefix("refs/heads/")) {
+			rc.seekPastPrefix("refs/heads/next/");
+			assertTrue(rc.next());
+			assertEquals(AFTER_NEXT, rc.getRef().getName());
+			assertTrue(rc.next());
+			assertEquals(LAST, rc.getRef().getName());
+
+			// NOT_REF_HEADS is next, but it's omitted because of
+			// seekRefsWithPrefix("refs/heads/").
+			assertFalse(rc.next());
+		}
+	}
+

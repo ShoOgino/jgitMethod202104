@@ -1,0 +1,18 @@
+	@Test
+	public void oneTableSeekPastWithRefCursor() throws IOException {
+		List<Ref> delta1 = Arrays.asList(
+				ref("refs/heads/apple", 1),
+				ref("refs/heads/master", 2));
+
+		MergedReftable mr = merge(write(delta1));
+		try (RefCursor rc = mr.seekRefsWithPrefix("")) {
+			rc.seekPastPrefix("refs/heads/apple");
+
+			assertTrue(rc.next());
+			assertEquals("refs/heads/master", rc.getRef().getName());
+			assertEquals(id(2), rc.getRef().getObjectId());
+
+			assertEquals(1, rc.getRef().getUpdateIndex());
+		}
+	}
+

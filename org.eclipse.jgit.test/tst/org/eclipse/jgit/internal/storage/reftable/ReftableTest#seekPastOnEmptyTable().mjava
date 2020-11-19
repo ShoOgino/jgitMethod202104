@@ -1,0 +1,9 @@
+	@Test
+	public void seekPastOnEmptyTable() throws IOException {
+		ReftableReader t = read(write());
+		try (RefCursor rc = t.seekRefsWithPrefix("")) {
+			rc.seekPastPrefix("refs/");
+			assertFalse(rc.next());
+		}
+	}
+

@@ -1,0 +1,9 @@
+	@Test
+	public void seekPastOnEmptyTable() throws IOException {
+		MergedReftable mr = merge(write(), write());
+		try (RefCursor rc = mr.seekRefsWithPrefix("")) {
+			rc.seekPastPrefix("refs/");
+			assertFalse(rc.next());
+		}
+	}
+

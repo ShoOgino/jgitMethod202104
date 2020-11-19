@@ -1,0 +1,11 @@
+	@Test
+	public void skipPastRefWithLastUTF8() throws IOException {
+		ReftableReader t = read(write(ref(String.format("refs/heads/%sbla", new String(LAST_UTF8_CHAR
+				, UTF_8)), 1)));
+
+		try (RefCursor rc = t.allRefs()) {
+			rc.seekPastPrefix("refs/heads/");
+			assertFalse(rc.next());
+		}
+	}
+
