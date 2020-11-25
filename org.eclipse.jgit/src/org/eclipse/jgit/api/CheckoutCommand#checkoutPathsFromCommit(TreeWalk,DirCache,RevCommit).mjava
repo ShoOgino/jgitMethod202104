@@ -14,6 +14,11 @@
 			editor.add(new PathEdit(path) {
 				@Override
 				public void apply(DirCacheEntry ent) {
+					if (ent.getStage() != DirCacheEntry.STAGE_0) {
+						// A checkout on a conflicting file stages the checked
+						// out file and resolves the conflict.
+						ent.setStage(DirCacheEntry.STAGE_0);
+					}
 					ent.setObjectId(blobId);
 					ent.setFileMode(mode);
 					checkoutPath(ent, r,

@@ -1,9 +1,19 @@
 	@Test
-	public void testAddEventsTwoThreads() {
-		TestRunnable thread1 = new TestRunnable("record1", 1);
-		TestRunnable thread2 = new TestRunnable("record2", 2);
+	public void testAddEventsTwoThreads() throws InterruptedException {
+		TestRunnable runnable1 = new TestRunnable("record1", 1);
+		TestRunnable runnable2 = new TestRunnable("record2", 2);
 
-		new Thread(thread1).start();
-		new Thread(thread2).start();
+		Thread thread1 = new Thread(runnable1);
+		Thread thread2 = new Thread(runnable2);
+
+		thread1.start();
+		thread2.start();
+
+		thread1.join();
+		thread2.join();
+		assertEquals(1, runnable1.getEventRecordsCount());
+		assertEquals(1, runnable2.getEventRecordsCount());
+		assertFalse(runnable1.isThrown());
+		assertFalse(runnable2.isThrown());
 	}
 

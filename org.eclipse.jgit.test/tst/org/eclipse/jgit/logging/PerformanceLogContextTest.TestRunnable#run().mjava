@@ -2,8 +2,13 @@
 		public void run() {
 			PerformanceLogRecord record = new PerformanceLogRecord(name,
 					durationMs);
-			PerformanceLogContext.getInstance().addEvent(record);
-			assertEquals(1, PerformanceLogContext.getInstance()
-					.getEventRecords().size());
+			try {
+				PerformanceLogContext.getInstance().addEvent(record);
+				eventRecordsCount = PerformanceLogContext.getInstance()
+						.getEventRecords().size();
+				PerformanceLogContext.getInstance().cleanEvents();
+			} catch (Exception e) {
+				thrown = true;
+			}
 		}
 
