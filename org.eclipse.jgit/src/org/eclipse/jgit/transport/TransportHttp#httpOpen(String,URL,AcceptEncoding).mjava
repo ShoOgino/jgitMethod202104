@@ -15,7 +15,8 @@
 		}
 
 		final Proxy proxy = HttpSupport.proxyFor(proxySelector, u);
-		HttpConnection conn = connectionFactory.create(u, proxy);
+		factoryUsed = true;
+		HttpConnection conn = factory.create(u, proxy);
 
 		if (!sslVerify && "https".equals(u.getProtocol())) { //$NON-NLS-1$
 			HttpSupport.disableSslVerify(conn);

@@ -1,0 +1,24 @@
+	/**
+	 * Sets the {@link HttpConnectionFactory} to be used by this
+	 * {@link TransportHttp} instance.
+	 * <p>
+	 * If no factory is set explicitly, the {@link TransportHttp} instance uses
+	 * the {@link HttpTransport#getConnectionFactory() globally defined
+	 * factory}.
+	 * </p>
+	 *
+	 * @param customFactory
+	 *            the {@link HttpConnectionFactory} to use
+	 * @throws IllegalStateException
+	 *             if an HTTP/HTTPS connection has already been opened on this
+	 *             {@link TransportHttp} instance
+	 * @since 5.11
+	 */
+	public void setHttpConnectionFactory(
+			@NonNull HttpConnectionFactory customFactory) {
+		if (factoryUsed) {
+			throw new IllegalStateException(JGitText.get().httpFactoryInUse);
+		}
+		factory = customFactory;
+	}
+
