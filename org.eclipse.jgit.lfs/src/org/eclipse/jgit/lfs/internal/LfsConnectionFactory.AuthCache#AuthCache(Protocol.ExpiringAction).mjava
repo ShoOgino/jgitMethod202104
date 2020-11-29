@@ -15,8 +15,10 @@
 							- AUTH_CACHE_EAGER_TIMEOUT;
 				} else if (action.expiresAt != null
 						&& !action.expiresAt.isEmpty()) {
-					this.validUntil = ISO_FORMAT.parse(action.expiresAt)
-							.getTime() - AUTH_CACHE_EAGER_TIMEOUT;
+					this.validUntil = LocalDateTime
+							.parse(action.expiresAt, ISO_FORMAT)
+							.atZone(ZoneOffset.UTC).toInstant().toEpochMilli()
+							- AUTH_CACHE_EAGER_TIMEOUT;
 				} else {
 					this.validUntil = System.currentTimeMillis();
 				}
