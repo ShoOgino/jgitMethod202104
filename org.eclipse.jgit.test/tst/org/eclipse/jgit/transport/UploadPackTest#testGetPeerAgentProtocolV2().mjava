@@ -1,6 +1,8 @@
 	@Test
 	public void testGetPeerAgentProtocolV2() throws Exception {
-		server.getConfig().setString("protocol", null, "version", "2");
+		server.getConfig().setString(ConfigConstants.CONFIG_PROTOCOL_SECTION,
+				null, ConfigConstants.CONFIG_KEY_VERSION,
+				TransferConfig.ProtocolVersion.V2.version());
 
 		RevCommit one = remote.commit().message("1").create();
 		remote.update("one", one);
