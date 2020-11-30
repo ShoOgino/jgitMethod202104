@@ -1,7 +1,9 @@
 	@Test
 	public void testReadString_Delim() throws IOException {
 		init("0001");
-		assertTrue(PacketLineIn.isDelimiter(in.readString()));
+		String act = in.readString();
+		assertTrue(PacketLineIn.isDelimiter(act));
+		assertFalse(PacketLineIn.isEnd(act));
 		assertEOF();
 	}
 
