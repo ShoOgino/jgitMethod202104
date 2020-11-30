@@ -1,6 +1,9 @@
 	/** {@inheritDoc} */
 	@Override
 	public void close() {
-		// No explicit connections are maintained.
+		if (gitSession != null) {
+			gitSession.close();
+			gitSession = null;
+		}
 	}
 

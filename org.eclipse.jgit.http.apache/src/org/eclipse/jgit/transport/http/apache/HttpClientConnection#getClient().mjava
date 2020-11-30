@@ -18,11 +18,18 @@
 				configBuilder
 						.setRedirectsEnabled(followRedirects.booleanValue());
 			}
-			SSLConnectionSocketFactory sslConnectionFactory = getSSLSocketFactory();
+			boolean pooled = true;
+			SSLConnectionSocketFactory sslConnectionFactory;
+			if (socketFactory != null) {
+				pooled = usePooling;
+				sslConnectionFactory = socketFactory;
+			} else {
+				// Legacy implementation.
+				pooled = (hostnameverifier == null);
+				sslConnectionFactory = getSSLSocketFactory();
+			}
 			clientBuilder.setSSLSocketFactory(sslConnectionFactory);
-			if (hostnameverifier != null) {
-				// Using a custom verifier: we don't want pooled connections
-				// with this.
+			if (!pooled) {
 				Registry<ConnectionSocketFactory> registry = RegistryBuilder
 						.<ConnectionSocketFactory> create()
 						.register("https", sslConnectionFactory)

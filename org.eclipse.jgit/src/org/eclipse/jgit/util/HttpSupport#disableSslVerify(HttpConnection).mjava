@@ -9,13 +9,13 @@
 	 */
 	public static void disableSslVerify(HttpConnection conn)
 			throws IOException {
-		final TrustManager[] trustAllCerts = new TrustManager[] {
-				new DummyX509TrustManager() };
+		TrustManager[] trustAllCerts = {
+				new NoCheckX509TrustManager() };
 		try {
 			conn.configure(null, trustAllCerts, null);
-			conn.setHostnameVerifier(new DummyHostnameVerifier());
+			conn.setHostnameVerifier((name, session) -> true);
 		} catch (KeyManagementException | NoSuchAlgorithmException e) {
-			throw new IOException(e.getMessage());
+			throw new IOException(e.getMessage(), e);
 		}
 	}
 

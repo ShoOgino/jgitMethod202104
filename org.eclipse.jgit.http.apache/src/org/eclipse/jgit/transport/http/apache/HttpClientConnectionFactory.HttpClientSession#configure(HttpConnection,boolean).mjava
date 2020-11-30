@@ -1,0 +1,44 @@
+		@Override
+		public HttpClientConnection configure(HttpConnection connection,
+				boolean sslVerify)
+				throws IOException, GeneralSecurityException {
+			if (!(connection instanceof HttpClientConnection)) {
+				throw new IllegalArgumentException(MessageFormat.format(
+						HttpApacheText.get().httpWrongConnectionType,
+						HttpClientConnection.class.getName(),
+						connection.getClass().getName()));
+			}
+			HttpClientConnection conn = (HttpClientConnection) connection;
+			String scheme = conn.getURL().getProtocol();
+			if (!"https".equals(scheme)) { //$NON-NLS-1$
+				return conn;
+			}
+			if (securityContext == null || isDefault != sslVerify) {
+				isDefault = sslVerify;
+				HostnameVerifier verifier;
+				if (sslVerify) {
+					securityContext = SSLContext.getDefault();
+					verifier = SSLConnectionSocketFactory
+							.getDefaultHostnameVerifier();
+				} else {
+					securityContext = SSLContext.getInstance("TLS");
+					TrustManager[] trustAllCerts = {
+							new NoCheckX509TrustManager() };
+					securityContext.init(null, trustAllCerts, null);
+					verifier = (name, session) -> true;
+				}
+				socketFactory = new SSLConnectionSocketFactory(securityContext,
+						verifier) {
+
+					@Override
+					protected void prepareSocket(SSLSocket socket)
+							throws IOException {
+						super.prepareSocket(socket);
+						HttpSupport.configureTLS(socket);
+					}
+				};
+			}
+			conn.setSSLSocketFactory(socketFactory, isDefault);
+			return conn;
+		}
+

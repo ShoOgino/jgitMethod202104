@@ -18,7 +18,17 @@
 		factoryUsed = true;
 		HttpConnection conn = factory.create(u, proxy);
 
-		if (!sslVerify && "https".equals(u.getProtocol())) { //$NON-NLS-1$
+		if (gitSession == null && (factory instanceof HttpConnectionFactory2)) {
+			gitSession = ((HttpConnectionFactory2) factory).newSession();
+		}
+		if (gitSession != null) {
+			try {
+				gitSession.configure(conn, sslVerify);
+			} catch (GeneralSecurityException e) {
+				throw new IOException(e.getMessage(), e);
+			}
+		} else if (!sslVerify && "https".equals(u.getProtocol())) { //$NON-NLS-1$
+			// Backwards compatibility
 			HttpSupport.disableSslVerify(conn);
 		}
 

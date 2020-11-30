@@ -3,9 +3,8 @@
 		SSLContext context;
 		if (verifier == null) {
 			// Use defaults
-			context = SSLContexts.createDefault();
-			verifier = new DefaultHostnameVerifier(
-					PublicSuffixMatcherLoader.getDefault());
+			context = SSLContexts.createSystemDefault();
+			verifier = SSLConnectionSocketFactory.getDefaultHostnameVerifier();
 		} else {
 			// Using a custom verifier. Attention: configure() must have been
 			// called already, otherwise one gets a "context not initialized"
