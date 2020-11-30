@@ -1,0 +1,18 @@
+	@Test
+	public void testGetRefs_ExcludingPrefixes() throws IOException {
+		writeLooseRef("refs/heads/A", A);
+		writeLooseRef("refs/heads/B", B);
+		writeLooseRef("refs/tags/tag", A);
+		writeLooseRef("refs/something/something", B);
+		writeLooseRef("refs/aaa/aaa", A);
+
+		Set<String> toExclude = new HashSet<>();
+		toExclude.add("refs/aaa/");
+		toExclude.add("refs/heads/");
+		List<Ref> refs = refdir.getRefsByPrefixWithExclusions(RefDatabase.ALL, toExclude);
+
+		assertEquals(2, refs.size());
+		assertTrue(refs.contains(refdir.exactRef("refs/tags/tag")));
+		assertTrue(refs.contains(refdir.exactRef("refs/something/something")));
+	}
+

@@ -1,0 +1,11 @@
+	@Test
+	public void testGetRefsExcludingNonExistingPrefixes() throws IOException {
+		Set<String> prefixes = new HashSet<>();
+		prefixes.add("refs/tags/");
+		prefixes.add("refs/heads/");
+		prefixes.add("refs/nonexistent/");
+		List<Ref> refs = db.getRefDatabase().getRefsByPrefixWithExclusions(RefDatabase.ALL, prefixes);
+		assertEquals(1, refs.size());
+		checkContainsRef(refs, db.exactRef("HEAD"));
+	}
+

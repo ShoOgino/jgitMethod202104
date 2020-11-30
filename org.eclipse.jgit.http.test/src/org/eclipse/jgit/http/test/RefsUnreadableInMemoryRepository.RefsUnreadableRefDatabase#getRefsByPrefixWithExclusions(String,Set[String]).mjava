@@ -1,0 +1,11 @@
+		/** {@inheritDoc} */
+		@Override
+		public List<Ref> getRefsByPrefixWithExclusions(String include, Set<String> excludes)
+				throws IOException {
+			if (failing) {
+				throw new IOException("disk failed, no refs found");
+			}
+
+			return super.getRefsByPrefixWithExclusions(include, excludes);
+		}
+
