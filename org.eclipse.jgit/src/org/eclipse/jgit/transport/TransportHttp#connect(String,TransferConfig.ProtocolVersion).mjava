@@ -2,6 +2,9 @@
 			TransferConfig.ProtocolVersion protocolVersion)
 			throws TransportException, NotSupportedException {
 		URL u = getServiceURL(service);
+		if (HttpAuthMethod.Type.NONE.equals(authMethod.getType())) {
+			authMethod = authFromUri(currentUri);
+		}
 		int authAttempts = 1;
 		int redirects = 0;
 		Collection<Type> ignoreTypes = null;

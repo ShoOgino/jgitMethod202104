@@ -1,0 +1,35 @@
+	/**
+	 * Sets preemptive Basic HTTP authentication. If the given {@code username}
+	 * or {@code password} is empty or {@code null}, no preemptive
+	 * authentication will be done. If {@code username} and {@code password} are
+	 * set, they will override authority information from the URI
+	 * ("user:password@").
+	 * <p>
+	 * If the connection encounters redirects, the pre-authentication will be
+	 * cleared if the redirect goes to a different host.
+	 * </p>
+	 *
+	 * @param username
+	 *            to use
+	 * @param password
+	 *            to use
+	 * @throws IllegalStateException
+	 *             if an HTTP/HTTPS connection has already been opened on this
+	 *             {@link TransportHttp} instance
+	 * @since 5.11
+	 */
+	public void setPreemptiveBasicAuthentication(String username,
+			String password) {
+		if (factoryUsed) {
+			throw new IllegalStateException(JGitText.get().httpPreAuthTooLate);
+		}
+		if (StringUtils.isEmptyOrNull(username)
+				|| StringUtils.isEmptyOrNull(password)) {
+			authMethod = authFromUri(currentUri);
+		} else {
+			HttpAuthMethod basic = HttpAuthMethod.Type.BASIC.method(null);
+			basic.authorize(username, password);
+			authMethod = basic;
+		}
+	}
+

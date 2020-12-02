@@ -1,8 +1,12 @@
 	@Test
-	public void testInitialClone_WithAuthentication() throws Exception {
+	public void testInitialClone_WithPreAuthenticationCleared()
+			throws Exception {
 		try (Repository dst = createBareRepository();
 				Transport t = Transport.open(dst, authURI)) {
 			assertFalse(dst.getObjectDatabase().has(A_txt));
+			((TransportHttp) t).setPreemptiveBasicAuthentication(
+					AppServer.username, AppServer.password);
+			((TransportHttp) t).setPreemptiveBasicAuthentication(null, null);
 			t.setCredentialsProvider(testCredentials);
 			t.fetch(NullProgressMonitor.INSTANCE, mirror(master));
 			assertTrue(dst.getObjectDatabase().has(A_txt));

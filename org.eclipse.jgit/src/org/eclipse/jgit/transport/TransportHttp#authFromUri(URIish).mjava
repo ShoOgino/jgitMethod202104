@@ -1,0 +1,22 @@
+	private HttpAuthMethod authFromUri(URIish u) {
+		String user = u.getUser();
+		String pass = u.getPass();
+		if (user != null && pass != null) {
+			try {
+				// User/password are _not_ application/x-www-form-urlencoded. In
+				// particular the "+" sign would be replaced by a space.
+				user = URLDecoder.decode(user.replace("+", "%2B"), //$NON-NLS-1$ //$NON-NLS-2$
+						StandardCharsets.UTF_8.name());
+				pass = URLDecoder.decode(pass.replace("+", "%2B"), //$NON-NLS-1$ //$NON-NLS-2$
+						StandardCharsets.UTF_8.name());
+				HttpAuthMethod basic = HttpAuthMethod.Type.BASIC.method(null);
+				basic.authorize(user, pass);
+				return basic;
+			} catch (IllegalArgumentException
+					| UnsupportedEncodingException e) {
+				LOG.warn(JGitText.get().httpUserInfoDecodeError, u);
+			}
+		}
+		return HttpAuthMethod.Type.NONE.method(null);
+	}
+

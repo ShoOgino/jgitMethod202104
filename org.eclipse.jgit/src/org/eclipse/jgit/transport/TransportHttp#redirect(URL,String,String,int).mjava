@@ -14,7 +14,13 @@
 		}
 		try {
 			URI redirectTo = new URI(location);
+			// Reset authentication if the redirect has user/password info or
+			// if the host is different.
+			boolean resetAuth = !StringUtils
+					.isEmptyOrNull(redirectTo.getUserInfo());
+			String currentHost = currentUrl.getHost();
 			redirectTo = currentUrl.toURI().resolve(redirectTo);
+			resetAuth = resetAuth || !currentHost.equals(redirectTo.getHost());
 			String redirected = redirectTo.toASCIIString();
 			if (!isValidRedirect(baseUrl, redirected, checkFor)) {
 				throw new TransportException(uri,
@@ -23,6 +29,9 @@
 			}
 			redirected = redirected.substring(0, redirected.indexOf(checkFor));
 			URIish result = new URIish(redirected);
+			if (resetAuth) {
+				authMethod = HttpAuthMethod.Type.NONE.method(null);
+			}
 			if (LOG.isInfoEnabled()) {
 				LOG.info(MessageFormat.format(JGitText.get().redirectHttp,
 						uri.setPass(null),

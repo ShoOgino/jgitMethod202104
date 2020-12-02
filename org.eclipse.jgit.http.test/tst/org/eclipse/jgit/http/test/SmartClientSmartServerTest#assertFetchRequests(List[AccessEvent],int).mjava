@@ -1,0 +1,29 @@
+	private void assertFetchRequests(List<AccessEvent> requests, int index) {
+		AccessEvent info = requests.get(index++);
+		assertEquals("GET", info.getMethod());
+		assertEquals(join(authURI, "info/refs"), info.getPath());
+		assertEquals(1, info.getParameters().size());
+		assertEquals("git-upload-pack", info.getParameter("service"));
+		assertEquals(200, info.getStatus());
+		assertEquals("application/x-git-upload-pack-advertisement",
+				info.getResponseHeader(HDR_CONTENT_TYPE));
+		if (!enableProtocolV2) {
+			assertEquals("gzip", info.getResponseHeader(HDR_CONTENT_ENCODING));
+		}
+
+		for (int i = index; i < requests.size(); i++) {
+			AccessEvent service = requests.get(i);
+			assertEquals("POST", service.getMethod());
+			assertEquals(join(authURI, "git-upload-pack"), service.getPath());
+			assertEquals(0, service.getParameters().size());
+			assertNotNull("has content-length",
+					service.getRequestHeader(HDR_CONTENT_LENGTH));
+			assertNull("not chunked",
+					service.getRequestHeader(HDR_TRANSFER_ENCODING));
+
+			assertEquals(200, service.getStatus());
+			assertEquals("application/x-git-upload-pack-result",
+					service.getResponseHeader(HDR_CONTENT_TYPE));
+		}
+	}
+
