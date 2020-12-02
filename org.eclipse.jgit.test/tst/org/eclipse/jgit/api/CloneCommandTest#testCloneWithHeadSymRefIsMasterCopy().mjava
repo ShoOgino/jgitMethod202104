@@ -1,0 +1,15 @@
+	@Test
+	public void testCloneWithHeadSymRefIsMasterCopy() throws IOException, GitAPIException {
+		// create a branch with the same head as master and switch to it
+		git.checkout().setStartPoint("master").setCreateBranch(true).setName("master-copy").call();
+
+		// when we clone the HEAD symref->master-copy means we start on master-copy and not master
+		File directory = createTempDirectory("testCloneRepositorySymRef_master-copy");
+		CloneCommand command = Git.cloneRepository();
+		command.setDirectory(directory);
+		command.setURI(fileUri());
+		Git git2 = command.call();
+		addRepoToClose(git2.getRepository());
+		assertEquals("refs/heads/master-copy", git2.getRepository().getFullBranch());
+	}
+

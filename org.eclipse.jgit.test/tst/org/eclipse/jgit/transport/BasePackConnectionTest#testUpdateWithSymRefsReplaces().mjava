@@ -1,0 +1,28 @@
+	@Test
+	public void testUpdateWithSymRefsReplaces() {
+		final Ref mainRef = new ObjectIdRef.Unpeeled(Ref.Storage.LOOSE,
+				"refs/heads/main", ObjectId.fromString(
+						"0000000000000000000000000000000000000001"));
+
+		final Map<String, Ref> refMap = new HashMap<>();
+		refMap.put(mainRef.getName(), mainRef);
+		refMap.put("HEAD", new ObjectIdRef.Unpeeled(Ref.Storage.LOOSE, "HEAD",
+				mainRef.getObjectId()));
+		refMap.put("refs/heads/other",
+				new ObjectIdRef.Unpeeled(Ref.Storage.LOOSE, "refs/heads/other",
+						ObjectId.fromString(
+								"0000000000000000000000000000000000000002")));
+
+		final Map<String, String> symRefs = new HashMap<>();
+		symRefs.put("HEAD", "refs/heads/main");
+
+		BasePackConnection.updateWithSymRefs(refMap, symRefs);
+
+		assertThat(refMap, hasKey("HEAD"));
+		final Ref headRef = refMap.get("HEAD");
+		assertThat(headRef, instanceOf(SymbolicRef.class));
+		final SymbolicRef headSymRef = (SymbolicRef) headRef;
+		assertEquals("HEAD", headSymRef.getName());
+		assertSame(mainRef, headSymRef.getTarget());
+	}
+

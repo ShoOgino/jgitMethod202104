@@ -1,0 +1,22 @@
+	@Test
+	public void testUpdateWithSymRefsIgnoresSelfReference() {
+		final Ref mainRef = new ObjectIdRef.Unpeeled(Ref.Storage.LOOSE,
+				"refs/heads/main", ObjectId.fromString(
+						"0000000000000000000000000000000000000001"));
+
+		final Map<String, Ref> refMap = new HashMap<>();
+		refMap.put(mainRef.getName(), mainRef);
+		refMap.put("refs/heads/other",
+				new ObjectIdRef.Unpeeled(Ref.Storage.LOOSE, "refs/heads/other",
+						ObjectId.fromString(
+								"0000000000000000000000000000000000000002")));
+
+		final Map<String, String> symRefs = new LinkedHashMap<>();
+		symRefs.put("refs/heads/sym1", "refs/heads/sym1");
+
+		BasePackConnection.updateWithSymRefs(refMap, symRefs);
+
+		assertEquals(2, refMap.size());
+		assertThat(refMap, not(hasKey("refs/heads/sym1")));
+	}
+

@@ -8,7 +8,8 @@
 
 		ByteArrayInputStream send = linesAsInputStream(inputLines);
 
-		server.getConfig().setString("protocol", null, "version", version);
+		server.getConfig().setString(ConfigConstants.CONFIG_PROTOCOL_SECTION,
+				null, ConfigConstants.CONFIG_KEY_VERSION, version);
 		UploadPack up = new UploadPack(server);
 		if (postConstructionSetup != null) {
 			postConstructionSetup.accept(up);

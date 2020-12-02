@@ -1,9 +1,11 @@
 	@Test
 	public void testV2Capabilities() throws Exception {
 		TestV2Hook hook = new TestV2Hook();
-		ByteArrayInputStream recvStream = uploadPackSetup( "2",
-				(UploadPack up) -> {up.setProtocolV2Hook(hook);},
-				PacketLineIn.end());
+		ByteArrayInputStream recvStream = uploadPackSetup(
+				TransferConfig.ProtocolVersion.V2.version(),
+				(UploadPack up) -> {
+					up.setProtocolV2Hook(hook);
+				}, PacketLineIn.end());
 		PacketLineIn pckIn = new PacketLineIn(recvStream);
 		assertThat(hook.capabilitiesRequest, notNullValue());
 		assertThat(pckIn.readString(), is("version 2"));

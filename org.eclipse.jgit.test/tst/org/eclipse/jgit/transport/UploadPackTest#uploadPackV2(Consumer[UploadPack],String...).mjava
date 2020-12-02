@@ -7,8 +7,9 @@
 			Consumer<UploadPack> postConstructionSetup,
 			String... inputLines)
 			throws Exception {
-		ByteArrayInputStream recvStream =
-				uploadPackSetup("2", postConstructionSetup, inputLines);
+		ByteArrayInputStream recvStream = uploadPackSetup(
+				TransferConfig.ProtocolVersion.V2.version(),
+				postConstructionSetup, inputLines);
 		PacketLineIn pckIn = new PacketLineIn(recvStream);
 
 		// drain capabilities

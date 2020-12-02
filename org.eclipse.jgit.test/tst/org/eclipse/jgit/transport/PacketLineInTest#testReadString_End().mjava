@@ -1,7 +1,9 @@
 	@Test
 	public void testReadString_End() throws IOException {
 		init("0000");
-		assertTrue(PacketLineIn.isEnd(in.readString()));
+		String act = in.readString();
+		assertTrue(PacketLineIn.isEnd(act));
+		assertFalse(PacketLineIn.isDelimiter(act));
 		assertEOF();
 	}
 

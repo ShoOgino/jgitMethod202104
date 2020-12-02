@@ -1,0 +1,42 @@
+	@Test
+	public void testUpdateWithSymRefsWithIndirectsAdds() {
+		final Ref mainRef = new ObjectIdRef.Unpeeled(Ref.Storage.LOOSE,
+				"refs/heads/main", ObjectId.fromString(
+						"0000000000000000000000000000000000000001"));
+
+		final Map<String, Ref> refMap = new HashMap<>();
+		refMap.put(mainRef.getName(), mainRef);
+		refMap.put("refs/heads/other",
+				new ObjectIdRef.Unpeeled(Ref.Storage.LOOSE, "refs/heads/other",
+						ObjectId.fromString(
+								"0000000000000000000000000000000000000002")));
+
+		final Map<String, String> symRefs = new LinkedHashMap<>(); // Ordered
+		symRefs.put("refs/heads/sym3", "refs/heads/sym2"); // Forward reference
+		symRefs.put("refs/heads/sym1", "refs/heads/main");
+		symRefs.put("refs/heads/sym2", "refs/heads/sym1"); // Backward reference
+
+		BasePackConnection.updateWithSymRefs(refMap, symRefs);
+
+		assertThat(refMap, hasKey("refs/heads/sym1"));
+		final Ref sym1Ref = refMap.get("refs/heads/sym1");
+		assertThat(sym1Ref, instanceOf(SymbolicRef.class));
+		final SymbolicRef sym1SymRef = (SymbolicRef) sym1Ref;
+		assertEquals("refs/heads/sym1", sym1SymRef.getName());
+		assertSame(mainRef, sym1SymRef.getTarget());
+
+		assertThat(refMap, hasKey("refs/heads/sym2"));
+		final Ref sym2Ref = refMap.get("refs/heads/sym2");
+		assertThat(sym2Ref, instanceOf(SymbolicRef.class));
+		final SymbolicRef sym2SymRef = (SymbolicRef) sym2Ref;
+		assertEquals("refs/heads/sym2", sym2SymRef.getName());
+		assertSame(sym1SymRef, sym2SymRef.getTarget());
+
+		assertThat(refMap, hasKey("refs/heads/sym3"));
+		final Ref sym3Ref = refMap.get("refs/heads/sym3");
+		assertThat(sym3Ref, instanceOf(SymbolicRef.class));
+		final SymbolicRef sym3SymRef = (SymbolicRef) sym3Ref;
+		assertEquals("refs/heads/sym3", sym3SymRef.getName());
+		assertSame(sym2SymRef, sym3SymRef.getTarget());
+	}
+

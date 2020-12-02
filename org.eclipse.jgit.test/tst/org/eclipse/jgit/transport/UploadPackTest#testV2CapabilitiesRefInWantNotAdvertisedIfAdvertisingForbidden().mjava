@@ -2,8 +2,9 @@
 	public void testV2CapabilitiesRefInWantNotAdvertisedIfAdvertisingForbidden() throws Exception {
 		server.getConfig().setBoolean("uploadpack", null, "allowrefinwant", true);
 		server.getConfig().setBoolean("uploadpack", null, "advertiserefinwant", false);
-		ByteArrayInputStream recvStream =
-				uploadPackSetup("2", null, PacketLineIn.end());
+		ByteArrayInputStream recvStream = uploadPackSetup(
+				TransferConfig.ProtocolVersion.V2.version(), null,
+				PacketLineIn.end());
 		PacketLineIn pckIn = new PacketLineIn(recvStream);
 
 		assertThat(pckIn.readString(), is("version 2"));

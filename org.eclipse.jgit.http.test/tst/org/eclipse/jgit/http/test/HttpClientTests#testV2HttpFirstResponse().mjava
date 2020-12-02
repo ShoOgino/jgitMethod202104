@@ -1,7 +1,9 @@
 	@Test
 	public void testV2HttpFirstResponse() throws Exception {
-		remoteRepository.getRepository().getConfig().setInt(
-				"protocol", null, "version", 2);
+		remoteRepository.getRepository().getConfig().setString(
+				ConfigConstants.CONFIG_PROTOCOL_SECTION, null,
+				ConfigConstants.CONFIG_KEY_VERSION,
+				TransferConfig.ProtocolVersion.V2.version());
 
 		String url = smartAuthNoneURI.toString() + "/info/refs?service=git-upload-pack";
 		HttpConnection c = HttpTransport.getConnectionFactory()

@@ -11,8 +11,7 @@
 		command.setURI(fileUri());
 		Git git2 = command.call();
 		addRepoToClose(git2.getRepository());
-		assertNotNull(git2);
-		assertEquals(git2.getRepository().getFullBranch(), "refs/heads/test");
+		assertEquals("refs/heads/test", git2.getRepository().getFullBranch());
 		// Expect both remote branches to exist; setCloneAllBranches(true)
 		// should override any setBranchesToClone().
 		assertNotNull(

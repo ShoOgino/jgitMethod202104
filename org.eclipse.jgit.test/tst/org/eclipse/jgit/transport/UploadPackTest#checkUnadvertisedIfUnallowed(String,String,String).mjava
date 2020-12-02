@@ -1,8 +1,9 @@
 	private void checkUnadvertisedIfUnallowed(String configSection,
 			String configName, String fetchCapability) throws Exception {
 		server.getConfig().setBoolean(configSection, null, configName, false);
-		ByteArrayInputStream recvStream =
-				uploadPackSetup("2", null, PacketLineIn.end());
+		ByteArrayInputStream recvStream = uploadPackSetup(
+				TransferConfig.ProtocolVersion.V2.version(), null,
+				PacketLineIn.end());
 		PacketLineIn pckIn = new PacketLineIn(recvStream);
 
 		assertThat(pckIn.readString(), is("version 2"));
