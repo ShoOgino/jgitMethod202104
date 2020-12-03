@@ -8,7 +8,7 @@
 
 		final Path file = createFile(bos.toByteArray(), "repo");
 		final FS fs = FS.DETECTED.newInstance();
-		fs.setUserHome(includedFile.getParent().toFile());
+		fs.setUserHome(parent(includedFile).toFile());
 
 		final FileBasedConfig config = new FileBasedConfig(file.toFile(), fs);
 		config.load();
