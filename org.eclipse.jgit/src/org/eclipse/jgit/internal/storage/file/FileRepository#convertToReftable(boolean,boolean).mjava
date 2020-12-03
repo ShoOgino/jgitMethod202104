@@ -20,7 +20,8 @@
 			throws IOException {
 		File reftableDir = new File(getDirectory(), Constants.REFTABLE);
 		File headFile = new File(getDirectory(), Constants.HEAD);
-		if (reftableDir.exists() && reftableDir.listFiles().length > 0) {
+		if (reftableDir.exists()
+				&& Files.list(reftableDir.toPath()).findAny().isPresent()) {
 			throw new IOException(JGitText.get().reftableDirExists);
 		}
 
