@@ -12,8 +12,9 @@
 				assertEquals(ObjectId.zeroId(), c.getRef().getObjectId());
 			}
 
-			List<String> files = Arrays.asList(reftableDir.listFiles()).stream()
-					.map(File::getName).collect(Collectors.toList());
+			List<String> files = Files.list(reftableDir.toPath())
+					.map(Path::getFileName).map(Path::toString)
+					.collect(Collectors.toList());
 			Collections.sort(files);
 
 			assertTrue(files.size() < 20);

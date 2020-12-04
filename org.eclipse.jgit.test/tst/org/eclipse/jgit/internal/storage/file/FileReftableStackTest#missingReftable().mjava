@@ -15,11 +15,14 @@
 				});
 				assertTrue(ok);
 
-				List<File> files = Arrays.asList(reftableDir.listFiles());
+				List<Path> files = Files.list(reftableDir.toPath())
+						.collect(Collectors.toList());
 				for (int j = 0; j < files.size(); j++) {
-					File f = files.get(j);
-					if (f.getName().endsWith(".ref")) {
-						assertTrue(f.delete());
+					Path f = files.get(j);
+					Path fileName = f.getFileName();
+					if (fileName != null
+							&& fileName.toString().endsWith(".ref")) {
+						Files.delete(f);
 						break outer;
 					}
 				}
