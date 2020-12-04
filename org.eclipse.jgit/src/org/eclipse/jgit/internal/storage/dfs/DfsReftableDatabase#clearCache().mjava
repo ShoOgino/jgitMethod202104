@@ -1,6 +1,7 @@
 	@Override
 	void clearCache() {
-		getLock().lock();
+		ReentrantLock l = getLock();
+		l.lock();
 		try {
 			if (ctx != null) {
 				ctx.close();
@@ -12,7 +13,7 @@
 				stack = null;
 			}
 		} finally {
-			getLock().unlock();
+			l.unlock();
 		}
 	}
 
