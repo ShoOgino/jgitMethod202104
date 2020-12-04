@@ -3,12 +3,13 @@
 	 * @throws IOException on I/O errors
 	 */
 	public void compactFully() throws IOException {
-		reftableDatabase.getLock().lock();
+		Lock l = reftableDatabase.getLock();
+		l.lock();
 		try {
 			reftableStack.compactFully();
 			reftableDatabase.clearCache();
 		} finally {
-			reftableDatabase.getLock().unlock();
+			l.unlock();
 		}
 	}
 
