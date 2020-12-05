@@ -1,12 +1,4 @@
-	/**
-	 * Format this builder's state as a commit object.
-	 *
-	 * @return this object in the canonical commit format, suitable for storage
-	 *         in a repository.
-	 * @throws java.io.UnsupportedEncodingException
-	 *             the encoding specified by {@link #getEncoding()} is not
-	 *             supported by this Java runtime.
-	 */
+	@Override
 	public byte[] build() throws UnsupportedEncodingException {
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		OutputStreamWriter w = new OutputStreamWriter(os, getEncoding());
@@ -35,19 +27,16 @@
 			w.flush();
 			os.write('\n');
 
-			if (getGpgSignature() != null) {
+			GpgSignature signature = getGpgSignature();
+			if (signature != null) {
 				os.write(hgpgsig);
 				os.write(' ');
-				writeGpgSignatureString(getGpgSignature().toExternalString(), os);
+				writeMultiLineHeader(signature.toExternalString(), os,
+						true);
 				os.write('\n');
 			}
 
-			if (!References.isSameObject(getEncoding(), UTF_8)) {
-				os.write(hencoding);
-				os.write(' ');
-				os.write(Constants.encodeASCII(getEncoding().name()));
-				os.write('\n');
-			}
+			writeEncoding(getEncoding(), os);
 
 			os.write('\n');
 

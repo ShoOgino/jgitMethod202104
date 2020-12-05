@@ -1,7 +1,7 @@
 	private void assertGpgSignatureStringOutcome(String signature,
 			String expectedOutcome) throws IOException {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		CommitBuilder.writeGpgSignatureString(signature, out);
+		ObjectBuilder.writeMultiLineHeader(signature, out, true);
 		String formatted_signature = new String(out.toByteArray(), US_ASCII);
 		assertEquals(expectedOutcome, formatted_signature);
 	}

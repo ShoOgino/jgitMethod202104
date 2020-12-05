@@ -3,8 +3,8 @@
 		String signature = "Ü Ä";
 		IllegalArgumentException e = assertThrows(
 				IllegalArgumentException.class,
-				() -> CommitBuilder.writeGpgSignatureString(signature,
-						new ByteArrayOutputStream()));
+				() -> ObjectBuilder.writeMultiLineHeader(signature,
+						new ByteArrayOutputStream(), true));
 		String message = MessageFormat.format(JGitText.get().notASCIIString,
 				signature);
 		assertEquals(message, e.getMessage());

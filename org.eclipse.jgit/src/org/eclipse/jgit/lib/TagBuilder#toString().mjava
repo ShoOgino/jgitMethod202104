@@ -18,14 +18,23 @@
 		r.append(tag != null ? tag : "NOT_SET");
 		r.append("\n");
 
-		if (tagger != null) {
+		if (getTagger() != null) {
 			r.append("tagger ");
-			r.append(tagger);
+			r.append(getTagger());
+			r.append("\n");
+		}
+
+		Charset encoding = getEncoding();
+		if (!References.isSameObject(encoding, UTF_8)) {
+			r.append("encoding ");
+			r.append(encoding.name());
 			r.append("\n");
 		}
 
 		r.append("\n");
-		r.append(message != null ? message : "");
+		r.append(getMessage() != null ? getMessage() : "");
+		GpgSignature signature = getGpgSignature();
+		r.append(signature != null ? signature.toExternalString() : "");
 		r.append("}");
 		return r.toString();
 	}

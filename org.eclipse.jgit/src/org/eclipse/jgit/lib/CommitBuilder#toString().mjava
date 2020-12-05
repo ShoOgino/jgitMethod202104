@@ -17,7 +17,7 @@
 		}
 
 		r.append("author ");
-		r.append(author != null ? author.toString() : "NOT_SET");
+		r.append(getAuthor() != null ? getAuthor().toString() : "NOT_SET");
 		r.append("\n");
 
 		r.append("committer ");
@@ -25,17 +25,20 @@
 		r.append("\n");
 
 		r.append("gpgSignature ");
-		r.append(gpgSignature != null ? gpgSignature.toString() : "NOT_SET");
+		GpgSignature signature = getGpgSignature();
+		r.append(signature != null ? signature.toString()
+				: "NOT_SET");
 		r.append("\n");
 
-		if (encoding != null && !References.isSameObject(encoding, UTF_8)) {
+		Charset encoding = getEncoding();
+		if (!References.isSameObject(encoding, UTF_8)) {
 			r.append("encoding ");
 			r.append(encoding.name());
 			r.append("\n");
 		}
 
 		r.append("\n");
-		r.append(message != null ? message : "");
+		r.append(getMessage() != null ? getMessage() : "");
 		r.append("}");
 		return r.toString();
 	}

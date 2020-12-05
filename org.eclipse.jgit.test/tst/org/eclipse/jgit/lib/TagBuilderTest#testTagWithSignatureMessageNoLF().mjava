@@ -1,0 +1,13 @@
+	@Test
+	public void testTagWithSignatureMessageNoLF() {
+		TagBuilder t = new TagBuilder();
+		t.setTag("sometag");
+		t.setObjectId(ObjectId.zeroId(), Constants.OBJ_COMMIT);
+		t.setEncoding(US_ASCII);
+		t.setMessage("A message\n\nthat does not end in LF");
+		t.setTagger(TAGGER);
+		t.setGpgSignature(new GpgSignature(SIGNATURE.getBytes(US_ASCII)));
+		Throwable ex = assertThrows(Throwable.class, t::build);
+		assertEquals(JGitText.get().signedTagMessageNoLf, ex.getMessage());
+	}
+

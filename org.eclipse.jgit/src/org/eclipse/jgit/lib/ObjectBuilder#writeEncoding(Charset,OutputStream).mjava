@@ -1,0 +1,20 @@
+	/**
+	 * Writes an "encoding" header.
+	 *
+	 * @param encoding
+	 *            to write
+	 * @param out
+	 *            to write to
+	 * @throws IOException
+	 *             if writing fails
+	 */
+	static void writeEncoding(@NonNull Charset encoding,
+			@NonNull OutputStream out) throws IOException {
+		if (!References.isSameObject(encoding, UTF_8)) {
+			out.write(hencoding);
+			out.write(' ');
+			out.write(Constants.encodeASCII(encoding.name()));
+			out.write('\n');
+		}
+	}
+

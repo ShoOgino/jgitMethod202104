@@ -1,0 +1,19 @@
+	@Test
+	public void testTagSimple() throws Exception {
+		TagBuilder t = new TagBuilder();
+		t.setTag("sometag");
+		t.setObjectId(ObjectId.zeroId(), Constants.OBJ_COMMIT);
+		t.setEncoding(US_ASCII);
+		t.setMessage("Short message only");
+		t.setTagger(TAGGER);
+		String tag = new String(t.build(), UTF_8);
+		String expected = "object 0000000000000000000000000000000000000000\n"
+				+ "type commit\n" //
+				+ "tag sometag\n" //
+				+ "tagger " + TAGGER_LINE + '\n' //
+				+ "encoding US-ASCII\n" //
+				+ '\n' //
+				+ "Short message only";
+		assertEquals(expected, tag);
+	}
+

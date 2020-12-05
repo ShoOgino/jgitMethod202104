@@ -13,12 +13,17 @@
 	 *            signature string with line breaks
 	 * @param out
 	 *            output stream
+	 * @param enforceAscii
+	 *            whether to throw {@link IllegalArgumentException} if non-ASCII
+	 *            characters are encountered
 	 * @throws IOException
 	 *             thrown by the output stream
 	 * @throws IllegalArgumentException
-	 *             if the signature string contains non 7-bit ASCII chars
+	 *             if the signature string contains non 7-bit ASCII chars and
+	 *             {@code enforceAscii == true}
 	 */
-	static void writeGpgSignatureString(String in, OutputStream out)
+	static void writeMultiLineHeader(@NonNull String in,
+			@NonNull OutputStream out, boolean enforceAscii)
 			throws IOException, IllegalArgumentException {
 		int length = in.length();
 		for (int i = 0; i < length; ++i) {
@@ -41,7 +46,7 @@
 				break;
 			default:
 				// sanity check
-				if (ch > 127)
+				if (ch > 127 && enforceAscii)
 					throw new IllegalArgumentException(MessageFormat
 							.format(JGitText.get().notASCIIString, in));
 				out.write(ch);

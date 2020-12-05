@@ -1,0 +1,25 @@
+	private static int nextStart(byte[] prefix, byte[] buffer, int from) {
+		int stop = buffer.length - prefix.length + 1;
+		int ptr = from;
+		if (ptr > 0) {
+			ptr = RawParseUtils.nextLF(buffer, ptr - 1);
+		}
+		while (ptr < stop) {
+			int lineStart = ptr;
+			boolean found = true;
+			for (byte element : prefix) {
+				if (element != buffer[ptr++]) {
+					found = false;
+					break;
+				}
+			}
+			if (found) {
+				return lineStart;
+			}
+			do {
+				ptr = RawParseUtils.nextLF(buffer, ptr);
+			} while (ptr < stop && buffer[ptr] == '\n');
+		}
+		return -1;
+	}
+

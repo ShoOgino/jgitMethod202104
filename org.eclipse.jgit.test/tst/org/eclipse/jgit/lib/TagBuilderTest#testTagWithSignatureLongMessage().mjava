@@ -1,0 +1,19 @@
+	@Test
+	public void testTagWithSignatureLongMessage() throws Exception {
+		TagBuilder t = new TagBuilder();
+		t.setTag("sometag");
+		t.setObjectId(ObjectId.zeroId(), Constants.OBJ_COMMIT);
+		t.setMessage("Short message\n\nFollowed by explanations.\n");
+		t.setTagger(TAGGER);
+		t.setGpgSignature(new GpgSignature(SIGNATURE.getBytes(US_ASCII)));
+		String tag = new String(t.build(), UTF_8);
+		String expected = "object 0000000000000000000000000000000000000000\n"
+				+ "type commit\n" //
+				+ "tag sometag\n" //
+				+ "tagger " + TAGGER_LINE + '\n' //
+				+ '\n' //
+				+ "Short message\n\nFollowed by explanations.\n" //
+				+ SIGNATURE + '\n';
+		assertEquals(expected, tag);
+	}
+

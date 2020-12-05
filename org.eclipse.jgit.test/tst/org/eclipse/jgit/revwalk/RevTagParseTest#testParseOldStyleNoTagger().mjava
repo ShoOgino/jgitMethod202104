@@ -2,13 +2,12 @@
 	public void testParseOldStyleNoTagger() throws Exception {
 		final ObjectId treeId = id("9788669ad918b6fcce64af8882fc9a81cb6aba67");
 		final String name = "v1.2.3.4.5";
-		final String message = "test\n" //
-				+ "\n" //
-				+ "-----BEGIN PGP SIGNATURE-----\n" //
+		final String fakeSignature = "-----BEGIN PGP SIGNATURE-----\n" //
 				+ "Version: GnuPG v1.4.1 (GNU/Linux)\n" //
 				+ "\n" //
 				+ "iD8DBQBC0b9oF3Y\n" //
-				+ "-----END PGP SIGNATURE------n";
+				+ "-----END PGP SIGNATURE-----";
+		final String message = "test\n\n" + fakeSignature + '\n';
 
 		final StringBuilder body = new StringBuilder();
 
@@ -41,6 +40,8 @@
 		assertEquals(name, c.getTagName());
 		assertEquals("test", c.getShortMessage());
 		assertEquals(message, c.getFullMessage());
+		assertEquals(fakeSignature + '\n',
+				new String(c.getRawGpgSignature(), US_ASCII));
 
 		assertNull(c.getTaggerIdent());
 	}
