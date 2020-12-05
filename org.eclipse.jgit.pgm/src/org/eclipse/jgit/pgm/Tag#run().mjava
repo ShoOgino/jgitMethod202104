@@ -19,6 +19,18 @@
 							command.setObjectId(walk.parseAny(object));
 						}
 					}
+					if (noSign) {
+						command.setSigned(false);
+					} else if (sign) {
+						command.setSigned(true);
+					}
+					if (annotated) {
+						command.setAnnotated(true);
+					} else if (message == null && !sign && gpgKeyId == null) {
+						// None of -a, -m, -s, -u given
+						command.setAnnotated(false);
+					}
+					command.setSigningKey(gpgKeyId);
 					try {
 						command.call();
 					} catch (RefAlreadyExistsException e) {

@@ -7,19 +7,59 @@
 	 *
 	 * @throws InvalidTagNameException
 	 *             if the tag name is null or invalid
-	 * @throws UnsupportedOperationException
-	 *             if the tag is signed (not supported yet)
+	 * @throws ServiceUnavailableException
+	 *             if the tag should be signed but no signer can be found
+	 * @throws UnsupportedSigningFormatException
+	 *             if the tag should be signed but {@code gpg.format} is not
+	 *             {@link GpgFormat#OPENPGP}
 	 */
 	private void processOptions(RepositoryState state)
-			throws InvalidTagNameException {
-		if (tagger == null && annotated)
-			tagger = new PersonIdent(repo);
-		if (name == null || !Repository.isValidRefName(Constants.R_TAGS + name))
+			throws InvalidTagNameException, ServiceUnavailableException,
+			UnsupportedSigningFormatException {
+		if (name == null
+				|| !Repository.isValidRefName(Constants.R_TAGS + name)) {
 			throw new InvalidTagNameException(
 					MessageFormat.format(JGitText.get().tagNameInvalid,
 							name == null ? "<null>" : name)); //$NON-NLS-1$
-		if (signed)
-			throw new UnsupportedOperationException(
-					JGitText.get().signingNotSupportedOnTag);
+		}
+		if (!isAnnotated()) {
+			if ((message != null && !message.isEmpty()) || tagger != null) {
+				throw new JGitInternalException(JGitText
+						.get().messageAndTaggerNotAllowedInUnannotatedTags);
+			}
+		} else {
+			if (tagger == null) {
+				tagger = new PersonIdent(repo);
+			}
+			// Figure out whether to sign.
+			if (!(Boolean.FALSE.equals(signed) && signingKey == null)) {
+				GpgConfig gpgConfig = new GpgConfig(repo.getConfig());
+				boolean doSign = isSigned() || gpgConfig.isSignAllTags();
+				if (!Boolean.TRUE.equals(annotated) && !doSign) {
+					doSign = gpgConfig.isSignAnnotated();
+				}
+				if (doSign) {
+					if (signingKey == null) {
+						signingKey = gpgConfig.getSigningKey();
+					}
+					if (gpgConfig.getKeyFormat() != GpgFormat.OPENPGP) {
+						throw new UnsupportedSigningFormatException(
+								JGitText.get().onlyOpenPgpSupportedForSigning);
+					}
+					GpgSigner signer = GpgSigner.getDefault();
+					if (!(signer instanceof GpgObjectSigner)) {
+						throw new ServiceUnavailableException(
+								JGitText.get().signingServiceUnavailable);
+					}
+					gpgSigner = (GpgObjectSigner) signer;
+					// The message of a signed tag must end in a newline because
+					// the signature will be appended.
+					if (message != null && !message.isEmpty()
+							&& !message.endsWith("\n")) { //$NON-NLS-1$
+						message += '\n';
+					}
+				}
+			}
+		}
 	}
 

@@ -27,10 +27,7 @@
 				id = revWalk.parseCommit(objectId);
 			}
 
-			if (!annotated) {
-				if (message != null || tagger != null)
-					throw new JGitInternalException(
-							JGitText.get().messageAndTaggerNotAllowedInUnannotatedTags);
+			if (!isAnnotated()) {
 				return updateTagRef(id, revWalk, name,
 						"SimpleTag[" + name + " : " + id //$NON-NLS-1$ //$NON-NLS-2$
 								+ "]"); //$NON-NLS-1$
@@ -42,6 +39,11 @@
 			newTag.setMessage(message);
 			newTag.setTagger(tagger);
 			newTag.setObjectId(id);
+
+			if (gpgSigner != null) {
+				gpgSigner.signObject(newTag, signingKey, tagger,
+						credentialsProvider);
+			}
 
 			// write the tag object
 			try (ObjectInserter inserter = repo.newObjectInserter()) {

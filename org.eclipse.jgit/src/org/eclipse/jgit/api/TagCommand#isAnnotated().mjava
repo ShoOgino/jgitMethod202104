@@ -1,11 +1,16 @@
 	/**
-	 * Whether this will create an annotated command
+	 * Whether this will create an annotated tag.
 	 *
 	 * @return true if this command will create an annotated tag (default is
 	 *         true)
 	 * @since 3.0
 	 */
 	public boolean isAnnotated() {
-		return annotated;
+		boolean setExplicitly = Boolean.TRUE.equals(annotated) || isSigned();
+		if (setExplicitly) {
+			return true;
+		}
+		// Annotated at default (not set explicitly)
+		return annotated == null;
 	}
 

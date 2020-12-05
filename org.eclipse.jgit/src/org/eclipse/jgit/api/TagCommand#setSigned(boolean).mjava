@@ -1,13 +1,18 @@
 	/**
 	 * If set to true the Tag command creates a signed tag object. This
-	 * corresponds to the parameter -s on the command line.
+	 * corresponds to the parameter -s (--sign or --no-sign) on the command
+	 * line.
+	 * <p>
+	 * If {@code true}, the tag will be a signed annotated tag.
+	 * </p>
 	 *
 	 * @param signed
-	 *            a boolean.
+	 *            whether to sign
 	 * @return {@code this}
 	 */
 	public TagCommand setSigned(boolean signed) {
-		this.signed = signed;
+		checkCallable();
+		this.signed = Boolean.valueOf(signed);
 		return this;
 	}
 
