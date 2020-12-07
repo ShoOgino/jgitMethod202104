@@ -1,0 +1,22 @@
+	@SuppressWarnings({"nls", "boxing"})
+	private void getRefsExcludingWithSeekPast(String prefix) throws Exception {
+		long start = System.nanoTime();
+		try (FileInputStream in = new FileInputStream(reftablePath);
+				BlockSource src = BlockSource.from(in);
+				ReftableReader reader = new ReftableReader(src)) {
+			try (RefCursor rc = reader.allRefs()) {
+				while (rc.next()) {
+					if (rc.getRef().getName().startsWith(prefix)) {
+						break;
+					}
+				}
+				rc.seekPastPrefix(prefix);
+				while (rc.next()) {
+					rc.getRef();
+				}
+			}
+		}
+		long tot = System.nanoTime() - start;
+		printf("total time the action took using seek: %10d usec", tot / 1000);
+	}
+
