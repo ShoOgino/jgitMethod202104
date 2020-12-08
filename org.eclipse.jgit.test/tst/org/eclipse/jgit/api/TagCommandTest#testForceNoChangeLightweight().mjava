@@ -8,9 +8,11 @@
 					.setAnnotated(false).call();
 			assertEquals(commit.getId(), tagRef.getObjectId());
 			// Without force, we want to get a RefAlreadyExistsException
-			assertThrows(RefAlreadyExistsException.class,
+			RefAlreadyExistsException e = assertThrows(
+					RefAlreadyExistsException.class,
 					() -> git.tag().setObjectId(commit).setName("tag")
 							.setAnnotated(false).call());
+			assertEquals(RefUpdate.Result.NO_CHANGE, e.getUpdateResult());
 			// With force the call should work
 			assertEquals(commit.getId(),
 					git.tag().setObjectId(commit).setName("tag")
