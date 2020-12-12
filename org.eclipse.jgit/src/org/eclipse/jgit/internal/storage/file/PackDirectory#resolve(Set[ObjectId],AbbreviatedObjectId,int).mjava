@@ -10,10 +10,10 @@
 	 *            maximum number of results to return. At most this many
 	 *            ObjectIds should be added to matches before returning.
 	 * @return {@code true} if the matches were exhausted before reaching
-	 *            {@code maxLimit}.
+	 *         {@code maxLimit}.
 	 */
 	boolean resolve(Set<ObjectId> matches, AbbreviatedObjectId id,
-			 int matchLimit) {
+			int matchLimit) {
 		// Go through the packs once. If we didn't find any resolutions
 		// scan for new packs and check once more.
 		int oldSize = matches.size();
@@ -27,8 +27,9 @@
 				} catch (IOException e) {
 					handlePackError(e, p);
 				}
-				if (matches.size() > matchLimit)
+				if (matches.size() > matchLimit) {
 					return false;
+				}
 			}
 		} while (matches.size() == oldSize && searchPacksAgain(pList));
 		return true;

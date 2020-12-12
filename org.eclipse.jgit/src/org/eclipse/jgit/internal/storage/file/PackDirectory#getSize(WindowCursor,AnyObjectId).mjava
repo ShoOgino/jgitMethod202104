@@ -7,12 +7,14 @@
 					try {
 						long len = p.getObjectSize(curs, id);
 						p.resetTransientErrorCount();
-						if (0 <= len)
+						if (0 <= len) {
 							return len;
+						}
 					} catch (PackMismatchException e) {
 						// Pack was modified; refresh the entire pack list.
-						if (searchPacksAgain(pList))
+						if (searchPacksAgain(pList)) {
 							continue SEARCH;
+						}
 					} catch (IOException e) {
 						handlePackError(e, p);
 					}

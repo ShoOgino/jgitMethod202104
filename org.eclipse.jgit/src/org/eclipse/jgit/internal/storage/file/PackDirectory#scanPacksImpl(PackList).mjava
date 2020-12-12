@@ -7,14 +7,16 @@
 		for (String indexName : names) {
 			// Must match "pack-[0-9a-f]{40}.idx" to be an index.
 			//
-			if (indexName.length() != 49 || !indexName.endsWith(".idx")) //$NON-NLS-1$
+			if (indexName.length() != 49 || !indexName.endsWith(".idx")) { //$NON-NLS-1$
 				continue;
+			}
 
 			final String base = indexName.substring(0, indexName.length() - 3);
 			int extensions = 0;
 			for (PackExt ext : PackExt.values()) {
-				if (names.contains(base + ext.getExtension()))
+				if (names.contains(base + ext.getExtension())) {
 					extensions |= ext.getBit();
+				}
 			}
 
 			if ((extensions & PACK.getBit()) == 0) {
@@ -53,8 +55,9 @@
 			p.close();
 		}
 
-		if (list.isEmpty())
+		if (list.isEmpty()) {
 			return new PackList(snapshot, NO_PACKS.packs);
+		}
 
 		final PackFile[] r = list.toArray(new PackFile[0]);
 		Arrays.sort(r, PackFile.SORT);

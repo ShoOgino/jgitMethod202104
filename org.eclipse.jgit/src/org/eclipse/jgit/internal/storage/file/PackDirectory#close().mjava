@@ -1,8 +1,9 @@
 	void close() {
 		PackList packs = packList.get();
 		if (packs != NO_PACKS && packList.compareAndSet(packs, NO_PACKS)) {
-			for (PackFile p : packs.packs)
+			for (PackFile p : packs.packs) {
 				p.close();
+			}
 		}
 	}
 
