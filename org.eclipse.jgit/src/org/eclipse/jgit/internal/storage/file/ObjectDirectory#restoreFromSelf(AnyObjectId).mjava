@@ -1,0 +1,17 @@
+	private boolean restoreFromSelf(AnyObjectId objectId) {
+		Pack preservedPack = preserved.getPack(objectId);
+		if (preservedPack == null) {
+			return false;
+		}
+		PackFile preservedFile = new PackFile(preservedPack.getPackFile());
+		// Restore the index last since the set will be considered for use once
+		// the index appears.
+		for (PackExt ext : PackExt.values()) {
+			if (!INDEX.equals(ext)) {
+				restore(preservedFile.create(ext));
+			}
+		}
+		restore(preservedFile.create(INDEX));
+		return true;
+	}
+

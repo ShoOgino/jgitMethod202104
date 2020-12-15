@@ -1,16 +1,10 @@
 	@Override
 	ObjectLoader openObject(WindowCursor curs, AnyObjectId objectId)
 			throws IOException {
-		if (loose.hasCached(objectId)) {
-			ObjectLoader ldr = openLooseObject(curs, objectId);
-			if (ldr != null) {
-				return ldr;
-			}
+		ObjectLoader ldr = openObjectWithoutRestoring(curs, objectId);
+		if (ldr == null && restoreFromSelfOrAlternate(objectId, null)) {
+			ldr = openObjectWithoutRestoring(curs, objectId);
 		}
-		ObjectLoader ldr = openPackedFromSelfOrAlternate(curs, objectId, null);
-		if (ldr != null) {
-			return ldr;
-		}
-		return openLooseFromSelfOrAlternate(curs, objectId, null);
+		return ldr;
 	}
 
