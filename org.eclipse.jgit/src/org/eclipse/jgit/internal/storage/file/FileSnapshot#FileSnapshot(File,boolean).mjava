@@ -19,9 +19,15 @@
 		BasicFileAttributes fileAttributes = null;
 		try {
 			fileAttributes = FS.DETECTED.fileAttributes(file);
+		} catch (NoSuchFileException e) {
+			this.lastModified = Instant.EPOCH;
+			this.size = 0L;
+			this.fileKey = MISSING_FILEKEY;
+			return;
 		} catch (IOException e) {
-			this.lastModified = Instant.ofEpochMilli(file.lastModified());
-			this.size = file.length();
+			LOG.error(e.getMessage(), e);
+			this.lastModified = Instant.EPOCH;
+			this.size = 0L;
 			this.fileKey = MISSING_FILEKEY;
 			return;
 		}

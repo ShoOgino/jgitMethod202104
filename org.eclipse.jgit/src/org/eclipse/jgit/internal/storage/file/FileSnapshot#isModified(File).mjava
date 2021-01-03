@@ -14,9 +14,14 @@
 			currLastModified = fileAttributes.lastModifiedTime().toInstant();
 			currSize = fileAttributes.size();
 			currFileKey = getFileKey(fileAttributes);
+		} catch (NoSuchFileException e) {
+			currLastModified = Instant.EPOCH;
+			currSize = 0L;
+			currFileKey = MISSING_FILEKEY;
 		} catch (IOException e) {
-			currLastModified = Instant.ofEpochMilli(path.lastModified());
-			currSize = path.length();
+			LOG.error(e.getMessage(), e);
+			currLastModified = Instant.EPOCH;
+			currSize = 0L;
 			currFileKey = MISSING_FILEKEY;
 		}
 		sizeChanged = isSizeChanged(currSize);
