@@ -32,12 +32,16 @@
 		}
 		fetchState.havesTotal += n;
 		if (n == 0
-				|| fetchState.havesWithoutAck > MAX_HAVES
+				|| (fetchState.hadAcks
+						&& fetchState.havesWithoutAck > MAX_HAVES)
 				|| fetchState.havesTotal > maxHaves) {
 			output.writeString("done\n"); //$NON-NLS-1$
 			output.end();
 			return true;
 		}
+		// Increment only after the test above. Of course we have no ACKs yet
+		// for the newly added "have"s, so it makes no sense to count them
+		// against the MAX_HAVES limit.
 		fetchState.havesWithoutAck += n;
 		output.end();
 		fetchState.incHavesToSend(statelessRPC);
