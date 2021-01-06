@@ -14,8 +14,11 @@
 	public void end() throws IOException {
 		formatLength(0);
 		out.write(lenbuffer, 0, 4);
-		log.debug("git> 0000"); //$NON-NLS-1$
-		if (flushOnEnd)
+		if (logEnabled && log.isDebugEnabled()) {
+			log.debug("git> 0000"); //$NON-NLS-1$
+		}
+		if (flushOnEnd) {
 			flush();
+		}
 	}
 
