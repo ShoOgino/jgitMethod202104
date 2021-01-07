@@ -1,0 +1,17 @@
+	/**
+	 * Construct a {@link WrongObjectTypeException} for the specified object id,
+	 * giving the expected type.
+	 *
+	 * @param id
+	 *            {@link ObjectId} of the object with the unexpected type
+	 * @param type
+	 *            expected object type code; see
+	 *            {@link Constants}{@code .OBJ_*}.
+	 */
+	public WrongObjectTypeException(ObjectId id, int type) {
+		super(MessageFormat.format(JGitText.get().objectIsNotA, id.name(),
+				Constants.typeString(type)));
+		this.name = id.name();
+		this.type = type;
+	}
+

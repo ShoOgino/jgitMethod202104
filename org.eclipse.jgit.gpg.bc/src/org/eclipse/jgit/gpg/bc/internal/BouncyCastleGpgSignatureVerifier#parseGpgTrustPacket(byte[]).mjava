@@ -1,0 +1,28 @@
+	private TrustLevel parseGpgTrustPacket(byte[] packet) {
+		if (packet == null || packet.length < 6) {
+			// A GPG trust packet has at least 6 bytes.
+			return TrustLevel.UNKNOWN;
+		}
+		if (packet[2] != 'g' || packet[3] != 'p' || packet[4] != 'g') {
+			// Not a GPG trust packet
+			return TrustLevel.UNKNOWN;
+		}
+		int trust = packet[0] & 0x0F;
+		switch (trust) {
+		case 0: // No determined/set
+		case 1: // Trust expired; i.e., calculation outdated or key expired
+		case 2: // Undefined: not enough information to set
+			return TrustLevel.UNKNOWN;
+		case 3:
+			return TrustLevel.NEVER;
+		case 4:
+			return TrustLevel.MARGINAL;
+		case 5:
+			return TrustLevel.FULL;
+		case 6:
+			return TrustLevel.ULTIMATE;
+		default:
+			return TrustLevel.UNKNOWN;
+		}
+	}
+

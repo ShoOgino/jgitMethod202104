@@ -1,0 +1,44 @@
+	@Override
+	@Nullable
+	public SignatureVerification verifySignature(@NonNull RevObject object,
+			@NonNull GpgConfig config) throws IOException {
+		if (object instanceof RevCommit) {
+			RevCommit commit = (RevCommit) object;
+			byte[] signatureData = commit.getRawGpgSignature();
+			if (signatureData == null) {
+				return null;
+			}
+			byte[] raw = commit.getRawBuffer();
+			// Now remove the GPG signature
+			byte[] header = { 'g', 'p', 'g', 's', 'i', 'g' };
+			int start = RawParseUtils.headerStart(header, raw, 0);
+			if (start < 0) {
+				return null;
+			}
+			int end = RawParseUtils.headerEnd(raw, start);
+			// start is at the beginning of the header's content
+			start -= header.length + 1;
+			// end is on the terminating LF; we need to skip that, too
+			if (end < raw.length) {
+				end++;
+			}
+			byte[] data = new byte[raw.length - (end - start)];
+			System.arraycopy(raw, 0, data, 0, start);
+			System.arraycopy(raw, end, data, start, raw.length - end);
+			return verify(data, signatureData);
+		} else if (object instanceof RevTag) {
+			RevTag tag = (RevTag) object;
+			byte[] signatureData = tag.getRawGpgSignature();
+			if (signatureData == null) {
+				return null;
+			}
+			byte[] raw = tag.getRawBuffer();
+			// The signature is just tacked onto the end of the message, which
+			// is last in the buffer.
+			byte[] data = Arrays.copyOfRange(raw, 0,
+					raw.length - signatureData.length);
+			return verify(data, signatureData);
+		}
+		return null;
+	}
+

@@ -16,13 +16,16 @@
 		}
 
 		outw.println();
-		String[] lines = tag.getFullMessage().split("\n"); //$NON-NLS-1$
-		for (String s : lines) {
-			outw.println(s);
+		String fullMessage = tag.getFullMessage();
+		if (!fullMessage.isEmpty()) {
+			String[] lines = tag.getFullMessage().split("\n"); //$NON-NLS-1$
+			for (String s : lines) {
+				outw.println(s);
+			}
 		}
 		byte[] rawSignature = tag.getRawGpgSignature();
 		if (rawSignature != null) {
-			lines = RawParseUtils.decode(rawSignature).split("\n"); //$NON-NLS-1$
+			String[] lines = RawParseUtils.decode(rawSignature).split("\n"); //$NON-NLS-1$
 			for (String s : lines) {
 				outw.println(s);
 			}

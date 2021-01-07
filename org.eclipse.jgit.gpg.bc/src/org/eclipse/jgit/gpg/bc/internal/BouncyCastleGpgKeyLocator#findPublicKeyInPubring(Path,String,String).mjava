@@ -2,6 +2,11 @@
 	 * Return the first public key matching the key id ({@link #signingKey}.
 	 *
 	 * @param pubringFile
+	 *            to search
+	 * @param keyId
+	 *            to look for, may be null
+	 * @param keySpec
+	 *            to look for
 	 *
 	 * @return the PGP public key, or {@code null} if none found
 	 * @throws IOException
@@ -9,14 +14,16 @@
 	 * @throws PGPException
 	 *             on BouncyCastle errors
 	 */
-	private PGPPublicKey findPublicKeyInPubring(Path pubringFile)
+	private static PGPPublicKey findPublicKeyInPubring(Path pubringFile,
+			String keyId, String keySpec)
 			throws IOException, PGPException {
 		try (InputStream in = newInputStream(pubringFile)) {
 			PGPPublicKeyRingCollection pgpPub = new PGPPublicKeyRingCollection(
 					new BufferedInputStream(in),
 					new JcaKeyFingerprintCalculator());
 
-			String keyId = toFingerprint(signingKey).toLowerCase(Locale.ROOT);
+			String id = keyId != null ? keyId
+					: toFingerprint(keySpec).toLowerCase(Locale.ROOT);
 			Iterator<PGPPublicKeyRing> keyrings = pgpPub.getKeyRings();
 			while (keyrings.hasNext()) {
 				PGPPublicKeyRing keyRing = keyrings.next();
@@ -26,19 +33,21 @@
 					// try key id
 					String fingerprint = Hex.toHexString(key.getFingerprint())
 							.toLowerCase(Locale.ROOT);
-					if (fingerprint.endsWith(keyId)) {
+					if (fingerprint.endsWith(id)) {
 						return key;
 					}
 					// try user id
 					Iterator<String> userIDs = key.getUserIDs();
 					while (userIDs.hasNext()) {
 						String userId = userIDs.next();
-						if (containsSigningKey(userId, signingKey)) {
+						if (containsSigningKey(userId, keySpec)) {
 							return key;
 						}
 					}
 				}
 			}
+		} catch (FileNotFoundException | NoSuchFileException e) {
+			// Ignore and return null
 		}
 		return null;
 	}

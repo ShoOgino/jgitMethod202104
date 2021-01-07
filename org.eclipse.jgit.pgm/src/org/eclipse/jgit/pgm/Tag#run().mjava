@@ -3,7 +3,25 @@
 	protected void run() {
 		try (Git git = new Git(db)) {
 			if (tagName != null) {
-				if (delete) {
+				if (verify) {
+					VerifySignatureCommand verifySig = git.verifySignature()
+							.setMode(VerifySignatureCommand.VerifyMode.TAGS)
+							.addName(tagName);
+
+					VerificationResult verification = verifySig.call()
+							.get(tagName);
+					if (verification == null) {
+						showUnsigned(git, tagName);
+					} else {
+						Throwable error = verification.getException();
+						if (error != null) {
+							throw die(error.getMessage(), error);
+						}
+						writeVerification(verifySig.getVerifier().getName(),
+								(RevTag) verification.getObject(),
+								verification.getVerification());
+					}
+				} else if (delete) {
 					List<String> deletedTags = git.tagDelete().setTags(tagName)
 							.call();
 					if (deletedTags.isEmpty()) {

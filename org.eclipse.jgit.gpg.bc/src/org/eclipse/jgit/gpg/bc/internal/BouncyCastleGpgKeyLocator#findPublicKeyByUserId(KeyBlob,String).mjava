@@ -1,0 +1,11 @@
+	private static PGPPublicKey findPublicKeyByUserId(KeyBlob keyBlob,
+			String keySpec)
+			throws IOException {
+		for (UserID userID : keyBlob.getUserIds()) {
+			if (containsSigningKey(userID.getUserIDAsString(), keySpec)) {
+				return getSigningPublicKey(keyBlob);
+			}
+		}
+		return null;
+	}
+

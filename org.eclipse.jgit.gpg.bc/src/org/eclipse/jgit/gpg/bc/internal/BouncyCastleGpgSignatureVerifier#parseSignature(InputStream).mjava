@@ -1,0 +1,16 @@
+	static PGPSignature parseSignature(InputStream in)
+			throws IOException, PGPException {
+		try (InputStream sigIn = PGPUtil.getDecoderStream(in)) {
+			JcaPGPObjectFactory pgpFactory = new JcaPGPObjectFactory(sigIn);
+			Object obj = pgpFactory.nextObject();
+			if (obj instanceof PGPCompressedData) {
+				obj = new JcaPGPObjectFactory(
+						((PGPCompressedData) obj).getDataStream()).nextObject();
+			}
+			if (obj instanceof PGPSignatureList) {
+				return ((PGPSignatureList) obj).get(0);
+			}
+			return null;
+		}
+	}
+
