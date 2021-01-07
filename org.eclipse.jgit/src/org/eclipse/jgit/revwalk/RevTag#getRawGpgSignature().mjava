@@ -8,23 +8,9 @@
 	@Nullable
 	public final byte[] getRawGpgSignature() {
 		byte[] raw = buffer;
-		int msgB = RawParseUtils.tagMessage(raw, 0);
-		if (msgB < 0) {
-			return null;
-		}
-		// Find the last signature start and return the rest
-		int start = nextStart(hSignature, raw, msgB);
+		int start = getSignatureStart();
 		if (start < 0) {
 			return null;
-		}
-		int next = RawParseUtils.nextLF(raw, start);
-		while (next < raw.length) {
-			int newStart = nextStart(hSignature, raw, next);
-			if (newStart < 0) {
-				break;
-			}
-			start = newStart;
-			next = RawParseUtils.nextLF(raw, start);
 		}
 		return Arrays.copyOfRange(raw, start, raw.length);
 	}

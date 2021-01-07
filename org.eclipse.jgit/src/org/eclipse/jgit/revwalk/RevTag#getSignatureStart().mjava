@@ -1,0 +1,23 @@
+	private int getSignatureStart() {
+		byte[] raw = buffer;
+		int msgB = RawParseUtils.tagMessage(raw, 0);
+		if (msgB < 0) {
+			return msgB;
+		}
+		// Find the last signature start and return the rest
+		int start = nextStart(hSignature, raw, msgB);
+		if (start < 0) {
+			return start;
+		}
+		int next = RawParseUtils.nextLF(raw, start);
+		while (next < raw.length) {
+			int newStart = nextStart(hSignature, raw, next);
+			if (newStart < 0) {
+				break;
+			}
+			start = newStart;
+			next = RawParseUtils.nextLF(raw, start);
+		}
+		return start;
+	}
+

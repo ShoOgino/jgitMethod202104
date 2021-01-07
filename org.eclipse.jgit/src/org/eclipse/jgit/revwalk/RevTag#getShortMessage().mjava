@@ -21,6 +21,16 @@
 		}
 
 		int msgE = RawParseUtils.endOfParagraph(raw, msgB);
+		int signatureStart = getSignatureStart();
+		if (signatureStart >= msgB && msgE > signatureStart) {
+			msgE = signatureStart;
+			if (msgE > msgB) {
+				msgE--;
+			}
+			if (msgB == msgE) {
+				return ""; //$NON-NLS-1$
+			}
+		}
 		String str = RawParseUtils.decode(guessEncoding(), raw, msgB, msgE);
 		if (RevCommit.hasLF(raw, msgB, msgE)) {
 			str = StringUtils.replaceLineBreaksWithSpace(str);

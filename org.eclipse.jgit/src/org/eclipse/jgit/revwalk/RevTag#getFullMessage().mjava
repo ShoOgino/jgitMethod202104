@@ -14,6 +14,11 @@
 		if (msgB < 0) {
 			return ""; //$NON-NLS-1$
 		}
-		return RawParseUtils.decode(guessEncoding(), raw, msgB, raw.length);
+		int signatureStart = getSignatureStart();
+		int end = signatureStart < 0 ? raw.length : signatureStart;
+		if (end == msgB) {
+			return ""; //$NON-NLS-1$
+		}
+		return RawParseUtils.decode(guessEncoding(), raw, msgB, end);
 	}
 

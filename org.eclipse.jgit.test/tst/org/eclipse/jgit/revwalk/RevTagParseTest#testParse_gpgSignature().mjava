@@ -15,7 +15,7 @@
 		b.write("tag v1.0\n".getBytes(UTF_8));
 		b.write("tagger t <t@example.com> 1218123387 +0700\n".getBytes(UTF_8));
 		b.write('\n');
-		b.write("message\n\n".getBytes(UTF_8));
+		b.write("message\n".getBytes(UTF_8));
 		b.write(signature.getBytes(US_ASCII));
 		b.write('\n');
 
@@ -26,7 +26,7 @@
 
 		assertEquals("t", t.getTaggerIdent().getName());
 		assertEquals("message", t.getShortMessage());
-		assertEquals("message\n\n" + signature + '\n', t.getFullMessage());
+		assertEquals("message\n", t.getFullMessage());
 		String gpgSig = new String(t.getRawGpgSignature(), UTF_8);
 		assertEquals(signature + '\n', gpgSig);
 	}

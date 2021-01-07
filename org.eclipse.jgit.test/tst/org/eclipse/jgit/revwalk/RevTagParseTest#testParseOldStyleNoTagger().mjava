@@ -7,7 +7,7 @@
 				+ "\n" //
 				+ "iD8DBQBC0b9oF3Y\n" //
 				+ "-----END PGP SIGNATURE-----";
-		final String message = "test\n\n" + fakeSignature + '\n';
+		final String message = "test\n" + fakeSignature + '\n';
 
 		final StringBuilder body = new StringBuilder();
 
@@ -39,7 +39,7 @@
 		assertNotNull(c.getTagName());
 		assertEquals(name, c.getTagName());
 		assertEquals("test", c.getShortMessage());
-		assertEquals(message, c.getFullMessage());
+		assertEquals("test\n", c.getFullMessage());
 		assertEquals(fakeSignature + '\n',
 				new String(c.getRawGpgSignature(), US_ASCII));
 
