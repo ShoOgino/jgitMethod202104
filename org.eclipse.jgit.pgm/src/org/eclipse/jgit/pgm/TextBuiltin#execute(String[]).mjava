@@ -15,7 +15,7 @@
 			SshdSessionFactory factory = new SshdSessionFactory(
 					new JGitKeyCache(), new DefaultProxyDataFactory());
 			Runtime.getRuntime()
-					.addShutdownHook(new Thread(() -> factory.close()));
+					.addShutdownHook(new Thread(factory::close));
 			SshSessionFactory.setInstance(factory);
 			break;
 		}
