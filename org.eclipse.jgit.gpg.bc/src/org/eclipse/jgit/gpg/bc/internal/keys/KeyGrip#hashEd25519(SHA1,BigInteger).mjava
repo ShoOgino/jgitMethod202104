@@ -1,0 +1,47 @@
+	/**
+	 * Computes the keygrip for an ed25519 public key.
+	 * <p>
+	 * Package-visible for tests only.
+	 * </p>
+	 *
+	 * @param grip
+	 *            initialized {@link SHA1}
+	 * @param q
+	 *            the public key's EC point
+	 * @return the keygrip
+	 * @throws PGPException
+	 *             if q indicates uncompressed format
+	 */
+	@SuppressWarnings("nls")
+	static byte[] hashEd25519(SHA1 grip, BigInteger q) throws PGPException {
+		// For the values, see RFC 7748: https://tools.ietf.org/html/rfc7748
+		// p = 2^255 - 19
+		hash(grip, Hex.decodeStrict(
+				"7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFED"),
+				'p', false);
+		// Field: a = 1
+		hash(grip, new byte[] { 0x01 }, 'a', false);
+		// Field: b = 121665/121666 (mod p)
+		// See Berstein et.al., "Twisted Edwards Curves",
+		// https://doi.org/10.1007/978-3-540-68164-9_26
+		hash(grip, Hex.decodeStrict(
+				"2DFC9311D490018C7338BF8688861767FF8FF5B2BEBE27548A14B235ECA6874A"),
+				'b', false);
+		// Generator point with affine X,Y
+		// @formatter:off
+		// X(P) = 15112221349535400772501151409588531511454012693041857206046113283949847762202
+		// Y(P) = 46316835694926478169428394003475163141307993866256225615783033603165251855960
+		// the "04" signifies uncompressed format.
+		// @formatter:on
+		hash(grip, Hex.decodeStrict("04"
+				+ "216936D3CD6E53FEC0A4E231FDD6DC5C692CC7609525A7B2C9562D608F25D51A"
+				+ "6666666666666666666666666666666666666666666666666666666666666658"),
+				'g', false);
+		// order = 2^252 + 0x14def9dea2f79cd65812631a5cf5d3ed
+		hash(grip, Hex.decodeStrict(
+				"1000000000000000000000000000000014DEF9DEA2F79CD65812631A5CF5D3ED"),
+				'n', false);
+		hashQ25519(grip, q);
+		return grip.digest();
+	}
+

@@ -1,0 +1,15 @@
+	private static void hash(SHA1 grip, byte[] data) {
+		// Need to skip leading zero bytes
+		int i = 0;
+		while (i < data.length && data[i] == 0) {
+			i++;
+		}
+		int length = data.length - i;
+		if (i < data.length) {
+			if ((data[i] & 0x80) != 0) {
+				grip.update((byte) 0);
+			}
+			grip.update(data, i, length);
+		}
+	}
+

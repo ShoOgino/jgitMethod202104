@@ -1,0 +1,10 @@
+	private void assertKeyGrip(String key, String expectedKeyGrip, Hash hash)
+			throws Exception {
+		SHA1 grip = SHA1.newInstance();
+		grip.setDetectCollision(false);
+		BigInteger pk = new BigInteger(key, 16);
+		byte[] keyGrip = hash.hash(grip, pk);
+		assertEquals("Keygrip should match", expectedKeyGrip,
+				Hex.toHexString(keyGrip).toUpperCase(Locale.ROOT));
+	}
+

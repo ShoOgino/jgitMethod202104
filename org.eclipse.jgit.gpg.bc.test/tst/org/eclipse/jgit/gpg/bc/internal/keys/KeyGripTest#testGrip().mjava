@@ -1,0 +1,22 @@
+	@Test
+	public void testGrip() throws Exception {
+		try (InputStream in = this.getClass()
+				.getResourceAsStream(data.filename)) {
+			int index[] = { 0 };
+			readAsc(in, key -> {
+				byte[] keyGrip = null;
+				try {
+					keyGrip = KeyGrip.getKeyGrip(key);
+				} catch (PGPException e) {
+					throw new RuntimeException(e);
+				}
+				assertTrue("More keys than expected",
+						index[0] < data.expectedKeyGrips.length);
+				assertEquals("Wrong keygrip", data.expectedKeyGrips[index[0]++],
+						Hex.toHexString(keyGrip).toUpperCase(Locale.ROOT));
+			});
+			assertEquals("Missing keys", data.expectedKeyGrips.length,
+					index[0]);
+		}
+	}
+

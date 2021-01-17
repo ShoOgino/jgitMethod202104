@@ -1,0 +1,9 @@
+	private static X9ECParameters getX9Parameters(
+			ASN1ObjectIdentifier curveOID) {
+		X9ECParameters params = CustomNamedCurves.getByOID(curveOID);
+		if (params == null) {
+			params = ECNamedCurveTable.getByOID(curveOID);
+		}
+		return params;
+	}
+

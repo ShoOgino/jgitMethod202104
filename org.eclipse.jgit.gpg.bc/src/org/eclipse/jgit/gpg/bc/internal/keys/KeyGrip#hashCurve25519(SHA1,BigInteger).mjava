@@ -1,0 +1,40 @@
+	/**
+	 * Computes the keygrip for a curve25519 public key.
+	 * <p>
+	 * Package-visible for tests only.
+	 * </p>
+	 *
+	 * @param grip
+	 *            initialized {@link SHA1}
+	 * @param q
+	 *            the public key's EC point
+	 * @return the keygrip
+	 * @throws PGPException
+	 *             if q indicates uncompressed format
+	 */
+	@SuppressWarnings("nls")
+	static byte[] hashCurve25519(SHA1 grip, BigInteger q) throws PGPException {
+		hash(grip, Hex.decodeStrict(
+				"7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFED"),
+				'p', false);
+		// Unclear: RFC 7748 says A = 486662. This value here is (A-2)/4 =
+		// 121665. Compare ecc-curves.c in libgcrypt:
+		// https://github.com/gpg/libgcrypt/blob/361a058/cipher/ecc-curves.c#L146
+		hash(grip, new byte[] { 0x01, (byte) 0xDB, 0x41 }, 'a', false);
+		hash(grip, new byte[] { 0x01 }, 'b', false);
+		// libgcrypt uses the old g.y value before the erratum to RFC 7748 for
+		// the keygrip. The new value would be
+		// 5F51E65E475F794B1FE122D388B72EB36DC2B28192839E4DD6163A5D81312C14. See
+		// https://www.rfc-editor.org/errata/eid4730 and
+		// https://github.com/gpg/libgcrypt/commit/f67b6492e0b0
+		hash(grip, Hex.decodeStrict("04"
+				+ "0000000000000000000000000000000000000000000000000000000000000009"
+				+ "20AE19A1B8A086B4E01EDD2C7748D14C923D4D7E6D7C61B229E9C5A27ECED3D9"),
+				'g', false);
+		hash(grip, Hex.decodeStrict(
+				"1000000000000000000000000000000014DEF9DEA2F79CD65812631A5CF5D3ED"),
+				'n', false);
+		hashQ25519(grip, q);
+		return grip.digest();
+	}
+

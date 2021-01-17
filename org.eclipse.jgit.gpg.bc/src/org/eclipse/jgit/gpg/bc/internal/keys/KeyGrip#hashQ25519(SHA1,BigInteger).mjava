@@ -1,0 +1,31 @@
+	private static void hashQ25519(SHA1 grip, BigInteger q)
+			throws PGPException {
+		byte[] data = q.toByteArray();
+		switch (data[0]) {
+		case 0x04:
+			if (data.length != 65) {
+				throw new PGPException(MessageFormat.format(
+						BCText.get().corrupt25519Key, Hex.toHexString(data)));
+			}
+			// Uncompressed: should not occur with ed25519 or curve25519
+			throw new PGPException(MessageFormat.format(
+					BCText.get().uncompressed25519Key, Hex.toHexString(data)));
+		case 0x40:
+			if (data.length != 33) {
+				throw new PGPException(MessageFormat.format(
+						BCText.get().corrupt25519Key, Hex.toHexString(data)));
+			}
+			// Compressed; normal case. Skip prefix.
+			hash(grip, Arrays.copyOfRange(data, 1, data.length), 'q', false);
+			break;
+		default:
+			if (data.length != 32) {
+				throw new PGPException(MessageFormat.format(
+						BCText.get().corrupt25519Key, Hex.toHexString(data)));
+			}
+			// Compressed format without prefix. Should not occur?
+			hash(grip, data, 'q', false);
+			break;
+		}
+	}
+
