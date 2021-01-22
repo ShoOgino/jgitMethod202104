@@ -12,6 +12,9 @@
 			Map<String, Object> o) throws IOException {
 		for (Map.Entry<String, Object> p : o.entrySet()) {
 			try {
+				if (p.getKey().equals(COMPRESSION_LEVEL)) {
+					continue;
+				}
 				new Statement(s, "set" + StringUtils.capitalize(p.getKey()), //$NON-NLS-1$
 						new Object[] { p.getValue() }).execute();
 			} catch (Exception e) {

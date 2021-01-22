@@ -1,0 +1,12 @@
+	private static void archive(Git git, File archive, String fmt, Map<String,
+			Object> options)
+			throws GitAPIException,
+			FileNotFoundException, AmbiguousObjectException,
+			IncorrectObjectTypeException, IOException {
+		git.archive().setOutputStream(new FileOutputStream(archive))
+				.setFormat(fmt)
+				.setTree(git.getRepository().resolve("HEAD"))
+				.setFormatOptions(options)
+				.call();
+	}
+

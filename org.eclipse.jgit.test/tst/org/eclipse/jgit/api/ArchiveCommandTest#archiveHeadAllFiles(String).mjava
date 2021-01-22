@@ -1,0 +1,21 @@
+	private void archiveHeadAllFiles(String fmt) throws Exception {
+		try (Git git = new Git(db)) {
+			createTestContent(git);
+			File archive = new File(getTemporaryDirectory(),
+					"archive." + format);
+			archive(git, archive, fmt);
+			ObjectId hash1 = ObjectId.fromRaw(IO.readFully(archive));
+
+			try (InputStream fi = Files.newInputStream(archive.toPath());
+					InputStream bi = new BufferedInputStream(fi);
+					ArchiveInputStream o = createArchiveInputStream(fmt, bi)) {
+				assertEntries(o);
+			}
+
+			Thread.sleep(WAIT);
+			archive(git, archive, fmt);
+			assertEquals(UNEXPECTED_DIFFERENT_HASH, hash1,
+					ObjectId.fromRaw(IO.readFully(archive)));
+		}
+	}
+

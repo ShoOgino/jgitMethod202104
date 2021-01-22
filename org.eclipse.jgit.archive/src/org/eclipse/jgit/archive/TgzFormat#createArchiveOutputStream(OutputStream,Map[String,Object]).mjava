@@ -2,7 +2,15 @@
 	@Override
 	public ArchiveOutputStream createArchiveOutputStream(OutputStream s,
 			Map<String, Object> o) throws IOException {
-		GzipCompressorOutputStream out = new GzipCompressorOutputStream(s);
+		GzipCompressorOutputStream out;
+		int compressionLevel = getCompressionLevel(o);
+		if (compressionLevel != -1) {
+			GzipParameters parameters = new GzipParameters();
+			parameters.setCompressionLevel(compressionLevel);
+			out = new GzipCompressorOutputStream(s, parameters);
+		} else {
+			out = new GzipCompressorOutputStream(s);
+		}
 		return tarFormat.createArchiveOutputStream(out, o);
 	}
 

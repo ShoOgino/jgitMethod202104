@@ -2,8 +2,6 @@
 			throws GitAPIException,
 			FileNotFoundException, AmbiguousObjectException,
 			IncorrectObjectTypeException, IOException {
-		git.archive().setOutputStream(new FileOutputStream(archive))
-				.setFormat(fmt)
-				.setTree(git.getRepository().resolve("HEAD")).call();
+		archive(git, archive, fmt, new HashMap<>());
 	}
 
