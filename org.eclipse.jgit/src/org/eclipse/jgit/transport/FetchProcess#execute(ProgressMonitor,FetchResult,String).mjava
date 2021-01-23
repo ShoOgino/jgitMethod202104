@@ -1,4 +1,5 @@
-	void execute(ProgressMonitor monitor, FetchResult result)
+	void execute(ProgressMonitor monitor, FetchResult result,
+			String initialBranch)
 			throws NotSupportedException, TransportException {
 		askFor.clear();
 		localUpdates.clear();
@@ -8,7 +9,7 @@
 
 		Throwable e1 = null;
 		try {
-			executeImp(monitor, result);
+			executeImp(monitor, result, initialBranch);
 		} catch (NotSupportedException | TransportException err) {
 			e1 = err;
 			throw err;

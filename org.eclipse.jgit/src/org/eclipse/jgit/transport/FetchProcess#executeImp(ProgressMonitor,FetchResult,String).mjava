@@ -1,6 +1,6 @@
 	private void executeImp(final ProgressMonitor monitor,
-			final FetchResult result) throws NotSupportedException,
-			TransportException {
+			final FetchResult result, String initialBranch)
+			throws NotSupportedException, TransportException {
 		final TagOpt tagopt = transport.getTagOpt();
 		String getTags = (tagopt == TagOpt.NO_TAGS) ? null : Constants.R_TAGS;
 		String getHead = null;
@@ -17,7 +17,12 @@
 		}
 		conn = transport.openFetch(toFetch, getTags, getHead);
 		try {
-			result.setAdvertisedRefs(transport.getURI(), conn.getRefsMap());
+			Map<String, Ref> refsMap = conn.getRefsMap();
+			if (isInitialBranchMissing(refsMap, initialBranch)) {
+				throw new TransportException(MessageFormat.format(
+						JGitText.get().remoteBranchNotFound, initialBranch));
+			}
+			result.setAdvertisedRefs(transport.getURI(), refsMap);
 			result.peerUserAgent = conn.getPeerUserAgent();
 			final Set<Ref> matched = new HashSet<>();
 			for (RefSpec spec : toFetch) {
