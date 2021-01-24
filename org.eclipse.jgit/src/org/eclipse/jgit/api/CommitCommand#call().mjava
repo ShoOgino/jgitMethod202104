@@ -112,8 +112,18 @@
 						throw new ServiceUnavailableException(
 								JGitText.get().signingServiceUnavailable);
 					}
-					gpgSigner.sign(commit, signingKey, committer,
-							credentialsProvider);
+					if (gpgSigner instanceof GpgObjectSigner) {
+						((GpgObjectSigner) gpgSigner).signObject(commit,
+								signingKey, committer, credentialsProvider,
+								gpgConfig);
+					} else {
+						if (gpgConfig.getKeyFormat() != GpgFormat.OPENPGP) {
+							throw new UnsupportedSigningFormatException(JGitText
+									.get().onlyOpenPgpSupportedForSigning);
+						}
+						gpgSigner.sign(commit, signingKey, committer,
+								credentialsProvider);
+					}
 				}
 
 				ObjectId commitId = odi.insert(commit);

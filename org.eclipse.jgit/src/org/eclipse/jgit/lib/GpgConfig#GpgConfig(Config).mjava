@@ -1,10 +1,28 @@
 	/**
-	 * Create a new GPG config, which will read configuration from config.
+	 * Create a new GPG config that reads the configuration from config.
 	 *
 	 * @param config
 	 *            the config to read from
 	 */
 	public GpgConfig(Config config) {
-		this.config = config;
+		keyFormat = config.getEnum(GpgFormat.values(),
+				ConfigConstants.CONFIG_GPG_SECTION, null,
+				ConfigConstants.CONFIG_KEY_FORMAT, GpgFormat.OPENPGP);
+		signingKey = config.getString(ConfigConstants.CONFIG_USER_SECTION, null,
+				ConfigConstants.CONFIG_KEY_SIGNINGKEY);
+
+		String exe = config.getString(ConfigConstants.CONFIG_GPG_SECTION,
+				keyFormat.toConfigValue(), ConfigConstants.CONFIG_KEY_PROGRAM);
+		if (exe == null) {
+			exe = config.getString(ConfigConstants.CONFIG_GPG_SECTION, null,
+					ConfigConstants.CONFIG_KEY_PROGRAM);
+		}
+		program = exe;
+		signCommits = config.getBoolean(ConfigConstants.CONFIG_COMMIT_SECTION,
+				ConfigConstants.CONFIG_KEY_GPGSIGN, false);
+		signAllTags = config.getBoolean(ConfigConstants.CONFIG_TAG_SECTION,
+				ConfigConstants.CONFIG_KEY_GPGSIGN, false);
+		forceAnnotated = config.getBoolean(ConfigConstants.CONFIG_TAG_SECTION,
+				ConfigConstants.CONFIG_KEY_FORCE_SIGN_ANNOTATED, false);
 	}
 

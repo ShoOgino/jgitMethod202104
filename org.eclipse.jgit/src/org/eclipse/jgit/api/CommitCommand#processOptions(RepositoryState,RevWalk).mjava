@@ -67,7 +67,9 @@
 			// an explicit message
 			throw new NoMessageException(JGitText.get().commitMessageNotSpecified);
 
-		GpgConfig gpgConfig = new GpgConfig(repo.getConfig());
+		if (gpgConfig == null) {
+			gpgConfig = new GpgConfig(repo.getConfig());
+		}
 		if (signCommit == null) {
 			signCommit = gpgConfig.isSignCommits() ? Boolean.TRUE
 					: Boolean.FALSE;
@@ -76,10 +78,6 @@
 			signingKey = gpgConfig.getSigningKey();
 		}
 		if (gpgSigner == null) {
-			if (gpgConfig.getKeyFormat() != GpgFormat.OPENPGP) {
-				throw new UnsupportedSigningFormatException(
-						JGitText.get().onlyOpenPgpSupportedForSigning);
-			}
 			gpgSigner = GpgSigner.getDefault();
 		}
 	}
