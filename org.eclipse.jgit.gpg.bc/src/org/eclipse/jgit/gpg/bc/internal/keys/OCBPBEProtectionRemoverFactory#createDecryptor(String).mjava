@@ -1,0 +1,57 @@
+	@Override
+	public PBESecretKeyDecryptor createDecryptor(String protection)
+			throws PGPException {
+		return new PBESecretKeyDecryptor(passphrase, calculatorProvider) {
+
+			@Override
+			public byte[] recoverKeyData(int encAlgorithm, byte[] key,
+					byte[] iv, byte[] encrypted, int encryptedOffset,
+					int encryptedLength) throws PGPException {
+				String algorithmName = PGPUtil
+						.getSymmetricCipherName(encAlgorithm);
+				byte[] decrypted = null;
+				try {
+					Cipher c = Cipher
+							.getInstance(algorithmName + "/OCB/NoPadding"); //$NON-NLS-1$
+					SecretKey secretKey = new SecretKeySpec(key, algorithmName);
+					c.init(Cipher.DECRYPT_MODE, secretKey,
+							new IvParameterSpec(iv));
+					c.updateAAD(aad);
+					decrypted = new byte[c.getOutputSize(encryptedLength)];
+					int decryptedLength = c.update(encrypted, encryptedOffset,
+							encryptedLength, decrypted);
+					// doFinal() for OCB will check the MAC and throw an
+					// exception if it doesn't match
+					decryptedLength += c.doFinal(decrypted, decryptedLength);
+					if (decryptedLength != decrypted.length) {
+						throw new PGPException(MessageFormat.format(
+								BCText.get().cryptWrongDecryptedLength,
+								Integer.valueOf(decryptedLength),
+								Integer.valueOf(decrypted.length)));
+					}
+					byte[] result = decrypted;
+					decrypted = null; // Don't clear in finally
+					return result;
+				} catch (NoClassDefFoundError e) {
+					String msg = MessageFormat.format(
+							BCText.get().gpgNoSuchAlgorithm,
+							algorithmName + "/OCB"); //$NON-NLS-1$
+					throw new PGPException(msg,
+							new NoSuchAlgorithmException(msg, e));
+				} catch (PGPException e) {
+					throw e;
+				} catch (Exception e) {
+					throw new PGPException(
+							MessageFormat.format(BCText.get().cryptCipherError,
+									e.getLocalizedMessage()),
+							e);
+				} finally {
+					if (decrypted != null) {
+						// Prevent halfway decrypted data leaking.
+						Arrays.fill(decrypted, (byte) 0);
+					}
+				}
+			}
+		};
+	}
+

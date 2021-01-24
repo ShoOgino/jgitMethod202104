@@ -1,0 +1,21 @@
+	static S2K parseS2K(InputStream in) throws IOException {
+		skipOpenParenthesis(in);
+
+		// Algorithm is hard-coded to SHA1 below anyway.
+		readString(in, in.read());
+		byte[] iv = readBytes(in, in.read());
+		final long iterationCount = Long.parseLong(readString(in, in.read()));
+
+		skipCloseParenthesis(in);
+
+		// we have to return the actual iteration count provided.
+		S2K s2k = new S2K(HashAlgorithmTags.SHA1, iv, (int) iterationCount) {
+			@Override
+			public long getIterationCount() {
+				return iterationCount;
+			}
+		};
+
+		return s2k;
+	}
+
