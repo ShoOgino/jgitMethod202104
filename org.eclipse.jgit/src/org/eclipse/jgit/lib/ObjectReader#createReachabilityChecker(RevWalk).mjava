@@ -1,0 +1,21 @@
+	/**
+	 * Create a reachability checker that will use bitmaps if possible.
+	 *
+	 * @param rw
+	 *            revwalk for use by the reachability checker
+	 * @return the most efficient reachability checker for this repository.
+	 * @throws IOException
+	 *             if it cannot open any of the underlying indices.
+	 *
+	 * @since 5.11
+	 */
+	@NonNull
+	public ReachabilityChecker createReachabilityChecker(RevWalk rw)
+			throws IOException {
+		if (getBitmapIndex() != null) {
+			return new BitmappedReachabilityChecker(rw);
+		}
+
+		return new PedestrianReachabilityChecker(true, rw);
+	}
+
