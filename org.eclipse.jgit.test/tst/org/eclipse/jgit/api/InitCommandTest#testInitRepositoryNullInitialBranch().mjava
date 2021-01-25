@@ -1,0 +1,14 @@
+	@Test
+	public void testInitRepositoryNullInitialBranch() throws Exception {
+		File directory = createTempDirectory("testInitRepository");
+		InitCommand command = new InitCommand();
+		command.setDirectory(directory);
+		command.setInitialBranch("main");
+		command.setInitialBranch(null);
+		try (Git git = command.call()) {
+			Repository r = git.getRepository();
+			assertNotNull(r);
+			assertEquals("refs/heads/master", r.getFullBranch());
+		}
+	}
+
