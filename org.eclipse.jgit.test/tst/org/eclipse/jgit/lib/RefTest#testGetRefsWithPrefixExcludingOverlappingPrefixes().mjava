@@ -1,0 +1,12 @@
+	@Test
+	public void testGetRefsWithPrefixExcludingOverlappingPrefixes() throws IOException {
+		Set<String> exclude = new HashSet<>();
+		exclude.add("refs/heads/pa");
+		exclude.add("refs/heads/");
+		exclude.add("refs/heads/p");
+		exclude.add("refs/tags/");
+		List<Ref> refs = db.getRefDatabase().getRefsByPrefixWithExclusions(RefDatabase.ALL, exclude);
+		assertEquals(1, refs.size());
+		checkContainsRef(refs, db.exactRef("HEAD"));
+	}
+

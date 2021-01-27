@@ -1,0 +1,10 @@
+	@Test
+	public void testGetRefsExcludingPrefixes() throws IOException {
+		Set<String> exclude = new HashSet<>();
+		exclude.add("refs/tags/");
+		exclude.add("refs/heads/");
+		List<Ref> refs = db.getRefDatabase().getRefsByPrefixWithExclusions(RefDatabase.ALL, exclude);
+		assertEquals(1, refs.size());
+		checkContainsRef(refs, db.exactRef("HEAD"));
+	}
+

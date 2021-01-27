@@ -1,0 +1,24 @@
+	@Test
+	public void seekPastWithLotsOfRefs() throws IOException {
+		Ref[] refs = new Ref[500];
+		for (int i = 1; i <= 500; i++) {
+			refs[i - 1] = ref(String.format("refs/%d", i), i);
+		}
+		ReftableReader t = read(write(refs));
+		try (RefCursor rc = t.allRefs()) {
+			rc.seekPastPrefix("refs/3");
+			assertTrue(rc.next());
+			assertEquals("refs/4", rc.getRef().getName());
+			assertTrue(rc.next());
+			assertEquals("refs/40", rc.getRef().getName());
+
+			rc.seekPastPrefix("refs/8");
+			assertTrue(rc.next());
+			assertEquals("refs/9", rc.getRef().getName());
+			assertTrue(rc.next());
+			assertEquals("refs/90", rc.getRef().getName());
+			assertTrue(rc.next());
+			assertEquals("refs/91", rc.getRef().getName());
+		}
+	}
+

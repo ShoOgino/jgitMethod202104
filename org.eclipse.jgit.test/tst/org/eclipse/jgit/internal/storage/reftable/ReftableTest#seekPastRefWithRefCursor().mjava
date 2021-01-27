@@ -1,0 +1,22 @@
+	@Test
+	public void seekPastRefWithRefCursor() throws IOException {
+		Ref exp = ref(MASTER, 1);
+		Ref next = ref(NEXT, 2);
+		Ref afterNext = ref(AFTER_NEXT, 3);
+		Ref afterNextNext = ref(LAST, 4);
+		ReftableReader t = read(write(exp, next, afterNext, afterNextNext));
+		try (RefCursor rc = t.seekRefsWithPrefix("")) {
+			assertTrue(rc.next());
+			assertEquals(MASTER, rc.getRef().getName());
+
+			rc.seekPastPrefix("refs/heads/next/");
+
+			assertTrue(rc.next());
+			assertEquals(AFTER_NEXT, rc.getRef().getName());
+			assertTrue(rc.next());
+			assertEquals(LAST, rc.getRef().getName());
+
+			assertFalse(rc.next());
+		}
+	}
+

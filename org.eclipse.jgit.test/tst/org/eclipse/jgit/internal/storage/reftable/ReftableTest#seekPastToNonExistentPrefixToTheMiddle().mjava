@@ -1,0 +1,23 @@
+	@Test
+	public void seekPastToNonExistentPrefixToTheMiddle() throws IOException {
+		Ref exp = ref(MASTER, 1);
+		Ref next = ref(NEXT, 2);
+		Ref afterNext = ref(AFTER_NEXT, 3);
+		Ref afterNextNext = ref(LAST, 4);
+		ReftableReader t = read(write(exp, next, afterNext, afterNextNext));
+		try (RefCursor rc = t.seekRefsWithPrefix("")) {
+			rc.seekPastPrefix("refs/heads/master_non_existent");
+
+			assertTrue(rc.next());
+			assertEquals(NEXT, rc.getRef().getName());
+
+			assertTrue(rc.next());
+			assertEquals(AFTER_NEXT, rc.getRef().getName());
+
+			assertTrue(rc.next());
+			assertEquals(LAST, rc.getRef().getName());
+
+			assertFalse(rc.next());
+		}
+	}
+
