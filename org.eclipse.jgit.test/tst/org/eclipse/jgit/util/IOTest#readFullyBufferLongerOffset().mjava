@@ -1,0 +1,12 @@
+	@Test
+	public void readFullyBufferLongerOffset() throws Exception {
+		byte[] buffer = initBuffer(50);
+		byte[] initial = Arrays.copyOf(buffer, buffer.length);
+		int length = read(buffer, 40);
+		assertEquals(10, length);
+		assertArrayEquals(Arrays.copyOfRange(buffer, 0, 40),
+				Arrays.copyOfRange(initial, 0, 40));
+		assertArrayEquals(Arrays.copyOfRange(buffer, 40, buffer.length),
+				Arrays.copyOfRange(DATA, 0, 10));
+	}
+

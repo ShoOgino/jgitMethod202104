@@ -1,0 +1,11 @@
+	@Test
+	public void readFullyBufferLonger() throws Exception {
+		byte[] buffer = initBuffer(50);
+		byte[] initial = Arrays.copyOf(buffer, buffer.length);
+		int length = read(buffer, 0);
+		assertEquals(DATA.length, length);
+		assertArrayEquals(Arrays.copyOfRange(buffer, 0, length), DATA);
+		assertArrayEquals(Arrays.copyOfRange(buffer, length, buffer.length),
+				Arrays.copyOfRange(initial, length, initial.length));
+	}
+
