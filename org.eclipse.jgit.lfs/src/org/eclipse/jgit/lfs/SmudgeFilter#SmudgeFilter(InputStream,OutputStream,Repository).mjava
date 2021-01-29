@@ -1,0 +1,25 @@
+	private SmudgeFilter(InputStream in, OutputStream out, Repository db)
+			throws IOException {
+		super(in, out);
+		InputStream from = in;
+		try {
+			LfsPointer res = LfsPointer.parseLfsPointer(from);
+			if (res != null) {
+				AnyLongObjectId oid = res.getOid();
+				Lfs lfs = new Lfs(db);
+				Path mediaFile = lfs.getMediaFile(oid);
+				if (!Files.exists(mediaFile)) {
+					downloadLfsResource(lfs, db, res);
+				}
+				this.in = Files.newInputStream(mediaFile);
+			} else {
+				// Not swapped; stream was reset, don't close!
+				from = null;
+			}
+		} finally {
+			if (from != null) {
+				from.close(); // Close the swapped-out stream
+			}
+		}
+	}
+

@@ -1,0 +1,16 @@
+	@Override
+	@Before
+	public void setUp() throws Exception {
+		super.setUp();
+		git = new Git(db);
+		// commit something
+		writeTrashFile("Test.txt", "Hello world");
+		git.add().addFilepattern("Test.txt").call();
+		git.commit().setMessage("Initial commit").call();
+		// prepare the config for LFS
+		StoredConfig config = git.getRepository().getConfig();
+		config.setString("filter", "lfs", "clean", CLEAN_NAME);
+		config.setString("filter", "lfs", "smudge", SMUDGE_NAME);
+		config.save();
+	}
+

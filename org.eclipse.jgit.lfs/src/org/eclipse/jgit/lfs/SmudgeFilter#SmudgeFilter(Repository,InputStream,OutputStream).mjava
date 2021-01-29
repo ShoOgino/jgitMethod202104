@@ -13,20 +13,6 @@
 	 */
 	public SmudgeFilter(Repository db, InputStream in, OutputStream out)
 			throws IOException {
-		super(in, out);
-		try {
-			Lfs lfs = new Lfs(db);
-			LfsPointer res = LfsPointer.parseLfsPointer(in);
-			if (res != null) {
-				AnyLongObjectId oid = res.getOid();
-				Path mediaFile = lfs.getMediaFile(oid);
-				if (!Files.exists(mediaFile)) {
-					downloadLfsResource(lfs, db, res);
-				}
-				this.in = Files.newInputStream(mediaFile);
-			}
-		} finally {
-			in.close(); // make sure the swapped stream is closed properly.
-		}
+		this(in.markSupported() ? in : new BufferedInputStream(in), out, db);
 	}
 

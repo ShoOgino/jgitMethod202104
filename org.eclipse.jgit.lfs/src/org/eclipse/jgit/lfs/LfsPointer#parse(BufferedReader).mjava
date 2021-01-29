@@ -1,0 +1,46 @@
+	private static LfsPointer parse(BufferedReader r) throws IOException {
+		boolean versionLine = false;
+		LongObjectId id = null;
+		long sz = -1;
+		// This parsing is a bit too general if we go by the spec at
+		// https://github.com/git-lfs/git-lfs/blob/master/docs/spec.md
+		// Comment lines are not mentioned in the spec, the "version" line
+		// MUST be the first, and keys are ordered alphabetically.
+		for (String s = r.readLine(); s != null; s = r.readLine()) {
+			if (s.startsWith("#") || s.length() == 0) { //$NON-NLS-1$
+				continue;
+			} else if (s.startsWith("version")) { //$NON-NLS-1$
+				if (versionLine || !checkVersionLine(s)) {
+					return null; // Not a LFS pointer
+				}
+				versionLine = true;
+			} else {
+				try {
+					if (s.startsWith("oid sha256:")) { //$NON-NLS-1$
+						if (id != null) {
+							return null; // Not a LFS pointer
+						}
+						id = LongObjectId.fromString(s.substring(11).trim());
+					} else if (s.startsWith("size")) { //$NON-NLS-1$
+						if (sz > 0 || s.length() < 5 || s.charAt(4) != ' ') {
+							return null; // Not a LFS pointer
+						}
+						sz = Long.parseLong(s.substring(5).trim());
+					}
+				} catch (RuntimeException e) {
+					// We could not parse the line. If we have a version
+					// already, this is a corrupt LFS pointer. Otherwise it
+					// is just not an LFS pointer.
+					if (versionLine) {
+						throw e;
+					}
+					return null;
+				}
+			}
+			if (versionLine && id != null && sz > -1) {
+				return new LfsPointer(id, sz);
+			}
+		}
+		return null;
+	}
+

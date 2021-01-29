@@ -1,69 +1,26 @@
 	/**
 	 * Try to parse the data provided by an InputStream to the format defined by
-	 * {@link #VERSION}
+	 * {@link #VERSION}. If the given stream supports mark and reset as
+	 * indicated by {@link InputStream#markSupported()}, its input position will
+	 * be reset if the stream content is not actually a LFS pointer (i.e., when
+	 * {@code null} is returned). If the stream content is an invalid LFS
+	 * pointer or the given stream does not support mark/reset, the input
+	 * position may not be reset.
 	 *
 	 * @param in
 	 *            the {@link java.io.InputStream} from where to read the data
-	 * @return an {@link org.eclipse.jgit.lfs.LfsPointer} or <code>null</code>
-	 *         if the stream was not parseable as LfsPointer
+	 * @return an {@link org.eclipse.jgit.lfs.LfsPointer} or {@code null} if the
+	 *         stream was not parseable as LfsPointer
 	 * @throws java.io.IOException
 	 */
 	@Nullable
 	public static LfsPointer parseLfsPointer(InputStream in)
 			throws IOException {
-		boolean versionLine = false;
-		LongObjectId id = null;
-		long sz = -1;
-
-		// This parsing is a bit too general if we go by the spec at
-		// https://github.com/git-lfs/git-lfs/blob/master/docs/spec.md
-		// Comment lines are not mentioned in the spec, and the "version" line
-		// MUST be the first.
-		try (BufferedReader br = new BufferedReader(
-				new InputStreamReader(in, UTF_8))) {
-			for (String s = br.readLine(); s != null; s = br.readLine()) {
-				if (s.startsWith("#") || s.length() == 0) { //$NON-NLS-1$
-					continue;
-				} else if (s.startsWith("version")) { //$NON-NLS-1$
-					if (versionLine || s.length() < 8 || s.charAt(7) != ' ') {
-						return null; // Not a LFS pointer
-					}
-					String rest = s.substring(8).trim();
-					versionLine = VERSION.equals(rest)
-							|| VERSION_LEGACY.equals(rest);
-					if (!versionLine) {
-						return null; // Not a LFS pointer
-					}
-				} else {
-					try {
-						if (s.startsWith("oid sha256:")) { //$NON-NLS-1$
-							if (id != null) {
-								return null; // Not a LFS pointer
-							}
-							id = LongObjectId
-									.fromString(s.substring(11).trim());
-						} else if (s.startsWith("size")) { //$NON-NLS-1$
-							if (sz > 0 || s.length() < 5
-									|| s.charAt(4) != ' ') {
-								return null; // Not a LFS pointer
-							}
-							sz = Long.parseLong(s.substring(5).trim());
-						}
-					} catch (RuntimeException e) {
-						// We could not parse the line. If we have a version
-						// already, this is a corrupt LFS pointer. Otherwise it
-						// is just not an LFS pointer.
-						if (versionLine) {
-							throw e;
-						}
-						return null;
-					}
-				}
-			}
-			if (versionLine && id != null && sz > -1) {
-				return new LfsPointer(id, sz);
-			}
+		if (in.markSupported()) {
+			return parse(in);
 		}
-		return null;
+		// Fallback; note that while parse() resets its input stream, that won't
+		// reset "in".
+		return parse(new BufferedInputStream(in));
 	}
 
