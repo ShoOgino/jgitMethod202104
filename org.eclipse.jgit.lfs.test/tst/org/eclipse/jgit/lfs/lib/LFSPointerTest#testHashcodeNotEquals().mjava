@@ -1,0 +1,9 @@
+	@Test
+	public void testHashcodeNotEquals() throws Exception {
+		AnyLongObjectId id = LongObjectId.fromString(TEST_SHA256);
+		LfsPointer lfs = new LfsPointer(id, 4);
+		AnyLongObjectId id2 = LongObjectId.fromString(TEST_SHA256);
+		LfsPointer lfs2 = new LfsPointer(id2, 5);
+		assertNotEquals(lfs.hashCode(), lfs2.hashCode());
+	}
+

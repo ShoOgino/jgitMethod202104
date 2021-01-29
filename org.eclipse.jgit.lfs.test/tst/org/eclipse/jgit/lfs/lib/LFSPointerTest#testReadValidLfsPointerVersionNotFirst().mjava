@@ -1,0 +1,15 @@
+	@Test
+	public void testReadValidLfsPointerVersionNotFirst() throws Exception {
+		// This is actually not allowed per the spec, but JGit accepts it
+		// anyway.
+		String ptr = "oid sha256:" + TEST_SHA256 + '\n'
+				+ "size 4\n"
+				+ "version https://git-lfs.github.com/spec/v1\n";
+		AnyLongObjectId id = LongObjectId.fromString(TEST_SHA256);
+		LfsPointer lfs = new LfsPointer(id, 4);
+		try (ByteArrayInputStream in = new ByteArrayInputStream(
+				ptr.getBytes(UTF_8))) {
+			assertEquals(lfs, LfsPointer.parseLfsPointer(in));
+		}
+	}
+

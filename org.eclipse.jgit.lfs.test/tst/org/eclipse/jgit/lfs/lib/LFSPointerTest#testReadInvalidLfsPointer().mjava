@@ -1,0 +1,9 @@
+	@Test
+	public void testReadInvalidLfsPointer() throws Exception {
+		String cSource = "size_t someFunction(void *ptr); // Fake C source\n";
+		try (ByteArrayInputStream in = new ByteArrayInputStream(
+				cSource.getBytes(UTF_8))) {
+			assertNull("Is not a LFS pointer", LfsPointer.parseLfsPointer(in));
+		}
+	}
+

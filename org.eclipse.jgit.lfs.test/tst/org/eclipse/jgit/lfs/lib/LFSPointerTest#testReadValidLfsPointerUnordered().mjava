@@ -1,0 +1,15 @@
+	@Test
+	public void testReadValidLfsPointerUnordered() throws Exception {
+		// This is actually not allowed per the spec, but JGit accepts it
+		// anyway.
+		String ptr = "version https://git-lfs.github.com/spec/v1\n"
+				+ "size 4\n"
+				+ "oid sha256:" + TEST_SHA256 + '\n';
+		AnyLongObjectId id = LongObjectId.fromString(TEST_SHA256);
+		LfsPointer lfs = new LfsPointer(id, 4);
+		try (ByteArrayInputStream in = new ByteArrayInputStream(
+				ptr.getBytes(UTF_8))) {
+			assertEquals(lfs, LfsPointer.parseLfsPointer(in));
+		}
+	}
+

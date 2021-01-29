@@ -1,0 +1,10 @@
+	@Test
+	public void testCompareToNotEqualsSize() throws Exception {
+		AnyLongObjectId id = LongObjectId.fromString(TEST_SHA256);
+		LfsPointer lfs = new LfsPointer(id, 4);
+		AnyLongObjectId id2 = LongObjectId.fromString(TEST_SHA256);
+		LfsPointer lfs2 = new LfsPointer(id2, 5);
+		assertNotEquals(0, lfs.compareTo(lfs2));
+		assertNotEquals(0, lfs2.compareTo(lfs));
+	}
+

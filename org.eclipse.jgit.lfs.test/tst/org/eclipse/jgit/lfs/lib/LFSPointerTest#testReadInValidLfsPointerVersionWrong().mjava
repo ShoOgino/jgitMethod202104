@@ -1,0 +1,11 @@
+	@Test
+	public void testReadInValidLfsPointerVersionWrong() throws Exception {
+		String ptr = "version https://git-lfs.example.org/spec/v1\n"
+				+ "oid sha256:" + TEST_SHA256 + '\n'
+				+ "size 4\n";
+		try (ByteArrayInputStream in = new ByteArrayInputStream(
+				ptr.getBytes(UTF_8))) {
+			assertNull("Is not a LFS pointer", LfsPointer.parseLfsPointer(in));
+		}
+	}
+

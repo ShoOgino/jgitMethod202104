@@ -1,13 +1,13 @@
 	@Test
-	public void testEncoding() throws IOException {
+	public void testRoundtrip() throws Exception {
 		AnyLongObjectId id = LongObjectId.fromString(TEST_SHA256);
 		LfsPointer ptr = new LfsPointer(id, 4);
 		try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
 			ptr.encode(baos);
-			assertEquals(
-					"version https://git-lfs.github.com/spec/v1\noid sha256:"
-							+ TEST_SHA256 + "\nsize 4\n",
-					baos.toString(UTF_8.name()));
+			try (ByteArrayInputStream in = new ByteArrayInputStream(
+					baos.toByteArray())) {
+				assertEquals(ptr, LfsPointer.parseLfsPointer(in));
+			}
 		}
 	}
 
