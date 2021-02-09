@@ -3,8 +3,10 @@
 	 *
 	 * @throws org.eclipse.jgit.api.errors.AbortedByHookException
 	 *             If the underlying hook script exited with non-zero.
+	 * @throws IOException
+	 *             if an IO error occurred
 	 */
-	protected void doRun() throws AbortedByHookException {
+	protected void doRun() throws AbortedByHookException, IOException {
 		final ByteArrayOutputStream errorByteArray = new ByteArrayOutputStream();
 		final TeeOutputStream stderrStream = new TeeOutputStream(errorByteArray,
 				getErrorStream());
@@ -18,7 +20,8 @@
 				getStdinArgs());
 		if (result.isExecutedWithError()) {
 			throw new AbortedByHookException(
-					new String(errorByteArray.toByteArray(), UTF_8),
+					new String(errorByteArray.toByteArray(),
+							Charset.defaultCharset().name()),
 					getHookName(), result.getExitCode());
 		}
 	}
