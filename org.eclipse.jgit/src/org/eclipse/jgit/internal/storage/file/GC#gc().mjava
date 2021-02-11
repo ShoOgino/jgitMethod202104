@@ -18,16 +18,16 @@
 	 * gc.log.
 	 *
 	 * @return the collection of
-	 *         {@link org.eclipse.jgit.internal.storage.file.PackFile}'s which
+	 *         {@link org.eclipse.jgit.internal.storage.file.Pack}'s which
 	 *         are newly created
 	 * @throws java.io.IOException
 	 * @throws java.text.ParseException
 	 *             If the configuration parameter "gc.pruneexpire" couldn't be
 	 *             parsed
 	 */
-	// TODO(ms): change signature and return Future<Collection<PackFile>>
+	// TODO(ms): change signature and return Future<Collection<Pack>>
 	@SuppressWarnings("FutureReturnValueIgnored")
-	public Collection<PackFile> gc() throws IOException, ParseException {
+	public Collection<Pack> gc() throws IOException, ParseException {
 		if (!background) {
 			return doGc();
 		}
@@ -37,9 +37,9 @@
 			return Collections.emptyList();
 		}
 
-		Callable<Collection<PackFile>> gcTask = () -> {
+		Callable<Collection<Pack>> gcTask = () -> {
 			try {
-				Collection<PackFile> newPacks = doGc();
+				Collection<Pack> newPacks = doGc();
 				if (automatic && tooManyLooseObjects()) {
 					String message = JGitText.get().gcTooManyUnpruned;
 					gcLog.write(message);

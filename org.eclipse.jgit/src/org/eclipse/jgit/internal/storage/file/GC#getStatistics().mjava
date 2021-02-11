@@ -6,13 +6,13 @@
 	 */
 	public RepoStatistics getStatistics() throws IOException {
 		RepoStatistics ret = new RepoStatistics();
-		Collection<PackFile> packs = repo.getObjectDatabase().getPacks();
-		for (PackFile f : packs) {
-			ret.numberOfPackedObjects += f.getIndex().getObjectCount();
+		Collection<Pack> packs = repo.getObjectDatabase().getPacks();
+		for (Pack p : packs) {
+			ret.numberOfPackedObjects += p.getIndex().getObjectCount();
 			ret.numberOfPackFiles++;
-			ret.sizeOfPackedObjects += f.getPackFile().length();
-			if (f.getBitmapIndex() != null)
-				ret.numberOfBitmaps += f.getBitmapIndex().getBitmapCount();
+			ret.sizeOfPackedObjects += p.getPackFile().length();
+			if (p.getBitmapIndex() != null)
+				ret.numberOfBitmaps += p.getBitmapIndex().getBitmapCount();
 		}
 		File objDir = repo.getObjectsDirectory();
 		String[] fanout = objDir.list();

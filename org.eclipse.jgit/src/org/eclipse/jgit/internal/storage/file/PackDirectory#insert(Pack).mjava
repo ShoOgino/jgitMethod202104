@@ -1,0 +1,24 @@
+	void insert(Pack pack) {
+		PackList o, n;
+		do {
+			o = packList.get();
+
+			// If the pack in question is already present in the list
+			// (picked up by a concurrent thread that did a scan?) we
+			// do not want to insert it a second time.
+			//
+			final Pack[] oldList = o.packs;
+			final String name = pack.getPackFile().getName();
+			for (Pack p : oldList) {
+				if (name.equals(p.getPackFile().getName())) {
+					return;
+				}
+			}
+
+			final Pack[] newList = new Pack[1 + oldList.length];
+			newList[0] = pack;
+			System.arraycopy(oldList, 0, newList, 1, oldList.length);
+			n = new PackList(o.snapshot, newList);
+		} while (!packList.compareAndSet(o, n));
+	}
+

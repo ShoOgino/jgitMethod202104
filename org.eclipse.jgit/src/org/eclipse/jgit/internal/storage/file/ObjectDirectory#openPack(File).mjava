@@ -4,7 +4,7 @@
 	 * Add a single existing pack to the list of available pack files.
 	 */
 	@Override
-	public PackFile openPack(File pack)
+	public Pack openPack(File pack)
 			throws IOException {
 		final String p = pack.getName();
 		if (p.length() != 50 || !p.startsWith("pack-") || !p.endsWith(".pack")) //$NON-NLS-1$ //$NON-NLS-2$
@@ -23,7 +23,7 @@
 			}
 		}
 
-		PackFile res = new PackFile(pack, extensions);
+		Pack res = new Pack(pack, extensions);
 		packed.insert(res);
 		return res;
 	}

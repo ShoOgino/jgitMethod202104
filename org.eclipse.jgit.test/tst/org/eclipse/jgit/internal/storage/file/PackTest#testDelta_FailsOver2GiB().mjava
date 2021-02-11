@@ -1,0 +1,55 @@
+	@Test
+	public void testDelta_FailsOver2GiB() throws Exception {
+		try (ObjectInserter.Formatter fmt = new ObjectInserter.Formatter()) {
+			byte[] base = new byte[] { 'a' };
+			ObjectId idA = fmt.idFor(Constants.OBJ_BLOB, base);
+			ObjectId idB = fmt.idFor(Constants.OBJ_BLOB, new byte[] { 'b' });
+
+			PackedObjectInfo a = new PackedObjectInfo(idA);
+			PackedObjectInfo b = new PackedObjectInfo(idB);
+
+			TemporaryBuffer.Heap packContents = new TemporaryBuffer.Heap(64 * 1024);
+			packHeader(packContents, 2);
+			a.setOffset(packContents.length());
+			objectHeader(packContents, Constants.OBJ_BLOB, base.length);
+			deflate(packContents, base);
+
+			ByteArrayOutputStream tmp = new ByteArrayOutputStream();
+			DeltaEncoder de = new DeltaEncoder(tmp, base.length, 3L << 30);
+			de.copy(0, 1);
+			byte[] delta = tmp.toByteArray();
+			b.setOffset(packContents.length());
+			objectHeader(packContents, Constants.OBJ_REF_DELTA, delta.length);
+			idA.copyRawTo(packContents);
+			deflate(packContents, delta);
+			byte[] footer = digest(packContents);
+
+			File dir = new File(repo.getObjectDatabase().getDirectory(),
+					"pack");
+			File packName = new File(dir, idA.name() + ".pack");
+			File idxName = new File(dir, idA.name() + ".idx");
+
+			try (FileOutputStream f = new FileOutputStream(packName)) {
+				f.write(packContents.toByteArray());
+			}
+
+			try (FileOutputStream f = new FileOutputStream(idxName)) {
+				List<PackedObjectInfo> list = new ArrayList<>();
+				list.add(a);
+				list.add(b);
+				Collections.sort(list);
+				new PackIndexWriterV1(f).write(list, footer);
+			}
+
+			Pack pack = new Pack(packName, PackExt.INDEX.getBit());
+			try {
+				pack.get(wc, b);
+				fail("expected LargeObjectException.ExceedsByteArrayLimit");
+			} catch (LargeObjectException.ExceedsByteArrayLimit bad) {
+				assertNull(bad.getObjectId());
+			} finally {
+				pack.close();
+			}
+		}
+	}
+
