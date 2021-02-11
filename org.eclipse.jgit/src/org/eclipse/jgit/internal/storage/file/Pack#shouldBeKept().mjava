@@ -4,8 +4,9 @@
 	 * @return true if a .keep file exist.
 	 */
 	public boolean shouldBeKept() {
-		if (keepFile == null)
-			keepFile = extFile(KEEP);
+		if (keepFile == null) {
+			keepFile = packFile.create(KEEP);
+		}
 		return keepFile.exists();
 	}
 

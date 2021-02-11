@@ -4,15 +4,6 @@
 	 * @return name extracted from {@code pack-*.pack} pattern.
 	 */
 	public String getPackName() {
-		String name = packName;
-		if (name == null) {
-			name = getPackFile().getName();
-			if (name.startsWith("pack-")) //$NON-NLS-1$
-				name = name.substring("pack-".length()); //$NON-NLS-1$
-			if (name.endsWith(".pack")) //$NON-NLS-1$
-				name = name.substring(0, name.length() - ".pack".length()); //$NON-NLS-1$
-			packName = name;
-		}
-		return name;
+		return packFile.getId();
 	}
 

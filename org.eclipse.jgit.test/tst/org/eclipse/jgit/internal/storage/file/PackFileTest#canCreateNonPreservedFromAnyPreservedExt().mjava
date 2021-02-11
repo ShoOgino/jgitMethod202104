@@ -1,0 +1,17 @@
+	@Test
+	public void canCreateNonPreservedFromAnyPreservedExt() throws Exception {
+		// Preserved PackFiles must have an extension
+		PackFile preserved = new PackFile(TEST_PRESERVED_DIR, OLD_PACK);
+		for (PackExt ext : PackExt.values()) {
+			PackFile preservedWithExt = preserved.create(ext);
+			PackFile nonPreserved = preservedWithExt
+					.createForDirectory(TEST_PACK_DIR);
+			File expected = new File(TEST_PACK_DIR,
+					PREFIX + TEST_ID + "." + ext.getExtension());
+			assertEquals(nonPreserved.getName(), expected.getName());
+			assertEquals(nonPreserved.getId(), TEST_ID);
+			assertEquals(nonPreserved.getPackExt(),
+					preservedWithExt.getPackExt());
+		}
+	}
+

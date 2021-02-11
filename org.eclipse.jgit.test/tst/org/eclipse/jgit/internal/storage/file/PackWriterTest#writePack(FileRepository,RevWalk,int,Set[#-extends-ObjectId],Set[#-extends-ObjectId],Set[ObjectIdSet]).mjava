@@ -17,12 +17,12 @@
 			pw.preparePack(NullProgressMonitor.INSTANCE, ow, want, have, NONE);
 			String id = pw.computeName().getName();
 			File packdir = repo.getObjectDatabase().getPackDirectory();
-			File packFile = new File(packdir, "pack-" + id + ".pack");
+			PackFile packFile = new PackFile(packdir, "pack-" + id + ".pack");
 			try (FileOutputStream packOS = new FileOutputStream(packFile)) {
 				pw.writePack(NullProgressMonitor.INSTANCE,
 						NullProgressMonitor.INSTANCE, packOS);
 			}
-			File idxFile = new File(packdir, "pack-" + id + ".idx");
+			PackFile idxFile = packFile.create(PackExt.INDEX);
 			try (FileOutputStream idxOS = new FileOutputStream(idxFile)) {
 				pw.writeIndex(idxOS);
 			}

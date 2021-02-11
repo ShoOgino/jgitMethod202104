@@ -1,0 +1,28 @@
+	/**
+	 * Create a PackFile for a pack or related file.
+	 *
+	 * @param directory
+	 *            Directory to create the PackFile in.
+	 * @param name
+	 *            Filename (last path section) of the PackFile
+	 */
+	public PackFile(File directory, String name) {
+		super(directory, name);
+		int dot = name.lastIndexOf('.');
+
+		if (dot < 0) {
+			base = name;
+			hasOldPrefix = false;
+			packExt = null;
+		} else {
+			base = name.substring(0, dot);
+			String tail = name.substring(dot + 1); // ["old-"] + extension
+			packExt = getPackExt(tail);
+			String old = tail.substring(0,
+					tail.length() - getExtension().length());
+			hasOldPrefix = old.equals(getExtPrefix(true));
+		}
+
+		id = base.startsWith(PREFIX) ? base.substring(PREFIX.length()) : base;
+	}
+

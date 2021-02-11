@@ -5,16 +5,18 @@
 				idx = loadedIdx;
 				if (idx == null) {
 					if (invalid) {
-						throw new PackInvalidException(packFile, invalidatingCause);
+						throw new PackInvalidException(packFile,
+								invalidatingCause);
 					}
 					try {
 						long start = System.currentTimeMillis();
-						idx = PackIndex.open(extFile(INDEX));
+						PackFile idxFile = packFile.create(INDEX);
+						idx = PackIndex.open(idxFile);
 						if (LOG.isDebugEnabled()) {
 							LOG.debug(String.format(
 									"Opening pack index %s, size %.3f MB took %d ms", //$NON-NLS-1$
-									extFile(INDEX).getAbsolutePath(),
-									Float.valueOf(extFile(INDEX).length()
+									idxFile.getAbsolutePath(),
+									Float.valueOf(idxFile.length()
 											/ (1024f * 1024)),
 									Long.valueOf(System.currentTimeMillis()
 											- start)));

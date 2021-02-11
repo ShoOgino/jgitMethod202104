@@ -6,8 +6,8 @@
 			}
 
 			final ObjectId name = pw.computeName();
-			final File packFile = fullPackFileName(name, ".pack");
-			final File idxFile = fullPackFileName(name, ".idx");
+			final PackFile packFile = fullPackFileName(name, ".pack");
+			final PackFile idxFile = packFile.create(PackExt.INDEX);
 			final File[] files = new File[] { packFile, idxFile };
 			write(files, pw);
 			return files;

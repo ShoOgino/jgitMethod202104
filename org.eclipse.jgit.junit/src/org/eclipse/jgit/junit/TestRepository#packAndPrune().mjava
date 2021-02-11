@@ -11,7 +11,7 @@
 			ObjectDirectory odb = (ObjectDirectory) db.getObjectDatabase();
 			NullProgressMonitor m = NullProgressMonitor.INSTANCE;
 
-			final File pack, idx;
+			final PackFile pack, idx;
 			try (PackWriter pw = new PackWriter(db)) {
 				Set<ObjectId> all = new HashSet<>();
 				for (Ref r : db.getRefDatabase().getRefs())
@@ -27,7 +27,7 @@
 				}
 				pack.setReadOnly();
 
-				idx = nameFor(odb, name, ".idx");
+				idx = pack.create(PackExt.INDEX);
 				try (OutputStream out =
 						new BufferedOutputStream(new FileOutputStream(idx))) {
 					pw.writeIndex(out);
