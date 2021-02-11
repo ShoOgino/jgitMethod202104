@@ -1,43 +1,32 @@
 	private PackList scanPacksImpl(PackList old) {
 		final Map<String, Pack> forReuse = reuseMap(old);
 		final FileSnapshot snapshot = FileSnapshot.save(directory);
-		final Set<String> names = listPackDirectory();
-		final List<Pack> list = new ArrayList<>(names.size() >> 2);
+		Map<String, Map<PackExt, PackFile>> packFilesByExtById = getPackFilesByExtById();
+		List<Pack> list = new ArrayList<>(packFilesByExtById.size());
 		boolean foundNew = false;
-		for (String indexName : names) {
-			// Must match "pack-[0-9a-f]{40}.idx" to be an index.
-			//
-			if (indexName.length() != 49 || !indexName.endsWith(".idx")) { //$NON-NLS-1$
-				continue;
-			}
-
-			final String base = indexName.substring(0, indexName.length() - 3);
-			int extensions = 0;
-			for (PackExt ext : PackExt.values()) {
-				if (names.contains(base + ext.getExtension())) {
-					extensions |= ext.getBit();
-				}
-			}
-
-			if ((extensions & PACK.getBit()) == 0) {
+		for (Map<PackExt, PackFile> packFilesByExt : packFilesByExtById
+				.values()) {
+			PackFile packFile = packFilesByExt.get(PACK);
+			if (packFile == null || !packFilesByExt.containsKey(INDEX)) {
 				// Sometimes C Git's HTTP fetch transport leaves a
 				// .idx file behind and does not download the .pack.
 				// We have to skip over such useless indexes.
-				//
+				// Also skip if we don't have any index for this id
 				continue;
 			}
 
-			final String packName = base + PACK.getExtension();
-			final File packFile = new File(directory, packName);
-			final Pack oldPack = forReuse.get(packName);
+			Pack oldPack = forReuse.get(packFile.getName());
 			if (oldPack != null
 					&& !oldPack.getFileSnapshot().isModified(packFile)) {
-				forReuse.remove(packName);
+				forReuse.remove(packFile.getName());
 				list.add(oldPack);
 				continue;
 			}
 
-			list.add(new Pack(packFile, extensions));
+			list.add(new Pack(packFile,
+					packFilesByExt.containsKey(BITMAP_INDEX)
+							? BITMAP_INDEX.getBit()
+							: 0));
 			foundNew = true;
 		}
 
