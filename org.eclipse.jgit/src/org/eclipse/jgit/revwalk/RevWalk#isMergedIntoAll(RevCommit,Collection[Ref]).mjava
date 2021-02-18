@@ -1,0 +1,21 @@
+	/**
+	 * Determine if a <code>commit</code> is merged into all of the given
+	 * <code>refs</code>.
+	 *
+	 * @param commit
+	 *            commit the caller thinks is reachable from <code>refs</code>.
+	 * @param refs
+	 *            refs to start iteration from, and which is most likely a
+	 *            descendant (child) of <code>commit</code>.
+	 * @return true if commit is merged into all of the refs; false otherwise.
+	 * @throws java.io.IOException
+	 *             a pack file or loose object could not be read.
+	 * @since 5.12
+	 */
+	public boolean isMergedIntoAll(RevCommit commit, Collection<Ref> refs)
+			throws IOException {
+		return getMergedInto(commit, refs,
+				GetMergedIntoStrategy.RETURN_ON_FIRST_NOT_FOUND).size()
+				== refs.size();
+	}
+

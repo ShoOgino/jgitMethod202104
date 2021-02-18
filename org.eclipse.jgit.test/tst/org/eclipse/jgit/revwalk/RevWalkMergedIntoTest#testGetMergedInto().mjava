@@ -1,0 +1,33 @@
+	@Test
+	public void testGetMergedInto() throws Exception {
+		/*
+		 *          i
+		 *         / \
+		 *        A   o
+		 *       / \   \
+		 *      o1  o2  E
+		 *     / \ / \
+		 *    B   C   D
+		 */
+		String b = "refs/heads/b";
+		String c = "refs/heads/c";
+		String d = "refs/heads/d";
+		String e = "refs/heads/e";
+		final RevCommit i = commit();
+		final RevCommit a = commit(i);
+		final RevCommit o1 = commit(a);
+		final RevCommit o2 = commit(a);
+		createBranch(commit(o1), b);
+		createBranch(commit(o1, o2), c);
+		createBranch(commit(o2), d);
+		createBranch(commit(commit(i)), e);
+
+		List<String>  modifiedResult = rw.getMergedInto(a, getRefs())
+				.stream().map(Ref::getName).collect(Collectors.toList());
+
+		assertTrue(modifiedResult.size() == 3);
+		assertTrue(modifiedResult.contains(b));
+		assertTrue(modifiedResult.contains(c));
+		assertTrue(modifiedResult.contains(d));
+	}
+

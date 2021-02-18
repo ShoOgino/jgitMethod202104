@@ -1,0 +1,21 @@
+	@Test
+	public void testIsMergedIntoAny() throws Exception {
+		/*
+		 *          i
+		 *         / \
+		 *        A   o
+		 *       /     \
+		 *      o       C
+		 *     /
+		 *    B
+		 */
+		String b = "refs/heads/b";
+		String c = "refs/heads/c";
+		final RevCommit i = commit();
+		final RevCommit a = commit(i);
+		createBranch(commit(commit(a)), b);
+		createBranch(commit(commit(i)), c);
+
+		assertTrue( rw.isMergedIntoAny(a, getRefs()));
+	}
+

@@ -1,0 +1,22 @@
+	/**
+	 * Determine the Refs into which a commit is merged.
+	 * <p>
+	 * A commit is merged into a ref if we can find a path of commits that leads
+	 * from that specific ref and ends at <code>commit</code>.
+	 * <p>
+	 *
+	 * @param commit
+	 *            commit the caller thinks is reachable from <code>refs</code>.
+	 * @param refs
+	 *            refs to start iteration from, and which is most likely a
+	 *            descendant (child) of <code>commit</code>.
+	 * @return list of refs that are reachable from <code>commit</code>.
+	 * @throws java.io.IOException
+	 *             a pack file or loose object could not be read.
+	 * @since 5.12
+	 */
+	public List<Ref> getMergedInto(RevCommit commit, Collection<Ref> refs)
+			throws IOException{
+		return getMergedInto(commit, refs, GetMergedIntoStrategy.EVALUATE_ALL);
+	}
+
