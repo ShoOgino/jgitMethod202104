@@ -1,0 +1,39 @@
+	/**
+	 * Inflate a region of the pack starting at {@code position}.
+	 *
+	 * @param pack
+	 *            the file the desired window is stored within.
+	 * @param position
+	 *            position within the file to read from.
+	 * @param dstbuf
+	 *            destination buffer the inflater should output decompressed
+	 *            data to. Must be large enough to store the entire stream,
+	 *            unless headerOnly is true.
+	 * @param headerOnly
+	 *            if true the caller wants only {@code dstbuf.length} bytes.
+	 * @return number of bytes inflated into <code>dstbuf</code>.
+	 * @throws IOException
+	 *             this cursor does not match the provider or id and the proper
+	 *             window could not be acquired through the provider's cache.
+	 * @throws DataFormatException
+	 *             the inflater encountered an invalid chunk of data. Data
+	 *             stream corruption is likely.
+	 */
+	int inflate(final Pack pack, long position, final byte[] dstbuf,
+			boolean headerOnly) throws IOException, DataFormatException {
+		prepareInflater();
+		pin(pack, position);
+		position += window.setInput(position, inf);
+		for (int dstoff = 0;;) {
+			int n = inf.inflate(dstbuf, dstoff, dstbuf.length - dstoff);
+			dstoff += n;
+			if (inf.finished() || (headerOnly && dstoff == dstbuf.length))
+				return dstoff;
+			if (inf.needsInput()) {
+				pin(pack, position);
+				position += window.setInput(position, inf);
+			} else if (n == 0)
+				throw new DataFormatException();
+		}
+	}
+

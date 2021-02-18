@@ -1,13 +1,13 @@
-	private List<PackFile> listPacks() throws Exception {
-		List<PackFile> fromOpenDb = listPacks(db);
-		List<PackFile> reopened;
+	private List<Pack> listPacks() throws Exception {
+		List<Pack> fromOpenDb = listPacks(db);
+		List<Pack> reopened;
 		try (FileRepository db2 = new FileRepository(db.getDirectory())) {
 			reopened = listPacks(db2);
 		}
 		assertEquals(fromOpenDb.size(), reopened.size());
 		for (int i = 0 ; i < fromOpenDb.size(); i++) {
-			PackFile a = fromOpenDb.get(i);
-			PackFile b = reopened.get(i);
+			Pack a = fromOpenDb.get(i);
+			Pack b = reopened.get(i);
 			assertEquals(a.getPackName(), b.getPackName());
 			assertEquals(
 					a.getPackFile().getAbsolutePath(), b.getPackFile().getAbsolutePath());

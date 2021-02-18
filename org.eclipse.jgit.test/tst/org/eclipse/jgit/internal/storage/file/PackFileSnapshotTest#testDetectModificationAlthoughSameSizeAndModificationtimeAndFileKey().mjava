@@ -17,16 +17,16 @@
 		createTestRepo(testDataSeed, testDataLength);
 
 		// Repack to create initial packfile. Make a copy of it
-		PackFile pf = repackAndCheck(5, null, null, null);
-		Path packFilePath = pf.getPackFile().toPath();
+		Pack p = repackAndCheck(5, null, null, null);
+		Path packFilePath = p.getPackFile().toPath();
 		Path fn = packFilePath.getFileName();
 		assertNotNull(fn);
 		String packFileName = fn.toString();
 		Path packFileBasePath = packFilePath
 				.resolveSibling(packFileName.replaceAll(".pack", ""));
-		AnyObjectId chk1 = pf.getPackChecksum();
-		String name = pf.getPackName();
-		Long length = Long.valueOf(pf.getPackFile().length());
+		AnyObjectId chk1 = p.getPackChecksum();
+		String name = p.getPackName();
+		Long length = Long.valueOf(p.getPackFile().length());
 		copyPack(packFileBasePath, "", ".copy1");
 
 		// Repack to create second packfile. Make a copy of it

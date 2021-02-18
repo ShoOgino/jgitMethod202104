@@ -13,14 +13,14 @@
 		c.setInt(ConfigConstants.CONFIG_GC_SECTION, null,
 				ConfigConstants.CONFIG_KEY_AUTOPACKLIMIT, 1);
 		c.save();
-		Collection<PackFile> packs = gc(Deflater.NO_COMPRESSION);
+		Collection<Pack> packs = gc(Deflater.NO_COMPRESSION);
 		assertEquals("expected 1 packfile after gc", 1, packs.size());
-		PackFile p1 = packs.iterator().next();
+		Pack p1 = packs.iterator().next();
 		PackFileSnapshot snapshot = p1.getFileSnapshot();
 
 		packs = gc(Deflater.BEST_COMPRESSION);
 		assertEquals("expected 1 packfile after gc", 1, packs.size());
-		PackFile p2 = packs.iterator().next();
+		Pack p2 = packs.iterator().next();
 		File pf = p2.getPackFile();
 
 		// changing compression level with aggressive gc may change size,
