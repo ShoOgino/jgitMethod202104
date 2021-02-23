@@ -1,5 +1,5 @@
 	private List<Ref> getMergedInto(RevCommit needle, Collection<Ref> haystacks,
-			Enum returnStrategy) throws IOException {
+				Enum returnStrategy, ProgressMonitor monitor) throws IOException {
 		List<Ref> result = new ArrayList<>();
 		RevFilter oldRF = filter;
 		TreeFilter oldTF = treeFilter;
@@ -8,6 +8,10 @@
 			filter = RevFilter.ALL;
 			treeFilter = TreeFilter.ALL;
 			for (Ref r: haystacks) {
+				if (monitor.isCancelled()) {
+					return result;
+				}
+				monitor.update(1);
 				RevObject o = parseAny(r.getObjectId());
 				if (!(o instanceof RevCommit)) {
 					continue;

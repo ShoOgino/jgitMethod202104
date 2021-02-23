@@ -10,13 +10,17 @@
 	 * @param refs
 	 *            refs to start iteration from, and which is most likely a
 	 *            descendant (child) of <code>commit</code>.
+	 * @param monitor
+	 *            the callback for progress and cancellation
 	 * @return list of refs that are reachable from <code>commit</code>.
 	 * @throws java.io.IOException
 	 *             a pack file or loose object could not be read.
 	 * @since 5.12
 	 */
-	public List<Ref> getMergedInto(RevCommit commit, Collection<Ref> refs)
-			throws IOException{
-		return getMergedInto(commit, refs, NullProgressMonitor.INSTANCE);
+	public List<Ref> getMergedInto(RevCommit commit, Collection<Ref> refs,
+					ProgressMonitor monitor) throws IOException{
+		return getMergedInto(commit, refs,
+				GetMergedIntoStrategy.EVALUATE_ALL,
+				monitor);
 	}
 

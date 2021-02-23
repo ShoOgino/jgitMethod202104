@@ -15,7 +15,8 @@
 	public boolean isMergedIntoAll(RevCommit commit, Collection<Ref> refs)
 			throws IOException {
 		return getMergedInto(commit, refs,
-				GetMergedIntoStrategy.RETURN_ON_FIRST_NOT_FOUND).size()
+				GetMergedIntoStrategy.RETURN_ON_FIRST_NOT_FOUND,
+				NullProgressMonitor.INSTANCE).size()
 				== refs.size();
 	}
 
