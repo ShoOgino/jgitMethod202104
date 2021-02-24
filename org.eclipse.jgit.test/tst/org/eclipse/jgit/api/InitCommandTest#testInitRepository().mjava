@@ -5,7 +5,9 @@
 		InitCommand command = new InitCommand();
 		command.setDirectory(directory);
 		try (Git git = command.call()) {
-			assertNotNull(git.getRepository());
+			Repository r = git.getRepository();
+			assertNotNull(r);
+			assertEquals("refs/heads/master", r.getFullBranch());
 		}
 	}
 

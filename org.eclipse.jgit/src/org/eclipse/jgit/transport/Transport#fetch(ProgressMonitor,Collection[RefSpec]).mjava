@@ -24,42 +24,11 @@
 	 *             the remote connection could not be established or object
 	 *             copying (if necessary) failed or update specification was
 	 *             incorrect.
+	 * @since 5.11
 	 */
 	public FetchResult fetch(final ProgressMonitor monitor,
-			Collection<RefSpec> toFetch) throws NotSupportedException,
-			TransportException {
-		if (toFetch == null || toFetch.isEmpty()) {
-			// If the caller did not ask for anything use the defaults.
-			//
-			if (fetch.isEmpty())
-				throw new TransportException(JGitText.get().nothingToFetch);
-			toFetch = fetch;
-		} else if (!fetch.isEmpty()) {
-			// If the caller asked for something specific without giving
-			// us the local tracking branch see if we can update any of
-			// the local tracking branches without incurring additional
-			// object transfer overheads.
-			//
-			final Collection<RefSpec> tmp = new ArrayList<>(toFetch);
-			for (RefSpec requested : toFetch) {
-				final String reqSrc = requested.getSource();
-				for (RefSpec configured : fetch) {
-					final String cfgSrc = configured.getSource();
-					final String cfgDst = configured.getDestination();
-					if (cfgSrc.equals(reqSrc) && cfgDst != null) {
-						tmp.add(configured);
-						break;
-					}
-				}
-			}
-			toFetch = tmp;
-		}
-
-		final FetchResult result = new FetchResult();
-		new FetchProcess(this, toFetch).execute(monitor, result);
-
-		local.autoGC(monitor);
-
-		return result;
+			Collection<RefSpec> toFetch)
+			throws NotSupportedException, TransportException {
+		return fetch(monitor, toFetch, null);
 	}
 

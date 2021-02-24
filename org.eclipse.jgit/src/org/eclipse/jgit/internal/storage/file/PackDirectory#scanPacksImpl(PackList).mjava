@@ -1,8 +1,8 @@
 	private PackList scanPacksImpl(PackList old) {
-		final Map<String, PackFile> forReuse = reuseMap(old);
+		final Map<String, Pack> forReuse = reuseMap(old);
 		final FileSnapshot snapshot = FileSnapshot.save(directory);
 		final Set<String> names = listPackDirectory();
-		final List<PackFile> list = new ArrayList<>(names.size() >> 2);
+		final List<Pack> list = new ArrayList<>(names.size() >> 2);
 		boolean foundNew = false;
 		for (String indexName : names) {
 			// Must match "pack-[0-9a-f]{40}.idx" to be an index.
@@ -29,7 +29,7 @@
 
 			final String packName = base + PACK.getExtension();
 			final File packFile = new File(directory, packName);
-			final PackFile oldPack = forReuse.get(packName);
+			final Pack oldPack = forReuse.get(packName);
 			if (oldPack != null
 					&& !oldPack.getFileSnapshot().isModified(packFile)) {
 				forReuse.remove(packName);
@@ -37,7 +37,7 @@
 				continue;
 			}
 
-			list.add(new PackFile(packFile, extensions));
+			list.add(new Pack(packFile, extensions));
 			foundNew = true;
 		}
 
@@ -51,7 +51,7 @@
 			return old;
 		}
 
-		for (PackFile p : forReuse.values()) {
+		for (Pack p : forReuse.values()) {
 			p.close();
 		}
 
@@ -59,8 +59,8 @@
 			return new PackList(snapshot, NO_PACKS.packs);
 		}
 
-		final PackFile[] r = list.toArray(new PackFile[0]);
-		Arrays.sort(r, PackFile.SORT);
+		final Pack[] r = list.toArray(new Pack[0]);
+		Arrays.sort(r, Pack.SORT);
 		return new PackList(snapshot, r);
 	}
 

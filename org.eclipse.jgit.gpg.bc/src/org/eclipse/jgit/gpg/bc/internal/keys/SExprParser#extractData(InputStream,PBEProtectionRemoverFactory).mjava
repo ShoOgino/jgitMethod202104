@@ -1,0 +1,69 @@
+	private static byte[][] extractData(InputStream inputStream,
+			PBEProtectionRemoverFactory keyProtectionRemoverFactory)
+			throws PGPException, IOException {
+		byte[] data;
+		byte[] protectedAt = null;
+
+		SXprUtils.skipOpenParenthesis(inputStream);
+
+		String type = SXprUtils.readString(inputStream, inputStream.read());
+		if (type.equals("protected")) {
+			String protection = SXprUtils.readString(inputStream,
+					inputStream.read());
+
+			SXprUtils.skipOpenParenthesis(inputStream);
+
+			S2K s2k = SXprUtils.parseS2K(inputStream);
+
+			byte[] iv = SXprUtils.readBytes(inputStream, inputStream.read());
+
+			SXprUtils.skipCloseParenthesis(inputStream);
+
+			byte[] secKeyData = SXprUtils.readBytes(inputStream,
+					inputStream.read());
+
+			SXprUtils.skipCloseParenthesis(inputStream);
+
+			PBESecretKeyDecryptor keyDecryptor = keyProtectionRemoverFactory
+					.createDecryptor(protection);
+
+			// TODO: recognise other algorithms
+			byte[] key = keyDecryptor.makeKeyFromPassPhrase(
+					SymmetricKeyAlgorithmTags.AES_128, s2k);
+
+			data = keyDecryptor.recoverKeyData(
+					SymmetricKeyAlgorithmTags.AES_128, key, iv, secKeyData, 0,
+					secKeyData.length);
+
+			// check if protected at is present
+			if (inputStream.read() == '(') {
+				ByteArrayOutputStream bOut = new ByteArrayOutputStream();
+
+				bOut.write('(');
+				int ch;
+				while ((ch = inputStream.read()) >= 0 && ch != ')') {
+					bOut.write(ch);
+				}
+
+				if (ch != ')') {
+					throw new IOException("unexpected end to SExpr");
+				}
+
+				bOut.write(')');
+
+				protectedAt = bOut.toByteArray();
+			}
+
+			SXprUtils.skipCloseParenthesis(inputStream);
+			SXprUtils.skipCloseParenthesis(inputStream);
+		} else if (type.equals("d") || type.equals("x")) {
+			// JGit modification: unencrypted DSA or ECC keys can have an "x"
+			// here
+			return null;
+		} else {
+			throw new PGPException("protected block not found");
+		}
+
+		return new byte[][] { data, protectedAt };
+	}
+

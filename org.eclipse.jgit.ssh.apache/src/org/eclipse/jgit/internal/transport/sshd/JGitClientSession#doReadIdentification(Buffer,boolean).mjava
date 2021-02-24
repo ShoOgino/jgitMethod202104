@@ -26,9 +26,15 @@
 			throw new IllegalStateException(
 					"doReadIdentification of client called with server=true"); //$NON-NLS-1$
 		}
-		int maxIdentSize = PropertyResolverUtils.getIntProperty(this,
-				FactoryManager.MAX_IDENTIFICATION_SIZE,
-				DEFAULT_MAX_IDENTIFICATION_SIZE);
+		Integer maxIdentLength = MAX_IDENTIFICATION_SIZE.get(this).orElse(null);
+		int maxIdentSize;
+		if (maxIdentLength == null || maxIdentLength
+				.intValue() < DEFAULT_MAX_IDENTIFICATION_SIZE) {
+			maxIdentSize = DEFAULT_MAX_IDENTIFICATION_SIZE;
+			MAX_IDENTIFICATION_SIZE.set(this, Integer.valueOf(maxIdentSize));
+		} else {
+			maxIdentSize = maxIdentLength.intValue();
+		}
 		int current = buffer.rpos();
 		int end = current + buffer.available();
 		if (current >= end) {

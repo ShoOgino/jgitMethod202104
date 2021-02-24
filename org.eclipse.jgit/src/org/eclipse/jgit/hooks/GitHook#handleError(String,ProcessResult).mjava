@@ -1,0 +1,20 @@
+	/**
+	 * Process that the hook exited with an error. This default implementation
+	 * throws an {@link AbortedByHookException }. Hooks which need a different
+	 * behavior can overwrite this method.
+	 *
+	 * @param message
+	 *            error message
+	 * @param result
+	 *            The process result of the hook
+	 * @throws AbortedByHookException
+	 *             When the hook should be aborted
+	 * @since 5.11
+	 */
+	protected void handleError(String message,
+			final ProcessResult result)
+			throws AbortedByHookException {
+		throw new AbortedByHookException(message, getHookName(),
+				result.getExitCode());
+	}
+

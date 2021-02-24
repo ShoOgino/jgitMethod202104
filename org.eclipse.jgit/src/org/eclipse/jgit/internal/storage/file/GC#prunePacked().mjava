@@ -7,7 +7,7 @@
 	 */
 	public void prunePacked() throws IOException {
 		ObjectDirectory objdb = repo.getObjectDatabase();
-		Collection<PackFile> packs = objdb.getPacks();
+		Collection<Pack> packs = objdb.getPacks();
 		File objects = repo.getObjectsDirectory();
 		String[] fanout = objects.list();
 
@@ -35,7 +35,7 @@
 							continue;
 						}
 						boolean found = false;
-						for (PackFile p : packs) {
+						for (Pack p : packs) {
 							checkCancelled();
 							if (p.hasObject(id)) {
 								found = true;

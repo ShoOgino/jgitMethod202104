@@ -1,0 +1,68 @@
+	/**
+	 * {@link Repository#resolve(String) Resolves} all names added to the
+	 * command to git objects and verifies their signature. Non-existing objects
+	 * are ignored.
+	 * <p>
+	 * Depending on the {@link #setMode(VerifyMode)}, only tags or commits or
+	 * any kind of objects are allowed.
+	 * </p>
+	 * <p>
+	 * Unsigned objects are silently skipped.
+	 * </p>
+	 *
+	 * @return a map of the given names to the corresponding
+	 *         {@link VerificationResult}, excluding ignored or skipped objects.
+	 * @throws ServiceUnavailableException
+	 *             if no {@link GpgSignatureVerifier} was set and no
+	 *             {@link GpgSignatureVerifierFactory} is available
+	 * @throws WrongObjectTypeException
+	 *             if a name resolves to an object of a type not allowed by the
+	 *             {@link #setMode(VerifyMode)} mode
+	 */
+	@Override
+	@NonNull
+	public Map<String, VerificationResult> call()
+			throws ServiceUnavailableException, WrongObjectTypeException {
+		checkCallable();
+		setCallable(false);
+		Map<String, VerificationResult> result = new HashMap<>();
+		if (verifier == null) {
+			GpgSignatureVerifierFactory factory = GpgSignatureVerifierFactory
+					.getDefault();
+			if (factory == null) {
+				throw new ServiceUnavailableException(
+						JGitText.get().signatureVerificationUnavailable);
+			}
+			verifier = factory.getVerifier();
+			ownVerifier = true;
+		}
+		if (config == null) {
+			config = new GpgConfig(repo.getConfig());
+		}
+		try (RevWalk walk = new RevWalk(repo)) {
+			for (String toCheck : namesToCheck) {
+				ObjectId id = repo.resolve(toCheck);
+				if (id != null && !ObjectId.zeroId().equals(id)) {
+					RevObject object;
+					try {
+						object = walk.parseAny(id);
+					} catch (MissingObjectException e) {
+						continue;
+					}
+					VerificationResult verification = verifyOne(object);
+					if (verification != null) {
+						result.put(toCheck, verification);
+					}
+				}
+			}
+		} catch (IOException e) {
+			throw new JGitInternalException(
+					JGitText.get().signatureVerificationError, e);
+		} finally {
+			if (ownVerifier) {
+				verifier.clear();
+			}
+		}
+		return result;
+	}
+

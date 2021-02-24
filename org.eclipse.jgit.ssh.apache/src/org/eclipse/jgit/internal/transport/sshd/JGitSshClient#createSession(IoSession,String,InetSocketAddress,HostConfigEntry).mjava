@@ -14,8 +14,7 @@
 			session.setCredentialsProvider(getCredentialsProvider());
 		}
 		int numberOfPasswordPrompts = getNumberOfPasswordPrompts(hostConfig);
-		session.getProperties().put(PASSWORD_PROMPTS,
-				Integer.valueOf(numberOfPasswordPrompts));
+		PASSWORD_PROMPTS.set(session, Integer.valueOf(numberOfPasswordPrompts));
 		List<Path> identities = hostConfig.getIdentities().stream()
 				.map(s -> {
 					try {

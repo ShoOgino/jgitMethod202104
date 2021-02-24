@@ -9,8 +9,8 @@
 	 */
 	@Test
 	public void testCloneAndFetchWithSessionLimit() throws Exception {
-		PropertyResolverUtils.updateProperty(server.getPropertyResolver(),
-				ServerFactoryManager.MAX_CONCURRENT_SESSIONS, 2);
+		MAX_CONCURRENT_SESSIONS
+				.set(server.getPropertyResolver(), Integer.valueOf(2));
 		File localClone = cloneWith("ssh://localhost/doesntmatter",
 				defaultCloneDir, null, //
 				"Host localhost", //

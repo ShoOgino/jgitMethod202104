@@ -1,0 +1,16 @@
+	private void readAsc(InputStream in, Consumer<PGPPublicKey> process)
+			throws IOException, PGPException {
+		PGPPublicKeyRingCollection pgpPub = new PGPPublicKeyRingCollection(
+			PGPUtil.getDecoderStream(in), new JcaKeyFingerprintCalculator());
+
+		Iterator<PGPPublicKeyRing> keyRings = pgpPub.getKeyRings();
+		while (keyRings.hasNext()) {
+			PGPPublicKeyRing keyRing = keyRings.next();
+
+			Iterator<PGPPublicKey> keys = keyRing.getPublicKeys();
+			while (keys.hasNext()) {
+				process.accept(keys.next());
+			}
+		}
+	}
+

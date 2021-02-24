@@ -1,0 +1,28 @@
+	/**
+	 * Writes information about a signature verification to the given writer.
+	 *
+	 * @param out
+	 *            to write to
+	 * @param verification
+	 *            to show
+	 * @param name
+	 *            of the verifier used
+	 * @param creator
+	 *            of the object verified; used for time zone information
+	 * @throws IOException
+	 *             if writing fails
+	 */
+	public static void writeVerification(ThrowingPrintWriter out,
+			SignatureVerification verification, String name,
+			PersonIdent creator) throws IOException {
+		String[] text = SignatureUtils
+				.toString(verification, creator,
+						new GitDateFormatter(GitDateFormatter.Format.LOCALE))
+				.split("\n"); //$NON-NLS-1$
+		for (String line : text) {
+			out.print(name);
+			out.print(": "); //$NON-NLS-1$
+			out.println(line);
+		}
+	}
+

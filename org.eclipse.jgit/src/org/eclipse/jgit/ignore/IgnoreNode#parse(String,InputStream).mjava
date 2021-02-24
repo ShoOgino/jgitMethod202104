@@ -1,0 +1,41 @@
+	/**
+	 * Parse files according to gitignore standards.
+	 *
+	 * @param sourceName
+	 *            identifying the source of the stream
+	 * @param in
+	 *            input stream holding the standard ignore format. The caller is
+	 *            responsible for closing the stream.
+	 * @throws java.io.IOException
+	 *             Error thrown when reading an ignore file.
+	 * @since 5.11
+	 */
+	public void parse(String sourceName, InputStream in) throws IOException {
+		BufferedReader br = asReader(in);
+		String txt;
+		int lineNumber = 1;
+		while ((txt = br.readLine()) != null) {
+			if (txt.length() > 0 && !txt.startsWith("#") && !txt.equals("/")) { //$NON-NLS-1$ //$NON-NLS-2$
+				FastIgnoreRule rule = new FastIgnoreRule();
+				try {
+					rule.parse(txt);
+				} catch (InvalidPatternException e) {
+					if (sourceName != null) {
+						LOG.error(MessageFormat.format(
+								JGitText.get().badIgnorePatternFull, sourceName,
+								Integer.toString(lineNumber), e.getPattern(),
+								e.getLocalizedMessage()), e);
+					} else {
+						LOG.error(MessageFormat.format(
+								JGitText.get().badIgnorePattern,
+								e.getPattern()), e);
+					}
+				}
+				if (!rule.isEmpty()) {
+					rules.add(rule);
+				}
+			}
+			lineNumber++;
+		}
+	}
+

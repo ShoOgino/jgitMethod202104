@@ -5,7 +5,7 @@
 			return Result.IO_FAILURE; // not supported
 
 		objId = source.getOldObjectId();
-		updateHEAD = needToUpdateHEAD();
+		boolean updateHEAD = needToUpdateHEAD();
 		tmp = refdb.newTemporaryUpdate();
 		try (RevWalk rw = new RevWalk(refdb.getRepository())) {
 			// First backup the source so its never unreachable.

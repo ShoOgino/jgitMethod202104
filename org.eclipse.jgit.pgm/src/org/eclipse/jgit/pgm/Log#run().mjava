@@ -1,6 +1,7 @@
 	/** {@inheritDoc} */
 	@Override
 	protected void run() {
+		config = new GpgConfig(db.getConfig());
 		diffFmt.setRepository(db);
 		try {
 			diffFmt.setPathFilter(pathFilter);
@@ -37,6 +38,9 @@
 			throw die(e.getMessage(), e);
 		} finally {
 			diffFmt.close();
+			if (verifier != null) {
+				verifier.clear();
+			}
 		}
 	}
 

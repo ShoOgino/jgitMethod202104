@@ -1,8 +1,0 @@
-	private PageRef<ByteWindow> createRef(PackFile p, long o, ByteWindow v) {
-		final PageRef<ByteWindow> ref = useStrongRefs
-				? new StrongRef(p, o, v, queue)
-				: new SoftRef(p, o, v, (SoftCleanupQueue) queue);
-		statsRecorder.recordOpenBytes(ref.getPack(), ref.getSize());
-		return ref;
-	}
-

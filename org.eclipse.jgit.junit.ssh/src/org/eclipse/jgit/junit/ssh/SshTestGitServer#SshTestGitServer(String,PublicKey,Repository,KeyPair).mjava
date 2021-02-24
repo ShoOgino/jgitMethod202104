@@ -18,7 +18,9 @@
 		this.testUser = testUser;
 		setTestUserPublicKey(testKey);
 		this.repository = repository;
-		server = SshServer.setUpDefaultServer();
+		ServerBuilder builder = ServerBuilder.builder()
+				.signatureFactories(getSignatureFactories());
+		server = builder.build();
 		hostKeys.add(hostKey);
 		server.setKeyPairProvider((session) -> hostKeys);
 

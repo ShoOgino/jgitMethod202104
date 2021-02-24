@@ -1,0 +1,17 @@
+	private BigInteger readBigInteger(String expectedType,
+			InputStream inputStream) throws IOException, PGPException {
+		SXprUtils.skipOpenParenthesis(inputStream);
+
+		String type = SXprUtils.readString(inputStream, inputStream.read());
+		if (!type.equals(expectedType)) {
+			throw new PGPException(expectedType + " value expected");
+		}
+
+		byte[] nBytes = SXprUtils.readBytes(inputStream, inputStream.read());
+		BigInteger v = new BigInteger(1, nBytes);
+
+		SXprUtils.skipCloseParenthesis(inputStream);
+
+		return v;
+	}
+

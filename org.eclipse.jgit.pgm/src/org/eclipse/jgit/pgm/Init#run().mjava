@@ -11,6 +11,9 @@
 		}
 		Repository repository;
 		try {
+			if (!StringUtils.isEmptyOrNull(branch)) {
+				command.setInitialBranch(branch);
+			}
 			repository = command.call().getRepository();
 			outw.println(MessageFormat.format(
 					CLIText.get().initializedEmptyGitRepositoryIn,

@@ -1,0 +1,66 @@
+	/**
+	 * See
+	 * {@link #runHookIfPresent(Repository, String, String[], OutputStream, OutputStream, String)}
+	 * . Should only be called by FS supporting shell scripts execution.
+	 *
+	 * @param repository
+	 *            The repository for which a hook should be run.
+	 * @param hookName
+	 *            The name of the hook to be executed.
+	 * @param args
+	 *            Arguments to pass to this hook. Cannot be <code>null</code>,
+	 *            but can be an empty array.
+	 * @param outRedirect
+	 *            A print stream on which to redirect the hook's stdout. Can be
+	 *            <code>null</code>, in which case the hook's standard output
+	 *            will be lost.
+	 * @param errRedirect
+	 *            A print stream on which to redirect the hook's stderr. Can be
+	 *            <code>null</code>, in which case the hook's standard error
+	 *            will be lost.
+	 * @param stdinArgs
+	 *            A string to pass on to the standard input of the hook. May be
+	 *            <code>null</code>.
+	 * @return The ProcessResult describing this hook's execution.
+	 * @throws org.eclipse.jgit.api.errors.JGitInternalException
+	 *             if we fail to run the hook somehow. Causes may include an
+	 *             interrupted process or I/O errors.
+	 * @since 5.11
+	 */
+	protected ProcessResult internalRunHookIfPresent(Repository repository,
+			final String hookName, String[] args, OutputStream outRedirect,
+			OutputStream errRedirect, String stdinArgs)
+			throws JGitInternalException {
+		File hookFile = findHook(repository, hookName);
+		if (hookFile == null || hookName == null) {
+			return new ProcessResult(Status.NOT_PRESENT);
+		}
+
+		File runDirectory = getRunDirectory(repository, hookName);
+		if (runDirectory == null) {
+			return new ProcessResult(Status.NOT_PRESENT);
+		}
+		String cmd = hookFile.getAbsolutePath();
+		ProcessBuilder hookProcess = runInShell(shellQuote(cmd), args);
+		hookProcess.directory(runDirectory.getAbsoluteFile());
+		Map<String, String> environment = hookProcess.environment();
+		environment.put(Constants.GIT_DIR_KEY,
+				repository.getDirectory().getAbsolutePath());
+		if (!repository.isBare()) {
+			environment.put(Constants.GIT_WORK_TREE_KEY,
+					repository.getWorkTree().getAbsolutePath());
+		}
+		try {
+			return new ProcessResult(runProcess(hookProcess, outRedirect,
+					errRedirect, stdinArgs), Status.OK);
+		} catch (IOException e) {
+			throw new JGitInternalException(MessageFormat.format(
+					JGitText.get().exceptionCaughtDuringExecutionOfHook,
+					hookName), e);
+		} catch (InterruptedException e) {
+			throw new JGitInternalException(MessageFormat.format(
+					JGitText.get().exceptionHookExecutionInterrupted,
+							hookName), e);
+		}
+	}
+

@@ -1,0 +1,16 @@
+	static PGPPublicKey findPublicKey(String fingerprint, String keySpec)
+			throws IOException, PGPException {
+		PGPPublicKey result = findPublicKeyInPubring(USER_PGP_PUBRING_FILE,
+				fingerprint, keySpec);
+		if (result == null && exists(USER_KEYBOX_PATH)) {
+			try {
+				result = findPublicKeyInKeyBox(USER_KEYBOX_PATH, fingerprint,
+						keySpec);
+			} catch (NoSuchAlgorithmException | NoSuchProviderException
+					| IOException | NoOpenPgpKeyException e) {
+				log.error(e.getMessage(), e);
+			}
+		}
+		return result;
+	}
+

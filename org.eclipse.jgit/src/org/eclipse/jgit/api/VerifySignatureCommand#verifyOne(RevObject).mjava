@@ -1,0 +1,26 @@
+	private VerificationResult verifyOne(RevObject object)
+			throws WrongObjectTypeException, IOException {
+		int type = object.getType();
+		if (VerifyMode.TAGS.equals(mode) && type != Constants.OBJ_TAG) {
+			throw new WrongObjectTypeException(object, Constants.OBJ_TAG);
+		} else if (VerifyMode.COMMITS.equals(mode)
+				&& type != Constants.OBJ_COMMIT) {
+			throw new WrongObjectTypeException(object, Constants.OBJ_COMMIT);
+		}
+		if (type == Constants.OBJ_COMMIT || type == Constants.OBJ_TAG) {
+			try {
+				GpgSignatureVerifier.SignatureVerification verification = verifier
+						.verifySignature(object, config);
+				if (verification == null) {
+					// Not signed
+					return null;
+				}
+				// Create new result
+				return new Result(object, verification, null);
+			} catch (JGitInternalException e) {
+				return new Result(object, null, e);
+			}
+		}
+		return null;
+	}
+

@@ -1,0 +1,19 @@
+	/**
+	 * Creates a new factory instance with the given parameters.
+	 * <p>
+	 * Because the AAD is given at factory level, the {@link PBESecretKeyDecryptor}s
+	 * created by the factory can be used to decrypt only a particular input
+	 * matching this AAD.
+	 * </p>
+	 *
+	 * @param passphrase         to use for secret key derivation
+	 * @param calculatorProvider for computing digests
+	 * @param aad                for the OCB decryption
+	 */
+	OCBPBEProtectionRemoverFactory(char[] passphrase,
+			PGPDigestCalculatorProvider calculatorProvider, byte[] aad) {
+		this.calculatorProvider = calculatorProvider;
+		this.passphrase = passphrase;
+		this.aad = aad;
+	}
+

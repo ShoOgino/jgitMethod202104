@@ -1,0 +1,16 @@
+	private static PGPPublicKey findPublicKeyByKeyId(KeyBlob keyBlob,
+			String keyId)
+			throws IOException {
+		if (keyId.isEmpty()) {
+			return null;
+		}
+		for (KeyInformation keyInfo : keyBlob.getKeyInformation()) {
+			String fingerprint = Hex.toHexString(keyInfo.getFingerprint())
+					.toLowerCase(Locale.ROOT);
+			if (fingerprint.endsWith(keyId)) {
+				return getPublicKey(keyBlob, keyInfo.getFingerprint());
+			}
+		}
+		return null;
+	}
+

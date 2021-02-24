@@ -3,30 +3,24 @@
 	 *
 	 * @throws org.eclipse.jgit.api.errors.AbortedByHookException
 	 *             If the underlying hook script exited with non-zero.
+	 * @throws IOException
+	 *             if an IO error occurred
 	 */
-	protected void doRun() throws AbortedByHookException {
+	protected void doRun() throws AbortedByHookException, IOException {
 		final ByteArrayOutputStream errorByteArray = new ByteArrayOutputStream();
 		final TeeOutputStream stderrStream = new TeeOutputStream(errorByteArray,
 				getErrorStream());
-		PrintStream hookErrRedirect = null;
-		try {
-			hookErrRedirect = new PrintStream(stderrStream, false,
-					UTF_8.name());
-		} catch (UnsupportedEncodingException e) {
-			// UTF-8 is guaranteed to be available
-		}
 		Repository repository = getRepository();
 		FS fs = repository.getFS();
 		if (fs == null) {
 			fs = FS.DETECTED;
 		}
 		ProcessResult result = fs.runHookIfPresent(repository, getHookName(),
-				getParameters(), getOutputStream(), hookErrRedirect,
+				getParameters(), getOutputStream(), stderrStream,
 				getStdinArgs());
 		if (result.isExecutedWithError()) {
-			throw new AbortedByHookException(
-					new String(errorByteArray.toByteArray(), UTF_8),
-					getHookName(), result.getExitCode());
+			handleError(new String(errorByteArray.toByteArray(),
+					Charset.defaultCharset().name()), result);
 		}
 	}
 

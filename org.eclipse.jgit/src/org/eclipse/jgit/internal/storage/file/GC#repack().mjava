@@ -12,8 +12,8 @@
 	 *             reflog-entries or during writing to the packfiles
 	 *             {@link java.io.IOException} occurs
 	 */
-	public Collection<PackFile> repack() throws IOException {
-		Collection<PackFile> toBeDeleted = repo.getObjectDatabase().getPacks();
+	public Collection<Pack> repack() throws IOException {
+		Collection<Pack> toBeDeleted = repo.getObjectDatabase().getPacks();
 
 		long time = System.currentTimeMillis();
 		Collection<Ref> refsBefore = getAllRefs();
@@ -45,10 +45,10 @@
 		}
 
 		List<ObjectIdSet> excluded = new LinkedList<>();
-		for (PackFile f : repo.getObjectDatabase().getPacks()) {
+		for (Pack p : repo.getObjectDatabase().getPacks()) {
 			checkCancelled();
-			if (f.shouldBeKept())
-				excluded.add(f.getIndex());
+			if (p.shouldBeKept())
+				excluded.add(p.getIndex());
 		}
 
 		// Don't exclude tags that are also branch tips
@@ -66,8 +66,8 @@
 			nonHeads.clear();
 		}
 
-		List<PackFile> ret = new ArrayList<>(2);
-		PackFile heads = null;
+		List<Pack> ret = new ArrayList<>(2);
+		Pack heads = null;
 		if (!allHeadsAndTags.isEmpty()) {
 			heads = writePack(allHeadsAndTags, PackWriter.NONE, allTags,
 					tagTargets, excluded);
@@ -77,13 +77,13 @@
 			}
 		}
 		if (!nonHeads.isEmpty()) {
-			PackFile rest = writePack(nonHeads, allHeadsAndTags, PackWriter.NONE,
+			Pack rest = writePack(nonHeads, allHeadsAndTags, PackWriter.NONE,
 					tagTargets, excluded);
 			if (rest != null)
 				ret.add(rest);
 		}
 		if (!txnHeads.isEmpty()) {
-			PackFile txn = writePack(txnHeads, PackWriter.NONE, PackWriter.NONE,
+			Pack txn = writePack(txnHeads, PackWriter.NONE, PackWriter.NONE,
 					null, excluded);
 			if (txn != null)
 				ret.add(txn);

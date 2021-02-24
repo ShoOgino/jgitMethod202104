@@ -1,0 +1,12 @@
+	private void showUnsigned(Git git, String wantedTag) throws IOException {
+		ObjectId id = git.getRepository().resolve(wantedTag);
+		if (id != null && !ObjectId.zeroId().equals(id)) {
+			try (RevWalk walk = new RevWalk(git.getRepository())) {
+				showTag(walk.parseTag(id));
+			}
+		} else {
+			throw die(
+					MessageFormat.format(CLIText.get().tagNotFound, wantedTag));
+		}
+	}
+

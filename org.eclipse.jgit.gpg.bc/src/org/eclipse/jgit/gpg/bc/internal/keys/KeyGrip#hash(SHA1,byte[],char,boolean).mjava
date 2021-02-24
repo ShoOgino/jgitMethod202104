@@ -1,0 +1,24 @@
+	private static void hash(SHA1 grip, byte[] data, char id, boolean zeroPad) {
+		// Need to skip leading zero bytes
+		int i = 0;
+		while (i < data.length && data[i] == 0) {
+			i++;
+		}
+		int length = data.length - i;
+		boolean addZero = false;
+		if (i < data.length && zeroPad && (data[i] & 0x80) != 0) {
+			addZero = true;
+		}
+		// libgcrypt includes an SExp in the hash
+		String prefix = "(1:" + id + (addZero ? length + 1 : length) + ':'; //$NON-NLS-1$
+		grip.update(prefix.getBytes(StandardCharsets.US_ASCII));
+		// For some items, gcrypt prepends a zero byte if the high bit is set
+		if (addZero) {
+			grip.update((byte) 0);
+		}
+		if (i < data.length) {
+			grip.update(data, i, length);
+		}
+		grip.update((byte) ')');
+	}
+

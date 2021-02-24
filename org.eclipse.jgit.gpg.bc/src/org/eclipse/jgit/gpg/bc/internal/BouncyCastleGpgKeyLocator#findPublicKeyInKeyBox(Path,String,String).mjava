@@ -1,0 +1,44 @@
+	/**
+	 * Finds a public key associated with the signing key.
+	 *
+	 * @param keyboxFile
+	 *            the KeyBox file
+	 * @param keyId
+	 *            to look for, may be null
+	 * @param keySpec
+	 *            to look for
+	 * @return publicKey the public key (maybe <code>null</code>)
+	 * @throws IOException
+	 *             in case of problems reading the file
+	 * @throws NoSuchAlgorithmException
+	 * @throws NoSuchProviderException
+	 * @throws NoOpenPgpKeyException
+	 *             if the file does not contain any OpenPGP key
+	 */
+	private static PGPPublicKey findPublicKeyInKeyBox(Path keyboxFile,
+			String keyId, String keySpec)
+			throws IOException, NoSuchAlgorithmException,
+			NoSuchProviderException, NoOpenPgpKeyException {
+		KeyBox keyBox = readKeyBoxFile(keyboxFile);
+		String id = keyId != null ? keyId
+				: toFingerprint(keySpec).toLowerCase(Locale.ROOT);
+		boolean hasOpenPgpKey = false;
+		for (KeyBlob keyBlob : keyBox.getKeyBlobs()) {
+			if (keyBlob.getType() == BlobType.OPEN_PGP_BLOB) {
+				hasOpenPgpKey = true;
+				PGPPublicKey key = findPublicKeyByKeyId(keyBlob, id);
+				if (key != null) {
+					return key;
+				}
+				key = findPublicKeyByUserId(keyBlob, keySpec);
+				if (key != null) {
+					return key;
+				}
+			}
+		}
+		if (!hasOpenPgpKey) {
+			throw new NoOpenPgpKeyException();
+		}
+		return null;
+	}
+

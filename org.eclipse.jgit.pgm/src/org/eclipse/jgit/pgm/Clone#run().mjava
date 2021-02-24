@@ -43,6 +43,8 @@
 			db = command.call().getRepository();
 			if (msgs && db.resolve(Constants.HEAD) == null)
 				outw.println(CLIText.get().clonedEmptyRepository);
+		} catch (TransportException e) {
+			throw die(e.getMessage(), e);
 		} catch (InvalidRemoteException e) {
 			throw die(MessageFormat.format(CLIText.get().doesNotExist,
 					sourceUri), e);

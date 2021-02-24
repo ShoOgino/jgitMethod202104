@@ -1,0 +1,21 @@
+	/**
+	 * Construct a reader for an existing, pre-indexed packfile.
+	 *
+	 * @param packFile
+	 *            path of the <code>.pack</code> file holding the data.
+	 * @param extensions
+	 *            additional pack file extensions with the same base as the pack
+	 */
+	public Pack(File packFile, int extensions) {
+		this.packFile = packFile;
+		this.fileSnapshot = PackFileSnapshot.save(packFile);
+		this.packLastModified = fileSnapshot.lastModifiedInstant();
+		this.extensions = extensions;
+
+		// Multiply by 31 here so we can more directly combine with another
+		// value in WindowCache.hash(), without doing the multiply there.
+		//
+		hash = System.identityHashCode(this) * 31;
+		length = Long.MAX_VALUE;
+	}
+

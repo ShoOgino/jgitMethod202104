@@ -1,0 +1,29 @@
+	void execute(ProgressMonitor monitor, FetchResult result,
+			String initialBranch)
+			throws NotSupportedException, TransportException {
+		askFor.clear();
+		localUpdates.clear();
+		fetchHeadUpdates.clear();
+		packLocks.clear();
+		localRefs = null;
+
+		Throwable e1 = null;
+		try {
+			executeImp(monitor, result, initialBranch);
+		} catch (NotSupportedException | TransportException err) {
+			e1 = err;
+			throw err;
+		} finally {
+			try {
+				for (PackLock lock : packLocks) {
+					lock.unlock();
+				}
+			} catch (IOException e) {
+				if (e1 != null) {
+					e.addSuppressed(e1);
+				}
+				throw new TransportException(e.getMessage(), e);
+			}
+		}
+	}
+

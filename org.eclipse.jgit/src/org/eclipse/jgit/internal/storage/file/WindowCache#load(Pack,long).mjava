@@ -1,0 +1,19 @@
+	private ByteWindow load(Pack pack, long offset) throws IOException {
+		long startTime = System.nanoTime();
+		if (pack.beginWindowCache())
+			statsRecorder.recordOpenFiles(1);
+		try {
+			if (mmap)
+				return pack.mmap(offset, windowSize);
+			ByteArrayWindow w = pack.read(offset, windowSize);
+			statsRecorder.recordLoadSuccess(System.nanoTime() - startTime);
+			return w;
+		} catch (IOException | RuntimeException | Error e) {
+			close(pack);
+			statsRecorder.recordLoadFailure(System.nanoTime() - startTime);
+			throw e;
+		} finally {
+			statsRecorder.recordMisses(1);
+		}
+	}
+

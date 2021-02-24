@@ -1,0 +1,14 @@
+	@Test
+	public void testCloneInitialBranchMissing() throws Exception {
+		createInitialCommit();
+
+		File gitDir = db.getDirectory();
+		String sourceURI = gitDir.toURI().toString();
+		File target = createTempDirectory("target");
+		String cmd = "git clone --branch foo " + sourceURI + " "
+				+ shellQuote(target.getPath());
+		Die e = assertThrows(Die.class, () -> execute(cmd));
+		assertEquals("Remote branch 'foo' not found in upstream origin",
+				e.getMessage());
+	}
+

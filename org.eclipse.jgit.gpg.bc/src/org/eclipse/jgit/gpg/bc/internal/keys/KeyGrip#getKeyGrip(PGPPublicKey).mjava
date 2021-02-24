@@ -1,0 +1,97 @@
+	/**
+	 * Computes the keygrip for a {@link PGPPublicKey}.
+	 *
+	 * @param publicKey
+	 *            to get the keygrip of
+	 * @return the keygrip
+	 * @throws PGPException
+	 *             if an unknown key type is encountered.
+	 */
+	@NonNull
+	public static byte[] getKeyGrip(PGPPublicKey publicKey)
+			throws PGPException {
+		SHA1 grip = SHA1.newInstance();
+		grip.setDetectCollision(false);
+
+		switch (publicKey.getAlgorithm()) {
+		case PublicKeyAlgorithmTags.RSA_GENERAL:
+		case PublicKeyAlgorithmTags.RSA_ENCRYPT:
+		case PublicKeyAlgorithmTags.RSA_SIGN:
+			BigInteger modulus = ((RSAPublicBCPGKey) publicKey
+					.getPublicKeyPacket().getKey()).getModulus();
+			hash(grip, modulus.toByteArray());
+			break;
+		case PublicKeyAlgorithmTags.DSA:
+			DSAPublicBCPGKey dsa = (DSAPublicBCPGKey) publicKey
+					.getPublicKeyPacket().getKey();
+			hash(grip, dsa.getP().toByteArray(), 'p', true);
+			hash(grip, dsa.getQ().toByteArray(), 'q', true);
+			hash(grip, dsa.getG().toByteArray(), 'g', true);
+			hash(grip, dsa.getY().toByteArray(), 'y', true);
+			break;
+		case PublicKeyAlgorithmTags.ELGAMAL_GENERAL:
+		case PublicKeyAlgorithmTags.ELGAMAL_ENCRYPT:
+			ElGamalPublicBCPGKey eg = (ElGamalPublicBCPGKey) publicKey
+					.getPublicKeyPacket().getKey();
+			hash(grip, eg.getP().toByteArray(), 'p', true);
+			hash(grip, eg.getG().toByteArray(), 'g', true);
+			hash(grip, eg.getY().toByteArray(), 'y', true);
+			break;
+		case PublicKeyAlgorithmTags.ECDH:
+		case PublicKeyAlgorithmTags.ECDSA:
+		case PublicKeyAlgorithmTags.EDDSA:
+			ECPublicBCPGKey ec = (ECPublicBCPGKey) publicKey
+					.getPublicKeyPacket().getKey();
+			ASN1ObjectIdentifier curveOID = ec.getCurveOID();
+			// BC doesn't know these OIDs.
+			if (OID_OPENPGP_ED25519.equals(curveOID.getId())
+					|| OID_RFC8410_ED25519.equals(curveOID.getId())) {
+				return hashEd25519(grip, ec.getEncodedPoint());
+			} else if (CryptlibObjectIdentifiers.curvey25519.equals(curveOID)
+					|| OID_RFC8410_CURVE25519.equals(curveOID.getId())) {
+				// curvey25519 actually is the OpenPGP OID for Curve25519 and is
+				// known to BC, but the parameters are for the short Weierstrass
+				// form. See https://github.com/bcgit/bc-java/issues/399 .
+				// libgcrypt uses Montgomery form.
+				return hashCurve25519(grip, ec.getEncodedPoint());
+			}
+			X9ECParameters params = getX9Parameters(curveOID);
+			if (params == null) {
+				throw new PGPException(MessageFormat
+						.format(BCText.get().unknownCurve, curveOID.getId()));
+			}
+			// Need to write p, a, b, g, n, q
+			BigInteger q = ec.getEncodedPoint();
+			byte[] g = params.getG().getEncoded(false);
+			BigInteger a = params.getCurve().getA().toBigInteger();
+			BigInteger b = params.getCurve().getB().toBigInteger();
+			BigInteger n = params.getN();
+			BigInteger p = null;
+			FiniteField field = params.getCurve().getField();
+			if (ECAlgorithms.isFpField(field)) {
+				p = field.getCharacteristic();
+			}
+			if (p == null) {
+				// Don't know...
+				throw new PGPException(MessageFormat.format(
+						BCText.get().unknownCurveParameters, curveOID.getId()));
+			}
+			hash(grip, p.toByteArray(), 'p', false);
+			hash(grip, a.toByteArray(), 'a', false);
+			hash(grip, b.toByteArray(), 'b', false);
+			hash(grip, g, 'g', false);
+			hash(grip, n.toByteArray(), 'n', false);
+			if (publicKey.getAlgorithm() == PublicKeyAlgorithmTags.EDDSA) {
+				hashQ25519(grip, q);
+			} else {
+				hash(grip, q.toByteArray(), 'q', false);
+			}
+			break;
+		default:
+			throw new PGPException(
+					MessageFormat.format(BCText.get().unknownKeyType,
+							Integer.toString(publicKey.getAlgorithm())));
+		}
+		return grip.digest();
+	}
+
