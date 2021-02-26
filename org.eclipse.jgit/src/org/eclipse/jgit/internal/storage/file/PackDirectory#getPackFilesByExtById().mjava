@@ -20,13 +20,15 @@
 		for (String name : nameList) {
 			try {
 				PackFile pack = new PackFile(directory, name);
-				Map<PackExt, PackFile> packByExt = packFilesByExtById
-						.get(pack.getId());
-				if (packByExt == null) {
-					packByExt = new HashMap<>(PackExt.values().length);
-					packFilesByExtById.put(pack.getId(), packByExt);
+				if (pack.getPackExt() != null) {
+					Map<PackExt, PackFile> packByExt = packFilesByExtById
+							.get(pack.getId());
+					if (packByExt == null) {
+						packByExt = new EnumMap<>(PackExt.class);
+						packFilesByExtById.put(pack.getId(), packByExt);
+					}
+					packByExt.put(pack.getPackExt(), pack);
 				}
-				packByExt.put(pack.getPackExt(), pack);
 			} catch (IllegalArgumentException e) {
 				continue;
 			}
