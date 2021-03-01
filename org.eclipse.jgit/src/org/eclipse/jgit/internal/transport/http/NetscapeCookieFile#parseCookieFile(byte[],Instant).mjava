@@ -3,9 +3,9 @@
 	 *
 	 * @param input
 	 *            the file content to parse
-	 * @param creationDate
-	 *            the date for the creation of the cookies (used to calculate
-	 *            the maxAge based on the expiration date given within the file)
+	 * @param createdAt
+	 *            cookie creation time; used to calculate the maxAge based on
+	 *            the expiration date given within the file
 	 * @return the set of parsed cookies from the given file (even expired
 	 *         ones). If there is more than one cookie with the same name in
 	 *         this file the last one overwrites the first one!
@@ -15,7 +15,7 @@
 	 *             if the given file does not have a proper format
 	 */
 	private static Set<HttpCookie> parseCookieFile(@NonNull byte[] input,
-			@NonNull Date creationDate)
+			@NonNull Instant createdAt)
 			throws IOException, IllegalArgumentException {
 
 		String decoded = RawParseUtils.decode(StandardCharsets.US_ASCII, input);
@@ -25,7 +25,7 @@
 				new StringReader(decoded))) {
 			String line;
 			while ((line = reader.readLine()) != null) {
-				HttpCookie cookie = parseLine(line, creationDate);
+				HttpCookie cookie = parseLine(line, createdAt);
 				if (cookie != null) {
 					cookies.add(cookie);
 				}

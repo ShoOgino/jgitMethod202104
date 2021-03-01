@@ -23,7 +23,7 @@
 						path);
 				// reread new changes if necessary
 				Set<HttpCookie> cookiesFromFile = NetscapeCookieFile
-						.parseCookieFile(cookieFileContent, creationDate);
+						.parseCookieFile(cookieFileContent, createdAt);
 				this.cookies = mergeCookies(cookiesFromFile, cookies);
 			}
 		} catch (FileNotFoundException e) {
@@ -33,7 +33,7 @@
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
 		try (Writer writer = new OutputStreamWriter(output,
 				StandardCharsets.US_ASCII)) {
-			write(writer, cookies, url, creationDate);
+			write(writer, cookies, url, createdAt);
 		}
 		LockFile lockFile = new LockFile(path.toFile());
 		for (int retryCount = 0; retryCount < LOCK_ACQUIRE_MAX_RETRY_COUNT; retryCount++) {

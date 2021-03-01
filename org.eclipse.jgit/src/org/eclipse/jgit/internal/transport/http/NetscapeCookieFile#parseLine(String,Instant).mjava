@@ -1,5 +1,5 @@
 	private static HttpCookie parseLine(@NonNull String line,
-			@NonNull Date creationDate) {
+			@NonNull Instant createdAt) {
 		if (line.isEmpty() || (line.startsWith("#") //$NON-NLS-1$
 				&& !line.startsWith(HTTP_ONLY_PREAMBLE))) {
 			return null;
@@ -35,7 +35,12 @@
 		cookie.setSecure(Boolean.parseBoolean(cookieLineParts[3]));
 
 		long expires = Long.parseLong(cookieLineParts[4]);
-		long maxAge = (expires - creationDate.getTime()) / 1000;
+		// Older versions stored milliseconds. This heuristic to detect that
+		// will cause trouble in the year 33658. :-)
+		if (cookieLineParts[4].length() == 13) {
+			expires = TimeUnit.MILLISECONDS.toSeconds(expires);
+		}
+		long maxAge = expires - createdAt.getEpochSecond();
 		if (maxAge <= 0) {
 			return null; // skip expired cookies
 		}

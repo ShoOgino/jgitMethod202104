@@ -1,6 +1,6 @@
 	private static void writeCookie(@NonNull Writer writer,
 			@NonNull HttpCookie cookie, @NonNull URL url,
-			@NonNull Date creationDate) throws IOException {
+			@NonNull Instant createdAt) throws IOException {
 		if (cookie.getMaxAge() <= 0) {
 			return; // skip expired cookies
 		}
@@ -28,7 +28,7 @@
 		final String expirationDate;
 		// whenCreated field is not accessible in HttpCookie
 		expirationDate = String
-				.valueOf(creationDate.getTime() + (cookie.getMaxAge() * 1000));
+				.valueOf(createdAt.getEpochSecond() + cookie.getMaxAge());
 		writer.write(expirationDate);
 		writer.write(COLUMN_SEPARATOR);
 		writer.write(cookie.getName());

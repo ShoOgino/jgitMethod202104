@@ -5,13 +5,13 @@
 			Files.copy(input, tmpFile, StandardCopyOption.REPLACE_EXISTING);
 		}
 
-		Date creationDate = new Date();
 		Set<HttpCookie> cookies = new LinkedHashSet<>();
 
 		HttpCookie cookie = new HttpCookie("key2", "value2");
 		cookie.setDomain("some-domain2");
 		cookie.setPath("/some/path2");
-		cookie.setMaxAge((JAN_01_2030_NOON - creationDate.getTime()) / 1000);
+		cookie.setMaxAge(
+				Duration.between(TEST_DATE, TEST_EXPIRY_DATE).getSeconds());
 		cookie.setSecure(true);
 		cookie.setHttpOnly(true);
 		cookies.add(cookie);
@@ -19,11 +19,12 @@
 		cookie = new HttpCookie("key3", "value3");
 		cookie.setDomain("some-domain3");
 		cookie.setPath("/some/path3");
-		cookie.setMaxAge((JAN_01_2030_NOON - creationDate.getTime()) / 1000);
+		cookie.setMaxAge(
+				Duration.between(TEST_DATE, TEST_EXPIRY_DATE).getSeconds());
 		cookies.add(cookie);
 
-		Set<HttpCookie> actualCookies = new NetscapeCookieFile(tmpFile, creationDate)
-				.getCookies(true);
+		Set<HttpCookie> actualCookies = new NetscapeCookieFile(tmpFile,
+				TEST_DATE).getCookies(true);
 		assertThat(actualCookies, HttpCookiesMatcher.containsInOrder(cookies));
 	}
 
