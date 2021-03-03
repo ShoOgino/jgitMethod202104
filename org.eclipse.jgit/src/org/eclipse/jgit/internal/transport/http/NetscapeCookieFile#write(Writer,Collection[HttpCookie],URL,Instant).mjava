@@ -9,18 +9,17 @@
 	 * @param url
 	 *            the url for which to write the cookie (to derive the default
 	 *            values for certain cookie attributes)
-	 * @param creationDate
-	 *            the date when the cookie has been created. Important for
-	 *            calculation the cookie expiration time (calculated from
-	 *            cookie's maxAge and this creation time)
+	 * @param createdAt
+	 *            cookie creation time; used to calculate a cookie's expiration
+	 *            time
 	 * @throws IOException
 	 *             if an I/O error occurs
 	 */
 	static void write(@NonNull Writer writer,
 			@NonNull Collection<HttpCookie> cookies, @NonNull URL url,
-			@NonNull Date creationDate) throws IOException {
+			@NonNull Instant createdAt) throws IOException {
 		for (HttpCookie cookie : cookies) {
-			writeCookie(writer, cookie, url, creationDate);
+			writeCookie(writer, cookie, url, createdAt);
 		}
 	}
 

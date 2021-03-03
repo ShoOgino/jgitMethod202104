@@ -15,14 +15,13 @@
 		cookie.setHttpOnly(true);
 		cookies.add(cookie);
 
-		Date creationDate = new Date();
-
 		try (Writer writer = Files.newBufferedWriter(tmpFile,
 				StandardCharsets.US_ASCII)) {
-			NetscapeCookieFile.write(writer, cookies, baseUrl, creationDate);
+			NetscapeCookieFile.write(writer, cookies, baseUrl, TEST_DATE);
 		}
 		Set<HttpCookie> actualCookies = new NetscapeCookieFile(tmpFile,
-				creationDate).getCookies(true);
+				TEST_DATE)
+				.getCookies(true);
 		assertThat(actualCookies, HttpCookiesMatcher.containsInOrder(cookies));
 	}
 

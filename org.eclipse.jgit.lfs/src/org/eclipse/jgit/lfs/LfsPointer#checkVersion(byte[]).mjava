@@ -1,0 +1,16 @@
+	private static boolean checkVersion(byte[] data) {
+		// According to the spec at
+		// https://github.com/git-lfs/git-lfs/blob/master/docs/spec.md
+		// it MUST always be the first line.
+		try (BufferedReader r = new BufferedReader(
+				new InputStreamReader(new ByteArrayInputStream(data), UTF_8))) {
+			String s = r.readLine();
+			if (s != null && s.startsWith("version")) { //$NON-NLS-1$
+				return checkVersionLine(s);
+			}
+		} catch (IOException e) {
+			// Doesn't occur, we're reading from a byte array!
+		}
+		return false;
+	}
+

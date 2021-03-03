@@ -1,0 +1,46 @@
+	@Nullable
+	private static LfsPointer parse(InputStream in)
+			throws IOException {
+		if (!in.markSupported()) {
+			// No translation; internal error
+			throw new IllegalArgumentException(
+					"LFS pointer parsing needs InputStream.markSupported() == true"); //$NON-NLS-1$
+		}
+		// Try reading only a short block first.
+		in.mark(SIZE_THRESHOLD);
+		byte[] preamble = new byte[SIZE_THRESHOLD];
+		int length = IO.readFully(in, preamble, 0);
+		if (length < preamble.length || in.read() < 0) {
+			// We have the whole file. Try to parse a pointer from it.
+			try (BufferedReader r = new BufferedReader(new InputStreamReader(
+					new ByteArrayInputStream(preamble, 0, length), UTF_8))) {
+				LfsPointer ptr = parse(r);
+				if (ptr == null) {
+					in.reset();
+				}
+				return ptr;
+			}
+		}
+		// Longer than SIZE_THRESHOLD: expect "version" to be the first line.
+		boolean hasVersion = checkVersion(preamble);
+		in.reset();
+		if (!hasVersion) {
+			return null;
+		}
+		in.mark(FULL_SIZE_THRESHOLD);
+		byte[] fullPointer = new byte[FULL_SIZE_THRESHOLD];
+		length = IO.readFully(in, fullPointer, 0);
+		if (length == fullPointer.length && in.read() >= 0) {
+			in.reset();
+			return null; // Too long.
+		}
+		try (BufferedReader r = new BufferedReader(new InputStreamReader(
+				new ByteArrayInputStream(fullPointer, 0, length), UTF_8))) {
+			LfsPointer ptr = parse(r);
+			if (ptr == null) {
+				in.reset();
+			}
+			return ptr;
+		}
+	}
+

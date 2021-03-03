@@ -9,13 +9,12 @@
 		HttpCookie cookie = new HttpCookie("key2", "value2");
 		cookie.setMaxAge(1000);
 		cookies.add(cookie);
-		Date creationDate = new Date();
 		try (Writer writer = Files.newBufferedWriter(tmpFile,
 				StandardCharsets.US_ASCII)) {
-			NetscapeCookieFile.write(writer, cookies, baseUrl, creationDate);
+			NetscapeCookieFile.write(writer, cookies, baseUrl, TEST_DATE);
 		}
 		String expectedExpiration = String
-				.valueOf(creationDate.getTime() + (cookie.getMaxAge() * 1000));
+				.valueOf(TEST_DATE.getEpochSecond() + cookie.getMaxAge());
 
 		assertThat(Files.readAllLines(tmpFile, StandardCharsets.US_ASCII),
 				CoreMatchers.equalTo(

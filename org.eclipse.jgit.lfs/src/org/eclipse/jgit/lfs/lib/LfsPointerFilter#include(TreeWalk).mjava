@@ -15,6 +15,8 @@
 		try (ObjectStream stream = object.openStream()) {
 			pointer = LfsPointer.parseLfsPointer(stream);
 			return pointer != null;
+		} catch (RuntimeException e) {
+			return false;
 		}
 	}
 

@@ -5,7 +5,8 @@
 				.getResourceAsStream("cookies-simple1.txt")) {
 			Files.copy(input, tmpFile, StandardCopyOption.REPLACE_EXISTING);
 		}
-		NetscapeCookieFile cookieFile = new NetscapeCookieFile(tmpFile);
+		NetscapeCookieFile cookieFile = new NetscapeCookieFile(tmpFile,
+				TEST_DATE);
 		cookieFile.getCookies(true);
 		// now modify file externally
 		try (InputStream input = this.getClass()
@@ -15,21 +16,18 @@
 		// now try to write
 		cookieFile.write(baseUrl);
 
-		// validate that the external changes are there as well
-		// due to rounding errors (conversion from ms to sec to ms)
-		// the expiration date might not be exact
 		List<String> lines = Files.readAllLines(tmpFile,
 				StandardCharsets.US_ASCII);
 
 		assertEquals("Expected 3 lines", 3, lines.size());
-		assertStringMatchesPatternWithInexactNumber(lines.get(0),
-				"some-domain1\tTRUE\t/some/path1\tFALSE\t(\\d*)\tkey1\tvalueFromSimple2",
-				JAN_01_2030_NOON, 1000);
-		assertStringMatchesPatternWithInexactNumber(lines.get(1),
-				"some-domain1\tTRUE\t/some/path1\tFALSE\t(\\d*)\tkey3\tvalueFromSimple2",
-				JAN_01_2030_NOON, 1000);
-		assertStringMatchesPatternWithInexactNumber(lines.get(2),
-				"some-domain1\tTRUE\t/some/path1\tFALSE\t(\\d*)\tkey2\tvalueFromSimple1",
-				JAN_01_2030_NOON, 1000);
+		assertEquals(
+				"some-domain1\tTRUE\t/some/path1\tFALSE\t1893499200\tkey1\tvalueFromSimple2",
+				lines.get(0));
+		assertEquals(
+				"some-domain1\tTRUE\t/some/path1\tFALSE\t1893499200\tkey3\tvalueFromSimple2",
+				lines.get(1));
+		assertEquals(
+				"some-domain1\tTRUE\t/some/path1\tFALSE\t1893499200\tkey2\tvalueFromSimple1",
+				lines.get(2));
 	}
 
