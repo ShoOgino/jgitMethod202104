@@ -18,9 +18,8 @@
 					all.add(r.getObjectId());
 				pw.preparePack(m, all, PackWriter.NONE);
 
-				final ObjectId name = pw.computeName();
-
-				pack = nameFor(odb, name, ".pack");
+				pack = new PackFile(odb.getPackDirectory(), pw.computeName(),
+						PackExt.PACK);
 				try (OutputStream out =
 						new BufferedOutputStream(new FileOutputStream(pack))) {
 					pw.writePack(m, m, out);

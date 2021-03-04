@@ -5,9 +5,10 @@
 				pw.addObject(o);
 			}
 
-			final ObjectId name = pw.computeName();
-			final PackFile packFile = fullPackFileName(name, ".pack");
-			final PackFile idxFile = packFile.create(PackExt.INDEX);
+			PackFile packFile = new PackFile(
+					db.getObjectDatabase().getPackDirectory(), pw.computeName(),
+					PackExt.PACK);
+			PackFile idxFile = packFile.create(PackExt.INDEX);
 			final File[] files = new File[] { packFile, idxFile };
 			write(files, pw);
 			return files;
