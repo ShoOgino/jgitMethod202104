@@ -1,0 +1,15 @@
+	private ObjectLoader openObjectWithoutRestoring(WindowCursor curs, AnyObjectId objectId)
+			throws IOException {
+		if (loose.hasCached(objectId)) {
+			ObjectLoader ldr = openLooseObject(curs, objectId);
+			if (ldr != null) {
+				return ldr;
+			}
+		}
+		ObjectLoader ldr = openPackedFromSelfOrAlternate(curs, objectId, null);
+		if (ldr != null) {
+			return ldr;
+		}
+		return openLooseFromSelfOrAlternate(curs, objectId, null);
+	}
+

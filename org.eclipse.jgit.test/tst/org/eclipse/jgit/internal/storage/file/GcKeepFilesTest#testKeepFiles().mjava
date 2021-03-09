@@ -16,10 +16,7 @@
 				.iterator();
 		Pack singlePack = packIt.next();
 		assertFalse(packIt.hasNext());
-		String packFileName = singlePack.getPackFile().getPath();
-		String keepFileName = packFileName.substring(0,
-				packFileName.lastIndexOf('.')) + ".keep";
-		File keepFile = new File(keepFileName);
+		PackFile keepFile = singlePack.getPackFile().create(PackExt.KEEP);
 		assertFalse(keepFile.exists());
 		assertTrue(keepFile.createNewFile());
 		bb.commit().add("A", "A2").add("B", "B2").create();

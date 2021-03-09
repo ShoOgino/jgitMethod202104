@@ -1,0 +1,17 @@
+	@Test
+	public void objectsAreSameFromAnyConstructor() throws Exception {
+		String name = PREFIX + TEST_ID + "." + PackExt.PACK.getExtension();
+		File pack = new File(TEST_PACK_DIR, name);
+		PackFile pf = new PackFile(pack);
+		PackFile pfFromDirAndName = new PackFile(TEST_PACK_DIR, name);
+		assertPackFilesEqual(pf, pfFromDirAndName);
+
+		PackFile pfFromOIdAndExt = new PackFile(TEST_PACK_DIR, TEST_OID,
+				PackExt.PACK);
+		assertPackFilesEqual(pf, pfFromOIdAndExt);
+
+		PackFile pfFromIdAndExt = new PackFile(TEST_PACK_DIR, TEST_ID,
+				PackExt.PACK);
+		assertPackFilesEqual(pf, pfFromIdAndExt);
+	}
+

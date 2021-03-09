@@ -1,0 +1,17 @@
+	@Test
+	public void canCreateAnyPreservedExtFromAnyPreservedExt() throws Exception {
+		// Preserved PackFiles must have an extension
+		PackFile preserved = new PackFile(TEST_PRESERVED_DIR, OLD_PACK);
+		for (PackExt from : PackExt.values()) {
+			PackFile preservedWithExt = preserved.create(from);
+			for (PackExt to : PackExt.values()) {
+				PackFile preservedNewExt = preservedWithExt.create(to);
+				File expected = new File(TEST_PRESERVED_DIR, PREFIX + TEST_ID
+						+ "." + OLD_PREFIX + to.getExtension());
+				assertEquals(preservedNewExt.getPackExt(), to);
+				assertEquals(preservedWithExt.getId(), preservedNewExt.getId());
+				assertEquals(preservedNewExt.getName(), expected.getName());
+			}
+		}
+	}
+

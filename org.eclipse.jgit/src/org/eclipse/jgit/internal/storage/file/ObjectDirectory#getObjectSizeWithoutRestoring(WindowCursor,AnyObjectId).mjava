@@ -1,0 +1,15 @@
+	private long getObjectSizeWithoutRestoring(WindowCursor curs,
+			AnyObjectId id) throws IOException {
+		if (loose.hasCached(id)) {
+			long len = loose.getSize(curs, id);
+			if (0 <= len) {
+				return len;
+			}
+		}
+		long len = getPackedSizeFromSelfOrAlternate(curs, id, null);
+		if (0 <= len) {
+			return len;
+		}
+		return getLooseSizeFromSelfOrAlternate(curs, id, null);
+	}
+

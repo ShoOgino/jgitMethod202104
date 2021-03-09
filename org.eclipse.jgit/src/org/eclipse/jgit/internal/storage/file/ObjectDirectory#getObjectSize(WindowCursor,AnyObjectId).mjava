@@ -1,16 +1,9 @@
 	@Override
-	long getObjectSize(WindowCursor curs, AnyObjectId id)
-			throws IOException {
-		if (loose.hasCached(id)) {
-			long len = loose.getSize(curs, id);
-			if (0 <= len) {
-				return len;
-			}
+	long getObjectSize(WindowCursor curs, AnyObjectId id) throws IOException {
+		long sz = getObjectSizeWithoutRestoring(curs, id);
+		if (0 > sz && restoreFromSelfOrAlternate(id, null)) {
+			sz = getObjectSizeWithoutRestoring(curs, id);
 		}
-		long len = getPackedSizeFromSelfOrAlternate(curs, id, null);
-		if (0 <= len) {
-			return len;
-		}
-		return getLooseSizeFromSelfOrAlternate(curs, id, null);
+		return sz;
 	}
 

@@ -1,0 +1,17 @@
+	private boolean restoreFromSelfOrAlternate(AnyObjectId objectId,
+			Set<AlternateHandle.Id> skips) {
+		if (restoreFromSelf(objectId)) {
+			return true;
+		}
+
+		skips = addMe(skips);
+		for (AlternateHandle alt : myAlternates()) {
+			if (!skips.contains(alt.getId())) {
+				if (alt.db.restoreFromSelfOrAlternate(objectId, skips)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+

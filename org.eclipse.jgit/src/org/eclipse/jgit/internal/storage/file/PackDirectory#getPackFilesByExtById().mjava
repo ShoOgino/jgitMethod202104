@@ -1,0 +1,38 @@
+	/**
+	 * Scans the pack directory for
+	 * {@link org.eclipse.jgit.internal.storage.file.PackFile}s and returns them
+	 * organized by their extensions and their pack ids
+	 *
+	 * Skips files in the directory that we cannot create a
+	 * {@link org.eclipse.jgit.internal.storage.file.PackFile} for.
+	 *
+	 * @return a map of {@link org.eclipse.jgit.internal.storage.file.PackFile}s
+	 *         and {@link org.eclipse.jgit.internal.storage.pack.PackExt}s keyed
+	 *         by pack ids
+	 */
+	private Map<String, Map<PackExt, PackFile>> getPackFilesByExtById() {
+		final String[] nameList = directory.list();
+		if (nameList == null) {
+			return Collections.emptyMap();
+		}
+		Map<String, Map<PackExt, PackFile>> packFilesByExtById = new HashMap<>(
+				nameList.length / 2); // assume roughly 2 files per id
+		for (String name : nameList) {
+			try {
+				PackFile pack = new PackFile(directory, name);
+				if (pack.getPackExt() != null) {
+					Map<PackExt, PackFile> packByExt = packFilesByExtById
+							.get(pack.getId());
+					if (packByExt == null) {
+						packByExt = new EnumMap<>(PackExt.class);
+						packFilesByExtById.put(pack.getId(), packByExt);
+					}
+					packByExt.put(pack.getPackExt(), pack);
+				}
+			} catch (IllegalArgumentException e) {
+				continue;
+			}
+		}
+		return packFilesByExtById;
+	}
+

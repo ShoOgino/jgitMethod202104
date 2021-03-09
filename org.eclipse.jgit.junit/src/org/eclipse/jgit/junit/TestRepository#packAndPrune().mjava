@@ -11,23 +11,22 @@
 			ObjectDirectory odb = (ObjectDirectory) db.getObjectDatabase();
 			NullProgressMonitor m = NullProgressMonitor.INSTANCE;
 
-			final File pack, idx;
+			final PackFile pack, idx;
 			try (PackWriter pw = new PackWriter(db)) {
 				Set<ObjectId> all = new HashSet<>();
 				for (Ref r : db.getRefDatabase().getRefs())
 					all.add(r.getObjectId());
 				pw.preparePack(m, all, PackWriter.NONE);
 
-				final ObjectId name = pw.computeName();
-
-				pack = nameFor(odb, name, ".pack");
+				pack = new PackFile(odb.getPackDirectory(), pw.computeName(),
+						PackExt.PACK);
 				try (OutputStream out =
 						new BufferedOutputStream(new FileOutputStream(pack))) {
 					pw.writePack(m, m, out);
 				}
 				pack.setReadOnly();
 
-				idx = nameFor(odb, name, ".idx");
+				idx = pack.create(PackExt.INDEX);
 				try (OutputStream out =
 						new BufferedOutputStream(new FileOutputStream(idx))) {
 					pw.writeIndex(out);

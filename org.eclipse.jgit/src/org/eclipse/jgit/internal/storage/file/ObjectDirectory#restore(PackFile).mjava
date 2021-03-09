@@ -1,0 +1,11 @@
+	private boolean restore(PackFile preservedPack) {
+		PackFile restored = preservedPack
+				.createForDirectory(packed.getDirectory());
+		try {
+			Files.createLink(restored.toPath(), preservedPack.toPath());
+		} catch (IOException e) {
+			return false;
+		}
+		return true;
+	}
+

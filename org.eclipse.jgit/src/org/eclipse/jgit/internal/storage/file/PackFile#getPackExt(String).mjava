@@ -1,0 +1,10 @@
+	private static PackExt getPackExt(String endsWithExtension) {
+		for (PackExt ext : PackExt.values()) {
+			if (endsWithExtension.endsWith(ext.getExtension())) {
+				return ext;
+			}
+		}
+		throw new IllegalArgumentException(MessageFormat.format(
+				JGitText.get().unrecognizedPackExtension, endsWithExtension));
+	}
+

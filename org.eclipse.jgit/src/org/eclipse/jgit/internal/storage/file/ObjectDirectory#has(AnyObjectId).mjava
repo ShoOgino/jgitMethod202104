@@ -2,7 +2,8 @@
 	@Override
 	public boolean has(AnyObjectId objectId) {
 		return loose.hasCached(objectId)
-				|| hasPackedInSelfOrAlternate(objectId, null)
-				|| hasLooseInSelfOrAlternate(objectId, null);
+				|| hasPackedOrLooseInSelfOrAlternate(objectId)
+				|| (restoreFromSelfOrAlternate(objectId, null)
+						&& hasPackedOrLooseInSelfOrAlternate(objectId));
 	}
 
