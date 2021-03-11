@@ -1,0 +1,11 @@
+	private static void assertDelete(String oldName, ObjectId oldId,
+			FileMode oldMode, DiffEntry delete) {
+		assertEquals(DiffEntry.DEV_NULL, delete.newPath);
+		assertEquals(DiffEntry.A_ZERO, delete.newId);
+		assertEquals(FileMode.MISSING, delete.newMode);
+		assertEquals(ChangeType.DELETE, delete.changeType);
+		assertEquals(oldName, delete.oldPath);
+		assertEquals(AbbreviatedObjectId.fromObjectId(oldId), delete.oldId);
+		assertEquals(oldMode, delete.oldMode);
+	}
+

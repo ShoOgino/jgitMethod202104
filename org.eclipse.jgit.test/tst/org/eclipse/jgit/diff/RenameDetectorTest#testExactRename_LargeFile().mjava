@@ -1,0 +1,17 @@
+	@Test
+	public void testExactRename_LargeFile() throws Exception {
+		ObjectId aId = blob("blah\nblah\nfoo"); // size = 14
+
+		DiffEntry a = DiffEntry.add(PATH_A, aId);
+		DiffEntry b = DiffEntry.delete(PATH_Q, aId);
+
+		rd.add(a);
+		rd.add(b);
+
+		// Exact renames are identified for large files
+		rd.setBigFileThreshold(10);
+		List<DiffEntry> entries = rd.compute();
+		assertEquals(1, entries.size());
+		assertRename(b, a, 100, entries.get(0));
+	}
+

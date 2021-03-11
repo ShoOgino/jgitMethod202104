@@ -1,0 +1,20 @@
+	@Test
+	public void testInexactRename_LargeFile() throws Exception {
+		ObjectId aId = blob("blah\nblah\nfoo"); // size = 14
+		ObjectId bId = blob("bla\nblah\nfoo"); // size = 13
+
+		DiffEntry a = DiffEntry.add(PATH_A, aId);
+		DiffEntry b = DiffEntry.delete(PATH_Q, bId);
+
+		rd.add(a);
+		rd.add(b);
+
+		rd.setBigFileThreshold(10);
+
+		// Inexact renames are not detected for large files
+		List<DiffEntry> entries = rd.compute();
+		assertEquals(2, entries.size());
+		assertAdd(PATH_A, aId, FileMode.REGULAR_FILE, entries.get(0));
+		assertDelete(PATH_Q, bId, FileMode.REGULAR_FILE, entries.get(1));
+	}
+
