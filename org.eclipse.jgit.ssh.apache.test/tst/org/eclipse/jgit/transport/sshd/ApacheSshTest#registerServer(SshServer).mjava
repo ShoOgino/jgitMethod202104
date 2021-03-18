@@ -1,0 +1,24 @@
+	/**
+	 * Writes the server's host key to our knownhosts file.
+	 *
+	 * @param srv to register
+	 * @throws Exception
+	 */
+	private void registerServer(SshServer srv) throws Exception {
+		// Add the proxy's host key to knownhosts
+		try (BufferedWriter writer = Files.newBufferedWriter(
+				knownHosts.toPath(), StandardCharsets.US_ASCII,
+				StandardOpenOption.WRITE, StandardOpenOption.APPEND)) {
+			writer.append('\n');
+			KnownHostHashValue.appendHostPattern(writer, "localhost",
+					srv.getPort());
+			writer.append(',');
+			KnownHostHashValue.appendHostPattern(writer, "127.0.0.1",
+					srv.getPort());
+			writer.append(' ');
+			PublicKeyEntry.appendPublicKeyEntry(writer,
+					srv.getKeyPairProvider().loadKeys(null).iterator().next().getPublic());
+			writer.append('\n');
+		}
+	}
+
