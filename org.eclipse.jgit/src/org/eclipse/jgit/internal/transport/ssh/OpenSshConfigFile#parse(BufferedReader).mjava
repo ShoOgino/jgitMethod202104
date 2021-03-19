@@ -13,8 +13,17 @@
 		entries.put(DEFAULT_NAME, defaults);
 
 		while ((line = reader.readLine()) != null) {
+			// OpenSsh ignores trailing comments on a line. Anything after the
+			// first # on a line is trimmed away (yes, even if the hash is
+			// inside quotes).
+			//
+			// See https://github.com/openssh/openssh-portable/commit/2bcbf679
+			int i = line.indexOf('#');
+			if (i >= 0) {
+				line = line.substring(0, i);
+			}
 			line = line.trim();
-			if (line.isEmpty() || line.startsWith("#")) { //$NON-NLS-1$
+			if (line.isEmpty()) {
 				continue;
 			}
 			String[] parts = line.split("[ \t]*[= \t]", 2); //$NON-NLS-1$

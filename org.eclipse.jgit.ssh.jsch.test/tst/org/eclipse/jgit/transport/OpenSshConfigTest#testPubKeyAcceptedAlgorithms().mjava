@@ -1,0 +1,10 @@
+	@Test
+	public void testPubKeyAcceptedAlgorithms() throws Exception {
+		config("Host=orcz\n\tPubkeyAcceptedAlgorithms ^ssh-rsa");
+		Host h = osc.lookup("orcz");
+		Config c = h.getConfig();
+		assertEquals("^ssh-rsa",
+				c.getValue(SshConstants.PUBKEY_ACCEPTED_ALGORITHMS));
+		assertEquals("^ssh-rsa", c.getValue("PubkeyAcceptedKeyTypes"));
+	}
+
