@@ -1,0 +1,10 @@
+	@Override
+	public boolean handleKexExtensionRequest(Session session, int index,
+			int count, String name, byte[] data) throws IOException {
+		if (ServerSignatureAlgorithms.NAME.equals(name)) {
+			handleServerSignatureAlgorithms(session,
+					ServerSignatureAlgorithms.INSTANCE.parseExtension(data));
+		}
+		return true;
+	}
+

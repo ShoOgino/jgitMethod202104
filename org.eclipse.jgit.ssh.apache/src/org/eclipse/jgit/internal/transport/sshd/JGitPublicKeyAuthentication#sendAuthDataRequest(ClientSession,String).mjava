@@ -2,11 +2,25 @@
 	protected boolean sendAuthDataRequest(ClientSession session, String service)
 			throws Exception {
 		if (current == null) {
-			algorithms.clear();
+			currentAlgorithms.clear();
+			chosenAlgorithm = null;
 		}
 		String currentAlgorithm = null;
-		if (current != null && !algorithms.isEmpty()) {
-			currentAlgorithm = algorithms.remove(0);
+		if (current != null && !currentAlgorithms.isEmpty()) {
+			currentAlgorithm = currentAlgorithms.poll();
+			if (chosenAlgorithm != null) {
+				Set<String> knownServerAlgorithms = session.getAttribute(
+						JGitKexExtensionHandler.SERVER_ALGORITHMS);
+				if (knownServerAlgorithms != null
+						&& knownServerAlgorithms.contains(chosenAlgorithm)) {
+					// We've tried key 'current' with 'chosenAlgorithm', but it
+					// failed. However, the server had told us it supported
+					// 'chosenAlgorithm'. Thus it makes no sense to continue
+					// with this key and other signature algorithms. Skip to the
+					// next key, if any.
+					currentAlgorithm = null;
+				}
+			}
 		}
 		if (currentAlgorithm == null) {
 			try {
@@ -16,14 +30,13 @@
 								"sendAuthDataRequest({})[{}] no more keys to send", //$NON-NLS-1$
 								session, service);
 					}
+					current = null;
 					return false;
 				}
 				current = keys.next();
-				algorithms.clear();
+				currentAlgorithms.clear();
+				chosenAlgorithm = null;
 			} catch (Error e) { // Copied from superclass
-				warn("sendAuthDataRequest({})[{}] failed ({}) to get next key: {}", //$NON-NLS-1$
-						session, service, e.getClass().getSimpleName(),
-						e.getMessage(), e);
 				throw new RuntimeSshException(e);
 			}
 		}
@@ -31,9 +44,6 @@
 		try {
 			key = current.getPublicKey();
 		} catch (Error e) { // Copied from superclass
-			warn("sendAuthDataRequest({})[{}] failed ({}) to retrieve public key: {}", //$NON-NLS-1$
-					session, service, e.getClass().getSimpleName(),
-					e.getMessage(), e);
 			throw new RuntimeSshException(e);
 		}
 		if (currentAlgorithm == null) {
@@ -49,15 +59,21 @@
 				existingFactories = getSignatureFactories();
 			}
 			if (existingFactories != null) {
+				if (log.isDebugEnabled()) {
+					log.debug(
+							"sendAuthDataRequest({})[{}] selecting from PubKeyAcceptedAlgorithms {}", //$NON-NLS-1$
+							session, service,
+							NamedResource.getNames(existingFactories));
+				}
 				// Select the factories by name and in order
 				existingFactories.forEach(f -> {
 					if (aliases.contains(f.getName())) {
-						algorithms.add(f.getName());
+						currentAlgorithms.add(f.getName());
 					}
 				});
 			}
-			currentAlgorithm = algorithms.isEmpty() ? keyType
-					: algorithms.remove(0);
+			currentAlgorithm = currentAlgorithms.isEmpty() ? keyType
+					: currentAlgorithms.poll();
 		}
 		String name = getName();
 		if (log.isDebugEnabled()) {
@@ -67,6 +83,7 @@
 					KeyUtils.getFingerPrint(key));
 		}
 
+		chosenAlgorithm = currentAlgorithm;
 		Buffer buffer = session
 				.createBuffer(SshConstants.SSH_MSG_USERAUTH_REQUEST);
 		buffer.putString(session.getUsername());

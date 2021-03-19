@@ -1,0 +1,50 @@
+	/**
+	 * Perform updates after a server-sig-algs extension has been received.
+	 *
+	 * @param session
+	 *            the message was received for
+	 * @param serverAlgorithms
+	 *            signature algorithm names announced by the server
+	 */
+	protected void handleServerSignatureAlgorithms(Session session,
+			Collection<String> serverAlgorithms) {
+		if (log.isDebugEnabled()) {
+			log.debug("handleServerSignatureAlgorithms({}): {}", session, //$NON-NLS-1$
+					serverAlgorithms);
+		}
+		// Client determines order; server says what it supports. Re-order
+		// such that supported ones are at the front, in client order,
+		// followed by unsupported ones, also in client order.
+		if (serverAlgorithms != null && !serverAlgorithms.isEmpty()) {
+			List<NamedFactory<Signature>> clientAlgorithms = session
+					.getSignatureFactories();
+			if (log.isDebugEnabled()) {
+				log.debug(
+						"handleServerSignatureAlgorithms({}): PubkeyAcceptedAlgorithms before: {}", //$NON-NLS-1$
+						session, clientAlgorithms);
+			}
+			List<NamedFactory<Signature>> unknown = new ArrayList<>();
+			Set<String> known = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+			known.addAll(serverAlgorithms);
+			for (Iterator<NamedFactory<Signature>> iter = clientAlgorithms
+					.iterator(); iter.hasNext();) {
+				NamedFactory<Signature> algo = iter.next();
+				if (!known.contains(algo.getName())) {
+					unknown.add(algo);
+					iter.remove();
+				}
+			}
+			// Re-add the unknown ones at the end. Per RFC 8308, some
+			// servers may not announce _all_ their supported algorithms,
+			// and a client may use unknown algorithms.
+			clientAlgorithms.addAll(unknown);
+			if (log.isDebugEnabled()) {
+				log.debug(
+						"handleServerSignatureAlgorithms({}): PubkeyAcceptedAlgorithms after: {}", //$NON-NLS-1$
+						session, clientAlgorithms);
+			}
+			session.setAttribute(SERVER_ALGORITHMS, known);
+			session.setSignatureFactories(clientAlgorithms);
+		}
+	}
+

@@ -1,0 +1,38 @@
+	@Override
+	public void handleKexInitProposal(Session session, boolean initiator,
+			Map<KexProposalOption, String> proposal) throws IOException {
+		// If it's the very first time, we may add the marker telling the server
+		// that we are ready to handle SSH_MSG_EXT_INFO
+		if (session == null || session.isServerSession() || !initiator) {
+			return;
+		}
+		if (session.getAttribute(CLIENT_PROPOSAL_MADE) != null) {
+			return;
+		}
+		String kexAlgorithms = proposal.get(KexProposalOption.SERVERKEYS);
+		if (StringUtils.isEmptyOrNull(kexAlgorithms)) {
+			return;
+		}
+		List<String> algorithms = new ArrayList<>();
+		// We're a client. We mustn't send the server extension, and we should
+		// send the client extension only once.
+		for (String algo : kexAlgorithms.split(",")) { //$NON-NLS-1$
+			if (KexExtensions.CLIENT_KEX_EXTENSION.equalsIgnoreCase(algo)
+					|| KexExtensions.SERVER_KEX_EXTENSION
+							.equalsIgnoreCase(algo)) {
+				continue;
+			}
+			algorithms.add(algo);
+		}
+		// Tell the server that we want to receive SSH2_MSG_EXT_INFO
+		algorithms.add(KexExtensions.CLIENT_KEX_EXTENSION);
+		if (log.isDebugEnabled()) {
+			log.debug(
+					"handleKexInitProposal({}): proposing HostKeyAlgorithms {}", //$NON-NLS-1$
+					session, algorithms);
+		}
+		proposal.put(KexProposalOption.SERVERKEYS,
+				String.join(",", algorithms)); //$NON-NLS-1$
+		session.setAttribute(CLIENT_PROPOSAL_MADE, Boolean.TRUE);
+	}
+
