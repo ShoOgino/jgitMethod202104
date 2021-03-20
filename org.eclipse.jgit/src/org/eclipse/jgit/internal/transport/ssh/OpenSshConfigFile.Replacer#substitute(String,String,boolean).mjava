@@ -1,0 +1,57 @@
+		public String substitute(String input, String allowed,
+				boolean withEnv) {
+			if (input == null || input.length() <= 1
+					|| input.indexOf('%') < 0
+							&& (!withEnv || input.indexOf("${") < 0)) { //$NON-NLS-1$
+				return input;
+			}
+			StringBuilder builder = new StringBuilder();
+			int start = 0;
+			int length = input.length();
+			while (start < length) {
+				char ch = input.charAt(start);
+				switch (ch) {
+				case '%':
+					if (start + 1 >= length) {
+						break;
+					}
+					String replacement = null;
+					ch = input.charAt(start + 1);
+					if (ch == '%' || allowed.indexOf(ch) >= 0) {
+						replacement = replacements.get(Character.valueOf(ch));
+					}
+					if (replacement == null) {
+						builder.append('%').append(ch);
+					} else {
+						builder.append(replacement);
+					}
+					start += 2;
+					continue;
+				case '$':
+					if (!withEnv || start + 2 >= length) {
+						break;
+					}
+					ch = input.charAt(start + 1);
+					if (ch == '{') {
+						int close = input.indexOf('}', start + 2);
+						if (close > start + 2) {
+							String variable = SystemReader.getInstance()
+									.getenv(input.substring(start + 2, close));
+							if (!StringUtils.isEmptyOrNull(variable)) {
+								builder.append(variable);
+							}
+							start = close + 1;
+							continue;
+						}
+					}
+					ch = '$';
+					break;
+				default:
+					break;
+				}
+				builder.append(ch);
+				start++;
+			}
+			return builder.toString();
+		}
+
