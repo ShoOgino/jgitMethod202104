@@ -1,28 +1,16 @@
 		@Override
 		public List<HostEntryPair> get() {
 			Path path = getPath();
-			try {
-				if (checkReloadRequired()) {
-					if (!Files.exists(path)) {
-						// Has disappeared.
-						resetReloadAttributes();
-						return Collections.emptyList();
+			synchronized (this) {
+				try {
+					if (checkReloadRequired()) {
+						entries = reload(getPath());
 					}
-					LockFile lock = new LockFile(path.toFile());
-					if (lock.lock()) {
-						try {
-							entries = reload(getPath());
-						} finally {
-							lock.unlock();
-						}
-					} else {
-						LOG.warn(format(SshdText.get().knownHostsFileLockedRead,
-								path));
-					}
+				} catch (IOException e) {
+					LOG.warn(format(SshdText.get().knownHostsFileReadFailed,
+							path));
 				}
-			} catch (IOException e) {
-				LOG.warn(format(SshdText.get().knownHostsFileReadFailed, path));
+				return Collections.unmodifiableList(entries);
 			}
-			return Collections.unmodifiableList(entries);
 		}
 
