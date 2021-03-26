@@ -1,48 +1,23 @@
 	@Override
 	protected String resolveAvailableSignaturesProposal(
 			FactoryManager manager) {
-		Set<String> defaultSignatures = new LinkedHashSet<>();
-		defaultSignatures.addAll(getSignatureFactoriesNames());
+		List<String> defaultSignatures = getSignatureFactoriesNames();
 		HostConfigEntry config = resolveAttribute(
 				JGitSshClient.HOST_CONFIG_ENTRY);
-		String hostKeyAlgorithms = config
+		String algorithms = config
 				.getProperty(SshConstants.HOST_KEY_ALGORITHMS);
-		if (hostKeyAlgorithms != null && !hostKeyAlgorithms.isEmpty()) {
-			char first = hostKeyAlgorithms.charAt(0);
-			switch (first) {
-			case '+':
-				// Additions make not much sense -- it's either in
-				// defaultSignatures already, or we have no implementation for
-				// it. No point in proposing it.
-				return String.join(",", defaultSignatures); //$NON-NLS-1$
-			case '-':
-				// This takes wildcard patterns!
-				removeFromList(defaultSignatures,
-						SshConstants.HOST_KEY_ALGORITHMS,
-						hostKeyAlgorithms.substring(1));
-				if (defaultSignatures.isEmpty()) {
-					// Too bad: user config error. Warn here, and then fail
-					// later.
-					log.warn(format(
-							SshdText.get().configNoRemainingHostKeyAlgorithms,
-							hostKeyAlgorithms));
+		if (!StringUtils.isEmptyOrNull(algorithms)) {
+			List<String> result = modifyAlgorithmList(defaultSignatures,
+					algorithms, SshConstants.HOST_KEY_ALGORITHMS);
+			if (!result.isEmpty()) {
+				if (log.isDebugEnabled()) {
+					log.debug(SshConstants.HOST_KEY_ALGORITHMS + ' ' + result);
 				}
-				return String.join(",", defaultSignatures); //$NON-NLS-1$
-			default:
-				// Default is overridden -- only accept the ones for which we do
-				// have an implementation.
-				List<String> newNames = filteredList(defaultSignatures,
-						hostKeyAlgorithms);
-				if (newNames.isEmpty()) {
-					log.warn(format(
-							SshdText.get().configNoKnownHostKeyAlgorithms,
-							hostKeyAlgorithms));
-					// Use the default instead.
-				} else {
-					return String.join(",", newNames); //$NON-NLS-1$
-				}
-				break;
+				return String.join(",", result); //$NON-NLS-1$
 			}
+			log.warn(format(SshdText.get().configNoKnownAlgorithms,
+					SshConstants.HOST_KEY_ALGORITHMS,
+					algorithms));
 		}
 		// No HostKeyAlgorithms; using default -- change order to put existing
 		// keys first.
@@ -62,7 +37,14 @@
 				}
 			}
 			reordered.addAll(defaultSignatures);
+			if (log.isDebugEnabled()) {
+				log.debug(SshConstants.HOST_KEY_ALGORITHMS + ' ' + reordered);
+			}
 			return String.join(",", reordered); //$NON-NLS-1$
+		}
+		if (log.isDebugEnabled()) {
+			log.debug(
+					SshConstants.HOST_KEY_ALGORITHMS + ' ' + defaultSignatures);
 		}
 		return String.join(",", defaultSignatures); //$NON-NLS-1$
 	}

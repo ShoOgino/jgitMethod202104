@@ -9,34 +9,35 @@
 		 *            to set or add
 		 */
 		public void setValue(String key, String value) {
+			String k = toKey(key);
 			if (value == null) {
 				if (multiOptions != null) {
-					multiOptions.remove(key);
+					multiOptions.remove(k);
 				}
 				if (listOptions != null) {
-					listOptions.remove(key);
+					listOptions.remove(k);
 				}
 				if (options != null) {
-					options.remove(key);
+					options.remove(k);
 				}
 				return;
 			}
-			if (MULTI_KEYS.contains(key)) {
+			if (MULTI_KEYS.contains(k)) {
 				if (multiOptions == null) {
 					multiOptions = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 				}
-				List<String> values = multiOptions.get(key);
+				List<String> values = multiOptions.get(k);
 				if (values == null) {
 					values = new ArrayList<>(4);
-					multiOptions.put(key, values);
+					multiOptions.put(k, values);
 				}
 				values.add(value);
 			} else {
 				if (options == null) {
 					options = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 				}
-				if (!options.containsKey(key)) {
-					options.put(key, value);
+				if (!options.containsKey(k)) {
+					options.put(k, value);
 				}
 			}
 		}

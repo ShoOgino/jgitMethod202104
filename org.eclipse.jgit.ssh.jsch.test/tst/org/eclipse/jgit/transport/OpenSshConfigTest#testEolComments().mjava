@@ -1,0 +1,10 @@
+	@Test
+	public void testEolComments() throws Exception {
+		config("#Comment\nHost=orcz #Comment\n\tPubkeyAcceptedAlgorithms ^ssh-rsa # Comment\n#Comment");
+		Host h = osc.lookup("orcz");
+		assertNotNull(h);
+		Config c = h.getConfig();
+		assertEquals("^ssh-rsa",
+				c.getValue(SshConstants.PUBKEY_ACCEPTED_ALGORITHMS));
+	}
+

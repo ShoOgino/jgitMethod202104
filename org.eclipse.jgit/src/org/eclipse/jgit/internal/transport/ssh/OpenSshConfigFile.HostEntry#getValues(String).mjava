@@ -9,10 +9,11 @@
 		 */
 		@Override
 		public List<String> getValues(String key) {
-			List<String> values = listOptions != null ? listOptions.get(key)
+			String k = toKey(key);
+			List<String> values = listOptions != null ? listOptions.get(k)
 					: null;
 			if (values == null) {
-				values = multiOptions != null ? multiOptions.get(key) : null;
+				values = multiOptions != null ? multiOptions.get(k) : null;
 			}
 			if (values == null || values.isEmpty()) {
 				return new ArrayList<>();

@@ -1,0 +1,49 @@
+	/**
+	 * Modifies a given algorithm list according to a list from the ssh config,
+	 * including remove ('-') and reordering ('^') operators. Addition ('+') is
+	 * not handled since we have no way of adding dynamically implementations,
+	 * and the defaultList is supposed to contain all known implementations
+	 * already.
+	 *
+	 * @param defaultList
+	 *            to modify
+	 * @param fromConfig
+	 *            telling how to modify the {@code defaultList}, must not be
+	 *            {@code null} or empty
+	 * @param overrideKey
+	 *            ssh config key; used for logging
+	 * @return the modified list or {@code null} if {@code overrideKey} is not
+	 *         set
+	 */
+	public List<String> modifyAlgorithmList(List<String> defaultList,
+			String fromConfig, String overrideKey) {
+		Set<String> defaults = new LinkedHashSet<>();
+		defaults.addAll(defaultList);
+		switch (fromConfig.charAt(0)) {
+		case '+':
+			// Additions make not much sense -- it's either in
+			// defaultList already, or we have no implementation for
+			// it. No point in proposing it.
+			return defaultList;
+		case '-':
+			// This takes wildcard patterns!
+			removeFromList(defaults, overrideKey, fromConfig.substring(1));
+			return new ArrayList<>(defaults);
+		case '^':
+			// Specified entries go to the front of the default list
+			List<String> allSignatures = filteredList(defaults,
+					fromConfig.substring(1));
+			Set<String> atFront = new HashSet<>(allSignatures);
+			for (String sig : defaults) {
+				if (!atFront.contains(sig)) {
+					allSignatures.add(sig);
+				}
+			}
+			return allSignatures;
+		default:
+			// Default is overridden -- only accept the ones for which we do
+			// have an implementation.
+			return filteredList(defaults, fromConfig);
+		}
+	}
+
